@@ -34,30 +34,30 @@ public class CypherQueryTest
     public void testDSL()
     {
         // Minimal
-        System.out.println( newQuery().nodes( "john", 0 ).returnNodes( "john" ).toString());
+        System.out.println( newQuery().nodes( "john", 0 ).returnNode( "john" ).toString());
 
         // Maximal
-        System.out.println( newQuery().nodes( "john", 0 ).returnNodes( "john" ).orderBy( "john.name" ).skip( 3 ).limit( 10 ).toString());
+        System.out.println( newQuery().nodes( "john", 0 ).returnNode( "john" ).orderBy( "john.name" ).skip( 3 ).limit( 10 ).toString());
     }
 
     @Test
     public void testStartNodes()
     {
         // Start with id
-        System.out.println( newQuery().nodes( "john", 0 ).returnNodes( "john" ).toString());
+        System.out.println( newQuery().nodes( "john", 0 ).returnNode( "john" ).toString());
 
-        System.out.println( newQuery().nodes( "family", 0, 1 ).returnNodes( "family" ).toString() );
+        System.out.println( newQuery().nodes( "family", 0, 1 ).returnNode( "family" ).toString() );
 
         // Start with parameters
-        System.out.println( newQuery().nodes( "john", "name" ).returnNodes( "john" ).toString());
+        System.out.println( newQuery().nodes( "john", "name" ).returnNode( "john" ).toString());
 
-        System.out.println( newQuery().nodes( "family", "mom", "dad" ).returnNodes( "family" ).toString());
+        System.out.println( newQuery().nodes( "family", "mom", "dad" ).returnNode( "family" ).toString());
 
         // Start with lookup
-        System.out.println( newQuery().nodesLookup( "john", "nodes", "name", "John" ).returnNodes( "john" ).toString());
+        System.out.println( newQuery().nodesLookup( "john", "nodes", "name", "John" ).returnNode( "john" ).toString());
 
         // Start with query
-        System.out.println( newQuery().nodesQuery( "john", "nodes", "name:John" ).returnNodes( "john" ).toString());
+        System.out.println( newQuery().nodesQuery( "john", "nodes", "name:John" ).returnNode( "john" ).toString());
 
         // Error handling
         try
@@ -95,17 +95,17 @@ public class CypherQueryTest
     public void testStartRelationships()
     {
         // Start with id
-        System.out.println( newQuery().relationships( "knows", 0 ).returnNodes( "knows" ).toString());
+        System.out.println( newQuery().relationships( "knows", 0 ).returnNode( "knows" ).toString());
 
-        System.out.println( newQuery().relationships( "likes", 0, 1 ).returnNodes( "likes" ).toString() );
+        System.out.println( newQuery().relationships( "likes", 0, 1 ).returnNode( "likes" ).toString() );
 
         // Start with parameters
-        System.out.println( newQuery().relationships( "knows", "name" ).returnNodes( "knows" ).toString());
+        System.out.println( newQuery().relationships( "knows", "name" ).returnNode( "knows" ).toString());
 
-        System.out.println( newQuery().relationships( "likes", "websitea", "websiteb" ).returnNodes( "likes" ).toString());
+        System.out.println( newQuery().relationships( "likes", "websitea", "websiteb" ).returnNode( "likes" ).toString());
 
         // Start with index
-        System.out.println( newQuery().relationshipsLookup( "knows", "relationships", "type", "Starred" ).returnNodes( "knows" ).toString());
+        System.out.println( newQuery().relationshipsLookup( "knows", "relationships", "type", "Starred" ).returnNode( "knows" ).toString());
 
         // Error handling
         try
@@ -142,20 +142,20 @@ public class CypherQueryTest
     @Test
     public void testWhere()
     {
-        System.out.println( newQuery().nodes( "n", 0 ).where( eq( "n.name", "Tobias" ) ).returnNodes( "n" ));
+        System.out.println( newQuery().nodes( "n", 0 ).where( eq( "n.name", "Tobias" ) ).returnNode( "n" ));
         
         System.out.println( newQuery().
             nodes( "n", 0 ).
             where( gt( "n.age", 30 ).and( eq( "n.name", "Tobias" ) ).or( not( eq( "n.name", "Tobias" ) ) ) ).
-            returnNodes( "n" ));
+            returnNode( "n" ));
     }
 
     @Test
     public void testReturn()
     {
         // Return with node
-        System.out.println( newQuery().nodes( "john", 0 ).returnNodes( "john" ).toString());
+        System.out.println( newQuery().nodes( "john", 0 ).returnNode( "john" ).toString());
 
-        System.out.println( newQuery().nodes( "mom", 0 ).nodes( "dad", 1 ).returnNodes( "mom", "dad" ).toString());
+        System.out.println( newQuery().nodes( "mom", 0 ).nodes( "dad", 1 ).returnNode( "mom", "dad" ).toString());
     }
 }

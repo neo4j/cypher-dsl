@@ -30,12 +30,10 @@ public interface Return
 {
     ReturnNext returnExpr(ReturnExpression returnExpression);
 
-    ReturnNext returnNodes(String... name);
-    ReturnNext returnNodes(boolean distinct, String... name);
-    ReturnNext returnRelationships(String... name);
-    ReturnNext returnPaths(String... name);
-    ReturnNext returnProperties(String... names);
-    ReturnNext returnProperties(boolean optional, String... names);
+    ReturnNext returnNode( String... name );
+    ReturnNext returnRelationship( String... name );
+    ReturnNext returnPath( String... name );
+    ReturnNext returnProperty( String... names );
 
     // Aggregate functions
     ReturnNext count();

@@ -84,105 +84,43 @@ public class CypherQuery
     @Override
     public StartNext nodes( String name, int... id )
     {
-        checkEmpty( name, "Name" );
-
-        for( int i : id )
-        {
-            if (i < 0)
-                throw new IllegalArgumentException( "Id may not be below zero" );
-        }
-
-        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
-        startNodes.name = name;
-        startNodes.nodes = id;
-        return start( startNodes );
+        return start( StartExpression.nodes( name, id ) );
     }
 
     @Override
     public StartNext nodes( String name, String... parameters )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( parameters, "Parameters" );
-
-        StartExpression.StartNodesParameters startNodes = new StartExpression.StartNodesParameters();
-        startNodes.name = name;
-        startNodes.parameters = parameters;
-        return start( startNodes );
+        return start( StartExpression.nodes( name, parameters ) );
     }
 
     @Override
     public StartNext nodesLookup( String name, String indexName, String key, String value )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( indexName, "Index" );
-        checkEmpty( key, "Key" );
-        checkEmpty( value, "Value" );
-
-        StartExpression.StartNodesLookup startNodesLookup = new StartExpression.StartNodesLookup();
-        startNodesLookup.name = name;
-        startNodesLookup.index = indexName;
-        startNodesLookup.key = key;
-        startNodesLookup.value = value;
-        return start( startNodesLookup );
+        return start( StartExpression.nodesLookup( name, indexName, key, value ) );
     }
 
     @Override
     public StartNext nodesQuery( String name, String indexName, String query )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( indexName, "Index" );
-        checkEmpty( query, "Query" );
-
-        StartExpression.StartNodesQuery startNodesQuery = new StartExpression.StartNodesQuery();
-        startNodesQuery.name = name;
-        startNodesQuery.index = indexName;
-        startNodesQuery.query = query;
-        return start( startNodesQuery );
+        return start( StartExpression.nodesQuery( name, indexName, query ) );
     }
 
     @Override
     public StartNext relationships( String name, int... id )
     {
-        checkEmpty( name, "Name" );
-
-        for( int i : id )
-        {
-            if (i < 0)
-                throw new IllegalArgumentException( "Id may not be below zero" );
-        }
-
-        StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
-        startRelationships.name = name;
-        startRelationships.relationships = id;
-        return start( startRelationships );
+        return start( StartExpression.relationships( name, id ) );
     }
 
     @Override
     public StartNext relationships( String name, String... parameters )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( parameters, "Parameters" );
-
-        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
-        startRelationships.name = name;
-        startRelationships.parameters = parameters;
-        return start( startRelationships );
+        return start( StartExpression.relationships( name, parameters ) );
     }
 
     @Override
     public StartNext relationshipsLookup( String name, String indexName, String key, String value )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( indexName, "Index" );
-        checkEmpty( key, "Key" );
-        checkEmpty( value, "Value" );
-
-        StartExpression.StartRelationshipsIndex startRelationshipsIndex = new StartExpression.StartRelationshipsIndex();
-        startRelationshipsIndex.name = name;
-        startRelationshipsIndex.index = indexName;
-        startRelationshipsIndex.key = key;
-        startRelationshipsIndex.value = value;
-        return start( startRelationshipsIndex );
+        return start( StartExpression.relationshipsLookup( name, indexName, key, value ) );
     }
 
     // Match --------------------------------------------------------
@@ -210,66 +148,27 @@ public class CypherQuery
     }
 
     @Override
-    public ReturnNext returnNodes( String... names )
+    public ReturnNext returnNode( String... names )
     {
-        query.returnExpressions.add( ReturnExpression.nodes( names ) );
-        return this;
+        return returnExpr( ReturnExpression.node( names ) );
     }
 
     @Override
-    public ReturnNext returnNodes( boolean distinct, String... names )
+    public ReturnNext returnRelationship( String... names )
     {
-        checkEmpty( names, "Names" );
-
-        ReturnExpression.ReturnNodes returnNodes = new ReturnExpression.ReturnNodes();
-        returnNodes.names = names;
-        returnNodes.distinct = distinct;
-        query.returnExpressions.add( returnNodes );
-
-        return this;
+        return returnExpr( ReturnExpression.relationship( names ) );
     }
 
     @Override
-    public ReturnNext returnRelationships( String... names )
+    public ReturnNext returnPath( String... names )
     {
-        checkEmpty( names, "Names" );
-
-        ReturnExpression.ReturnRelationships returnRelationships = new ReturnExpression.ReturnRelationships();
-        returnRelationships.names = names;
-        query.returnExpressions.add( returnRelationships );
-
-        return this;
+        return returnExpr( ReturnExpression.path( names ) );
     }
 
     @Override
-    public ReturnNext returnPaths( String... names )
+    public ReturnNext returnProperty( String... names )
     {
-        checkEmpty( names, "Names" );
-
-        ReturnExpression.ReturnPaths returnPaths = new ReturnExpression.ReturnPaths();
-        returnPaths.names = names;
-        query.returnExpressions.add( returnPaths );
-
-        return this;
-    }
-
-    @Override
-    public ReturnNext returnProperties( String... names )
-    {
-        query.returnExpressions.add( ReturnExpression.properties( names ) );
-        return this;
-    }
-
-    @Override
-    public ReturnNext returnProperties( boolean optional, String... names )
-    {
-        checkEmpty( names, "Names" );
-        ReturnExpression.ReturnProperties returnProperties = new ReturnExpression.ReturnProperties();
-        returnProperties.names = names;
-        returnProperties.optional = optional;
-        query.returnExpressions.add( returnProperties );
-
-        return this;
+        return returnExpr( ReturnExpression.property( names ) );
     }
 
     @Override
@@ -281,13 +180,13 @@ public class CypherQuery
     @Override
     public ReturnNext count( String name )
     {
-        return returnExpr(ReturnExpression.count(name));
+        return returnExpr(ReturnExpression.count( name ));
     }
 
     @Override
     public ReturnNext sum( String name )
     {
-        return returnExpr(ReturnExpression.sum(name));
+        return returnExpr(ReturnExpression.sum( name ));
     }
 
     @Override
@@ -325,18 +224,13 @@ public class CypherQuery
     @Override
     public OrderBy orderBy( String name )
     {
-        OrderByExpression orderBy = new OrderByExpression();
-        orderBy.name = name;
-        return orderBy( orderBy );
+        return orderBy( OrderByExpression.orderBy( name ) );
     }
 
     @Override
     public OrderBy orderBy( String name, Order order )
     {
-        OrderByExpression orderBy = new OrderByExpression();
-        orderBy.name = name;
-        orderBy.order = order;
-        return orderBy( orderBy );
+        return orderBy( OrderByExpression.orderBy( name ).order( order ) );
     }
 
     // Skip ---------------------------------------------------------

@@ -21,6 +21,9 @@
 package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
+import org.neo4j.cypherdsl.StartNext;
+
+import static org.neo4j.cypherdsl.query.Query.checkEmpty;
 
 /**
  * Provides the possible expressions for the START clause.
@@ -28,6 +31,103 @@ import java.io.Serializable;
 public abstract class StartExpression
     implements AsString, Serializable,Cloneable
 {
+    public static StartNodes nodes( String name, int... id )
+    {
+        checkEmpty( name, "Name" );
+
+        for( int i : id )
+        {
+            if (i < 0)
+                throw new IllegalArgumentException( "Id may not be below zero" );
+        }
+
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
+        startNodes.name = name;
+        startNodes.nodes = id;
+        return startNodes;
+    }
+
+    public static StartNodesParameters nodes( String name, String... parameters )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( parameters, "Parameters" );
+
+        StartExpression.StartNodesParameters startNodes = new StartExpression.StartNodesParameters();
+        startNodes.name = name;
+        startNodes.parameters = parameters;
+        return startNodes;
+    }
+
+    public static StartNodesLookup nodesLookup( String name, String indexName, String key, String value )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
+        checkEmpty( key, "Key" );
+        checkEmpty( value, "Value" );
+
+        StartExpression.StartNodesLookup startNodesLookup = new StartExpression.StartNodesLookup();
+        startNodesLookup.name = name;
+        startNodesLookup.index = indexName;
+        startNodesLookup.key = key;
+        startNodesLookup.value = value;
+        return startNodesLookup;
+    }
+
+    public static StartNodesQuery nodesQuery( String name, String indexName, String query )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
+        checkEmpty( query, "Query" );
+
+        StartExpression.StartNodesQuery startNodesQuery = new StartExpression.StartNodesQuery();
+        startNodesQuery.name = name;
+        startNodesQuery.index = indexName;
+        startNodesQuery.query = query;
+        return startNodesQuery;
+    }
+
+    public static StartRelationships relationships( String name, int... id )
+    {
+        checkEmpty( name, "Name" );
+
+        for( int i : id )
+        {
+            if (i < 0)
+                throw new IllegalArgumentException( "Id may not be below zero" );
+        }
+
+        StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
+        startRelationships.name = name;
+        startRelationships.relationships = id;
+        return startRelationships;
+    }
+
+    public static StartRelationshipsParameters relationships( String name, String... parameters )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( parameters, "Parameters" );
+
+        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
+        startRelationships.name = name;
+        startRelationships.parameters = parameters;
+        return startRelationships;
+    }
+
+    public static StartRelationshipsIndex relationshipsLookup( String name, String indexName, String key, String value )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
+        checkEmpty( key, "Key" );
+        checkEmpty( value, "Value" );
+
+        StartExpression.StartRelationshipsIndex startRelationshipsIndex = new StartExpression.StartRelationshipsIndex();
+        startRelationshipsIndex.name = name;
+        startRelationshipsIndex.index = indexName;
+        startRelationshipsIndex.key = key;
+        startRelationshipsIndex.value = value;
+        return startRelationshipsIndex;
+    }
+
     public String name;
 
     @Override

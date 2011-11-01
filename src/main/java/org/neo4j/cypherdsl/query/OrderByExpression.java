@@ -46,6 +46,12 @@ public class OrderByExpression
         return this;
     }
 
+    public OrderByExpression order(OrderBy.Order order)
+    {
+        this.order = order;
+        return this;
+    }
+
     public void asString(StringBuilder builder)
     {
         builder.append( name );

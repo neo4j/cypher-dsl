@@ -30,22 +30,40 @@ import static org.neo4j.cypherdsl.query.Query.*;
 public abstract class ReturnExpression<T extends ReturnExpression>
     implements AsString, Serializable, Cloneable
 {
-    public static ReturnNodes nodes( String... names )
+    public static ReturnNode node( String... names )
     {
         Query.checkEmpty( names, "Names" );
 
-        ReturnExpression.ReturnNodes returnNodes = new ReturnExpression.ReturnNodes();
-        returnNodes.names = names;
+        ReturnNode returnNode = new ReturnNode();
+        returnNode.names = names;
 
-        return returnNodes;
+        return returnNode;
     }
 
-    public static ReturnProperties properties( String... names )
+    public static ReturnRelationship relationship( String... names )
     {
         checkEmpty( names, "Names" );
-        ReturnExpression.ReturnProperties returnProperties = new ReturnExpression.ReturnProperties();
-        returnProperties.names = names;
-        return returnProperties;
+
+        ReturnRelationship returnRelationship = new ReturnRelationship();
+        returnRelationship.names = names;
+        return returnRelationship;
+    }
+
+    public static ReturnProperty property( String... names )
+    {
+        checkEmpty( names, "Names" );
+        ReturnProperty returnProperty = new ReturnProperty();
+        returnProperty.names = names;
+        return returnProperty;
+    }
+
+    public static ReturnPath path( String... names )
+    {
+        checkEmpty( names, "Names" );
+
+        ReturnPath returnPath = new ReturnPath();
+        returnPath.names = names;
+        return returnPath;
     }
 
     public static ReturnAggregate count()
@@ -168,8 +186,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return super.clone();
     }
 
-    public static class ReturnNodes
-        extends ReturnExpression<ReturnNodes>
+    public static class ReturnNode
+        extends ReturnExpression<ReturnNode>
     {
         public String[] names;
 
@@ -187,8 +205,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         }
     }
 
-    public static class ReturnRelationships
-        extends ReturnExpression<ReturnRelationships>
+    public static class ReturnRelationship
+        extends ReturnExpression<ReturnRelationship>
     {
         public String[] names;
 
@@ -204,8 +222,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         }
     }
 
-    public static class ReturnPaths
-        extends ReturnExpression<ReturnPaths>
+    public static class ReturnPath
+        extends ReturnExpression<ReturnPath>
     {
         public String[] names;
 
@@ -221,13 +239,13 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         }
     }
 
-    public static class ReturnProperties
-        extends ReturnExpression<ReturnProperties>
+    public static class ReturnProperty
+        extends ReturnExpression<ReturnProperty>
     {
         public boolean optional;
         public String[] names;
 
-        public ReturnProperties optional()
+        public ReturnProperty optional()
         {
             optional = true;
             return this;
