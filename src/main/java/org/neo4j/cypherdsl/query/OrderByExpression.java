@@ -18,46 +18,47 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl;
+package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.ast.AsString;
+import java.io.Serializable;
+import org.neo4j.cypherdsl.OrderBy;
 
 /**
  * TODO
  */
-public class AggregationExpression
-    implements AsString
+public class OrderByExpression
+    implements AsString, Serializable, Cloneable
 {
-    public static AggregationExpression count()
+    public static OrderByExpression orderBy(String name)
     {
-        return new AggregationExpression("count", null);
+        OrderByExpression orderBy = new OrderByExpression();
+        orderBy.name = name;
+        return orderBy;
     }
 
-    public static AggregationExpression count(String name)
-    {
-        return new AggregationExpression("count", name);
-    }
-
-    public String function;
     public String name;
-    public boolean distinct;
+    public OrderBy.Order order;
+    public boolean optional;
 
-    public AggregationExpression( String function, String name)
+    public OrderByExpression optional()
     {
-        this.function = function;
-        this.name = name;
-    }
-
-    public AggregationExpression distinct()
-    {
-        distinct = true;
+        optional = true;
         return this;
     }
 
-    @Override
-    public void asString( StringBuilder builder )
+    public void asString(StringBuilder builder)
     {
-        builder.append( name ).append( '(' );
-        
+        builder.append( name );
+        if (order != null)
+            builder.append( ' ' ).append( order.name() );
+        if (optional)
+            builder.append( '?' );
+    }
+
+    @Override
+    public Object clone()
+        throws CloneNotSupportedException
+    {
+        return super.clone();
     }
 }

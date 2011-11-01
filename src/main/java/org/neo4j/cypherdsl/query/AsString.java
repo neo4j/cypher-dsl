@@ -18,23 +18,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.ast;
-
-import org.neo4j.cypherdsl.OrderBy;
+package org.neo4j.cypherdsl.query;
 
 /**
  * TODO
  */
-public class OrderBySet
-    implements AsString
+public interface AsString
 {
-    public String name;
-    public OrderBy.Order order;
-
-    public void asString(StringBuilder builder)
-    {
-        builder.append( name );
-        if (order != null)
-            builder.append( ' ' ).append( order.name() );
-    }
+    void asString(StringBuilder builder);
 }

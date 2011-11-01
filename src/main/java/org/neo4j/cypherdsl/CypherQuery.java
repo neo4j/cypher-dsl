@@ -19,10 +19,14 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.ast.OrderBySet;
-import org.neo4j.cypherdsl.ast.Query;
-import org.neo4j.cypherdsl.ast.ReturnSet;
-import org.neo4j.cypherdsl.ast.StartSet;
+import org.neo4j.cypherdsl.query.MatchExpression;
+import org.neo4j.cypherdsl.query.OrderByExpression;
+import org.neo4j.cypherdsl.query.Query;
+import org.neo4j.cypherdsl.query.ReturnExpression;
+import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.query.WhereExpression;
+
+import static org.neo4j.cypherdsl.query.Query.checkEmpty;
 
 /**
  * TODO
@@ -30,19 +34,44 @@ import org.neo4j.cypherdsl.ast.StartSet;
 public class CypherQuery
     implements StartNext, ReturnNext, Match, OrderBy, Skip, Limit, Execute
 {
+    private Query query;
+
     public static Start newQuery()
     {
-        return new CypherQuery();
+        return new CypherQuery( );
     }
 
-    private Query query;
+    public static Where newWhereQuery(Query query)
+    {
+        return new CypherQuery( query);
+    }
 
     private CypherQuery()
     {
         query = new Query();
     }
 
+    private CypherQuery(Query query)
+    {
+        try
+        {
+            this.query = (Query) query.clone();
+        }
+        catch( CloneNotSupportedException e )
+        {
+            throw new IllegalStateException( "Query was not cloneable" );
+        }
+    }
+
     // Start --------------------------------------------------------
+    @Override
+    public StartNext start( StartExpression startExpression )
+    {
+        query.startExpressions.add( startExpression );
+
+        return this;
+    }
+
     @Override
     public StartNext nodes( String name, int... id )
     {
@@ -54,12 +83,10 @@ public class CypherQuery
                 throw new IllegalArgumentException( "Id may not be below zero" );
         }
 
-        StartSet.StartNodes startNodes = new StartSet.StartNodes();
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
         startNodes.name = name;
         startNodes.nodes = id;
-        this.query.startSets.add( startNodes );
-
-        return this;
+        return start( startNodes );
     }
 
     @Override
@@ -68,12 +95,10 @@ public class CypherQuery
         checkEmpty( name, "Name" );
         checkEmpty( parameters, "Parameters" );
 
-        StartSet.StartNodesParameters startNodes = new StartSet.StartNodesParameters();
+        StartExpression.StartNodesParameters startNodes = new StartExpression.StartNodesParameters();
         startNodes.name = name;
         startNodes.parameters = parameters;
-        this.query.startSets.add( startNodes );
-
-        return this;
+        return start( startNodes );
     }
 
     @Override
@@ -84,13 +109,12 @@ public class CypherQuery
         checkEmpty( key, "Key" );
         checkEmpty( value, "Value" );
 
-        StartSet.StartNodesLookup startNodesLookup = new StartSet.StartNodesLookup();
+        StartExpression.StartNodesLookup startNodesLookup = new StartExpression.StartNodesLookup();
         startNodesLookup.name = name;
         startNodesLookup.index = indexName;
         startNodesLookup.key = key;
         startNodesLookup.value = value;
-        this.query.startSets.add( startNodesLookup );
-        return this;
+        return start( startNodesLookup );
     }
 
     @Override
@@ -100,12 +124,11 @@ public class CypherQuery
         checkEmpty( indexName, "Index" );
         checkEmpty( query, "Query" );
 
-        StartSet.StartNodesQuery startNodesQuery = new StartSet.StartNodesQuery();
+        StartExpression.StartNodesQuery startNodesQuery = new StartExpression.StartNodesQuery();
         startNodesQuery.name = name;
         startNodesQuery.index = indexName;
         startNodesQuery.query = query;
-        this.query.startSets.add( startNodesQuery );
-        return this;
+        return start( startNodesQuery );
     }
 
     @Override
@@ -119,12 +142,10 @@ public class CypherQuery
                 throw new IllegalArgumentException( "Id may not be below zero" );
         }
 
-        StartSet.StartRelationships startRelationships = new StartSet.StartRelationships();
+        StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
         startRelationships.name = name;
         startRelationships.relationships = id;
-        query.startSets.add( startRelationships );
-
-        return this;
+        return start( startRelationships );
     }
 
     @Override
@@ -133,12 +154,10 @@ public class CypherQuery
         checkEmpty( name, "Name" );
         checkEmpty( parameters, "Parameters" );
 
-        StartSet.StartRelationshipsParameters startRelationships = new StartSet.StartRelationshipsParameters();
+        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
         startRelationships.name = name;
         startRelationships.parameters = parameters;
-        query.startSets.add( startRelationships );
-
-        return this;
+        return start( startRelationships );
     }
 
     @Override
@@ -149,13 +168,12 @@ public class CypherQuery
         checkEmpty( key, "Key" );
         checkEmpty( value, "Value" );
 
-        StartSet.StartRelationshipsIndex startRelationshipsIndex = new StartSet.StartRelationshipsIndex();
+        StartExpression.StartRelationshipsIndex startRelationshipsIndex = new StartExpression.StartRelationshipsIndex();
         startRelationshipsIndex.name = name;
         startRelationshipsIndex.index = indexName;
         startRelationshipsIndex.key = key;
         startRelationshipsIndex.value = value;
-        query.startSets.add( startRelationshipsIndex );
-        return this;
+        return start( startRelationshipsIndex );
     }
 
     // Match --------------------------------------------------------
@@ -176,14 +194,16 @@ public class CypherQuery
 
     // Return -------------------------------------------------------
     @Override
+    public ReturnNext returnExpr( ReturnExpression returnExpression )
+    {
+        query.returnExpressions.add( returnExpression );
+        return this;
+    }
+
+    @Override
     public ReturnNext returnNodes( String... names )
     {
-        checkEmpty( names, "Names" );
-
-        ReturnSet.ReturnNodes returnNodes = new ReturnSet.ReturnNodes();
-        returnNodes.names = names;
-        query.returnSets.add( returnNodes );
-
+        query.returnExpressions.add( ReturnExpression.nodes( names ) );
         return this;
     }
 
@@ -192,10 +212,10 @@ public class CypherQuery
     {
         checkEmpty( names, "Names" );
 
-        ReturnSet.ReturnNodes returnNodes = new ReturnSet.ReturnNodes();
+        ReturnExpression.ReturnNodes returnNodes = new ReturnExpression.ReturnNodes();
         returnNodes.names = names;
         returnNodes.distinct = distinct;
-        query.returnSets.add( returnNodes );
+        query.returnExpressions.add( returnNodes );
 
         return this;
     }
@@ -205,9 +225,9 @@ public class CypherQuery
     {
         checkEmpty( names, "Names" );
 
-        ReturnSet.ReturnRelationships returnRelationships = new ReturnSet.ReturnRelationships();
+        ReturnExpression.ReturnRelationships returnRelationships = new ReturnExpression.ReturnRelationships();
         returnRelationships.names = names;
-        query.returnSets.add( returnRelationships );
+        query.returnExpressions.add( returnRelationships );
 
         return this;
     }
@@ -217,9 +237,9 @@ public class CypherQuery
     {
         checkEmpty( names, "Names" );
 
-        ReturnSet.ReturnPaths returnPaths = new ReturnSet.ReturnPaths();
+        ReturnExpression.ReturnPaths returnPaths = new ReturnExpression.ReturnPaths();
         returnPaths.names = names;
-        query.returnSets.add( returnPaths );
+        query.returnExpressions.add( returnPaths );
 
         return this;
     }
@@ -227,11 +247,7 @@ public class CypherQuery
     @Override
     public ReturnNext returnProperties( String... names )
     {
-        checkEmpty( names, "Names" );
-        ReturnSet.ReturnProperties returnProperties = new ReturnSet.ReturnProperties();
-        returnProperties.names = names;
-        query.returnSets.add( returnProperties );
-
+        query.returnExpressions.add( ReturnExpression.properties( names ) );
         return this;
     }
 
@@ -239,47 +255,79 @@ public class CypherQuery
     public ReturnNext returnProperties( boolean optional, String... names )
     {
         checkEmpty( names, "Names" );
-        ReturnSet.ReturnProperties returnProperties = new ReturnSet.ReturnProperties();
+        ReturnExpression.ReturnProperties returnProperties = new ReturnExpression.ReturnProperties();
         returnProperties.names = names;
         returnProperties.optional = optional;
-        query.returnSets.add( returnProperties );
+        query.returnExpressions.add( returnProperties );
 
         return this;
     }
 
     @Override
-    public ReturnNext returnLength( String name )
+    public ReturnNext count()
     {
-        checkEmpty( name, "Name" );
+        return returnExpr(ReturnExpression.count());
+    }
 
-        ReturnSet.ReturnFunction returnFunction = new ReturnSet.ReturnFunction();
-        returnFunction.function = "length";
-        returnFunction.name = name;
-        query.returnSets.add( returnFunction );
+    @Override
+    public ReturnNext count( String name )
+    {
+        return returnExpr(ReturnExpression.count(name));
+    }
 
-        return this;
+    @Override
+    public ReturnNext sum( String name )
+    {
+        return returnExpr(ReturnExpression.sum(name));
+    }
+
+    @Override
+    public ReturnNext avg( String name )
+    {
+        return returnExpr(ReturnExpression.avg( name ));
+    }
+
+    @Override
+    public ReturnNext max( String name )
+    {
+        return returnExpr(ReturnExpression.max( name ));
+    }
+
+    @Override
+    public ReturnNext min( String name )
+    {
+        return returnExpr( ReturnExpression.min( name ) );
+    }
+
+    @Override
+    public ReturnNext collect( String name )
+    {
+        return returnExpr(ReturnExpression.collect( name ));
     }
 
     // OrderBy ------------------------------------------------------
     @Override
+    public OrderBy orderBy( OrderByExpression orderByExpression )
+    {
+        query.orderByExpressions.add( orderByExpression );
+        return this;
+    }
+
+    @Override
     public OrderBy orderBy( String name )
     {
-        OrderBySet orderBy = new OrderBySet();
+        OrderByExpression orderBy = new OrderByExpression();
         orderBy.name = name;
-        query.orderBySets.add( orderBy );
-
-        return this;
+        return orderBy( orderBy );
     }
 
     @Override
     public OrderBy orderBy( String name, Order order )
     {
-        OrderBySet orderBy = new OrderBySet();
+        OrderByExpression orderBy = new OrderByExpression();
         orderBy.name = name;
         orderBy.order = order;
-        query.orderBySets.add( orderBy );
-
-        return this;
+        return orderBy( orderBy );
     }
 
     // Skip ---------------------------------------------------------
@@ -321,25 +369,5 @@ public class CypherQuery
     public String toString()
     {
         return query.toString();
-    }
-
-    private boolean isEmpty(String string)
-    {
-        return string == null || string.length() == 0;
-    }
-
-    private void checkEmpty(String string, String name)
-    {
-        if (isEmpty( string ))
-            throw new IllegalArgumentException( name+" may not be null or empty string" );
-    }
-
-    private void checkEmpty(String[] strings, String name)
-    {
-        for( String string : strings )
-        {
-            if (isEmpty( string ))
-                throw new IllegalArgumentException( name+" may not be null or empty string" );
-        }
     }
 }

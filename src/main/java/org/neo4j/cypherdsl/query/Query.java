@@ -18,30 +18,49 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.ast;
+package org.neo4j.cypherdsl.query;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import org.neo4j.cypherdsl.MatchExpression;
-import org.neo4j.cypherdsl.WhereExpression;
 
 /**
  * TODO
  */
 public class Query
-    implements AsString
+    implements AsString, Serializable, Cloneable
 {
-    public List<StartSet> startSets = new ArrayList<StartSet>();
-    public List<MatchExpression> matchExpressions = new ArrayList<MatchExpression>();
+    public static boolean isEmpty(String string)
+    {
+        return string == null || string.length() == 0;
+    }
+
+    public static void checkEmpty(String string, String name)
+    {
+        if (isEmpty( string ))
+            throw new IllegalArgumentException( name+" may not be null or empty string" );
+    }
+
+    public static void checkEmpty(String[] strings, String name)
+    {
+        for( String string : strings )
+        {
+            if (isEmpty( string ))
+                throw new IllegalArgumentException( name+" may not be null or empty string" );
+        }
+    }
+
+    public ArrayList<StartExpression> startExpressions = new ArrayList<StartExpression>();
+    public ArrayList<MatchExpression> matchExpressions = new ArrayList<MatchExpression>();
     public WhereExpression whereExpression;
-    public List<ReturnSet> returnSets = new ArrayList<ReturnSet>();
-    public List<OrderBySet> orderBySets = new ArrayList<OrderBySet>();
+    public ArrayList<ReturnExpression> returnExpressions = new ArrayList<ReturnExpression>();
+    public ArrayList<OrderByExpression> orderByExpressions = new ArrayList<OrderByExpression>();
     public Integer skip;
     public Integer limit;
 
     public void asString(StringBuilder builder)
     {
-        clause( builder, "START", startSets );
+        clause( builder, "START", startExpressions );
         clause( builder, "MATCH", matchExpressions );
 
         if (whereExpression != null)
@@ -50,14 +69,28 @@ public class Query
             whereExpression.asString( builder );
         }
 
-        clause( builder, "RETURN", returnSets );
-        clause( builder, "ORDER BY", orderBySets );
+        clause( builder, "RETURN", returnExpressions );
+        clause( builder, "ORDER BY", orderByExpressions );
 
         if (skip != null)
             builder.append( " SKIP " ).append( skip );
 
         if (limit != null)
             builder.append( " LIMIT " ).append( limit );
+    }
+
+    @Override
+    public Object clone()
+        throws CloneNotSupportedException
+    {
+        Query query = (Query) super.clone();
+        query.startExpressions = (ArrayList<StartExpression>) query.startExpressions.clone();
+        query.matchExpressions = (ArrayList<MatchExpression>) query.matchExpressions.clone();
+        if (query.whereExpression != null)
+            query.whereExpression = (WhereExpression) query.whereExpression.clone();
+        query.returnExpressions = (ArrayList<ReturnExpression>) query.returnExpressions.clone();
+        query.orderByExpressions = (ArrayList<OrderByExpression>) query.orderByExpressions.clone();
+        return query;
     }
 
     private void clause( StringBuilder builder, String name, List<? extends AsString> asStringList )

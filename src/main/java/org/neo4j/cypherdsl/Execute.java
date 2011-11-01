@@ -20,14 +20,14 @@
 
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.ast.Query;
+import org.neo4j.cypherdsl.query.AsString;
+import org.neo4j.cypherdsl.query.Query;
 
 /**
  * TODO
  */
 public interface Execute
+    extends AsString
 {
-    void asString(StringBuilder builder);
-
     Query toQuery();
 }

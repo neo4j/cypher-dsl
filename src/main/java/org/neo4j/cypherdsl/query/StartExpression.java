@@ -18,18 +18,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.ast;
+package org.neo4j.cypherdsl.query;
+
+import java.io.Serializable;
 
 /**
  * TODO
  */
-public interface StartSet
-    extends AsString
+public abstract class StartExpression
+    implements AsString, Serializable,Cloneable
 {
-    public class StartNodes
-        implements StartSet
+    public String name;
+
+    @Override
+    public Object clone()
+        throws CloneNotSupportedException
     {
-        public String name;
+        return super.clone();
+    }
+
+    public static class StartNodes
+        extends StartExpression
+    {
         public int[] nodes;
 
         public void asString(StringBuilder builder)
@@ -46,10 +56,9 @@ public interface StartSet
         }
     }
 
-    public class StartNodesParameters
-        implements StartSet
+    public static class StartNodesParameters
+        extends StartExpression
     {
-        public String name;
         public String[] parameters;
 
         public void asString(StringBuilder builder)
@@ -66,10 +75,9 @@ public interface StartSet
         }
     }
 
-    public class StartNodesLookup
-        implements StartSet
+    public static class StartNodesLookup
+        extends StartExpression
     {
-        public String name;
         public String index;
         public String key;
         public String value;
@@ -81,10 +89,9 @@ public interface StartSet
         }
     }
 
-    public class StartNodesQuery
-        implements StartSet
+    public static class StartNodesQuery
+        extends StartExpression
     {
-        public String name;
         public String index;
         public String query;
 
@@ -95,10 +102,9 @@ public interface StartSet
         }
     }
 
-    public class StartRelationships
-        implements StartSet
+    public static class StartRelationships
+        extends StartExpression
     {
-        public String name;
         public int[] relationships;
 
         public void asString(StringBuilder builder)
@@ -115,10 +121,9 @@ public interface StartSet
         }
     }
 
-    public class StartRelationshipsParameters
-        implements StartSet
+    public static class StartRelationshipsParameters
+        extends StartExpression
     {
-        public String name;
         public String[] parameters;
 
         public void asString(StringBuilder builder)
@@ -135,10 +140,9 @@ public interface StartSet
         }
     }
 
-    public class StartRelationshipsIndex
-        implements StartSet
+    public static class StartRelationshipsIndex
+        extends StartExpression
     {
-        public String name;
         public String index;
         public String key;
         public String value;

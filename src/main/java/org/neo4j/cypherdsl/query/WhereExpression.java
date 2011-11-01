@@ -18,31 +18,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl;
+package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.ast.AsString;
+import java.io.Serializable;
 
 /**
  * TODO
  */
 public abstract class WhereExpression
-    implements AsString
+    implements AsString, Serializable, Cloneable
 {
-    public static And and(WhereExpression... expressions)
+    public static And and(PredicateExpression... expressions)
     {
         And and = new And();
         and.expressions = expressions;
         return and;
     }
 
-    public static Or or(WhereExpression... expressions)
+    public static Or or(PredicateExpression... expressions)
     {
         Or or = new Or();
         or.expressions = expressions;
         return or;
     }
 
-    public static Not not(WhereExpression expression)
+    public static Not not(PredicateExpression expression)
     {
         Not not = new Not();
         not.expression = expression;
@@ -145,20 +145,66 @@ public abstract class WhereExpression
         return type;
     }
 
-    public And and(WhereExpression expression)
+    public static IterablePredicateExpression all( String name, String iterable, PredicateExpression predicateExpression )
     {
-        return and( this, expression );
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "all";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
     }
 
-    public Or or(WhereExpression expression)
+    public static IterablePredicateExpression any( String name,
+                                                   String iterable,
+                                                   PredicateExpression predicateExpression
+    )
     {
-        return or( this, expression );
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "any";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    public static IterablePredicateExpression none( String name,
+                                                   String iterable,
+                                                   PredicateExpression predicateExpression
+    )
+    {
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "none";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    public static IterablePredicateExpression single( String name,
+                                                   String iterable,
+                                                   PredicateExpression predicateExpression
+    )
+    {
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "single";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    @Override
+    public Object clone()
+        throws CloneNotSupportedException
+    {
+        return super.clone();
     }
 
     public static class And
-        extends WhereExpression
+        extends PredicateExpression
     {
-        public WhereExpression[] expressions;
+        public PredicateExpression[] expressions;
 
         @Override
         public void asString( StringBuilder builder )
@@ -174,9 +220,9 @@ public abstract class WhereExpression
     }
 
     public static class Or
-        extends WhereExpression
+        extends PredicateExpression
     {
-        public WhereExpression[] expressions;
+        public PredicateExpression[] expressions;
 
         @Override
         public void asString( StringBuilder builder )
@@ -198,9 +244,9 @@ public abstract class WhereExpression
     }
 
     public static class Not
-        extends WhereExpression
+        extends PredicateExpression
     {
-        public WhereExpression expression;
+        public PredicateExpression expression;
 
         @Override
         public void asString( StringBuilder builder )
@@ -212,7 +258,7 @@ public abstract class WhereExpression
     }
 
     public static class Equals
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public Object value;
@@ -229,7 +275,7 @@ public abstract class WhereExpression
     }
 
     public static class Regexp
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public String regexp;
@@ -242,7 +288,7 @@ public abstract class WhereExpression
     }
 
     public static class Exists
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
 
@@ -254,7 +300,7 @@ public abstract class WhereExpression
     }
 
     public static class IsNull
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
 
@@ -266,7 +312,7 @@ public abstract class WhereExpression
     }
 
     public static class IsNotNull
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
 
@@ -278,7 +324,7 @@ public abstract class WhereExpression
     }
 
     public static class GT
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public Number number;
@@ -291,7 +337,7 @@ public abstract class WhereExpression
     }
 
     public static class LT
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public Number number;
@@ -304,7 +350,7 @@ public abstract class WhereExpression
     }
 
     public static class GTE
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public Number number;
@@ -317,7 +363,7 @@ public abstract class WhereExpression
     }
 
     public static class LTE
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public Number number;
@@ -330,7 +376,7 @@ public abstract class WhereExpression
     }
 
     public static class NE
-        extends WhereExpression
+        extends PredicateExpression
     {
         public String property;
         public Object value;
@@ -354,6 +400,45 @@ public abstract class WhereExpression
         }
     }
 
+    public abstract static class PredicateExpression
+        extends WhereExpression
+    {
+        public boolean optional;
+
+        public PredicateExpression optional()
+        {
+            optional = true;
+            return this;
+        }
+
+        public And and(PredicateExpression expression)
+        {
+            return and( this, expression );
+        }
+
+        public Or or(PredicateExpression expression)
+        {
+            return or( this, expression );
+        }
+    }
+
+    public static class IterablePredicateExpression
+        extends WhereExpression
+    {
+        public String function;
+        public String name;
+        public String iterable;
+        public PredicateExpression predicate;
+
+        @Override
+        public void asString( StringBuilder builder )
+        {
+            builder.append( function ).append( '(' ).append( name ).append( " in " ).append( iterable ).append( ':' );
+            predicate.asString( builder );
+            builder.append( ')' );
+        }
+    }
+
     public static class Type
     {
         public String name;
@@ -365,7 +450,7 @@ public abstract class WhereExpression
 
         public Equals eq(String name)
         {
-            return WhereExpression.eq("type("+this.name+")",name);
+            return WhereExpression.eq( "type(" + this.name + ")", name );
         }
     }
 }

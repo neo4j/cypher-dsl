@@ -20,6 +20,8 @@
 
 package org.neo4j.cypherdsl;
 
+import org.neo4j.cypherdsl.query.MatchExpression;
+
 /**
  * TODO
  */

@@ -20,11 +20,16 @@
 
 package org.neo4j.cypherdsl;
 
+import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.query.WhereExpression;
+
 /**
  * TODO
  */
 public interface Start
 {
+    StartNext start(StartExpression startExpression);
+
     StartNext nodes( String name, int... id );
 
     StartNext nodes( String name, String... parameters );
