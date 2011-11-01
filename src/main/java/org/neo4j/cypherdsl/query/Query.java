@@ -25,7 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TODO
+ * Model for a Cypher Query. The model is serializable and cloneable, to make it easy to
+ * save on disk or transfer over the wire. Being cloneable also helps with query builder continuation.
  */
 public class Query
     implements AsString, Serializable, Cloneable

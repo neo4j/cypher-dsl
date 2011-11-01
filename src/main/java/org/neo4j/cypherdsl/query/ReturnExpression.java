@@ -25,7 +25,7 @@ import java.io.Serializable;
 import static org.neo4j.cypherdsl.query.Query.*;
 
 /**
- * TODO
+ * Provides the possible expressions for the RETURN clause.
  */
 public abstract class ReturnExpression<T extends ReturnExpression>
     implements AsString, Serializable, Cloneable

@@ -21,9 +21,14 @@
 package org.neo4j.cypherdsl.query;
 
 /**
- * TODO
+ * Interface for all parts of the model that should be externalizable to a StringBuilder.
  */
 public interface AsString
 {
+    /**
+     * Implementations of this method should append the string representation of the model.
+     *
+     * @param builder
+     */
     void asString(StringBuilder builder);
 }

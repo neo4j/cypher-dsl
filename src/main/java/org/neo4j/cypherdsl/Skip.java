@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl;
 
 /**
- * TODO
+ * Implements the SKIP clause.
  */
 public interface Skip
     extends Limit

@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl;
 
 /**
- * TODO
+ * This is a continuation interface used once the first START clause has been added.
  */
 public interface StartNext
     extends Start, Match

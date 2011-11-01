@@ -24,7 +24,8 @@ import org.neo4j.cypherdsl.query.AsString;
 import org.neo4j.cypherdsl.query.Query;
 
 /**
- * TODO
+ * Once the query has been constructed, the methods here can be used to either stringify it or extract the
+ * Query model for further processing.
  */
 public interface Execute
     extends AsString

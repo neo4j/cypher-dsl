@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.query;
 import java.io.Serializable;
 
 /**
- * TODO
+ * Provides the possible expressions for the WHERE clause.
  */
 public abstract class WhereExpression
     implements AsString, Serializable, Cloneable

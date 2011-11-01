@@ -23,7 +23,9 @@ package org.neo4j.cypherdsl;
 import org.neo4j.cypherdsl.query.MatchExpression;
 
 /**
- * TODO
+ * Implements the MATCH clause. Use the MatchExpression static methods
+ * to create expressions to be passed in here. Many MatchExpressions can be
+ * provided for a single query.
  */
 public interface Match
     extends Where

@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl;
 
 /**
- * TODO
+ * This is a continuation interface used once the first RETURN clause has been added.
  */
 public interface ReturnNext
     extends Return, OrderBy

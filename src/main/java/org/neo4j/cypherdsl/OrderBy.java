@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl;
 import org.neo4j.cypherdsl.query.OrderByExpression;
 
 /**
- * TODO
+ * Implements the ORDER BY clause.
  */
 public interface OrderBy
     extends Skip

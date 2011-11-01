@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl;
 import org.neo4j.cypherdsl.query.WhereExpression;
 
 /**
- * TODO
+ * Implements the WHERE clause. Use the static methods in WhereExpression to create expressions.
  */
 public interface Where
     extends Return

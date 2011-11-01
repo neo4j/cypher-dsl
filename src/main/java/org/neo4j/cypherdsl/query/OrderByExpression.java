@@ -24,7 +24,7 @@ import java.io.Serializable;
 import org.neo4j.cypherdsl.OrderBy;
 
 /**
- * TODO
+ * Provides the possible expressions for the ORDER BY clause.
  */
 public class OrderByExpression
     implements AsString, Serializable, Cloneable

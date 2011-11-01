@@ -36,7 +36,9 @@ import static org.neo4j.cypherdsl.query.Query.checkEmpty;
  * and then use the Query as continuation point. When a new CypherQuery is created
  * by using the newQuery() method the Query is cloned, so that the original Query
  * is not modified. This can be used effectively to create a base query which can then
- * be used many times. Typical examples would be to create
+ * be used many times. Typical examples would be to create a query which is reused many times
+ * for paging purposes, and also to provide a base query using START and MATCH which is then
+ * expanded using WHERE and RETURN clauses.
  */
 public class CypherQuery
     implements StartNext, ReturnNext, Match, OrderBy, Skip, Limit, Execute

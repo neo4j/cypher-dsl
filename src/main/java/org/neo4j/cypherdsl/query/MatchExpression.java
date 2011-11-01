@@ -23,11 +23,14 @@ package org.neo4j.cypherdsl.query;
 import java.io.Serializable;
 
 /**
- * TODO
+ * Provides the possible expressions for the MATCH clause.
  */
 public abstract class MatchExpression
     implements AsString, Serializable, Cloneable
 {
+    /**
+     * The direction of the path expression.
+     */
     public enum Direction
     {
         ANY,
@@ -35,6 +38,15 @@ public abstract class MatchExpression
         INCOMING
     }
 
+    /**
+     * Use this to create a named path.
+     *
+     * Example: named("p",path("a","b")) -> p=(a)--(b)
+     *
+     * @param name
+     * @param path
+     * @return
+     */
     public static NamedPath named( String name, AbstractPath path )
     {
         NamedPath namedPath = new NamedPath();
@@ -43,6 +55,16 @@ public abstract class MatchExpression
         return namedPath;
     }
 
+    /**
+     * Use this to create a basic path. Use the methods on the returned
+     * Path to further modify the path if necessary.
+     *
+     * Example: path("a","b") -> (a)--(b)
+     *
+     * @param from
+     * @param to
+     * @return
+     */
     public static Path path( String from,
                              String to
     )
@@ -54,6 +76,17 @@ public abstract class MatchExpression
         return path;
     }
 
+    /**
+     * Use this to create a path with a given direction. Use the methods
+     * on the returned Path to further modify the path if necessary.
+     *
+     * Example: path("a",OUTGOING,"b") -> (a)-->(b)
+     *
+     * @param from
+     * @param direction
+     * @param to
+     * @return
+     */
     public static Path path( String from,
                              Direction direction,
                              String to
@@ -67,6 +100,19 @@ public abstract class MatchExpression
         return path;
     }
 
+    /**
+     * Use this to create a path with almost all information provided.
+     * Use the methods on the returned Path to further modify the path if necessary
+     *
+     * Example: path("a",OUTGOING,"r","KNOWS","b") -> (a)-[r:KNOWS]->(b)
+     *
+     * @param from
+     * @param direction
+     * @param name
+     * @param relationShip
+     * @param to
+     * @return
+     */
     public static Path path( String from,
                              Direction direction,
                              String name,
@@ -84,6 +130,21 @@ public abstract class MatchExpression
         return path;
     }
 
+    /**
+     * Use this to create a path with all information provided.
+     *
+     * Example: path("a",OUTGOING,"r",true, "KNOWS",1,3,"b") -> (a)-[r?:KNOWS*1..3]->(b)
+     *
+     * @param from
+     * @param direction
+     * @param name
+     * @param optional
+     * @param relationship
+     * @param minHops
+     * @param maxHops
+     * @param to
+     * @return
+     */
     public static Path path( String from,
                              Direction direction,
                              String name,
@@ -107,6 +168,13 @@ public abstract class MatchExpression
         return path;
     }
 
+    /**
+     * Use this to invoke the shortestPath function
+     *
+     * @param from
+     * @param to
+     * @return
+     */
     public static FunctionPath shortestPath( String from, String to )
     {
         FunctionPath functionPath = new FunctionPath();

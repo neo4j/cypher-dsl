@@ -26,7 +26,7 @@ import static org.neo4j.cypherdsl.CypherQuery.*;
 import static org.neo4j.cypherdsl.query.WhereExpression.*;
 
 /**
- * TODO
+ * Tests for all parts of the Cypher DSL.
  */
 public class CypherQueryTest
 {

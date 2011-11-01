@@ -21,10 +21,10 @@
 package org.neo4j.cypherdsl;
 
 import org.neo4j.cypherdsl.query.StartExpression;
-import org.neo4j.cypherdsl.query.WhereExpression;
 
 /**
- * TODO
+ * Implements the START clause. Use the static methods in StartExpression to create expressions,
+ * or use the convenience methods here for common cases.
  */
 public interface Start
 {

@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl;
 
 /**
- * TODO
+ * Implements the LIMIT clause
  */
 public interface Limit
     extends Execute
