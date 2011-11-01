@@ -55,6 +55,12 @@ public class Query
             throw new IllegalArgumentException( name+" may not be null or empty string" );
     }
 
+    public static void checkEmpty(Expression.Value value, String name)
+    {
+        if (value instanceof Expression.Literal && isEmpty( (String) ((Expression.Literal)value).value ))
+            throw new IllegalArgumentException( name+" may not be null or empty string" );
+    }
+
     public static void checkEmpty(String[] strings, String name)
     {
         for( String string : strings )

@@ -325,7 +325,7 @@ public class CypherReferenceTest
         assertEquals( "START n=node(3,1) WHERE n.belt?=\"white\" RETURN n",
                       newQuery().
                           nodes( "n", 3, 1 ).
-                          where( eq( optional( "n.belt" ), "white" ) ).
+                          where( eq( "n.belt" , "white" ).optional() ).
                           returnNode( "n" ).
                           toString() );
     }

@@ -26,7 +26,7 @@ import java.io.Serializable;
 public abstract class WhereExpression
     implements AsString, Serializable, Cloneable
 {
-    public static And and(PredicateExpression... expressions)
+    public static And and(BooleanExpression... expressions)
     {
         Query.checkNull( expressions, "Expressions" );
 
@@ -35,7 +35,7 @@ public abstract class WhereExpression
         return and;
     }
 
-    public static Or or(PredicateExpression... expressions)
+    public static Or or(BooleanExpression... expressions)
     {
         Query.checkNull( expressions, "Expressions" );
 
@@ -53,11 +53,6 @@ public abstract class WhereExpression
         return not;
     }
 
-    public static String optional(String propertyName)
-    {
-        return propertyName+"?";
-    }
-
     public static Equals eq( String property, Object value )
     {
         Query.checkEmpty( property, "Property" );
@@ -65,51 +60,51 @@ public abstract class WhereExpression
 
         Equals equals = new Equals();
         equals.property = property;
-        equals.value = value;
+        equals.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
         return equals;
     }
 
-    public static GT gt( String property, Number number )
+    public static GT gt( String property, Object value )
     {
         Query.checkEmpty( property, "Property" );
-        Query.checkNull( number, "Number" );
+        Query.checkNull( value, "Value" );
 
         GT gt = new GT();
         gt.property = property;
-        gt.number = number;
+        gt.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
         return gt;
     }
 
-    public static LT lt( String property, Number number )
+    public static LT lt( String property, Object value )
     {
         Query.checkEmpty( property, "Property" );
-        Query.checkNull( number, "Number" );
+        Query.checkNull( value, "Value" );
 
         LT lt = new LT();
         lt.property = property;
-        lt.number = number;
+        lt.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
         return lt;
     }
 
-    public static GTE gte( String property, Number number )
+    public static GTE gte( String property, Object value )
     {
         Query.checkEmpty( property, "Property" );
-        Query.checkNull( number, "Number" );
+        Query.checkNull( value, "Number" );
 
         GTE gte = new GTE();
         gte.property = property;
-        gte.number = number;
+        gte.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
         return gte;
     }
 
-    public static LTE lte( String property, Number number )
+    public static LTE lte( String property, Object value )
     {
         Query.checkEmpty( property, "Property" );
-        Query.checkNull( number, "Number" );
+        Query.checkNull( value, "Number" );
 
         LTE lte = new LTE();
         lte.property = property;
-        lte.number = number;
+        lte.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
         return lte;
     }
 
@@ -120,11 +115,18 @@ public abstract class WhereExpression
 
         NE ne = new NE();
         ne.property = property;
-        ne.value = value;
+        ne.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
         return ne;
     }
 
     public static Regexp regexp( String property, String regexp )
+    {
+        Query.checkEmpty( regexp, "Regular expression" );
+
+        return regexp(property, Expression.literal( regexp ));
+    }
+
+    public static Regexp regexp( String property, Expression.Value regexp )
     {
         Query.checkEmpty( property, "Property" );
         Query.checkEmpty( regexp, "Regular expression" );
@@ -253,9 +255,9 @@ public abstract class WhereExpression
     }
 
     public static class And
-        extends PredicateExpression
+        extends BooleanExpression
     {
-        public PredicateExpression[] expressions;
+        public BooleanExpression[] expressions;
 
         @Override
         public void asString( StringBuilder builder )
@@ -271,9 +273,9 @@ public abstract class WhereExpression
     }
 
     public static class Or
-        extends PredicateExpression
+        extends BooleanExpression
     {
-        public PredicateExpression[] expressions;
+        public BooleanExpression[] expressions;
 
         @Override
         public void asString( StringBuilder builder )
@@ -295,9 +297,9 @@ public abstract class WhereExpression
     }
 
     public static class Not
-        extends PredicateExpression
+        extends BooleanExpression
     {
-        public PredicateExpression expression;
+        public BooleanExpression expression;
 
         @Override
         public void asString( StringBuilder builder )
@@ -312,16 +314,16 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Object value;
+        public Expression.Value value;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( '=' );
-            if (value instanceof String)
-                builder.append( '\"' ).append( value ).append( '\"' );
-            else
-                builder.append( value );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( '=' );
+            value.asString( builder );
         }
     }
 
@@ -329,12 +331,17 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public String regexp;
+        public Expression.Value regexp;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( "=~/" ).append( regexp ).append( "/" );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( "=~/" ); // TODO Should the / be include for parameters?
+            regexp.asString( builder );
+            builder.append( '/' );
         }
     }
 
@@ -358,7 +365,10 @@ public abstract class WhereExpression
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( " is null" );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( " is null" );
         }
     }
 
@@ -370,7 +380,10 @@ public abstract class WhereExpression
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( " is not null" );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( " is not null" );
         }
     }
 
@@ -378,12 +391,16 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Number number;
+        public Expression.Value value;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( '>' ).append( number );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( '>' );
+            value.asString( builder );
         }
     }
 
@@ -391,12 +408,16 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Number number;
+        public Expression.Value value;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( '<' ).append( number );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( '<' );
+            value.asString( builder );
         }
     }
 
@@ -404,12 +425,16 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Number number;
+        public Expression.Value value;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( ">=" ).append( number );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( ">=" );
+            value.asString( builder );
         }
     }
 
@@ -417,12 +442,16 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Number number;
+        public Expression.Value value;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( "<=" ).append( number );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( "<=" );
+            value.asString( builder );
         }
     }
 
@@ -430,12 +459,16 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Object value;
+        public Expression.Value value;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( property ).append( "!=" ).append( value );
+            builder.append( property );
+            if (optional)
+                builder.append( '?' );
+            builder.append( "!=" );
+            value.asString( builder );
         }
     }
 
@@ -451,8 +484,22 @@ public abstract class WhereExpression
         }
     }
 
-    public abstract static class PredicateExpression
+    public abstract static class BooleanExpression
         extends WhereExpression
+    {
+        public And and(BooleanExpression expression)
+        {
+            return and( this, expression );
+        }
+
+        public Or or(BooleanExpression expression)
+        {
+            return or( this, expression );
+        }
+    }
+
+    public abstract static class PredicateExpression
+        extends BooleanExpression
     {
         public boolean optional;
 
@@ -460,16 +507,6 @@ public abstract class WhereExpression
         {
             optional = true;
             return this;
-        }
-
-        public And and(PredicateExpression expression)
-        {
-            return and( this, expression );
-        }
-
-        public Or or(PredicateExpression expression)
-        {
-            return or( this, expression );
         }
     }
 

@@ -20,8 +20,10 @@ package org.neo4j.cypherdsl;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.neo4j.cypherdsl.query.Expression;
 
 import static org.neo4j.cypherdsl.CypherQuery.*;
+import static org.neo4j.cypherdsl.query.Expression.param;
 import static org.neo4j.cypherdsl.query.WhereExpression.*;
 
 /**
@@ -141,7 +143,7 @@ public class CypherQueryTest
     @Test
     public void testWhere()
     {
-        System.out.println( newQuery().nodes( "n", 0 ).where( eq( "n.name", "Tobias" ) ).returnNode( "n" ));
+        System.out.println( newQuery().nodes( "n", 0 ).where( eq( "n.name", param( "name" ) ) ).returnNode( "n" ));
         
         System.out.println( newQuery().
             nodes( "n", 0 ).

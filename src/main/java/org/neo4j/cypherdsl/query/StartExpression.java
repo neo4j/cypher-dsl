@@ -26,6 +26,7 @@ import static org.neo4j.cypherdsl.query.Query.*;
  * Provides the possible expressions for the START clause.
  */
 public abstract class StartExpression
+    extends Expression
     implements AsString, Serializable,Cloneable
 {
     public static StartNodes nodes( String name, int... id )
@@ -40,27 +41,33 @@ public abstract class StartExpression
 
         StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
         startNodes.name = name;
-        startNodes.nodes = id;
+        startNodes.nodes = literals( id );
         return startNodes;
     }
 
-    public static StartNodesParameters nodes( String name, String... parameters )
+    public static StartNodes nodes( String name, String... parameters )
     {
         checkEmpty( name, "Name" );
         checkEmpty( parameters, "Parameters" );
 
-        StartExpression.StartNodesParameters startNodes = new StartExpression.StartNodesParameters();
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
         startNodes.name = name;
-        startNodes.parameters = parameters;
+        startNodes.nodes = parameters( parameters );
         return startNodes;
     }
 
     public static StartNodesLookup nodesLookup( String name, String indexName, String key, String value )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( indexName, "Index" );
         checkEmpty( key, "Key" );
         checkEmpty( value, "Value" );
+
+        return nodesLookup( name, indexName, literal( key ), literal( value ) );
+    }
+
+    public static StartNodesLookup nodesLookup( String name, String indexName, Value key, Value value )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
 
         StartExpression.StartNodesLookup startNodesLookup = new StartExpression.StartNodesLookup();
         startNodesLookup.name = name;
@@ -95,7 +102,7 @@ public abstract class StartExpression
 
         StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
         startRelationships.name = name;
-        startRelationships.relationships = id;
+        startRelationships.relationships = literals( id );
         return startRelationships;
     }
 
@@ -111,6 +118,14 @@ public abstract class StartExpression
     }
 
     public static StartRelationshipsIndex relationshipsLookup( String name, String indexName, String key, String value )
+    {
+        checkEmpty( key, "Key" );
+        checkEmpty( value, "Value" );
+
+        return relationshipsLookup( name, indexName, literal( key ), literal( value ) );
+    }
+
+    public static StartRelationshipsIndex relationshipsLookup( String name, String indexName, Value key, Value value )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
@@ -137,36 +152,17 @@ public abstract class StartExpression
     public static class StartNodes
         extends StartExpression
     {
-        public int[] nodes;
+        public Value[] nodes;
 
         public void asString(StringBuilder builder)
         {
             builder.append( name ).append( "=node(" );
             for( int i = 0; i < nodes.length; i++ )
             {
-                int node = nodes[ i ];
+                Value node = nodes[ i ];
                 if (i > 0)
                     builder.append( ',' );
-                builder.append( node );
-            }
-            builder.append( ')' );
-        }
-    }
-
-    public static class StartNodesParameters
-        extends StartExpression
-    {
-        public String[] parameters;
-
-        public void asString(StringBuilder builder)
-        {
-            builder.append( name ).append( "=node(" );
-            for( int i = 0; i < parameters.length; i++ )
-            {
-                String parameter = parameters[ i ];
-                if (i > 0)
-                    builder.append( ',' );
-                builder.append( '{' ).append( parameter ).append( '}' );
+                node.asString( builder );
             }
             builder.append( ')' );
         }
@@ -176,13 +172,16 @@ public abstract class StartExpression
         extends StartExpression
     {
         public String index;
-        public String key;
-        public String value;
+        public Value key;
+        public Value value;
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=node:" ).append( index ).append( '(' ).
-                append( key ).append( "=\"" ).append( value ).append( "\")" );
+            builder.append( name ).append( "=node:" ).append( index ).append( '(' );
+            key.asString( builder );
+            builder.append( "=" );
+            value.asString( builder );
+            builder.append( ')' );
         }
     }
 
@@ -202,17 +201,17 @@ public abstract class StartExpression
     public static class StartRelationships
         extends StartExpression
     {
-        public int[] relationships;
+        public Value[] relationships;
 
         public void asString(StringBuilder builder)
         {
             builder.append( name ).append( "=relationship(" );
             for( int i = 0; i < relationships.length; i++ )
             {
-                int rel = relationships[ i ];
+                Value rel = relationships[ i ];
                 if (i > 0)
                     builder.append( ',' );
-                builder.append( rel );
+                rel.asString( builder );
             }
             builder.append( ')' );
         }
@@ -241,13 +240,16 @@ public abstract class StartExpression
         extends StartExpression
     {
         public String index;
-        public String key;
-        public String value;
+        public Value key;
+        public Value value;
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=relationship:" ).append( index ).append( '(' ).
-                append( key ).append( "=\"" ).append( value ).append( "\")" );
+            builder.append( name ).append( "=relationship:" ).append( index ).append( '(' );
+            key.asString( builder );
+            builder.append( '=' );
+            value.asString( builder );
+            builder.append( ')' );
         }
     }
 
