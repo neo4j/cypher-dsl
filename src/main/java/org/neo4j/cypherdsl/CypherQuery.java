@@ -26,8 +26,6 @@ import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.WhereExpression;
 
-import static org.neo4j.cypherdsl.query.Query.checkEmpty;
-
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
  * or retrieve the internal Query model for further processing.
