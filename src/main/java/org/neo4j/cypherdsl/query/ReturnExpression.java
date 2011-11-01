@@ -75,6 +75,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
 
     public static ReturnAggregate count(String name)
     {
+        checkEmpty( name, "Name" );
+
         ReturnAggregate returnAggregate = new ReturnAggregate();
         returnAggregate.function = "count";
         returnAggregate.name = name;
@@ -83,6 +85,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
 
     public static ReturnAggregate sum(String name)
     {
+        checkEmpty( name, "Name" );
+
         ReturnAggregate returnAggregate = new ReturnAggregate();
         returnAggregate.function = "sum";
         returnAggregate.name = name;
@@ -91,6 +95,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
 
     public static ReturnAggregate avg(String name)
     {
+        checkEmpty( name, "Name" );
+
         ReturnAggregate returnAggregate = new ReturnAggregate();
         returnAggregate.function = "avg";
         returnAggregate.name = name;
@@ -99,6 +105,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
 
     public static ReturnAggregate max(String name)
     {
+        checkEmpty( name, "Name" );
+
         ReturnAggregate returnAggregate = new ReturnAggregate();
         returnAggregate.function = "max";
         returnAggregate.name = name;
@@ -107,6 +115,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
 
     public static ReturnAggregate min(String name)
     {
+        checkEmpty( name, "Name" );
+
         ReturnAggregate returnAggregate = new ReturnAggregate();
         returnAggregate.function = "min";
         returnAggregate.name = name;
@@ -115,6 +125,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
 
     public static ReturnAggregate collect(String name)
     {
+        checkEmpty( name, "Name" );
+
         ReturnAggregate returnAggregate = new ReturnAggregate();
         returnAggregate.function = "collect";
         returnAggregate.name = name;

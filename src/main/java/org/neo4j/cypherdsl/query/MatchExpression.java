@@ -49,6 +49,10 @@ public abstract class MatchExpression
      */
     public static NamedPath named( String name, AbstractPath path )
     {
+        Query.checkEmpty( name, "Name" );
+        if (path == null)
+            throw new IllegalArgumentException( "Path may not be null" );
+
         NamedPath namedPath = new NamedPath();
         namedPath.name = name;
         namedPath.path = path;
@@ -69,6 +73,9 @@ public abstract class MatchExpression
                              String to
     )
     {
+        Query.checkNull( from, "From" );
+        Query.checkNull( to, "To" );
+
         Path path = new Path();
         path.from = from;
         path.to = to;
@@ -92,6 +99,11 @@ public abstract class MatchExpression
                              String to
     )
     {
+        Query.checkNull( from, "From" );
+        if (direction == null)
+            throw new IllegalArgumentException( "Direction may not be null" );
+        Query.checkNull( to, "To" );
+
         Path path = new Path();
         path.from = from;
         path.to = to;
@@ -120,6 +132,9 @@ public abstract class MatchExpression
                              String to
     )
     {
+        Query.checkNull( from, "From" );
+        Query.checkNull( to, "To" );
+
         Path path = new Path();
         path.from = from;
         path.name = name;
@@ -155,6 +170,9 @@ public abstract class MatchExpression
                              String to
     )
     {
+        Query.checkNull( from, "From" );
+        Query.checkNull( to, "To" );
+
         Path path = new Path();
         path.from = from;
         path.to = to;
@@ -177,6 +195,9 @@ public abstract class MatchExpression
      */
     public static FunctionPath shortestPath( String from, String to )
     {
+        Query.checkNull( from, "From" );
+        Query.checkNull( to, "To" );
+
         FunctionPath functionPath = new FunctionPath();
         functionPath.function = "shortestPath";
         functionPath.from = from;
@@ -186,6 +207,11 @@ public abstract class MatchExpression
 
     public static FunctionPath shortestPath( String from, Direction direction, String to )
     {
+        Query.checkNull( from, "From" );
+        Query.checkNull( to, "To" );
+        if (direction == null)
+            throw new IllegalArgumentException( "Direction may not be null" );
+
         FunctionPath functionPath = new FunctionPath();
         functionPath.function = "shortestPath";
         functionPath.from = from;
@@ -257,18 +283,21 @@ public abstract class MatchExpression
 
         public T direction( Direction direction )
         {
+            Query.checkNull( direction, "Direction" );
             this.direction = direction;
             return (T) this;
         }
 
         public T name( String name )
         {
+            Query.checkEmpty( name, "Name" );
             this.name = name;
             return (T) this;
         }
 
         public T relationship( String relationship )
         {
+            Query.checkEmpty( relationship, "Relationship" );
             this.relationship = relationship;
             return (T) this;
         }
@@ -281,6 +310,12 @@ public abstract class MatchExpression
 
         public T hops( Integer minHops, Integer maxHops )
         {
+            if (minHops != null && minHops < 0)
+                throw new IllegalArgumentException( "Minimum number of hops must be over zero" );
+
+            if (maxHops != null && maxHops < 0)
+                throw new IllegalArgumentException( "Maximum number of hops must be over zero" );
+
             this.minHops = minHops;
             this.maxHops = maxHops;
             return (T) this;
@@ -301,6 +336,8 @@ public abstract class MatchExpression
 
         public MultiPath path( String to )
         {
+            Query.checkNull(to, "To");
+
             MultiPath path = new MultiPath();
             path.leftPath = this;
             path.to = to;
@@ -310,6 +347,8 @@ public abstract class MatchExpression
 
         public MultiPath path( Direction direction, String to )
         {
+            Query.checkNull(to, "To");
+
             MultiPath path = new MultiPath();
             path.leftPath = this;
             path.direction = direction;
@@ -320,6 +359,8 @@ public abstract class MatchExpression
 
         public MultiPath path( Direction direction, String name, String relationship, String to )
         {
+            Query.checkNull(to, "To");
+
             MultiPath path = new MultiPath();
             path.leftPath = this;
             path.direction = direction;
@@ -345,6 +386,8 @@ public abstract class MatchExpression
 
         public MultiPath path( String to )
         {
+            Query.checkNull(to, "To");
+
             MultiPath path = new MultiPath();
             path.leftPath = this;
             path.to = to;

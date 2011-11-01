@@ -76,6 +76,7 @@ public class CypherQuery
     @Override
     public StartNext start( StartExpression startExpression )
     {
+        Query.checkNull( startExpression, "Expression" );
         query.startExpressions.add( startExpression );
 
         return this;
@@ -127,6 +128,7 @@ public class CypherQuery
     @Override
     public Match match( MatchExpression expression )
     {
+        Query.checkNull( expression, "Expression" );
         query.matchExpressions.add( expression );
         return this;
     }
@@ -135,6 +137,7 @@ public class CypherQuery
     @Override
     public Return where( WhereExpression expression )
     {
+        Query.checkNull( expression, "Expression" );
         query.whereExpression = expression;
         return this;
     }
@@ -143,6 +146,7 @@ public class CypherQuery
     @Override
     public ReturnNext returnExpr( ReturnExpression returnExpression )
     {
+        Query.checkNull( returnExpression, "Expression" );
         query.returnExpressions.add( returnExpression );
         return this;
     }
@@ -217,6 +221,7 @@ public class CypherQuery
     @Override
     public OrderBy orderBy( OrderByExpression orderByExpression )
     {
+        Query.checkNull( orderByExpression, "Expression" );
         query.orderByExpressions.add( orderByExpression );
         return this;
     }

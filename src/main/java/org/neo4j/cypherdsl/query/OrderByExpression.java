@@ -31,6 +31,7 @@ public class OrderByExpression
 {
     public static OrderByExpression orderBy(String name)
     {
+        Query.checkEmpty( name, "Name" );
         OrderByExpression orderBy = new OrderByExpression();
         orderBy.name = name;
         return orderBy;

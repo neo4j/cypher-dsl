@@ -21,9 +21,8 @@
 package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
-import org.neo4j.cypherdsl.StartNext;
 
-import static org.neo4j.cypherdsl.query.Query.checkEmpty;
+import static org.neo4j.cypherdsl.query.Query.*;
 
 /**
  * Provides the possible expressions for the START clause.

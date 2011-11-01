@@ -30,6 +30,8 @@ public abstract class WhereExpression
 {
     public static And and(PredicateExpression... expressions)
     {
+        Query.checkNull( expressions, "Expressions" );
+
         And and = new And();
         and.expressions = expressions;
         return and;
@@ -37,6 +39,8 @@ public abstract class WhereExpression
 
     public static Or or(PredicateExpression... expressions)
     {
+        Query.checkNull( expressions, "Expressions" );
+
         Or or = new Or();
         or.expressions = expressions;
         return or;
@@ -44,6 +48,8 @@ public abstract class WhereExpression
 
     public static Not not(PredicateExpression expression)
     {
+        Query.checkNull( expression, "Expression" );
+
         Not not = new Not();
         not.expression = expression;
         return not;
@@ -56,6 +62,9 @@ public abstract class WhereExpression
 
     public static Equals eq( String property, Object value )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkNull( value, "Value" );
+
         Equals equals = new Equals();
         equals.property = property;
         equals.value = value;
@@ -64,6 +73,9 @@ public abstract class WhereExpression
 
     public static GT gt( String property, Number number )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkNull( number, "Number" );
+
         GT gt = new GT();
         gt.property = property;
         gt.number = number;
@@ -72,6 +84,9 @@ public abstract class WhereExpression
 
     public static LT lt( String property, Number number )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkNull( number, "Number" );
+
         LT lt = new LT();
         lt.property = property;
         lt.number = number;
@@ -80,6 +95,9 @@ public abstract class WhereExpression
 
     public static GTE gte( String property, Number number )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkNull( number, "Number" );
+
         GTE gte = new GTE();
         gte.property = property;
         gte.number = number;
@@ -88,6 +106,9 @@ public abstract class WhereExpression
 
     public static LTE lte( String property, Number number )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkNull( number, "Number" );
+
         LTE lte = new LTE();
         lte.property = property;
         lte.number = number;
@@ -96,6 +117,9 @@ public abstract class WhereExpression
 
     public static NE ne( String property, Object value )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkNull( value, "Value" );
+
         NE ne = new NE();
         ne.property = property;
         ne.value = value;
@@ -104,6 +128,9 @@ public abstract class WhereExpression
 
     public static Regexp regexp( String property, String regexp )
     {
+        Query.checkEmpty( property, "Property" );
+        Query.checkEmpty( regexp, "Regular expression" );
+
         Regexp regexp1 = new Regexp();
         regexp1.property = property;
         regexp1.regexp = regexp;
@@ -112,6 +139,8 @@ public abstract class WhereExpression
 
     public static Exists exists(String property)
     {
+        Query.checkEmpty( property, "Property" );
+
         Exists exists = new Exists();
         exists.property = property;
         return exists;
@@ -119,6 +148,8 @@ public abstract class WhereExpression
 
     public static IsNull isNull(String property)
     {
+        Query.checkEmpty( property, "Property" );
+
         IsNull isNull = new IsNull();
         isNull.property = property;
         return isNull;
@@ -126,6 +157,8 @@ public abstract class WhereExpression
 
     public static IsNotNull isNotNull(String property)
     {
+        Query.checkEmpty( property, "Property" );
+
         IsNotNull isNotNull = new IsNotNull();
         isNotNull.property = property;
         return isNotNull;
@@ -133,6 +166,8 @@ public abstract class WhereExpression
 
     public static Literal literal(String whereClause)
     {
+        Query.checkEmpty( whereClause, "Literal clause" );
+
         Literal literal = new Literal( );
         literal.literal = whereClause;
         return literal;
@@ -140,6 +175,8 @@ public abstract class WhereExpression
 
     public static Type type(String relationShipName)
     {
+        Query.checkEmpty( relationShipName, "Relationship" );
+
         Type type = new Type();
         type.name = relationShipName;
         return type;
@@ -147,6 +184,10 @@ public abstract class WhereExpression
 
     public static IterablePredicateExpression all( String name, String iterable, PredicateExpression predicateExpression )
     {
+        Query.checkEmpty( name, "Name" );
+        Query.checkEmpty( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
         IterablePredicateExpression expression = new IterablePredicateExpression();
         expression.function = "all";
         expression.name = name;
@@ -160,6 +201,10 @@ public abstract class WhereExpression
                                                    PredicateExpression predicateExpression
     )
     {
+        Query.checkEmpty( name, "Name" );
+        Query.checkEmpty( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
         IterablePredicateExpression expression = new IterablePredicateExpression();
         expression.function = "any";
         expression.name = name;
@@ -173,6 +218,10 @@ public abstract class WhereExpression
                                                    PredicateExpression predicateExpression
     )
     {
+        Query.checkEmpty( name, "Name" );
+        Query.checkEmpty( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
         IterablePredicateExpression expression = new IterablePredicateExpression();
         expression.function = "none";
         expression.name = name;
@@ -186,6 +235,10 @@ public abstract class WhereExpression
                                                    PredicateExpression predicateExpression
     )
     {
+        Query.checkEmpty( name, "Name" );
+        Query.checkEmpty( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
         IterablePredicateExpression expression = new IterablePredicateExpression();
         expression.function = "single";
         expression.name = name;

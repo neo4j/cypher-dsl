@@ -36,6 +36,21 @@ public class Query
         return string == null || string.length() == 0;
     }
 
+    public static void checkNull(Object object, String name)
+    {
+        if (object.getClass().isArray())
+        {
+            Object[] array = (Object[]) object;
+            for( Object obj : array )
+            {
+                if (obj == null)
+                    throw new IllegalArgumentException( name+" may not be null" );
+            }
+        } else
+            if (object == null)
+                throw new IllegalArgumentException( name+" may not be null" );
+    }
+
     public static void checkEmpty(String string, String name)
     {
         if (isEmpty( string ))
