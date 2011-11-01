@@ -25,7 +25,6 @@ import org.neo4j.cypherdsl.query.MatchExpression;
 import org.neo4j.cypherdsl.query.OrderByExpression;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
-import org.neo4j.cypherdsl.query.WhereExpression;
 
 import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.newQuery;
@@ -646,7 +645,7 @@ public class CypherReferenceTest
         assertEquals( "START a=node(3) MATCH p=(a)-->(b)-->(c) RETURN length(p)",
                       newQuery().
                           nodes( "a", 3 ).
-                          match( named( "p", path( "a", OUTGOING, "b" ).path( OUTGOING, "c" ))).
+                          match( named( "p", path( "a", OUTGOING, "b" ).path( OUTGOING, "c" ) ) ).
                           returnExpr( length( "p" ) ).
                           toString() );
     }
@@ -707,13 +706,13 @@ public class CypherReferenceTest
             match( path( "hyperEdge", OUTGOING, "role" ).relationship( "hasRole" ) ).toQuery();
 
         assertEquals( "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
-                      CypherQuery.newWhereQuery( query ).
+                      CypherQuery.newQuery( query ).
                           where( eq( "group.name", "Group2" ) ).
                           returnProperties( "role.name" ).
                           toString() );
 
         assertEquals( "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name,group.name ORDER BY role.name ASCENDING",
-                      CypherQuery.newWhereQuery( query ).
+                      CypherQuery.newQuery( query ).
                           returnProperties( "role.name", "group.name" ).
                           orderBy( "role.name", ASCENDING ).
                           toString() );

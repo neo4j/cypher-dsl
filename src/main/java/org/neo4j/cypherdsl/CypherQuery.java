@@ -29,7 +29,14 @@ import org.neo4j.cypherdsl.query.WhereExpression;
 import static org.neo4j.cypherdsl.query.Query.checkEmpty;
 
 /**
- * TODO
+ * DSL for creating Cypher queries. Once created you can serialize to a string,
+ * or retrieve the internal Query model for further processing.
+ *
+ * It is possible to iteratively construct Cypher queries by calling toQuery()
+ * and then use the Query as continuation point. When a new CypherQuery is created
+ * by using the newQuery() method the Query is cloned, so that the original Query
+ * is not modified. This can be used effectively to create a base query which can then
+ * be used many times. Typical examples would be to create
  */
 public class CypherQuery
     implements StartNext, ReturnNext, Match, OrderBy, Skip, Limit, Execute
@@ -41,7 +48,7 @@ public class CypherQuery
         return new CypherQuery( );
     }
 
-    public static Where newWhereQuery(Query query)
+    public static CypherQuery newQuery( Query query )
     {
         return new CypherQuery( query);
     }
