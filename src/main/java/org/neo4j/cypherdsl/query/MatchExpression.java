@@ -115,6 +115,29 @@ public abstract class MatchExpression
      * Use this to create a path with almost all information provided.
      * Use the methods on the returned Path to further modify the path if necessary
      *
+     * Example: path("a",OUTGOING,"r",KNOWS,"b") -> (a)-[r:KNOWS]->(b)
+     *
+     * @param from
+     * @param direction
+     * @param name
+     * @param relationship
+     * @param to
+     * @return
+     */
+    public static Path path( String from,
+                             Direction direction,
+                             String name,
+                             Enum relationship,
+                             String to
+    )
+    {
+        return path( from, direction, name, relationship == null ? null : relationship.name(), to );
+    }
+
+    /**
+     * Use this to create a path with almost all information provided.
+     * Use the methods on the returned Path to further modify the path if necessary
+     *
      * Example: path("a",OUTGOING,"r","KNOWS","b") -> (a)-[r:KNOWS]->(b)
      *
      * @param from
@@ -294,6 +317,13 @@ public abstract class MatchExpression
             return (T) this;
         }
 
+        public T relationship( Enum relationship )
+        {
+            Query.checkNull( relationship, "Relationship" );
+            this.relationship = relationship.name();
+            return (T) this;
+        }
+
         public T relationship( String relationship )
         {
             Query.checkEmpty( relationship, "Relationship" );
@@ -354,6 +384,11 @@ public abstract class MatchExpression
             path.to = to;
 
             return path;
+        }
+
+        public MultiPath path( Direction direction, String name, Enum relationship, String to )
+        {
+            return path( direction, name, relationship == null ? null : relationship.name(), to );
         }
 
         public MultiPath path( Direction direction, String name, String relationship, String to )
