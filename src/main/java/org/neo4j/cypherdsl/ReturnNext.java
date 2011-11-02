@@ -25,4 +25,5 @@ package org.neo4j.cypherdsl;
 public interface ReturnNext
     extends Return, OrderBy
 {
+
 }

@@ -30,7 +30,7 @@ public abstract class StartExpression
     extends Expression
     implements AsString, Serializable,Cloneable
 {
-    public static StartNodes nodes( String name, int... id )
+    public static StartNodes node( String name, int... id )
     {
         checkEmpty( name, "Name" );
 
@@ -46,7 +46,7 @@ public abstract class StartExpression
         return startNodes;
     }
 
-    public static StartNodes nodes( String name, String... parameters )
+    public static StartNodes node( String name, String... parameters )
     {
         checkEmpty( name, "Name" );
         checkEmpty( parameters, "Parameters" );
@@ -57,15 +57,15 @@ public abstract class StartExpression
         return startNodes;
     }
 
-    public static StartNodesLookup nodesLookup( String name, String indexName, String key, String value )
+    public static StartNodesLookup lookup( String name, String indexName, String key, String value )
     {
         checkEmpty( key, "Key" );
         checkEmpty( value, "Value" );
 
-        return nodesLookup( name, indexName, literal( key ), literal( value ) );
+        return lookup( name, indexName, identifier( key ), literal( value ) );
     }
 
-    public static StartNodesLookup nodesLookup( String name, String indexName, Value key, Value value )
+    public static StartNodesLookup lookup( String name, String indexName, Identifier key, Value value )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
@@ -78,7 +78,7 @@ public abstract class StartExpression
         return startNodesLookup;
     }
 
-    public static StartNodesQuery nodesQuery( String name, String indexName, String query )
+    public static StartNodesQuery query( String name, String indexName, String query )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
@@ -91,7 +91,7 @@ public abstract class StartExpression
         return startNodesQuery;
     }
 
-    public static StartRelationships relationships( String name, int... id )
+    public static StartRelationships relationship( String name, int... id )
     {
         checkEmpty( name, "Name" );
 
@@ -107,7 +107,7 @@ public abstract class StartExpression
         return startRelationships;
     }
 
-    public static StartRelationshipsParameters relationships( String name, String... parameters )
+    public static StartRelationshipsParameters relationship( String name, String... parameters )
     {
         checkEmpty( name, "Name" );
         checkEmpty( parameters, "Parameters" );
@@ -118,19 +118,19 @@ public abstract class StartExpression
         return startRelationships;
     }
 
-    public static StartRelationshipsIndex relationshipsLookup( String name, String indexName, String key, String value )
+    public static StartRelationshipsIndex relationshipLookup( String name, String indexName, String key, String value )
     {
         checkEmpty( key, "Key" );
         checkEmpty( value, "Value" );
 
-        return relationshipsLookup( name, indexName, literal( key ), literal( value ) );
+        return relationshipLookup( name, indexName, identifier( key ), literal( value ) );
     }
 
-    public static StartRelationshipsIndex relationshipsLookup( String name, String indexName, Value key, Value value )
+    public static StartRelationshipsIndex relationshipLookup( String name, String indexName, Identifier key, Value value )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
-        checkEmpty( key, "Key" );
+        checkNull( key, "Key" );
         checkEmpty( value, "Value" );
 
         StartExpression.StartRelationshipsIndex startRelationshipsIndex = new StartExpression.StartRelationshipsIndex();
@@ -173,7 +173,7 @@ public abstract class StartExpression
         extends StartExpression
     {
         public String index;
-        public Value key;
+        public Identifier key;
         public Value value;
 
         public void asString(StringBuilder builder)
@@ -241,7 +241,7 @@ public abstract class StartExpression
         extends StartExpression
     {
         public String index;
-        public Value key;
+        public Identifier key;
         public Value value;
 
         public void asString(StringBuilder builder)

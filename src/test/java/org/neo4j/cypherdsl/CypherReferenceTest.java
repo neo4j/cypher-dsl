@@ -26,11 +26,13 @@ import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
 
 import static org.junit.Assert.*;
-import static org.neo4j.cypherdsl.CypherQuery.newQuery;
-import static org.neo4j.cypherdsl.OrderBy.Order.*;
+import static org.neo4j.cypherdsl.CypherQuery.*;
 import static org.neo4j.cypherdsl.query.MatchExpression.*;
+import static org.neo4j.cypherdsl.query.OrderByExpression.Order.*;
 import static org.neo4j.cypherdsl.query.MatchExpression.Direction.*;
+import static org.neo4j.cypherdsl.query.OrderByExpression.property;
 import static org.neo4j.cypherdsl.query.ReturnExpression.*;
+import static org.neo4j.cypherdsl.query.StartExpression.*;
 import static org.neo4j.cypherdsl.query.WhereExpression.*;
 
 /**
@@ -42,78 +44,59 @@ public class CypherReferenceTest
     public void test15_3_1()
     {
         assertEquals( "START n=node(1) RETURN n",
-                      newQuery().nodes( "n", 1 ).returnNode( "n" ).toString() );
+                      start( node( "n", 1 ) ).returns( nodes( "n" ) ).toString() );
     }
 
     @Test
     public void test15_3_2()
     {
         assertEquals( "START r=relationship(0) RETURN r",
-                      newQuery().
-                          relationships( "r", 0 )
-                          .returnRelationship( "r" )
-                          .toString() );
+                      start( relationship( "r", 0 ) ).returns( relationships( "r" ) ).toString());
     }
 
     @Test
     public void test15_3_3()
     {
         assertEquals( "START n=node(1,2,3) RETURN n",
-                      newQuery().
-                          nodes( "n", 1, 2, 3 ).
-                          returnNode( "n" ).
-                          toString() );
+                      start( node( "n", 1, 2, 3 )).returns( nodes( "n" ) ).toString());
     }
 
     @Test
     public void test15_3_4()
     {
         assertEquals( "START n=node:nodes(name=\"A\") RETURN n",
-                      newQuery().
-                          nodesLookup( "n", "nodes", "name", "A" ).
-                          returnNode( "n" ).
-                          toString() );
+                      start(lookup("n", "nodes", "name", "A" )).returns( nodes( "n" ) ).toString());
     }
 
     @Test
     public void test15_3_5()
     {
         assertEquals( "START r=relationship:rels(property=\"some_value\") RETURN r",
-                      newQuery().
-                          relationshipsLookup( "r", "rels", "property", "some_value" ).
-                          returnNode( "r" ).
-                          toString() );
+                      start(relationshipLookup( "r", "rels", "property", "some_value" )).
+                            returns( nodes( "r" ) ).toString() );
     }
 
     @Test
     public void test15_3_6()
     {
         assertEquals( "START n=node:nodes(\"name:A\") RETURN n",
-                      newQuery().
-                          nodesQuery( "n", "nodes", "name:A" ).
-                          returnNode( "n" ).
-                          toString() );
+                      start( query( "n", "nodes", "name:A" )).returns( nodes( "n" ) ).toString());
     }
 
     @Test
     public void test15_3_7()
     {
         assertEquals( "START a=node(1),b=node(2) RETURN a,b",
-                      newQuery().
-                          nodes( "a", 1 ).
-                          nodes( "b", 2 ).
-                          returnNode( "a", "b" ).
-                          toString() );
+                      start( node( "a",1 ),node( "b",2 ) ).returns( nodes( "a","b" ) ).toString());
     }
 
     @Test
     public void test15_4_1()
     {
         assertEquals( "START n=node(3) MATCH (n)--(x) RETURN x",
-                      newQuery().
-                          nodes( "n", 3 ).
+                      start( node( "n", 3 ) ).
                           match( path( "n", "x" ) ).
-                          returnNode( "x" ).
+                          returns( nodes( "x" ) ).
                           toString() );
     }
 
@@ -121,10 +104,9 @@ public class CypherReferenceTest
     public void test15_4_2()
     {
         assertEquals( "START n=node(3) MATCH (n)-->(x) RETURN x",
-                      newQuery().
-                          nodes( "n", 3 ).
+                      start( node( "n", 3 )).
                           match( path( "n", OUTGOING, "x" ) ).
-                          returnNode( "x" ).
+                          returns( nodes( "x" ) ).
                           toString() );
     }
 
@@ -132,10 +114,9 @@ public class CypherReferenceTest
     public void test15_4_3()
     {
         assertEquals( "START n=node(3) MATCH (n)-[r]->(x) RETURN r",
-                      newQuery().
-                          nodes( "n", 3 ).
+                      start(node( "n", 3 )).
                           match( path( "n", OUTGOING, "r", null, "x" ) ).
-                          returnNode( "r" ).
+                          returns( nodes( "r" ) ).
                           toString() );
     }
 
@@ -143,10 +124,9 @@ public class CypherReferenceTest
     public void test15_4_4()
     {
         assertEquals( "START n=node(3) MATCH (n)-[:BLOCKS]->(x) RETURN x",
-                      newQuery().
-                          nodes( "n", 3 ).
-                          match( path( "n", OUTGOING, null, "BLOCKS", "x" )).
-                          returnNode( "x" ).
+                      start( node( "n", 3 )).
+                          match( path( "n", OUTGOING, null, "BLOCKS", "x" ) ).
+                          returns( nodes( "x" ) ).
                           toString() );
     }
 
@@ -154,10 +134,9 @@ public class CypherReferenceTest
     public void test15_4_5()
     {
         assertEquals( "START n=node(3) MATCH (n)-[r:BLOCKS]->(x) RETURN r",
-                      newQuery().
-                          nodes( "n", 3 ).
-                          match( path( "n", OUTGOING, "r", "BLOCKS", "x" )).
-                          returnNode( "r" ).
+                      start( node( "n", 3 )).
+                          match( path( "n", OUTGOING, "r", "BLOCKS", "x" ) ).
+                          returns( nodes( "r" ) ).
                           toString() );
     }
 
@@ -165,10 +144,9 @@ public class CypherReferenceTest
     public void test15_4_6()
     {
         assertEquals( "START n=node(3) MATCH (n)-[r:`TYPE WITH SPACE IN IT`]->(x) RETURN r",
-                      newQuery().
-                          nodes( "n", 3 ).
-                          match( path( "n", OUTGOING, "r", "`TYPE WITH SPACE IN IT`", "x" )).
-                          returnNode( "r" ).
+                      start( node( "n", 3 )).
+                          match( path( "n", OUTGOING, "r", "`TYPE WITH SPACE IN IT`", "x" ) ).
+                          returns( nodes( "r" ) ).
                           toString() );
     }
 
@@ -176,11 +154,10 @@ public class CypherReferenceTest
     public void test15_4_7()
     {
         assertEquals( "START a=node(3) MATCH (a)-[:KNOWS]->(b)-[:KNOWS]->(c) RETURN a,b,c",
-                      newQuery().
-                          nodes( "a", 3 ).
+                      start( node( "a", 3 )).
                           match( path( "a", OUTGOING, null, "KNOWS", "b" ).
                               path( OUTGOING, null, "KNOWS", "c" ) ).
-                          returnNode( "a", "b", "c" ).
+                          returns( nodes( "a", "b", "c" ) ).
                           toString() );
     }
 
@@ -188,10 +165,9 @@ public class CypherReferenceTest
     public void test15_4_8()
     {
         assertEquals( "START a=node(3),x=node(2,4) MATCH (a)-[:KNOWS*1..3]->(x) RETURN a,x",
-                      newQuery().
-                          nodes( "a", 3 ).nodes( "x", 2, 4 ).
+                      start( node( "a", 3 ), node( "x", 2, 4 )).
                           match( path( "a", OUTGOING, null, "KNOWS", "x" ).hops( 1, 3 ) ).
-                          returnNode( "a", "x" ).
+                          returns( nodes( "a", "x" ) ).
                           toString() );
     }
 
@@ -199,11 +175,10 @@ public class CypherReferenceTest
     public void test15_4_9()
     {
         assertEquals( "START a=node(3) MATCH p1=(a)-[:KNOWS*0..1]->(b),p2=(b)-[:KNOWS*0..1]->(c) RETURN a,b,c,length(p1),length(p2)",
-                      newQuery().
-                          nodes( "a", 3 ).
-                          match( MatchExpression.named( "p1", path( "a", OUTGOING, null, "KNOWS", "b" ).hops( 0, 1 ) ) ).
-                          match( MatchExpression.named( "p2", path( "b", OUTGOING, null, "KNOWS", "c" ).hops( 0, 1 ) ) ).
-                          returnNode( "a", "b", "c" ).returnExpr( length( "p1" ) ).returnExpr( length( "p2" ) ).
+                      start( node( "a", 3 ) ).
+                          match( named( "p1", path( "a", OUTGOING, null, "KNOWS", "b" ).hops( 0, 1 ) ),
+                                 named( "p2", path( "b", OUTGOING, null, "KNOWS", "c" ).hops( 0, 1 ) ) ).
+                          returns( nodes( "a", "b", "c" ), length( "p1" ), length( "p2" ) ).
                           toString() );
     }
 
@@ -211,10 +186,9 @@ public class CypherReferenceTest
     public void test15_4_10()
     {
         assertEquals( "START a=node(2) MATCH (a)-[?]->(b) RETURN a,x",
-                      newQuery().
-                          nodes( "a", 2 ).
+                      start( node( "a", 2 )).
                           match( path( "a", OUTGOING, "b" ).optional() ).
-                          returnNode( "a", "x" ).
+                          returns( nodes( "a", "x" ) ).
                           toString() );
     }
 
@@ -222,10 +196,9 @@ public class CypherReferenceTest
     public void test15_4_11()
     {
         assertEquals( "START a=node(3) MATCH (a)-[r?:LOVES]->() RETURN a,r",
-                      newQuery().
-                          nodes( "a", 3 ).
+                      start( node( "a", 3 )).
                           match( path( "a", OUTGOING, "r", "LOVES", "" ).optional() ).
-                          returnNode( "a" ).returnRelationship( "r" ).
+                          returns( nodes( "a" ), relationships( "r" ) ).
                           toString() );
     }
 
@@ -233,10 +206,9 @@ public class CypherReferenceTest
     public void test15_4_12()
     {
         assertEquals( "START a=node(2) MATCH (a)-[?]->(x) RETURN x,x.name",
-                      newQuery().
-                          nodes( "a", 2 ).
+                      start( node( "a", 2 )).
                           match( path( "a", OUTGOING, "x" ).optional() ).
-                          returnNode( "x" ).returnProperty( "x.name" ).
+                          returns( nodes( "x" ), properties( "x.name" ) ).
                           toString() );
     }
 
@@ -244,12 +216,11 @@ public class CypherReferenceTest
     public void test15_4_13()
     {
         assertEquals( "START a=node(3) MATCH (a)-[:KNOWS]->(b)-[:KNOWS]->(c),(a)-[:BLOCKS]-(d)-[:KNOWS]-(c) RETURN a,b,c,d",
-                      newQuery().
-                          nodes( "a", 3 ).
+                      start( node( "a", 3 )).
                           match( path( "a", OUTGOING, null, "KNOWS", "b" )
-                                     .path( OUTGOING, null, "KNOWS", "c" )).
-                          match( path( "a", ANY, null, "BLOCKS", "d" ).path( "c" ).relationship( "KNOWS" ) ).
-                          returnNode( "a", "b", "c", "d" ).
+                                     .path( OUTGOING, null, "KNOWS", "c" ),
+                                 path( "a", ANY, null, "BLOCKS", "d" ).path( "c" ).relationship( "KNOWS" ) ).
+                          returns( nodes( "a", "b", "c", "d" ) ).
                           toString() );
     }
 
@@ -257,10 +228,9 @@ public class CypherReferenceTest
     public void test15_4_14()
     {
         assertEquals( "START d=node(1),e=node(2) MATCH p=shortestPath((d)-[*..15]->(e)) RETURN p",
-                      newQuery().
-                          nodes( "d", 1 ).nodes( "e", 2 ).
+                      start( node( "d", 1 ), node( "e", 2 ) ).
                           match( named( "p", shortestPath( "d", OUTGOING, "e" ).hops( null, 15 ) ) ).
-                          returnPath( "p" ).
+                          returns( paths( "p" ) ).
                           toString() );
     }
 
@@ -268,10 +238,9 @@ public class CypherReferenceTest
     public void test15_4_15()
     {
         assertEquals( "START a=node(3) MATCH p=(a)-->(b) RETURN p",
-                      newQuery().
-                          nodes( "a", 3 ).
+                      start( node( "a", 3 )).
                           match( named( "p", path( "a", OUTGOING, "b" ) ) ).
-                          returnPath( "p" ).
+                          returns( paths( "p" ) ).
                           toString() );
     }
 
@@ -279,10 +248,9 @@ public class CypherReferenceTest
     public void test15_4_16()
     {
         assertEquals( "START r=relationship(0) MATCH (a)-[r]-(b) RETURN a,b",
-                      newQuery().
-                          relationships( "r", 0 ).
+                      start( relationship( "r", 0 )).
                           match( path( "a", "b" ).name( "r" ) ).
-                          returnNode( "a", "b" ).
+                          returns( nodes( "a", "b" ) ).
                           toString() );
     }
 
@@ -290,11 +258,10 @@ public class CypherReferenceTest
     public void test15_5_1()
     {
         assertEquals( "START n=node(3,1) WHERE (n.age<30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n",
-                      newQuery().
-                          nodes( "n", 3, 1 ).
+                      start( node( "n", 3, 1 )).
                           where( lt( "n.age", 30 ).and( eq( "n.name", "Tobias" ) )
                                      .or( not( eq( "n.name", "Tobias" ) ) ) ).
-                          returnNode( "n" ).
+                          returns( nodes( "n" ) ).
                           toString() );
     }
 
@@ -302,10 +269,9 @@ public class CypherReferenceTest
     public void test15_5_2()
     {
         assertEquals( "START n=node(3,1) WHERE n.age<30 RETURN n",
-                      newQuery().
-                          nodes( "n", 3, 1 ).
+                      start(node( "n", 3, 1 )).
                           where( lt( "n.age", 30 ) ).
-                          returnNode( "n" ).
+                          returns( nodes( "n" ) ).
                           toString() );
     }
 
@@ -313,10 +279,9 @@ public class CypherReferenceTest
     public void test15_5_3()
     {
         assertEquals( "START n=node(3,1) WHERE n.name=~/Tob.*/ RETURN n",
-                      newQuery().
-                          nodes( "n", 3, 1 ).
+                      start( node( "n", 3, 1 )).
                           where( regexp( "n.name", "Tob.*" ) ).
-                          returnNode( "n" ).
+                          returns( nodes( "n" ) ).
                           toString() );
     }
 
@@ -324,10 +289,9 @@ public class CypherReferenceTest
     public void test15_5_4()
     {
         assertEquals( "START n=node(3,1) WHERE n.belt?=\"white\" RETURN n",
-                      newQuery().
-                          nodes( "n", 3, 1 ).
-                          where( eq( "n.belt" , "white" ).optional() ).
-                          returnNode( "n" ).
+                      start( node( "n", 3, 1 )).
+                          where( eq( "n.belt", "white" ).optional() ).
+                          returns( nodes( "n" ) ).
                           toString() );
     }
 
@@ -335,11 +299,10 @@ public class CypherReferenceTest
     public void test15_5_5()
     {
         assertEquals( "START a=node(1),b=node(3,2) MATCH (a)<-[r?]-(b) WHERE r is null RETURN b",
-                      newQuery().
-                          nodes( "a", 1 ).nodes( "b", 3, 2 ).
+                      start( node( "a", 1 ), node( "b", 3, 2 )).
                           match( path( "a", INCOMING, "r", null, "b" ).optional() ).
                           where( isNull( "r" ) ).
-                          returnNode( "b" ).
+                          returns( nodes( "b" ) ).
                           toString() );
     }
 
@@ -347,11 +310,10 @@ public class CypherReferenceTest
     public void test15_5_5_2()
     {
         assertEquals( "START a=node(1),b=node(3,2) MATCH (a)<-[r?]-(b) WHERE r is not null RETURN b",
-                      newQuery().
-                          nodes( "a", 1 ).nodes( "b", 3, 2 ).
+                      start( node( "a", 1 ), node( "b", 3, 2 )).
                           match( path( "a", INCOMING, "r", null, "b" ).optional() ).
                           where( isNotNull( "r" ) ).
-                          returnNode( "b" ).
+                          returns( nodes( "b" ) ).
                           toString() );
     }
 
@@ -359,20 +321,16 @@ public class CypherReferenceTest
     public void test15_6_1()
     {
         assertEquals( "START n=node(2) RETURN n",
-                      newQuery().
-                          nodes( "n", 2 ).
-                          returnNode( "n" ).
-                          toString() );
+                      start( node( "n", 2 )).returns( nodes( "n" ) ).toString() );
     }
 
     @Test
     public void test15_6_2()
     {
         assertEquals( "START n=node(1) MATCH (n)-[r:KNOWS]->(c) RETURN r",
-                      newQuery().
-                          nodes( "n", 1 ).
-                          match( MatchExpression.path( "n", OUTGOING, "r", "KNOWS", "c" )).
-                          returnRelationship( "r" ).
+                      start( node( "n", 1 )).
+                          match( MatchExpression.path( "n", OUTGOING, "r", "KNOWS", "c" ) ).
+                          returns( relationships( "r" ) ).
                           toString() );
     }
 
@@ -380,19 +338,15 @@ public class CypherReferenceTest
     public void test15_6_3()
     {
         assertEquals( "START n=node(1) RETURN n.name",
-                      newQuery().
-                          nodes( "n", 1 ).
-                          returnProperty( "n.name" ).
-                          toString() );
+                      start( node( "n", 1 )).returns( properties( "n.name" ) ).toString() );
     }
 
     @Test
     public void test15_6_4()
     {
         assertEquals( "START `This isn't a common identifier`=node(1) RETURN `This isn't a common identifier`.`<<!!__??>>`",
-                      newQuery().
-                          nodes( "`This isn't a common identifier`", 1 ).
-                          returnProperty( "`This isn't a common identifier`.`<<!!__??>>`" ).
+                      start( node( "`This isn't a common identifier`", 1 )).
+                          returns( properties( "`This isn't a common identifier`.`<<!!__??>>`" ) ).
                           toString() );
     }
 
@@ -400,9 +354,8 @@ public class CypherReferenceTest
     public void test15_6_5()
     {
         assertEquals( "START n=node(1,2) RETURN n.age?",
-                      newQuery().
-                          nodes( "n", 1, 2 ).
-                          returnExpr( property( "n.age" ).optional() ).
+                      start( node( "n", 1, 2 )).
+                          returns( properties( "n.age" ).optional() ).
                           toString() );
     }
 
@@ -410,10 +363,9 @@ public class CypherReferenceTest
     public void test15_6_6()
     {
         assertEquals( "START a=node(1) MATCH (a)-->(b) RETURN distinct b",
-                      newQuery().
-                          nodes( "a", 1 ).
+                      start( node( "a", 1 )).
                           match( path( "a", OUTGOING, "b" ) ).
-                          returnExpr( ReturnExpression.node( "b" ).distinct() ).
+                          returns( nodes( "b" ).distinct() ).
                           toString() );
     }
 
@@ -421,10 +373,9 @@ public class CypherReferenceTest
     public void test15_7_2()
     {
         assertEquals( "START n=node(2) MATCH (n)-->(x) RETURN n,count(*)",
-                      newQuery().
-                          nodes( "n", 2 ).
+                      start( node( "n", 2 ) ).
                           match( path( "n", OUTGOING, "x" ) ).
-                          returnNode( "n" ).count().
+                          returns( nodes( "n" ), count() ).
                           toString() );
     }
 
@@ -432,10 +383,9 @@ public class CypherReferenceTest
     public void test15_7_3()
     {
         assertEquals( "START n=node(2) MATCH (n)-[r]->() RETURN type(r),count(*)",
-                      newQuery().
-                          nodes( "n", 2 ).
+                      start( node( "n", 2 )).
                           match( path( "n", OUTGOING, "r", null, "" ) ).
-                          returnExpr( ReturnExpression.type( "r" ) ).count().
+                          returns( ReturnExpression.type( "r" ), count() ).
                           toString() );
     }
 
@@ -443,10 +393,9 @@ public class CypherReferenceTest
     public void test15_7_4()
     {
         assertEquals( "START n=node(2) MATCH (n)-->(x) RETURN count(x)",
-                      newQuery().
-                          nodes( "n", 2 ).
-                          match( path( "n", OUTGOING, "x" )).
-                          count( "x" ).
+                      start( node( "n", 2 )).
+                          match( path( "n", OUTGOING, "x" ) ).
+                          returns( count( "x" ) ).
                           toString() );
     }
 
@@ -454,9 +403,8 @@ public class CypherReferenceTest
     public void test15_7_5()
     {
         assertEquals( "START n=node(2,3,4,1) RETURN count(n.property?)",
-                      newQuery().
-                          nodes( "n", 2, 3, 4, 1 ).
-                          returnExpr( count( "n.property" ).optional() ).
+                      start( node( "n", 2, 3, 4, 1 )).
+                          returns( count( "n.property" ).optional() ).
                           toString() );
     }
 
@@ -464,60 +412,44 @@ public class CypherReferenceTest
     public void test15_7_6()
     {
         assertEquals( "START n=node(2,3,4) RETURN sum(n.property)",
-                      newQuery().
-                          nodes( "n", 2, 3, 4 ).
-                          sum( "n.property" ).
-                          toString() );
+                      start( node( "n", 2, 3, 4 )).returns( sum( "n.property" ) ).toString() );
     }
 
     @Test
     public void test15_7_7()
     {
         assertEquals( "START n=node(2,3,4) RETURN avg(n.property)",
-                      newQuery().
-                          nodes( "n", 2, 3, 4 ).
-                          avg( "n.property" ).
-                          toString() );
+                      start( node( "n", 2, 3, 4 )).returns( avg( "n.property" ) ).toString() );
     }
 
     @Test
     public void test15_7_8()
     {
         assertEquals( "START n=node(2,3,4) RETURN max(n.property)",
-                      newQuery().
-                          nodes( "n", 2, 3, 4 ).
-                          max( "n.property" ).
-                          toString() );
+                      start( node( "n", 2, 3, 4 )).returns( max( "n.property" ) ).toString() );
     }
 
     @Test
     public void test15_7_9()
     {
         assertEquals( "START n=node(2,3,4) RETURN min(n.property)",
-                      newQuery().
-                          nodes( "n", 2, 3, 4 ).
-                          min( "n.property" ).
-                          toString() );
+                      start(node( "n", 2, 3, 4 )).returns( min( "n.property" ) ).toString() );
     }
 
     @Test
     public void test15_7_10()
     {
         assertEquals( "START n=node(2,3,4) RETURN collect(n.property)",
-                      newQuery().
-                          nodes( "n", 2, 3, 4 ).
-                          collect( "n.property" ).
-                          toString() );
+                      start( node( "n", 2, 3, 4 )).returns( collect( "n.property" ) ).toString() );
     }
 
     @Test
     public void test15_7_11()
     {
         assertEquals( "START a=node(2) MATCH (a)-->(b) RETURN count(distinct b.eyes)",
-                      newQuery().
-                          nodes( "a", 2 ).
+                      start( node( "a", 2 )).
                           match( path( "a", OUTGOING, "b" ) ).
-                          returnExpr( count( "b.eyes" ).distinct() ).
+                          returns( count( "b.eyes" ).distinct() ).
                           toString() );
     }
 
@@ -525,10 +457,9 @@ public class CypherReferenceTest
     public void test15_8_1()
     {
         assertEquals( "START n=node(3,1,2) RETURN n ORDER BY n.name",
-                      newQuery().
-                          nodes( "n", 3, 1, 2 ).
-                          returnNode( "n" ).
-                          orderBy( "n.name" ).
+                      start( node( "n", 3, 1, 2 )).
+                          returns( nodes( "n" ) ).
+                          orderBy( property( "n.name" ) ).
                           toString() );
     }
 
@@ -536,10 +467,9 @@ public class CypherReferenceTest
     public void test15_8_2()
     {
         assertEquals( "START n=node(3,1,2) RETURN n ORDER BY n.age,n.name",
-                      newQuery().
-                          nodes( "n", 3, 1, 2 ).
-                          returnNode( "n" ).
-                          orderBy( "n.age" ).orderBy( "n.name" ).
+                      start( node( "n", 3, 1, 2 ) ).
+                          returns( nodes( "n" ) ).
+                          orderBy( property( "n.age" ), property( "n.name" ) ).
                           toString() );
     }
 
@@ -547,10 +477,9 @@ public class CypherReferenceTest
     public void test15_8_3()
     {
         assertEquals( "START n=node(3,1,2) RETURN n.length?,n ORDER BY n.length?",
-                      newQuery().
-                          nodes( "n", 3, 1, 2 ).
-                          returnExpr( property( "n.length" ).optional() ).returnNode( "n" ).
-                          orderBy( OrderByExpression.orderBy( "n.length" ).optional() ).
+                      start( node( "n", 3, 1, 2 )).
+                          returns( properties( "n.length" ).optional(), nodes("n") ).
+                          orderBy( property( "n.length" ).optional() ).
                           toString() );
     }
 
@@ -558,10 +487,9 @@ public class CypherReferenceTest
     public void test15_9_1()
     {
         assertEquals( "START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP 3",
-                      newQuery().
-                          nodes( "n", 3, 4, 5, 1, 2 ).
-                          returnNode( "n" ).
-                          orderBy( "n.name" ).
+                      start( node( "n", 3, 4, 5, 1, 2 )).
+                          returns( nodes("n") ).
+                          orderBy( property( "n.name" ) ).
                           skip( 3 ).
                           toString() );
     }
@@ -570,10 +498,9 @@ public class CypherReferenceTest
     public void test15_9_2()
     {
         assertEquals( "START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP 1 LIMIT 2",
-                      newQuery().
-                          nodes( "n", 3, 4, 5, 1, 2 ).
-                          returnNode( "n" ).
-                          orderBy( "n.name" ).
+                      start( node( "n", 3, 4, 5, 1, 2 )).
+                          returns( nodes("n") ).
+                          orderBy( property("n.name") ).
                           skip( 1 ).
                           limit( 2 ).
                           toString() );
@@ -583,9 +510,8 @@ public class CypherReferenceTest
     public void test15_10_1()
     {
         assertEquals( "START n=node(3,4,5,1,2) RETURN n LIMIT 3",
-                      newQuery().
-                          nodes( "n", 3, 4, 5, 1, 2 ).
-                          returnNode( "n" ).
+                      start( node( "n", 3, 4, 5, 1, 2 )).
+                          returns( nodes("n") ).
                           limit( 3 ).
                           toString() );
     }
@@ -594,11 +520,10 @@ public class CypherReferenceTest
     public void test15_11_2()
     {
         assertEquals( "START a=node(3),b=node(1) MATCH p=(a)-[*1..3]->(b) WHERE all(x in nodes(p):x.age>30) RETURN p",
-                      newQuery().
-                          nodes( "a", 3 ).nodes( "b", 1 ).
+                      start( node( "a", 3 ),node( "b", 1 )).
                           match( named( "p", path( "a", OUTGOING, "b" ).hops( 1, 3 ) ) ).
                           where( all( "x", "nodes(p)", gt( "x.age", 30 ) ) ).
-                          returnPath( "p" ).
+                          returns( paths( "p" ) ).
                           toString() );
     }
 
@@ -606,11 +531,10 @@ public class CypherReferenceTest
     public void test15_11_3()
     {
         assertEquals( "START a=node(3) MATCH p=(a)-[*1..3]->(b) WHERE any(x in nodes(p):x.eyes=\"blue\") RETURN p",
-                      newQuery().
-                          nodes( "a", 3 ).
+                      start(node( "a", 3 )).
                           match( named( "p", path( "a", OUTGOING, "b" ).hops( 1, 3 ) ) ).
                           where( any( "x", "nodes(p)", eq( "x.eyes", "blue" ) ) ).
-                          returnPath( "p" ).
+                          returns( paths( "p" ) ).
                           toString() );
     }
 
@@ -618,11 +542,10 @@ public class CypherReferenceTest
     public void test15_11_4()
     {
         assertEquals( "START n=node(3) MATCH p=(n)-[*1..3]->(b) WHERE none(x in nodes(p):x.age=25) RETURN p",
-                      newQuery().
-                          nodes( "n", 3 ).
+                      start(node( "n", 3 )).
                           match( named( "p", path( "n", OUTGOING, "b" ).hops( 1, 3 ) ) ).
                           where( none( "x", "nodes(p)", eq( "x.age", 25 ) ) ).
-                          returnPath( "p" ).
+                          returns( paths( "p" ) ).
                           toString() );
     }
 
@@ -630,11 +553,10 @@ public class CypherReferenceTest
     public void test15_11_5()
     {
         assertEquals( "START n=node(3) MATCH p=(n)-->(b) WHERE single(var in nodes(p):var.eyes=\"blue\") RETURN p",
-                      newQuery().
-                          nodes( "n", 3 ).
-                          match( named( "p", path( "n", OUTGOING, "b" )) ).
+                      start( node( "n", 3 )).
+                          match( named( "p", path( "n", OUTGOING, "b" ) ) ).
                           where( single( "var", "nodes(p)", eq( "var.eyes", "blue" ) ) ).
-                          returnPath( "p" ).
+                          returns( paths( "p" ) ).
                           toString() );
     }
 
@@ -642,10 +564,9 @@ public class CypherReferenceTest
     public void test15_11_7()
     {
         assertEquals( "START a=node(3) MATCH p=(a)-->(b)-->(c) RETURN length(p)",
-                      newQuery().
-                          nodes( "a", 3 ).
+                      start( node( "a", 3 )).
                           match( named( "p", path( "a", OUTGOING, "b" ).path( OUTGOING, "c" ) ) ).
-                          returnExpr( length( "p" ) ).
+                          returns( length( "p" ) ).
                           toString() );
     }
 
@@ -653,10 +574,9 @@ public class CypherReferenceTest
     public void test15_11_8()
     {
         assertEquals( "START n=node(3) MATCH (n)-[r]->() RETURN type(r)",
-                      newQuery().
-                          nodes( "n", 3 ).
+                      start( node( "n", 3 )).
                           match( path( "n", OUTGOING, "r", null, "" )).
-                          returnExpr( ReturnExpression.type( "r" ) ).
+                          returns( ReturnExpression.type( "r" ) ).
                           toString() );
     }
 
@@ -664,20 +584,16 @@ public class CypherReferenceTest
     public void test15_11_9()
     {
         assertEquals( "START a=node(3,4,5) RETURN id(a)",
-                      newQuery().
-                          nodes( "a", 3, 4, 5 ).
-                          returnExpr( ReturnExpression.id( "a" ) ).
-                          toString() );
+                      start( node( "a", 3, 4, 5 )).returns( id( "a" ) ).toString() );
     }
 
     @Test
     public void test15_11_11()
     {
         assertEquals( "START a=node(3),c=node(2) MATCH p=(a)-->(b)-->(c) RETURN nodes(p)",
-                      newQuery().
-                          nodes( "a", 3 ).nodes( "c", 2 ).
+                      start( node( "a", 3 ), node( "c", 2 )).
                           match( named( "p", path( "a", OUTGOING, "b" ).path( OUTGOING, "c" ) ) ).
-                          returnExpr( ReturnExpression.nodes( "p" ) ).
+                          returns( nodesOf( "p" ) ).
                           toString() );
     }
 
@@ -685,10 +601,9 @@ public class CypherReferenceTest
     public void test15_11_12()
     {
         assertEquals( "START a=node(3),c=node(2) MATCH p=(a)-->(b)-->(c) RETURN relationships(p)",
-                      newQuery().
-                          nodes( "a", 3 ).nodes( "c", 2 ).
+                      start( node( "a", 3 ), node( "c", 2 )).
                           match( named( "p", path( "a", OUTGOING, "b" ).path( OUTGOING, "c" ) ) ).
-                          returnExpr( ReturnExpression.relationships( "p" ) ).
+                          returns( relationshipsOf( "p" ) ).
                           toString() );
     }
 
@@ -699,21 +614,20 @@ public class CypherReferenceTest
         // This test shows how to do partial queries. When the Query from toQuery() is passed into a new CypherQuery
         // it is cloned, so any modifications do not affect the original query
 
-        Query query = newQuery().nodesLookup( "n", "node_auto_index", "name", "User1" ).
-            match( path( "n", OUTGOING, "hyperEdge" ).relationship( "hasRoleInGroup" )
-                       .path( OUTGOING, "group" ).relationship( "hasGroup" ) ).
-            match( path( "hyperEdge", OUTGOING, "role" ).relationship( "hasRole" ) ).toQuery();
+        Query query = start( lookup( "n", "node_auto_index", "name", "User1" )).
+            match( path( "n", OUTGOING, "hyperEdge" ).relationship( "hasRoleInGroup" ).path( OUTGOING, "group" ).relationship( "hasGroup" ),
+                   path( "hyperEdge", OUTGOING, "role" ).relationship( "hasRole" ) ).toQuery();
 
         assertEquals( "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
                       CypherQuery.newQuery( query ).
                           where( eq( "group.name", "Group2" ) ).
-                          returnProperty( "role.name" ).
+                          returns( properties("role.name") ).
                           toString() );
 
         assertEquals( "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name,group.name ORDER BY role.name ASCENDING",
                       CypherQuery.newQuery( query ).
-                          returnProperty( "role.name", "group.name" ).
-                          orderBy( "role.name", ASCENDING ).
+                          returns( properties("role.name", "group.name") ).
+                          orderBy( property("role.name", ASCENDING) ).
                           toString() );
     }
 
@@ -721,17 +635,16 @@ public class CypherReferenceTest
     public void test15_12_2()
     {
         assertEquals( "START joe=node:node_auto_index(name=\"Joe\") MATCH (joe)-[:knows]->(friend)-[:knows]->(friend_of_friend),(joe)-[r?:knows]->(friend_of_friend) WHERE r is null RETURN friend_of_friend.name,count(*) ORDER BY count(*) DESCENDING,friend_of_friend.name",
-                      newQuery().
-                          nodesLookup( "joe", "node_auto_index", "name", "Joe" ).
+                      start(lookup( "joe", "node_auto_index", "name", "Joe" )).
                           match( path( "joe", OUTGOING, "friend" ).relationship( "knows" )
                                      .path( OUTGOING, "friend_of_friend" )
-                                     .relationship( "knows" ) ).
-                          match( path( "joe", OUTGOING, "friend_of_friend" ).name( "r" )
+                                     .relationship( "knows" ),
+                                 path( "joe", OUTGOING, "friend_of_friend" ).name( "r" )
                                      .optional()
                                      .relationship( "knows" ) ).
                           where( isNull( "r" ) ).
-                          returnProperty( "friend_of_friend.name" ).count().
-                          orderBy( "count(*)", DESCENDING ).orderBy( "friend_of_friend.name" ).
+                          returns( properties("friend_of_friend.name"), count()).
+                          orderBy( property("count(*)", DESCENDING), property( "friend_of_friend.name") ).
                           toString() );
     }
 
@@ -739,20 +652,18 @@ public class CypherReferenceTest
     public void test15_12_3()
     {
         assertEquals( "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
-                      newQuery().
-                          nodesLookup( "place", "node_auto_index", "name", "CoffeShop1" ).
+                      start( lookup( "place", "node_auto_index", "name", "CoffeShop1" )).
                           match( path( "place", INCOMING, "person" ).relationship( "favorite" )
                                      .path( OUTGOING, "stuff" ).relationship( "favorite" ) ).
-                          returnProperty( "stuff.name" ).count().
-                          orderBy( "count(*)", DESCENDING ).orderBy( "stuff.name" ).
+                          returns( properties("stuff.name"), count()).
+                          orderBy( property("count(*)", DESCENDING ), property( "stuff.name" )).
                           toString() );
         
         assertEquals( "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
-                      newQuery().
-                          nodesLookup( "place", "node_auto_index", "name", "CoffeShop1" ).
+                      start( lookup( "place", "node_auto_index", "name", "CoffeShop1" )).
                           match( path( "place", OUTGOING, "tag" ).relationship( "tagged" ).path( INCOMING, "otherPlace" ).relationship( "tagged" ) ).
-                          returnProperty( "otherPlace.name" ).collect( "tag.name" ).
-                          orderBy( "otherPlace.name", DESCENDING ).
+                          returns( properties("otherPlace.name"), collect( "tag.name" )).
+                          orderBy( property("otherPlace.name", DESCENDING) ).
                           toString());
     }
 
@@ -760,13 +671,12 @@ public class CypherReferenceTest
     public void test15_12_4()
     {
         assertEquals( "START me=node:node_auto_index(name=\"Joe\") MATCH (me)-[:favorite]->(stuff)<-[:favorite]-(person),(me)-[r?:friend]-(person) WHERE r is null RETURN person.name,count(stuff) ORDER BY count(stuff) DESCENDING",
-                      newQuery().
-                        nodesLookup( "me", "node_auto_index", "name", "Joe" ).
-                        match( path( "me", OUTGOING, "stuff" ).relationship( "favorite" ).path( INCOMING, "person" ).relationship( "favorite" ) ).
-                        match( path("me","person").name( "r" ).optional().relationship( "friend" ) ).
+                      start( lookup( "me", "node_auto_index", "name", "Joe" )).
+                        match( path( "me", OUTGOING, "stuff" ).relationship( "favorite" ).path( INCOMING, "person" ).relationship( "favorite" ),
+                               path("me","person").name( "r" ).optional().relationship( "friend" ) ).
                         where( isNull( "r" ) ).
-                          returnProperty( "person.name" ).count( "stuff" ).
-                        orderBy( "count(stuff)", DESCENDING ).
+                        returns( properties("person.name"), count( "stuff" )).
+                        orderBy( property("count(stuff)", DESCENDING) ).
                         toString());
     }
 }

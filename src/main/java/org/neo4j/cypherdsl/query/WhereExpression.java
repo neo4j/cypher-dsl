@@ -122,13 +122,6 @@ public abstract class WhereExpression
 
     public static Regexp regexp( String property, String regexp )
     {
-        Query.checkEmpty( regexp, "Regular expression" );
-
-        return regexp(property, Expression.literal( regexp ));
-    }
-
-    public static Regexp regexp( String property, Expression.Value regexp )
-    {
         Query.checkEmpty( property, "Property" );
         Query.checkEmpty( regexp, "Regular expression" );
 
@@ -332,7 +325,7 @@ public abstract class WhereExpression
         extends PredicateExpression
     {
         public String property;
-        public Expression.Value regexp;
+        public String regexp;
 
         @Override
         public void asString( StringBuilder builder )
@@ -341,7 +334,7 @@ public abstract class WhereExpression
             if (optional)
                 builder.append( '?' );
             builder.append( "=~/" ); // TODO Should the / be include for parameters?
-            regexp.asString( builder );
+            builder.append( regexp );
             builder.append( '/' );
         }
     }

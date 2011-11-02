@@ -28,7 +28,12 @@ import org.neo4j.cypherdsl.OrderBy;
 public class OrderByExpression
     implements AsString, Serializable, Cloneable
 {
-    public static OrderByExpression orderBy(String name)
+    public enum Order
+    {
+        ASCENDING, DESCENDING
+    }
+
+    public static OrderByExpression property( String name )
     {
         Query.checkEmpty( name, "Name" );
         OrderByExpression orderBy = new OrderByExpression();
@@ -36,8 +41,18 @@ public class OrderByExpression
         return orderBy;
     }
 
+    public static OrderByExpression property( String name, Order order )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkNull( order, "Order" );
+        OrderByExpression orderBy = new OrderByExpression();
+        orderBy.name = name;
+        orderBy.order = order;
+        return orderBy;
+    }
+
     public String name;
-    public OrderBy.Order order;
+    public Order order;
     public boolean optional;
 
     public OrderByExpression optional()
@@ -46,7 +61,7 @@ public class OrderByExpression
         return this;
     }
 
-    public OrderByExpression order(OrderBy.Order order)
+    public OrderByExpression order(Order order)
     {
         this.order = order;
         return this;

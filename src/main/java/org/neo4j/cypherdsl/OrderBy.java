@@ -27,13 +27,5 @@ import org.neo4j.cypherdsl.query.OrderByExpression;
 public interface OrderBy
     extends Skip
 {
-    public enum Order
-    {
-        ASCENDING, DESCENDING
-    }
-
-    OrderBy orderBy(OrderByExpression orderByExpression);
-
-    OrderBy orderBy(String name);
-    OrderBy orderBy(String name, Order order );
+    OrderBy orderBy(OrderByExpression... orderByExpression);
 }

@@ -27,19 +27,5 @@ import org.neo4j.cypherdsl.query.ReturnExpression;
 public interface Return
     extends Execute
 {
-    ReturnNext returnExpr(ReturnExpression returnExpression);
-
-    ReturnNext returnNode( String... name );
-    ReturnNext returnRelationship( String... name );
-    ReturnNext returnPath( String... name );
-    ReturnNext returnProperty( String... names );
-
-    // Aggregate functions
-    ReturnNext count();
-    ReturnNext count(String name);
-    ReturnNext sum(String name);
-    ReturnNext avg(String name);
-    ReturnNext max(String name);
-    ReturnNext min(String name);
-    ReturnNext collect(String name);
+    ReturnNext returns( ReturnExpression... returnExpression );
 }

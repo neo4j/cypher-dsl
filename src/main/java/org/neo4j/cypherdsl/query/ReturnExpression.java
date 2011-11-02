@@ -29,7 +29,7 @@ import static org.neo4j.cypherdsl.query.Query.*;
 public abstract class ReturnExpression<T extends ReturnExpression>
     implements AsString, Serializable, Cloneable
 {
-    public static ReturnNode node( String... names )
+    public static ReturnNode nodes( String... names )
     {
         Query.checkEmpty( names, "Names" );
 
@@ -39,7 +39,7 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return returnNode;
     }
 
-    public static ReturnRelationship relationship( String... names )
+    public static ReturnRelationship relationships( String... names )
     {
         checkEmpty( names, "Names" );
 
@@ -48,7 +48,7 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return returnRelationship;
     }
 
-    public static ReturnProperty property( String... names )
+    public static ReturnProperty properties( String... names )
     {
         checkEmpty( names, "Names" );
         ReturnProperty returnProperty = new ReturnProperty();
@@ -56,7 +56,7 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return returnProperty;
     }
 
-    public static ReturnPath path( String... names )
+    public static ReturnPath paths( String... names )
     {
         checkEmpty( names, "Names" );
 
@@ -162,7 +162,7 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return returnFunction;
     }
 
-    public static ReturnFunction nodes(String name)
+    public static ReturnFunction nodesOf(String name)
     {
         checkEmpty( name, "Name" );
 
@@ -172,7 +172,7 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return returnFunction;
     }
 
-    public static ReturnFunction relationships(String name)
+    public static ReturnFunction relationshipsOf(String name)
     {
         checkEmpty( name, "Name" );
 

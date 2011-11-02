@@ -38,6 +38,13 @@ public class Expression
         return literal;
     }
 
+    public static Identifier identifier( String name )
+    {
+        Identifier identifier = new Identifier();
+        identifier.name = name;
+        return identifier;
+    }
+
     public static Literal[] literals( Object[] values )
     {
         Literal[] literals = new Literal[values.length];

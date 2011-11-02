@@ -39,14 +39,22 @@ import org.neo4j.cypherdsl.query.WhereExpression;
  * expanded using WHERE and RETURN clauses.
  */
 public class CypherQuery
-    implements StartNext, ReturnNext, Match, OrderBy, Skip, Limit, Execute
+    implements Match, ReturnNext, OrderBy, Skip, Limit, Execute
 {
     private Query query;
 
+    public static Match start(StartExpression... startExpressions)
+    {
+        CypherQuery query = new CypherQuery(  );
+        return query.startX( startExpressions );
+    }
+
+/*
     public static Start newQuery()
     {
         return new CypherQuery( );
     }
+*/
 
     public static CypherQuery newQuery( Query query )
     {
@@ -71,63 +79,24 @@ public class CypherQuery
     }
 
     // Start --------------------------------------------------------
-    @Override
-    public StartNext start( StartExpression startExpression )
+    public Match startX( StartExpression... startExpression )
     {
-        Query.checkNull( startExpression, "Expression" );
-        query.startExpressions.add( startExpression );
+        for( StartExpression expression : startExpression )
+        {
+            query.startExpressions.add( expression );
+        }
 
         return this;
     }
 
-    @Override
-    public StartNext nodes( String name, int... id )
-    {
-        return start( StartExpression.nodes( name, id ) );
-    }
-
-    @Override
-    public StartNext nodes( String name, String... parameters )
-    {
-        return start( StartExpression.nodes( name, parameters ) );
-    }
-
-    @Override
-    public StartNext nodesLookup( String name, String indexName, String key, String value )
-    {
-        return start( StartExpression.nodesLookup( name, indexName, key, value ) );
-    }
-
-    @Override
-    public StartNext nodesQuery( String name, String indexName, String query )
-    {
-        return start( StartExpression.nodesQuery( name, indexName, query ) );
-    }
-
-    @Override
-    public StartNext relationships( String name, int... id )
-    {
-        return start( StartExpression.relationships( name, id ) );
-    }
-
-    @Override
-    public StartNext relationships( String name, String... parameters )
-    {
-        return start( StartExpression.relationships( name, parameters ) );
-    }
-
-    @Override
-    public StartNext relationshipsLookup( String name, String indexName, String key, String value )
-    {
-        return start( StartExpression.relationshipsLookup( name, indexName, key, value ) );
-    }
-
     // Match --------------------------------------------------------
     @Override
-    public Match match( MatchExpression expression )
+    public Match match( MatchExpression... expression )
     {
-        Query.checkNull( expression, "Expression" );
-        query.matchExpressions.add( expression );
+        for( MatchExpression matchExpression : expression )
+        {
+            query.matchExpressions.add( matchExpression );
+        }
         return this;
     }
 
@@ -142,98 +111,24 @@ public class CypherQuery
 
     // Return -------------------------------------------------------
     @Override
-    public ReturnNext returnExpr( ReturnExpression returnExpression )
+    public ReturnNext returns( ReturnExpression... returnExpression )
     {
-        Query.checkNull( returnExpression, "Expression" );
-        query.returnExpressions.add( returnExpression );
+        for( ReturnExpression expression : returnExpression )
+        {
+            query.returnExpressions.add( expression );
+        }
         return this;
-    }
-
-    @Override
-    public ReturnNext returnNode( String... names )
-    {
-        return returnExpr( ReturnExpression.node( names ) );
-    }
-
-    @Override
-    public ReturnNext returnRelationship( String... names )
-    {
-        return returnExpr( ReturnExpression.relationship( names ) );
-    }
-
-    @Override
-    public ReturnNext returnPath( String... names )
-    {
-        return returnExpr( ReturnExpression.path( names ) );
-    }
-
-    @Override
-    public ReturnNext returnProperty( String... names )
-    {
-        return returnExpr( ReturnExpression.property( names ) );
-    }
-
-    @Override
-    public ReturnNext count()
-    {
-        return returnExpr(ReturnExpression.count());
-    }
-
-    @Override
-    public ReturnNext count( String name )
-    {
-        return returnExpr(ReturnExpression.count( name ));
-    }
-
-    @Override
-    public ReturnNext sum( String name )
-    {
-        return returnExpr(ReturnExpression.sum( name ));
-    }
-
-    @Override
-    public ReturnNext avg( String name )
-    {
-        return returnExpr(ReturnExpression.avg( name ));
-    }
-
-    @Override
-    public ReturnNext max( String name )
-    {
-        return returnExpr(ReturnExpression.max( name ));
-    }
-
-    @Override
-    public ReturnNext min( String name )
-    {
-        return returnExpr( ReturnExpression.min( name ) );
-    }
-
-    @Override
-    public ReturnNext collect( String name )
-    {
-        return returnExpr(ReturnExpression.collect( name ));
     }
 
     // OrderBy ------------------------------------------------------
     @Override
-    public OrderBy orderBy( OrderByExpression orderByExpression )
+    public OrderBy orderBy( OrderByExpression... orderByExpression )
     {
-        Query.checkNull( orderByExpression, "Expression" );
-        query.orderByExpressions.add( orderByExpression );
+        for( OrderByExpression expression : orderByExpression )
+        {
+            query.orderByExpressions.add( expression );
+        }
         return this;
-    }
-
-    @Override
-    public OrderBy orderBy( String name )
-    {
-        return orderBy( OrderByExpression.orderBy( name ) );
-    }
-
-    @Override
-    public OrderBy orderBy( String name, Order order )
-    {
-        return orderBy( OrderByExpression.orderBy( name ).order( order ) );
     }
 
     // Skip ---------------------------------------------------------
