@@ -49,13 +49,6 @@ public class CypherQuery
         return query.startX( startExpressions );
     }
 
-/*
-    public static Start newQuery()
-    {
-        return new CypherQuery( );
-    }
-*/
-
     public static CypherQuery newQuery( Query query )
     {
         return new CypherQuery( query);
