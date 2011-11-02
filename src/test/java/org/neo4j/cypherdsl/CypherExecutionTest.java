@@ -19,13 +19,14 @@
  */
 package org.neo4j.cypherdsl;
 
+import java.io.IOException;
+import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypher.commands.Query;
 import org.neo4j.cypher.javacompat.CypherParser;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -36,10 +37,7 @@ import org.neo4j.test.TestData;
 
 import static org.neo4j.cypherdsl.query.MatchExpression.Direction.*;
 import static org.neo4j.cypherdsl.query.MatchExpression.*;
-import static org.neo4j.cypherdsl.query.ReturnExpression.properties;
-
-import static org.neo4j.cypherdsl.query.MatchExpression.Direction.OUTGOING;
-import static org.neo4j.cypherdsl.query.MatchExpression.path;
+import static org.neo4j.cypherdsl.query.ReturnExpression.*;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database.
@@ -65,7 +63,7 @@ public class CypherExecutionTest
     {
         data.get();
 
-        String query = CypherQuery.start( StartExpression.lookup( "john", "node_auto_index", "name", "John" ))
+        String query = CypherQuery.start( StartExpression.lookup( "john", "node_auto_index", "name", "John" ) )
                                               .match( path( "john", OUTGOING, "" ).relationship( "friend" )
                                                           .path( OUTGOING, null, "friend", "fof" ) )
                                               .returns( properties( "john.name", "fof.name" ) )
