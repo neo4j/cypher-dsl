@@ -39,27 +39,26 @@ import org.neo4j.cypherdsl.query.WhereExpression;
  * expanded using WHERE and RETURN clauses.
  */
 public class CypherQuery
-    implements Match, ReturnNext, OrderBy, Skip, Limit, Execute
 {
     private Query query;
 
-    public static Match start(StartExpression... startExpressions)
+    public static Match start( StartExpression... startExpressions )
     {
-        CypherQuery query = new CypherQuery(  );
-        return query.startX( startExpressions );
+        CypherQuery query = new CypherQuery();
+        return query.starts( startExpressions );
     }
 
     public static CypherQuery newQuery( Query query )
     {
-        return new CypherQuery( query);
+        return new CypherQuery( query );
     }
 
-    private CypherQuery()
+    public CypherQuery()
     {
         query = new Query();
     }
 
-    private CypherQuery(Query query)
+    private CypherQuery( Query query )
     {
         try
         {
@@ -72,96 +71,128 @@ public class CypherQuery
     }
 
     // Start --------------------------------------------------------
-    public Match startX( StartExpression... startExpression )
+    public Match starts( StartExpression... startExpression )
     {
         for( StartExpression expression : startExpression )
         {
             query.startExpressions.add( expression );
         }
 
-        return this;
+        return new Grammar();
+    }
+
+    public StartExpression.StartNodes node( String name, int... id )
+    {
+        return StartExpression.node( name, id );
     }
 
     // Match --------------------------------------------------------
-    @Override
-    public Match match( MatchExpression... expression )
+    protected MatchExpression.Path path( String name )
     {
-        for( MatchExpression matchExpression : expression )
-        {
-            query.matchExpressions.add( matchExpression );
-        }
-        return this;
-    }
-
-    // Where --------------------------------------------------------
-    @Override
-    public Return where( WhereExpression expression )
-    {
-        Query.checkNull( expression, "Expression" );
-        query.whereExpression = expression;
-        return this;
+        return MatchExpression.pathX( name );
     }
 
     // Return -------------------------------------------------------
-    @Override
-    public ReturnNext returns( ReturnExpression... returnExpression )
+    protected ReturnExpression.ReturnNode nodes( String... names )
     {
-        for( ReturnExpression expression : returnExpression )
-        {
-            query.returnExpressions.add( expression );
-        }
-        return this;
-    }
-
-    // OrderBy ------------------------------------------------------
-    @Override
-    public OrderBy orderBy( OrderByExpression... orderByExpression )
-    {
-        for( OrderByExpression expression : orderByExpression )
-        {
-            query.orderByExpressions.add( expression );
-        }
-        return this;
-    }
-
-    // Skip ---------------------------------------------------------
-    @Override
-    public Limit skip( int skip )
-    {
-        if (skip < 0)
-            throw new IllegalArgumentException( "Skip may not be below zero" );
-
-        query.skip = skip;
-        return this;
-    }
-
-    // Limit --------------------------------------------------------
-    @Override
-    public Execute limit( int limit)
-    {
-        if (limit < 0)
-            throw new IllegalArgumentException( "Limit may not be below zero" );
-
-        query.limit = limit;
-        return this;
-    }
-
-    // Execute ------------------------------------------------------
-    @Override
-    public void asString(StringBuilder builder)
-    {
-        query.asString( builder );
-    }
-
-    @Override
-    public Query toQuery()
-    {
-        return query;
+        return ReturnExpression.nodes( names );
     }
 
     @Override
     public String toString()
     {
         return query.toString();
+    }
+
+    // Grammar
+    private class Grammar
+        implements Match, ReturnNext, OrderBy, Skip, Limit, Execute
+    {
+        // Match --------------------------------------------------------
+        @Override
+        public Match match( MatchExpression... expression )
+        {
+            for( MatchExpression matchExpression : expression )
+            {
+                query.matchExpressions.add( matchExpression );
+            }
+            return this;
+        }
+
+        // Where --------------------------------------------------------
+        @Override
+        public Return where( WhereExpression expression )
+        {
+            Query.checkNull( expression, "Expression" );
+            query.whereExpression = expression;
+            return this;
+        }
+
+        // Return -------------------------------------------------------
+        @Override
+        public ReturnNext returns( ReturnExpression... returnExpression )
+        {
+            for( ReturnExpression expression : returnExpression )
+            {
+                query.returnExpressions.add( expression );
+            }
+            return this;
+        }
+
+        // OrderBy ------------------------------------------------------
+        @Override
+        public OrderBy orderBy( OrderByExpression... orderByExpression )
+        {
+            for( OrderByExpression expression : orderByExpression )
+            {
+                query.orderByExpressions.add( expression );
+            }
+            return this;
+        }
+
+        // Skip ---------------------------------------------------------
+        @Override
+        public Limit skip( int skip )
+        {
+            if( skip < 0 )
+            {
+                throw new IllegalArgumentException( "Skip may not be below zero" );
+            }
+
+            query.skip = skip;
+            return this;
+        }
+
+        // Limit --------------------------------------------------------
+        @Override
+        public Execute limit( int limit )
+        {
+            if( limit < 0 )
+            {
+                throw new IllegalArgumentException( "Limit may not be below zero" );
+            }
+
+            query.limit = limit;
+            return this;
+        }
+
+        // Execute ------------------------------------------------------
+        @Override
+        public void asString( StringBuilder builder )
+        {
+            query.asString( builder );
+        }
+
+        @Override
+        public Query toQuery()
+        {
+            return query;
+        }
+
+        @Override
+        public String toString()
+        {
+            return CypherQuery.this.toString();
+        }
     }
 }

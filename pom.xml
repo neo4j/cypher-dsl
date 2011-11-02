@@ -83,6 +83,7 @@
                     <argLine>-Xmx300m</argLine>
                 </configuration>
             </plugin>
+          <!--
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <executions>
@@ -102,6 +103,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
     </build>
 

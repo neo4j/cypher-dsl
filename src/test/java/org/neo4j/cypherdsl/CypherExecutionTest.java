@@ -64,8 +64,8 @@ public class CypherExecutionTest
         data.get();
 
         String query = CypherQuery.start( StartExpression.lookup( "john", "node_auto_index", "name", "John" ) )
-                                              .match( path( "john", OUTGOING, "" ).relationship( "friend" )
-                                                          .path( OUTGOING, null, "friend", "fof" ) )
+                                              .match( path( "john", OUT, "" ).relationship( "friend" )
+                                                          .path( OUT, null, "friend", "fof" ) )
                                               .returns( properties( "john.name", "fof.name" ) )
                                               .toString();
 

@@ -33,8 +33,8 @@ public abstract class MatchExpression
     public enum Direction
     {
         ANY,
-        OUTGOING,
-        INCOMING
+        OUT,
+        IN
     }
 
     /**
@@ -56,6 +56,13 @@ public abstract class MatchExpression
         namedPath.name = name;
         namedPath.path = path;
         return namedPath;
+    }
+
+    public static Path pathX(String name)
+    {
+        Path path = new Path();
+        path.name = name;
+        return path;
     }
 
     /**
@@ -86,7 +93,7 @@ public abstract class MatchExpression
      * Use this to create a path with a given direction. Use the methods
      * on the returned Path to further modify the path if necessary.
      *
-     * Example: path("a",OUTGOING,"b") -> (a)-->(b)
+     * Example: path("a",OUT,"b") -> (a)-->(b)
      *
      * @param from
      * @param direction
@@ -115,7 +122,28 @@ public abstract class MatchExpression
      * Use this to create a path with almost all information provided.
      * Use the methods on the returned Path to further modify the path if necessary
      *
-     * Example: path("a",OUTGOING,"r",KNOWS,"b") -> (a)-[r:KNOWS]->(b)
+     * Example: path("a",OUT,"r","b") -> (a)-[r]->(b)
+     *
+     * @param from
+     * @param direction
+     * @param name
+     * @param to
+     * @return
+     */
+    public static Path path( String from,
+                             Direction direction,
+                             String name,
+                             String to
+    )
+    {
+        return path( from, direction, name, (String) null, to );
+    }
+
+    /**
+     * Use this to create a path with almost all information provided.
+     * Use the methods on the returned Path to further modify the path if necessary
+     *
+     * Example: path("a",OUT,"r",KNOWS,"b") -> (a)-[r:KNOWS]->(b)
      *
      * @param from
      * @param direction
@@ -138,7 +166,7 @@ public abstract class MatchExpression
      * Use this to create a path with almost all information provided.
      * Use the methods on the returned Path to further modify the path if necessary
      *
-     * Example: path("a",OUTGOING,"r","KNOWS","b") -> (a)-[r:KNOWS]->(b)
+     * Example: path("a",OUT,"r","KNOWS","b") -> (a)-[r:KNOWS]->(b)
      *
      * @param from
      * @param direction
@@ -170,7 +198,7 @@ public abstract class MatchExpression
     /**
      * Use this to create a path with all information provided.
      *
-     * Example: path("a",OUTGOING,"r",true, "KNOWS",1,3,"b") -> (a)-[r?:KNOWS*1..3]->(b)
+     * Example: path("a",OUT,"r",true, "KNOWS",1,3,"b") -> (a)-[r?:KNOWS*1..3]->(b)
      *
      * @param from
      * @param direction
@@ -263,7 +291,7 @@ public abstract class MatchExpression
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( direction.equals( Direction.INCOMING ) ? "<-" : "-" );
+            builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
             if( name != null || relationship != null || optional || minHops != null || maxHops != null )
             {
@@ -298,7 +326,7 @@ public abstract class MatchExpression
                 builder.append( ']' );
             }
 
-            builder.append( direction.equals( Direction.OUTGOING ) ? "->" : "-" );
+            builder.append( direction.equals( Direction.OUT ) ? "->" : "-" );
 
             builder.append( '(' ).append( to ).append( ')' );
         }
@@ -307,6 +335,27 @@ public abstract class MatchExpression
         {
             Query.checkNull( direction, "Direction" );
             this.direction = direction;
+            return (T) this;
+        }
+
+        public T out(String relationship)
+        {
+            this.direction = Direction.OUT;
+            this.relationship = relationship;
+            return (T) this;
+        }
+
+        public T in(String relationship)
+        {
+            this.direction = Direction.IN;
+            this.relationship = relationship;
+            return (T) this;
+        }
+
+        public T any(String relationship)
+        {
+            this.direction = Direction.ANY;
+            this.relationship = relationship;
             return (T) this;
         }
 
@@ -347,6 +396,12 @@ public abstract class MatchExpression
 
             this.minHops = minHops;
             this.maxHops = maxHops;
+            return (T) this;
+        }
+
+        public T to(String to)
+        {
+            this.to = to;
             return (T) this;
         }
     }
@@ -403,6 +458,12 @@ public abstract class MatchExpression
             path.to = to;
 
             return path;
+        }
+
+        public Path from(String from)
+        {
+            this.from = from;
+            return this;
         }
     }
 
