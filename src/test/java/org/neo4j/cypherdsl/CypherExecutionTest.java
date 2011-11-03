@@ -35,7 +35,6 @@ import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
-import static org.neo4j.cypherdsl.query.MatchExpression.Direction.*;
 import static org.neo4j.cypherdsl.query.MatchExpression.*;
 import static org.neo4j.cypherdsl.query.ReturnExpression.*;
 

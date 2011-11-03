@@ -29,17 +29,16 @@ public abstract class WhereExpression
 {
     public static StringType string(String name)
     {
-        return new StringType(name);
+        StringType type = new StringType();
+        type.name = name;
+        return type;
     }
 
     public static NumberType number(String name)
     {
-        return new NumberType(name);
-    }
-
-    public static NumberType length(String name)
-    {
-        return new NumberType( "length("+name+")" );
+        NumberType type = new NumberType();
+        type.name = name;
+        return type;
     }
 
     public static And and(BooleanExpression... expressions)
@@ -263,25 +262,59 @@ public abstract class WhereExpression
         return super.clone();
     }
 
-    public static class StringType
+    public static abstract class CommonType<T>
     {
-        private String name;
+        protected String name;
 
-        private StringType( String name )
-        {
-            this.name = name;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public Equals eq(String value)
+        public Equals eq(T value)
         {
             return WhereExpression.eq( name, value );
         }
 
+        public GT gt(T value)
+        {
+            return WhereExpression.gt( name, value );
+        }
+
+        public LT lt(T value)
+        {
+            return WhereExpression.lt( name, value );
+        }
+
+        public GTE gte(T value)
+        {
+            return WhereExpression.gte( name, value );
+        }
+
+        public LTE lte(T value)
+        {
+            return WhereExpression.lte( name, value );
+        }
+
+        public NE ne(T value)
+        {
+            return WhereExpression.ne( name, value );
+        }
+
+        public Exists exists()
+        {
+            return WhereExpression.exists( name );
+        }
+
+        public IsNull isNull()
+        {
+            return WhereExpression.isNull( name );
+        }
+
+        public IsNotNull isNotNull()
+        {
+            return WhereExpression.isNotNull( name );
+        }
+    }
+
+    public static class StringType
+        extends CommonType<String>
+    {
         public Regexp regexp(String value)
         {
             return WhereExpression.regexp( name, value );
@@ -289,43 +322,8 @@ public abstract class WhereExpression
     }
 
     public static class NumberType
+        extends CommonType<Number>
     {
-        private String name;
-
-        private NumberType( String name )
-        {
-            this.name = name;
-        }
-
-        public String getName()
-        {
-            return name;
-        }
-
-        public Equals eq(Number value)
-        {
-            return WhereExpression.eq( name, value );
-        }
-
-        public GT gt(Number value)
-        {
-            return WhereExpression.gt( name, value );
-        }
-
-        public LT lt(Number value)
-        {
-            return WhereExpression.lt( name, value );
-        }
-
-        public GTE gte(Number value)
-        {
-            return WhereExpression.gte( name, value );
-        }
-
-        public LTE lte(Number value)
-        {
-            return WhereExpression.lte( name, value );
-        }
     }
 
     public static class And
