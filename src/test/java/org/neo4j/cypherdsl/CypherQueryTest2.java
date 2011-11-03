@@ -37,15 +37,14 @@ public class CypherQueryTest2
             starts( node( "john", 0 ) ).returns( nodes( "john" ) );
         }}.toString() );
 
-        assertEquals( "START john=node(0) RETURN john", new CypherQuery()
+        assertEquals( "START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
         {{
                 starts( node( "john", 0 ) ).match( path( "r" ).from( "john" )
                                                        .optional()
                                                        .out( "KNOWS" )
                                                        .hops( 1, 3 )
                                                        .to( "x" ) ).returns( nodes( "x" ) );
-            }}.toString() );
-
+        }}.toString() );
     }
 }
 

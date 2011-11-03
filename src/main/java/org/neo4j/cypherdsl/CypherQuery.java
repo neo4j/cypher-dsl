@@ -87,9 +87,14 @@ public class CypherQuery
     }
 
     // Match --------------------------------------------------------
+    protected MatchExpression.Path path()
+    {
+        return MatchExpression.path( );
+    }
+
     protected MatchExpression.Path path( String name )
     {
-        return MatchExpression.pathX( name );
+        return MatchExpression.path( name );
     }
 
     // Return -------------------------------------------------------

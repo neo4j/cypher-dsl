@@ -32,241 +32,36 @@ public abstract class MatchExpression
      */
     public enum Direction
     {
-        ANY,
+        BOTH,
         OUT,
         IN
     }
 
-    /**
-     * Use this to create a named path.
-     *
-     * Example: named("p",path("a","b")) -> p=(a)--(b)
-     *
-     * @param name
-     * @param path
-     * @return
-     */
-    public static NamedPath named( String name, AbstractPath path )
+    public static Path path()
     {
-        Query.checkEmpty( name, "Name" );
-        if (path == null)
-            throw new IllegalArgumentException( "Path may not be null" );
-
-        NamedPath namedPath = new NamedPath();
-        namedPath.name = name;
-        namedPath.path = path;
-        return namedPath;
+        return new Path();
     }
 
-    public static Path pathX(String name)
+    public static Path path(String name)
     {
         Path path = new Path();
-        path.name = name;
-        return path;
-    }
-
-    /**
-     * Use this to create a basic path. Use the methods on the returned
-     * Path to further modify the path if necessary.
-     *
-     * Example: path("a","b") -> (a)--(b)
-     *
-     * @param from
-     * @param to
-     * @return
-     */
-    public static Path path( String from,
-                             String to
-    )
-    {
-        Query.checkNull( from, "From" );
-        Query.checkNull( to, "To" );
-
-        Path path = new Path();
-        path.from = from;
-        path.to = to;
-
-        return path;
-    }
-
-    /**
-     * Use this to create a path with a given direction. Use the methods
-     * on the returned Path to further modify the path if necessary.
-     *
-     * Example: path("a",OUT,"b") -> (a)-->(b)
-     *
-     * @param from
-     * @param direction
-     * @param to
-     * @return
-     */
-    public static Path path( String from,
-                             Direction direction,
-                             String to
-    )
-    {
-        Query.checkNull( from, "From" );
-        if (direction == null)
-            throw new IllegalArgumentException( "Direction may not be null" );
-        Query.checkNull( to, "To" );
-
-        Path path = new Path();
-        path.from = from;
-        path.to = to;
-        path.direction = direction;
-
-        return path;
-    }
-
-    /**
-     * Use this to create a path with almost all information provided.
-     * Use the methods on the returned Path to further modify the path if necessary
-     *
-     * Example: path("a",OUT,"r","b") -> (a)-[r]->(b)
-     *
-     * @param from
-     * @param direction
-     * @param name
-     * @param to
-     * @return
-     */
-    public static Path path( String from,
-                             Direction direction,
-                             String name,
-                             String to
-    )
-    {
-        return path( from, direction, name, (String) null, to );
-    }
-
-    /**
-     * Use this to create a path with almost all information provided.
-     * Use the methods on the returned Path to further modify the path if necessary
-     *
-     * Example: path("a",OUT,"r",KNOWS,"b") -> (a)-[r:KNOWS]->(b)
-     *
-     * @param from
-     * @param direction
-     * @param name
-     * @param relationship
-     * @param to
-     * @return
-     */
-    public static Path path( String from,
-                             Direction direction,
-                             String name,
-                             Enum relationship,
-                             String to
-    )
-    {
-        return path( from, direction, name, relationship == null ? null : relationship.name(), to );
-    }
-
-    /**
-     * Use this to create a path with almost all information provided.
-     * Use the methods on the returned Path to further modify the path if necessary
-     *
-     * Example: path("a",OUT,"r","KNOWS","b") -> (a)-[r:KNOWS]->(b)
-     *
-     * @param from
-     * @param direction
-     * @param name
-     * @param relationShip
-     * @param to
-     * @return
-     */
-    public static Path path( String from,
-                             Direction direction,
-                             String name,
-                             String relationShip,
-                             String to
-    )
-    {
-        Query.checkNull( from, "From" );
-        Query.checkNull( to, "To" );
-
-        Path path = new Path();
-        path.from = from;
-        path.name = name;
-        path.relationship = relationShip;
-        path.to = to;
-        path.direction = direction;
-
-        return path;
-    }
-
-    /**
-     * Use this to create a path with all information provided.
-     *
-     * Example: path("a",OUT,"r",true, "KNOWS",1,3,"b") -> (a)-[r?:KNOWS*1..3]->(b)
-     *
-     * @param from
-     * @param direction
-     * @param name
-     * @param optional
-     * @param relationship
-     * @param minHops
-     * @param maxHops
-     * @param to
-     * @return
-     */
-    public static Path path( String from,
-                             Direction direction,
-                             String name,
-                             boolean optional,
-                             String relationship,
-                             Integer minHops,
-                             Integer maxHops,
-                             String to
-    )
-    {
-        Query.checkNull( from, "From" );
-        Query.checkNull( to, "To" );
-
-        Path path = new Path();
-        path.from = from;
-        path.to = to;
-        path.direction = direction;
-        path.name = name;
-        path.relationship = relationship;
-        path.optional = optional;
-        path.minHops = minHops;
-        path.maxHops = maxHops;
-
+        path.pathName = name;
         return path;
     }
 
     /**
      * Use this to invoke the shortestPath function
      *
-     * @param from
-     * @param to
+     * @param name
      * @return
      */
-    public static FunctionPath shortestPath( String from, String to )
+    public static FunctionPath shortestPath( String name )
     {
-        Query.checkNull( from, "From" );
-        Query.checkNull( to, "To" );
+        Query.checkNull( name, "Name" );
 
         FunctionPath functionPath = new FunctionPath();
         functionPath.function = "shortestPath";
-        functionPath.from = from;
-        functionPath.to = to;
-        return functionPath;
-    }
-
-    public static FunctionPath shortestPath( String from, Direction direction, String to )
-    {
-        Query.checkNull( from, "From" );
-        Query.checkNull( to, "To" );
-        if (direction == null)
-            throw new IllegalArgumentException( "Direction may not be null" );
-
-        FunctionPath functionPath = new FunctionPath();
-        functionPath.function = "shortestPath";
-        functionPath.from = from;
-        functionPath.direction = direction;
-        functionPath.to = to;
+        functionPath.pathName = name;
         return functionPath;
     }
 
@@ -280,9 +75,9 @@ public abstract class MatchExpression
     public static class AbstractPath<T extends AbstractPath>
         extends MatchExpression
     {
-        public String to;
-        public Direction direction = Direction.ANY;
-        public String name;
+        public String to = "";
+        public Direction direction = Direction.BOTH;
+        public String as;
         public String relationship;
         public boolean optional;
         public Integer minHops;
@@ -293,12 +88,12 @@ public abstract class MatchExpression
         {
             builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
-            if( name != null || relationship != null || optional || minHops != null || maxHops != null )
+            if( as != null || relationship != null || optional || minHops != null || maxHops != null )
             {
                 builder.append( '[' );
-                if( name != null )
+                if( as != null )
                 {
-                    builder.append( name );
+                    builder.append( as );
                 }
                 if( optional )
                 {
@@ -331,10 +126,21 @@ public abstract class MatchExpression
             builder.append( '(' ).append( to ).append( ')' );
         }
 
-        public T direction( Direction direction )
+        public T out()
         {
-            Query.checkNull( direction, "Direction" );
-            this.direction = direction;
+            this.direction = Direction.OUT;
+            return (T) this;
+        }
+
+        public T in()
+        {
+            this.direction = Direction.IN;
+            return (T) this;
+        }
+
+        public T both()
+        {
+            this.direction = Direction.BOTH;
             return (T) this;
         }
 
@@ -352,28 +158,28 @@ public abstract class MatchExpression
             return (T) this;
         }
 
-        public T any(String relationship)
+        public T both( String relationship )
         {
-            this.direction = Direction.ANY;
+            this.direction = Direction.BOTH;
             this.relationship = relationship;
             return (T) this;
         }
 
-        public T name( String name )
+        public T as( String name )
         {
             Query.checkEmpty( name, "Name" );
-            this.name = name;
+            this.as = name;
             return (T) this;
         }
 
-        public T relationship( Enum relationship )
+        public T rel( Enum relationship )
         {
             Query.checkNull( relationship, "Relationship" );
             this.relationship = relationship.name();
             return (T) this;
         }
 
-        public T relationship( String relationship )
+        public T rel( String relationship )
         {
             Query.checkEmpty( relationship, "Relationship" );
             this.relationship = relationship;
@@ -404,60 +210,29 @@ public abstract class MatchExpression
             this.to = to;
             return (T) this;
         }
+
+        public Link link()
+        {
+            Link path = new Link();
+            path.leftPath = this;
+
+            return path;
+        }
     }
 
     public static class Path
         extends AbstractPath<Path>
     {
-        public String from;
+        public String pathName;
+        public String from = "";
 
         @Override
         public void asString( StringBuilder builder )
         {
+            if (pathName != null)
+                builder.append( pathName ).append( '=' );
             builder.append( '(' ).append( from ).append( ')' );
             super.asString( builder );
-        }
-
-        public MultiPath path( String to )
-        {
-            Query.checkNull(to, "To");
-
-            MultiPath path = new MultiPath();
-            path.leftPath = this;
-            path.to = to;
-
-            return path;
-        }
-
-        public MultiPath path( Direction direction, String to )
-        {
-            Query.checkNull(to, "To");
-
-            MultiPath path = new MultiPath();
-            path.leftPath = this;
-            path.direction = direction;
-            path.to = to;
-
-            return path;
-        }
-
-        public MultiPath path( Direction direction, String name, Enum relationship, String to )
-        {
-            return path( direction, name, relationship == null ? null : relationship.name(), to );
-        }
-
-        public MultiPath path( Direction direction, String name, String relationship, String to )
-        {
-            Query.checkNull(to, "To");
-
-            MultiPath path = new MultiPath();
-            path.leftPath = this;
-            path.direction = direction;
-            path.name = name;
-            path.relationship = relationship;
-            path.to = to;
-
-            return path;
         }
 
         public Path from(String from)
@@ -467,8 +242,8 @@ public abstract class MatchExpression
         }
     }
 
-    public static class MultiPath
-        extends AbstractPath<MultiPath>
+    public static class Link
+        extends AbstractPath<Link>
     {
         public AbstractPath leftPath;
 
@@ -478,46 +253,97 @@ public abstract class MatchExpression
             leftPath.asString( builder );
             super.asString( builder );
         }
-
-        public MultiPath path( String to )
-        {
-            Query.checkNull(to, "To");
-
-            MultiPath path = new MultiPath();
-            path.leftPath = this;
-            path.to = to;
-
-            return path;
-        }
     }
 
     public static class FunctionPath
-        extends AbstractPath<FunctionPath>
-    {
-        public String function;
-        public String from;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( function ).append( '(' );
-            builder.append( '(' ).append( from ).append( ')' );
-            super.asString( builder );
-            builder.append( ')' );
-        }
-    }
-
-    public static class NamedPath
         extends MatchExpression
     {
-        public String name;
-        public AbstractPath path;
+        public String pathName;
+        public String function;
+        public String from = "";
+        public String to = "";
+        public Direction direction = Direction.BOTH;
+        public Integer minHops;
+        public Integer maxHops;
+
+        public FunctionPath out()
+        {
+            this.direction = Direction.OUT;
+            return this;
+        }
+
+        public FunctionPath in()
+        {
+            this.direction = Direction.IN;
+            return this;
+        }
+
+        public FunctionPath both()
+        {
+            this.direction = Direction.BOTH;
+            return this;
+        }
+
+        public FunctionPath from(String from)
+        {
+            Query.checkEmpty( from, "From" );
+            this.from = from;
+            return this;
+        }
+
+        public FunctionPath to(String to)
+        {
+            Query.checkEmpty( to, "To" );
+            this.to = to;
+            return this;
+        }
+
+        public FunctionPath hops( Integer minHops, Integer maxHops )
+        {
+            if (minHops != null && minHops < 0)
+                throw new IllegalArgumentException( "Minimum number of hops must be over zero" );
+
+            if (maxHops != null && maxHops < 0)
+                throw new IllegalArgumentException( "Maximum number of hops must be over zero" );
+
+            this.minHops = minHops;
+            this.maxHops = maxHops;
+            return this;
+        }
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( name ).append( '=' );
-            path.asString( builder );
+            builder.append( pathName ).append( "=" );
+            builder.append( function ).append( '(' );
+            builder.append( '(' ).append( from ).append( ')' );
+
+            builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
+
+            if( minHops != null || maxHops != null )
+            {
+                builder.append( '[' );
+                if( minHops != null || maxHops != null )
+                {
+                    builder.append( '*' );
+                    if( minHops != null )
+                    {
+                        builder.append( minHops );
+                    }
+                    builder.append( ".." );
+                    if( maxHops != null )
+                    {
+                        builder.append( maxHops );
+                    }
+                }
+
+                builder.append( ']' );
+            }
+
+            builder.append( direction.equals( Direction.OUT ) ? "->" : "-" );
+
+            builder.append( '(' ).append( to ).append( ')' );
+            builder.append( ')' );
         }
     }
 }

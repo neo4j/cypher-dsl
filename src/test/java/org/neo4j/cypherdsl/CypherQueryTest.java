@@ -57,7 +57,7 @@ public class CypherQueryTest
         // Start with parameters
         System.out.println( start(node( "john", "name" )).returns( nodes("john" )).toString());
 
-        System.out.println( start(node( "family", "mom", "dad" )).returns( nodes("family" )).toString());
+        System.out.println( start(node( "family")).returns( nodes("family" )).toString());
 
         // Start with lookup
         System.out.println( start(lookup( "john", "nodes", "name", "John" )).returns( nodes("john" )).toString());

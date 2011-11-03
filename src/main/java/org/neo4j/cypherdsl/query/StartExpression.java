@@ -46,14 +46,14 @@ public abstract class StartExpression
         return startNodes;
     }
 
-    public static StartNodes node( String name, String... parameters )
+    public static StartNodes node( String name, String parameter )
     {
         checkEmpty( name, "Name" );
-        checkEmpty( parameters, "Parameters" );
+        checkEmpty( parameter, "Parameters" );
 
         StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
         startNodes.name = name;
-        startNodes.nodes = parameters( parameters );
+        startNodes.nodes = parameters( new String[]{parameter} );
         return startNodes;
     }
 
