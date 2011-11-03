@@ -47,7 +47,7 @@ public class CypherQueryTest2
                        .to( "x" ) ).returns( nodes( "x" ) );
         }}.toString() );
 
-        assertEquals( "START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
+        assertEquals( "START n=node(3,1) WHERE (n.age<30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", new CypherQuery()
         {{
             starts( node( "n", 3, 1 ) ).
             where( number( "n.age" ).lt( 30 ).and( string( "n.name").eq( "Tobias" ) )
