@@ -27,6 +27,21 @@ import java.io.Serializable;
 public abstract class WhereExpression
     implements AsString, Serializable, Cloneable
 {
+    public static StringType string(String name)
+    {
+        return new StringType(name);
+    }
+
+    public static NumberType number(String name)
+    {
+        return new NumberType(name);
+    }
+
+    public static NumberType length(String name)
+    {
+        return new NumberType( "length("+name+")" );
+    }
+
     public static And and(BooleanExpression... expressions)
     {
         Query.checkNull( expressions, "Expressions" );
@@ -246,6 +261,71 @@ public abstract class WhereExpression
         throws CloneNotSupportedException
     {
         return super.clone();
+    }
+
+    public static class StringType
+    {
+        private String name;
+
+        private StringType( String name )
+        {
+            this.name = name;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public Equals eq(String value)
+        {
+            return WhereExpression.eq( name, value );
+        }
+
+        public Regexp regexp(String value)
+        {
+            return WhereExpression.regexp( name, value );
+        }
+    }
+
+    public static class NumberType
+    {
+        private String name;
+
+        private NumberType( String name )
+        {
+            this.name = name;
+        }
+
+        public String getName()
+        {
+            return name;
+        }
+
+        public Equals eq(Number value)
+        {
+            return WhereExpression.eq( name, value );
+        }
+
+        public GT gt(Number value)
+        {
+            return WhereExpression.gt( name, value );
+        }
+
+        public LT lt(Number value)
+        {
+            return WhereExpression.lt( name, value );
+        }
+
+        public GTE gte(Number value)
+        {
+            return WhereExpression.gte( name, value );
+        }
+
+        public LTE lte(Number value)
+        {
+            return WhereExpression.lte( name, value );
+        }
     }
 
     public static class And

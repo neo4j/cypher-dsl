@@ -1,130 +1,141 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>org.neo4j.build</groupId>
-        <artifactId>parent-central</artifactId>
-        <version>25</version>
-        <relativePath/>
-    </parent>
-    <groupId>org.neo4j</groupId>
-    <artifactId>neo4j-cypher-dsl</artifactId>
-    <version>1.5-SNAPSHOT</version>
-    <name>Neo4j Cypher DSL</name>
-    <description>Neo4j Cypher DSL</description>
-    <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.neo4j.build</groupId>
+    <artifactId>parent-central</artifactId>
+    <version>25</version>
+    <relativePath/>
+  </parent>
+  <groupId>org.neo4j</groupId>
+  <artifactId>neo4j-cypher-dsl</artifactId>
+  <version>1.5-SNAPSHOT</version>
+  <name>Neo4j Cypher DSL</name>
+  <description>Neo4j Cypher DSL</description>
+  <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
-    <properties>
-        <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
-        <short-name>cypher-dsl</short-name>
-        <license-text.header>GPL-3-header.txt</license-text.header>
-    </properties>
+  <properties>
+    <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
+    <short-name>cypher-dsl</short-name>
+    <license-text.header>GPL-3-header.txt</license-text.header>
+  </properties>
 
-    <packaging>jar</packaging>
+  <packaging>jar</packaging>
 
-    <scm>
-        <url>https://github.com/neo4j/cypher-dsl/tree/master/</url>
-    </scm>
+  <scm>
+    <url>https://github.com/neo4j/cypher-dsl/tree/master/</url>
+  </scm>
 
-    <licenses>
-        <license>
-            <name>GNU General Public License, Version 3</name>
-            <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
-            <comments>The software ("Software") developed and owned by Network Engine for
-                Objects in Lund AB (referred to in this notice as "Neo Technology") is
-                licensed under the GNU GENERAL PUBLIC LICENSE Version 3 to all third
-                parties and that license is included below.
+  <licenses>
+    <license>
+      <name>GNU General Public License, Version 3</name>
+      <url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+      <comments>The software ("Software") developed and owned by Network Engine for
+        Objects in Lund AB (referred to in this notice as "Neo Technology") is
+        licensed under the GNU GENERAL PUBLIC LICENSE Version 3 to all third
+        parties and that license is included below.
 
-                However, if you have executed an End User Software License and Services
-                Agreement or an OEM Software License and Support Services Agreement, or
-                another commercial license agreement with Neo Technology or one of its
-                affiliates (each, a "Commercial Agreement"), the terms of the license in
-                such Commercial Agreement will supersede the GNU GENERAL PUBLIC LICENSE
-                Version 3 and you may use the Software solely pursuant to the terms of
-                the relevant Commercial Agreement.
-            </comments>
-        </license>
-    </licenses>
+        However, if you have executed an End User Software License and Services
+        Agreement or an OEM Software License and Support Services Agreement, or
+        another commercial license agreement with Neo Technology or one of its
+        affiliates (each, a "Commercial Agreement"), the terms of the license in
+        such Commercial Agreement will supersede the GNU GENERAL PUBLIC LICENSE
+        Version 3 and you may use the Software solely pursuant to the terms of
+        the relevant Commercial Agreement.
+      </comments>
+    </license>
+  </licenses>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-cypher</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <version>1.5-SNAPSHOT</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-kernel</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>org.neo4j</groupId>
-            <artifactId>neo4j-lucene-index</artifactId>
-            <version>1.5-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-core</artifactId>
+      <version>2.2.3</version>
+      <optional>true</optional>
+    </dependency>
 
-    <build>
-        <plugins>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <argLine>-Xmx300m</argLine>
-                </configuration>
-            </plugin>
-          <!--
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>docs-assembly</id>
-                        <phase>package</phase>
-                        <configuration>
-                            <attach>true</attach>
-                            <appendAssemblyId>true</appendAssemblyId>
-                            <descriptors>
-                                <descriptor>src/main/assembly/docs-assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
-        </plugins>
-    </build>
 
-    <reporting>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <configuration>
-                    <!-- Override parent to include impl package in javadocs. -->
-                    <excludePackageNames>*.dummy</excludePackageNames>
-                </configuration>
-            </plugin>
-        </plugins>
-    </reporting>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-cypher</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-kernel</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-kernel</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-lucene-index</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
+  </dependencies>
 
-    <distributionManagement>
-        <site>
-            <id>neo4j-site</id>
-            <url>scpexe://components.neo4j.org/home/neo/components/${project.artifactId}/${project.version}</url>
-        </site>
-    </distributionManagement>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <argLine>-Xmx300m</argLine>
+        </configuration>
+      </plugin>
+      <!--
+      <plugin>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <executions>
+              <execution>
+                  <id>docs-assembly</id>
+                  <phase>package</phase>
+                  <configuration>
+                      <attach>true</attach>
+                      <appendAssemblyId>true</appendAssemblyId>
+                      <descriptors>
+                          <descriptor>src/main/assembly/docs-assembly.xml</descriptor>
+                      </descriptors>
+                  </configuration>
+                  <goals>
+                      <goal>single</goal>
+                  </goals>
+              </execution>
+          </executions>
+      </plugin>
+      -->
+    </plugins>
+  </build>
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <!-- Override parent to include impl package in javadocs. -->
+          <excludePackageNames>*.dummy</excludePackageNames>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
+
+  <distributionManagement>
+    <site>
+      <id>neo4j-site</id>
+      <url>scpexe://components.neo4j.org/home/neo/components/${project.artifactId}/${project.version}</url>
+    </site>
+  </distributionManagement>
 
 </project>

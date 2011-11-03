@@ -54,7 +54,7 @@ public class CypherQuery
         return new CypherQuery( query );
     }
 
-    private Query query;
+    protected Query query;
 
     public CypherQuery()
     {
@@ -143,6 +143,22 @@ public class CypherQuery
     protected MatchExpression.FunctionPath shortestPath( String name )
     {
         return MatchExpression.shortestPath( name );
+    }
+
+    // Where --------------------------------------------------------
+    protected WhereExpression.StringType string(String name)
+    {
+        return WhereExpression.string( name );
+    }
+
+    protected WhereExpression.NumberType number(String name)
+    {
+        return WhereExpression.number( name );
+    }
+
+    protected WhereExpression.Not not(WhereExpression.PredicateExpression expr)
+    {
+        return WhereExpression.not( expr );
     }
 
     // Return -------------------------------------------------------
@@ -244,12 +260,12 @@ public class CypherQuery
     }
 
     // Grammar
-    private class Grammar
+    protected class Grammar
         implements Match, ReturnNext, OrderBy, Skip, Limit, Execute
     {
         // Match --------------------------------------------------------
         @Override
-        public Match match( MatchExpression... expression )
+        public Where match( MatchExpression... expression )
         {
             for( MatchExpression matchExpression : expression )
             {

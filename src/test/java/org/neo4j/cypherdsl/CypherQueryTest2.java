@@ -39,12 +39,20 @@ public class CypherQueryTest2
 
         assertEquals( "START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
         {{
-                starts( node( "john", 0 ) ).match( path( "r" ).from( "john" )
-                                                       .optional()
-                                                       .out( "KNOWS" )
-                                                       .hops( 1, 3 )
-                                                       .to( "x" ) ).returns( nodes( "x" ) );
+            starts( node( "john", 0 ) ).
+            match( path( "r" ).from( "john" )
+                       .optional()
+                       .out( "KNOWS" )
+                       .hops( 1, 3 )
+                       .to( "x" ) ).returns( nodes( "x" ) );
+        }}.toString() );
+
+        assertEquals( "START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
+        {{
+            starts( node( "n", 3, 1 ) ).
+            where( number( "n.age" ).lt( 30 ).and( string( "n.name").eq( "Tobias" ) )
+                       .or( not( string( "n.name" ).eq( "Tobias" ) ) ) ).
+            returns( nodes( "n" ) );
         }}.toString() );
     }
 }
-
