@@ -19,12 +19,15 @@
  */
 package org.neo4j.cypherdsl;
 
+import org.neo4j.cypherdsl.query.Expression;
 import org.neo4j.cypherdsl.query.MatchExpression;
 import org.neo4j.cypherdsl.query.OrderByExpression;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.WhereExpression;
+
+import static org.neo4j.cypherdsl.query.Query.checkEmpty;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -40,8 +43,6 @@ import org.neo4j.cypherdsl.query.WhereExpression;
  */
 public class CypherQuery
 {
-    private Query query;
-
     public static Match start( StartExpression... startExpressions )
     {
         CypherQuery query = new CypherQuery();
@@ -52,6 +53,8 @@ public class CypherQuery
     {
         return new CypherQuery( query );
     }
+
+    private Query query;
 
     public CypherQuery()
     {
@@ -81,9 +84,49 @@ public class CypherQuery
         return new Grammar();
     }
 
-    public StartExpression.StartNodes node( String name, int... id )
+    protected StartExpression.StartNodes node( String name, int... id )
     {
         return StartExpression.node( name, id );
+    }
+
+    protected StartExpression.StartNodes node( String name, String parameter )
+    {
+        return StartExpression.node( name, parameter );
+    }
+
+    protected StartExpression.StartNodesLookup lookup( String name, String indexName, String key, String value )
+    {
+        return StartExpression.lookup( name, indexName, key, value );
+    }
+
+    protected StartExpression.StartNodesLookup lookup( String name, String indexName, Expression.Identifier key, Expression.Value value )
+    {
+        return StartExpression.lookup( name, indexName, key, value );
+    }
+
+    protected StartExpression.StartNodesQuery query( String name, String indexName, String query )
+    {
+        return StartExpression.query( name, indexName, query );
+    }
+
+    protected StartExpression.StartRelationships relationship( String name, int... id )
+    {
+        return StartExpression.relationship( name, id );
+    }
+
+    protected StartExpression.StartRelationshipsParameters relationship( String name, String parameter )
+    {
+        return StartExpression.relationship( name, parameter );
+    }
+
+    protected StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, String key, String value )
+    {
+        return StartExpression.relationshipLookup( name, indexName, key, value );
+    }
+
+    protected StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, Expression.Identifier key, Expression.Value value )
+    {
+        return StartExpression.relationshipLookup( name, indexName, key, value );
     }
 
     // Match --------------------------------------------------------
@@ -97,10 +140,101 @@ public class CypherQuery
         return MatchExpression.path( name );
     }
 
+    protected MatchExpression.FunctionPath shortestPath( String name )
+    {
+        return MatchExpression.shortestPath( name );
+    }
+
     // Return -------------------------------------------------------
     protected ReturnExpression.ReturnNode nodes( String... names )
     {
         return ReturnExpression.nodes( names );
+    }
+
+    protected ReturnExpression.ReturnRelationship relationships( String... names )
+    {
+        return ReturnExpression.relationships( names );
+    }
+
+    protected ReturnExpression.ReturnProperty properties( String... names )
+    {
+        return ReturnExpression.properties( names );
+    }
+
+    protected ReturnExpression.ReturnPath paths( String... names )
+    {
+        return ReturnExpression.paths( names );
+    }
+
+    protected ReturnExpression.ReturnAggregate count()
+    {
+        return ReturnExpression.count(  );
+    }
+
+    protected ReturnExpression.ReturnAggregate count(String name)
+    {
+        return ReturnExpression.count( name );
+    }
+
+    protected ReturnExpression.ReturnAggregate sum(String name)
+    {
+        return ReturnExpression.sum( name );
+    }
+
+    protected ReturnExpression.ReturnAggregate avg(String name)
+    {
+        return ReturnExpression.avg( name );
+    }
+
+    protected ReturnExpression.ReturnAggregate max(String name)
+    {
+        return ReturnExpression.max( name );
+    }
+
+    protected ReturnExpression.ReturnAggregate min(String name)
+    {
+        return ReturnExpression.min( name );
+    }
+
+    protected ReturnExpression.ReturnAggregate collect(String name)
+    {
+        return ReturnExpression.collect( name );
+    }
+
+    protected ReturnExpression length( String name )
+    {
+        return ReturnExpression.length( name );
+    }
+
+    protected ReturnExpression.ReturnFunction type(String name)
+    {
+        return ReturnExpression.type( name );
+    }
+
+    protected ReturnExpression.ReturnFunction id(String name)
+    {
+        return ReturnExpression.id( name );
+    }
+
+    protected ReturnExpression.ReturnFunction nodesOf(String name)
+    {
+        return ReturnExpression.nodesOf( name );
+    }
+
+    protected ReturnExpression.ReturnFunction relationshipsOf(String name)
+    {
+        return ReturnExpression.relationshipsOf( name );
+    }
+
+    // Order by -----------------------------------------------------
+    protected OrderByExpression property( String name )
+    {
+        return OrderByExpression.property( name );
+    }
+
+    protected OrderByExpression property( String name, OrderByExpression.Order order )
+    {
+        return OrderByExpression.property( name, order );
     }
 
     @Override

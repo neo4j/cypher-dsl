@@ -19,6 +19,8 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import java.util.regex.Pattern;
+
 /**
  * Common methods for all expressions
  */

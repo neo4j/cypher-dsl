@@ -21,15 +21,13 @@ package org.neo4j.cypherdsl;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.neo4j.cypherdsl.query.Expression;
 
+import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.*;
 import static org.neo4j.cypherdsl.query.Expression.param;
-import static org.neo4j.cypherdsl.query.StartExpression.*;
-import static org.neo4j.cypherdsl.query.MatchExpression.*;
-import static org.neo4j.cypherdsl.query.WhereExpression.*;
-import static org.neo4j.cypherdsl.query.OrderByExpression.*;
 import static org.neo4j.cypherdsl.query.ReturnExpression.*;
+import static org.neo4j.cypherdsl.query.StartExpression.*;
+import static org.neo4j.cypherdsl.query.WhereExpression.*;
 
 /**
  * Tests for all parts of the Cypher DSL.
@@ -37,39 +35,29 @@ import static org.neo4j.cypherdsl.query.ReturnExpression.*;
 public class CypherQueryTest
 {
     @Test
-    public void testDSL()
-    {
-        // Minimal
-        System.out.println( start( node( "john", 0 )).returns( nodes("john") ).toString());
-
-        // Maximal
-        System.out.println( start( node( "john", 0 )).returns( nodes("john") ).orderBy( property("john.name") ).skip( 3 ).limit( 10 ).toString());
-    }
-
-    @Test
     public void testStartNodes()
     {
         // Start with id
-        System.out.println( start(node( "john", 0 )).returns( nodes("john") ).toString());
+        assertEquals( "START john=node(0) RETURN john", start( node( "john", 0 ) ).returns( nodes( "john" ) ).toString() );
 
-        System.out.println( start(node( "family", 0, 1 )).returns( nodes("family" )).toString() );
+        assertEquals( "START family=node(0,1) RETURN family", start(node( "family", 0, 1 )).returns( nodes("family" )).toString() );
 
         // Start with parameters
-        System.out.println( start(node( "john", "name" )).returns( nodes("john" )).toString());
+        assertEquals( "START john=node({name}) RETURN john", start(node( "john", "name" )).returns( nodes("john" )).toString());
 
-        System.out.println( start(node( "family")).returns( nodes("family" )).toString());
+        assertEquals( "START family=node() RETURN family", start(node( "family")).returns( nodes("family" )).toString());
 
         // Start with lookup
-        System.out.println( start(lookup( "john", "nodes", "name", "John" )).returns( nodes("john" )).toString());
+        assertEquals( "START john=node:nodes(name=\"John\") RETURN john", start(lookup( "john", "nodes", "name", "John" )).returns( nodes("john" )).toString());
 
         // Start with query
-        System.out.println( start(query( "john", "nodes", "name:John" )).returns( nodes("john" )).toString());
+        assertEquals( "START john=node:nodes(\"name:John\") RETURN john", start(query( "john", "nodes", "name:John" )).returns( nodes("john" )).toString());
 
         // Error handling
         try
         {
             start(node( null, 0 ));
-            Assert.fail( "Expected exception");
+            Assert.fail( "Expected exception" );
         }
         catch( Exception e )
         {
@@ -101,17 +89,17 @@ public class CypherQueryTest
     public void testStartRelationships()
     {
         // Start with id
-        System.out.println( start(relationship( "knows", 0 )).returns( relationships("knows") ).toString());
+        assertEquals( "START knows=relationship(0) RETURN knows", start(relationship( "knows", 0 )).returns( relationships("knows") ).toString());
 
-        System.out.println( start(relationship( "likes", 0, 1 )).returns( relationships("likes") ).toString() );
+        assertEquals( "START likes=relationship(0,1) RETURN likes", start(relationship( "likes", 0, 1 )).returns( relationships("likes") ).toString() );
 
         // Start with parameters
-        System.out.println( start(relationship( "knows", "name" )).returns( relationships("knows") ).toString());
+        assertEquals( "START knows=relationship({name}) RETURN knows", start(relationship( "knows", "name" )).returns( relationships("knows") ).toString());
 
-        System.out.println( start(relationship( "likes", "websitea", "websiteb" )).returns( relationships("likes") ).toString());
+        assertEquals( "START likes=relationship({websitea}) RETURN likes", start(relationship( "likes", "websitea")).returns( relationships("likes") ).toString());
 
         // Start with index
-        System.out.println( start(relationshipLookup( "knows", "relationships", "type", "Starred" )).returns( relationships("knows") ).toString());
+        assertEquals( "START knows=relationship:relationships(type=\"Starred\") RETURN knows", start(relationshipLookup( "knows", "relationships", "type", "Starred" )).returns( relationships("knows") ).toString());
 
         // Error handling
         try
@@ -148,19 +136,19 @@ public class CypherQueryTest
     @Test
     public void testWhere()
     {
-        System.out.println( start(node( "n", 0 )).where( eq( "n.name", param( "name" ) ) ).returns( nodes("n") ));
+        assertEquals( "START n=node(0) WHERE n.name={name} RETURN n", start(node( "n", 0 )).where( eq( "n.name", param( "name" ) ) ).returns( nodes("n") ).toString());
         
-        System.out.println( start(node( "n", 0 )).
+        assertEquals( "START n=node(0) WHERE (n.age>30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", start(node( "n", 0 )).
             where( gt( "n.age", 30 ).and( eq( "n.name", "Tobias" ) ).or( not( eq( "n.name", "Tobias" ) ) ) ).
-            returns( properties("n") ));
+            returns( properties("n") ).toString());
     }
 
     @Test
     public void testReturn()
     {
         // Return with node
-        System.out.println( start(node( "john", 0 )).returns( nodes("john") ).toString());
+        assertEquals( "START john=node(0) RETURN john", start(node( "john", 0 )).returns( nodes("john") ).toString());
 
-        System.out.println( start(node( "mom", 0 ), node( "dad", 1 )).returns( nodes("mom", "dad") ).toString());
+        assertEquals( "START mom=node(0),dad=node(1) RETURN mom,dad", start(node( "mom", 0 ), node( "dad", 1 )).returns( nodes("mom", "dad") ).toString());
     }
 }

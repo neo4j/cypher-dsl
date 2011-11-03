@@ -107,14 +107,14 @@ public abstract class StartExpression
         return startRelationships;
     }
 
-    public static StartRelationshipsParameters relationship( String name, String... parameters )
+    public static StartRelationshipsParameters relationship( String name, String parameter )
     {
         checkEmpty( name, "Name" );
-        checkEmpty( parameters, "Parameters" );
+        checkEmpty( parameter, "Parameter" );
 
         StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
         startRelationships.name = name;
-        startRelationships.parameters = parameters;
+        startRelationships.parameter = parameter;
         return startRelationships;
     }
 
@@ -221,19 +221,11 @@ public abstract class StartExpression
     public static class StartRelationshipsParameters
         extends StartExpression
     {
-        public String[] parameters;
+        public String parameter;
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=relationship(" );
-            for( int i = 0; i < parameters.length; i++ )
-            {
-                String parameter = parameters[ i ];
-                if (i > 0)
-                    builder.append( ',' );
-                builder.append( '{' ).append( parameter ).append( '}' );
-            }
-            builder.append( ')' );
+            builder.append( name ).append( "=relationship({" ).append( parameter ).append( "})" );
         }
     }
 

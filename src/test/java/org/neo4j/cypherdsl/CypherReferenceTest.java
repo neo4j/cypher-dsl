@@ -20,14 +20,12 @@
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
-import org.neo4j.cypherdsl.query.MatchExpression;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
 
 import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.*;
 import static org.neo4j.cypherdsl.query.MatchExpression.*;
-import static org.neo4j.cypherdsl.query.MatchExpression.Direction.*;
 import static org.neo4j.cypherdsl.query.OrderByExpression.Order.*;
 import static org.neo4j.cypherdsl.query.OrderByExpression.*;
 import static org.neo4j.cypherdsl.query.ReturnExpression.*;
@@ -383,7 +381,7 @@ public class CypherReferenceTest
     {
         assertEquals( "START n=node(2) MATCH (n)-[r]->() RETURN type(r),count(*)",
                       start( node( "n", 2 ) ).
-                          match( path().from("n").as( "r" ).out( )).
+                          match( path().from( "n" ).as( "r" ).out() ).
                           returns( ReturnExpression.type( "r" ), count() ).
                           toString() );
     }
@@ -520,7 +518,7 @@ public class CypherReferenceTest
     {
         assertEquals( "START a=node(3),b=node(1) MATCH p=(a)-[*1..3]->(b) WHERE all(x in nodes(p):x.age>30) RETURN p",
                       start( node( "a", 3 ), node( "b", 1 ) ).
-                          match( path( "p" ).from( "a" ).out( ).hops( 1,3 ).to( "b" )).
+                          match( path( "p" ).from( "a" ).out().hops( 1, 3 ).to( "b" ) ).
                           where( all( "x", "nodes(p)", gt( "x.age", 30 ) ) ).
                           returns( paths( "p" ) ).
                           toString() );
@@ -531,7 +529,7 @@ public class CypherReferenceTest
     {
         assertEquals( "START a=node(3) MATCH p=(a)-[*1..3]->(b) WHERE any(x in nodes(p):x.eyes=\"blue\") RETURN p",
                       start( node( "a", 3 ) ).
-                          match( path( "p" ).from( "a" ).out( ).hops( 1, 3 ).to( "b" )).
+                          match( path( "p" ).from( "a" ).out().hops( 1, 3 ).to( "b" ) ).
                           where( any( "x", "nodes(p)", eq( "x.eyes", "blue" ) ) ).
                           returns( paths( "p" ) ).
                           toString() );
@@ -553,7 +551,7 @@ public class CypherReferenceTest
     {
         assertEquals( "START n=node(3) MATCH p=(n)-->(b) WHERE single(var in nodes(p):var.eyes=\"blue\") RETURN p",
                       start( node( "n", 3 ) ).
-                          match( path( "p" ).from( "n" ).out( ).to( "b" )).
+                          match( path( "p" ).from( "n" ).out().to( "b" ) ).
                           where( single( "var", "nodes(p)", eq( "var.eyes", "blue" ) ) ).
                           returns( paths( "p" ) ).
                           toString() );
@@ -591,7 +589,7 @@ public class CypherReferenceTest
     {
         assertEquals( "START a=node(3),c=node(2) MATCH p=(a)-->(b)-->(c) RETURN nodes(p)",
                       start( node( "a", 3 ), node( "c", 2 ) ).
-                          match( path( "p" ).from( "a" ).out( ).to( "b" ).link().out(  ).to( "c" )).
+                          match( path( "p" ).from( "a" ).out().to( "b" ).link().out().to( "c" ) ).
                           returns( nodesOf( "p" ) ).
                           toString() );
     }
@@ -614,8 +612,8 @@ public class CypherReferenceTest
         // it is cloned, so any modifications do not affect the original query
 
         Query query = start( lookup( "n", "node_auto_index", "name", "User1" ) ).
-            match( path().from( "n" ).out( "hasRoleInGroup" ).to( "hyperEdge" ).link().out("hasGroup" ).to( "group" ),
-                   path().from("hyperEdge").out( "hasRole" ).to( "role" )).toQuery();
+            match( path().from( "n" ).out( "hasRoleInGroup" ).to( "hyperEdge" ).link().out( "hasGroup" ).to( "group" ),
+                   path().from( "hyperEdge" ).out( "hasRole" ).to( "role" ) ).toQuery();
 
         assertEquals( "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
                       CypherQuery.newQuery( query ).starts().
@@ -637,7 +635,7 @@ public class CypherReferenceTest
                       start( lookup( "joe", "node_auto_index", "name", "Joe" ) ).
                           match( path().from( "joe" ).out( "knows" ).to( "friend" )
                                      .link().out( "knows" ).to( "friend_of_friend" ),
-                                 path().from( "joe").as( "r" ).out( "knows" ).optional().to( "friend_of_friend" )).
+                                 path().from( "joe" ).as( "r" ).out( "knows" ).optional().to( "friend_of_friend" ) ).
                           where( isNull( "r" ) ).
                           returns( properties( "friend_of_friend.name" ), count() ).
                           orderBy( property( "count(*)", DESCENDING ), property( "friend_of_friend.name" ) ).
@@ -650,7 +648,7 @@ public class CypherReferenceTest
         assertEquals( "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
                       start( lookup( "place", "node_auto_index", "name", "CoffeShop1" ) ).
                           match( path().from( "place" ).in( "favorite" ).to( "person" )
-                                     .link().out( "favorite" ).to( "stuff" )).
+                                     .link().out( "favorite" ).to( "stuff" ) ).
                           returns( properties( "stuff.name" ), count() ).
                           orderBy( property( "count(*)", DESCENDING ), property( "stuff.name" ) ).
                           toString() );
@@ -658,7 +656,7 @@ public class CypherReferenceTest
         assertEquals( "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
                       start( lookup( "place", "node_auto_index", "name", "CoffeShop1" ) ).
                           match( path().from( "place" ).out( "tagged" ).to( "tag" )
-                                     .link().in( "tagged" ).to( "otherPlace" )).
+                                     .link().in( "tagged" ).to( "otherPlace" ) ).
                           returns( properties( "otherPlace.name" ), collect( "tag.name" ) ).
                           orderBy( property( "otherPlace.name", DESCENDING ) ).
                           toString() );
