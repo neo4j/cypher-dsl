@@ -73,7 +73,7 @@ public class Expression
         return parameters;
     }
 
-    public static Literal[] literals( int[] values )
+    public static Literal[] literals( long[] values )
     {
         Literal[] literals = new Literal[values.length];
         for( int i = 0; i < values.length; i++ )

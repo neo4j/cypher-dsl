@@ -24,10 +24,10 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.cypher.commands.Query;
-import org.neo4j.cypher.javacompat.CypherParser;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.querydsl.Projection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.GraphDescription;
@@ -35,8 +35,10 @@ import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
+import static org.neo4j.cypherdsl.CypherQuery.*;
 import static org.neo4j.cypherdsl.query.MatchExpression.*;
 import static org.neo4j.cypherdsl.query.ReturnExpression.*;
+import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.*;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database.
@@ -50,7 +52,6 @@ public class CypherExecutionTest
 
     private ImpermanentGraphDatabase graphdb;
     private ExecutionEngine engine;
-    private CypherParser parser;
 
     @Test
     @GraphDescription.Graph( value = {
@@ -62,15 +63,40 @@ public class CypherExecutionTest
     {
         data.get();
 
-        String query = CypherQuery.start( StartExpression.lookup( "john", "node_auto_index", "name", "John" ) )
+        String query = start( StartExpression.lookup( "john", "node_auto_index", "name", "John" ) )
                                               .match( path().from( "john" ).out( "friend" )
                                                           .link().out( "friend" ).to( "fof" ))
-                                              .returns( properties( "john.name", "fof.name" ) )
+                                              .returns( properties( "john.name", "fof.name", "john" ) )
                                               .toString();
 
         System.out.println(query);
-        Query parsedQuery = parser.parse( query );
-        System.out.println( engine.execute( parsedQuery ).toString() );
+        ExecutionResult result = engine.execute( query );
+        Node john = null;
+        for( Map<String, Object> stringObjectMap : result )
+        {
+            john = ((Node)stringObjectMap.get( "john" ));
+        }
+        System.out.println( result.toString() );
+
+        {
+            Execute q = start( node( "john", john ) )
+                                                  .match( path().from( "john" ).out( "friend" )
+                                                              .link().out( "friend" ).to( "fof" ) )
+                                                  .returns( properties( "john.name", "fof.name" ) );
+
+            System.out.println(q);
+            System.out.println( engine.execute( q.toString() ).toString() );
+        }
+
+        {
+            Projection projection = new Projection(engine);
+
+            Iterable<Friend> friends = projection.iterable( start( node( "john", john ) )
+                          .match( path().from( "john" ).out( "friend" )
+                                      .link().out( "friend" ).to( "fof" ) )
+                          .returns( properties( "john.name", "fof.name" ) ), Friend.class );
+            System.out.println( friends );
+        }
     }
 
     @Before
@@ -80,7 +106,6 @@ public class CypherExecutionTest
         graphdb = new ImpermanentGraphDatabase();
         graphdb.cleanContent( false );
 
-        parser = new CypherParser();
         engine = new ExecutionEngine( graphdb );
     }
 
@@ -88,5 +113,17 @@ public class CypherExecutionTest
     public GraphDatabaseService graphdb()
     {
         return graphdb;
+    }
+
+    public static class Friend
+    {
+        public String name;
+        public String friend;
+
+        @Override
+        public String toString()
+        {
+            return name+" is friend with "+friend;
+        }
     }
 }

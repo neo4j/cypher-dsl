@@ -66,24 +66,24 @@
       <version>2.2.3</version>
       <scope>provided</scope>
     </dependency>
-
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-kernel</artifactId>
+      <version>1.5-SNAPSHOT</version>
+      <type>jar</type>
+    </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-cypher</artifactId>
       <version>1.5-SNAPSHOT</version>
-      <scope>test</scope>
+      <optional>true</optional>
+
     </dependency>
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-kernel</artifactId>
       <version>1.5-SNAPSHOT</version>
       <type>test-jar</type>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.neo4j</groupId>
-      <artifactId>neo4j-kernel</artifactId>
-      <version>1.5-SNAPSHOT</version>
       <scope>test</scope>
     </dependency>
     <dependency>

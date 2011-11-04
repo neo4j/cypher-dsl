@@ -84,7 +84,7 @@ public class CypherQuery
         return new Grammar();
     }
 
-    protected StartExpression.StartNodes node( String name, int... id )
+    protected StartExpression.StartNodes node( String name, long... id )
     {
         return StartExpression.node( name, id );
     }
@@ -109,7 +109,7 @@ public class CypherQuery
         return StartExpression.query( name, indexName, query );
     }
 
-    protected StartExpression.StartRelationships relationship( String name, int... id )
+    protected StartExpression.StartRelationships relationship( String name, long... id )
     {
         return StartExpression.relationship( name, id );
     }

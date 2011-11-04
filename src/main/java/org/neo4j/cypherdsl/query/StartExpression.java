@@ -30,11 +30,11 @@ public abstract class StartExpression
     extends Expression
     implements AsString, Serializable,Cloneable
 {
-    public static StartNodes node( String name, int... id )
+    public static StartNodes node( String name, long... id )
     {
         checkEmpty( name, "Name" );
 
-        for( int i : id )
+        for( long i : id )
         {
             if (i < 0)
                 throw new IllegalArgumentException( "Id may not be below zero" );
@@ -91,11 +91,11 @@ public abstract class StartExpression
         return startNodesQuery;
     }
 
-    public static StartRelationships relationship( String name, int... id )
+    public static StartRelationships relationship( String name, long... id )
     {
         checkEmpty( name, "Name" );
 
-        for( int i : id )
+        for( long i : id )
         {
             if (i < 0)
                 throw new IllegalArgumentException( "Id may not be below zero" );
