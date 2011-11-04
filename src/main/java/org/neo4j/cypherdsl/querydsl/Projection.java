@@ -26,43 +26,27 @@ import com.mysema.query.types.QBean;
 import com.mysema.query.types.path.PathBuilder;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.cypherdsl.Execute;
 
 /**
- * TODO
+ * Projection is responsible for converting the results of a query into an iterable of instances
+ * of a given class.
  */
 public class Projection
 {
-    private ExecutionEngine engine;
-
-    public Projection( ExecutionEngine engine )
+    public <T> Iterable<T> iterable( Iterable<Map<String,Object>> result, Class<T> targetClass )
     {
-        this.engine = engine;
-    }
-
-    public <T> Iterable<T> iterable(Execute query, Class<T> targetClass)
-    {
-        return iterable( query, Collections.<String,Object>emptyMap(), targetClass );
-    }
-
-    public <T> Iterable<T> iterable(Execute query, Map<String, Object> parameters, Class<T> targetClass)
-    {
-        PathBuilder<T> friend = new PathBuilder<T>( targetClass, "entity" );
+        PathBuilder<T> entity = new PathBuilder<T>( targetClass, "entity" );
         Field[] fields = targetClass.getFields();
         Expression[] fieldExpressions = new Expression[fields.length];
         for( int i = 0; i < fields.length; i++ )
         {
-            fieldExpressions[i] = friend.getString( fields[ i ].getName() );
+            fieldExpressions[i] = entity.getString( fields[ i ].getName() );
         }
 
         QBean<T> bean = Projections.fields( targetClass, fieldExpressions );
-        ExecutionResult result = engine.execute( query.toString() , parameters );
-        List<T> friends = new ArrayList<T>(  );
+        List<T> entities = new ArrayList<T>(  );
         for( Map<String, Object> stringObjectMap : result )
         {
             Object[] args = new Object[stringObjectMap.size()];
@@ -71,9 +55,9 @@ public class Projection
             {
                 args[idx++] = object;
             }
-            friends.add( bean.newInstance( args ) );
+            entities.add( bean.newInstance( args ) );
         }
 
-        return friends;
+        return entities;
     }
 }

@@ -87,14 +87,13 @@ public class CypherExecutionTest
             System.out.println(q);
             System.out.println( engine.execute( q.toString() ).toString() );
         }
-
+        
         {
-            Projection projection = new Projection(engine);
-
-            Iterable<Friend> friends = projection.iterable( start( node( "john", john ) )
+            Projection projection = new Projection();
+            Iterable<Friend> friends = projection.iterable( engine.execute( start( node( "john", john ) )
                           .match( path().from( "john" ).out( "friend" )
                                       .link().out( "friend" ).to( "fof" ) )
-                          .returns( properties( "john.name", "fof.name" ) ), Friend.class );
+                          .returns( properties( "john.name", "fof.name" ) ).toString()), Friend.class );
             System.out.println( friends );
         }
     }
