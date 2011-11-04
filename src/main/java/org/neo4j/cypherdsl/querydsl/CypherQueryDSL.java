@@ -95,17 +95,23 @@ public class CypherQueryDSL
                                                                 @Nullable WhereExpression.BooleanExpression booleanExpression
                 )
                 {
-                    if (operation.getOperator().getId().equals( Ops.AND.getId() ))
+                    String id = operation.getOperator().getId();
+                    if ( id.equals( Ops.AND.getId() ))
                     {
-                        return WhereExpression.and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 ).accept( this, null ) );
-                    } else if (operation.getOperator().getId().equals( Ops.EQ_PRIMITIVE.getId() ))
+                        return WhereExpression.and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
+                    } else if ( id.equals( Ops.EQ_PRIMITIVE.getId() ) || id.equals( Ops.EQ_OBJECT.getId() ))
                     {
                         return WhereExpression.eq( operation.getArg( 0 ).toString(), ((Constant)operation.getArg( 1 )).getConstant() );
-                    } else if (operation.getOperator().getId().equals( Ops.GT.getId() ))
+                    } else if ( id.equals( Ops.GT.getId() ))
                     {
                         return WhereExpression.gt( operation.getArg( 0 ).toString(), ((Constant)operation.getArg( 1 )).getConstant() );
+                    } else if ( id.equals( Ops.LT.getId() ))
+                    {
+                        return WhereExpression.lt( operation.getArg( 0 )
+                                                       .toString(), ( (Constant) operation.getArg( 1 ) ).getConstant() );
                     } else
-                        throw new IllegalArgumentException( "Unknown operator:"+operation.getOperator().getId()+" in expression "+operation );
+                        throw new IllegalArgumentException( "Unknown operator:"+ id +" in expression "+operation );
                 }
 
                 @Override

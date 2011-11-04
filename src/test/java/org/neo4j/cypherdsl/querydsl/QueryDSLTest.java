@@ -27,6 +27,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.neo4j.cypherdsl.CypherQuery;
 
+import static com.mysema.query.alias.Alias.*;
 import static com.mysema.query.support.Expressions.*;
 import static org.neo4j.cypherdsl.query.ReturnExpression.*;
 import static org.neo4j.cypherdsl.query.StartExpression.*;
@@ -40,29 +41,45 @@ public class QueryDSLTest
     @Test
     public void testQueryDSL()
     {
-        Path<Person> person = Expressions.path(Person.class, "n");
-        Path<String> personFirstName = Expressions.path(String.class, person, "firstName");
-        Path<Integer> personAge = Expressions.path(Integer.class, person, "age");
-        BooleanBuilder expr = new BooleanBuilder(predicate( Ops.EQ_PRIMITIVE, personFirstName, constant( "P" ) )).and( predicate( Ops.GT, personAge, constant( 25 ) ) );
+        {
+            Path<Person> person = Expressions.path(Person.class, "n");
+            Path<String> personFirstName = Expressions.path(String.class, person, "firstName");
+            Path<Integer> personAge = Expressions.path(Integer.class, person, "age");
+            BooleanBuilder expr = new BooleanBuilder(predicate( Ops.EQ_PRIMITIVE, personFirstName, constant( "P" ) )).and( predicate( Ops.GT, personAge, constant( 25 ) ) );
 
-        Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
-                             CypherQueryDSL.start( node( "n", 1, 2, 3 ) )
-                                 .where( expr )
-                                 .returns( nodes( "n" ) )
-                                 .toString() );
+            Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
+                                 CypherQueryDSL.start( node( "n", 1, 2, 3 ) )
+                                     .where( expr )
+                                     .returns( nodes( "n" ) )
+                                     .toString() );
+        }
+
+        {
+            Person person = alias( Person.class, "n" );
+            Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
+                                 CypherQueryDSL.start( node( "n", 1, 2, 3 ) )
+                                     .where( $( person.getFirstName() ).eq( "P" ).and( $( person.getAge() ).gt( 25 ) ) )
+                                     .returns( nodes( "n" ) )
+                                     .toString() );
+        }
+
+        {
+            QPerson person = QPerson.person;
+            Assert.assertEquals( "START person=node(1,2,3) WHERE person.firstName=\"P\" and person.age>25 RETURN person",
+                                 CypherQueryDSL.start( node( "person", 1, 2, 3 ) )
+                                     .where( person.firstName.eq( "P" ).and( person.age.gt( 25 ) ) )
+                                     .returns( nodes( "person" ) )
+                                     .toString() );
+        }
+
+
 
         Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
                              CypherQuery.start( node( "n", 1, 2, 3 ) )
-                                 .where( string( "n.firstName" ).eq( "P" ).and( number("n.age").gt( 25 ) ) )
+                                 .where( prop( "n.firstName" ).eq( "P" ).and( prop( "n.age" ).gt( 25 ) ) )
                                  .returns( nodes( "n" ) )
                                  .toString() );
 
 
-    }
-
-    class Person
-    {
-        String firstName;
-        int age;
     }
 }

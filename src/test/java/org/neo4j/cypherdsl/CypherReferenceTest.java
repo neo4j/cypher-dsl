@@ -263,8 +263,8 @@ public class CypherReferenceTest
 
         assertEquals( "START n=node(3,1) WHERE (n.age<30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n",
                       start( node( "n", 3, 1 ) ).
-                          where( number( "n.age" ).lt( 30 ).and( string( "n.name" ).eq( "Tobias" ) )
-                                     .or( not( string( "n.name" ).eq("Tobias" ) ) ) ).
+                          where( prop( "n.age" ).lt( 30 ).and( prop( "n.name" ).eq( "Tobias" ) )
+                                     .or( not( prop( "n.name" ).eq("Tobias" ) ) ) ).
                           returns( nodes( "n" ) ).
                           toString() );
     }

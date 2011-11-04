@@ -146,6 +146,11 @@ public class CypherQuery
     }
 
     // Where --------------------------------------------------------
+    protected WhereExpression.CommonType prop(String name)
+    {
+        return WhereExpression.prop( name );
+    }
+
     protected WhereExpression.StringType string(String name)
     {
         return WhereExpression.string( name );

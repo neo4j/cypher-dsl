@@ -27,6 +27,13 @@ import java.io.Serializable;
 public abstract class WhereExpression
     implements AsString, Serializable, Cloneable
 {
+    public static CommonType prop(String name)
+    {
+        CommonType type = new CommonType();
+         type.name = name;
+         return type;
+    }
+
     public static StringType string(String name)
     {
         StringType type = new StringType();
@@ -262,7 +269,7 @@ public abstract class WhereExpression
         return super.clone();
     }
 
-    public static abstract class CommonType<T>
+    public static abstract class AbstractType<T>
     {
         protected String name;
 
@@ -312,8 +319,31 @@ public abstract class WhereExpression
         }
     }
 
+    public static class CommonType
+        extends AbstractType<Object>
+    {
+        public Regexp regexp(String value)
+        {
+            return WhereExpression.regexp( name, value );
+        }
+
+        public StringType asString()
+        {
+            StringType type = new StringType();
+            type.name = name;
+            return type;
+        }
+
+        public NumberType asNumber()
+        {
+            NumberType type = new NumberType();
+            type.name = name;
+            return type;
+        }
+    }
+
     public static class StringType
-        extends CommonType<String>
+        extends AbstractType<String>
     {
         public Regexp regexp(String value)
         {
@@ -322,7 +352,7 @@ public abstract class WhereExpression
     }
 
     public static class NumberType
-        extends CommonType<Number>
+        extends AbstractType<Number>
     {
     }
 

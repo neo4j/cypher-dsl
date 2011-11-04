@@ -14,6 +14,14 @@
   <description>Neo4j Cypher DSL</description>
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
+  <repositories>
+    <repository>
+      <id>querydsl</id>
+      <name>QueryDsl</name>
+      <url>http://source.mysema.com/maven2/releases</url>
+    </repository>
+  </repositories>
+
   <properties>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
@@ -51,9 +59,13 @@
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
       <version>2.2.3</version>
-      <optional>true</optional>
     </dependency>
-
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-apt</artifactId>
+      <version>2.2.3</version>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.neo4j</groupId>
@@ -93,6 +105,26 @@
         <configuration>
           <argLine>-Xmx300m</argLine>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>com.mysema.maven</groupId>
+        <artifactId>maven-apt-plugin</artifactId>
+        <version>1.0.2</version>
+        <configuration>
+          <processor>com.mysema.query.apt.QuerydslAnnotationProcessor</processor>
+        </configuration>
+        <executions>
+          <execution>
+            <id>test-sources</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>test-process</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/generated-sources/test</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <!--
       <plugin>
