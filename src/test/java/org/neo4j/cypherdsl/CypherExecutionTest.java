@@ -19,6 +19,7 @@
  */
 package org.neo4j.cypherdsl;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.Before;
@@ -30,6 +31,7 @@ import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.result.Projection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.test.GraphDescription;
 import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -50,7 +52,7 @@ public class CypherExecutionTest
     TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor(
         this, true ) );
 
-    private ImpermanentGraphDatabase graphdb;
+    private EmbeddedGraphDatabase graphdb;
     private ExecutionEngine engine;
 
     @Test
@@ -102,8 +104,9 @@ public class CypherExecutionTest
     public void setup()
         throws IOException
     {
-        graphdb = new ImpermanentGraphDatabase();
-        graphdb.cleanContent( false );
+        String storeDir = new File(".").getAbsolutePath();
+        System.out.println(storeDir);
+        graphdb = new EmbeddedGraphDatabase(storeDir);
 
         engine = new ExecutionEngine( graphdb );
     }

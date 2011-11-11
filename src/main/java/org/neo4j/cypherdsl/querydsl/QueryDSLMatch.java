@@ -28,5 +28,5 @@ import org.neo4j.cypherdsl.query.MatchExpression;
 public interface QueryDSLMatch
     extends Match, QueryDSLWhere
 {
-    QueryDSLWhere match( MatchExpression... expression );
+    QueryDSLMatch match( MatchExpression... expression );
 }

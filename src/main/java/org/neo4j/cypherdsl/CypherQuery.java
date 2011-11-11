@@ -270,7 +270,7 @@ public class CypherQuery
     {
         // Match --------------------------------------------------------
         @Override
-        public Where match( MatchExpression... expression )
+        public Match match( MatchExpression... expression )
         {
             for( MatchExpression matchExpression : expression )
             {

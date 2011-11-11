@@ -63,9 +63,9 @@ public class CypherQueryDSL
         implements QueryDSLMatch, QueryDSLWhere
     {
         @Override
-        public QueryDSLWhere match( MatchExpression... expression )
+        public QueryDSLMatch match( MatchExpression... expression )
         {
-            return (QueryDSLWhere) super.match( expression );
+            return (QueryDSLMatch) super.match( expression );
         }
 
         @Override
