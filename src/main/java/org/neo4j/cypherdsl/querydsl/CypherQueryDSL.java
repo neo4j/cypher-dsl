@@ -98,18 +98,48 @@ public class CypherQueryDSL
                     String id = operation.getOperator().getId();
                     if ( id.equals( Ops.AND.getId() ))
                     {
-                        return WhereExpression.and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
-                            .accept( this, null ) );
+                        return WhereExpression.and(operation.getArg(0).accept(this, null), operation.getArg(1)
+                                .accept(this, null));
+                    } else if ( id.equals( Ops.OR.getId() ))
+                    {
+                        return WhereExpression.or(operation.getArg(0).accept(this, null), operation.getArg(1)
+                                .accept(this, null));
+                    } else if ( id.equals( Ops.NOT.getId() ))
+                    {
+                        return WhereExpression.not((WhereExpression.PredicateExpression)  operation.getArg(0).accept(this, null));
                     } else if ( id.equals( Ops.EQ_PRIMITIVE.getId() ) || id.equals( Ops.EQ_OBJECT.getId() ))
                     {
-                        return WhereExpression.eq( operation.getArg( 0 ).toString(), ((Constant)operation.getArg( 1 )).getConstant() );
+                        return WhereExpression.eq(operation.getArg(0).toString(), ((Constant) operation.getArg(1)).getConstant());
+                    } else if ( id.equals( Ops.NE_PRIMITIVE.getId() ) || id.equals( Ops.NE_OBJECT.getId() ))
+                    {
+                        return WhereExpression.ne(operation.getArg(0).toString(), ((Constant) operation.getArg(1)).getConstant());
                     } else if ( id.equals( Ops.GT.getId() ))
                     {
-                        return WhereExpression.gt( operation.getArg( 0 ).toString(), ((Constant)operation.getArg( 1 )).getConstant() );
+                        return WhereExpression.gt(operation.getArg(0).toString(), ((Constant) operation.getArg(1)).getConstant());
                     } else if ( id.equals( Ops.LT.getId() ))
                     {
-                        return WhereExpression.lt( operation.getArg( 0 )
+                        return WhereExpression.lt(operation.getArg(0)
+                                .toString(), ((Constant) operation.getArg(1)).getConstant());
+                    } else if ( id.equals( Ops.GOE.getId() ))
+                    {
+                        return WhereExpression.gte( operation.getArg( 0 )
                                                        .toString(), ( (Constant) operation.getArg( 1 ) ).getConstant() );
+                    } else if ( id.equals( Ops.LOE.getId() ))
+                    {
+                        return WhereExpression.lte( operation.getArg( 0 )
+                                                       .toString(), ( (Constant) operation.getArg( 1 ) ).getConstant() );
+                    } else if ( id.equals( Ops.EXISTS.getId() ))
+                    {
+                        return WhereExpression.exists( operation.getArg( 0 )
+                                                       .toString() );
+                    } else if ( id.equals( Ops.IS_NULL.getId() ))
+                    {
+                        return WhereExpression.isNull( operation.getArg( 0 )
+                                                       .toString() );
+                    } else if ( id.equals( Ops.IS_NOT_NULL.getId() ))
+                    {
+                        return WhereExpression.isNotNull( operation.getArg( 0 )
+                                                       .toString() );
                     } else
                         throw new IllegalArgumentException( "Unknown operator:"+ id +" in expression "+operation );
                 }

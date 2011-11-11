@@ -59,6 +59,13 @@
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
       <version>2.2.3</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>com.mysema.querydsl</groupId>
+      <artifactId>querydsl-lucene</artifactId>
+      <version>2.2.3</version>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>

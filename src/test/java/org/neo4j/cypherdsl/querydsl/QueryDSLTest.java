@@ -72,6 +72,14 @@ public class QueryDSLTest
                                      .toString() );
         }
 
+        {
+            QPerson person = QPerson.person;
+            Assert.assertEquals( "START person=node:node_auto_index(\"firstName:rickard\") RETURN person",
+                                 CypherQueryDSL.start( LuceneStartExpression.query("person", "node_auto_index", person.firstName.eq("Rickard")) )
+                                     .returns( nodes( "person" ) )
+                                     .toString() );
+        }
+
 
 
         Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",

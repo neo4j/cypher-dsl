@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.querydsl;
+package org.neo4j.cypherdsl.result;
 
 import com.mysema.query.types.Expression;
 import com.mysema.query.types.Projections;

@@ -27,7 +27,7 @@ import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.query.StartExpression;
-import org.neo4j.cypherdsl.querydsl.Projection;
+import org.neo4j.cypherdsl.result.Projection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.GraphDescription;
@@ -63,10 +63,10 @@ public class CypherExecutionTest
     {
         data.get();
 
-        String query = start( StartExpression.lookup( "john", "node_auto_index", "name", "John" ) )
-                                              .match( path().from( "john" ).out( "friend" )
-                                                          .link().out( "friend" ).to( "fof" ))
-                                              .returns( properties( "john.name", "fof.name", "john" ) )
+        String query = start(StartExpression.lookup("john", "node_auto_index", "name", "John"))
+                                              .match(path().from("john").out("friend")
+                                                      .link().out("friend").to("fof"))
+                                              .returns(properties("john.name", "fof.name", "john"))
                                               .toString();
 
         System.out.println(query);
@@ -79,10 +79,10 @@ public class CypherExecutionTest
         System.out.println( result.toString() );
 
         {
-            Execute q = start( node( "john", john ) )
-                                                  .match( path().from( "john" ).out( "friend" )
-                                                              .link().out( "friend" ).to( "fof" ) )
-                                                  .returns( properties( "john.name", "fof.name" ) );
+            Execute q = start(node("john", john))
+                                                  .match(path().from("john").out("friend")
+                                                          .link().out("friend").to("fof"))
+                                                  .returns(properties("john.name", "fof.name"));
 
             System.out.println(q);
             System.out.println( engine.execute( q.toString() ).toString() );
@@ -90,10 +90,10 @@ public class CypherExecutionTest
         
         {
             Projection projection = new Projection();
-            Iterable<Friend> friends = projection.iterable( engine.execute( start( node( "john", john ) )
-                          .match( path().from( "john" ).out( "friend" )
-                                      .link().out( "friend" ).to( "fof" ) )
-                          .returns( properties( "john.name", "fof.name" ) ).toString()), Friend.class );
+            Iterable<Friend> friends = projection.iterable( engine.execute( start(node("john", john))
+                          .match(path().from("john").out("friend")
+                                  .link().out("friend").to("fof"))
+                          .returns(properties("john.name", "fof.name")).toString()), Friend.class );
             System.out.println( friends );
         }
     }
