@@ -58,6 +58,12 @@ public class CypherQueryDSL
         return new QueryDSLGrammar();
     }
 
+    // Additional QueryDSL methods
+    protected StartExpression.StartNodesQuery query( String name, String indexName, Predicate query )
+    {
+        return LuceneStartExpression.query(name, indexName, query);
+    }
+
     private class QueryDSLGrammar
         extends Grammar
         implements QueryDSLMatch, QueryDSLWhere
