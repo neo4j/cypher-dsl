@@ -20,7 +20,7 @@ Example:
     Execute q = start(node("john", john)).
                 match(path().from("john").out("friend").link().out("friend").to("fof")).
                 returns(properties("john.name", "fof.name"));
-    System.out.println( engine.execute( q.toString() ).toString() );
+    ExecutionResult result = engine.execute( q.toString() ).toString();
 
 QueryDSL integration
 ====================
