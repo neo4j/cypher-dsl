@@ -14,14 +14,6 @@
   <description>Neo4j Cypher DSL</description>
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
-  <repositories>
-    <repository>
-      <id>querydsl</id>
-      <name>QueryDsl</name>
-      <url>http://source.mysema.com/maven2/releases</url>
-    </repository>
-  </repositories>
-
   <properties>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
@@ -31,7 +23,9 @@
   <packaging>jar</packaging>
 
   <scm>
-    <url>https://github.com/neo4j/cypher-dsl/tree/master/</url>
+    <connection>scm:git:git://github.com/neo4j/cypher-dsl.git</connection>
+    <developerConnection>scm:git:git@github.com:neo4j/cypher-dsl.git</developerConnection>
+    <url>https://github.com/neo4j/cypher-dsl</url>
   </scm>
 
   <licenses>
@@ -194,3 +188,4 @@
   </distributionManagement>
 
 </project>
+
