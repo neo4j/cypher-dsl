@@ -25,6 +25,7 @@ Example:
 QueryDSL integration
 ====================
 It is possible to use the QueryDSL library and predicates with this DSL. Here's an example:
+
     QPerson person = QPerson.person;
     Assert.assertEquals( "START person=node(1,2,3) WHERE person.firstName=\"P\" and person.age>25 RETURN person",
                          CypherQueryDSL.start( node( "person", 1, 2, 3 ) )
