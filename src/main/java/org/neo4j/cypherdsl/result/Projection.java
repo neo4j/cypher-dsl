@@ -21,6 +21,7 @@
 package org.neo4j.cypherdsl.result;
 
 import com.mysema.query.types.Expression;
+import com.mysema.query.types.Path;
 import com.mysema.query.types.Projections;
 import com.mysema.query.types.QBean;
 import com.mysema.query.types.path.PathBuilder;
@@ -33,9 +34,11 @@ import java.util.Map;
  * Projection is responsible for converting the results of a query into an iterable of instances
  * of a given class.
  */
-public class Projection
+public class Projection<T>
 {
-    public <T> Iterable<T> iterable( Iterable<Map<String,Object>> result, Class<T> targetClass )
+    private QBean<T> bean;
+
+    public Projection(Class<T> targetClass)
     {
         PathBuilder<T> entity = new PathBuilder<T>( targetClass, "entity" );
         Field[] fields = targetClass.getFields();
@@ -45,16 +48,23 @@ public class Projection
             fieldExpressions[i] = entity.getString( fields[ i ].getName() );
         }
 
-        QBean<T> bean = Projections.fields( targetClass, fieldExpressions );
+        bean = Projections.fields(targetClass, fieldExpressions);
+    }
+
+
+    public Iterable<T> iterable( Iterable<Map<String,Object>> result )
+    {
         List<T> entities = new ArrayList<T>(  );
+
         for( Map<String, Object> stringObjectMap : result )
         {
             Object[] args = new Object[stringObjectMap.size()];
             int idx = 0;
-            for( Object object : stringObjectMap.values() )
+            for (Expression<?> expression : bean.getArgs())
             {
-                args[idx++] = object;
+                args[idx++] = stringObjectMap.get(((Path)expression).getMetadata().getExpression().toString());
             }
+
             entities.add( bean.newInstance( args ) );
         }
 

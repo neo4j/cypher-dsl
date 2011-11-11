@@ -27,6 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypherdsl.result.JSONSerializer;
+import org.neo4j.cypherdsl.result.NameResolver;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.GraphDescription;
@@ -61,11 +62,20 @@ public class JSONSerializerTest
         data.get();
 
         JSONSerializer serializer = new JSONSerializer();
-        String json = serializer.toJSON( engine.execute( start( lookup( "john", "node_auto_index", "name", "John" ) )
-                                                             .match( path().from( "john" ).out( "friend" )
-                                                                           .link().out( "friend" ).to( "fof" ) )
-                                                             .returns( properties( "john.name", "fof.name" ) )
-                                                             .toString() ) );
+        String query = start(lookup("john", "node_auto_index", "name", "John"))
+                .match(path().from("john").out("friend")
+                        .link().out("friend").to("fof"))
+                .returns(properties("john.name", "fof.name"), nodes("john"), count())
+                .toString();
+        String json = serializer.toJSON( engine.execute(query) ).toString();
+        System.out.println( json );
+
+        // Now replace names to make it prettier
+        json = serializer.toJSON( new NameResolver().
+                replace("john.name", "name").
+                replace("fof.name", "friend").
+                replace("count(*)", "count").
+                replace("john", "node").map(engine.execute( query ))  ).toString();
         System.out.println( json );
     }
 
@@ -83,8 +93,8 @@ public class JSONSerializerTest
             .match( shortestPath( "p" ).from( "john" ).out().hops( null,3 ).to( "maria" ) )
             .returns( paths( "p" ) )
             .toString();
-        String json = serializer.toJSON( engine.execute( query ) );
         System.out.println( query );
+        String json = serializer.toJSON(engine.execute(query)).toString();
         System.out.println( json );
     }
 

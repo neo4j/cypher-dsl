@@ -28,6 +28,7 @@ import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.result.NameResolver;
 import org.neo4j.cypherdsl.result.Projection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -91,11 +92,13 @@ public class CypherExecutionTest
         }
         
         {
-            Projection projection = new Projection();
-            Iterable<Friend> friends = projection.iterable( engine.execute( start(node("john", john))
+            Projection<Friend> projection = new Projection<Friend>(Friend.class);
+            Iterable<Friend> friends = projection.iterable( new NameResolver().
+                    replace("john.name", "name").
+                    replace("fof.name", "friend").map(engine.execute( start(node("john", john))
                           .match(path().from("john").out("friend")
                                   .link().out("friend").to("fof"))
-                          .returns(properties("john.name", "fof.name")).toString()), Friend.class );
+                          .returns(properties("john.name", "fof.name")).toString())) );
             System.out.println( friends );
         }
     }

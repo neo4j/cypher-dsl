@@ -20,53 +20,73 @@
 
 package org.neo4j.cypherdsl.result;
 
-import java.util.Map;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
+import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Serializer that converts Cypher execution results to JSON.
  */
 public class JSONSerializer
 {
-    public String toJSON(Iterable<Map<String, Object>> result)
+    private ObjectMapper mapper = new ObjectMapper();
+
+    public ArrayNode toJSON(Iterable<Map<String, Object>> result)
     {
-        StringBuilder builder = new StringBuilder( );
+        ArrayNode root = mapper.createArrayNode();
 
-        builder.append( "[" );
-        boolean firstItem = true;
-        for( Map<String, Object> stringObjectMap : result )
+        for (Map<String, Object> stringObjectMap : result)
         {
-            if (!firstItem)
-                builder.append( ',' );
-            firstItem = false;
+            ObjectNode entry = root.objectNode();
 
-            builder.append( "{" );
-
-            boolean firstValue = true;
-            for( Map.Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet() )
+            for (Map.Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet())
             {
-                if (!firstValue)
-                    builder.append( ',' );
-                firstValue = false;
-
-                builder.append( '\"' ).append( stringObjectEntry.getKey() ).append( "\":" );
-
-                if (stringObjectEntry.getValue() instanceof String)
+                if (stringObjectEntry.getValue() instanceof Path)
                 {
-                    builder.append( "\"" ).append( stringObjectEntry.getValue() ).append( "\"" );
-                } else if (stringObjectEntry.getValue() instanceof Path)
+                    entry.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
+                } else if (stringObjectEntry.getValue() instanceof Node)
                 {
-                    builder.append( "\"" ).append( stringObjectEntry.getValue() ).append( "\"" );
-                }else
+                    Node node = (Node) stringObjectEntry.getValue();
+                    ObjectNode nodeNode = entry.objectNode();
+                    nodeNode.put("_id", node.getId());
+                    for (String propertyName : node.getPropertyKeys())
+                    {
+                        addProperty(nodeNode, propertyName, node.getProperty(propertyName));
+                    }
+                    entry.put(stringObjectEntry.getKey(), nodeNode);
+                } else
                 {
-                    builder.append( stringObjectEntry.getValue() );
+                    addProperty(entry, stringObjectEntry.getKey(), stringObjectEntry.getValue());
                 }
             }
 
-
-            builder.append( "}" );
+            root.add(entry);
         }
-        builder.append( "]" );
-        return builder.toString();
+        return root;
+    }
+
+    private void addProperty(ObjectNode node, String name, Object value)
+    {
+        if (value instanceof String)
+        {
+            node.put(name, value.toString());
+        } else if (value instanceof Long)
+        {
+            Long number = (Long) value;
+            node.put(name, number);
+        } else if (value instanceof Integer)
+        {
+            Integer number = (Integer) value;
+            node.put(name, number);
+        } else
+        {
+            throw new IllegalArgumentException("Unknown value type:" + value.getClass());
+        }
     }
 }

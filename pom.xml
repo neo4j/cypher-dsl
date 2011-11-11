@@ -102,6 +102,13 @@
     </dependency>
       
     <dependency>
+        <groupId>org.codehaus.jackson</groupId>
+        <artifactId>jackson-mapper-asl</artifactId>
+        <version>1.9.1</version>
+        <optional>true</optional>
+    </dependency>
+
+    <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-kernel</artifactId>
       <version>1.5</version>
