@@ -52,7 +52,7 @@ public class CypherExecutionTest
     TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor(
         this, true ) );
 
-    private EmbeddedGraphDatabase graphdb;
+    private ImpermanentGraphDatabase graphdb;
     private ExecutionEngine engine;
 
     @Test
@@ -104,9 +104,8 @@ public class CypherExecutionTest
     public void setup()
         throws IOException
     {
-        String storeDir = new File(".").getAbsolutePath();
-        System.out.println(storeDir);
-        graphdb = new EmbeddedGraphDatabase(storeDir);
+        graphdb = new ImpermanentGraphDatabase();
+        graphdb.cleanContent(true);
 
         engine = new ExecutionEngine( graphdb );
     }
