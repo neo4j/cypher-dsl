@@ -34,6 +34,7 @@ import static com.mysema.query.alias.Alias.alias;
 import static com.mysema.query.support.Expressions.constant;
 import static com.mysema.query.support.Expressions.predicate;
 import static org.junit.Assert.assertEquals;
+import static org.neo4j.cypherdsl.query.OrderByExpression.property;
 import static org.neo4j.cypherdsl.query.OrderByExpression.Order.DESCENDING;
 import static org.neo4j.cypherdsl.query.ReturnExpression.count;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.start;
@@ -124,7 +125,7 @@ public class QueryDSLTest
                         match(path().from(place).in("favorite").to(person)
                                 .link().out("favorite").to(stuff)).
                         returns(properties(stuff.name), count()).
-                        orderBy(OrderByExpression.property("count(*)", DESCENDING), property(stuff.name)).
+                        orderBy(property("count(*)", DESCENDING), property(stuff.name)).
                         toString());
 
         // Java instance initialization block style
