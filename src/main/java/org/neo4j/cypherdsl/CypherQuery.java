@@ -74,7 +74,7 @@ public class CypherQuery
     }
 
     // Start --------------------------------------------------------
-    public Match starts( StartExpression... startExpression )
+    protected Match starts( StartExpression... startExpression )
     {
         for( StartExpression expression : startExpression )
         {

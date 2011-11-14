@@ -31,11 +31,10 @@ import static org.neo4j.cypherdsl.query.Query.checkNull;
  * Create Lucene query lookup expressions using QueryDSL predicates
  */
 public class LuceneStartExpression
-    extends StartExpression.StartNodesQuery
 {
     private static final LuceneSerializer luceneSerializer = new LuceneSerializer(true, true);
 
-    public static StartNodesQuery query( String name, String indexName, Predicate query )
+    public static StartExpression.StartNodesQuery query( String name, String indexName, Predicate query )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );

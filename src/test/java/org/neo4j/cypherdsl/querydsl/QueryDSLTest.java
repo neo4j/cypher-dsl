@@ -26,6 +26,7 @@ import com.mysema.query.types.Path;
 import org.junit.Assert;
 import org.junit.Test;
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.query.OrderByExpression;
 
 import static com.mysema.query.alias.Alias.*;
 import static com.mysema.query.support.Expressions.*;
@@ -55,10 +56,10 @@ public class QueryDSLTest
         }
 
         {
-            Person person = alias( Person.class, "n" );
+            Person person = alias(Person.class, "n");
             Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
                                  CypherQueryDSL.start( node( "n", 1, 2, 3 ) )
-                                     .where( $( person.getFirstName() ).eq( "P" ).and( $( person.getAge() ).gt( 25 ) ) )
+                                     .where( $( person.getFirstName() ).eq("P").and( $( person.getAge() ).gt(25) ) )
                                      .returns( nodes( "n" ) )
                                      .toString() );
         }
@@ -67,20 +68,31 @@ public class QueryDSLTest
             QPerson person = QPerson.person;
             Assert.assertEquals( "START person=node(1,2,3) WHERE person.firstName=\"P\" and person.age>25 RETURN person",
                                  CypherQueryDSL.start( node( "person", 1, 2, 3 ) )
-                                     .where( person.firstName.eq( "P" ).and( person.age.gt( 25 ) ) )
+                                     .where(person.firstName.eq("P").and(person.age.gt(25)))
                                      .returns( nodes( "person" ) )
                                      .toString() );
         }
 
         {
             QPerson person = QPerson.person;
-            Assert.assertEquals( "START person=node:node_auto_index(\"firstName:rickard\") RETURN person",
-                                 CypherQueryDSL.start( LuceneStartExpression.query("person", "node_auto_index", person.firstName.eq("Rickard")) )
-                                     .returns( nodes( "person" ) )
-                                     .toString() );
+            Assert.assertEquals("START person=node:node_auto_index(\"firstName:rickard\") RETURN person.firstName ORDER BY person.firstName DESCENDING",
+                    CypherQueryDSL.start(LuceneStartExpression.query("person", "node_auto_index", person.firstName.eq("Rickard")))
+                            .returns(QueryDSLReturnExpression.properties(person.firstName))
+                            .orderBy(QueryDSLOrderByExpression.property(person.firstName, OrderByExpression.Order.DESCENDING))
+                            .toString());
         }
 
-
+        {
+            Assert.assertEquals("START person=node:node_auto_index(\"firstName:rickard\") RETURN person.firstName ORDER BY person.firstName DESCENDING",
+                    new CypherQueryDSL()
+                    {{
+                        QPerson person = QPerson.person;
+                        starts(query("person", "node_auto_index", person.firstName.eq("Rickard")))
+                            .returns(properties(person.firstName))
+                            .orderBy(property(person.firstName, OrderByExpression.Order.DESCENDING));
+                    }}
+                    .toString());
+        }
 
         Assert.assertEquals( "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
                              CypherQuery.start( node( "n", 1, 2, 3 ) )

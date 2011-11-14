@@ -32,9 +32,7 @@ import com.mysema.query.types.Visitor;
 import javax.annotation.Nullable;
 import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.query.MatchExpression;
-import org.neo4j.cypherdsl.query.StartExpression;
-import org.neo4j.cypherdsl.query.WhereExpression;
+import org.neo4j.cypherdsl.query.*;
 
 /**
  * TODO
@@ -62,6 +60,21 @@ public class CypherQueryDSL
     protected StartExpression.StartNodesQuery query( String name, String indexName, Predicate query )
     {
         return LuceneStartExpression.query(name, indexName, query);
+    }
+
+    protected OrderByExpression property( Path<?> path )
+    {
+        return OrderByExpression.property(path.toString());
+    }
+
+    protected OrderByExpression property( Path<?> path, OrderByExpression.Order order )
+    {
+        return OrderByExpression.property(path.toString(), order);
+    }
+
+    protected ReturnExpression.ReturnProperty properties( Path<?>... paths )
+    {
+        return QueryDSLReturnExpression.properties(paths);
     }
 
     private class QueryDSLGrammar
