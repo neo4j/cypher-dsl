@@ -19,20 +19,13 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Constant;
-import com.mysema.query.types.FactoryExpression;
-import com.mysema.query.types.Operation;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.ParamExpression;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.Predicate;
-import com.mysema.query.types.SubQueryExpression;
-import com.mysema.query.types.TemplateExpression;
-import com.mysema.query.types.Visitor;
+import com.mysema.query.types.*;
+
 import javax.annotation.Nullable;
 import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Return;
 import org.neo4j.cypherdsl.query.*;
+import org.neo4j.cypherdsl.query.Expression;
 
 /**
  * TODO
@@ -57,9 +50,60 @@ public class CypherQueryDSL
     }
 
     // Additional QueryDSL methods
+    protected StartExpression.StartNodes node( Path<?> entity, long... id )
+    {
+        return StartExpression.node(entity.toString(), id);
+    }
+
+    protected StartExpression.StartNodes node( Path<?> entity, String parameter )
+    {
+        return StartExpression.node(entity.toString(), parameter);
+    }
+
+    protected StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Path<?> key, String value )
+    {
+        return StartExpression.lookup(entity.toString(), indexName, key.getMetadata().getExpression().toString(), value);
+    }
+
+    protected StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Expression.Identifier key, Expression.Value value )
+    {
+        return StartExpression.lookup(entity.toString(), indexName, key, value);
+    }
+
+    protected StartExpression.StartNodesQuery query( Path<?> entity, String indexName, Predicate query )
+    {
+        return query(entity.toString(), indexName, query);
+    }
+
     protected StartExpression.StartNodesQuery query( String name, String indexName, Predicate query )
     {
-        return LuceneStartExpression.query(name, indexName, query);
+        return QueryDSLStartExpression.query(name, indexName, query);
+    }
+
+    protected StartExpression.StartNodesQuery query( EntityPath<?> entity, String indexName, Predicate query )
+    {
+        return QueryDSLStartExpression.query(entity, indexName, query);
+    }
+
+    protected QueryDSLMatchExpression.QueryDSLPath path()
+    {
+        return QueryDSLMatchExpression.path();
+    }
+
+    protected QueryDSLMatchExpression.QueryDSLPath path(String name)
+    {
+        return QueryDSLMatchExpression.path(name);
+    }
+
+    /**
+     * Use this to invoke the shortestPath function
+     *
+     * @param name
+     * @return
+     */
+    protected QueryDSLMatchExpression.QueryDSLFunctionPath shortestPath( String name )
+    {
+        return QueryDSLMatchExpression.shortestPath(name);
     }
 
     protected OrderByExpression property( Path<?> path )
@@ -70,6 +114,11 @@ public class CypherQueryDSL
     protected OrderByExpression property( Path<?> path, OrderByExpression.Order order )
     {
         return OrderByExpression.property(path.toString(), order);
+    }
+
+    protected ReturnExpression.ReturnNode nodes( Path<?>... entityPaths )
+    {
+        return QueryDSLReturnExpression.nodes(entityPaths);
     }
 
     protected ReturnExpression.ReturnProperty properties( Path<?>... paths )

@@ -213,15 +213,15 @@ public abstract class MatchExpression
 
         public Link link()
         {
-            Link path = new Link();
-            path.leftPath = this;
+            Link link = new Link();
+            link.leftPath = this;
 
-            return path;
+            return link;
         }
     }
 
-    public static class Path
-        extends AbstractPath<Path>
+    public static class Path<T extends Path>
+        extends AbstractPath<T>
     {
         public String pathName;
         public String from = "";
@@ -235,15 +235,15 @@ public abstract class MatchExpression
             super.asString( builder );
         }
 
-        public Path from(String from)
+        public T from(String from)
         {
             this.from = from;
-            return this;
+            return (T) this;
         }
     }
 
-    public static class Link
-        extends AbstractPath<Link>
+    public static class Link<T extends Link>
+        extends AbstractPath<T>
     {
         public AbstractPath leftPath;
 
@@ -255,7 +255,7 @@ public abstract class MatchExpression
         }
     }
 
-    public static class FunctionPath
+    public static class FunctionPath<T extends FunctionPath>
         extends MatchExpression
     {
         public String pathName;
@@ -266,39 +266,39 @@ public abstract class MatchExpression
         public Integer minHops;
         public Integer maxHops;
 
-        public FunctionPath out()
+        public T out()
         {
             this.direction = Direction.OUT;
-            return this;
+            return (T) this;
         }
 
-        public FunctionPath in()
+        public T in()
         {
             this.direction = Direction.IN;
-            return this;
+            return (T) this;
         }
 
-        public FunctionPath both()
+        public T both()
         {
             this.direction = Direction.BOTH;
-            return this;
+            return (T) this;
         }
 
-        public FunctionPath from(String from)
+        public T from(String from)
         {
             Query.checkEmpty( from, "From" );
             this.from = from;
-            return this;
+            return (T) this;
         }
 
-        public FunctionPath to(String to)
+        public T to(String to)
         {
             Query.checkEmpty( to, "To" );
             this.to = to;
-            return this;
+            return (T) this;
         }
 
-        public FunctionPath hops( Integer minHops, Integer maxHops )
+        public T hops( Integer minHops, Integer maxHops )
         {
             if (minHops != null && minHops < 0)
                 throw new IllegalArgumentException( "Minimum number of hops must be over zero" );
@@ -308,7 +308,7 @@ public abstract class MatchExpression
 
             this.minHops = minHops;
             this.maxHops = maxHops;
-            return this;
+            return (T) this;
         }
 
         @Override
