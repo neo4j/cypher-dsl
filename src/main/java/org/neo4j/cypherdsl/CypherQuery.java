@@ -184,7 +184,7 @@ public class CypherQuery
 
     protected ReturnExpression.ReturnPaths paths( String... names )
     {
-        return ReturnExpression.paths( names );
+        return ReturnExpression.paths(names );
     }
 
     protected ReturnExpression.ReturnAggregate count()
