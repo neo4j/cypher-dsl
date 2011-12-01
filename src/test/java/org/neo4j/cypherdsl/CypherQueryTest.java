@@ -150,5 +150,7 @@ public class CypherQueryTest
         assertEquals( "START john=node(0) RETURN john", start(node( "john", 0 )).returns( nodes("john") ).toString());
 
         assertEquals( "START mom=node(0),dad=node(1) RETURN mom,dad", start(node( "mom", 0 ), node( "dad", 1 )).returns( nodes("mom", "dad") ).toString());
+
+        assertEquals( "START mom=node(0),dad=node(1) RETURN mom.age AS momsAge,dad.age AS dadsAge", start(node( "mom", 0 ), node( "dad", 1 )).returns( properties("mom.age", "dad.age").as("momsAge","dadsAge") ).toString());
     }
 }

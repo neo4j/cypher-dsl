@@ -20,10 +20,7 @@
 
 package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.EntityPath;
 import com.mysema.query.types.Path;
-import org.neo4j.cypherdsl.query.OrderByExpression;
-import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
 
 /**
@@ -31,7 +28,7 @@ import org.neo4j.cypherdsl.query.ReturnExpression;
  */
 public class QueryDSLReturnExpression
 {
-    public static ReturnExpression.ReturnProperty properties( Path<?>... paths )
+    public static ReturnExpression.ReturnProperties properties( Path<?>... paths )
     {
         String[] returns = new String[paths.length];
         for (int i = 0; i < paths.length; i++)
@@ -42,7 +39,7 @@ public class QueryDSLReturnExpression
         return ReturnExpression.properties(returns);
     }
 
-    public static ReturnExpression.ReturnNode nodes( Path<?>... entityPaths )
+    public static ReturnExpression.ReturnNodes nodes( Path<?>... entityPaths )
     {
         String[] returns = new String[entityPaths.length];
         for (int i = 0; i < entityPaths.length; i++)

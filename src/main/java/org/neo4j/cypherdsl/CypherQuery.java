@@ -167,22 +167,22 @@ public class CypherQuery
     }
 
     // Return -------------------------------------------------------
-    protected ReturnExpression.ReturnNode nodes( String... names )
+    protected ReturnExpression.ReturnNodes nodes( String... names )
     {
         return ReturnExpression.nodes( names );
     }
 
-    protected ReturnExpression.ReturnRelationship relationships( String... names )
+    protected ReturnExpression.ReturnRelationships relationships( String... names )
     {
         return ReturnExpression.relationships( names );
     }
 
-    protected ReturnExpression.ReturnProperty properties( String... names )
+    protected ReturnExpression.ReturnProperties properties( String... names )
     {
         return ReturnExpression.properties( names );
     }
 
-    protected ReturnExpression.ReturnPath paths( String... names )
+    protected ReturnExpression.ReturnPaths paths( String... names )
     {
         return ReturnExpression.paths( names );
     }
@@ -222,27 +222,32 @@ public class CypherQuery
         return ReturnExpression.collect( name );
     }
 
-    protected ReturnExpression length( String name )
+    protected ReturnExpression.ReturnNameFunction length( String name )
     {
         return ReturnExpression.length( name );
     }
 
-    protected ReturnExpression.ReturnFunction type(String name)
+    protected ReturnExpression.ReturnNameFunction type(String name)
     {
         return ReturnExpression.type( name );
     }
 
-    protected ReturnExpression.ReturnFunction id(String name)
+    protected ReturnExpression.ReturnNameFunction id(String name)
     {
         return ReturnExpression.id( name );
     }
 
-    protected ReturnExpression.ReturnFunction nodesOf(String name)
+    protected ReturnExpression.ReturnExpressionsFunction coalesce(ReturnExpression... expressions)
+    {
+        return ReturnExpression.coalesce( expressions );
+    }
+
+    protected ReturnExpression.ReturnNameFunction nodesOf(String name)
     {
         return ReturnExpression.nodesOf( name );
     }
 
-    protected ReturnExpression.ReturnFunction relationshipsOf(String name)
+    protected ReturnExpression.ReturnNameFunction relationshipsOf(String name)
     {
         return ReturnExpression.relationshipsOf( name );
     }

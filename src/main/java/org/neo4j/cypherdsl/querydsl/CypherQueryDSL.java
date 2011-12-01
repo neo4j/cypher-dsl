@@ -116,12 +116,12 @@ public class CypherQueryDSL
         return OrderByExpression.property(path.toString(), order);
     }
 
-    protected ReturnExpression.ReturnNode nodes( Path<?>... entityPaths )
+    protected ReturnExpression.ReturnNodes nodes( Path<?>... entityPaths )
     {
         return QueryDSLReturnExpression.nodes(entityPaths);
     }
 
-    protected ReturnExpression.ReturnProperty properties( Path<?>... paths )
+    protected ReturnExpression.ReturnProperties properties( Path<?>... paths )
     {
         return QueryDSLReturnExpression.properties(paths);
     }

@@ -29,38 +29,38 @@ import static org.neo4j.cypherdsl.query.Query.*;
 public abstract class ReturnExpression<T extends ReturnExpression>
     implements AsString, Serializable, Cloneable
 {
-    public static ReturnNode nodes( String... names )
+    public static ReturnNodes nodes( String... names )
     {
         Query.checkEmpty( names, "Names" );
 
-        ReturnNode returnNode = new ReturnNode();
+        ReturnNodes returnNode = new ReturnNodes();
         returnNode.names = names;
 
         return returnNode;
     }
 
-    public static ReturnRelationship relationships( String... names )
+    public static ReturnRelationships relationships( String... names )
     {
-        checkEmpty( names, "Names" );
+        checkEmpty(names, "Names");
 
-        ReturnRelationship returnRelationship = new ReturnRelationship();
+        ReturnRelationships returnRelationship = new ReturnRelationships();
         returnRelationship.names = names;
         return returnRelationship;
     }
 
-    public static ReturnProperty properties( String... names )
+    public static ReturnProperties properties( String... names )
     {
         checkEmpty( names, "Names" );
-        ReturnProperty returnProperty = new ReturnProperty();
+        ReturnProperties returnProperty = new ReturnProperties();
         returnProperty.names = names;
         return returnProperty;
     }
 
-    public static ReturnPath paths( String... names )
+    public static ReturnPaths paths( String... names )
     {
         checkEmpty( names, "Names" );
 
-        ReturnPath returnPath = new ReturnPath();
+        ReturnPaths returnPath = new ReturnPaths();
         returnPath.names = names;
         return returnPath;
     }
@@ -132,57 +132,69 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return returnAggregate;
     }
 
-    public static ReturnExpression length( String name )
+    public static ReturnNameFunction length( String name )
     {
         checkEmpty( name, "Name" );
 
-        ReturnExpression.ReturnFunction returnFunction = new ReturnExpression.ReturnFunction();
+        ReturnExpression.ReturnNameFunction returnFunction = new ReturnExpression.ReturnNameFunction();
         returnFunction.function = "length";
         returnFunction.name = name;
         return returnFunction;
     }
 
-    public static ReturnFunction type(String name)
+    public static ReturnNameFunction type(String name)
     {
         checkEmpty( name, "Name" );
 
-        ReturnExpression.ReturnFunction returnFunction = new ReturnExpression.ReturnFunction();
+        ReturnExpression.ReturnNameFunction returnFunction = new ReturnExpression.ReturnNameFunction();
         returnFunction.function = "type";
         returnFunction.name = name;
         return returnFunction;
     }
 
-    public static ReturnFunction id(String name)
+    public static ReturnNameFunction id(String name)
     {
         checkEmpty( name, "Name" );
 
-        ReturnExpression.ReturnFunction returnFunction = new ReturnExpression.ReturnFunction();
+        ReturnExpression.ReturnNameFunction returnFunction = new ReturnExpression.ReturnNameFunction();
         returnFunction.function = "id";
         returnFunction.name = name;
         return returnFunction;
     }
 
-    public static ReturnFunction nodesOf(String name)
+    public static ReturnExpressionsFunction coalesce(ReturnExpression... expressions)
+    {
+        if (expressions.length < 1)
+            throw new IllegalArgumentException("At least one expression must be provided to coalesce function");
+
+        ReturnExpression.ReturnExpressionsFunction returnFunction = new ReturnExpression.ReturnExpressionsFunction();
+        returnFunction.function = "coalesce";
+        returnFunction.expressions = expressions;
+        return returnFunction;
+    }
+
+    public static ReturnNameFunction nodesOf(String name)
     {
         checkEmpty( name, "Name" );
 
-        ReturnExpression.ReturnFunction returnFunction = new ReturnExpression.ReturnFunction();
+        ReturnExpression.ReturnNameFunction returnFunction = new ReturnExpression.ReturnNameFunction();
         returnFunction.function = "nodes";
         returnFunction.name = name;
         return returnFunction;
     }
 
-    public static ReturnFunction relationshipsOf(String name)
+    public static ReturnNameFunction relationshipsOf(String name)
     {
         checkEmpty( name, "Name" );
 
-        ReturnExpression.ReturnFunction returnFunction = new ReturnExpression.ReturnFunction();
+        ReturnExpression.ReturnNameFunction returnFunction = new ReturnExpression.ReturnNameFunction();
         returnFunction.function = "relationships";
         returnFunction.name = name;
         return returnFunction;
     }
 
     public boolean distinct;
+    public String[] as;
 
     public T distinct()
     {
@@ -197,10 +209,19 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         return super.clone();
     }
 
-    public static class ReturnNode
-        extends ReturnExpression<ReturnNode>
+    public static class ReturnNodes
+        extends ReturnExpression<ReturnNodes>
     {
         public String[] names;
+
+        public ReturnNodes as(String... names)
+        {
+            if (names.length != names.length)
+                throw new IllegalArgumentException("Number of aliases does not match number of nodes specified");
+
+            as = names;
+            return this;
+        }
 
         public void asString(StringBuilder builder)
         {
@@ -212,53 +233,24 @@ public abstract class ReturnExpression<T extends ReturnExpression>
                 if (distinct)
                     builder.append( "distinct " );
                 builder.append( name );
+
+                if (as != null)
+                    builder.append(" AS ").append(as[i]);
             }
         }
     }
 
-    public static class ReturnRelationship
-        extends ReturnExpression<ReturnRelationship>
+    public static class ReturnRelationships
+        extends ReturnExpression<ReturnRelationships>
     {
         public String[] names;
 
-        public void asString(StringBuilder builder)
+        public ReturnRelationships as(String... names)
         {
-            for( int i = 0; i < names.length; i++ )
-            {
-                String name = names[ i ];
-                if (i > 0)
-                    builder.append( ',' );
-                builder.append( name );
-            }
-        }
-    }
+            if (names.length != names.length)
+                throw new IllegalArgumentException("Number of aliases does not match number of relationships specified");
 
-    public static class ReturnPath
-        extends ReturnExpression<ReturnPath>
-    {
-        public String[] names;
-
-        public void asString(StringBuilder builder)
-        {
-            for( int i = 0; i < names.length; i++ )
-            {
-                String name = names[ i ];
-                if (i > 0)
-                    builder.append( ',' );
-                builder.append( name );
-            }
-        }
-    }
-
-    public static class ReturnProperty
-        extends ReturnExpression<ReturnProperty>
-    {
-        public boolean optional;
-        public String[] names;
-
-        public ReturnProperty optional()
-        {
-            optional = true;
+            as = names;
             return this;
         }
 
@@ -269,22 +261,143 @@ public abstract class ReturnExpression<T extends ReturnExpression>
                 String name = names[ i ];
                 if (i > 0)
                     builder.append( ',' );
+                if (distinct)
+                    builder.append( "distinct " );
                 builder.append( name );
-                if (optional)
-                    builder.append( '?' );
+
+                if (as != null)
+                    builder.append(" AS ").append(as[i]);
             }
         }
     }
 
-    public static class ReturnFunction
-        extends ReturnExpression<ReturnFunction>
+    public static class ReturnPaths
+        extends ReturnExpression<ReturnPaths>
+    {
+        public String[] names;
+
+        public ReturnPaths as(String... names)
+        {
+            if (names.length != names.length)
+                throw new IllegalArgumentException("Number of aliases does not match number of paths specified");
+
+            as = names;
+            return this;
+        }
+
+        public void asString(StringBuilder builder)
+        {
+            for( int i = 0; i < names.length; i++ )
+            {
+                String name = names[ i ];
+                if (i > 0)
+                    builder.append( ',' );
+                if (distinct)
+                    builder.append( "distinct " );
+                builder.append( name );
+
+                if (as != null)
+                    builder.append(" AS ").append(as[i]);
+            }
+        }
+    }
+
+    public static class ReturnProperties
+        extends ReturnExpression<ReturnProperties>
+    {
+        public boolean optional;
+        public String[] names;
+
+        public ReturnProperties optional()
+        {
+            optional = true;
+            return this;
+        }
+
+        public ReturnProperties as(String... names)
+        {
+            if (names.length != names.length)
+                throw new IllegalArgumentException("Number of aliases does not match number of properties specified");
+
+            as = names;
+            return this;
+        }
+
+        public void asString(StringBuilder builder)
+        {
+            for( int i = 0; i < names.length; i++ )
+            {
+                String name = names[ i ];
+                if (i > 0)
+                    builder.append( ',' );
+                if (distinct)
+                    builder.append( "distinct " );
+                builder.append( name );
+                if (optional)
+                    builder.append( '?' );
+
+                if (as != null)
+                    builder.append(" AS ").append(as[i]);
+            }
+        }
+    }
+
+    public abstract static class ReturnFunction<T extends ReturnFunction>
+        extends ReturnExpression<T>
     {
         public String function;
+
+        public T as(String name)
+        {
+            as = new String[]{name};
+            return (T) this;
+        }
+    }
+
+    public static class ReturnNameFunction
+        extends ReturnFunction<ReturnNameFunction>
+    {
         public String name;
+
+        public ReturnNameFunction as(String name)
+        {
+            as = new String[]{name};
+            return this;
+        }
 
         public void asString(StringBuilder builder)
         {
             builder.append( function ).append( '(' ).append( name ).append( ')' );
+            if (as != null)
+                builder.append(" AS ").append(as[0]);
+        }
+    }
+
+    public static class ReturnExpressionsFunction
+        extends ReturnFunction<ReturnExpressionsFunction>
+    {
+        public ReturnExpression[] expressions;
+
+        public ReturnExpressionsFunction as(String name)
+        {
+            as = new String[]{name};
+            return this;
+        }
+
+        public void asString(StringBuilder builder)
+        {
+            builder.append( function ).append( '(' );
+
+            for (int i = 0; i < expressions.length; i++)
+            {
+                ReturnExpression expression = expressions[i];
+                if (i > 0)
+                    builder.append( ',' );
+                expression.asString(builder);
+            }
+            builder.append( ')' );
+            if (as != null)
+                builder.append(" AS ").append(as[0]);
         }
     }
 
@@ -298,6 +411,12 @@ public abstract class ReturnExpression<T extends ReturnExpression>
         public ReturnAggregate optional()
         {
             optional = true;
+            return this;
+        }
+
+        public ReturnAggregate as(String name)
+        {
+            as = new String[]{name};
             return this;
         }
 
@@ -316,6 +435,8 @@ public abstract class ReturnExpression<T extends ReturnExpression>
                     builder.append( '?' );
             }
             builder.append( ')' );
+            if (as != null)
+                builder.append(" AS ").append(as[0]);
         }
     }
 }
