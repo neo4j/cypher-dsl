@@ -27,6 +27,9 @@ import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.WhereExpression;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.neo4j.cypherdsl.query.Query.checkEmpty;
 
 /**
@@ -355,9 +358,58 @@ public class CypherQuery
         }
 
         @Override
+        public ExecuteWithParameters parameter(String name, Object value)
+        {
+            ExecuteWithParams withParams = new ExecuteWithParams(query);
+            return withParams.parameter(name, value);
+        }
+
+        @Override
         public String toString()
         {
             return CypherQuery.this.toString();
+        }
+    }
+
+    protected class ExecuteWithParams
+        implements ExecuteWithParameters
+    {
+        private Query query;
+        private Map<String, Object> parameters = new HashMap<String, Object>();
+
+        public ExecuteWithParams(Query query)
+        {
+            this.query = query;
+        }
+
+        @Override
+        public Query toQuery()
+        {
+            return query;
+        }
+
+        public Map<String, Object> getParameters()
+        {
+            return parameters;
+        }
+
+        @Override
+        public ExecuteWithParameters parameter(String name, Object value)
+        {
+            parameters.put(name, value);
+            return this;
+        }
+
+        @Override
+        public void asString(StringBuilder builder)
+        {
+            query.asString(builder);
+        }
+
+        @Override
+        public String toString()
+        {
+            return query.toString();
         }
     }
 }

@@ -150,7 +150,7 @@
           </execution>
         </executions>
       </plugin>
-      <!--
+
       <plugin>
           <artifactId>maven-assembly-plugin</artifactId>
           <executions>
@@ -161,7 +161,7 @@
                       <attach>true</attach>
                       <appendAssemblyId>true</appendAssemblyId>
                       <descriptors>
-                          <descriptor>src/main/assembly/docs-assembly.xml</descriptor>
+                          <descriptor>src/main/assemblies/docs-assembly.xml</descriptor>
                       </descriptors>
                   </configuration>
                   <goals>
@@ -170,7 +170,6 @@
               </execution>
           </executions>
       </plugin>
-      -->
     </plugins>
   </build>
 

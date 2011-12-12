@@ -17,19 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.AsString;
-import org.neo4j.cypherdsl.query.Query;
+import java.util.Map;
 
 /**
- * Once the query has been constructed, the methods here can be used to either stringify it or extract the
- * Query model for further processing.
+ * TODO
  */
-public interface Execute
-    extends AsString
+public interface ExecuteWithParameters
+    extends Execute
 {
-    Query toQuery();
-
-    ExecuteWithParameters parameter(String name, Object value);
+    Map<String, Object> getParameters();
 }
