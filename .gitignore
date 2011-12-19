@@ -1,0 +1,14 @@
+*~
+\#*
+target
+*.swp
+.project
+.classpath
+.settings
+.factorypath
+*.iws
+*.ipr
+*.iml
+.idea
+.DS_Store
+
