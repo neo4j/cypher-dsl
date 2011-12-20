@@ -23,9 +23,12 @@ import com.mysema.query.types.*;
 
 import javax.annotation.Nullable;
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.Match;
 import org.neo4j.cypherdsl.Return;
 import org.neo4j.cypherdsl.query.*;
 import org.neo4j.cypherdsl.query.Expression;
+
+import java.util.Collections;
 
 /**
  * TODO
@@ -40,6 +43,13 @@ public class CypherQueryDSL
     }
 
     public QueryDSLMatch starts( StartExpression... startExpression )
+    {
+        Collections.addAll(query.startExpressions, startExpression);
+
+        return new QueryDSLGrammar();
+    }
+
+    public QueryDSLMatch starts( Iterable<StartExpression> startExpression )
     {
         for( StartExpression expression : startExpression )
         {
@@ -134,6 +144,12 @@ public class CypherQueryDSL
         public QueryDSLMatch match( MatchExpression... expression )
         {
             return (QueryDSLMatch) super.match( expression );
+        }
+
+        @Override
+        public QueryDSLMatch match(Iterable<MatchExpression> expressions)
+        {
+            return (QueryDSLMatch) super.match(expressions);
         }
 
         @Override

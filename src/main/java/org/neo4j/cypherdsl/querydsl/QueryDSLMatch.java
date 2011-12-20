@@ -29,4 +29,6 @@ public interface QueryDSLMatch
     extends Match, QueryDSLWhere
 {
     QueryDSLMatch match( MatchExpression... expression );
+
+    QueryDSLMatch match(Iterable<MatchExpression> expressions);
 }

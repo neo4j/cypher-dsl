@@ -28,4 +28,5 @@ public interface Return
     extends Execute
 {
     ReturnNext returns( ReturnExpression... returnExpression );
+    ReturnNext returns( Iterable<ReturnExpression> returnExpressions );
 }

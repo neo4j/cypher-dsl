@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.WhereExpression;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -79,9 +80,16 @@ public class CypherQuery
     // Start --------------------------------------------------------
     protected Match starts( StartExpression... startExpression )
     {
-        for( StartExpression expression : startExpression )
+        Collections.addAll(query.startExpressions, startExpression);
+
+        return new Grammar();
+    }
+
+    protected Match starts( Iterable<StartExpression> startExpression )
+    {
+        for (StartExpression expression : startExpression)
         {
-            query.startExpressions.add( expression );
+            query.startExpressions.add(expression);
         }
 
         return new Grammar();
@@ -280,9 +288,16 @@ public class CypherQuery
         @Override
         public Match match( MatchExpression... expression )
         {
-            for( MatchExpression matchExpression : expression )
+            Collections.addAll(query.matchExpressions, expression);
+            return this;
+        }
+
+        @Override
+        public Match match(Iterable<MatchExpression> expressions)
+        {
+            for (MatchExpression expression : expressions)
             {
-                query.matchExpressions.add( matchExpression );
+                query.matchExpressions.add(expression);
             }
             return this;
         }
@@ -300,9 +315,16 @@ public class CypherQuery
         @Override
         public ReturnNext returns( ReturnExpression... returnExpression )
         {
-            for( ReturnExpression expression : returnExpression )
+            Collections.addAll(query.returnExpressions, returnExpression);
+            return this;
+        }
+
+        @Override
+        public ReturnNext returns(Iterable<ReturnExpression> returnExpressions)
+        {
+            for (ReturnExpression returnExpression : returnExpressions)
             {
-                query.returnExpressions.add( expression );
+                query.returnExpressions.add(returnExpression);
             }
             return this;
         }
@@ -311,9 +333,16 @@ public class CypherQuery
         @Override
         public OrderBy orderBy( OrderByExpression... orderByExpression )
         {
-            for( OrderByExpression expression : orderByExpression )
+            Collections.addAll(query.orderByExpressions, orderByExpression);
+            return this;
+        }
+
+        @Override
+        public OrderBy orderBy(Iterable<OrderByExpression> orderByExpressions)
+        {
+            for (OrderByExpression orderByExpression : orderByExpressions)
             {
-                query.orderByExpressions.add( expression );
+                query.orderByExpressions.add(orderByExpression);
             }
             return this;
         }

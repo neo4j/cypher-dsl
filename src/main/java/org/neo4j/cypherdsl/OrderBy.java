@@ -28,4 +28,5 @@ public interface OrderBy
     extends Skip
 {
     OrderBy orderBy(OrderByExpression... orderByExpression);
+    OrderBy orderBy(Iterable<OrderByExpression> orderByExpressions);
 }

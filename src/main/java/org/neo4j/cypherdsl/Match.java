@@ -30,4 +30,5 @@ public interface Match
     extends Where
 {
     Match match(MatchExpression... expression);
+    Match match(Iterable<MatchExpression> expressions);
 }
