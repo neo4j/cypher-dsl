@@ -22,7 +22,9 @@ package org.neo4j.cypherdsl.querydsl;
 import com.mysema.query.BooleanBuilder;
 import com.mysema.query.support.Expressions;
 import com.mysema.query.types.Ops;
+import com.mysema.query.types.ParamExpression;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.expr.Param;
 import org.junit.Assert;
 import org.junit.Test;
 import org.neo4j.cypherdsl.query.OrderByExpression;
@@ -108,6 +110,15 @@ public class QueryDSLTest
             Assert.assertEquals("START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
                     start(node(n, 1, 2, 3))
                             .where(n.firstName.eq("P").and(n.age.gt(25)))
+                            .returns(QueryDSLReturnExpression.nodes(n))
+                            .toString());
+        }
+
+        {
+            QPerson n = new QPerson("n");
+            Assert.assertEquals("START n=node(1,2,3) WHERE n.firstName={name} and n.age>{age} RETURN n",
+                    start(node(n, 1, 2, 3))
+                            .where(n.firstName.eq(new Param<String>(String.class, "name")).and(n.age.gt(new Param<Integer>(Integer.class, "age"))))
                             .returns(QueryDSLReturnExpression.nodes(n))
                             .toString());
         }

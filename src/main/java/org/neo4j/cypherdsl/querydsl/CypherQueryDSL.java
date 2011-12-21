@@ -193,13 +193,13 @@ public class CypherQueryDSL
                         return WhereExpression.not((WhereExpression.PredicateExpression)  operation.getArg(0).accept(this, null));
                     } else if ( id.equals( Ops.EQ_PRIMITIVE.getId() ) || id.equals( Ops.EQ_OBJECT.getId() ))
                     {
-                        return WhereExpression.eq(operation.getArg(0).toString(), ((Constant) operation.getArg(1)).getConstant());
+                        return WhereExpression.eq(operation.getArg(0).toString(), arg(operation.getArg(1)));
                     } else if ( id.equals( Ops.NE_PRIMITIVE.getId() ) || id.equals( Ops.NE_OBJECT.getId() ))
                     {
-                        return WhereExpression.ne(operation.getArg(0).toString(), ((Constant) operation.getArg(1)).getConstant());
+                        return WhereExpression.ne(operation.getArg(0).toString(), arg(operation.getArg(1)));
                     } else if ( id.equals( Ops.GT.getId() ))
                     {
-                        return WhereExpression.gt(operation.getArg(0).toString(), ((Constant) operation.getArg(1)).getConstant());
+                        return WhereExpression.gt(operation.getArg(0).toString(), arg(operation.getArg(1)));
                     } else if ( id.equals( Ops.LT.getId() ))
                     {
                         return WhereExpression.lt(operation.getArg(0)
@@ -207,11 +207,11 @@ public class CypherQueryDSL
                     } else if ( id.equals( Ops.GOE.getId() ))
                     {
                         return WhereExpression.gte( operation.getArg( 0 )
-                                                       .toString(), ( (Constant) operation.getArg( 1 ) ).getConstant() );
+                                                       .toString(), arg(operation.getArg(1)) );
                     } else if ( id.equals( Ops.LOE.getId() ))
                     {
                         return WhereExpression.lte( operation.getArg( 0 )
-                                                       .toString(), ( (Constant) operation.getArg( 1 ) ).getConstant() );
+                                                       .toString(), arg(operation.getArg(1)) );
                     } else if ( id.equals( Ops.EXISTS.getId() ))
                     {
                         return WhereExpression.exists( operation.getArg( 0 )
@@ -258,6 +258,16 @@ public class CypherQueryDSL
                 )
                 {
                     return null;
+                }
+                
+                public Object arg(com.mysema.query.types.Expression expression)
+                {
+                    if (expression instanceof Constant)
+                        return ((Constant)expression).getConstant();
+                    else if (expression instanceof ParamExpression)
+                        return Expression.param(((ParamExpression)expression).getName());
+                    else
+                        throw new IllegalArgumentException("Unknown argument type:"+expression);
                 }
             }, null );
 
