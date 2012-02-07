@@ -71,6 +71,7 @@ public class Query
         }
     }
 
+    public String cypherVersion;
     public ArrayList<StartExpression> startExpressions = new ArrayList<StartExpression>();
     public ArrayList<MatchExpression> matchExpressions = new ArrayList<MatchExpression>();
     public WhereExpression whereExpression;
@@ -81,7 +82,13 @@ public class Query
 
     public void asString(StringBuilder builder)
     {
-        clause( builder, "START", startExpressions );
+        String startExpression = "START";
+        if(cypherVersion != null)
+        {
+            startExpression = "CYPHER " + cypherVersion + " START";
+        }
+        
+        clause( builder, startExpression, startExpressions );
         clause( builder, "MATCH", matchExpressions );
 
         if (whereExpression != null)

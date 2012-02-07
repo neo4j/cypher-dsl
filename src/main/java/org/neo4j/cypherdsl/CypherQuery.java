@@ -19,6 +19,7 @@
  */
 package org.neo4j.cypherdsl;
 
+
 import org.neo4j.cypherdsl.query.Expression;
 import org.neo4j.cypherdsl.query.MatchExpression;
 import org.neo4j.cypherdsl.query.OrderByExpression;
@@ -26,12 +27,9 @@ import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.WhereExpression;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.neo4j.cypherdsl.query.Query.checkEmpty;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -47,6 +45,12 @@ import static org.neo4j.cypherdsl.query.Query.checkEmpty;
  */
 public class CypherQuery
 {
+    public static CypherQuery cypherVersion( String version )
+    {
+        CypherQuery query = new CypherQuery();
+        return query.usingVersion(version);
+    }
+
     public static Match start( StartExpression... startExpressions )
     {
         CypherQuery query = new CypherQuery();
@@ -76,6 +80,14 @@ public class CypherQuery
             throw new IllegalStateException( "Query was not cloneable" );
         }
     }
+
+    // Syntax version -----------------------------------------------
+    protected CypherQuery usingVersion( String version )
+    {
+        query.cypherVersion = version;
+        return this;
+    }
+
 
     // Start --------------------------------------------------------
     protected Match starts( StartExpression... startExpression )

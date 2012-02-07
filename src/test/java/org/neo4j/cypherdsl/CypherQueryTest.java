@@ -144,6 +144,16 @@ public class CypherQueryTest
     }
 
     @Test
+    public void testCypherVersion()
+    {
+        assertEquals( "CYPHER 1.5 START n=node(0) RETURN n", cypherVersion("1.5").starts(node( "n", 0 )).returns( nodes("n") ).toString());
+
+        assertEquals( "START n=node(0) WHERE (n.age>30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", start(node( "n", 0 )).
+            where( gt( "n.age", 30 ).and( eq( "n.name", "Tobias" ) ).or( not( eq( "n.name", "Tobias" ) ) ) ).
+            returns( properties("n") ).toString());
+    }
+
+    @Test
     public void testReturn()
     {
         // Return with node
