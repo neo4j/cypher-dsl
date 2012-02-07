@@ -19,8 +19,14 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.*;
 
+import org.neo4j.cypherdsl.query.Expression;
+import org.neo4j.cypherdsl.query.MatchExpression;
+import org.neo4j.cypherdsl.query.OrderByExpression;
+import org.neo4j.cypherdsl.query.Query;
+import org.neo4j.cypherdsl.query.ReturnExpression;
+import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.query.WhereExpression;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
