@@ -623,7 +623,7 @@ public abstract class WhereExpression
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( function ).append( '(' ).append( name ).append( " in " ).append( iterable ).append( ':' );
+            builder.append( function ).append( '(' ).append( name ).append( " in " ).append( iterable ).append( " WHERE " );
             predicate.asString( builder );
             builder.append( ')' );
         }

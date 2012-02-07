@@ -542,7 +542,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_2()
     {
-        assertEquals( "START a=node(3),b=node(1) MATCH p=(a)-[*1..3]->(b) WHERE all(x in nodes(p):x.age>30) RETURN p",
+        assertEquals( "START a=node(3),b=node(1) MATCH p=(a)-[*1..3]->(b) WHERE all(x in nodes(p) WHERE x.age>30) RETURN p",
                       start( node( "a", 3 ), node( "b", 1 ) ).
                           match( path( "p" ).from( "a" ).out().hops( 1, 3 ).to( "b" ) ).
                           where( all( "x", "nodes(p)", gt( "x.age", 30 ) ) ).
@@ -553,7 +553,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_3()
     {
-        assertEquals( "START a=node(3) MATCH p=(a)-[*1..3]->(b) WHERE any(x in nodes(p):x.eyes=\"blue\") RETURN p",
+        assertEquals( "START a=node(3) MATCH p=(a)-[*1..3]->(b) WHERE any(x in nodes(p) WHERE x.eyes=\"blue\") RETURN p",
                       start( node( "a", 3 ) ).
                           match( path( "p" ).from( "a" ).out().hops( 1, 3 ).to( "b" ) ).
                           where( any( "x", "nodes(p)", eq( "x.eyes", "blue" ) ) ).
@@ -564,7 +564,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_4()
     {
-        assertEquals( "START n=node(3) MATCH p=(n)-[*1..3]->(b) WHERE none(x in nodes(p):x.age=25) RETURN p",
+        assertEquals( "START n=node(3) MATCH p=(n)-[*1..3]->(b) WHERE none(x in nodes(p) WHERE x.age=25) RETURN p",
                       start( node( "n", 3 ) ).
                           match( path( "p" ).from( "n" ).out( ).hops( 1,3 ).to( "b" )).
                           where( none( "x", "nodes(p)", eq( "x.age", 25 ) ) ).
@@ -575,7 +575,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_5()
     {
-        assertEquals( "START n=node(3) MATCH p=(n)-->(b) WHERE single(var in nodes(p):var.eyes=\"blue\") RETURN p",
+        assertEquals( "START n=node(3) MATCH p=(n)-->(b) WHERE single(var in nodes(p) WHERE var.eyes=\"blue\") RETURN p",
                       start( node( "n", 3 ) ).
                           match( path( "p" ).from( "n" ).out().to( "b" ) ).
                           where( single( "var", "nodes(p)", eq( "var.eyes", "blue" ) ) ).
