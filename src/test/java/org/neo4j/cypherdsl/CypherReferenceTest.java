@@ -645,7 +645,7 @@ public class CypherReferenceTest
     @Test
     public void test15_14_1_1()
     {
-        assertEquals( CYPHER+"START a=node(3),b=node(1) MATCH p=(a)-[*1..3]->(b) WHERE all(x in nodes(p) WHERE x.age>30) RETURN p",
+        assertEquals( CYPHER+"START a=node(3),b=node(1) MATCH p=(a)-[*1..3]->(b) WHERE all(x IN nodes(p) WHERE x.age>30) RETURN p",
                       start( node( "a", 3 ), node( "b", 1 ) ).
                           match( path( "p" ).from( "a" ).out().hops( 1, 3 ).to( "b" ) ).
                           where( all( "x", nodes( identifier( "p" ) ), identifier( "x" ).number( "age" ).gt( 30 ) ) ).
@@ -656,7 +656,7 @@ public class CypherReferenceTest
     @Test
     public void test15_14_1_2()
     {
-        assertEquals( CYPHER+"START a=node(2) WHERE any(x in a.array WHERE x=\"one\") RETURN p",
+        assertEquals( CYPHER+"START a=node(2) WHERE any(x IN a.array WHERE x=\"one\") RETURN p",
                       start( node( "a", 2 ) ).
                           where( any( "x", identifier( "a" ).property( "array" ), string( "x" ).eq( "one" ) ) ).
                           returns( identifier( "p" ) ).
@@ -666,7 +666,7 @@ public class CypherReferenceTest
     @Test
     public void test15_14_1_3()
     {
-        assertEquals( CYPHER+"START n=node(3) MATCH p=(n)-[*1..3]->(b) WHERE none(x in nodes(p) WHERE x.age=25) RETURN p",
+        assertEquals( CYPHER+"START n=node(3) MATCH p=(n)-[*1..3]->(b) WHERE none(x IN nodes(p) WHERE x.age=25) RETURN p",
                       start( node( "n", 3 ) ).
                           match( path( "p" ).from( "n" ).out( ).hops( 1,3 ).to( "b" )).
                           where( none( "x", nodes( identifier( "p" ) ), identifier( "x" ).number( "age" ).eq( 25 ) ) ).
@@ -677,7 +677,7 @@ public class CypherReferenceTest
     @Test
     public void test15_14_1_4()
     {
-        assertEquals( CYPHER+"START n=node(3) MATCH p=(n)-->(b) WHERE single(var in nodes(p) WHERE var.eyes=\"blue\") RETURN p",
+        assertEquals( CYPHER+"START n=node(3) MATCH p=(n)-->(b) WHERE single(var IN nodes(p) WHERE var.eyes=\"blue\") RETURN p",
                       start( node( "n", 3 ) ).
                           match( path( "p" ).from( "n" ).out().to( "b" ) ).
                           where( single( "var", nodes( identifier( "p" ) ), identifier( "var" ).string( "eyes" )
@@ -757,7 +757,7 @@ public class CypherReferenceTest
     @Test
     public void test15_14_3_3()
     {
-        assertEquals( CYPHER+"START a=node(3),b=node(4),c=node(1) MATCH p=(a)-->(b)-->(c) RETURN extract(n in nodes(p):n.age)",
+        assertEquals( CYPHER+"START a=node(3),b=node(4),c=node(1) MATCH p=(a)-->(b)-->(c) RETURN extract(n IN nodes(p):n.age)",
                       start( node( "a", 3 ), node( "b",4), node( "c", 1 ) ).
                           match( path( "p" ).from( "a" ).out().to( "b" ).link().out().to( "c" ) ).
                           returns( extract( "n", nodes( identifier( "p" ) ), identifier( "n" ).number( "age" ) ) ).
@@ -767,7 +767,7 @@ public class CypherReferenceTest
     @Test
     public void test15_14_3_4()
     {
-        assertEquals( CYPHER+"START a=node(2) RETURN a.array,filter(x in a.array:length(x)=3)",
+        assertEquals( CYPHER+"START a=node(2) RETURN a.array,filter(x IN a.array:length(x)=3)",
                       start( node( "a", 2 ) ).
                           returns( identifier( "a" ).property( "array" ), filter( "x", identifier( "a" ).property( "array" ), length( identifier( "x" ) )
                               .eq( 3 ) ) ).
