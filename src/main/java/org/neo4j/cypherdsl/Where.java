@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.WhereExpression;
+import org.neo4j.cypherdsl.query.PredicateExpression;
 
 /**
  * Implements the WHERE clause. Use the static methods in WhereExpression to create expressions.
@@ -27,5 +27,5 @@ import org.neo4j.cypherdsl.query.WhereExpression;
 public interface Where
     extends Return
 {
-    Return where(WhereExpression expression);
+    Return where(PredicateExpression expression);
 }

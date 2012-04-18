@@ -66,10 +66,10 @@ public class CypherExecutionTest
     {
         data.get();
 
-        String query = start(StartExpression.lookup("john", "node_auto_index", "name", "John"))
+        String query = start(lookup("john", "node_auto_index", "name", "John"))
                                               .match(path().from("john").out("friend")
                                                       .link().out("friend").to("fof"))
-                                              .returns(properties("john.name", "fof.name", "john"))
+                                              .returns(identifier("john").property( "name"), identifier("fof").property( "name"), identifier("john"))
                                               .toString();
 
         System.out.println(query);
@@ -85,7 +85,7 @@ public class CypherExecutionTest
             Execute q = start(node("john", john))
                                                   .match(path().from("john").out("friend")
                                                           .link().out("friend").to("fof"))
-                                                  .returns(properties("john.name", "fof.name"));
+                                                  .returns(identifier("john").property( "name"), identifier("fof").property( "name"));
 
             System.out.println(q);
             System.out.println( engine.execute( q.toString() ).toString() );
@@ -98,7 +98,7 @@ public class CypherExecutionTest
                     replace("fof.name", "friend").map(engine.execute( start(node("john", john))
                           .match(path().from("john").out("friend")
                                   .link().out("friend").to("fof"))
-                          .returns(properties("john.name", "fof.name")).toString())) );
+                          .returns(identifier("john").property( "name"), identifier("fof").property( "name")).toString())) );
             System.out.println( friends );
         }
     }

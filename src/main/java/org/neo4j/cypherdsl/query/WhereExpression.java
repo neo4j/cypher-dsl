@@ -19,628 +19,132 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import java.io.Serializable;
-
 /**
  * Provides the possible expressions for the WHERE clause.
  */
 public abstract class WhereExpression
-    implements AsString, Serializable, Cloneable
+    extends PredicateExpression
 {
-    public static CommonType prop(String name)
+
+    public static class WhereRelationship
+        extends PredicateExpression
     {
-        CommonType type = new CommonType();
-         type.name = name;
-         return type;
-    }
-
-    public static StringType string(String name)
-    {
-        StringType type = new StringType();
-        type.name = name;
-        return type;
-    }
-
-    public static NumberType number(String name)
-    {
-        NumberType type = new NumberType();
-        type.name = name;
-        return type;
-    }
-
-    public static And and(BooleanExpression... expressions)
-    {
-        Query.checkNull( expressions, "Expressions" );
-
-        And and = new And();
-        and.expressions = expressions;
-        return and;
-    }
-
-    public static Or or(BooleanExpression... expressions)
-    {
-        Query.checkNull( expressions, "Expressions" );
-
-        Or or = new Or();
-        or.expressions = expressions;
-        return or;
-    }
-
-    public static Not not(PredicateExpression expression)
-    {
-        Query.checkNull( expression, "Expression" );
-
-        Not not = new Not();
-        not.expression = expression;
-        return not;
-    }
-
-    public static Equals eq( String property, Object value )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkNull( value, "Value" );
-
-        Equals equals = new Equals();
-        equals.property = property;
-        equals.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
-        return equals;
-    }
-
-    public static GT gt( String property, Object value )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkNull( value, "Value" );
-
-        GT gt = new GT();
-        gt.property = property;
-        gt.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
-        return gt;
-    }
-
-    public static LT lt( String property, Object value )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkNull( value, "Value" );
-
-        LT lt = new LT();
-        lt.property = property;
-        lt.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
-        return lt;
-    }
-
-    public static GTE gte( String property, Object value )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkNull( value, "Number" );
-
-        GTE gte = new GTE();
-        gte.property = property;
-        gte.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
-        return gte;
-    }
-
-    public static LTE lte( String property, Object value )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkNull( value, "Number" );
-
-        LTE lte = new LTE();
-        lte.property = property;
-        lte.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
-        return lte;
-    }
-
-    public static NE ne( String property, Object value )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkNull( value, "Value" );
-
-        NE ne = new NE();
-        ne.property = property;
-        ne.value = value instanceof Expression.Value ? (Expression.Value) value : Expression.literal( value );
-        return ne;
-    }
-
-    public static Regexp regexp( String property, String regexp )
-    {
-        Query.checkEmpty( property, "Property" );
-        Query.checkEmpty( regexp, "Regular expression" );
-
-        Regexp regexp1 = new Regexp();
-        regexp1.property = property;
-        regexp1.regexp = regexp;
-        return regexp1;
-    }
-
-    public static Exists exists(String property)
-    {
-        Query.checkEmpty( property, "Property" );
-
-        Exists exists = new Exists();
-        exists.property = property;
-        return exists;
-    }
-
-    public static IsNull isNull(String property)
-    {
-        Query.checkEmpty( property, "Property" );
-
-        IsNull isNull = new IsNull();
-        isNull.property = property;
-        return isNull;
-    }
-
-    public static IsNotNull isNotNull(String property)
-    {
-        Query.checkEmpty( property, "Property" );
-
-        IsNotNull isNotNull = new IsNotNull();
-        isNotNull.property = property;
-        return isNotNull;
-    }
-
-    public static Literal literal(String whereClause)
-    {
-        Query.checkEmpty( whereClause, "Literal clause" );
-
-        Literal literal = new Literal( );
-        literal.literal = whereClause;
-        return literal;
-    }
-
-    public static Type type(String relationShipName)
-    {
-        Query.checkEmpty( relationShipName, "Relationship" );
-
-        Type type = new Type();
-        type.name = relationShipName;
-        return type;
-    }
-
-    public static IterablePredicateExpression all( String name, String iterable, PredicateExpression predicateExpression )
-    {
-        Query.checkEmpty( name, "Name" );
-        Query.checkEmpty( iterable, "Iterable" );
-        Query.checkNull( predicateExpression, "Predicate" );
-
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "all";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return expression;
-    }
-
-    public static IterablePredicateExpression any( String name,
-                                                   String iterable,
-                                                   PredicateExpression predicateExpression
-    )
-    {
-        Query.checkEmpty( name, "Name" );
-        Query.checkEmpty( iterable, "Iterable" );
-        Query.checkNull( predicateExpression, "Predicate" );
-
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "any";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return expression;
-    }
-
-    public static IterablePredicateExpression none( String name,
-                                                   String iterable,
-                                                   PredicateExpression predicateExpression
-    )
-    {
-        Query.checkEmpty( name, "Name" );
-        Query.checkEmpty( iterable, "Iterable" );
-        Query.checkNull( predicateExpression, "Predicate" );
-
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "none";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return expression;
-    }
-
-    public static IterablePredicateExpression single( String name,
-                                                   String iterable,
-                                                   PredicateExpression predicateExpression
-    )
-    {
-        Query.checkEmpty( name, "Name" );
-        Query.checkEmpty( iterable, "Iterable" );
-        Query.checkNull( predicateExpression, "Predicate" );
-
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "single";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return expression;
-    }
-
-    @Override
-    public Object clone()
-        throws CloneNotSupportedException
-    {
-        return super.clone();
-    }
-
-    public static abstract class AbstractType<T>
-    {
-        protected String name;
-
-        public Equals eq(T value)
-        {
-            return WhereExpression.eq( name, value );
-        }
-
-        public GT gt(T value)
-        {
-            return WhereExpression.gt( name, value );
-        }
-
-        public LT lt(T value)
-        {
-            return WhereExpression.lt( name, value );
-        }
-
-        public GTE gte(T value)
-        {
-            return WhereExpression.gte( name, value );
-        }
-
-        public LTE lte(T value)
-        {
-            return WhereExpression.lte( name, value );
-        }
-
-        public NE ne(T value)
-        {
-            return WhereExpression.ne( name, value );
-        }
-
-        public Exists exists()
-        {
-            return WhereExpression.exists( name );
-        }
-
-        public IsNull isNull()
-        {
-            return WhereExpression.isNull( name );
-        }
-
-        public IsNotNull isNotNull()
-        {
-            return WhereExpression.isNotNull( name );
-        }
-    }
-
-    public static class CommonType
-        extends AbstractType<Object>
-    {
-        public Regexp regexp(String value)
-        {
-            return WhereExpression.regexp( name, value );
-        }
-
-        public StringType asString()
-        {
-            StringType type = new StringType();
-            type.name = name;
-            return type;
-        }
-
-        public NumberType asNumber()
-        {
-            NumberType type = new NumberType();
-            type.name = name;
-            return type;
-        }
-    }
-
-    public static class StringType
-        extends AbstractType<String>
-    {
-        public Regexp regexp(String value)
-        {
-            return WhereExpression.regexp( name, value );
-        }
-    }
-
-    public static class NumberType
-        extends AbstractType<Number>
-    {
-    }
-
-    public static class And
-        extends BooleanExpression
-    {
-        public BooleanExpression[] expressions;
+        public String from = "";
+        public String to = "";
+        public Direction direction = Direction.BOTH;
+        public String[] relationships = new String[0];
+        public Integer minHops;
+        public Integer maxHops;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            for( int i = 0; i < expressions.length; i++ )
-            {
-                WhereExpression expression = expressions[ i ];
-                if (i > 0)
-                    builder.append( " and " );
-                expression.asString( builder );
-            }
-        }
-    }
+            builder.append( '(' ).append( from ).append( ')' );
+            builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
-    public static class Or
-        extends BooleanExpression
-    {
-        public BooleanExpression[] expressions;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            for( int i = 0; i < expressions.length; i++ )
+            if( relationships.length > 0 || minHops != null || maxHops != null )
             {
-                WhereExpression expression = expressions[ i ];
-                if (i > 0)
-                    builder.append( " or " );
-                if (expression instanceof And)
+                builder.append( '[' );
+                if( relationships.length > 0 )
                 {
-                    builder.append( '(' );
-                    expression.asString( builder );
-                    builder.append( ')' );
-                } else
-                    expression.asString( builder );
+                    builder.append( ':' );
+                    for( int i = 0; i < relationships.length; i++ )
+                    {
+                        String rel = relationships[ i ];
+                        if (i>0)
+                            builder.append( "|" );
+                        builder.append( rel );
+                    }
+                }
+
+                if( minHops != null || maxHops != null )
+                {
+                    builder.append( '*' );
+                    if( minHops != null )
+                    {
+                        builder.append( minHops );
+                    }
+                    builder.append( ".." );
+                    if( maxHops != null )
+                    {
+                        builder.append( maxHops );
+                    }
+                }
+
+                builder.append( ']' );
             }
-        }
-    }
 
-    public static class Not
-        extends BooleanExpression
-    {
-        public BooleanExpression expression;
+            builder.append( direction.equals( Direction.OUT ) ? "->" : "-" );
 
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( "not(" );
-            expression.asString( builder );
-            builder.append( ')' );
-        }
-    }
-
-    public static class Equals
-        extends PredicateExpression
-    {
-        public String property;
-        public Expression.Value value;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( '=' );
-            value.asString( builder );
-        }
-    }
-
-    public static class Regexp
-        extends PredicateExpression
-    {
-        public String property;
-        public String regexp;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( "=~/" ); // TODO Should the / be include for parameters?
-            builder.append( regexp );
-            builder.append( '/' );
-        }
-    }
-
-    public static class Exists
-        extends PredicateExpression
-    {
-        public String property;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-        }
-    }
-
-    public static class IsNull
-        extends PredicateExpression
-    {
-        public String property;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( " is null" );
-        }
-    }
-
-    public static class IsNotNull
-        extends PredicateExpression
-    {
-        public String property;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( " is not null" );
-        }
-    }
-
-    public static class GT
-        extends PredicateExpression
-    {
-        public String property;
-        public Expression.Value value;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( '>' );
-            value.asString( builder );
-        }
-    }
-
-    public static class LT
-        extends PredicateExpression
-    {
-        public String property;
-        public Expression.Value value;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( '<' );
-            value.asString( builder );
-        }
-    }
-
-    public static class GTE
-        extends PredicateExpression
-    {
-        public String property;
-        public Expression.Value value;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( ">=" );
-            value.asString( builder );
-        }
-    }
-
-    public static class LTE
-        extends PredicateExpression
-    {
-        public String property;
-        public Expression.Value value;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( "<=" );
-            value.asString( builder );
-        }
-    }
-
-    public static class NE
-        extends PredicateExpression
-    {
-        public String property;
-        public Expression.Value value;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( property );
-            if (optional)
-                builder.append( '?' );
-            builder.append( "!=" );
-            value.asString( builder );
-        }
-    }
-
-    public static class Literal
-        extends WhereExpression
-    {
-        public String literal;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( literal );
-        }
-    }
-
-    public abstract static class BooleanExpression
-        extends WhereExpression
-    {
-        public And and(BooleanExpression expression)
-        {
-            return and( this, expression );
+            builder.append( '(' ).append( to ).append( ')' );
         }
 
-        public Or or(BooleanExpression expression)
+        public WhereRelationship out(String... relationship)
         {
-            return or( this, expression );
+            this.direction = Direction.OUT;
+            this.relationships = relationship;
+            return this;
         }
-    }
 
-    public abstract static class PredicateExpression
-        extends BooleanExpression
-    {
-        public boolean optional;
-
-        public PredicateExpression optional()
+        public WhereRelationship in(String... relationship)
         {
-            optional = true;
+            this.direction = Direction.IN;
+            this.relationships = relationship;
+            return this;
+        }
+
+        public WhereRelationship both( String... relationship )
+        {
+            this.direction = Direction.BOTH;
+            this.relationships = relationship;
+            return this;
+        }
+
+        public WhereRelationship hops( Integer minHops, Integer maxHops )
+        {
+            if (minHops != null && minHops < 0)
+                throw new IllegalArgumentException( "Minimum number of hops must be over zero" );
+
+            if (maxHops != null && maxHops < 0)
+                throw new IllegalArgumentException( "Maximum number of hops must be over zero" );
+
+            this.minHops = minHops;
+            this.maxHops = maxHops;
+            return this;
+        }
+
+        public WhereRelationship from(String from)
+        {
+            this.from = from;
+            return this;
+        }
+
+        public WhereRelationship to(String to)
+        {
+            this.to = to;
             return this;
         }
     }
 
-    public static class IterablePredicateExpression
-        extends WhereExpression
+    public static class WhereIn
+        extends PredicateExpression
     {
-        public String function;
-        public String name;
-        public String iterable;
-        public PredicateExpression predicate;
+        public Expression expression;
+        public Expression[] elements;
 
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( function ).append( '(' ).append( name ).append( " in " ).append( iterable ).append( " WHERE " );
-            predicate.asString( builder );
-            builder.append( ')' );
-        }
-    }
-
-    public static class Type
-    {
-        public String name;
-
-        public Regexp regexp(String regexp)
-        {
-            return WhereExpression.regexp("type("+name+")",regexp);
-        }
-
-        public Equals eq(String name)
-        {
-            return WhereExpression.eq( "type(" + this.name + ")", name );
+            expression.asString( builder );
+            builder.append( " IN [" );
+            for( int i = 0; i < elements.length; i++ )
+            {
+                Expression element = elements[ i ];
+                if (i>0)
+                    builder.append( "," );
+                element.asString( builder );
+            }
+            builder.append( "]" );
         }
     }
 }

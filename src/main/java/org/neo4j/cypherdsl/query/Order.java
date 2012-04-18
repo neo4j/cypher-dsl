@@ -17,17 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
+package org.neo4j.cypherdsl.query;
 
 /**
- * Implements the RETURN clause.
- */
-public interface Return
-    extends Execute
+* TODO
+*/
+public enum Order
 {
-    ReturnNext returns( Expression... returnExpression );
-    ReturnNext returns( Iterable<Expression> returnExpressions );
+    ASCENDING, DESCENDING
 }

@@ -17,17 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
+package org.neo4j.cypherdsl.query;
 
 /**
- * Implements the RETURN clause.
- */
-public interface Return
-    extends Execute
+* TODO
+*/
+public class Regexp
+    extends PredicateExpression
 {
-    ReturnNext returns( Expression... returnExpression );
-    ReturnNext returns( Iterable<Expression> returnExpressions );
+    public Expression left;
+    public Expression regexp;
+    public boolean caseSensitive;
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        left.asString( builder );
+        builder.append( "=~/" ); // TODO Should the / be include for parameters?
+        if (!caseSensitive)
+            builder.append( "(?i)" );
+        regexp.asString( builder );
+        builder.append( '/' );
+    }
 }

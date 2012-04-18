@@ -17,17 +17,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
+package org.neo4j.cypherdsl.query;
 
 /**
- * Implements the RETURN clause.
- */
-public interface Return
-    extends Execute
+* This represents all binary operators, such as +, -, *, / and %
+*/
+public class BinaryOperatorExpression
+    extends FunctionExpression
 {
-    ReturnNext returns( Expression... returnExpression );
-    ReturnNext returns( Iterable<Expression> returnExpressions );
+    public String operator;
+    public Expression left;
+    public Expression right;
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        left.asString( builder );
+        builder.append( operator );
+        right.asString( builder );
+    }
 }

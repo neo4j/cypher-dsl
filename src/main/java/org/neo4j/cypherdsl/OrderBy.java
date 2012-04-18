@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.OrderByExpression;
+import org.neo4j.cypherdsl.query.Expression;
 
 /**
  * Implements the ORDER BY clause.
@@ -27,6 +27,6 @@ import org.neo4j.cypherdsl.query.OrderByExpression;
 public interface OrderBy
     extends Skip
 {
-    OrderBy orderBy(OrderByExpression... orderByExpression);
-    OrderBy orderBy(Iterable<OrderByExpression> orderByExpressions);
+    OrderBy orderBy(Expression... orderByExpression);
+    OrderBy orderBy(Iterable<Expression> orderByExpressions);
 }

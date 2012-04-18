@@ -20,16 +20,35 @@
 package org.neo4j.cypherdsl;
 
 
+import org.neo4j.cypherdsl.query.BinaryPredicateExpression;
+import org.neo4j.cypherdsl.query.BooleanExpression;
 import org.neo4j.cypherdsl.query.Expression;
+import org.neo4j.cypherdsl.query.FunctionExpression;
+import org.neo4j.cypherdsl.query.Has;
+import org.neo4j.cypherdsl.query.Identifier;
+import org.neo4j.cypherdsl.query.IsNotNull;
+import org.neo4j.cypherdsl.query.IsNull;
+import org.neo4j.cypherdsl.query.IterablePredicateExpression;
+import org.neo4j.cypherdsl.query.Literal;
 import org.neo4j.cypherdsl.query.MatchExpression;
+import org.neo4j.cypherdsl.query.NumberProperty;
+import org.neo4j.cypherdsl.query.Order;
 import org.neo4j.cypherdsl.query.OrderByExpression;
+import org.neo4j.cypherdsl.query.Parameter;
+import org.neo4j.cypherdsl.query.PredicateExpression;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.ReturnExpression;
 import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.query.StringProperty;
 import org.neo4j.cypherdsl.query.WhereExpression;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static org.neo4j.cypherdsl.query.FunctionExpression.Extract;
+import static org.neo4j.cypherdsl.query.Query.*;
+
+import org.neo4j.cypherdsl.query.Regexp;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -45,25 +64,45 @@ import java.util.Map;
  */
 public class CypherQuery
 {
-    public static CypherQuery cypherVersion( String version )
-    {
-        CypherQuery query = new CypherQuery();
-        return query.usingVersion(version);
-    }
-
+    /**
+     * Start building a new Cypher query
+     *
+     * @param startExpressions list of start expressions
+     * @return Grammar for Match clause
+     */
     public static Match start( StartExpression... startExpressions )
     {
         CypherQuery query = new CypherQuery();
         return query.starts( startExpressions );
     }
 
+    /**
+     * Continue building on existing Query object
+     *
+     * @param query a previously created query object
+     * @return CypherQuery DSL that can be used to continue building the query
+     */
     public static CypherQuery newQuery( Query query )
     {
         return new CypherQuery( query );
     }
 
+    // The internal query object. Methods in the DSL work on this
     protected Query query;
 
+    /**
+     * Use this constructor if you want to use the instantiation block style
+     * of using the DSL.
+     *
+     * Example:
+     * <pre>
+     *     new CypherQuery()
+     *     {{
+     *         starts(node("n",1)).returns(identifier("n"));
+     *     }}.toString()
+     * </pre>
+     *
+     */
     public CypherQuery()
     {
         query = new Query();
@@ -81,15 +120,369 @@ public class CypherQuery
         }
     }
 
-    // Syntax version -----------------------------------------------
-    protected CypherQuery usingVersion( String version )
+    // Common -------------------------------------------------------
+
+    /**
+     *
+     * Declare a Cypher query parameter.
+     * This will be replaced with {name}.
+     *
+     * @param name of the parameter
+     * @return Parameter instance
+     */
+    public static Parameter param(String name)
     {
-        query.cypherVersion = version;
-        return this;
+        Parameter parameter = new Parameter();
+        parameter.name = name;
+        return parameter;
     }
 
+    /**
+     * Declare a literal value, such "Foo" or 3.
+     * If a string is passed in, then output will
+     * be quoted appropriately.
+     *
+     * @param value literal value
+     * @return Literal instance
+     */
+    public static Literal literal( Object value )
+    {
+        Literal literal = new Literal();
+        literal.value = value;
+        return literal;
+    }
+
+    /**
+     * Declare an identifier. This is used to
+     * refer to names declared elsewhere in the query.
+     *
+     * If you want to refer to properties, then create
+     * this first, and then call e.g. .property("propname")
+     *
+     * @param name
+     * @return
+     */
+    public static Identifier identifier( String name )
+    {
+        Identifier identifier = new Identifier();
+        identifier.name = name;
+        return identifier;
+    }
+
+    /**
+     * Declare a string literal that you want to
+     * perform operations on.
+     *
+     * @param name
+     * @return
+     */
+    public static StringProperty string( String name )
+    {
+        StringProperty property = new StringProperty();
+        property.name = name;
+        return property;
+    }
+
+    /**
+     * Declare a number literal that you want to
+     * perform operations on.
+     *
+     * @param name
+     * @return
+     */
+    public static NumberProperty number( String name )
+    {
+        NumberProperty property = new NumberProperty();
+        property.name = name;
+        return property;
+    }
+
+    /**
+     * Declare a list of literal values.
+     *
+     * @param values
+     * @return
+     */
+    public static Literal[] literals( Object... values )
+    {
+        Literal[] literals = new Literal[values.length];
+        for( int i = 0; i < values.length; i++ )
+        {
+            Object value = values[ i ];
+            Literal literal = new Literal();
+            literal.value = value;
+            literals[i] = literal;
+        }
+        return literals;
+    }
+
+    /**
+     * Declare a list of identifiers.
+     *
+     * @param values
+     * @return
+     */
+    public static Identifier[] identifiers( String... values )
+    {
+        Identifier[] identifiers = new Identifier[values.length];
+        for( int i = 0; i < values.length; i++ )
+        {
+            String value = values[ i ];
+            Identifier identifier = new Identifier();
+            identifier.name = value;
+            identifiers[i] = identifier;
+        }
+        return identifiers;
+    }
+
+    /**
+     * Declare a list of parameters.
+     *
+     * @param names
+     * @return
+     */
+    public static Parameter[] parameters( String... names )
+    {
+        Parameter[] parameters = new Parameter[names.length];
+        for( int i = 0; i < names.length; i++ )
+        {
+            String value = names[ i ];
+            Parameter parameter = new Parameter();
+            parameter.name = value;
+            parameters[i] = parameter;
+        }
+        return parameters;
+    }
+
+    /**
+     * Declare a list of literals using node values
+     *
+     * @param values
+     * @return
+     */
+    public static Literal[] literals( long... values )
+    {
+        Literal[] literals = new Literal[values.length];
+        for( int i = 0; i < values.length; i++ )
+        {
+            Object value = values[ i ];
+            Literal literal = new Literal();
+            literal.value = value;
+            literals[i] = literal;
+        }
+        return literals;
+    }
+
+    /**
+     * "and" a series of expressions together.
+     *
+     * @param expressions
+     * @return
+     */
+    public static BooleanExpression.And and(PredicateExpression... expressions)
+    {
+        Query.checkNull( expressions, "Expressions" );
+
+        BooleanExpression.And and = new BooleanExpression.And();
+        and.expressions = expressions;
+        return and;
+    }
+
+    /**
+     * "or" a series of expressions together.
+     *
+     * @param expressions
+     * @return
+     */
+    public static BooleanExpression.Or or(PredicateExpression... expressions)
+    {
+        Query.checkNull( expressions, "Expressions" );
+
+        BooleanExpression.Or or = new BooleanExpression.Or();
+        or.expressions = expressions;
+        return or;
+    }
+
+    /**
+     * Invert the boolean value of a predicate.
+     *
+     * @param expression
+     * @return
+     */
+    public static BooleanExpression.Not not(PredicateExpression expression)
+    {
+        Query.checkNull( expression, "Expression" );
+
+        BooleanExpression.Not not = new BooleanExpression.Not();
+        not.expression = expression;
+        return not;
+    }
+
+    /**
+     * "=" operation
+     *
+     * @param left expression
+     * @param right expression
+     * @return predicate expression
+     */
+    public static BinaryPredicateExpression eq(Object left, Object right)
+    {
+        return binaryPredicate( "=", left, right );
+    }
+
+    /**
+     * ">" operation
+     *
+     * @param left expression
+     * @param right expression
+     * @return predicate expression
+     */
+    public static BinaryPredicateExpression gt(Object left, Object right)
+    {
+        return binaryPredicate( ">", left, right );
+    }
+
+    /**
+     * "<" operation
+     *
+     * @param left expression
+     * @param right expression
+     * @return predicate expression
+     */
+    public static BinaryPredicateExpression lt(Object left, Object right)
+    {
+        return binaryPredicate( "<", left, right );
+    }
+
+    /**
+     * ">=" operation
+     *
+     * @param left expression
+     * @param right expression
+     * @return predicate expression
+     */
+    public static BinaryPredicateExpression gte(Object left, Object right)
+    {
+        return binaryPredicate( ">=", left, right );
+    }
+
+    /**
+     * ">=" operation
+     *
+     * @param left expression
+     * @param right expression
+     * @return predicate expression
+     */
+    public static BinaryPredicateExpression lte(Object left, Object right)
+    {
+        return binaryPredicate( ">=", left, right );
+    }
+
+    /**
+     * "<>" operation
+     *
+     * @param left expression
+     * @param right expression
+     * @return predicate expression
+     */
+    public static BinaryPredicateExpression ne(Object left, Object right)
+    {
+        return binaryPredicate( "<>", left, right );
+    }
+
+    private static BinaryPredicateExpression binaryPredicate( String operator, Object left, Object right )
+    {
+        Query.checkNull( left, "Left expression" );
+        Query.checkNull( right, "Right expression" );
+
+        BinaryPredicateExpression binaryPredicateExpression = new BinaryPredicateExpression();
+        binaryPredicateExpression.operator = operator;
+        binaryPredicateExpression.left = left instanceof Expression ? (Expression) left : CypherQuery.literal( left );
+        binaryPredicateExpression.right = right instanceof Expression ? (Expression) right : CypherQuery.literal( right );
+        return binaryPredicateExpression;
+    }
+
+    /**
+     * Create a case-sensitive regular expression. Corresponds to:
+     * <pre>
+     *     property ~=/regex/
+     * </pre>
+     *
+     * @param property
+     * @param regexp
+     * @return
+     */
+    public static Regexp regexp( Expression property, Expression regexp )
+    {
+        return regexp( property, regexp, true );
+    }
+
+    /**
+     * Create a regular expression. Corresponds to:
+     * <pre>
+     *     property ~=/regex/
+     * </pre>
+     *
+     * @param property
+     * @param regexp
+     * @param caseSensitive
+     * @return
+     */
+    public static Regexp regexp( Expression property, Expression regexp, boolean caseSensitive )
+    {
+        Regexp regularExpression = new Regexp();
+        regularExpression.caseSensitive = caseSensitive;
+        regularExpression.left = property;
+        regularExpression.regexp = regexp;
+        return regularExpression;
+    }
+
+    /**
+     * has(expression)
+     *
+     * @param expression
+     * @return
+     */
+    public Has has(Expression expression)
+    {
+        Has has = new Has();
+        has.expression = expression;
+        return has;
+    }
+
+    /**
+     * expression is null
+     *
+     * @param expression
+     * @return
+     */
+    public IsNull isNull(Expression expression)
+    {
+        IsNull isNull = new IsNull();
+        isNull.expression = expression;
+        return isNull;
+    }
+
+    /**
+     * expression is not null
+     *
+     * @param expression
+     * @return
+     */
+    public IsNotNull isNotNull(Expression expression)
+    {
+        IsNotNull isNotNull = new IsNotNull();
+        isNotNull.expression = expression;
+        return isNotNull;
+    }
 
     // Start --------------------------------------------------------
+    /**
+     * START clause. Use this with Java initialization block style.
+     *
+     * @param startExpression
+     * @return
+     */
     protected Match starts( StartExpression... startExpression )
     {
         Collections.addAll(query.startExpressions, startExpression);
@@ -97,6 +490,12 @@ public class CypherQuery
         return new Grammar();
     }
 
+    /**
+     * START clause. Use this with Java initialization block style.
+     *
+     * @param startExpression
+     * @return
+     */
     protected Match starts( Iterable<StartExpression> startExpression )
     {
         for (StartExpression expression : startExpression)
@@ -107,183 +506,872 @@ public class CypherQuery
         return new Grammar();
     }
 
-    protected StartExpression.StartNodes node( String name, long... id )
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node(id1,id2,id3)
+     * </pre>
+     *
+     * @param name
+     * @param id
+     * @return
+     */
+    public static StartExpression.StartNodes node( String name, long... id )
     {
-        return StartExpression.node( name, id );
+        checkEmpty( name, "Name" );
+
+        for( long i : id )
+        {
+            if (i < 0)
+                throw new IllegalArgumentException( "Id may not be below zero" );
+        }
+
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
+        startNodes.name = name;
+        startNodes.nodes = literals( id );
+        return startNodes;
     }
 
-    protected StartExpression.StartNodes node( String name, String parameter )
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node({parameter})
+     * </pre>
+     *
+     * @param name
+     * @param parameter
+     * @return
+     */
+    public static StartExpression.StartNodes node( String name, String parameter )
     {
-        return StartExpression.node( name, parameter );
+        checkEmpty( name, "Name" );
+        checkEmpty( parameter, "Parameters" );
+
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
+        startNodes.name = name;
+        startNodes.nodes = parameters( parameter );
+        return startNodes;
     }
 
-    protected StartExpression.StartNodesLookup lookup( String name, String indexName, String key, String value )
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node(*)
+     * </pre>
+     *
+     * @param name
+     * @return
+     */
+    public static StartExpression.StartNodes allNodes( String name )
     {
-        return StartExpression.lookup( name, indexName, key, value );
+        checkEmpty( name, "Name" );
+
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
+        startNodes.name = name;
+        startNodes.nodes = new Expression[]{new StartExpression.AllNodes()};
+        return startNodes;
     }
 
-    protected StartExpression.StartNodesLookup lookup( String name, String indexName, Expression.Identifier key, Expression.Value value )
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName(key="value")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param key
+     * @param value
+     * @return
+     */
+    public static StartExpression.StartNodesLookup lookup( String name, String indexName, String key, String value )
     {
-        return StartExpression.lookup( name, indexName, key, value );
+        checkEmpty( key, "Key" );
+        checkEmpty( value, "Value" );
+
+        return lookup( name, indexName, identifier( key ), literal( value ) );
     }
 
-    protected StartExpression.StartNodesQuery query( String name, String indexName, String query )
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName(key="value")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param key
+     * @param value
+     * @return
+     */
+    public static StartExpression.StartNodesLookup lookup( String name, String indexName, Identifier key, Expression value )
     {
-        return StartExpression.query( name, indexName, query );
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
+
+        StartExpression.StartNodesLookup startNodesLookup = new StartExpression.StartNodesLookup();
+        startNodesLookup.name = name;
+        startNodesLookup.index = indexName;
+        startNodesLookup.key = key;
+        startNodesLookup.value = value;
+        return startNodesLookup;
     }
 
-    protected StartExpression.StartRelationships relationship( String name, long... id )
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName("query")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param query
+     * @return
+     */
+    public static StartExpression.StartNodesQuery query( String name, String indexName, String query )
     {
-        return StartExpression.relationship( name, id );
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
+        checkEmpty( query, "Query" );
+
+        StartExpression.StartNodesQuery startNodesQuery = new StartExpression.StartNodesQuery();
+        startNodesQuery.name = name;
+        startNodesQuery.index = indexName;
+        startNodesQuery.query = query;
+        return startNodesQuery;
     }
 
-    protected StartExpression.StartRelationshipsParameters relationship( String name, String parameter )
+    /**
+     * Declare start relationships. Corresponds to:
+     * <pre>
+     * name=relationship(id1,id2,id3)
+     * </pre>
+     *
+     * @param name
+     * @param id
+     * @return
+     */
+    public static StartExpression.StartRelationships relationship( String name, long... id )
     {
-        return StartExpression.relationship( name, parameter );
+        checkEmpty( name, "Name" );
+
+        for( long i : id )
+        {
+            if (i < 0)
+                throw new IllegalArgumentException( "Id may not be below zero" );
+        }
+
+        StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
+        startRelationships.name = name;
+        startRelationships.relationships = literals( id );
+        return startRelationships;
     }
 
-    protected StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, String key, String value )
+    /**
+     * Declare start relationships. Corresponds to:
+     * <pre>
+     * name=relationship({parameter})
+     * </pre>
+     *
+     * @param name
+     * @param parameter
+     * @return
+     */
+    public static StartExpression.StartRelationshipsParameters relationship( String name, String parameter )
     {
-        return StartExpression.relationshipLookup( name, indexName, key, value );
+        checkEmpty( name, "Name" );
+        checkEmpty( parameter, "Parameter" );
+
+        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
+        startRelationships.name = name;
+        startRelationships.parameter = parameter;
+        return startRelationships;
     }
 
-    protected StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, Expression.Identifier key, Expression.Value value )
+    /**
+     * Declare start relationships. Corresponds to:
+     * <pre>
+     * name=relationship:indexName(key="value")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param key
+     * @param value
+     * @return
+     */
+    public static StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, String key, String value )
     {
-        return StartExpression.relationshipLookup( name, indexName, key, value );
+        checkEmpty( key, "Key" );
+        checkEmpty( value, "Value" );
+
+        return relationshipLookup( name, indexName, identifier( key ), literal( value ) );
+    }
+
+    /**
+     * Declare start relationships. Corresponds to:
+     * <pre>
+     * name=relationship:indexName(key="value")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param key
+     * @param value
+     * @return
+     */
+    public static StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, Identifier key, Expression value )
+    {
+        checkEmpty( name, "Name" );
+        checkEmpty( indexName, "Index" );
+        checkNull( key, "Key" );
+        checkNull( value, "Value" );
+
+        StartExpression.StartRelationshipsIndex startRelationshipsIndex = new StartExpression.StartRelationshipsIndex();
+        startRelationshipsIndex.name = name;
+        startRelationshipsIndex.index = indexName;
+        startRelationshipsIndex.key = key;
+        startRelationshipsIndex.value = value;
+        return startRelationshipsIndex;
     }
 
     // Match --------------------------------------------------------
-    protected MatchExpression.Path path()
+    /**
+     * Declare a path for MATCH clauses
+     *
+     * @return
+     */
+    public static MatchExpression.Path path()
     {
-        return MatchExpression.path( );
+        return new MatchExpression.Path();
     }
 
-    protected MatchExpression.Path path( String name )
+    /**
+     * Declare a named path for MATCH clauses
+     *
+     * @param name
+     * @return
+     */
+    public static MatchExpression.Path path(String name)
     {
-        return MatchExpression.path( name );
+        MatchExpression.Path path = new MatchExpression.Path();
+        path.pathName = name;
+        return path;
     }
 
-    protected MatchExpression.FunctionPath shortestPath( String name )
+    /**
+     * Use this to invoke the shortestPath function
+     *
+     * @param name
+     * @return
+     */
+    public static MatchExpression.FunctionPath shortestPath( String name )
     {
-        return MatchExpression.shortestPath( name );
+        Query.checkNull( name, "Name" );
+
+        MatchExpression.FunctionPath functionPath = new MatchExpression.FunctionPath();
+        functionPath.function = "shortestPath";
+        functionPath.pathName = name;
+        return functionPath;
+    }
+
+    /**
+     * Use this to invoke the allShortestPaths function
+     *
+     * @param name
+     * @return
+     */
+    public static MatchExpression.FunctionPath allShortestPaths( String name )
+    {
+        Query.checkNull( name, "Name" );
+
+        MatchExpression.FunctionPath functionPath = new MatchExpression.FunctionPath();
+        functionPath.function = "allShortestPaths";
+        functionPath.pathName = name;
+        return functionPath;
     }
 
     // Where --------------------------------------------------------
-    protected WhereExpression.CommonType prop(String name)
+    /**
+     * Filter on relationships in WHERE clause
+     *
+     * @return
+     */
+    public static WhereExpression.WhereRelationship relationship()
     {
-        return WhereExpression.prop( name );
+        return new WhereExpression.WhereRelationship();
     }
 
-    protected WhereExpression.StringType string(String name)
+    /**
+     * Declare an IN operator. Corresponds to:
+     * <pre>
+     *     expression IN [element1,element2,element3]
+     * </pre>
+     *
+     * @param expression
+     * @param elements
+     * @return
+     */
+    public static WhereExpression.WhereIn in(Expression expression, Expression... elements)
     {
-        return WhereExpression.string( name );
+        Query.checkNull( expression, "Expression" );
+
+        WhereExpression.WhereIn in = new WhereExpression.WhereIn();
+        in.expression = expression;
+        in.elements = elements;
+        return in;
     }
 
-    protected WhereExpression.NumberType number(String name)
-    {
-        return WhereExpression.number( name );
-    }
-
-    protected WhereExpression.Not not(WhereExpression.PredicateExpression expr)
-    {
-        return WhereExpression.not( expr );
-    }
 
     // Return -------------------------------------------------------
-    protected ReturnExpression.ReturnNodes nodes( String... names )
+
+    /**
+     * If you want to specify AS or DISTINCT on an expression in the RETURN clause,
+     * then use this.
+     *
+     * @param expression
+     * @return
+     */
+    public static ReturnExpression<ReturnExpression> exp(Expression expression)
     {
-        return ReturnExpression.nodes( names );
+        ReturnExpression<ReturnExpression> returnExpression = new ReturnExpression<ReturnExpression>();
+        returnExpression.expression = expression;
+        return returnExpression;
     }
 
-    protected ReturnExpression.ReturnRelationships relationships( String... names )
+    /**
+     * Declare a count(*) RETURN expression
+     *
+     * @return
+     */
+    public static ReturnExpression.ReturnAggregate count()
     {
-        return ReturnExpression.relationships( names );
+        ReturnExpression.ReturnAggregate returnAggregate = new ReturnExpression.ReturnAggregate();
+        returnAggregate.function = "count";
+        return returnAggregate;
     }
 
-    protected ReturnExpression.ReturnProperties properties( String... names )
+    /**
+     * Declare a count(expression) RETURN expression
+     *
+     * @return
+     */
+    public static FunctionExpression count(Expression expression)
     {
-        return ReturnExpression.properties( names );
+        checkNull( expression, "Expression" );
+
+        FunctionExpression returnAggregate = new FunctionExpression();
+        returnAggregate.name = "count";
+        returnAggregate.expression = expression;
+        return returnAggregate;
     }
 
-    protected ReturnExpression.ReturnPaths paths( String... names )
+    /**
+     * Declare a sum(expression) RETURN expression
+     *
+     * @return
+     */
+    public static FunctionExpression sum(Expression expression)
     {
-        return ReturnExpression.paths(names );
+        checkNull( expression, "Expression" );
+
+        FunctionExpression returnAggregate = new FunctionExpression();
+        returnAggregate.name = "sum";
+        returnAggregate.expression = expression;
+        return returnAggregate;
     }
 
-    protected ReturnExpression.ReturnAggregate count()
+    /**
+     * Declare a avg(expression) RETURN expression
+     *
+     * @return
+     */
+    public static FunctionExpression avg(Expression expression)
     {
-        return ReturnExpression.count(  );
+        checkNull( expression, "Expression" );
+
+        FunctionExpression returnAggregate = new FunctionExpression();
+        returnAggregate.name = "avg";
+        returnAggregate.expression = expression;
+        return returnAggregate;
     }
 
-    protected ReturnExpression.ReturnAggregate count(String name)
+    /**
+     * Declare a max(expression) RETURN expression
+     *
+     * @return
+     */
+    public static FunctionExpression max(Expression expression)
     {
-        return ReturnExpression.count( name );
+        checkNull( expression, "Expression" );
+
+        FunctionExpression returnAggregate = new FunctionExpression();
+        returnAggregate.name = "max";
+        returnAggregate.expression = expression;
+        return returnAggregate;
     }
 
-    protected ReturnExpression.ReturnAggregate sum(String name)
+    /**
+     * Declare a min(expression) RETURN expression
+     *
+     * @return
+     */
+    public static FunctionExpression min(Expression expression)
     {
-        return ReturnExpression.sum( name );
+        checkNull( expression, "Expression" );
+
+        FunctionExpression returnAggregate = new FunctionExpression();
+        returnAggregate.name = "min";
+        returnAggregate.expression = expression;
+        return returnAggregate;
     }
 
-    protected ReturnExpression.ReturnAggregate avg(String name)
+    /**
+     * Declare a collect(expression) RETURN expression
+     *
+     * @return
+     */
+    public static FunctionExpression collect(Expression expression)
     {
-        return ReturnExpression.avg( name );
-    }
+        checkNull( expression, "Expression" );
 
-    protected ReturnExpression.ReturnAggregate max(String name)
-    {
-        return ReturnExpression.max( name );
-    }
-
-    protected ReturnExpression.ReturnAggregate min(String name)
-    {
-        return ReturnExpression.min( name );
-    }
-
-    protected ReturnExpression.ReturnAggregate collect(String name)
-    {
-        return ReturnExpression.collect( name );
-    }
-
-    protected ReturnExpression.ReturnNameFunction length( String name )
-    {
-        return ReturnExpression.length( name );
-    }
-
-    protected ReturnExpression.ReturnNameFunction type(String name)
-    {
-        return ReturnExpression.type( name );
-    }
-
-    protected ReturnExpression.ReturnNameFunction id(String name)
-    {
-        return ReturnExpression.id( name );
-    }
-
-    protected ReturnExpression.ReturnExpressionsFunction coalesce(ReturnExpression... expressions)
-    {
-        return ReturnExpression.coalesce( expressions );
-    }
-
-    protected ReturnExpression.ReturnNameFunction nodesOf(String name)
-    {
-        return ReturnExpression.nodesOf( name );
-    }
-
-    protected ReturnExpression.ReturnNameFunction relationshipsOf(String name)
-    {
-        return ReturnExpression.relationshipsOf( name );
+        FunctionExpression returnAggregate = new FunctionExpression();
+        returnAggregate.name = "collect";
+        returnAggregate.expression = expression;
+        return returnAggregate;
     }
 
     // Order by -----------------------------------------------------
-    protected OrderByExpression property( String name )
+    /**
+     * Declare an ORDER clause expression. Typically used with identifier("n").property("property") as
+     * parameter.
+     *
+     * @param expression
+     * @return
+     */
+    public static OrderByExpression order( Expression expression )
     {
-        return OrderByExpression.property( name );
+        Query.checkNull( expression, "Expression" );
+        OrderByExpression orderBy = new OrderByExpression();
+        orderBy.expression = expression;
+        return orderBy;
     }
 
-    protected OrderByExpression property( String name, OrderByExpression.Order order )
+    /**
+     * Declare an ORDER clause expression, with either ASCENDING or DESCENDING order
+     * explicitly set. Typically used with identifier("n").property("property") as
+     * parameter.
+     *
+     * @param expression
+     * @param order
+     * @return
+     */
+    public static OrderByExpression order( Expression expression, Order order )
     {
-        return OrderByExpression.property( name, order );
+        Query.checkNull( expression, "Name" );
+        Query.checkNull( order, "Order" );
+        OrderByExpression orderBy = new OrderByExpression();
+        orderBy.expression = expression;
+        orderBy.order = order;
+        return orderBy;
+    }
+
+
+    // Functions ----------------------------------------------------
+    /**
+     * Declare an ALL expression. Corresponds to:
+     * <pre>
+     *     ALL(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression all( String name, Expression iterable, PredicateExpression predicateExpression )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkNull( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "all";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    /**
+     * Declare an ANY expression. Corresponds to:
+     * <pre>
+     *     ANY(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression any( String name,
+                                                   Expression iterable,
+                                                   PredicateExpression predicateExpression
+    )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkNull( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "any";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    /**
+     * Declare a NONE expression. Corresponds to:
+     * <pre>
+     *     NONE(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression none( String name,
+                                                    Expression iterable,
+                                                   PredicateExpression predicateExpression
+    )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkEmpty( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "none";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    /**
+     * Declare a SINGLE expression. Corresponds to:
+     * <pre>
+     *     SINGLE(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression single( String name,
+                                                      Expression iterable,
+                                                      PredicateExpression predicateExpression
+    )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkNull( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
+        IterablePredicateExpression expression = new IterablePredicateExpression();
+        expression.function = "single";
+        expression.name = name;
+        expression.iterable = iterable;
+        expression.predicate = predicateExpression;
+        return expression;
+    }
+
+    // Scalar functions
+    /**
+     * Declare a length function. Corresponds to:
+     * <pre>
+     *     length(iterable)
+     * </pre>
+     *
+     * @param iterableExpression
+     * @return
+     */
+    public static FunctionExpression length(Expression iterableExpression)
+    {
+        checkNull( iterableExpression, "Expression" );
+
+        FunctionExpression function = new FunctionExpression();
+        function.name = "length";
+        function.expression = iterableExpression;
+        return function;
+    }
+
+    /**
+     * Declare a type function. Corresponds to:
+     * <pre>
+     *     type(relationship)
+     * </pre>
+     *
+     * @param relationshipExpression
+     * @return
+     */
+    public static FunctionExpression type(Expression relationshipExpression)
+    {
+        checkNull( relationshipExpression, "Expression" );
+
+        FunctionExpression function = new FunctionExpression();
+        function.name = "type";
+        function.expression = relationshipExpression;
+        return function;
+    }
+
+    /**
+     * Declare an id function. Corresponds to:
+     * <pre>
+     *     id(propertyContainer)
+     * </pre>
+     *
+     * @param propertyContainerExpression
+     * @return
+     */
+    public static FunctionExpression id(Expression propertyContainerExpression)
+    {
+        checkNull( propertyContainerExpression, "Expression" );
+
+        FunctionExpression function = new FunctionExpression();
+        function.name = "id";
+        function.expression = propertyContainerExpression;
+        return function;
+    }
+
+    /**
+     * Declare a coalesce function. Corresponds to:
+     * <pre>
+     *     coalesce(expression1,expression2,expression3)
+     * </pre>
+     *
+     * @param expressions
+     * @return
+     */
+    public static FunctionExpression coalesce(Expression... expressions)
+    {
+        if (expressions.length < 1)
+            throw new IllegalArgumentException("At least one expression must be provided to coalesce function");
+
+        FunctionExpression coalesce = new FunctionExpression();
+        coalesce.name = "coalesce";
+        FunctionExpression.Expressions expressions1 = new FunctionExpression.Expressions();
+        expressions1.expressions = expressions;
+        coalesce.expression = expressions1;
+        return coalesce;
+    }
+
+    /**
+     * Declare a head function. Corresponds to:
+     * <pre>
+     *     head(collection)
+     * </pre>
+     *
+     * @param expression
+     * @return
+     */
+    public static FunctionExpression head(Expression collectionExpression)
+    {
+        checkNull( collectionExpression, "Expression" );
+
+        FunctionExpression head = new FunctionExpression();
+        head.name = "head";
+        head.expression = collectionExpression;
+        return head;
+    }
+
+    /**
+     * Declare a head function. Corresponds to:
+     * <pre>
+     *     head(collection)
+     * </pre>
+     *
+     * @param collectionExpression
+     * @return
+     */
+    public static FunctionExpression last(Expression collectionExpression)
+    {
+        checkNull( collectionExpression, "Expression" );
+
+        FunctionExpression last = new FunctionExpression();
+        last.name = "last";
+        last.expression = collectionExpression;
+        return last;
+    }
+
+    // Iterable functions
+
+    /**
+     * Declare a nodes function. Corresponds to:
+     * <pre>
+     *     nodes(path)
+     * </pre>
+     * @param pathExpression
+     * @return
+     */
+    public static FunctionExpression nodes(Expression pathExpression)
+    {
+        checkNull( pathExpression, "Expression" );
+
+        FunctionExpression function = new FunctionExpression();
+        function.name = "nodes";
+        function.expression = pathExpression;
+        return function;
+    }
+
+    /**
+     * Declare a relationships function. Corresponds to:
+     * <pre>
+     *     relationships(path)
+     * </pre>
+     * @param pathExpression
+     * @return
+     */
+    public static FunctionExpression relationships(Expression pathExpression)
+    {
+        checkNull( pathExpression, "Expression" );
+
+        FunctionExpression function = new FunctionExpression();
+        function.name = "relationships";
+        function.expression = pathExpression;
+        return function;
+    }
+
+    /**
+     * Declare a tail function. Corresponds to:
+     * <pre>
+     *     tail(path)
+     * </pre>
+     * @param pathExpression
+     * @return
+     */
+    public static FunctionExpression tail(Expression pathExpression)
+    {
+        checkNull( pathExpression, "Expression" );
+
+        FunctionExpression function = new FunctionExpression();
+        function.name = "tail";
+        function.expression = pathExpression;
+        return function;
+    }
+
+    /**
+     * Declare an extract function. Corresponds to:
+     * <pre>
+     *     extract(name IN iterable : expression)
+     * </pre>
+     * @param iterable
+     * @param expression
+     * @return
+     */
+    public static Extract extract( String name, Expression iterable, Expression expression )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkNull( iterable, "Iterable" );
+        Query.checkNull( expression, "Expression" );
+
+        Extract extract = new Extract();
+        extract.name = name;
+        extract.iterable = iterable;
+        extract.expression = expression;
+        return extract;
+    }
+
+    /**
+     * Declare a filter function. Corresponds to:
+     * <pre>
+     *     filter(name IN iterable : predicate)
+     * </pre>
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static FunctionExpression.Filter filter( String name, Expression iterable, PredicateExpression predicateExpression )
+    {
+        Query.checkEmpty( name, "Name" );
+        Query.checkNull( iterable, "Iterable" );
+        Query.checkNull( predicateExpression, "Predicate" );
+
+        FunctionExpression.Filter filter = new FunctionExpression.Filter();
+        filter.name = name;
+        filter.iterable = iterable;
+        filter.predicate = predicateExpression;
+        return filter;
+    }
+
+    // Mathematical functions
+    /**
+     * Declare an abs function. Corresponds to:
+     * <pre>
+     *     abs(expression)
+     * </pre>
+     *
+     * @param numericalExpression
+     * @return
+     */
+    public static FunctionExpression abs(Expression numericalExpression)
+    {
+        FunctionExpression function = new FunctionExpression();
+        function.name = "abs";
+        function.expression = numericalExpression;
+        return function;
+    }
+
+    /**
+     * Declare a round function. Corresponds to:
+     * <pre>
+     *     round(expression)
+     * </pre>
+     *
+     * @param numericalExpression
+     * @return
+     */
+    public static FunctionExpression round(Expression numericalExpression)
+    {
+        FunctionExpression function = new FunctionExpression();
+        function.name = "round";
+        function.expression = numericalExpression;
+        return function;
+    }
+
+    /**
+     * Declare a sqrt function. Corresponds to:
+     * <pre>
+     *     sqrt(expression)
+     * </pre>
+     *
+     * @param numericalExpression
+     * @return
+     */
+    public static FunctionExpression sqrt(Expression numericalExpression)
+    {
+        FunctionExpression function = new FunctionExpression();
+        function.name = "sqrt";
+        function.expression = numericalExpression;
+        return function;
+    }
+
+    /**
+     * Declare a sign function. Corresponds to:
+     * <pre>
+     *     sign(expression)
+     * </pre>
+     *
+     * @param numericalExpression
+     * @return
+     */
+    public static FunctionExpression sign(Expression numericalExpression)
+    {
+        FunctionExpression function = new FunctionExpression();
+        function.name = "sign";
+        function.expression = numericalExpression;
+        return function;
     }
 
     @Override
@@ -316,7 +1404,7 @@ public class CypherQuery
 
         // Where --------------------------------------------------------
         @Override
-        public Return where( WhereExpression expression )
+        public Return where( PredicateExpression expression )
         {
             Query.checkNull( expression, "Expression" );
             query.whereExpression = expression;
@@ -325,36 +1413,62 @@ public class CypherQuery
 
         // Return -------------------------------------------------------
         @Override
-        public ReturnNext returns( ReturnExpression... returnExpression )
+        public ReturnNext returns( Expression... returnExpressions )
         {
-            Collections.addAll(query.returnExpressions, returnExpression);
+            for( Expression expression : returnExpressions )
+            {
+                if (expression instanceof ReturnExpression<?>)
+                    query.returnExpressions.add( (ReturnExpression) expression);
+                else
+                    query.returnExpressions.add( exp( expression ) );
+            }
             return this;
         }
 
         @Override
-        public ReturnNext returns(Iterable<ReturnExpression> returnExpressions)
+        public ReturnNext returns(Iterable<Expression> returnExpressions)
         {
-            for (ReturnExpression returnExpression : returnExpressions)
+            for( Expression expression : returnExpressions )
             {
-                query.returnExpressions.add(returnExpression);
+                if (expression instanceof ReturnExpression<?>)
+                    query.returnExpressions.add( (ReturnExpression) expression);
+                else
+                    query.returnExpressions.add( exp( expression ) );
             }
             return this;
         }
 
         // OrderBy ------------------------------------------------------
         @Override
-        public OrderBy orderBy( OrderByExpression... orderByExpression )
+        public OrderBy orderBy( Expression... orderByExpressions )
         {
-            Collections.addAll(query.orderByExpressions, orderByExpression);
+            for( Expression byExpression : orderByExpressions )
+            {
+                if( byExpression instanceof OrderByExpression )
+                {
+                    query.orderByExpressions.add( (OrderByExpression) byExpression );
+                }
+                else
+                {
+                    query.orderByExpressions.add( order( byExpression ) );
+                }
+            }
             return this;
         }
 
         @Override
-        public OrderBy orderBy(Iterable<OrderByExpression> orderByExpressions)
+        public OrderBy orderBy(Iterable<Expression> orderByExpressions)
         {
-            for (OrderByExpression orderByExpression : orderByExpressions)
+            for( Expression byExpression : orderByExpressions )
             {
-                query.orderByExpressions.add(orderByExpression);
+                if( byExpression instanceof OrderByExpression )
+                {
+                    query.orderByExpressions.add( (OrderByExpression) byExpression );
+                }
+                else
+                {
+                    query.orderByExpressions.add( order( byExpression ) );
+                }
             }
             return this;
         }

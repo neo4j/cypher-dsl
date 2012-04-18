@@ -19,16 +19,17 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
+import com.mysema.query.lucene.LuceneSerializer;
 import com.mysema.query.types.*;
 
 import javax.annotation.Nullable;
 import org.neo4j.cypherdsl.CypherQuery;
-import org.neo4j.cypherdsl.Match;
 import org.neo4j.cypherdsl.Return;
 import org.neo4j.cypherdsl.query.*;
 import org.neo4j.cypherdsl.query.Expression;
 
 import java.util.Collections;
+import org.neo4j.cypherdsl.query.Order;
 
 /**
  * TODO
@@ -60,49 +61,70 @@ public class CypherQueryDSL
     }
 
     // Additional QueryDSL methods
-    protected StartExpression.StartNodes node( Path<?> entity, long... id )
+    public static Identifier identifier( Path<?> entityPath )
     {
-        return StartExpression.node(entity.toString(), id);
+        return identifier(entityPath.toString());
     }
 
-    protected StartExpression.StartNodes node( Path<?> entity, String parameter )
+    public static Property property( Path<?> entityPath )
     {
-        return StartExpression.node(entity.toString(), parameter);
+        return identifier(entityPath.getRoot().toString()).property( entityPath.getMetadata().getExpression().toString() );
     }
 
-    protected StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Path<?> key, String value )
+    public static StringProperty string( Path<?> entityPath )
     {
-        return StartExpression.lookup(entity.toString(), indexName, key.getMetadata().getExpression().toString(), value);
+        return identifier(entityPath.getRoot().toString()).string( entityPath.getMetadata().getExpression().toString() );
     }
 
-    protected StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Expression.Identifier key, Expression.Value value )
+    public static NumberProperty number( Path<?> entityPath )
     {
-        return StartExpression.lookup(entity.toString(), indexName, key, value);
+        return identifier(entityPath.getRoot().toString()).number( entityPath.getMetadata().getExpression().toString() );
     }
 
-    protected StartExpression.StartNodesQuery query( Path<?> entity, String indexName, Predicate query )
+    // Start
+    private static final LuceneSerializer luceneSerializer = new LuceneSerializer(true, true);
+
+    public static StartExpression.StartNodesQuery query( Path<?> entity, String indexName, Predicate query )
     {
         return query(entity.toString(), indexName, query);
     }
 
-    protected StartExpression.StartNodesQuery query( String name, String indexName, Predicate query )
+    public static StartExpression.StartNodesQuery query( String name, String indexName, Predicate query )
     {
-        return QueryDSLStartExpression.query(name, indexName, query);
+        return query( name, indexName, luceneSerializer.toQuery( query, null ).toString() );
     }
 
-    protected StartExpression.StartNodesQuery query( EntityPath<?> entity, String indexName, Predicate query )
+    public static StartExpression.StartNodes node( Path<?> entity, long... id )
     {
-        return QueryDSLStartExpression.query(entity, indexName, query);
+        return CypherQuery.node(entity.toString(), id);
     }
 
-    protected QueryDSLMatchExpression.QueryDSLPath path()
+    public static StartExpression.StartNodes node( Path<?> entity, String parameter )
     {
-        return QueryDSLMatchExpression.path();
+        return CypherQuery.node( entity.toString(), parameter );
     }
 
-    protected QueryDSLMatchExpression.QueryDSLPath path(String name)
+    public static StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Path<?> key, String value )
     {
-        return QueryDSLMatchExpression.path(name);
+        return CypherQuery.lookup(entity.toString(), indexName, key.getMetadata().getExpression().toString(), value);
+    }
+
+    public static StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Identifier key, Expression value )
+    {
+        return CypherQuery.lookup( entity.toString(), indexName, key, value );
+    }
+
+    // Match
+    public static QueryDSLMatchExpression.QueryDSLPath path()
+    {
+        return new QueryDSLMatchExpression.QueryDSLPath();
+    }
+
+    public static QueryDSLMatchExpression.QueryDSLPath path(String name)
+    {
+        QueryDSLMatchExpression.QueryDSLPath path = new QueryDSLMatchExpression.QueryDSLPath();
+        path.pathName = name;
+        return path;
     }
 
     /**
@@ -111,29 +133,14 @@ public class CypherQueryDSL
      * @param name
      * @return
      */
-    protected QueryDSLMatchExpression.QueryDSLFunctionPath shortestPath( String name )
+    public static QueryDSLMatchExpression.QueryDSLFunctionPath shortestPath( String name )
     {
-        return QueryDSLMatchExpression.shortestPath(name);
-    }
+        Query.checkNull( name, "Name" );
 
-    protected OrderByExpression property( Path<?> path )
-    {
-        return OrderByExpression.property(path.toString());
-    }
-
-    protected OrderByExpression property( Path<?> path, OrderByExpression.Order order )
-    {
-        return OrderByExpression.property(path.toString(), order);
-    }
-
-    protected ReturnExpression.ReturnNodes nodes( Path<?>... entityPaths )
-    {
-        return QueryDSLReturnExpression.nodes(entityPaths);
-    }
-
-    protected ReturnExpression.ReturnProperties properties( Path<?>... paths )
-    {
-        return QueryDSLReturnExpression.properties(paths);
+        QueryDSLMatchExpression.QueryDSLFunctionPath functionPath = new QueryDSLMatchExpression.QueryDSLFunctionPath();
+        functionPath.function = "shortestPath";
+        functionPath.pathName = name;
+        return functionPath;
     }
 
     private class QueryDSLGrammar
@@ -156,105 +163,99 @@ public class CypherQueryDSL
         public Return where( Predicate predicate )
         {
             // Parse predicate
-            query.whereExpression = predicate.accept( new Visitor<WhereExpression.BooleanExpression, WhereExpression.BooleanExpression>()
+            query.whereExpression = predicate.accept( new Visitor<PredicateExpression, BooleanExpression>()
             {
                 @Override
-                public WhereExpression.BooleanExpression visit( Constant<?> constant,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public PredicateExpression visit( Constant<?> constant,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     return null;
                 }
 
                 @Override
-                public WhereExpression.BooleanExpression visit( FactoryExpression<?> factoryExpression,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public PredicateExpression visit( FactoryExpression<?> factoryExpression,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     return null;
                 }
 
                 @Override
-                public WhereExpression.BooleanExpression visit( Operation<?> operation,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public PredicateExpression visit( Operation<?> operation,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     String id = operation.getOperator().getId();
                     if ( id.equals( Ops.AND.getId() ))
                     {
-                        return WhereExpression.and(operation.getArg(0).accept(this, null), operation.getArg(1)
-                                .accept(this, null));
+                        return and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
                     } else if ( id.equals( Ops.OR.getId() ))
                     {
-                        return WhereExpression.or(operation.getArg(0).accept(this, null), operation.getArg(1)
-                                .accept(this, null));
+                        return or( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
                     } else if ( id.equals( Ops.NOT.getId() ))
                     {
-                        return WhereExpression.not((WhereExpression.PredicateExpression)  operation.getArg(0).accept(this, null));
+                        return not( operation.getArg( 0 ).accept( this, null ) );
                     } else if ( id.equals( Ops.EQ_PRIMITIVE.getId() ) || id.equals( Ops.EQ_OBJECT.getId() ))
                     {
-                        return WhereExpression.eq(operation.getArg(0).toString(), arg(operation.getArg(1)));
+                        return eq( arg( operation.getArg( 0 ) ), arg( operation.getArg( 1 ) ));
                     } else if ( id.equals( Ops.NE_PRIMITIVE.getId() ) || id.equals( Ops.NE_OBJECT.getId() ))
                     {
-                        return WhereExpression.ne(operation.getArg(0).toString(), arg(operation.getArg(1)));
+                        return ne( arg( operation.getArg( 0 ) ), arg( operation.getArg( 1 ) ));
                     } else if ( id.equals( Ops.GT.getId() ))
                     {
-                        return WhereExpression.gt(operation.getArg(0).toString(), arg(operation.getArg(1)));
+                        return gt( arg( operation.getArg( 0 ) ), arg( operation.getArg( 1 ) ));
                     } else if ( id.equals( Ops.LT.getId() ))
                     {
-                        return WhereExpression.lt(operation.getArg(0)
-                                .toString(), ((Constant) operation.getArg(1)).getConstant());
+                        return lt( arg( operation.getArg( 0 ) ), arg( operation.getArg( 1 ) ));
                     } else if ( id.equals( Ops.GOE.getId() ))
                     {
-                        return WhereExpression.gte( operation.getArg( 0 )
-                                                       .toString(), arg(operation.getArg(1)) );
+                        return gte( arg( operation.getArg( 0 ) ), arg( operation.getArg( 1 ) ));
                     } else if ( id.equals( Ops.LOE.getId() ))
                     {
-                        return WhereExpression.lte( operation.getArg( 0 )
-                                                       .toString(), arg(operation.getArg(1)) );
+                        return lte( arg( operation.getArg( 0 ) ), arg( operation.getArg( 1 ) ));
                     } else if ( id.equals( Ops.EXISTS.getId() ))
                     {
-                        return WhereExpression.exists( operation.getArg( 0 )
-                                                       .toString() );
+                        return has( (Expression) arg( operation.getArg( 0 )));
                     } else if ( id.equals( Ops.IS_NULL.getId() ))
                     {
-                        return WhereExpression.isNull( operation.getArg( 0 )
-                                                       .toString() );
+                        return isNull( (Expression) arg( operation.getArg( 0 )));
                     } else if ( id.equals( Ops.IS_NOT_NULL.getId() ))
                     {
-                        return WhereExpression.isNotNull( operation.getArg( 0 )
-                                                       .toString() );
+                        return isNotNull( (Expression) arg( operation.getArg( 0 )));
                     } else
                         throw new IllegalArgumentException( "Unknown operator:"+ id +" in expression "+operation );
                 }
 
                 @Override
-                public WhereExpression.BooleanExpression visit( ParamExpression<?> paramExpression,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public BooleanExpression visit( ParamExpression<?> paramExpression,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     return null;
                 }
 
                 @Override
-                public WhereExpression.BooleanExpression visit( Path<?> path,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public BooleanExpression visit( Path<?> path,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     return null;
                 }
 
                 @Override
-                public WhereExpression.BooleanExpression visit( SubQueryExpression<?> subQueryExpression,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public BooleanExpression visit( SubQueryExpression<?> subQueryExpression,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     return null;
                 }
 
                 @Override
-                public WhereExpression.BooleanExpression visit( TemplateExpression<?> templateExpression,
-                                                                @Nullable WhereExpression.BooleanExpression booleanExpression
+                public BooleanExpression visit( TemplateExpression<?> templateExpression,
+                                                                @Nullable BooleanExpression booleanExpression
                 )
                 {
                     return null;
@@ -265,7 +266,12 @@ public class CypherQueryDSL
                     if (expression instanceof Constant)
                         return ((Constant)expression).getConstant();
                     else if (expression instanceof ParamExpression)
-                        return Expression.param(((ParamExpression)expression).getName());
+                        return param( ( (ParamExpression) expression ).getName() );
+                    else if (expression instanceof Path)
+                    {
+                        Path path = (Path) expression;
+                        return identifier( path.getRoot()).string( path.getMetadata().getExpression().toString() );
+                    }
                     else
                         throw new IllegalArgumentException("Unknown argument type:"+expression);
                 }

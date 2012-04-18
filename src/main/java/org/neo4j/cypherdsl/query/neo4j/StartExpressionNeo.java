@@ -19,6 +19,7 @@
  */
 package org.neo4j.cypherdsl.query.neo4j;
 
+import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.graphdb.Node;
@@ -29,9 +30,8 @@ import static org.neo4j.cypherdsl.query.Query.checkEmpty;
  * TODO
  */
 public abstract class StartExpressionNeo
-    extends StartExpression
 {
-    public static StartNodes node( String name, Node... nodes )
+    public static StartExpression.StartNodes node( String name, Node... nodes )
     {
         checkEmpty( name, "Name" );
 
@@ -47,9 +47,9 @@ public abstract class StartExpressionNeo
             ids[i] = node.getId();
         }
 
-        StartExpressionNeo.StartNodes startNodes = new StartExpressionNeo.StartNodes();
+        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
         startNodes.name = name;
-        startNodes.nodes = literals( ids );
+        startNodes.nodes = CypherQuery.literals( ids );
         return startNodes;
     }
 

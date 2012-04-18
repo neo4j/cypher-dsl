@@ -17,17 +17,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
+package org.neo4j.cypherdsl.query;
 
 /**
- * Implements the RETURN clause.
- */
-public interface Return
-    extends Execute
+* TODO
+*/
+public class Literal
+    extends Expression
 {
-    ReturnNext returns( Expression... returnExpression );
-    ReturnNext returns( Iterable<Expression> returnExpressions );
+    public Object value;
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        if (value instanceof String)
+        {
+            if (builder.toString().endsWith( "/" ) || builder.toString().endsWith( "(?i)" )) // -> Regexp with /literal/ or /(?i)literal/
+                builder.append( value.toString().replaceAll( "/","\\\\/" ) );
+            else
+                builder.append( "\"" ).append( value.toString().replaceAll( "/","\\\\/" ) ).append( "\"" );
+        }
+        else
+            builder.append( value.toString() );
+    }
 }

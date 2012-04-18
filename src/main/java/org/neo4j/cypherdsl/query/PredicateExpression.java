@@ -17,17 +17,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
+package org.neo4j.cypherdsl.query;
+
+import java.io.Serializable;
+import org.neo4j.cypherdsl.CypherQuery;
 
 /**
- * Implements the RETURN clause.
- */
-public interface Return
-    extends Execute
+* This represents any expression that evaluate to true or false.
+*/
+public abstract class PredicateExpression
+    implements AsString, Serializable, Cloneable
 {
-    ReturnNext returns( Expression... returnExpression );
-    ReturnNext returns( Iterable<Expression> returnExpressions );
+    public BooleanExpression.And and(PredicateExpression expression)
+    {
+        return CypherQuery.and( this, expression );
+    }
+
+    public BooleanExpression.Or or(PredicateExpression expression)
+    {
+        return CypherQuery.or( this, expression );
+    }
+
+    @Override
+    public Object clone()
+        throws CloneNotSupportedException
+    {
+        return super.clone();
+    }
 }

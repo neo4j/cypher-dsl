@@ -22,6 +22,7 @@ package org.neo4j.cypherdsl;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
+import static org.neo4j.cypherdsl.CypherReferenceTest.CYPHER;
 
 /**
  * Tests for all parts of the Cypher DSL.
@@ -31,27 +32,38 @@ public class CypherQueryTest2
     @Test
     public void testDSL()
     {
-        assertEquals( "START john=node(0) RETURN john", new CypherQuery()
+        assertEquals( CYPHER+"START john=node(0) RETURN john", new CypherQuery()
         {{
-            starts( node( "john", 0 ) ).returns( nodes( "john" ) );
+            starts( node( "john", 0 ) ).returns( identifier( "john" ) );
         }}.toString() );
 
-        assertEquals( "START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
+        assertEquals( CYPHER+"START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
         {{
             starts( node( "john", 0 ) ).
             match( path( "r" ).from( "john" )
                        .optional()
                        .out( "KNOWS" )
                        .hops( 1, 3 )
-                       .to( "x" ) ).returns( nodes( "x" ) );
+                       .to( "x" ) ).returns( identifier( "x" ) );
         }}.toString() );
 
-        assertEquals( "START n=node(3,1) WHERE (n.age<30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", new CypherQuery()
+        assertEquals( CYPHER+"START n=node(3,1) WHERE (n.age<30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", new CypherQuery()
         {{
             starts( node( "n", 3, 1 ) ).
-            where( number( "n.age" ).lt( 30 ).and( string( "n.name").eq( "Tobias" ) )
-                       .or( not( string( "n.name" ).eq( "Tobias" ) ) ) ).
-            returns( nodes( "n" ) );
+            where( identifier( "n" ).property("age" ).lt( 30 ).and( identifier( "n" ).string( "name").eq( "Tobias" ) )
+                       .or( not( identifier( "n" ).string( "name" ).eq( "Tobias" ) ) ) ).
+            returns( identifier( "n" ) );
+        }}.toString() );
+    }
+
+    @Test
+    public void testAndOrPrecedence()
+    {
+        assertEquals( CYPHER+"START n=node(1) WHERE n.value=0 and (n.title=\"ololo\" or n.value=1) RETURN n", new CypherQuery()
+        {{
+            starts( node( "n", 1 ) ).
+            where( identifier( "n" ).number( "value" ).eq( 0 ).and( identifier( "n" ).string( "title" ).eq( "ololo" ).or(identifier("n").number( "value" ).eq( 1 ) ) )).
+            returns( identifier( "n" ) );
         }}.toString() );
     }
 }

@@ -56,9 +56,9 @@ public class Query
             throw new IllegalArgumentException( name+" may not be null or empty string" );
     }
 
-    public static void checkEmpty(Expression.Value value, String name)
+    public static void checkEmpty(Expression value, String name)
     {
-        if (value instanceof Expression.Literal && isEmpty( (String) ((Expression.Literal)value).value ))
+        if (value instanceof Literal && isEmpty( (String) ((Literal)value).value ))
             throw new IllegalArgumentException( name+" may not be null or empty string" );
     }
 
@@ -71,10 +71,9 @@ public class Query
         }
     }
 
-    public String cypherVersion;
     public ArrayList<StartExpression> startExpressions = new ArrayList<StartExpression>();
     public ArrayList<MatchExpression> matchExpressions = new ArrayList<MatchExpression>();
-    public WhereExpression whereExpression;
+    public PredicateExpression whereExpression;
     public ArrayList<ReturnExpression> returnExpressions = new ArrayList<ReturnExpression>();
     public ArrayList<OrderByExpression> orderByExpressions = new ArrayList<OrderByExpression>();
     public Integer skip;
@@ -82,13 +81,9 @@ public class Query
 
     public void asString(StringBuilder builder)
     {
-        String startExpression = "START";
-        if(cypherVersion != null)
-        {
-            startExpression = "CYPHER " + cypherVersion + " START";
-        }
-        
-        clause( builder, startExpression, startExpressions );
+        builder.append( "CYPHER 1.7" );
+
+        clause( builder, "START", startExpressions );
         clause( builder, "MATCH", matchExpressions );
 
         if (whereExpression != null)
@@ -115,7 +110,7 @@ public class Query
         query.startExpressions = (ArrayList<StartExpression>) query.startExpressions.clone();
         query.matchExpressions = (ArrayList<MatchExpression>) query.matchExpressions.clone();
         if (query.whereExpression != null)
-            query.whereExpression = (WhereExpression) query.whereExpression.clone();
+            query.whereExpression = (PredicateExpression) query.whereExpression.clone();
         query.returnExpressions = (ArrayList<ReturnExpression>) query.returnExpressions.clone();
         query.orderByExpressions = (ArrayList<OrderByExpression>) query.orderByExpressions.clone();
         return query;

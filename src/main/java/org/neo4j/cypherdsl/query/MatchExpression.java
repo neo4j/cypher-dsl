@@ -20,6 +20,7 @@
 package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
+import org.neo4j.cypherdsl.CypherQuery;
 
 /**
  * Provides the possible expressions for the MATCH clause.
@@ -27,44 +28,6 @@ import java.io.Serializable;
 public abstract class MatchExpression
     implements AsString, Serializable, Cloneable
 {
-    /**
-     * The direction of the path expression.
-     */
-    public enum Direction
-    {
-        BOTH,
-        OUT,
-        IN
-    }
-
-    public static Path path()
-    {
-        return new Path();
-    }
-
-    public static Path path(String name)
-    {
-        Path path = new Path();
-        path.pathName = name;
-        return path;
-    }
-
-    /**
-     * Use this to invoke the shortestPath function
-     *
-     * @param name
-     * @return
-     */
-    public static FunctionPath shortestPath( String name )
-    {
-        Query.checkNull( name, "Name" );
-
-        FunctionPath functionPath = new FunctionPath();
-        functionPath.function = "shortestPath";
-        functionPath.pathName = name;
-        return functionPath;
-    }
-
     @Override
     public Object clone()
         throws CloneNotSupportedException
@@ -78,7 +41,7 @@ public abstract class MatchExpression
         public String to = "";
         public Direction direction = Direction.BOTH;
         public String as;
-        public String relationship;
+        public Expression[] relationships = new Expression[0];
         public boolean optional;
         public Integer minHops;
         public Integer maxHops;
@@ -88,7 +51,7 @@ public abstract class MatchExpression
         {
             builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
-            if( as != null || relationship != null || optional || minHops != null || maxHops != null )
+            if( as != null || relationships.length > 0 || optional || minHops != null || maxHops != null )
             {
                 builder.append( '[' );
                 if( as != null )
@@ -99,9 +62,15 @@ public abstract class MatchExpression
                 {
                     builder.append( '?' );
                 }
-                if( relationship != null )
+                if( relationships.length > 0 )
                 {
-                    builder.append( ':' ).append( relationship );
+                    builder.append( ':' );
+                    for( int i = 0; i < relationships.length; i++ )
+                    {
+                        if (i>0)
+                            builder.append( "|" );
+                        relationships[ i ].asString( builder );
+                    }
                 }
 
                 if( minHops != null || maxHops != null )
@@ -126,42 +95,24 @@ public abstract class MatchExpression
             builder.append( '(' ).append( to ).append( ')' );
         }
 
-        public T out()
+        public T out(String... relationship)
         {
             this.direction = Direction.OUT;
+            this.relationships = CypherQuery.identifiers( relationship );
             return (T) this;
         }
 
-        public T in()
+        public T in(String... relationship)
         {
             this.direction = Direction.IN;
+            this.relationships = CypherQuery.identifiers(relationship);
             return (T) this;
         }
 
-        public T both()
+        public T both( String... relationship )
         {
             this.direction = Direction.BOTH;
-            return (T) this;
-        }
-
-        public T out(String relationship)
-        {
-            this.direction = Direction.OUT;
-            this.relationship = relationship;
-            return (T) this;
-        }
-
-        public T in(String relationship)
-        {
-            this.direction = Direction.IN;
-            this.relationship = relationship;
-            return (T) this;
-        }
-
-        public T both( String relationship )
-        {
-            this.direction = Direction.BOTH;
-            this.relationship = relationship;
+            this.relationships = CypherQuery.identifiers(relationship);
             return (T) this;
         }
 
@@ -169,20 +120,6 @@ public abstract class MatchExpression
         {
             Query.checkEmpty( name, "Name" );
             this.as = name;
-            return (T) this;
-        }
-
-        public T rel( Enum relationship )
-        {
-            Query.checkNull( relationship, "Relationship" );
-            this.relationship = relationship.name();
-            return (T) this;
-        }
-
-        public T rel( String relationship )
-        {
-            Query.checkEmpty( relationship, "Relationship" );
-            this.relationship = relationship;
             return (T) this;
         }
 

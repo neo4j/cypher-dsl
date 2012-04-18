@@ -24,10 +24,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.Expression.param;
-import static org.neo4j.cypherdsl.query.ReturnExpression.*;
-import static org.neo4j.cypherdsl.query.StartExpression.*;
-import static org.neo4j.cypherdsl.query.WhereExpression.*;
+import static org.neo4j.cypherdsl.CypherReferenceTest.*;
 
 /**
  * Tests for all parts of the Cypher DSL.
@@ -38,20 +35,20 @@ public class CypherQueryTest
     public void testStartNodes()
     {
         // Start with id
-        assertEquals( "START john=node(0) RETURN john", start( node( "john", 0 ) ).returns( nodes( "john" ) ).toString() );
+        assertEquals( CYPHER+"START john=node(0) RETURN john", start( node( "john", 0 ) ).returns( identifier( "john" ) ).toString() );
 
-        assertEquals( "START family=node(0,1) RETURN family", start(node( "family", 0, 1 )).returns( nodes("family" )).toString() );
+        assertEquals( CYPHER+"START family=node(0,1) RETURN family", start(node( "family", 0, 1 )).returns( identifier("family" )).toString() );
 
         // Start with parameters
-        assertEquals( "START john=node({name}) RETURN john", start(node( "john", "name" )).returns( nodes("john" )).toString());
+        assertEquals( CYPHER+"START john=node({name}) RETURN john", start(node( "john", "name" )).returns( identifier("john" )).toString());
 
-        assertEquals( "START family=node() RETURN family", start(node( "family")).returns( nodes("family" )).toString());
+        assertEquals( CYPHER+"START family=node() RETURN family", start(node( "family")).returns( identifier("family" )).toString());
 
         // Start with lookup
-        assertEquals( "START john=node:nodes(name=\"John\") RETURN john", start(lookup( "john", "nodes", "name", "John" )).returns( nodes("john" )).toString());
+        assertEquals( CYPHER+"START john=node:nodes(name=\"John\") RETURN john", start(lookup( "john", "nodes", "name", "John" )).returns( identifier("john" )).toString());
 
         // Start with query
-        assertEquals( "START john=node:nodes(\"name:John\") RETURN john", start(query( "john", "nodes", "name:John" )).returns( nodes("john" )).toString());
+        assertEquals( CYPHER+"START john=node:nodes(\"name:John\") RETURN john", start(query( "john", "nodes", "name:John" )).returns( identifier("john" )).toString());
 
         // Error handling
         try
@@ -89,17 +86,17 @@ public class CypherQueryTest
     public void testStartRelationships()
     {
         // Start with id
-        assertEquals( "START knows=relationship(0) RETURN knows", start(relationship( "knows", 0 )).returns( relationships("knows") ).toString());
+        assertEquals( CYPHER+"START knows=relationship(0) RETURN knows", start(relationship( "knows", 0 )).returns( identifier("knows") ).toString());
 
-        assertEquals( "START likes=relationship(0,1) RETURN likes", start(relationship( "likes", 0, 1 )).returns( relationships("likes") ).toString() );
+        assertEquals( CYPHER+"START likes=relationship(0,1) RETURN likes", start(relationship( "likes", 0, 1 )).returns( identifier("likes") ).toString() );
 
         // Start with parameters
-        assertEquals( "START knows=relationship({name}) RETURN knows", start(relationship( "knows", "name" )).returns( relationships("knows") ).toString());
+        assertEquals( CYPHER+"START knows=relationship({name}) RETURN knows", start(relationship( "knows", "name" )).returns( identifier("knows") ).toString());
 
-        assertEquals( "START likes=relationship({websitea}) RETURN likes", start(relationship( "likes", "websitea")).returns( relationships("likes") ).toString());
+        assertEquals( CYPHER+"START likes=relationship({websitea}) RETURN likes", start(relationship( "likes", "websitea")).returns( identifier("likes") ).toString());
 
         // Start with index
-        assertEquals( "START knows=relationship:relationships(type=\"Starred\") RETURN knows", start(relationshipLookup( "knows", "relationships", "type", "Starred" )).returns( relationships("knows") ).toString());
+        assertEquals( CYPHER+"START knows=relationship:relationships(type=\"Starred\") RETURN knows", start(relationshipLookup( "knows", "relationships", "type", "Starred" )).returns( identifier("knows") ).toString());
 
         // Error handling
         try
@@ -136,31 +133,28 @@ public class CypherQueryTest
     @Test
     public void testWhere()
     {
-        assertEquals( "START n=node(0) WHERE n.name={name} RETURN n", start(node( "n", 0 )).where( eq( "n.name", param( "name" ) ) ).returns( nodes("n") ).toString());
+        assertEquals( CYPHER+"START n=node(0) WHERE n.name={name} RETURN n", start(node( "n", 0 )).where( identifier( "n" ).string("name").eq( param( "name" ) ) ).returns( identifier("n") ).toString());
         
-        assertEquals( "START n=node(0) WHERE (n.age>30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", start(node( "n", 0 )).
-            where( gt( "n.age", 30 ).and( eq( "n.name", "Tobias" ) ).or( not( eq( "n.name", "Tobias" ) ) ) ).
-            returns( properties("n") ).toString());
-    }
-
-    @Test
-    public void testCypherVersion()
-    {
-        assertEquals( "CYPHER 1.5 START n=node(0) RETURN n", cypherVersion("1.5").starts(node( "n", 0 )).returns( nodes("n") ).toString());
-
-        assertEquals( "START n=node(0) WHERE (n.age>30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", start(node( "n", 0 )).
-            where( gt( "n.age", 30 ).and( eq( "n.name", "Tobias" ) ).or( not( eq( "n.name", "Tobias" ) ) ) ).
-            returns( properties("n") ).toString());
+        assertEquals( CYPHER+"START n=node(0) WHERE (n.age>30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", start( node( "n", 0 ) )
+            .
+                where( identifier( "n" ).number( "age" ).gt( 30 )
+                           .and( identifier( "n" ).string( "name" ).eq( "Tobias" ) )
+                           .or( not( identifier( "n" ).string( "name" ).eq( "Tobias" ) ) ) )
+            .
+                returns( identifier( "n" ) )
+            .toString() );
     }
 
     @Test
     public void testReturn()
     {
         // Return with node
-        assertEquals( "START john=node(0) RETURN john", start(node( "john", 0 )).returns( nodes("john") ).toString());
+        assertEquals( CYPHER+"START john=node(0) RETURN john", start(node( "john", 0 )).returns( identifier("john") ).toString());
 
-        assertEquals( "START mom=node(0),dad=node(1) RETURN mom,dad", start(node( "mom", 0 ), node( "dad", 1 )).returns( nodes("mom", "dad") ).toString());
+        assertEquals( CYPHER+"START mom=node(0),dad=node(1) RETURN mom,dad", start(node( "mom", 0 ), node( "dad", 1 )).returns( identifiers("mom", "dad") ).toString());
 
-        assertEquals( "START mom=node(0),dad=node(1) RETURN mom.age AS momsAge,dad.age AS dadsAge", start(node( "mom", 0 ), node( "dad", 1 )).returns( properties("mom.age", "dad.age").as("momsAge","dadsAge") ).toString());
+        assertEquals( CYPHER+"START mom=node(0),dad=node(1) RETURN mom.age AS momsAge,dad.age AS dadsAge",
+                      start(node( "mom", 0 ), node( "dad", 1 )).
+                      returns( exp( identifier( "mom" ).property( "age" ) ).as( "momsAge" ), exp( identifier( "dad" ).property( "age" ) ).as( "dadsAge" )).toString());
     }
 }

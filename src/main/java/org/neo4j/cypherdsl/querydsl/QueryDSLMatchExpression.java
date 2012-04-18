@@ -19,46 +19,15 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Path;
-import org.neo4j.cypherdsl.query.AsString;
+import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.MatchExpression;
 import org.neo4j.cypherdsl.query.Query;
-
-import java.io.Serializable;
 
 /**
  * Provides the possible expressions for the MATCH clause.
  */
 public abstract class QueryDSLMatchExpression
 {
-    public static QueryDSLPath path()
-    {
-        return new QueryDSLPath();
-    }
-
-    public static QueryDSLPath path(String name)
-    {
-        QueryDSLPath path = new QueryDSLPath();
-        path.pathName = name;
-        return path;
-    }
-
-    /**
-     * Use this to invoke the shortestPath function
-     *
-     * @param name
-     * @return
-     */
-    public static QueryDSLFunctionPath shortestPath( String name )
-    {
-        Query.checkNull( name, "Name" );
-
-        QueryDSLFunctionPath functionPath = new QueryDSLFunctionPath();
-        functionPath.function = "shortestPath";
-        functionPath.pathName = name;
-        return functionPath;
-    }
-
     @Override
     public Object clone()
         throws CloneNotSupportedException

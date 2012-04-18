@@ -61,11 +61,10 @@ public class JSONSerializerTest
         data.get();
 
         JSONSerializer serializer = new JSONSerializer();
-        String query = start(lookup("john", "node_auto_index", "name", "John"))
-                .match(path().from("john").out("friend")
-                        .link().out("friend").to("fof"))
-                .returns(properties("john.name", "fof.name"), nodes("john"), count())
-                .toString();
+        String query = start(lookup("john", "node_auto_index", "name", "John")).
+                        match(path().from("john").out("friend").link().out("friend").to("fof")).
+                        returns(identifier("john").property( "name"), identifier("fof").property( "name"), identifier("john"), count())
+                        .toString();
         String json = serializer.toJSON( engine.execute(query) ).toString();
         System.out.println( json );
 
@@ -90,7 +89,7 @@ public class JSONSerializerTest
         JSONSerializer serializer = new JSONSerializer();
         String query = start( lookup( "john", "node_auto_index", "name", "John" ), lookup( "maria", "node_auto_index", "name", "Maria" ) )
             .match( shortestPath( "p" ).from( "john" ).out().hops( null,3 ).to( "maria" ) )
-            .returns( paths( "p" ) )
+            .returns( identifier( "p" ) )
             .toString();
         System.out.println( query );
         String json = serializer.toJSON(engine.execute(query)).toString();

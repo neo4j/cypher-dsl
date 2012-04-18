@@ -17,23 +17,27 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Path;
-import org.neo4j.cypherdsl.query.OrderByExpression;
+package org.neo4j.cypherdsl.query;
 
 /**
- * TODO
- */
-public class QueryDSLOrderByExpression
+* Iterable predicates are of the form: function(name IN iterable WHERE predicate)
+*/
+public class IterablePredicateExpression
+    extends PredicateExpression
 {
-    public static OrderByExpression property( Path<?> path )
-    {
-        return OrderByExpression.property(path.toString());
-    }
+    public String function;
+    public String name;
+    public Expression iterable;
+    public PredicateExpression predicate;
 
-    public static OrderByExpression property( Path<?> path, OrderByExpression.Order order )
+    @Override
+    public void asString( StringBuilder builder )
     {
-        return OrderByExpression.property(path.toString(), order);
+        builder.append( function ).append( '(' ).append( name ).append( " IN " );
+        iterable.asString( builder );
+        builder.append( " WHERE " );
+        predicate.asString( builder );
+        builder.append( ')' );
     }
 }

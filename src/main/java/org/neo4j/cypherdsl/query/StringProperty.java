@@ -17,35 +17,41 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.CypherQuery;
+
 /**
- * Provides the possible expressions for the ORDER BY clause.
- */
-public class OrderByExpression
-    extends Expression
+* TODO
+*/
+public class StringProperty
+    extends Property<StringProperty>
 {
-
-    public Expression expression;
-    public Order order;
-
-    public OrderByExpression order(Order order)
+    public Regexp regexp(String value)
     {
-        this.order = order;
-        return this;
+        return regexp( value, true );
     }
 
-    public void asString(StringBuilder builder)
+    public Regexp regexp(String value, boolean caseSensitive)
     {
-        expression.asString( builder );
-        if (order != null)
-            builder.append( ' ' ).append( order.name() );
+        Query.checkEmpty( value, "Regular expression" );
+
+        Regexp regexp1 = new Regexp();
+        regexp1.left = this;
+        regexp1.regexp = CypherQuery.literal( value );
+        regexp1.caseSensitive = caseSensitive;
+        return regexp1;
     }
 
-    @Override
-    public Object clone()
-        throws CloneNotSupportedException
+    public FunctionExpression add(Expression expression)
     {
-        return super.clone();
+        Query.checkNull( expression, "Expression" );
+
+        BinaryOperatorExpression function = new BinaryOperatorExpression();
+        function.operator = "+";
+        function.left = this;
+        function.right = expression;
+        return function;
     }
 }
