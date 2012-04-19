@@ -22,10 +22,11 @@ package org.neo4j.cypherdsl;
 import org.neo4j.cypherdsl.query.PredicateExpression;
 
 /**
- * Implements the WHERE clause. Use the static methods in WhereExpression to create expressions.
+ * Implements the WHERE clause. Use the static methods in WhereExpression to create expressions. Several
+ * invocations of where() will cause the expressions to be AND'ed together
  */
 public interface Where
     extends Return
 {
-    Return where(PredicateExpression expression);
+    Where where(PredicateExpression expression);
 }

@@ -21,6 +21,10 @@
 package org.neo4j.cypherdsl.query;
 
 import java.util.regex.Pattern;
+import org.neo4j.cypherdsl.CypherQuery;
+
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 /**
 * TODO
@@ -34,6 +38,12 @@ public class Identifier
 
     public CommonProperty property(String name)
     {
+        return property( identifier( name ) );
+    }
+
+    public CommonProperty property(Identifier name)
+    {
+        checkNull( name, "Name" );
         CommonProperty property = new CommonProperty();
         property.owner = this;
         property.name = name;
@@ -42,6 +52,12 @@ public class Identifier
 
     public StringProperty string(String name)
     {
+        return string( identifier( name ) );
+    }
+
+    public StringProperty string(Identifier name)
+    {
+        checkNull( name, "Name" );
         StringProperty stringProperty = new StringProperty();
         stringProperty.owner = this;
         stringProperty.name = name;
@@ -50,6 +66,12 @@ public class Identifier
 
     public NumberProperty number(String name)
     {
+        return number( identifier( name ) );
+    }
+
+    public NumberProperty number(Identifier name)
+    {
+        checkNull( name, "Name" );
         NumberProperty numberProperty = new NumberProperty();
         numberProperty.owner = this;
         numberProperty.name = name;

@@ -29,7 +29,6 @@ import org.neo4j.cypherdsl.query.*;
 import org.neo4j.cypherdsl.query.Expression;
 
 import java.util.Collections;
-import org.neo4j.cypherdsl.query.Order;
 
 /**
  * TODO
@@ -109,9 +108,9 @@ public class CypherQueryDSL
         return CypherQuery.lookup(entity.toString(), indexName, key.getMetadata().getExpression().toString(), value);
     }
 
-    public static StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Identifier key, Expression value )
+    public static StartExpression.StartNodesLookup lookup( Path<?> entity, String indexName, Identifier key, Literal value )
     {
-        return CypherQuery.lookup( entity.toString(), indexName, key, value );
+        return CypherQuery.lookup( identifier(entity.toString()), identifier(indexName), key, value );
     }
 
     // Match
@@ -122,6 +121,12 @@ public class CypherQueryDSL
 
     public static QueryDSLMatchExpression.QueryDSLPath path(String name)
     {
+        return path( identifier( name ) );
+    }
+
+    public static QueryDSLMatchExpression.QueryDSLPath path(Identifier name)
+    {
+        Query.checkNull( name, "Name" );
         QueryDSLMatchExpression.QueryDSLPath path = new QueryDSLMatchExpression.QueryDSLPath();
         path.pathName = name;
         return path;
@@ -134,6 +139,17 @@ public class CypherQueryDSL
      * @return
      */
     public static QueryDSLMatchExpression.QueryDSLFunctionPath shortestPath( String name )
+    {
+        return shortestPath( identifier( name ) );
+    }
+
+    /**
+     * Use this to invoke the shortestPath function
+     *
+     * @param name
+     * @return
+     */
+    public static QueryDSLMatchExpression.QueryDSLFunctionPath shortestPath( Identifier name )
     {
         Query.checkNull( name, "Name" );
 
@@ -163,7 +179,7 @@ public class CypherQueryDSL
         public Return where( Predicate predicate )
         {
             // Parse predicate
-            query.whereExpression = predicate.accept( new Visitor<PredicateExpression, BooleanExpression>()
+            query.whereExpressions.add( predicate.accept( new Visitor<PredicateExpression, BooleanExpression>()
             {
                 @Override
                 public PredicateExpression visit( Constant<?> constant,
@@ -275,7 +291,7 @@ public class CypherQueryDSL
                     else
                         throw new IllegalArgumentException("Unknown argument type:"+expression);
                 }
-            }, null );
+            }, null ));
 
             return this;
         }

@@ -132,6 +132,7 @@ public class CypherQuery
      */
     public static Parameter param(String name)
     {
+        checkEmpty( name, "Name" );
         Parameter parameter = new Parameter();
         parameter.name = name;
         return parameter;
@@ -147,6 +148,7 @@ public class CypherQuery
      */
     public static Literal literal( Object value )
     {
+        checkNull( value, "Value" );
         Literal literal = new Literal();
         literal.value = value;
         return literal;
@@ -164,6 +166,7 @@ public class CypherQuery
      */
     public static Identifier identifier( String name )
     {
+        checkEmpty( name, "Identifier" );
         Identifier identifier = new Identifier();
         identifier.name = name;
         return identifier;
@@ -178,8 +181,9 @@ public class CypherQuery
      */
     public static StringProperty string( String name )
     {
+        checkEmpty( name, "Name" );
         StringProperty property = new StringProperty();
-        property.name = name;
+        property.name = identifier( name);
         return property;
     }
 
@@ -192,8 +196,9 @@ public class CypherQuery
      */
     public static NumberProperty number( String name )
     {
+        checkEmpty( name, "Name" );
         NumberProperty property = new NumberProperty();
-        property.name = name;
+        property.name = identifier( name);
         return property;
     }
 
@@ -209,9 +214,7 @@ public class CypherQuery
         for( int i = 0; i < values.length; i++ )
         {
             Object value = values[ i ];
-            Literal literal = new Literal();
-            literal.value = value;
-            literals[i] = literal;
+            literals[i] = literal(value);
         }
         return literals;
     }
@@ -228,9 +231,7 @@ public class CypherQuery
         for( int i = 0; i < values.length; i++ )
         {
             String value = values[ i ];
-            Identifier identifier = new Identifier();
-            identifier.name = value;
-            identifiers[i] = identifier;
+            identifiers[i] = identifier(value);
         }
         return identifiers;
     }
@@ -247,9 +248,7 @@ public class CypherQuery
         for( int i = 0; i < names.length; i++ )
         {
             String value = names[ i ];
-            Parameter parameter = new Parameter();
-            parameter.name = value;
-            parameters[i] = parameter;
+            parameters[i] = param( value );
         }
         return parameters;
     }
@@ -266,9 +265,7 @@ public class CypherQuery
         for( int i = 0; i < values.length; i++ )
         {
             Object value = values[ i ];
-            Literal literal = new Literal();
-            literal.value = value;
-            literals[i] = literal;
+            literals[i] = literal(value);
         }
         return literals;
     }
@@ -518,7 +515,22 @@ public class CypherQuery
      */
     public static StartExpression.StartNodes node( String name, long... id )
     {
-        checkEmpty( name, "Name" );
+        return node( identifier( name ), id );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node(id1,id2,id3)
+     * </pre>
+     *
+     * @param name
+     * @param id
+     * @return
+     */
+    public static StartExpression.StartNodes node( Identifier name, long... id )
+    {
+        checkNull( name, "Name" );
 
         for( long i : id )
         {
@@ -544,6 +556,21 @@ public class CypherQuery
      */
     public static StartExpression.StartNodes node( String name, String parameter )
     {
+        return node( identifier( name), parameter );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node({parameter})
+     * </pre>
+     *
+     * @param name
+     * @param parameter
+     * @return
+     */
+    public static StartExpression.StartNodes node( Identifier name, String parameter )
+    {
         checkEmpty( name, "Name" );
         checkEmpty( parameter, "Parameters" );
 
@@ -564,7 +591,21 @@ public class CypherQuery
      */
     public static StartExpression.StartNodes allNodes( String name )
     {
-        checkEmpty( name, "Name" );
+        return allNodes( identifier( name ));
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node(*)
+     * </pre>
+     *
+     * @param name
+     * @return
+     */
+    public static StartExpression.StartNodes allNodes( Identifier name )
+    {
+        checkNull( name, "Name" );
 
         StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
         startNodes.name = name;
@@ -586,10 +627,7 @@ public class CypherQuery
      */
     public static StartExpression.StartNodesLookup lookup( String name, String indexName, String key, String value )
     {
-        checkEmpty( key, "Key" );
-        checkEmpty( value, "Value" );
-
-        return lookup( name, indexName, identifier( key ), literal( value ) );
+        return lookup( identifier( name ), identifier(indexName), identifier( key ), literal( value ) );
     }
 
     /**
@@ -604,7 +642,7 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static StartExpression.StartNodesLookup lookup( String name, String indexName, Identifier key, Expression value )
+    public static StartExpression.StartNodesLookup lookup( Identifier name, Identifier indexName, Identifier key, Literal value )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
@@ -630,8 +668,24 @@ public class CypherQuery
      */
     public static StartExpression.StartNodesQuery query( String name, String indexName, String query )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( indexName, "Index" );
+        return query(identifier( name ), identifier( indexName ), query );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName("query")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param query
+     * @return
+     */
+    public static StartExpression.StartNodesQuery query( Identifier name, Identifier indexName, String query )
+    {
+        checkNull( name, "Name" );
+        checkNull( indexName, "Index" );
         checkEmpty( query, "Query" );
 
         StartExpression.StartNodesQuery startNodesQuery = new StartExpression.StartNodesQuery();
@@ -653,7 +707,22 @@ public class CypherQuery
      */
     public static StartExpression.StartRelationships relationship( String name, long... id )
     {
-        checkEmpty( name, "Name" );
+        return relationship( identifier( name ), id );
+    }
+
+    /**
+     * Declare start relationships. Corresponds to:
+     * <pre>
+     * name=relationship(id1,id2,id3)
+     * </pre>
+     *
+     * @param name
+     * @param id
+     * @return
+     */
+    public static StartExpression.StartRelationships relationship( Identifier name, long... id )
+    {
+        checkNull( name, "Name" );
 
         for( long i : id )
         {
@@ -679,7 +748,22 @@ public class CypherQuery
      */
     public static StartExpression.StartRelationshipsParameters relationship( String name, String parameter )
     {
-        checkEmpty( name, "Name" );
+        return relationship( identifier( name ), parameter);
+    }
+
+    /**
+     * Declare start relationships. Corresponds to:
+     * <pre>
+     * name=relationship({parameter})
+     * </pre>
+     *
+     * @param name
+     * @param parameter
+     * @return
+     */
+    public static StartExpression.StartRelationshipsParameters relationship( Identifier name, String parameter )
+    {
+        checkNull( name, "Name" );
         checkEmpty( parameter, "Parameter" );
 
         StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
@@ -702,10 +786,7 @@ public class CypherQuery
      */
     public static StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, String key, String value )
     {
-        checkEmpty( key, "Key" );
-        checkEmpty( value, "Value" );
-
-        return relationshipLookup( name, indexName, identifier( key ), literal( value ) );
+        return relationshipLookup( identifier( name ), identifier( indexName ), identifier( key ), literal( value));
     }
 
     /**
@@ -720,10 +801,10 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, Identifier key, Expression value )
+    public static StartExpression.StartRelationshipsIndex relationshipLookup( Identifier name, Identifier indexName, Identifier key, Literal value )
     {
-        checkEmpty( name, "Name" );
-        checkEmpty( indexName, "Index" );
+        checkNull( name, "Name" );
+        checkNull( indexName, "Index" );
         checkNull( key, "Key" );
         checkNull( value, "Value" );
 
@@ -754,6 +835,18 @@ public class CypherQuery
      */
     public static MatchExpression.Path path(String name)
     {
+        return path(identifier( name ));
+    }
+
+    /**
+     * Declare a named path for MATCH clauses
+     *
+     * @param name
+     * @return
+     */
+    public static MatchExpression.Path path(Identifier name)
+    {
+        checkNull( name, "Name" );
         MatchExpression.Path path = new MatchExpression.Path();
         path.pathName = name;
         return path;
@@ -766,6 +859,17 @@ public class CypherQuery
      * @return
      */
     public static MatchExpression.FunctionPath shortestPath( String name )
+    {
+        return shortestPath( identifier( name ) );
+    }
+
+    /**
+     * Use this to invoke the shortestPath function
+     *
+     * @param name
+     * @return
+     */
+    public static MatchExpression.FunctionPath shortestPath( Identifier name )
     {
         Query.checkNull( name, "Name" );
 
@@ -782,6 +886,17 @@ public class CypherQuery
      * @return
      */
     public static MatchExpression.FunctionPath allShortestPaths( String name )
+    {
+        return allShortestPaths( identifier( name ) );
+    }
+
+    /**
+     * Use this to invoke the allShortestPaths function
+     *
+     * @param name
+     * @return
+     */
+    public static MatchExpression.FunctionPath allShortestPaths( Identifier name )
     {
         Query.checkNull( name, "Name" );
 
@@ -991,7 +1106,23 @@ public class CypherQuery
      */
     public static IterablePredicateExpression all( String name, Expression iterable, PredicateExpression predicateExpression )
     {
-        Query.checkEmpty( name, "Name" );
+        return all( identifier( name ), iterable, predicateExpression );
+    }
+
+    /**
+     * Declare an ALL expression. Corresponds to:
+     * <pre>
+     *     ALL(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression all( Identifier name, Expression iterable, PredicateExpression predicateExpression )
+    {
+        Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
@@ -1019,7 +1150,26 @@ public class CypherQuery
                                                    PredicateExpression predicateExpression
     )
     {
-        Query.checkEmpty( name, "Name" );
+        return any( identifier( name ), iterable, predicateExpression );
+    }
+
+    /**
+     * Declare an ANY expression. Corresponds to:
+     * <pre>
+     *     ANY(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression any( Identifier name,
+                                                   Expression iterable,
+                                                   PredicateExpression predicateExpression
+    )
+    {
+        Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
@@ -1047,8 +1197,27 @@ public class CypherQuery
                                                    PredicateExpression predicateExpression
     )
     {
-        Query.checkEmpty( name, "Name" );
-        Query.checkEmpty( iterable, "Iterable" );
+        return none( identifier( name ), iterable, predicateExpression );
+    }
+
+    /**
+     * Declare a NONE expression. Corresponds to:
+     * <pre>
+     *     NONE(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression none( Identifier name,
+                                                    Expression iterable,
+                                                   PredicateExpression predicateExpression
+    )
+    {
+        Query.checkNull( name, "Name" );
+        Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
         IterablePredicateExpression expression = new IterablePredicateExpression();
@@ -1075,7 +1244,26 @@ public class CypherQuery
                                                       PredicateExpression predicateExpression
     )
     {
-        Query.checkEmpty( name, "Name" );
+        return single( identifier( name ), iterable, predicateExpression );
+    }
+
+    /**
+     * Declare a SINGLE expression. Corresponds to:
+     * <pre>
+     *     SINGLE(name IN iterable WHERE expression)
+     * </pre>
+     *
+     * @param name
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static IterablePredicateExpression single( Identifier name,
+                                                      Expression iterable,
+                                                      PredicateExpression predicateExpression
+    )
+    {
+        Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
@@ -1173,7 +1361,7 @@ public class CypherQuery
      *     head(collection)
      * </pre>
      *
-     * @param expression
+     * @param collectionExpression
      * @return
      */
     public static FunctionExpression head(Expression collectionExpression)
@@ -1272,7 +1460,21 @@ public class CypherQuery
      */
     public static Extract extract( String name, Expression iterable, Expression expression )
     {
-        Query.checkEmpty( name, "Name" );
+        return extract( identifier( name ), iterable, expression );
+    }
+
+    /**
+     * Declare an extract function. Corresponds to:
+     * <pre>
+     *     extract(name IN iterable : expression)
+     * </pre>
+     * @param iterable
+     * @param expression
+     * @return
+     */
+    public static Extract extract( Identifier name, Expression iterable, Expression expression )
+    {
+        Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( expression, "Expression" );
 
@@ -1294,7 +1496,21 @@ public class CypherQuery
      */
     public static FunctionExpression.Filter filter( String name, Expression iterable, PredicateExpression predicateExpression )
     {
-        Query.checkEmpty( name, "Name" );
+        return filter( identifier( name ), iterable, predicateExpression );
+    }
+
+    /**
+     * Declare a filter function. Corresponds to:
+     * <pre>
+     *     filter(name IN iterable : predicate)
+     * </pre>
+     * @param iterable
+     * @param predicateExpression
+     * @return
+     */
+    public static FunctionExpression.Filter filter( Identifier name, Expression iterable, PredicateExpression predicateExpression )
+    {
+        Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
@@ -1404,10 +1620,10 @@ public class CypherQuery
 
         // Where --------------------------------------------------------
         @Override
-        public Return where( PredicateExpression expression )
+        public Where where( PredicateExpression expression )
         {
             Query.checkNull( expression, "Expression" );
-            query.whereExpression = expression;
+            query.whereExpressions.add( expression );
             return this;
         }
 

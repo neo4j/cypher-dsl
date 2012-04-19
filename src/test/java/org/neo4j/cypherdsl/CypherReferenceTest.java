@@ -20,6 +20,7 @@
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
+import org.neo4j.cypherdsl.query.Identifier;
 import org.neo4j.cypherdsl.query.Query;
 
 import static org.junit.Assert.*;
@@ -452,7 +453,7 @@ public class CypherReferenceTest
     public void test15_9_4()
     {
         assertEquals( CYPHER+"START `This isn't a common identifier`=node(1) RETURN `This isn't a common identifier`.`<<!!__??>>`",
-                      start( node( "`This isn't a common identifier`", 1 ) ).
+                      start( node( identifier("This isn't a common identifier"), 1 ) ).
                           returns( identifier( "This isn't a common identifier").property( "<<!!__??>>" ) ).
                           toString() );
     }
@@ -822,20 +823,37 @@ public class CypherReferenceTest
     @Test
     public void test5_1_2()
     {
-        assertEquals( CYPHER+"START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
+        Identifier u1 = identifier("u1");
+        Identifier u2 = identifier("u2");
+        Identifier hyperEdge1 = identifier("hyperEdge1");
+        Identifier group = identifier("group");
+        Identifier role = identifier("role");
+        Identifier hyperEdge2 = identifier("hyperEdge2");
+        assertEquals( CYPHER + "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
                       "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
                       "(hyperEdge1)-[:hasRole]->(role)," +
                       "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
                       "(hyperEdge2)-[:hasRole]->(role) " +
                       "RETURN group.name,count(role) " +
                       "ORDER BY group.name ASCENDING",
-                      start( lookup( "u1", "node_auto_index", "name", "User1" ), lookup( "u2", "node_auto_index", "name", "User2" ) ).
-                      match( path().from( "u1" ).out( "hasRoleInGroup" ).to( "hyperEdge1" ).link().out( "hasGroup" ).to( "group" ),
-                             path().from( "hyperEdge1" ).out( "hasRole" ).to( "role" ),
-                             path().from( "u2" ).out( "hasRoleInGroup" ).to( "hyperEdge2" ).link().out( "hasGroup" ).to( "group" ),
-                             path().from( "hyperEdge2" ).out( "hasRole" ).to( "role" )).
-                      returns( identifier( "group" ).property( "name" ), count( identifier( "role" ) ) ).
-                      orderBy( order( identifier( "group" ).property( "name" ), ASCENDING ) ).toString());
+                      start( lookup( u1, identifier( "node_auto_index" ), identifier( "name" ), literal( "User1" ) ), lookup( u2, identifier( "node_auto_index" ), identifier( "name" ), literal( "User2" ) ) ).
+                              match( path().from( u1 )
+                                         .out( "hasRoleInGroup" )
+                                         .to( hyperEdge1 )
+                                         .link()
+                                         .out( "hasGroup" )
+                                         .to( group ),
+                                     path().from( hyperEdge1 ).out( "hasRole" ).to( role ),
+                                     path().from( u2 )
+                                         .out( "hasRoleInGroup" )
+                                         .to( hyperEdge2 )
+                                         .link()
+                                         .out( "hasGroup" )
+                                         .to( group ),
+                                     path().from( hyperEdge2 ).out( "hasRole" ).to( role ) ).
+                              returns( group.property( "name" ), count( role ) ).
+                              orderBy( order( group.property( "name" ), ASCENDING ) )
+                          .toString() );
     }
 
     @Test

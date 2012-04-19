@@ -73,7 +73,7 @@ public class Query
 
     public ArrayList<StartExpression> startExpressions = new ArrayList<StartExpression>();
     public ArrayList<MatchExpression> matchExpressions = new ArrayList<MatchExpression>();
-    public PredicateExpression whereExpression;
+    public ArrayList<PredicateExpression> whereExpressions = new ArrayList<PredicateExpression>();
     public ArrayList<ReturnExpression> returnExpressions = new ArrayList<ReturnExpression>();
     public ArrayList<OrderByExpression> orderByExpressions = new ArrayList<OrderByExpression>();
     public Integer skip;
@@ -83,17 +83,12 @@ public class Query
     {
         builder.append( "CYPHER 1.7" );
 
-        clause( builder, "START", startExpressions );
-        clause( builder, "MATCH", matchExpressions );
+        clause( builder, "START", startExpressions,"," );
+        clause( builder, "MATCH", matchExpressions,"," );
+        clause( builder, "WHERE", whereExpressions," AND " );
 
-        if (whereExpression != null)
-        {
-            builder.append( " WHERE " );
-            whereExpression.asString( builder );
-        }
-
-        clause( builder, "RETURN", returnExpressions );
-        clause( builder, "ORDER BY", orderByExpressions );
+        clause( builder, "RETURN", returnExpressions,"," );
+        clause( builder, "ORDER BY", orderByExpressions,"," );
 
         if (skip != null)
             builder.append( " SKIP " ).append( skip );
@@ -109,14 +104,13 @@ public class Query
         Query query = (Query) super.clone();
         query.startExpressions = (ArrayList<StartExpression>) query.startExpressions.clone();
         query.matchExpressions = (ArrayList<MatchExpression>) query.matchExpressions.clone();
-        if (query.whereExpression != null)
-            query.whereExpression = (PredicateExpression) query.whereExpression.clone();
+        query.whereExpressions = (ArrayList<PredicateExpression>) query.whereExpressions.clone();
         query.returnExpressions = (ArrayList<ReturnExpression>) query.returnExpressions.clone();
         query.orderByExpressions = (ArrayList<OrderByExpression>) query.orderByExpressions.clone();
         return query;
     }
 
-    private void clause( StringBuilder builder, String name, List<? extends AsString> asStringList )
+    private void clause( StringBuilder builder, String name, List<? extends AsString> asStringList, String separator )
     {
         if (!asStringList.isEmpty())
         {
@@ -128,7 +122,7 @@ public class Query
             {
                 AsString asString = asStringList.get( i );
                 if (i > 0)
-                    builder.append( ',' );
+                    builder.append( separator );
                 asString.asString( builder );
             }
         }

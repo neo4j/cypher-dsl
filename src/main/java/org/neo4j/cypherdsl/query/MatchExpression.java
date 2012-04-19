@@ -38,9 +38,9 @@ public abstract class MatchExpression
     public static class AbstractPath<T extends AbstractPath>
         extends MatchExpression
     {
-        public String to = "";
+        public Identifier to;
         public Direction direction = Direction.BOTH;
-        public String as;
+        public Identifier as;
         public Expression[] relationships = new Expression[0];
         public boolean optional;
         public Integer minHops;
@@ -56,7 +56,7 @@ public abstract class MatchExpression
                 builder.append( '[' );
                 if( as != null )
                 {
-                    builder.append( as );
+                    as.asString( builder );
                 }
                 if( optional )
                 {
@@ -92,7 +92,10 @@ public abstract class MatchExpression
 
             builder.append( direction.equals( Direction.OUT ) ? "->" : "-" );
 
-            builder.append( '(' ).append( to ).append( ')' );
+            builder.append( '(' );
+            if (to != null)
+                to.asString( builder );
+            builder.append( ')' );
         }
 
         public T out(String... relationship)
@@ -118,7 +121,12 @@ public abstract class MatchExpression
 
         public T as( String name )
         {
-            Query.checkEmpty( name, "Name" );
+            return as( CypherQuery.identifier( name ) );
+        }
+
+        public T as( Identifier name )
+        {
+            Query.checkNull( name, "Name" );
             this.as = name;
             return (T) this;
         }
@@ -144,6 +152,12 @@ public abstract class MatchExpression
 
         public T to(String to)
         {
+            return to(CypherQuery.identifier( to ));
+        }
+
+        public T to(Identifier to)
+        {
+            Query.checkNull( to, "To" );
             this.to = to;
             return (T) this;
         }
@@ -160,20 +174,32 @@ public abstract class MatchExpression
     public static class Path<T extends Path>
         extends AbstractPath<T>
     {
-        public String pathName;
-        public String from = "";
+        public Identifier pathName;
+        public Identifier from;
 
         @Override
         public void asString( StringBuilder builder )
         {
             if (pathName != null)
-                builder.append( pathName ).append( '=' );
-            builder.append( '(' ).append( from ).append( ')' );
+            {
+                pathName.asString( builder );
+                builder.append( '=' );
+            }
+            builder.append( '(' );
+            if (from != null)
+                from.asString( builder );
+            builder.append( ')' );
             super.asString( builder );
         }
 
         public T from(String from)
         {
+            return from(CypherQuery.identifier(from));
+        }
+
+        public T from(Identifier from)
+        {
+            Query.checkNull(from, "From");
             this.from = from;
             return (T) this;
         }
@@ -195,10 +221,10 @@ public abstract class MatchExpression
     public static class FunctionPath<T extends FunctionPath>
         extends MatchExpression
     {
-        public String pathName;
+        public Identifier pathName;
         public String function;
-        public String from = "";
-        public String to = "";
+        public Identifier from;
+        public Identifier to;
         public Direction direction = Direction.BOTH;
         public Integer minHops;
         public Integer maxHops;
@@ -223,14 +249,24 @@ public abstract class MatchExpression
 
         public T from(String from)
         {
-            Query.checkEmpty( from, "From" );
+            return from(CypherQuery.identifier( from ));
+        }
+
+        public T from(Identifier from)
+        {
+            Query.checkNull( from, "From" );
             this.from = from;
             return (T) this;
         }
 
         public T to(String to)
         {
-            Query.checkEmpty( to, "To" );
+            return to(CypherQuery.identifier( to ));
+        }
+
+        public T to(Identifier to)
+        {
+            Query.checkNull( to, "To" );
             this.to = to;
             return (T) this;
         }
@@ -251,9 +287,13 @@ public abstract class MatchExpression
         @Override
         public void asString( StringBuilder builder )
         {
-            builder.append( pathName ).append( "=" );
+            pathName.asString( builder );
+            builder.append( "=" );
             builder.append( function ).append( '(' );
-            builder.append( '(' ).append( from ).append( ')' );
+            builder.append( '(' );
+            if (from != null)
+                from.asString( builder );
+            builder.append( ')' );
 
             builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
@@ -279,7 +319,10 @@ public abstract class MatchExpression
 
             builder.append( direction.equals( Direction.OUT ) ? "->" : "-" );
 
-            builder.append( '(' ).append( to ).append( ')' );
+            builder.append( '(' );
+            if (to != null)
+                to.asString( builder );
+            builder.append( ')' );
             builder.append( ')' );
         }
     }

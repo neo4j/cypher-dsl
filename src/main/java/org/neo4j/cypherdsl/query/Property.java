@@ -32,7 +32,7 @@ public abstract class Property<TYPE extends Property>
     private static Pattern simpleName = Pattern.compile( "\\w*" );
 
     protected Identifier owner;
-    public String name;
+    public Identifier name;
     protected NullHandling nullHandling = NullHandling.NULL;
 
     public TYPE falseIfMissing()
@@ -113,10 +113,7 @@ public abstract class Property<TYPE extends Property>
             builder.append( '.' );
         }
 
-        if (simpleName.matcher( name ).matches())
-            builder.append( name );
-        else
-            builder.append( '`' ).append( name ).append( '`' );
+        name.asString( builder );
         AsString nullHandling1 = (AsString) nullHandling;
         nullHandling1.asString( builder );
     }

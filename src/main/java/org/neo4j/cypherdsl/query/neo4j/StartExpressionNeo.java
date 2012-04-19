@@ -20,11 +20,12 @@
 package org.neo4j.cypherdsl.query.neo4j;
 
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.query.Identifier;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.graphdb.Node;
 
-import static org.neo4j.cypherdsl.query.Query.checkEmpty;
+import static org.neo4j.cypherdsl.query.Query.*;
 
 /**
  * TODO
@@ -33,7 +34,12 @@ public abstract class StartExpressionNeo
 {
     public static StartExpression.StartNodes node( String name, Node... nodes )
     {
-        checkEmpty( name, "Name" );
+        return node( CypherQuery.identifier( name ), nodes );
+    }
+
+    public static StartExpression.StartNodes node( Identifier name, Node... nodes )
+    {
+        checkNull( name, "Name" );
 
         for( Node node : nodes )
         {

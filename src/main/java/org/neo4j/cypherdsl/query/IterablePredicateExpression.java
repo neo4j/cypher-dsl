@@ -27,14 +27,16 @@ public class IterablePredicateExpression
     extends PredicateExpression
 {
     public String function;
-    public String name;
+    public Identifier name;
     public Expression iterable;
     public PredicateExpression predicate;
 
     @Override
     public void asString( StringBuilder builder )
     {
-        builder.append( function ).append( '(' ).append( name ).append( " IN " );
+        builder.append( function ).append( '(' );
+        name.asString( builder );
+        builder.append( " IN " );
         iterable.asString( builder );
         builder.append( " WHERE " );
         predicate.asString( builder );

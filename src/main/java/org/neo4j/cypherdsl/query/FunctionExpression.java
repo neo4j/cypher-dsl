@@ -102,7 +102,7 @@ public class FunctionExpression
     public static class Extract
         extends Expression
     {
-        public String name;
+        public Identifier name;
         public Expression iterable;
         public Expression expression;
 
@@ -110,7 +110,8 @@ public class FunctionExpression
         public void asString( StringBuilder builder )
         {
             builder.append( "extract" ).append( '(' );
-            builder.append( name ).append( " IN " );
+            name.asString( builder );
+            builder.append( " IN " );
             iterable.asString( builder );
             builder.append( ":" );
             expression.asString( builder );
@@ -122,7 +123,7 @@ public class FunctionExpression
     public static class Filter
         extends Expression
     {
-        public String name;
+        public Identifier name;
         public Expression iterable;
         public PredicateExpression predicate;
 
@@ -130,7 +131,8 @@ public class FunctionExpression
         public void asString( StringBuilder builder )
         {
             builder.append( "filter" ).append( '(' );
-            builder.append( name ).append( " IN " );
+            name.asString( builder );
+            builder.append( " IN " );
             iterable.asString( builder );
             builder.append( ":" );
             predicate.asString( builder );

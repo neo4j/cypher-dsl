@@ -53,7 +53,7 @@ public class CypherQueryTest
         // Error handling
         try
         {
-            start(node( null, 0 ));
+            start(node( "", 0 ));
             Assert.fail( "Expected exception" );
         }
         catch( Exception e )
@@ -101,7 +101,7 @@ public class CypherQueryTest
         // Error handling
         try
         {
-            start(relationship( null, 0 ));
+            start(relationship( "", 0 ));
             Assert.fail( "Expected exception");
         }
         catch( Exception e )

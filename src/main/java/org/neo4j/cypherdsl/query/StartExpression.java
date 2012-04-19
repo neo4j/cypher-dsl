@@ -30,7 +30,7 @@ public abstract class StartExpression
     extends Expression
     implements AsString, Serializable,Cloneable
 {
-    public String name;
+    public Identifier name;
 
     public static class AllNodes
         extends Expression
@@ -49,7 +49,8 @@ public abstract class StartExpression
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=node(" );
+            name.asString( builder );
+            builder.append( "=node(" );
             for( int i = 0; i < nodes.length; i++ )
             {
                 Expression node = nodes[ i ];
@@ -64,13 +65,16 @@ public abstract class StartExpression
     public static class StartNodesLookup
         extends StartExpression
     {
-        public String index;
+        public Identifier index;
         public Identifier key;
         public Expression value;
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=node:" ).append( index ).append( '(' );
+            name.asString( builder );
+            builder.append( "=node:" );
+            index.asString( builder );
+            builder.append( '(' );
             key.asString( builder );
             builder.append( "=" );
             value.asString( builder );
@@ -81,13 +85,15 @@ public abstract class StartExpression
     public static class StartNodesQuery
         extends StartExpression
     {
-        public String index;
+        public Identifier index;
         public String query;
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=node:" ).append( index ).append( "(\"" ).
-                append( query ).append( "\")" );
+            name.asString( builder );
+            builder.append( "=node:" );
+            index.asString( builder );
+            builder.append( "(\"" ).append( query).append( "\")" );
         }
     }
 
@@ -98,7 +104,8 @@ public abstract class StartExpression
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=relationship(" );
+            name.asString( builder );
+            builder.append( "=relationship(" );
             for( int i = 0; i < relationships.length; i++ )
             {
                 Expression rel = relationships[ i ];
@@ -117,20 +124,24 @@ public abstract class StartExpression
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=relationship({" ).append( parameter ).append( "})" );
+            name.asString( builder );
+            builder.append( "=relationship({" ).append( parameter ).append( "})" );
         }
     }
 
     public static class StartRelationshipsIndex
         extends StartExpression
     {
-        public String index;
+        public Identifier index;
         public Identifier key;
-        public Expression value;
+        public Literal value;
 
         public void asString(StringBuilder builder)
         {
-            builder.append( name ).append( "=relationship:" ).append( index ).append( '(' );
+            name.asString( builder );
+            builder.append( "=relationship:" );
+            index.asString( builder );
+            builder.append( '(' );
             key.asString( builder );
             builder.append( '=' );
             value.asString( builder );
