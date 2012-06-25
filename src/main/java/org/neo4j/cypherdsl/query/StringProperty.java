@@ -44,14 +44,14 @@ public class StringProperty
         return regexp1;
     }
 
-    public FunctionExpression add(Expression expression)
+    public FunctionExpression concat(Object value)
     {
-        Query.checkNull( expression, "Expression" );
+        Query.checkNull( value, "Expression" );
 
         BinaryOperatorExpression function = new BinaryOperatorExpression();
         function.operator = "+";
         function.left = this;
-        function.right = expression;
+        function.right = value instanceof Expression ? (Expression) value : CypherQuery.literal( value );
         return function;
     }
 }

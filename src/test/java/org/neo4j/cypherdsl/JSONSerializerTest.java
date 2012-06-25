@@ -26,7 +26,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypherdsl.result.JSONSerializer;
-import org.neo4j.cypherdsl.result.NameResolver;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.GraphDescription;
@@ -35,9 +34,6 @@ import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.MatchExpression.*;
-import static org.neo4j.cypherdsl.query.ReturnExpression.*;
-import static org.neo4j.cypherdsl.query.StartExpression.*;
 
 /**
  * TODO
@@ -62,18 +58,11 @@ public class JSONSerializerTest
 
         JSONSerializer serializer = new JSONSerializer();
         String query = start(lookup("john", "node_auto_index", "name", "John")).
-                        match(path().from("john").out("friend").link().out("friend").to("fof")).
-                        returns(identifier("john").property( "name"), identifier("fof").property( "name"), identifier("john"), count())
+                        match( path().from( "john" ).out( "friend" ).link().out( "friend" ).to( "fof" ) ).
+                        returns( exp( identifier( "john" ).property( "name" ) ).as( "name" ), exp( identifier( "fof" ).property( "name" ) )
+                            .as( "friend" ), identifier( "john" ), count().as( "count" ) )
                         .toString();
         String json = serializer.toJSON( engine.execute(query) ).toString();
-        System.out.println( json );
-
-        // Now replace names to make it prettier
-        json = serializer.toJSON( new NameResolver().
-                replace("john.name", "name").
-                replace("fof.name", "friend").
-                replace("count(*)", "count").
-                replace("john", "node").map(engine.execute( query ))  ).toString();
         System.out.println( json );
     }
 

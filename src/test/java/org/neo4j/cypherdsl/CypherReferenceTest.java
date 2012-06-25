@@ -19,6 +19,7 @@
  */
 package org.neo4j.cypherdsl;
 
+import java.util.HashMap;
 import org.junit.Test;
 import org.neo4j.cypherdsl.query.Identifier;
 import org.neo4j.cypherdsl.query.Query;
@@ -32,7 +33,7 @@ import static org.neo4j.cypherdsl.query.Order.*;
  */
 public class CypherReferenceTest
 {
-    public static final String CYPHER="CYPHER 1.7 ";
+    public static final String CYPHER="CYPHER 1.8 ";
 
     @Test
     public void test15_6_1()
@@ -97,7 +98,7 @@ public class CypherReferenceTest
     {
         assertEquals( CYPHER+"START n=node(3) MATCH (n)--(x) RETURN x",
                       start( node( "n", 3 ) ).
-                          match( path().from( "n" ).to( "x" ) ).
+                          match( path().from( "n" ).both( ).to( "x" ) ).
                           returns( identifier( "x" ) ).
                           toString() );
     }
@@ -794,6 +795,146 @@ public class CypherReferenceTest
                                                                                                                       .subtract( identifier( "c" )
                                                                                                                                      .property( "age" ) ) ) ).
                           toString() );
+    }
+
+    @Test
+    public void test16_17_1()
+    {
+        assertEquals( CYPHER+"START david=node(1) MATCH (david)-[otherPerson]->() WITH otherPerson,count(*) AS foaf WHERE foaf>1 RETURN otherPerson",
+                      start( node( "david", 1 ) ).
+                      match( path().from( "david" ).out( ).as( "otherPerson" ) ).
+                      with(identifier( "otherPerson" ), count().as( "foaf" )).
+                      where( number( "foaf" ).gt( literal( 1 ) ) ).
+                      returns( identifier( "otherPerson" ) ).
+                      toString());
+    }
+
+
+
+    @Test
+    public void test16_18_1()
+    {
+        assertEquals( CYPHER + "CREATE (n)",
+                      create( path().from( "n" ) ).toString() );
+    }
+
+    @Test
+    public void test16_18_2()
+    {
+        assertEquals( CYPHER+"CREATE (n {name:\"Andres\",title:\"Developer\"})",
+                      create(path( ).from( identifier( "n" ), value( "name", literal( "Andres" )), value( "title", literal( "Developer" ) ) )).toString());
+    }
+
+    @Test
+    public void test16_18_3()
+    {
+        assertEquals( CYPHER+"CREATE (a {name:\"Andres\"}) RETURN a",
+                      create(path( ).from( "a", value("name", literal( "Andres" ) ) )).returns( identifier( "a" ) ).toString());
+    }
+
+    @Test
+    public void test16_18_4()
+    {
+        assertEquals( CYPHER+"START a=node(1),b=node(2) CREATE (a)-[r:REL]->(b) RETURN r",
+                      start( node( "a", 1 ), node( "b", 2 ) ).create(path( ).from( "a" ).out( "REL" ).as( identifier( "r" ) ).to( identifier( "b" ) ) ).returns( identifier( "r" ) ).toString());
+    }
+
+    @Test
+    public void test16_18_5()
+    {
+        assertEquals( CYPHER + "START a=node(1),b=node(2) CREATE (a)-[r:REL {name:a.name+\"<->\"+b.name}]->(b) RETURN r",
+                      start( node( "a", 1 ), node( "b", 2 ) ).create( path().from( "a" )
+                                                                          .out( identifier("REL"), value( "name", identifier( "a" )
+                                                                              .string( "name" )
+                                                                              .concat( "<->" )
+                                                                              .concat( identifier( "b" ).string( "name" ) ) ) )
+                                                                          .as( "r" )
+                                                                          .to( identifier( "b" ) ) )
+                          .returns( identifier( "r" ) ).toString() );
+    }
+
+    @Test
+    public void test16_18_6()
+    {
+        assertEquals( CYPHER+"CREATE (andres {name:\"Andres\"})-[:WORKS_AT]->(neo)<-[:WORKS_AT]-(michael {name:\"Michael\"}) RETURN andres,michael",
+                      create(path( ).from( "andres", value("name", literal( "Andres" ) ) ).out( "WORKS_AT" ).to( identifier( "neo" ) ).link().in( "WORKS_AT" ).to( "michael", value("name", literal( "Michael" )) )).returns( identifier( "andres" ), identifier( "michael" ) ).toString());
+    }
+
+    @Test
+    public void test16_18_7()
+    {
+        assertEquals( CYPHER+"CREATE (node {props})",
+                      create(path().from( "node", param( "props" ) )).toString());
+    }
+
+    @Test
+    public void test16_19_1()
+    {
+        assertEquals( CYPHER+"START n=node(4) DELETE n",
+                      start( node( "n", 4 ) ).delete( identifier( "n" ) ).toString());
+    }
+
+    @Test
+    public void test16_19_2()
+    {
+        assertEquals( CYPHER+"START n=node(3) MATCH (n)-[r]-() DELETE n,r",
+                      start( node( "n",3 ) ).match( path( ).from( "n" ).both( ).as( "r" ) ).delete( identifier( "n" ), identifier( "r" ) ).toString() );
+    }
+
+    @Test
+    public void test16_19_3()
+    {
+        assertEquals( CYPHER+"START andres=node(3) DELETE andres.age RETURN andres",
+                      start( node( "andres", 3 ) ).delete( identifier( "andres" ).property( "age" ) ).returns( identifier( "andres" ) ).toString());
+    }
+
+    @Test
+    public void test16_20_1()
+    {
+        assertEquals( CYPHER+"START n=node(2) SET n.surname=\"Taylor\" RETURN n",
+                      start( node( "n", 2 ) ).set(property( identifier( "n" ).property( "surname" ), literal( "Taylor" ))).returns( identifier( "n" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_1()
+    {
+        assertEquals( CYPHER+"START left=node(1),right=node(3,4) RELATE (left)-[r:KNOWS]->(right) RETURN r",
+                      start( node( "left", 1 ), node( "right", 3,4 ) ).relate(path().from( "left" ).out( "KNOWS" ).as( "r" ).to( "right" )).returns( identifier( "r" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_2()
+    {
+        assertEquals( CYPHER+"START root=node(2) RELATE (root)-[:LOVES]-(someone) RETURN someone",
+                      start( node( "root", 2 ) ).relate( path(  ).from( "root").both( "LOVES" ).to( "someone" ) ).returns( identifier( "someone" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_3()
+    {
+        assertEquals( CYPHER+"START root=node(2) RELATE (root)-[:X]-(leaf {name:\"D\"}) RETURN leaf",
+                      start( node( "root", 2 ) ).relate( path(  ).from( "root" ).both( "X" ).to( identifier( "leaf" ), value("name", literal( "D" )) ) ).returns( identifier( "leaf" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_4()
+    {
+        assertEquals( CYPHER+"START root=node(2) RELATE (root)-[r:X {since:\"forever\"}]-() RETURN r",
+                      start( node( "root", 2 ) ).relate( path(  ).from( "root" ).both( identifier("X"), value("since", literal( "forever" )) ).as( "r" ) ).returns( identifier( "r" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_5()
+    {
+        assertEquals( CYPHER+"START root=node(2) RELATE (root)-[:FOO]->(x),(root)-[:BAR]->(x) RETURN x",
+                      start( node( "root", 2 ) ).relate( path( ).from( "root" ).out( "FOO" ).to( "x" ), path( ).from( "root" ).out( "BAR" ).to( "x" ) ).returns( identifier( "x" ) ) .toString());
+    }
+
+    @Test
+    public void test16_22_1()
+    {
+        assertEquals( CYPHER+"START begin=node(2),end=node(1) MATCH p=(begin)-->(end) FOREACH(n in nodes(p): SET n.marked=true)",
+                      start( node( "begin", 2 ), node( "end", 1 ) ).match( path( "p" ).from( "begin" ).out( ).to("end" )).forEach(identifier("n"), nodes( identifier( "p" ) )).set(property( identifier( "n" ).property( "marked" ), literal( true )) ).toString());
     }
 
     // Cookbook

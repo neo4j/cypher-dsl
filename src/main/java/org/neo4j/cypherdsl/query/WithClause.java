@@ -17,17 +17,30 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Predicate;
-import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.Where;
+package org.neo4j.cypherdsl.query;
+
+import java.util.ArrayList;
 
 /**
  * TODO
  */
-public interface QueryDSLWhere
-    extends Where
+public class WithClause
+    extends Clause
 {
-    QueryDSLWhere where( Predicate predicate );
+    private ArrayList<Expression> expressions = new ArrayList<Expression>();
+
+    public WithClause( Iterable<Expression> expressions )
+    {
+        for( Expression expression : expressions )
+        {
+            this.expressions.add( expression );
+        }
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        clauseAsString( builder, "WITH", expressions, "," );
+    }
 }

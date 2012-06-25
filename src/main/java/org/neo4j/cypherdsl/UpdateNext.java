@@ -17,17 +17,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Predicate;
-import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.Where;
+package org.neo4j.cypherdsl;
 
 /**
  * TODO
  */
-public interface QueryDSLWhere
-    extends Where
+public interface UpdateNext
+    extends Create,Set,Delete,Relate, ForEach, With, Return
 {
-    QueryDSLWhere where( Predicate predicate );
 }

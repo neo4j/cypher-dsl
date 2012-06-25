@@ -26,7 +26,7 @@ import org.neo4j.cypherdsl.query.PredicateExpression;
  * invocations of where() will cause the expressions to be AND'ed together
  */
 public interface Where
-    extends Return
+    extends With, Return
 {
     Where where(PredicateExpression expression);
 }

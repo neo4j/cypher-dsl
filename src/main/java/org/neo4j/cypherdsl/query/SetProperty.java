@@ -17,17 +17,29 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Predicate;
-import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.Where;
+package org.neo4j.cypherdsl.query;
 
 /**
- * TODO
+ * Represents a property being assigned to a value
  */
-public interface QueryDSLWhere
-    extends Where
+public class SetProperty
+    implements AsString
 {
-    QueryDSLWhere where( Predicate predicate );
+    private Property<?> property;
+    private Expression value;
+
+    public SetProperty( Property<?> property, Expression value )
+    {
+        this.property = property;
+        this.value = value;
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        property.asString( builder );
+        builder.append( '=' );
+        value.asString( builder );
+    }
 }

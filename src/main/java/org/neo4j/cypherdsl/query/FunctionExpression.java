@@ -62,6 +62,17 @@ public class FunctionExpression
         return binaryPredicate( "<>", value );
     }
 
+    public BinaryOperatorExpression concat(Object value)
+    {
+        Query.checkNull( value, "Value" );
+
+        BinaryOperatorExpression boe = new BinaryOperatorExpression();
+        boe.left = this;
+        boe.operator = "+";
+        boe.right = value instanceof Expression ? (Expression) value : CypherQuery.literal( value );
+        return boe;
+    }
+
     private BinaryPredicateExpression binaryPredicate( String operator, Object value )
     {
         Query.checkNull( value, "Value" );

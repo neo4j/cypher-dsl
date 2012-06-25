@@ -17,17 +17,33 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Predicate;
-import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.Where;
+package org.neo4j.cypherdsl.query;
+
+import java.io.Serializable;
+import java.util.List;
 
 /**
- * TODO
+ * Base class for all clauses
  */
-public interface QueryDSLWhere
-    extends Where
+public abstract class Clause
+    implements AsString, Serializable, Cloneable
 {
-    QueryDSLWhere where( Predicate predicate );
+    protected void clauseAsString( StringBuilder builder, String name, List<? extends AsString> asStringList, String separator )
+    {
+        if (!asStringList.isEmpty())
+        {
+            if (builder.length() > 0)
+                builder.append( ' ' );
+            builder.append( name ).append( ' ' );
+
+            for( int i = 0; i < asStringList.size(); i++ )
+            {
+                AsString asString = asStringList.get( i );
+                if (i > 0)
+                    builder.append( separator );
+                asString.asString( builder );
+            }
+        }
+    }
 }

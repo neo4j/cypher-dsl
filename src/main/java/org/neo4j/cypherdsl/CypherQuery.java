@@ -20,26 +20,44 @@
 package org.neo4j.cypherdsl;
 
 
+import java.util.Arrays;
+import org.neo4j.cypherdsl.query.AbstractPath;
 import org.neo4j.cypherdsl.query.BinaryPredicateExpression;
 import org.neo4j.cypherdsl.query.BooleanExpression;
+import org.neo4j.cypherdsl.query.CreateClause;
+import org.neo4j.cypherdsl.query.DeleteClause;
 import org.neo4j.cypherdsl.query.Expression;
+import org.neo4j.cypherdsl.query.ForEachClause;
 import org.neo4j.cypherdsl.query.FunctionExpression;
 import org.neo4j.cypherdsl.query.Has;
 import org.neo4j.cypherdsl.query.Identifier;
 import org.neo4j.cypherdsl.query.IsNotNull;
 import org.neo4j.cypherdsl.query.IsNull;
 import org.neo4j.cypherdsl.query.IterablePredicateExpression;
+import org.neo4j.cypherdsl.query.LimitClause;
 import org.neo4j.cypherdsl.query.Literal;
+import org.neo4j.cypherdsl.query.MatchClause;
 import org.neo4j.cypherdsl.query.MatchExpression;
 import org.neo4j.cypherdsl.query.NumberProperty;
 import org.neo4j.cypherdsl.query.Order;
+import org.neo4j.cypherdsl.query.OrderByClause;
 import org.neo4j.cypherdsl.query.OrderByExpression;
 import org.neo4j.cypherdsl.query.Parameter;
+import org.neo4j.cypherdsl.query.Path;
 import org.neo4j.cypherdsl.query.PredicateExpression;
+import org.neo4j.cypherdsl.query.Property;
+import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.Query;
+import org.neo4j.cypherdsl.query.RelateClause;
+import org.neo4j.cypherdsl.query.ReturnClause;
 import org.neo4j.cypherdsl.query.ReturnExpression;
+import org.neo4j.cypherdsl.query.SetClause;
+import org.neo4j.cypherdsl.query.SetProperty;
+import org.neo4j.cypherdsl.query.SkipClause;
+import org.neo4j.cypherdsl.query.StartClause;
 import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.StringProperty;
+import org.neo4j.cypherdsl.query.WhereClause;
 import org.neo4j.cypherdsl.query.WhereExpression;
 import java.util.Collections;
 import java.util.HashMap;
@@ -49,6 +67,7 @@ import static org.neo4j.cypherdsl.query.FunctionExpression.Extract;
 import static org.neo4j.cypherdsl.query.Query.*;
 
 import org.neo4j.cypherdsl.query.Regexp;
+import org.neo4j.cypherdsl.query.WithClause;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -70,10 +89,16 @@ public class CypherQuery
      * @param startExpressions list of start expressions
      * @return Grammar for Match clause
      */
-    public static Match start( StartExpression... startExpressions )
+    public static StartNext start( StartExpression... startExpressions )
     {
         CypherQuery query = new CypherQuery();
         return query.starts( startExpressions );
+    }
+
+    public static UpdateNext create(AbstractPath<?>... paths)
+    {
+        CypherQuery query = new CypherQuery(  );
+        return query.creates(paths);
     }
 
     /**
@@ -231,7 +256,7 @@ public class CypherQuery
         for( int i = 0; i < values.length; i++ )
         {
             String value = values[ i ];
-            identifiers[i] = identifier(value);
+            identifiers[i] = identifier( value );
         }
         return identifiers;
     }
@@ -265,9 +290,24 @@ public class CypherQuery
         for( int i = 0; i < values.length; i++ )
         {
             Object value = values[ i ];
-            literals[i] = literal(value);
+            literals[i] = literal( value );
         }
         return literals;
+    }
+
+    public static SetProperty property(Property<?> property, Expression value )
+    {
+        return new SetProperty( property, value );
+    }
+
+    public static PropertyValue value(String id, Expression value )
+    {
+        return new PropertyValue( identifier( id), value );
+    }
+
+    public static PropertyValue value(Identifier id, Expression value )
+    {
+        return new PropertyValue( id, value );
     }
 
     /**
@@ -477,12 +517,12 @@ public class CypherQuery
     /**
      * START clause. Use this with Java initialization block style.
      *
-     * @param startExpression
+     * @param startExpressions
      * @return
      */
-    protected Match starts( StartExpression... startExpression )
+    protected StartNext starts( StartExpression... startExpressions )
     {
-        Collections.addAll(query.startExpressions, startExpression);
+        query.add( new StartClause( Arrays.asList( startExpressions) ));
 
         return new Grammar();
     }
@@ -490,15 +530,19 @@ public class CypherQuery
     /**
      * START clause. Use this with Java initialization block style.
      *
-     * @param startExpression
+     * @param startExpressions
      * @return
      */
-    protected Match starts( Iterable<StartExpression> startExpression )
+    protected StartNext starts( Iterable<StartExpression> startExpressions )
     {
-        for (StartExpression expression : startExpression)
-        {
-            query.startExpressions.add(expression);
-        }
+        query.add( new StartClause( startExpressions ));
+
+        return new Grammar();
+    }
+
+    protected UpdateNext creates(AbstractPath<?>... paths)
+    {
+        query.add( new CreateClause( Arrays.asList( paths )));
 
         return new Grammar();
     }
@@ -534,8 +578,10 @@ public class CypherQuery
 
         for( long i : id )
         {
-            if (i < 0)
+            if( i < 0 )
+            {
                 throw new IllegalArgumentException( "Id may not be below zero" );
+            }
         }
 
         StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
@@ -726,8 +772,10 @@ public class CypherQuery
 
         for( long i : id )
         {
-            if (i < 0)
+            if( i < 0 )
+            {
                 throw new IllegalArgumentException( "Id may not be below zero" );
+            }
         }
 
         StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
@@ -818,13 +866,13 @@ public class CypherQuery
 
     // Match --------------------------------------------------------
     /**
-     * Declare a path for MATCH clauses
+     * Declare a path for MATCH or CREATE clauses
      *
      * @return
      */
-    public static MatchExpression.Path path()
+    public static Path path()
     {
-        return new MatchExpression.Path();
+        return new Path();
     }
 
     /**
@@ -833,7 +881,7 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static MatchExpression.Path path(String name)
+    public static Path path(String name)
     {
         return path(identifier( name ));
     }
@@ -844,10 +892,10 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static MatchExpression.Path path(Identifier name)
+    public static Path path(Identifier name)
     {
         checkNull( name, "Name" );
-        MatchExpression.Path path = new MatchExpression.Path();
+        Path path = new Path();
         path.pathName = name;
         return path;
     }
@@ -1344,8 +1392,10 @@ public class CypherQuery
      */
     public static FunctionExpression coalesce(Expression... expressions)
     {
-        if (expressions.length < 1)
-            throw new IllegalArgumentException("At least one expression must be provided to coalesce function");
+        if( expressions.length < 1 )
+        {
+            throw new IllegalArgumentException( "At least one expression must be provided to coalesce function" );
+        }
 
         FunctionExpression coalesce = new FunctionExpression();
         coalesce.name = "coalesce";
@@ -1598,23 +1648,81 @@ public class CypherQuery
 
     // Grammar
     protected class Grammar
-        implements Match, ReturnNext, OrderBy, Skip, Limit, Execute
+        implements StartNext, With, WithNext, Create, Set, Delete, Relate, UpdateNext, Match, ReturnNext, OrderBy, Skip, Limit, Execute
     {
+        // With ---------------------------------------------------------
+        public WithNext with(Expression... withExpressions)
+        {
+            query.add( new WithClause( Arrays.asList( withExpressions ) ) );
+
+            return this;
+        }
+
+        // Create -------------------------------------------------------
+        @Override
+        public UpdateNext create( AbstractPath<?>... paths )
+        {
+            query.add( new CreateClause( Arrays.asList( paths ) ) );
+
+            return this;
+        }
+
+        // Set ----------------------------------------------------------
+        @Override
+        public UpdateNext set( SetProperty... propertyValues )
+        {
+            query.add(new SetClause( Arrays.asList( propertyValues ) ));
+
+            return this;
+        }
+
+        // Delete -------------------------------------------------------
+        @Override
+        public UpdateNext delete( Expression... expressions )
+        {
+            query.add( new DeleteClause( Arrays.asList( expressions ) ));
+
+            return this;
+        }
+
+        // Relate -------------------------------------------------------
+        @Override
+        public UpdateNext relate( AbstractPath<?>... expressions )
+        {
+            query.add( new RelateClause(Arrays.asList( expressions )) );
+
+            return this;
+        }
+
+        // For each -----------------------------------------------------
+        @Override
+        public ForEachExpression forEach( Identifier id, Expression in )
+        {
+            ForEachClause clause = new ForEachClause( id, in );
+            query.add(clause);
+            return new ForEachExpression(clause, this);
+        }
+
+        // Start --------------------------------------------------------
+
+        @Override
+        public StartNext starts( StartExpression... startExpression )
+        {
+            return this;
+        }
+
         // Match --------------------------------------------------------
         @Override
-        public Match match( MatchExpression... expression )
+        public Match match( MatchExpression... expressions )
         {
-            Collections.addAll(query.matchExpressions, expression);
+            query.add( new MatchClause( Arrays.asList( expressions ) ) );
             return this;
         }
 
         @Override
         public Match match(Iterable<MatchExpression> expressions)
         {
-            for (MatchExpression expression : expressions)
-            {
-                query.matchExpressions.add(expression);
-            }
+            query.add( new MatchClause(expressions) );
             return this;
         }
 
@@ -1623,7 +1731,7 @@ public class CypherQuery
         public Where where( PredicateExpression expression )
         {
             Query.checkNull( expression, "Expression" );
-            query.whereExpressions.add( expression );
+            query.add( new WhereClause(expression) );
             return this;
         }
 
@@ -1631,26 +1739,14 @@ public class CypherQuery
         @Override
         public ReturnNext returns( Expression... returnExpressions )
         {
-            for( Expression expression : returnExpressions )
-            {
-                if (expression instanceof ReturnExpression<?>)
-                    query.returnExpressions.add( (ReturnExpression) expression);
-                else
-                    query.returnExpressions.add( exp( expression ) );
-            }
+            query.add( new ReturnClause(Arrays.asList( returnExpressions) ));
             return this;
         }
 
         @Override
         public ReturnNext returns(Iterable<Expression> returnExpressions)
         {
-            for( Expression expression : returnExpressions )
-            {
-                if (expression instanceof ReturnExpression<?>)
-                    query.returnExpressions.add( (ReturnExpression) expression);
-                else
-                    query.returnExpressions.add( exp( expression ) );
-            }
+            query.add( new ReturnClause(returnExpressions ));
             return this;
         }
 
@@ -1658,34 +1754,14 @@ public class CypherQuery
         @Override
         public OrderBy orderBy( Expression... orderByExpressions )
         {
-            for( Expression byExpression : orderByExpressions )
-            {
-                if( byExpression instanceof OrderByExpression )
-                {
-                    query.orderByExpressions.add( (OrderByExpression) byExpression );
-                }
-                else
-                {
-                    query.orderByExpressions.add( order( byExpression ) );
-                }
-            }
+            query.add( new OrderByClause( Arrays.asList( orderByExpressions ) ) );
             return this;
         }
 
         @Override
         public OrderBy orderBy(Iterable<Expression> orderByExpressions)
         {
-            for( Expression byExpression : orderByExpressions )
-            {
-                if( byExpression instanceof OrderByExpression )
-                {
-                    query.orderByExpressions.add( (OrderByExpression) byExpression );
-                }
-                else
-                {
-                    query.orderByExpressions.add( order( byExpression ) );
-                }
-            }
+            query.add( new OrderByClause( orderByExpressions ) );
             return this;
         }
 
@@ -1698,7 +1774,7 @@ public class CypherQuery
                 throw new IllegalArgumentException( "Skip may not be below zero" );
             }
 
-            query.skip = skip;
+            query.add( new SkipClause( skip ) );
             return this;
         }
 
@@ -1711,7 +1787,7 @@ public class CypherQuery
                 throw new IllegalArgumentException( "Limit may not be below zero" );
             }
 
-            query.limit = limit;
+            query.add( new LimitClause( limit ) );
             return this;
         }
 

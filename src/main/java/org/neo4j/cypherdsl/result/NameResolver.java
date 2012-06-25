@@ -26,7 +26,10 @@ import java.util.Map;
 
 /**
 * Helps translating names in ExecutionResult to other names more suitable for JSON output or POJO mapping.
+ *
+ * Deprecated: not needed since 1.8 introduces AS for return column renaming
 */
+@Deprecated
 public class NameResolver
     extends HashMap<String, String>
 {

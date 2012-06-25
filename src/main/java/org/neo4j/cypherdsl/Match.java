@@ -27,7 +27,7 @@ import org.neo4j.cypherdsl.query.MatchExpression;
  * provided for a single query.
  */
 public interface Match
-    extends Where
+    extends Where, Delete, ForEach
 {
     Match match(MatchExpression... expression);
     Match match(Iterable<MatchExpression> expressions);

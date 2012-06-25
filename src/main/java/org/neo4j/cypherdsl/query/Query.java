@@ -71,18 +71,35 @@ public class Query
         }
     }
 
-    public ArrayList<StartExpression> startExpressions = new ArrayList<StartExpression>();
-    public ArrayList<MatchExpression> matchExpressions = new ArrayList<MatchExpression>();
-    public ArrayList<PredicateExpression> whereExpressions = new ArrayList<PredicateExpression>();
-    public ArrayList<ReturnExpression> returnExpressions = new ArrayList<ReturnExpression>();
-    public ArrayList<OrderByExpression> orderByExpressions = new ArrayList<OrderByExpression>();
-    public Integer skip;
-    public Integer limit;
+    private ArrayList<Clause> clauses = new ArrayList<Clause>(  );
+
+    public void add(Clause clause)
+    {
+        // Check if we should merge to consecutive WHERE clauses
+        if (!clauses.isEmpty() && clause instanceof WhereClause)
+        {
+            Clause previousClause = clauses.get( clauses.size() - 1 );
+            if ( previousClause instanceof WhereClause )
+            {
+                WhereClause previousWhere = (WhereClause) previousClause;
+                previousWhere.mergeWith((WhereClause)clause);
+                return;
+            }
+        }
+
+        clauses.add( clause );
+    }
 
     public void asString(StringBuilder builder)
     {
-        builder.append( "CYPHER 1.7" );
+        builder.append( "CYPHER 1.8" );
 
+        for( Clause clause : clauses )
+        {
+            clause.asString( builder );
+        }
+
+/*
         clause( builder, "START", startExpressions,"," );
         clause( builder, "MATCH", matchExpressions,"," );
         clause( builder, "WHERE", whereExpressions," AND " );
@@ -95,6 +112,7 @@ public class Query
 
         if (limit != null)
             builder.append( " LIMIT " ).append( limit );
+*/
     }
 
     @Override
@@ -102,30 +120,8 @@ public class Query
         throws CloneNotSupportedException
     {
         Query query = (Query) super.clone();
-        query.startExpressions = (ArrayList<StartExpression>) query.startExpressions.clone();
-        query.matchExpressions = (ArrayList<MatchExpression>) query.matchExpressions.clone();
-        query.whereExpressions = (ArrayList<PredicateExpression>) query.whereExpressions.clone();
-        query.returnExpressions = (ArrayList<ReturnExpression>) query.returnExpressions.clone();
-        query.orderByExpressions = (ArrayList<OrderByExpression>) query.orderByExpressions.clone();
+        query.clauses = (ArrayList<Clause>) query.clauses.clone();
         return query;
-    }
-
-    private void clause( StringBuilder builder, String name, List<? extends AsString> asStringList, String separator )
-    {
-        if (!asStringList.isEmpty())
-        {
-            if (builder.length() > 0)
-                builder.append( ' ' );
-            builder.append( name ).append( ' ' );
-
-            for( int i = 0; i < asStringList.size(); i++ )
-            {
-                AsString asString = asStringList.get( i );
-                if (i > 0)
-                    builder.append( separator );
-                asString.asString( builder );
-            }
-        }
     }
 
     @Override

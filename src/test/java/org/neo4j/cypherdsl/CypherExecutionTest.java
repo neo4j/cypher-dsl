@@ -19,7 +19,6 @@
  */
 package org.neo4j.cypherdsl;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Map;
 import org.junit.Before;
@@ -27,21 +26,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
-import org.neo4j.cypherdsl.query.StartExpression;
-import org.neo4j.cypherdsl.result.NameResolver;
 import org.neo4j.cypherdsl.result.Projection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.kernel.EmbeddedGraphDatabase;
 import org.neo4j.test.GraphDescription;
 import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.MatchExpression.*;
-import static org.neo4j.cypherdsl.query.ReturnExpression.*;
-import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.*;
+import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.node;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database.
@@ -93,12 +87,16 @@ public class CypherExecutionTest
         
         {
             Projection<Friend> projection = new Projection<Friend>(Friend.class);
-            Iterable<Friend> friends = projection.iterable( new NameResolver().
-                    replace("john.name", "name").
-                    replace("fof.name", "friend").map(engine.execute( start(node("john", john))
-                          .match(path().from("john").out("friend")
-                                  .link().out("friend").to("fof"))
-                          .returns(identifier("john").property( "name"), identifier("fof").property( "name")).toString())) );
+            Iterable<Friend> friends = projection.iterable( engine.execute( start( node( "john", john ) )
+                                                                                .match( path().from( "john" )
+                                                                                            .out( "friend" )
+                                                                                            .link()
+                                                                                            .out( "friend" )
+                                                                                            .to( "fof" ) )
+                                                                                .returns( exp( identifier( "john" ).property( "name" ) )
+                                                                                              .as( "name" ), exp( identifier( "fof" )
+                                                                                                                      .property( "name" ) )
+                                                                                    .as( "friend" ) ).toString() ));
             System.out.println( friends );
         }
     }

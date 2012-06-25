@@ -20,8 +20,9 @@
 package org.neo4j.cypherdsl.querydsl;
 
 import org.neo4j.cypherdsl.query.Direction;
+import org.neo4j.cypherdsl.query.Link;
 import org.neo4j.cypherdsl.query.MatchExpression;
-import org.neo4j.cypherdsl.query.Query;
+import org.neo4j.cypherdsl.query.Path;
 
 /**
  * Provides the possible expressions for the MATCH clause.
@@ -36,7 +37,7 @@ public abstract class QueryDSLMatchExpression
     }
 
     public static class QueryDSLPath
-        extends MatchExpression.Path<QueryDSLPath>
+        extends Path<QueryDSLPath>
     {
         public QueryDSLPath from(String from)
         {
@@ -64,7 +65,7 @@ public abstract class QueryDSLMatchExpression
     }
 
     public static class QueryDSLLink
-        extends MatchExpression.Link<QueryDSLLink>
+        extends Link<QueryDSLLink>
     {
         public QueryDSLLink to(com.mysema.query.types.Path<?> to)
         {

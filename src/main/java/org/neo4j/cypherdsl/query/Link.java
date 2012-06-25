@@ -17,17 +17,21 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Predicate;
-import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.Where;
+package org.neo4j.cypherdsl.query;
 
 /**
- * TODO
- */
-public interface QueryDSLWhere
-    extends Where
+* TODO
+*/
+public class Link<T extends Link>
+    extends AbstractPath<T>
 {
-    QueryDSLWhere where( Predicate predicate );
+    public AbstractPath leftPath;
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        leftPath.asString( builder );
+        super.asString( builder );
+    }
 }

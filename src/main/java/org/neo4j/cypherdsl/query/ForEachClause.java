@@ -17,17 +17,39 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.types.Predicate;
-import org.neo4j.cypherdsl.Return;
-import org.neo4j.cypherdsl.Where;
+package org.neo4j.cypherdsl.query;
 
 /**
  * TODO
  */
-public interface QueryDSLWhere
-    extends Where
+public class ForEachClause
+    extends Clause
 {
-    QueryDSLWhere where( Predicate predicate );
+    private final Identifier id;
+    private final Expression in;
+    private Clause clause;
+
+    public ForEachClause( Identifier id, Expression in )
+    {
+        this.id = id;
+        this.in = in;
+    }
+
+    public void execute(Clause clause)
+    {
+        this.clause = clause;
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        builder.append( " FOREACH(" );
+        id.asString( builder );
+        builder.append( " in " );
+        in.asString( builder );
+        builder.append( ":" );
+        clause.asString( builder );
+        builder.append( ')' );
+    }
 }
