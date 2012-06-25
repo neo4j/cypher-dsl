@@ -20,80 +20,59 @@
 
 package org.neo4j.cypherdsl.query;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import org.neo4j.cypherdsl.ForEachStatements;
 
 /**
  * TODO
  */
-public class ForEachClause
-    extends Clause
-    implements AsString, ForEachStatements
+public class ForEachStatement
+    implements ForEachStatements, AsString
 {
-    private final Identifier id;
-    private final Expression in;
-    private final List<AsString> forEachStatements = new ArrayList<AsString>(  );
+    private ForEachClause forEachClause;
 
-    public ForEachClause( Identifier id, Expression in )
+    public ForEachStatement( ForEachClause forEachClause )
     {
-        this.id = id;
-        this.in = in;
+        this.forEachClause = forEachClause;
     }
 
     public ForEachStatement create(AbstractPath<?>... paths)
     {
-        return new ForEachStatement(add( new CreateClause( Arrays.asList(paths) ) ) );
+        return new ForEachStatement( forEachClause.add(new CreateClause( Arrays.asList( paths ) )));
     }
 
     @Override
     public ForEachStatement set( SetProperty... setProperties )
     {
-        return new ForEachStatement(add( new SetClause( Arrays.asList(setProperties) ) ) );
+        return new ForEachStatement( forEachClause.add(new SetClause( Arrays.asList( setProperties ) )));
     }
 
     @Override
     public ForEachStatement delete( Expression... expressions )
     {
-        return new ForEachStatement(add( new DeleteClause( Arrays.asList(expressions) ) ) );
+        return new ForEachStatement( forEachClause.add(new DeleteClause( Arrays.asList( expressions ) )));
     }
 
     @Override
     public ForEachStatement relate( AbstractPath<?>... expressions )
     {
-        return new ForEachStatement(add( new RelateClause( Arrays.asList(expressions) ) ) );
+        return new ForEachStatement( forEachClause.add(new RelateClause( Arrays.asList( expressions ) )));
     }
 
     @Override
     public ForEachStatement forEach( ForEachStatement statement )
     {
-        return new ForEachStatement(add( statement ) );
-    }
-
-    ForEachClause add(AsString clause)
-    {
-        forEachStatements.add( clause );
-        return this;
+        return new ForEachStatement( forEachClause.add(statement.getClause()));
     }
 
     @Override
     public void asString( StringBuilder builder )
     {
-        builder.append( " FOREACH(" );
-        id.asString( builder );
-        builder.append( " in " );
-        in.asString( builder );
-        builder.append( ":" );
+        forEachClause.asString( builder );
+    }
 
-        String comma = "";
-        for( AsString forEachStatement : forEachStatements )
-        {
-            builder.append( comma );
-            forEachStatement.asString( builder );
-            comma = ",";
-        }
-
-        builder.append( ')' );
+    public Clause getClause()
+    {
+        return forEachClause;
     }
 }

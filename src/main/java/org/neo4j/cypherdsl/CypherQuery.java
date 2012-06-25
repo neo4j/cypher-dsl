@@ -19,8 +19,9 @@
  */
 package org.neo4j.cypherdsl;
 
-
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import org.neo4j.cypherdsl.query.AbstractPath;
 import org.neo4j.cypherdsl.query.BinaryPredicateExpression;
 import org.neo4j.cypherdsl.query.BooleanExpression;
@@ -28,6 +29,7 @@ import org.neo4j.cypherdsl.query.CreateClause;
 import org.neo4j.cypherdsl.query.DeleteClause;
 import org.neo4j.cypherdsl.query.Expression;
 import org.neo4j.cypherdsl.query.ForEachClause;
+import org.neo4j.cypherdsl.query.ForEachStatement;
 import org.neo4j.cypherdsl.query.FunctionExpression;
 import org.neo4j.cypherdsl.query.Has;
 import org.neo4j.cypherdsl.query.Identifier;
@@ -48,6 +50,7 @@ import org.neo4j.cypherdsl.query.PredicateExpression;
 import org.neo4j.cypherdsl.query.Property;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.Query;
+import org.neo4j.cypherdsl.query.Regexp;
 import org.neo4j.cypherdsl.query.RelateClause;
 import org.neo4j.cypherdsl.query.ReturnClause;
 import org.neo4j.cypherdsl.query.ReturnExpression;
@@ -59,15 +62,10 @@ import org.neo4j.cypherdsl.query.StartExpression;
 import org.neo4j.cypherdsl.query.StringProperty;
 import org.neo4j.cypherdsl.query.WhereClause;
 import org.neo4j.cypherdsl.query.WhereExpression;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.neo4j.cypherdsl.query.FunctionExpression.Extract;
-import static org.neo4j.cypherdsl.query.Query.*;
-
-import org.neo4j.cypherdsl.query.Regexp;
 import org.neo4j.cypherdsl.query.WithClause;
+
+import static org.neo4j.cypherdsl.query.FunctionExpression.*;
+import static org.neo4j.cypherdsl.query.Query.*;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -1139,6 +1137,11 @@ public class CypherQuery
         return orderBy;
     }
 
+    // For each -----------------------------------------------------
+    public static ForEachStatements in(Identifier id, Expression in)
+    {
+        return new ForEachClause( id, in );
+    }
 
     // Functions ----------------------------------------------------
     /**
@@ -1695,12 +1698,12 @@ public class CypherQuery
         }
 
         // For each -----------------------------------------------------
+
         @Override
-        public ForEachExpression forEach( Identifier id, Expression in )
+        public UpdateNext forEach( ForEachStatement statement )
         {
-            ForEachClause clause = new ForEachClause( id, in );
-            query.add(clause);
-            return new ForEachExpression(clause, this);
+            query.add( statement.getClause() );
+            return this;
         }
 
         // Start --------------------------------------------------------

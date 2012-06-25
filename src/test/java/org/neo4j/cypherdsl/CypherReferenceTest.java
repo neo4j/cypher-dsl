@@ -934,7 +934,10 @@ public class CypherReferenceTest
     public void test16_22_1()
     {
         assertEquals( CYPHER+"START begin=node(2),end=node(1) MATCH p=(begin)-->(end) FOREACH(n in nodes(p): SET n.marked=true)",
-                      start( node( "begin", 2 ), node( "end", 1 ) ).match( path( "p" ).from( "begin" ).out( ).to("end" )).forEach(identifier("n"), nodes( identifier( "p" ) )).set(property( identifier( "n" ).property( "marked" ), literal( true )) ).toString());
+                      start( node( "begin", 2 ), node( "end", 1 ) ).
+                      match( path( "p" ).from( "begin" ).out( ).to("end" )).
+                      forEach(in( identifier("n"), nodes( identifier( "p" ) )).
+                                set(property( identifier( "n" ).property( "marked" ), literal( true )) )).toString());
     }
 
     // Cookbook
