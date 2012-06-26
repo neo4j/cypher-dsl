@@ -24,21 +24,41 @@ package org.neo4j.cypherdsl.query;
 * TODO
 */
 public class Literal
-    extends Expression
+    extends Value
 {
-    public Object value;
-
-    @Override
-    public void asString( StringBuilder builder )
+    public Literal( Object value )
     {
-        if (value instanceof String)
+        super( new LiteralExpression(value) );
+    }
+
+    private static class LiteralExpression
+        extends AbstractExpression
+    {
+        public Object value;
+
+        private LiteralExpression( Object value )
         {
-            if (builder.toString().endsWith( "/" ) || builder.toString().endsWith( "(?i)" )) // -> Regexp with /literal/ or /(?i)literal/
-                builder.append( value.toString().replaceAll( "/","\\\\/" ) );
-            else
-                builder.append( "\"" ).append( value.toString().replaceAll( "/","\\\\/" ) ).append( "\"" );
+            this.value = value;
         }
-        else
-            builder.append( value.toString() );
+
+        @Override
+        public void asString( StringBuilder builder )
+        {
+            if (value instanceof String)
+            {
+                if (builder.toString().endsWith( "/" ) || builder.toString().endsWith( "(?i)" )) // -> Regexp with /literal/ or /(?i)literal/
+                    builder.append( value.toString().replaceAll( "/", "\\\\/" ) );
+                else
+                    builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"", "\\\"" ) ).append( "\"" );
+            }
+            else
+                builder.append( value.toString() );
+        }
+
+        @Override
+        public String toString()
+        {
+            return value.toString();
+        }
     }
 }

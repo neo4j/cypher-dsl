@@ -19,8 +19,6 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.MatchExpression;
-
 /**
  * Implements the MATCH clause. Use the MatchExpression static methods
  * to create expressions to be passed in here. Many MatchExpressions can be
@@ -29,6 +27,6 @@ import org.neo4j.cypherdsl.query.MatchExpression;
 public interface Match
     extends Where, Delete, ForEach
 {
-    Match match(MatchExpression... expression);
-    Match match(Iterable<MatchExpression> expressions);
+    Match match(PathExpression... expression);
+    Match match(Iterable<PathExpression> expressions);
 }

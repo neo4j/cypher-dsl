@@ -20,11 +20,13 @@
 
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Expression;
+
 /**
 * TODO
 */
 public class Regexp
-    extends PredicateExpression
+    extends AbstractExpression
 {
     public Expression left;
     public Expression regexp;

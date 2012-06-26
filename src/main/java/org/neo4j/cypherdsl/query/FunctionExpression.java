@@ -21,67 +21,25 @@
 package org.neo4j.cypherdsl.query;
 
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.NodeExpression;
+import org.neo4j.cypherdsl.NumericExpression;
+import org.neo4j.cypherdsl.PathExpression;
+import org.neo4j.cypherdsl.StringExpression;
 
 /**
- * Base class for all functions
+ * Expresses all functions of the form "f(exp)"
  */
 public class FunctionExpression
-    extends Expression
+    extends AbstractExpression
 {
     public String name;
     public Expression expression;
 
-    // Operators
-    public BinaryPredicateExpression eq(Object value)
+    public FunctionExpression( String name, Expression expression )
     {
-        return binaryPredicate( "=", value );
-    }
-
-    public BinaryPredicateExpression gt(Object value)
-    {
-        return binaryPredicate( ">", value );
-    }
-
-    public BinaryPredicateExpression lt(Object value)
-    {
-        return binaryPredicate( "<", value );
-    }
-
-    public BinaryPredicateExpression gte(Object value)
-    {
-        return binaryPredicate( ">=", value );
-    }
-
-    public BinaryPredicateExpression lte(Object value)
-    {
-        return binaryPredicate( ">=", value );
-    }
-
-    public BinaryPredicateExpression ne(Object value)
-    {
-        return binaryPredicate( "<>", value );
-    }
-
-    public BinaryOperatorExpression concat(Object value)
-    {
-        Query.checkNull( value, "Value" );
-
-        BinaryOperatorExpression boe = new BinaryOperatorExpression();
-        boe.left = this;
-        boe.operator = "+";
-        boe.right = value instanceof Expression ? (Expression) value : CypherQuery.literal( value );
-        return boe;
-    }
-
-    private BinaryPredicateExpression binaryPredicate( String operator, Object value )
-    {
-        Query.checkNull( value, "Value" );
-
-        BinaryPredicateExpression binaryPredicateExpression = new BinaryPredicateExpression();
-        binaryPredicateExpression.operator = operator;
-        binaryPredicateExpression.left = this;
-        binaryPredicateExpression.right = value instanceof Expression ? (Expression) value : CypherQuery.literal( value );
-        return binaryPredicateExpression;
+        this.name = name;
+        this.expression = expression;
     }
 
     @Override
@@ -90,64 +48,5 @@ public class FunctionExpression
         builder.append( name ).append( '(' );
         expression.asString( builder );
         builder.append( ')' );
-    }
-
-    public static class Expressions
-        extends Expression
-    {
-        public Expression[] expressions;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            for( int i = 0; i < expressions.length; i++ )
-            {
-                Expression expression = expressions[ i ];
-                if (i>0)
-                    builder.append( ',' );
-                expression.asString( builder );
-            }
-        }
-    }
-
-    public static class Extract
-        extends Expression
-    {
-        public Identifier name;
-        public Expression iterable;
-        public Expression expression;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( "extract" ).append( '(' );
-            name.asString( builder );
-            builder.append( " IN " );
-            iterable.asString( builder );
-            builder.append( ":" );
-            expression.asString( builder );
-            builder.append( ')' );
-        }
-
-    }
-
-    public static class Filter
-        extends Expression
-    {
-        public Identifier name;
-        public Expression iterable;
-        public PredicateExpression predicate;
-
-        @Override
-        public void asString( StringBuilder builder )
-        {
-            builder.append( "filter" ).append( '(' );
-            name.asString( builder );
-            builder.append( " IN " );
-            iterable.asString( builder );
-            builder.append( ":" );
-            predicate.asString( builder );
-            builder.append( ')' );
-        }
     }
 }

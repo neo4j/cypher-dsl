@@ -20,12 +20,10 @@
 
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.AbstractPath;
-
 /**
  * TODO
  */
 public interface Relate
 {
-    UpdateNext relate(AbstractPath<?>... expressions);
+    UpdateNext relate(PathExpression... expressions);
 }

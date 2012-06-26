@@ -20,16 +20,18 @@
 
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Expression;
+
 /**
  * Represents a property being assigned to a value
  */
 public class SetProperty
     implements AsString
 {
-    private Property<?> property;
+    private Property property;
     private Expression value;
 
-    public SetProperty( Property<?> property, Expression value )
+    public SetProperty( Property property, Expression value )
     {
         this.property = property;
         this.value = value;

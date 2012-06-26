@@ -20,12 +20,10 @@
 
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-
 /**
  * TODO
  */
 public interface Delete
 {
-    UpdateNext delete(Expression... expressions);
+    UpdateNext delete(ReferenceExpression... expressions);
 }

@@ -19,15 +19,13 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import java.io.Serializable;
-
-import static org.neo4j.cypherdsl.query.Query.*;
+import org.neo4j.cypherdsl.Expression;
 
 /**
  * Provides the possible expressions for the RETURN clause.
  */
 public class ReturnExpression<T extends ReturnExpression>
-    extends Expression
+    extends AbstractExpression
 {
     public Expression expression;
     public boolean distinct;
@@ -78,6 +76,16 @@ public class ReturnExpression<T extends ReturnExpression>
             builder.append( ')' );
             if (as != null)
                 builder.append(" AS ").append(as);
+        }
+    }
+
+    public static class All
+        extends ReturnExpression<All>
+    {
+        @Override
+        public void asString( StringBuilder builder )
+        {
+            builder.append( "*" );
         }
     }
 }

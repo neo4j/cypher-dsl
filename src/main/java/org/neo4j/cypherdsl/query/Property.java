@@ -22,110 +22,49 @@ package org.neo4j.cypherdsl.query;
 
 import java.util.regex.Pattern;
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.ReferenceExpression;
+import org.neo4j.cypherdsl.ScalarExpression;
 
 /**
 * TODO
 */
-public abstract class Property<TYPE extends Property>
-    extends Expression
+public class Property
+    extends Value
+    implements ReferenceExpression
 {
-    private static Pattern simpleName = Pattern.compile( "\\w*" );
-
-    protected Identifier owner;
-    public Identifier name;
     protected NullHandling nullHandling = NullHandling.NULL;
 
-    public TYPE falseIfMissing()
+    protected Property( Identifier owner,
+                        Identifier name
+    )
+    {
+        super( new Operator(owner, "."), name );
+    }
+
+    public Property falseIfMissing()
     {
         nullHandling = NullHandling.FALSE_IF_MISSING;
-        return (TYPE) this;
+        return (Property) this;
     }
 
-    public TYPE trueIfMissing()
+    public Property trueIfMissing()
     {
         nullHandling = NullHandling.TRUE_IF_MISSING;
-        return (TYPE) this;
+        return (Property) this;
     }
 
-    public TYPE optional()
+    public Property optional()
     {
         nullHandling = NullHandling.TRUE_IF_MISSING;
-        return (TYPE) this;
-    }
-
-    public BinaryPredicateExpression eq(Object value)
-    {
-        return binaryPredicate( "=", value );
-    }
-
-    public BinaryPredicateExpression gt(Object value)
-    {
-        return binaryPredicate( ">", value );
-    }
-
-    public BinaryPredicateExpression lt(Object value)
-    {
-        return binaryPredicate( "<", value );
-    }
-
-    public BinaryPredicateExpression gte(Object value)
-    {
-        return binaryPredicate( ">=", value );
-    }
-
-    public BinaryPredicateExpression lte(Object value)
-    {
-        return binaryPredicate( ">=", value );
-    }
-
-    public BinaryPredicateExpression ne(Object value)
-    {
-        return binaryPredicate( "<>", value );
-    }
-
-    public Has has()
-    {
-        Has has = new Has();
-        has.expression = this;
-        return has;
-    }
-
-    public IsNull isNull()
-    {
-        IsNull isNull = new IsNull();
-        isNull.expression = this;
-        return isNull;
-    }
-
-    public IsNotNull isNotNull()
-    {
-        IsNotNull isNotNull = new IsNotNull();
-        isNotNull.expression = this;
-        return isNotNull;
+        return (Property) this;
     }
 
     @Override
     public void asString( StringBuilder builder )
     {
-        if (owner != null)
-        {
-            owner.asString( builder );
-            builder.append( '.' );
-        }
-
-        name.asString( builder );
+        super.asString( builder );
         AsString nullHandling1 = (AsString) nullHandling;
         nullHandling1.asString( builder );
-    }
-
-    private BinaryPredicateExpression binaryPredicate( String operator, Object value )
-    {
-        Query.checkNull( value, "Value" );
-
-        BinaryPredicateExpression binaryPredicateExpression = new BinaryPredicateExpression();
-        binaryPredicateExpression.operator = operator;
-        binaryPredicateExpression.left = this;
-        binaryPredicateExpression.right = value instanceof Expression ? (Expression) value : CypherQuery.literal( value );
-        return binaryPredicateExpression;
     }
 }

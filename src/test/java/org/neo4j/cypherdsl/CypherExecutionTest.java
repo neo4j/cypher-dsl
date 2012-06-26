@@ -35,7 +35,7 @@ import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.node;
+import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.*;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database.
@@ -61,9 +61,8 @@ public class CypherExecutionTest
         data.get();
 
         String query = start(lookup("john", "node_auto_index", "name", "John"))
-                                              .match(path().from("john").out("friend")
-                                                      .link().out("friend").to("fof"))
-                                              .returns(identifier("john").property( "name"), identifier("fof").property( "name"), identifier("john"))
+                                              .match(node("john").out("friend").node().out( "friend" ).node( "fof" ))
+                                              .returns( identifier( "john" ).property( "name" ), identifier( "fof" ).property( "name" ), identifier( "john" ) )
                                               .toString();
 
         System.out.println(query);
@@ -76,10 +75,13 @@ public class CypherExecutionTest
         System.out.println( result.toString() );
 
         {
-            Execute q = start(node("john", john))
-                                                  .match(path().from("john").out("friend")
-                                                          .link().out("friend").to("fof"))
-                                                  .returns(identifier("john").property( "name"), identifier("fof").property( "name"));
+            Execute q = start( nodeById( "john", john ) )
+                                                  .match( node( "john" ).out( "friend" )
+                                                              .node()
+                                                              .out( "friend" )
+                                                              .node( "fof" ) )
+                                                  .returns( identifier( "john" ).property( "name" ), identifier( "fof" )
+                                                      .property( "name" ) );
 
             System.out.println(q);
             System.out.println( engine.execute( q.toString() ).toString() );
@@ -87,12 +89,11 @@ public class CypherExecutionTest
         
         {
             Projection<Friend> projection = new Projection<Friend>(Friend.class);
-            Iterable<Friend> friends = projection.iterable( engine.execute( start( node( "john", john ) )
-                                                                                .match( path().from( "john" )
+            Iterable<Friend> friends = projection.iterable( engine.execute( start( nodeById( "john", john ) )
+                                                                                .match( node( "john" ).out( "friend" )
+                                                                                            .node()
                                                                                             .out( "friend" )
-                                                                                            .link()
-                                                                                            .out( "friend" )
-                                                                                            .to( "fof" ) )
+                                                                                            .node( "fof" ) )
                                                                                 .returns( exp( identifier( "john" ).property( "name" ) )
                                                                                               .as( "name" ), exp( identifier( "fof" )
                                                                                                                       .property( "name" ) )

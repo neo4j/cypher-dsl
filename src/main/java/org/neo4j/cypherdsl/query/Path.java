@@ -21,80 +21,118 @@
 package org.neo4j.cypherdsl.query;
 
 import java.util.Arrays;
+import java.util.Collections;
+import org.neo4j.cypherdsl.BooleanExpression;
+import org.neo4j.cypherdsl.CollectionExpression;
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.PathExpression;
 
 /**
 * TODO
 */
-public class Path<T extends Path>
-    extends AbstractPath<T>
+public class Path
+    extends AbstractExpression
+    implements PathExpression
 {
-    public Identifier pathName;
-    public Expression from;
-    public Expression fromPropertyValues;
+    private Expression node;
+    private Expression nodePropertyValues;
+    private PathRelationship relationship;
+
+    public Path( Expression node, PathRelationship relationship )
+    {
+        this.node = node;
+        this.relationship = relationship;
+    }
+
+    public Path values(PropertyValue... propertyValues)
+    {
+        nodePropertyValues = new PropertyValues( Arrays.asList( propertyValues ) );
+        return this;
+    }
+
+    public Path values(Iterable<PropertyValue> propertyValues)
+    {
+        nodePropertyValues = new PropertyValues( propertyValues );
+        return this;
+    }
+
+    public Path values(Parameter propertyValues)
+    {
+        nodePropertyValues = propertyValues;
+        return this;
+    }
+
+    public PathRelationship out()
+    {
+        return new PathRelationship( this, Direction.OUT, Collections.<Identifier>emptyList());
+    }
+
+    public PathRelationship out(String... relationships)
+    {
+        return new PathRelationship( this, Direction.OUT, Arrays.asList( CypherQuery.identifiers( relationships ) ));
+    }
+
+    public PathRelationship out(Identifier... relationships)
+    {
+        return new PathRelationship( this, Direction.OUT, Arrays.asList( relationships ) );
+    }
+
+    public PathRelationship in()
+    {
+        return new PathRelationship( this, Direction.IN, Collections.<Identifier>emptyList());
+    }
+
+    public PathRelationship in(String... relationships)
+    {
+        return new PathRelationship( this, Direction.IN, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
+    }
+
+    public PathRelationship in(Identifier... relationships)
+    {
+        return new PathRelationship( this, Direction.IN, Arrays.asList( relationships ));
+    }
+
+    public PathRelationship both()
+    {
+        return new PathRelationship( this, Direction.BOTH, Collections.<Identifier>emptyList());
+    }
+
+    public PathRelationship both( String... relationships)
+    {
+        return new PathRelationship( this, Direction.BOTH, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
+    }
+
+    public PathRelationship both( Identifier... relationships)
+    {
+        return new PathRelationship( this, Direction.BOTH, Arrays.asList( relationships));
+    }
 
     @Override
     public void asString( StringBuilder builder )
     {
-        if (pathName != null)
+        if( relationship != null )
         {
-            pathName.asString( builder );
-            builder.append( '=' );
+            relationship.asString( builder );
         }
-        builder.append( '(' );
-        if( from != null )
-        {
-            from.asString( builder );
 
-            // TODO Should it be allowed to create nodes which have no names?
-            if ( fromPropertyValues != null)
+        builder.append( '(' );
+        if( node != null )
+        {
+            node.asString( builder );
+
+            if ( nodePropertyValues != null)
             {
                 builder.append( ' ');
-                fromPropertyValues.asString( builder );
+                nodePropertyValues.asString( builder );
+            }
+        } else
+        {
+            if ( nodePropertyValues != null)
+            {
+                nodePropertyValues.asString( builder );
             }
         }
         builder.append( ')' );
-        super.asString( builder );
     }
-
-    public T from(String from, PropertyValue... propertyValues)
-    {
-        return from( CypherQuery.identifier( from ), propertyValues);
-    }
-
-    public T from(String from, Iterable<PropertyValue> propertyValues)
-    {
-        return from( CypherQuery.identifier( from ), propertyValues);
-    }
-
-    public T from(Expression from, PropertyValue... propertyValues)
-    {
-        return from(from, Arrays.asList(propertyValues));
-    }
-
-    public T from(Expression from, Iterable<PropertyValue> propertyValues)
-    {
-        Query.checkNull(from, "From");
-        this.from = from;
-
-        if (propertyValues.iterator().hasNext())
-            this.fromPropertyValues = new PropertyValues( propertyValues );
-
-        return (T) this;
-    }
-
-    public T from(String from, Parameter parameterWithProperties)
-    {
-        return from( CypherQuery.identifier( from ), parameterWithProperties);
-    }
-
-    public T from(Identifier from, Parameter parameterWithProperties)
-    {
-        Query.checkNull(from, "From");
-        this.from = from;
-        this.fromPropertyValues = parameterWithProperties;
-
-        return (T) this;
-    }
-
 }

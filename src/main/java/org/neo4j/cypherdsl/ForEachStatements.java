@@ -20,9 +20,7 @@
 
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.AbstractPath;
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ForEachStatement;
+import org.neo4j.cypherdsl.ForEachStatement;
 import org.neo4j.cypherdsl.query.SetProperty;
 
 /**
@@ -30,9 +28,9 @@ import org.neo4j.cypherdsl.query.SetProperty;
  */
 public interface ForEachStatements
 {
-    ForEachStatement create(AbstractPath<?>... paths);
+    ForEachStatement create(PathExpression... paths);
     ForEachStatement set( SetProperty... propertyValues );
-    ForEachStatement delete( Expression... expressions );
-    ForEachStatement relate( AbstractPath<?>... expressions );
+    ForEachStatement delete( ReferenceExpression... expressions );
+    ForEachStatement relate( PathExpression... expressions );
     ForEachStatement forEach( ForEachStatement statement );
 }

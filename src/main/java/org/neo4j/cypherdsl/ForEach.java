@@ -20,7 +20,7 @@
 
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.ForEachStatement;
+import org.neo4j.cypherdsl.ForEachStatement;
 
 /**
  * TODO

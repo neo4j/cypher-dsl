@@ -24,13 +24,27 @@ package org.neo4j.cypherdsl.query;
 * TODO
 */
 public class Parameter
-    extends Expression
+    extends Value
 {
-    public String name;
-
-    @Override
-    public void asString( StringBuilder builder )
+    public Parameter( String name )
     {
-        builder.append( '{' ).append( name ).append( '}' );
+        super( new ParameterExpression( name ) );
+    }
+
+    private static class ParameterExpression
+        extends AbstractExpression
+    {
+        public String name;
+
+        private ParameterExpression( String name )
+        {
+            this.name = name;
+        }
+
+        @Override
+        public void asString( StringBuilder builder )
+        {
+            builder.append( '{' ).append( name ).append( '}' );
+        }
     }
 }

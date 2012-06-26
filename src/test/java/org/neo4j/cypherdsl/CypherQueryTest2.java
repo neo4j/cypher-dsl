@@ -34,22 +34,23 @@ public class CypherQueryTest2
     {
         assertEquals( CYPHER+"START john=node(0) RETURN john", new CypherQuery()
         {{
-            starts( node( "john", 0 ) ).returns( identifier( "john" ) );
+            starts( nodesById( "john", 0 ) ).returns( identifier( "john" ) );
         }}.toString() );
 
         assertEquals( CYPHER+"START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
         {{
-            starts( node( "john", 0 ) ).
-            match( path( "r" ).from( "john" )
-                       .optional()
+            starts( nodesById( "john", 0 ) ).
+            match( path( "r", node( "john" )
                        .out( "KNOWS" )
+                       .optional()
                        .hops( 1, 3 )
-                       .to( "x" ) ).returns( identifier( "x" ) );
+                       .node( "x" ) )).
+            returns( identifier( "x" ) );
         }}.toString() );
 
         assertEquals( CYPHER+"START n=node(3,1) WHERE (n.age<30 and n.name=\"Tobias\") or not(n.name=\"Tobias\") RETURN n", new CypherQuery()
         {{
-            starts( node( "n", 3, 1 ) ).
+            starts( nodesById( "n", 3, 1 ) ).
             where( identifier( "n" ).property("age" ).lt( 30 ).and( identifier( "n" ).string( "name").eq( "Tobias" ) )
                        .or( not( identifier( "n" ).string( "name" ).eq( "Tobias" ) ) ) ).
             returns( identifier( "n" ) );
@@ -61,7 +62,7 @@ public class CypherQueryTest2
     {
         assertEquals( CYPHER+"START n=node(1) WHERE n.value=0 and (n.title=\"ololo\" or n.value=1) RETURN n", new CypherQuery()
         {{
-            starts( node( "n", 1 ) ).
+            starts( nodesById( "n", 1 ) ).
             where( identifier( "n" ).number( "value" ).eq( 0 ).and( identifier( "n" ).string( "title" ).eq( "ololo" ).or(identifier("n").number( "value" ).eq( 1 ) ) )).
             returns( identifier( "n" ) );
         }}.toString() );

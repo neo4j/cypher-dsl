@@ -19,9 +19,6 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.query.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
-
 /**
  * Implements the RETURN clause.
  */

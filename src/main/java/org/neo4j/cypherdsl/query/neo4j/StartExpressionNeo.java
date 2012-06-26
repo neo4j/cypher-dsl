@@ -32,12 +32,12 @@ import static org.neo4j.cypherdsl.query.Query.*;
  */
 public abstract class StartExpressionNeo
 {
-    public static StartExpression.StartNodes node( String name, Node... nodes )
+    public static StartExpression.StartNodes nodeById( String name, Node... nodes )
     {
-        return node( CypherQuery.identifier( name ), nodes );
+        return nodeById( CypherQuery.identifier( name ), nodes );
     }
 
-    public static StartExpression.StartNodes node( Identifier name, Node... nodes )
+    public static StartExpression.StartNodes nodeById( Identifier name, Node... nodes )
     {
         checkNull( name, "Name" );
 

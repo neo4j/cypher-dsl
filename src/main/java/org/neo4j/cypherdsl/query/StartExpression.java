@@ -20,20 +20,20 @@
 package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
-
-import static org.neo4j.cypherdsl.query.Query.*;
+import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.ReferenceExpression;
+import org.neo4j.cypherdsl.StringExpression;
 
 /**
  * Provides the possible expressions for the START clause.
  */
 public abstract class StartExpression
-    extends Expression
-    implements AsString, Serializable,Cloneable
+    extends AbstractExpression
 {
     public Identifier name;
 
     public static class AllNodes
-        extends Expression
+        extends AbstractExpression
     {
         @Override
         public void asString( StringBuilder builder )
@@ -66,7 +66,7 @@ public abstract class StartExpression
         extends StartExpression
     {
         public Identifier index;
-        public Identifier key;
+        public ReferenceExpression key;
         public Expression value;
 
         public void asString(StringBuilder builder)
@@ -134,7 +134,7 @@ public abstract class StartExpression
     {
         public Identifier index;
         public Identifier key;
-        public Literal value;
+        public StringExpression value;
 
         public void asString(StringBuilder builder)
         {

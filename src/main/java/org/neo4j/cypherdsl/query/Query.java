@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.List;
+import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.query.clause.Clause;
+import org.neo4j.cypherdsl.query.clause.WhereClause;
 
 /**
  * Model for a Cypher Query. The model is serializable and cloneable, to make it easy to
@@ -58,7 +60,7 @@ public class Query
 
     public static void checkEmpty(Expression value, String name)
     {
-        if (value instanceof Literal && isEmpty( (String) ((Literal)value).value ))
+        if (value instanceof Literal && isEmpty( value.toString() ))
             throw new IllegalArgumentException( name+" may not be null or empty string" );
     }
 
@@ -76,7 +78,7 @@ public class Query
     public void add(Clause clause)
     {
         // Check if we should merge to consecutive WHERE clauses
-        if (!clauses.isEmpty() && clause instanceof WhereClause)
+        if (!clauses.isEmpty() && clause instanceof WhereClause )
         {
             Clause previousClause = clauses.get( clauses.size() - 1 );
             if ( previousClause instanceof WhereClause )

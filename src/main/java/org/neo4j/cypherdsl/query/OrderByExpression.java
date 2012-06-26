@@ -19,13 +19,14 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Expression;
+
 /**
  * Provides the possible expressions for the ORDER BY clause.
  */
 public class OrderByExpression
-    extends Expression
+    extends AbstractExpression
 {
-
     public Expression expression;
     public Order order;
 

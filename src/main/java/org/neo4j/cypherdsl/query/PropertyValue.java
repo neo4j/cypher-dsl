@@ -20,6 +20,8 @@
 
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Expression;
+
 /**
  * Represents matching a property to a value
  */

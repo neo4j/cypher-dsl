@@ -21,82 +21,78 @@
 package org.neo4j.cypherdsl.query;
 
 import java.util.regex.Pattern;
-import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.BooleanExpression;
+import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.NumericExpression;
+import org.neo4j.cypherdsl.ReferenceExpression;
+import org.neo4j.cypherdsl.StringExpression;
 
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.CypherQuery.*;
 import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 /**
 * TODO
 */
 public class Identifier
-    extends Expression
+    extends Value
+    implements ReferenceExpression
 {
     private static Pattern simpleName = Pattern.compile( "\\w*" );
 
-    public String name;
+    public Identifier( String name )
+    {
+        super( new IdentifierExpression(name) );
+    }
 
-    public CommonProperty property(String name)
+    public Property property(String name)
     {
         return property( identifier( name ) );
     }
 
-    public CommonProperty property(Identifier name)
+    public Property property(Identifier name)
     {
         checkNull( name, "Name" );
-        CommonProperty property = new CommonProperty();
-        property.owner = this;
-        property.name = name;
-        return property;
+        return new Property(this, name);
     }
 
-    public StringProperty string(String name)
+    public StringExpression string(String name)
     {
         return string( identifier( name ) );
     }
 
-    public StringProperty string(Identifier name)
+    public StringExpression string(Identifier name)
     {
         checkNull( name, "Name" );
-        StringProperty stringProperty = new StringProperty();
-        stringProperty.owner = this;
-        stringProperty.name = name;
-        return stringProperty;
+        return new Property(this, name);
     }
 
-    public NumberProperty number(String name)
+    public NumericExpression number(String name)
     {
         return number( identifier( name ) );
     }
 
-    public NumberProperty number(Identifier name)
+    public NumericExpression number(Identifier name)
     {
         checkNull( name, "Name" );
-        NumberProperty numberProperty = new NumberProperty();
-        numberProperty.owner = this;
-        numberProperty.name = name;
-        return numberProperty;
+        return new Property(this, name);
     }
 
-    public IsNull isNull()
+    private static class IdentifierExpression
+        extends AbstractExpression
     {
-        IsNull isNull = new IsNull();
-        isNull.expression = this;
-        return isNull;
-    }
+        private String name;
 
-    public IsNotNull isNotNull()
-    {
-        IsNotNull isNotNull = new IsNotNull();
-        isNotNull.expression = this;
-        return isNotNull;
-    }
+        private IdentifierExpression( String name )
+        {
+            this.name = name;
+        }
 
-    public void asString( StringBuilder builder )
-    {
-        if (simpleName.matcher( name ).matches())
-            builder.append( name );
-        else
-            builder.append( '`' ).append( name ).append( '`' );
+        public void asString( StringBuilder builder )
+        {
+            if (simpleName.matcher( name ).matches())
+                builder.append( name );
+            else
+                builder.append( '`' ).append( name ).append( '`' );
+        }
     }
 }
