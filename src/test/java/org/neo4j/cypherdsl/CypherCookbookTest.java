@@ -421,13 +421,13 @@ public class CypherCookbookTest
                       "WHERE has(me.name) and me.name=\"me\" " +
                       "WITH me,count(DISTINCT r1) AS H1,count(DISTINCT r2) AS H2,you " +
                       "MATCH (me)-[r1:ATE]->(food)<-[r2:ATE]-(you) " +
-                      "RETURN sum(1-abs(r1.times/H1-r2.times/H2)*r1.times+r2.times/H1+H2) AS similarity",
+                      "RETURN sum((1-abs(r1.times/H1-r2.times/H2))*(r1.times+r2.times)/(H1+H2)) AS similarity",
                       start( allNodes( "me" ) ).
                       match( node( "me" ).out( "ATE").as("r1" ).node( "food" ).in( "ATE" ).as("r2").node( "you" ) ).
                       where( has( identifier( "me" ).property( "name" ) ).and( identifier( "me" ).property( "name" ).eq( "me" ) ) ).
                       with( identifier( "me" ), as( count( distinct( identifier( "r1" ) ) ), "H1" ), as( count( distinct( identifier( "r2" ) ) ), "H2" ),identifier( "you" )  ).
                       match( node( "me" ).out( "ATE").as("r1").node( "food" ).in( "ATE").as("r2").node( "you" ) ).
-                      returns( as( sum( literal( 1 ).subtract( abs( identifier( "r1" ).property( "times" ).divideBy( identifier( "H1" ) ).subtract( identifier( "r2" ).property( "times" ).divideBy( identifier( "H2" )))).
-                                         times( identifier( "r1" ).property( "times" ).add( identifier( "r2" ).property( "times" ) ) ).divideBy( identifier( "H1" ).add( identifier( "H2" ) ) )) ) , "similarity" ) ).toString());
+                      returns( as( sum( p(literal( 1 ).subtract( abs( identifier( "r1" ).property( "times" ).divideBy( identifier( "H1" ) ).subtract( identifier( "r2" ).property( "times" ).divideBy( identifier( "H2" )))))).
+                                         times( p(identifier( "r1" ).property( "times" ).add( identifier( "r2" ).property( "times" ) ) ).divideBy( p( identifier( "H1" ).add( identifier( "H2" ) )) )) ) , "similarity" ) ).toString());
     }
 }

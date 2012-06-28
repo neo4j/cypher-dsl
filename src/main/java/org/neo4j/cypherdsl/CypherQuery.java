@@ -919,16 +919,51 @@ public class CypherQuery
     }
 
     // Return -------------------------------------------------------
+    /**
+     * Use this to rename identifiers for RETURN or WITH
+     *
+     * Corresponds to:
+     * <pre>
+     * expression AS name
+     * </pre>
+     *
+     * @param expression
+     * @param name
+     * @return
+     */
     public static Expression as(Expression expression, String name)
     {
         return new Value(new Operator(expression, " AS "), identifier( name ));
     }
 
+    /**
+     * Use this to rename identifiers for RETURN or WITH
+     *
+     * Corresponds to:
+     * <pre>
+     * expression AS name
+     * </pre>
+     *
+     * @param expression
+     * @param name
+     * @return
+     */
     public static Expression as(Expression expression, Identifier name)
     {
         return new Value(new Operator(expression, " AS "), name);
     }
 
+    /**
+     * Use this to declare DISTINCT
+     *
+     * Corresponds to:
+     * <pre>
+     * DISTINCT expression
+     * </pre>
+     *
+     * @param expression
+     * @return
+     */
     public static Expression distinct(Expression expression)
     {
         return new Value(new Operator("DISTINCT "), expression);
@@ -1563,6 +1598,20 @@ public class CypherQuery
     }
 
     // Mathematical expressions
+    /**
+     * Declare extra parentheses. This can be useful to ensure that operators are performed in the order you desire.
+     *
+     * Corresponds to:
+     * <pre>
+     * (numericExpression)
+     * </pre>
+     *
+     */
+    public static NumericExpression p(NumericExpression numericExpression)
+    {
+        return new Value( new FunctionExpression( "", numericExpression ) );
+    }
+
     /**
      * Declare an abs expression. Corresponds to:
      * <pre>
