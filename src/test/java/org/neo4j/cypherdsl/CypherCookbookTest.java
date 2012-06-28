@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2011 "Neo Technology,"
+ * Copyright (c) 2002-2012 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
@@ -209,8 +210,9 @@ public class CypherCookbookTest
                       "WHERE type(r1)=type(r2) and type(r1)=~/FOLLOWS|LOVES/ " +
                       "RETURN other.name,type(r1)",
                       start( lookup( "me", "node_auto_index", "name", "Joe" ) ).
-                      match( node( "me" ).out().as( "r1").node( "other" ).out().as( "r2").node( "me" ) ).
-                      where( type( identifier( "r1" ) ).eq( type( identifier( "r2" ) ) ).and( type( identifier( "r1" ) ).regexp( "FOLLOWS|LOVES" ) ) ).
+                      match( node( "me" ).out().as( "r1" ).node( "other" ).out().as( "r2" ).node( "me" ) ).
+                      where( type( identifier( "r1" ) ).eq( type( identifier( "r2" ) ) )
+                                 .and( type( identifier( "r1" ) ).regexp( "FOLLOWS|LOVES" ) ) ).
                       returns( identifier( "other" ).property( "name" ), type( identifier( "r1" ) ) ).toString());
     }
 
@@ -229,7 +231,10 @@ public class CypherCookbookTest
                       where( type( identifier( "r1" ) ).eq( type( identifier( "r2" ) ) ).and( not( node( "origin" ).both("KNOWS").node( "candidate" ) ) ) ).
                       returns( as( identifier( "origin" ).property( "name" ) , "origin" ),
                                as( identifier( "candidate" ).property( "name" ) , "candidate" ),
-                               as( sum( round( identifier( "r2" ).property( "weight" ).add( coalesce( identifier( "r2" ).property( "activity" ).optional(), literal( 0 ) ).times( 2 ) ) ) ), "boost" )).
+                               as( sum( round( identifier( "r2" ).property( "weight" ).add( coalesce( identifier( "r2" )
+                                                                                                          .property( "activity" )
+                                                                                                          .optional(), literal( 0 ) )
+                                                                                                .times( 2 ) ) ) ), "boost" )).
                       orderBy( order( identifier( "boost" ), DESCENDING )).
                       limit( 10 ).toString());
     }
@@ -423,11 +428,18 @@ public class CypherCookbookTest
                       "MATCH (me)-[r1:ATE]->(food)<-[r2:ATE]-(you) " +
                       "RETURN sum((1-abs(r1.times/H1-r2.times/H2))*(r1.times+r2.times)/(H1+H2)) AS similarity",
                       start( allNodes( "me" ) ).
-                      match( node( "me" ).out( "ATE").as("r1" ).node( "food" ).in( "ATE" ).as("r2").node( "you" ) ).
-                      where( has( identifier( "me" ).property( "name" ) ).and( identifier( "me" ).property( "name" ).eq( "me" ) ) ).
-                      with( identifier( "me" ), as( count( distinct( identifier( "r1" ) ) ), "H1" ), as( count( distinct( identifier( "r2" ) ) ), "H2" ),identifier( "you" )  ).
-                      match( node( "me" ).out( "ATE").as("r1").node( "food" ).in( "ATE").as("r2").node( "you" ) ).
-                      returns( as( sum( p(literal( 1 ).subtract( abs( identifier( "r1" ).property( "times" ).divideBy( identifier( "H1" ) ).subtract( identifier( "r2" ).property( "times" ).divideBy( identifier( "H2" )))))).
-                                         times( p(identifier( "r1" ).property( "times" ).add( identifier( "r2" ).property( "times" ) ) ).divideBy( p( identifier( "H1" ).add( identifier( "H2" ) )) )) ) , "similarity" ) ).toString());
+                      match( node( "me" ).out( "ATE" ).as( "r1" ).node( "food" ).in( "ATE" ).as( "r2" ).node( "you" ) ).
+                      where( has( identifier( "me" ).property( "name" ) ).and( identifier( "me" ).property( "name" )
+                                                                                   .eq( "me" ) ) ).
+                      with( identifier( "me" ), as( count( distinct( identifier( "r1" ) ) ), "H1" ), as( count( distinct( identifier( "r2" ) ) ), "H2" ), identifier( "you" ) ).
+                      match( node( "me" ).out( "ATE" ).as( "r1" ).node( "food" ).in( "ATE" ).as( "r2" ).node( "you" ) ).
+                      returns( as( sum( p( literal( 1 ).subtract( abs( identifier( "r1" ).property( "times" )
+                                                                           .divideBy( identifier( "H1" ) )
+                                                                           .subtract( identifier( "r2" ).property( "times" )
+                                                                                          .divideBy( identifier( "H2" ) ) ) ) ) )
+                                            .
+                                                times( p( identifier( "r1" ).property( "times" )
+                                                              .add( identifier( "r2" ).property( "times" ) ) ).divideBy( p( identifier( "H1" )
+                                                                                                                                .add( identifier( "H2" ) ) ) ) ) ), "similarity" ) ).toString());
     }
 }
