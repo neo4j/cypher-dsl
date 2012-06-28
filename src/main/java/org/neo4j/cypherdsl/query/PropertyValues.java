@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl.query;
 
 /**
- * TODO
+ * Represents a collection of PropertyValue
  */
 public class PropertyValues
     extends AbstractExpression

@@ -19,15 +19,12 @@
  */
 package org.neo4j.cypherdsl.result;
 
+import java.util.Map;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Serializer that converts Cypher execution results to JSON.

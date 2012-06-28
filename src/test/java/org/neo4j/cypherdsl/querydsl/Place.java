@@ -22,7 +22,7 @@ package org.neo4j.cypherdsl.querydsl;
 import com.mysema.query.annotations.QueryEntity;
 
 /**
- * TODO
+ * Place entity
  */
 @QueryEntity
 public class Place

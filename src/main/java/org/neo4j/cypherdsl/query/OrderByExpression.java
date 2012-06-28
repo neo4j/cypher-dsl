@@ -19,7 +19,8 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.Order;
 
 /**
  * Provides the possible expressions for the ORDER BY clause.

@@ -21,11 +21,11 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.Expression;
-import org.neo4j.cypherdsl.ReferenceExpression;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.expression.ReferenceExpression;
 
 /**
- * TODO
+ * CREATE clause
  */
 public class DeleteClause
     extends Clause

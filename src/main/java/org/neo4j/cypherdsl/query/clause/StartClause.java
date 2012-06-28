@@ -21,10 +21,10 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.expression.StartExpression;
 
 /**
- * TODO
+ * START clause
  */
 public class StartClause
     extends Clause

@@ -31,17 +31,18 @@ import com.mysema.query.types.SubQueryExpression;
 import com.mysema.query.types.TemplateExpression;
 import com.mysema.query.types.Visitor;
 import javax.annotation.Nullable;
-import org.neo4j.cypherdsl.BooleanExpression;
+import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.CypherQuery;
-import org.neo4j.cypherdsl.Expression;
-import org.neo4j.cypherdsl.NumericExpression;
-import org.neo4j.cypherdsl.StringExpression;
-import org.neo4j.cypherdsl.query.Identifier;
-import org.neo4j.cypherdsl.query.Property;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.expression.NumericExpression;
+import org.neo4j.cypherdsl.expression.StringExpression;
+import org.neo4j.cypherdsl.Identifier;
+import org.neo4j.cypherdsl.Property;
 import org.neo4j.cypherdsl.query.Value;
 
 /**
- * TODO
+ * Methods here are used to integrate Cypher DSL with the QueryDSL library. Create QBeans with QueryDSL
+ * and use those as parameters for these methods, which can then be used with the regular Cypher DSL methods.
  */
 public class CypherQueryDSL
     extends CypherQuery

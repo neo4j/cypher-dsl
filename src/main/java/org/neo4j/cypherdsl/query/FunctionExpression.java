@@ -21,11 +21,11 @@
 package org.neo4j.cypherdsl.query;
 
 import org.neo4j.cypherdsl.CypherQuery;
-import org.neo4j.cypherdsl.Expression;
-import org.neo4j.cypherdsl.NodeExpression;
-import org.neo4j.cypherdsl.NumericExpression;
-import org.neo4j.cypherdsl.PathExpression;
-import org.neo4j.cypherdsl.StringExpression;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.expression.NodeExpression;
+import org.neo4j.cypherdsl.expression.NumericExpression;
+import org.neo4j.cypherdsl.expression.PathExpression;
+import org.neo4j.cypherdsl.expression.StringExpression;
 
 /**
  * Expresses all functions of the form "f(exp)"

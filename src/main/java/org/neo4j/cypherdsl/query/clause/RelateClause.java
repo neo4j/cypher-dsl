@@ -21,10 +21,10 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.PathExpression;
+import org.neo4j.cypherdsl.expression.PathExpression;
 
 /**
- * TODO
+ * RELATE clause
  */
 public class RelateClause
     extends Clause

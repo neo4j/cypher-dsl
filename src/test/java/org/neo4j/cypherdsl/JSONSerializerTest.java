@@ -36,7 +36,7 @@ import org.neo4j.test.TestData;
 import static org.neo4j.cypherdsl.CypherQuery.*;
 
 /**
- * TODO
+ * Test of JSON serialization of results.
  */
 public class JSONSerializerTest
     implements GraphHolder
@@ -59,8 +59,7 @@ public class JSONSerializerTest
         JSONSerializer serializer = new JSONSerializer();
         String query = start(lookup("john", "node_auto_index", "name", "John")).
                         match( node( "john" ).out( "friend" ).node().out( "friend" ).node( "fof" ) ).
-                        returns( exp( identifier( "john" ).property( "name" ) ).as( "name" ), exp( identifier( "fof" ).property( "name" ) )
-                            .as( "friend" ), identifier( "john" ), count().as( "count" ) )
+                        returns( as( identifier( "john" ).property( "name" ) , "name" ), as( identifier( "fof" ).property( "name" ) ,"friend" ), identifier( "john" ), as( count(), "count" ) )
                         .toString();
         String json = serializer.toJSON( engine.execute(query) ).toString();
         System.out.println( json );

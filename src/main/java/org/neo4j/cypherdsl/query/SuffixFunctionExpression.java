@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
  * Expresses all functions of the form "exp f", such as "exp is null"

@@ -21,10 +21,10 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.BooleanExpression;
+import org.neo4j.cypherdsl.expression.BooleanExpression;
 
 /**
- * TODO
+ * WHERE clause
  */
 public class WhereClause
     extends Clause

@@ -19,15 +19,15 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.BooleanExpression;
-import org.neo4j.cypherdsl.CollectionExpression;
-import org.neo4j.cypherdsl.Expression;
-import org.neo4j.cypherdsl.NodeExpression;
-import org.neo4j.cypherdsl.NumericExpression;
-import org.neo4j.cypherdsl.PathExpression;
-import org.neo4j.cypherdsl.RelationshipExpression;
-import org.neo4j.cypherdsl.ScalarExpression;
-import org.neo4j.cypherdsl.StringExpression;
+import org.neo4j.cypherdsl.expression.BooleanExpression;
+import org.neo4j.cypherdsl.expression.CollectionExpression;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.expression.NodeExpression;
+import org.neo4j.cypherdsl.expression.NumericExpression;
+import org.neo4j.cypherdsl.expression.PathExpression;
+import org.neo4j.cypherdsl.expression.RelationshipExpression;
+import org.neo4j.cypherdsl.expression.ScalarExpression;
+import org.neo4j.cypherdsl.expression.StringExpression;
 
 import static org.neo4j.cypherdsl.CypherQuery.*;
 
@@ -57,10 +57,22 @@ public class Value
     }
 
     // NumericExpression --------------------------------------------
+    public NumericExpression add(Number expression)
+    {
+        Query.checkNull( expression, "Expression" );
+        return new Value( new Operator( this, "+" ), literal( expression ));
+    }
+
     public NumericExpression add(NumericExpression expression)
     {
         Query.checkNull( expression, "Expression" );
         return new Value( new Operator( this, "+" ), expression);
+    }
+
+    public NumericExpression subtract(Number expression)
+    {
+        Query.checkNull( expression, "Expression" );
+        return new Value( new Operator( this, "-" ), literal( expression ));
     }
 
     public NumericExpression subtract(NumericExpression expression)
@@ -69,16 +81,34 @@ public class Value
         return new Value( new Operator( this, "-" ), expression);
     }
 
+    public NumericExpression times(Number expression)
+    {
+        Query.checkNull( expression, "Expression" );
+        return new Value( new Operator( this, "*" ), literal( expression ));
+    }
+
     public NumericExpression times(NumericExpression expression)
     {
         Query.checkNull( expression, "Expression" );
         return new Value( new Operator( this, "*" ), expression);
     }
 
+    public NumericExpression divideBy(Number expression)
+    {
+        Query.checkNull( expression, "Expression" );
+        return new Value( new Operator( this, "/" ), literal( expression ));
+    }
+
     public NumericExpression divideBy(NumericExpression expression)
     {
         Query.checkNull( expression, "Expression" );
         return new Value( new Operator( this, "/" ), expression);
+    }
+
+    public NumericExpression mod(Number expression)
+    {
+        Query.checkNull( expression, "Expression" );
+        return new Value( new Operator( this, "%" ), literal( expression ));
     }
 
     public NumericExpression mod(NumericExpression expression)

@@ -26,14 +26,14 @@ import com.mysema.query.types.Path;
 import com.mysema.query.types.expr.Param;
 import org.junit.Assert;
 import org.junit.Test;
-import org.neo4j.cypherdsl.query.Order;
+import org.neo4j.cypherdsl.Order;
 
 import static com.mysema.query.alias.Alias.*;
 import static com.mysema.query.support.Expressions.*;
 import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.nodesById;
 import static org.neo4j.cypherdsl.CypherReferenceTest.*;
-import static org.neo4j.cypherdsl.query.Order.*;
+import static org.neo4j.cypherdsl.Order.*;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.count;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.identifier;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.literal;
@@ -45,7 +45,7 @@ import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.start;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.*;
 
 /**
- * TODO
+ * Test for integration with QueryDSL
  */
 public class QueryDSLTest
 {

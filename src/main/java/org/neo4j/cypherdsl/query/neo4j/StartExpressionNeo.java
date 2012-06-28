@@ -20,15 +20,16 @@
 package org.neo4j.cypherdsl.query.neo4j;
 
 import org.neo4j.cypherdsl.CypherQuery;
-import org.neo4j.cypherdsl.query.Identifier;
+import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.query.Query;
-import org.neo4j.cypherdsl.query.StartExpression;
+import org.neo4j.cypherdsl.expression.StartExpression;
 import org.neo4j.graphdb.Node;
 
 import static org.neo4j.cypherdsl.query.Query.*;
 
 /**
- * TODO
+ * START expressions that use Neo4j Node objects directly, thus avoiding use of
+ * long identifiers.
  */
 public abstract class StartExpressionNeo
 {

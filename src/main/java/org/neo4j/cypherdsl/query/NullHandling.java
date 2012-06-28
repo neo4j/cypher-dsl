@@ -20,8 +20,10 @@
 
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.AsString;
+
 /**
-* TODO
+* Null handling for property references
 */
 public enum NullHandling
     implements AsString

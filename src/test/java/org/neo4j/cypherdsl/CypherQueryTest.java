@@ -155,7 +155,7 @@ public class CypherQueryTest
 
         assertEquals( CYPHER+"START mom=node(0),dad=node(1) RETURN mom.age AS momsAge,dad.age AS dadsAge",
                       start( nodesById( "mom", 0 ), nodesById( "dad", 1 )).
-                      returns( exp( identifier( "mom" ).property( "age" ) ).as( "momsAge" ), exp( identifier( "dad" ).property( "age" ) ).as( "dadsAge" )).toString());
+                      returns( as( identifier( "mom" ).property( "age" ), "momsAge" ), as( identifier( "dad" ).property( "age" ) , "dadsAge" )).toString());
     }
 
     @Test

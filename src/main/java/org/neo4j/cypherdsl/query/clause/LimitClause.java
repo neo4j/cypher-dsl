@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl.query.clause;
 
 /**
- * TODO
+ * LIMIT clause
  */
 public class LimitClause
     extends Clause

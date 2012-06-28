@@ -21,31 +21,21 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.Expression;
-import org.neo4j.cypherdsl.query.ReturnExpression;
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
- * TODO
+ * RETURN clause
  */
 public class ReturnClause
     extends Clause
 {
-    private ArrayList<ReturnExpression> expressions = new ArrayList<ReturnExpression>();
+    private ArrayList<Expression> expressions = new ArrayList<Expression>();
 
     public ReturnClause( Iterable<Expression> expressions )
     {
         for( Expression expression : expressions )
         {
-            if( expression instanceof ReturnExpression<?> )
-            {
-                this.expressions.add( (ReturnExpression) expression );
-            }
-            else
-            {
-                ReturnExpression<ReturnExpression> returnExpression = new ReturnExpression<ReturnExpression>();
-                returnExpression.expression = expression;
-                this.expressions.add( returnExpression );
-            }
+            this.expressions.add( expression );
         }
     }
 

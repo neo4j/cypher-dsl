@@ -19,10 +19,11 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.PathExpression;
+import org.neo4j.cypherdsl.Identifier;
+import org.neo4j.cypherdsl.expression.PathExpression;
 
 /**
- * TODO
+ * Represents a named path.
  */
 public class NamedPath
     extends AbstractExpression

@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.AsString;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.Literal;
 import org.neo4j.cypherdsl.query.clause.Clause;
 import org.neo4j.cypherdsl.query.clause.WhereClause;
 

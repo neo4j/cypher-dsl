@@ -21,10 +21,10 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
-import org.neo4j.cypherdsl.query.SetProperty;
+import org.neo4j.cypherdsl.SetProperty;
 
 /**
- * TODO
+ * SET clause
  */
 public class SetClause
     extends Clause

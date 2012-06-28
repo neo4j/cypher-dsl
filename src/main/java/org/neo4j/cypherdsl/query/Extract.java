@@ -19,12 +19,13 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.CollectionExpression;
-import org.neo4j.cypherdsl.ScalarExpression;
-import org.neo4j.cypherdsl.ScalarExpression;
+import org.neo4j.cypherdsl.expression.CollectionExpression;
+import org.neo4j.cypherdsl.Identifier;
+import org.neo4j.cypherdsl.expression.ScalarExpression;
+import org.neo4j.cypherdsl.expression.ScalarExpression;
 
 /**
-* TODO
+* Represents an extract function
 */
 public class Extract
     extends AbstractExpression

@@ -21,7 +21,7 @@
 package org.neo4j.cypherdsl.query.clause;
 
 /**
- * TODO
+ * SKIP clause
  */
 public class SkipClause
     extends Clause

@@ -20,13 +20,11 @@
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
-import org.neo4j.cypherdsl.query.Identifier;
-import org.neo4j.cypherdsl.query.Order;
 import org.neo4j.cypherdsl.query.Query;
 
 import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.Order.*;
+import static org.neo4j.cypherdsl.Order.*;
 
 /**
  * Construct Cypher queries corresponding to the Cypher Reference manual
@@ -483,7 +481,7 @@ public class CypherReferenceTest
     {
         assertEquals( CYPHER + "START a=node(1) RETURN a.age AS SomethingTotallyDifferent",
                       start( nodesById( "a", 1 ) ).
-                          returns( exp( identifier( "a" ).property( "age" ) ).as( "SomethingTotallyDifferent" ) ).
+                          returns( as( identifier( "a" ).property( "age" ), "SomethingTotallyDifferent" ) ).
                           toString() );
     }
 
@@ -502,7 +500,7 @@ public class CypherReferenceTest
         assertEquals( CYPHER+"START a=node(1) MATCH (a)-->(b) RETURN DISTINCT b",
                       start( nodesById( "a", 1 ) ).
                           match( node( "a" ).out().node( "b" ) ).
-                          returns( exp( identifier( "b" ) ).distinct() ).
+                          returns( distinct( identifier( "b" ) ) ).
                           toString() );
     }
 
@@ -586,7 +584,7 @@ public class CypherReferenceTest
         assertEquals( CYPHER+"START a=node(2) MATCH (a)-->(b) RETURN count(DISTINCT b.eyes)",
                       start( nodesById( "a", 2 ) ).
                           match( node( "a" ).out().node( "b" ) ).
-                          returns( count( exp( identifier( "b" ).property( "eyes" ) ).distinct() ) ).
+                          returns( count( distinct( identifier( "b" ).property( "eyes" ) ) ) ).
                           toString() );
     }
 
@@ -669,7 +667,7 @@ public class CypherReferenceTest
         assertEquals( CYPHER+"START david=node(1) MATCH (david)-[otherPerson]->() WITH otherPerson,count(*) AS foaf WHERE foaf>1 RETURN otherPerson",
                       start( nodesById( "david", 1 ) ).
                       match( node( "david" ).out( ).as( "otherPerson" ).node() ).
-                      with(identifier( "otherPerson" ), count().as( "foaf" )).
+                      with(identifier( "otherPerson" ), as( count(), "foaf" )).
                       where( identifier( "foaf" ).gt( literal( 1 ) ) ).
                       returns( identifier( "otherPerson" ) ).
                       toString());
@@ -993,134 +991,6 @@ public class CypherReferenceTest
         assertEquals( CYPHER+"START a=node(1) RETURN sign(-17),sign(0.1)",
                       start( nodesById( "a", 1 ) ).
                           returns( sign( -17), sign( 0.1) ).
-                          toString() );
-    }
-
-    // Cookbook
-    @Test
-    public void test5_1_1()
-    {
-        // This test shows how to do partial queries. When the Query from toQuery() is passed into a new CypherQuery
-        // it is cloned, so any modifications do not affect the original query
-
-        Query query = start( lookup( "n", "node_auto_index", "name", "User1" ) ).
-            match( node( "n" ).out( "hasRoleInGroup" ).node( "hyperEdge" ).out( "hasGroup" ).node( "group" ),
-                   node( "hyperEdge" ).out( "hasRole" ).node( "role" ) ).toQuery();
-
-        assertEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
-                      CypherQuery.newQuery( query ).starts().
-                          where( identifier( "group" ).string( "name" ).eq( "Group2" ) ).
-                          returns( identifier( "role" ).string( "name" ) ).
-                          toString() );
-
-        assertEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name,group.name ORDER BY role.name ASCENDING",
-                      CypherQuery.newQuery( query ).starts().
-                          returns( identifier( "role" ).property( "name" ), identifier( "group" ).property( "name" ) ).
-                          orderBy( order( identifier( "role" ).string( "name" ), ASCENDING ) ).
-                          toString() );
-    }
-
-    @Test
-    public void test5_1_2()
-    {
-        Identifier u1 = identifier("u1");
-        Identifier u2 = identifier("u2");
-        Identifier hyperEdge1 = identifier("hyperEdge1");
-        Identifier group = identifier("group");
-        Identifier role = identifier("role");
-        Identifier hyperEdge2 = identifier("hyperEdge2");
-        assertEquals( CYPHER + "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
-                      "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
-                      "(hyperEdge1)-[:hasRole]->(role)," +
-                      "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
-                      "(hyperEdge2)-[:hasRole]->(role) " +
-                      "RETURN group.name,count(role) " +
-                      "ORDER BY group.name ASCENDING",
-                      start( lookup( u1, identifier( "node_auto_index" ), identifier( "name" ), literal( "User1" ) ), lookup( u2, identifier( "node_auto_index" ), identifier( "name" ), literal( "User2" ) ) ).
-                              match( node( u1 )
-                                         .out( "hasRoleInGroup" )
-                                         .node( hyperEdge1 )
-                                         .out( "hasGroup" )
-                                         .node( group ),
-                                     node( hyperEdge1 ).out( "hasRole" ).node( role ),
-                                     node( u2 )
-                                         .out( "hasRoleInGroup" )
-                                         .node( hyperEdge2 )
-                                         .out( "hasGroup" )
-                                         .node( group ),
-                                     node( hyperEdge2 ).out( "hasRole" ).node( role ) ).
-                              returns( group.property( "name" ), count( role ) ).
-                              orderBy( order( group.property( "name" ), ASCENDING ) )
-                          .toString() );
-    }
-
-    @Test
-    public void test5_1_3()
-    {
-        assertEquals( CYPHER+ "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
-                      "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
-                      "(hyperEdge1)-[:hasRole]->(role)," +
-                      "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
-                      "(hyperEdge2)-[:hasRole]->(role) " +
-                      "RETURN group.name,count(role) " +
-                      "ORDER BY group.name ASCENDING",
-                      start( lookup( "u1", "node_auto_index", "name", "User1" ), lookup( "u2", "node_auto_index", "name", "User2" ) ).
-                      match( node( "u1" ).out( "hasRoleInGroup" )
-                                 .node( "hyperEdge1" )
-                                 .out( "hasGroup" )
-                                 .node( "group" ),
-                             node( "hyperEdge1" ).out( "hasRole" ).node( "role" ),
-                             node( "u2" ).out( "hasRoleInGroup" )
-                                 .node( "hyperEdge2" )
-                                 .out( "hasGroup" )
-                                 .node( "group" ),
-                             node( "hyperEdge2" ).out( "hasRole" ).node( "role" ) ).
-                      returns( identifier( "group" ).property( "name" ), count( identifier( "role" ) ) ).
-                      orderBy( order( identifier( "group" ).property( "name" ), Order.ASCENDING ) ).toString()
-                            );
-    }
-
-    @Test
-    public void test5_2_1()
-    {
-        assertEquals( CYPHER+"START joe=node:node_auto_index(name=\"Joe\") MATCH (joe)-[:knows]->(friend)-[:knows]->(friend_of_friend),(joe)-[r?:knows]->(friend_of_friend) WHERE r is null RETURN friend_of_friend.name,count(*) ORDER BY count(*) DESCENDING,friend_of_friend.name",
-                      start( lookup( "joe", "node_auto_index", "name", "Joe" ) ).
-                          match( node( "joe" ).out( "knows" ).node( "friend" )
-                                     .out( "knows" ).node( "friend_of_friend" ),
-                                 node( "joe" ).out( "knows" ).as( "r" ).optional().node( "friend_of_friend" ) ).
-                          where( isNull( identifier("r" )) ).
-                          returns( identifier( "friend_of_friend" ).property( "name" ), count() ).
-                          orderBy( order( count(), DESCENDING ), identifier( "friend_of_friend" ).property( "name" ) ).
-                          toString() );
-    }
-
-    @Test
-    public void test5_3_1()
-    {
-        assertEquals( CYPHER+"START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
-                      start( lookup( "place", "node_auto_index", "name", "CoffeShop1" ) ).
-                          match( node( "place" ).in( "favorite" ).node( "person" ).out( "favorite" ).node( "stuff" ) ).
-                          returns( identifier( "stuff" ).property( "name" ), count() ).
-                          orderBy( order( count(), DESCENDING ), identifier( "stuff" ).property( "name" ) ).
-                          toString() );
-
-        assertEquals( CYPHER + "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
-                      start( lookup( "place", "node_auto_index", "name", "CoffeShop1" ) ).
-                          match( node( "place" ).out( "tagged" ).node( "tag" ).in( "tagged" ).node( "otherPlace" ) ).
-                          returns( identifier( "otherPlace" ).property( "name" ), collect( identifier( "tag" ).property( "name" ) ) ).
-                          orderBy( order( identifier( "otherPlace" ).property( "name" ), DESCENDING ) ).
-                          toString() );
-    }
-
-    @Test
-    public void test5_4_1()
-    {
-        assertEquals( CYPHER+"START me=node:node_auto_index(name=\"Joe\") MATCH (me)-[:favorite]->(stuff)<-[:favorite]-(person) WHERE not((me)-[:friend]-(person)) RETURN person.name,count(stuff) ORDER BY count(stuff) DESCENDING",
-                      start( lookup( "me", "node_auto_index", "name", "Joe" ) ).
-                          match( node( "me" ).out( "favorite" ).node( "stuff" ).in( "favorite" ).node( "person" )).
-                          where( not( node( "me").both( "friend" ).node( "person"))).
-                          returns( identifier( "person" ).property( "name" ), count( identifier( "stuff" ) ) ).
-                          orderBy( order( count( identifier( "stuff" ) ), DESCENDING ) ).
                           toString() );
     }
 }

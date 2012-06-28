@@ -22,7 +22,7 @@ package org.neo4j.cypherdsl.query.clause;
 
 import java.io.Serializable;
 import java.util.List;
-import org.neo4j.cypherdsl.query.AsString;
+import org.neo4j.cypherdsl.AsString;
 
 /**
  * Base class for all clauses

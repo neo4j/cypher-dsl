@@ -19,10 +19,10 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
-* TODO
+* Collections many expressions into a list
 */
 public class Expressions
     extends AbstractExpression

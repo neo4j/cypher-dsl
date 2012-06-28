@@ -20,10 +20,10 @@
 
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.Expression;
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
-* TODO
+* Represents a regexp operation.
 */
 public class Regexp
     extends AbstractExpression
@@ -36,7 +36,7 @@ public class Regexp
     public void asString( StringBuilder builder )
     {
         left.asString( builder );
-        builder.append( "=~/" ); // TODO Should the / be include for parameters?
+        builder.append( "=~/" );
         if (!caseSensitive)
             builder.append( "(?i)" );
         regexp.asString( builder );

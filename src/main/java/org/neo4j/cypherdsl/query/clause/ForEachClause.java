@@ -22,17 +22,17 @@ package org.neo4j.cypherdsl.query.clause;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.neo4j.cypherdsl.Expression;
-import org.neo4j.cypherdsl.ForEachStatement;
-import org.neo4j.cypherdsl.ForEachStatements;
-import org.neo4j.cypherdsl.PathExpression;
-import org.neo4j.cypherdsl.ReferenceExpression;
-import org.neo4j.cypherdsl.query.AsString;
-import org.neo4j.cypherdsl.query.Identifier;
-import org.neo4j.cypherdsl.query.SetProperty;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.grammar.ForEachStatement;
+import org.neo4j.cypherdsl.grammar.ForEachStatements;
+import org.neo4j.cypherdsl.expression.PathExpression;
+import org.neo4j.cypherdsl.expression.ReferenceExpression;
+import org.neo4j.cypherdsl.AsString;
+import org.neo4j.cypherdsl.Identifier;
+import org.neo4j.cypherdsl.SetProperty;
 
 /**
- * TODO
+ * FOR EACH clause
  */
 public class ForEachClause
     extends Clause
@@ -48,9 +48,16 @@ public class ForEachClause
         this.in = in;
     }
 
+    @Override
     public ForEachStatement create(PathExpression... paths)
     {
         return new ForEachStatement(add( new CreateClause( Arrays.asList(paths) ) ) );
+    }
+
+    @Override
+    public ForEachStatement create(Iterable<PathExpression> paths)
+    {
+        return new ForEachStatement(add( new CreateClause( paths ) ) );
     }
 
     @Override
@@ -60,15 +67,33 @@ public class ForEachClause
     }
 
     @Override
+    public ForEachStatement set( Iterable<SetProperty> setProperties )
+    {
+        return new ForEachStatement(add( new SetClause( setProperties) ) );
+    }
+
+    @Override
     public ForEachStatement delete( ReferenceExpression... expressions )
     {
         return new ForEachStatement(add( new DeleteClause( Arrays.asList(expressions) ) ) );
     }
 
     @Override
+    public ForEachStatement delete( Iterable<ReferenceExpression> expressions )
+    {
+        return new ForEachStatement(add( new DeleteClause( expressions) ) );
+    }
+
+    @Override
     public ForEachStatement relate( PathExpression... expressions )
     {
         return new ForEachStatement(add( new RelateClause( Arrays.asList(expressions) ) ) );
+    }
+
+    @Override
+    public ForEachStatement relate( Iterable<PathExpression> expressions )
+    {
+        return new ForEachStatement(add( new RelateClause( expressions) ) );
     }
 
     @Override
