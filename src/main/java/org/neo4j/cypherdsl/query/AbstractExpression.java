@@ -82,4 +82,12 @@ public abstract class AbstractExpression
     {
         return super.clone();
     }
+
+    @Override
+    public String toString()
+    {
+        StringBuilder builder = new StringBuilder( );
+        asString( builder );
+        return builder.toString();
+    }
 }
