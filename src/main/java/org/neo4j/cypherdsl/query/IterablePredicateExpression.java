@@ -20,15 +20,15 @@
 
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.CollectionExpression;
-import org.neo4j.cypherdsl.Identifier;
 
 /**
-* Iterable predicates are of the form: function(name IN iterable WHERE predicate)
-*/
+ * Iterable predicates are of the form: function(name IN iterable WHERE predicate)
+ */
 public class IterablePredicateExpression
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public String function;
     public Identifier name;

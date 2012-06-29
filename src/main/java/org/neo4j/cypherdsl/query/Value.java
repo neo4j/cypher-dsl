@@ -19,6 +19,8 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import static org.neo4j.cypherdsl.CypherQuery.literal;
+
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.CollectionExpression;
 import org.neo4j.cypherdsl.expression.Expression;
@@ -29,15 +31,14 @@ import org.neo4j.cypherdsl.expression.RelationshipExpression;
 import org.neo4j.cypherdsl.expression.ScalarExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
 
-import static org.neo4j.cypherdsl.CypherQuery.*;
-
 /**
  * Handles a single value that corresponds to any expression. Optionally
  * can be a part of binary operation.
  */
 public class Value
-    extends AbstractExpression
-    implements ScalarExpression, NumericExpression, StringExpression, BooleanExpression, NodeExpression, RelationshipExpression, PathExpression, CollectionExpression
+        extends AbstractExpression
+        implements ScalarExpression, NumericExpression, StringExpression, BooleanExpression, NodeExpression,
+        RelationshipExpression, PathExpression, CollectionExpression
 {
     public Operator operator;
     public Expression value;
@@ -57,112 +58,112 @@ public class Value
     }
 
     // NumericExpression --------------------------------------------
-    public NumericExpression add(Number expression)
+    public NumericExpression add( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "+" ), literal( expression ));
+        return new Value( new Operator( this, "+" ), literal( expression ) );
     }
 
-    public NumericExpression add(NumericExpression expression)
+    public NumericExpression add( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "+" ), expression);
+        return new Value( new Operator( this, "+" ), expression );
     }
 
-    public NumericExpression subtract(Number expression)
+    public NumericExpression subtract( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "-" ), literal( expression ));
+        return new Value( new Operator( this, "-" ), literal( expression ) );
     }
 
-    public NumericExpression subtract(NumericExpression expression)
+    public NumericExpression subtract( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "-" ), expression);
+        return new Value( new Operator( this, "-" ), expression );
     }
 
-    public NumericExpression times(Number expression)
+    public NumericExpression times( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "*" ), literal( expression ));
+        return new Value( new Operator( this, "*" ), literal( expression ) );
     }
 
-    public NumericExpression times(NumericExpression expression)
+    public NumericExpression times( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "*" ), expression);
+        return new Value( new Operator( this, "*" ), expression );
     }
 
-    public NumericExpression divideBy(Number expression)
+    public NumericExpression divideBy( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "/" ), literal( expression ));
+        return new Value( new Operator( this, "/" ), literal( expression ) );
     }
 
-    public NumericExpression divideBy(NumericExpression expression)
+    public NumericExpression divideBy( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "/" ), expression);
+        return new Value( new Operator( this, "/" ), expression );
     }
 
-    public NumericExpression mod(Number expression)
+    public NumericExpression mod( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "%" ), literal( expression ));
+        return new Value( new Operator( this, "%" ), literal( expression ) );
     }
 
-    public NumericExpression mod(NumericExpression expression)
+    public NumericExpression mod( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "%" ), expression);
+        return new Value( new Operator( this, "%" ), expression );
     }
 
-    public BooleanExpression gt(Number expression)
+    public BooleanExpression gt( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">" ), literal(expression));
+        return new Value( new Operator( this, ">" ), literal( expression ) );
     }
 
-    public BooleanExpression lt(Number expression)
+    public BooleanExpression lt( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<" ), literal(expression));
+        return new Value( new Operator( this, "<" ), literal( expression ) );
     }
 
-    public BooleanExpression gte(Number expression)
+    public BooleanExpression gte( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">=" ), literal(expression));
+        return new Value( new Operator( this, ">=" ), literal( expression ) );
     }
 
-    public BooleanExpression lte(Number expression)
+    public BooleanExpression lte( Number expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<=" ), literal(expression));
+        return new Value( new Operator( this, "<=" ), literal( expression ) );
     }
 
-    public BooleanExpression gt(NumericExpression expression)
+    public BooleanExpression gt( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">" ), expression);
+        return new Value( new Operator( this, ">" ), expression );
     }
 
-    public BooleanExpression lt(NumericExpression expression)
+    public BooleanExpression lt( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<" ), expression);
+        return new Value( new Operator( this, "<" ), expression );
     }
 
-    public BooleanExpression gte(NumericExpression expression)
+    public BooleanExpression gte( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">=" ), expression);
+        return new Value( new Operator( this, ">=" ), expression );
     }
 
-    public BooleanExpression lte(NumericExpression expression)
+    public BooleanExpression lte( NumericExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<=" ), expression);
+        return new Value( new Operator( this, "<=" ), expression );
     }
 
     // String expression --------------------------------------------
@@ -170,56 +171,56 @@ public class Value
     public BooleanExpression gt( String expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">" ), literal( expression));
+        return new Value( new Operator( this, ">" ), literal( expression ) );
     }
 
     @Override
     public BooleanExpression gt( StringExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">" ), expression);
+        return new Value( new Operator( this, ">" ), expression );
     }
 
     @Override
     public BooleanExpression gte( String expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">=" ), literal( expression));
+        return new Value( new Operator( this, ">=" ), literal( expression ) );
     }
 
     @Override
     public BooleanExpression gte( StringExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, ">=" ), expression);
+        return new Value( new Operator( this, ">=" ), expression );
     }
 
     @Override
     public BooleanExpression lt( String expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<" ), literal( expression));
+        return new Value( new Operator( this, "<" ), literal( expression ) );
     }
 
     @Override
     public BooleanExpression lt( StringExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<" ), expression);
+        return new Value( new Operator( this, "<" ), expression );
     }
 
     @Override
     public BooleanExpression lte( String expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<=" ), literal( expression));
+        return new Value( new Operator( this, "<=" ), literal( expression ) );
     }
 
     @Override
     public BooleanExpression lte( StringExpression expression )
     {
         Query.checkNull( expression, "Expression" );
-        return new Value( new Operator( this, "<=" ), expression);
+        return new Value( new Operator( this, "<=" ), expression );
     }
 
     /**
@@ -253,7 +254,7 @@ public class Value
      */
     public BooleanExpression regexp( String regexp, boolean caseSensitive )
     {
-        return regexp(literal( regexp ), caseSensitive);
+        return regexp( literal( regexp ), caseSensitive );
     }
 
     public BooleanExpression regexp( StringExpression regexp, boolean caseSensitive )
@@ -265,12 +266,12 @@ public class Value
         return new Value( regularExpression );
     }
 
-    public StringExpression concat(String expression)
+    public StringExpression concat( String expression )
     {
-        return new Value( new Operator( this, "+" ), literal( expression ));
+        return new Value( new Operator( this, "+" ), literal( expression ) );
     }
 
-    public StringExpression concat(StringExpression expression)
+    public StringExpression concat( StringExpression expression )
     {
         return new Value( new Operator( this, "+" ), expression );
     }
@@ -278,8 +279,10 @@ public class Value
     @Override
     public void asString( StringBuilder builder )
     {
-        if (operator != null)
+        if ( operator != null )
+        {
             operator.asString( builder );
+        }
         value.asString( builder );
     }
 

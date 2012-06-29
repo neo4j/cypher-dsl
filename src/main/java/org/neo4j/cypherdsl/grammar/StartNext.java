@@ -24,6 +24,6 @@ package org.neo4j.cypherdsl.grammar;
  * This specifies what can come after a START clause
  */
 public interface StartNext
-    extends Match, ForEach, With
+        extends Match, ForEach, With
 {
 }

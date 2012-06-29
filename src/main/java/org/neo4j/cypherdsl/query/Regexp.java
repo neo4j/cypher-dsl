@@ -23,10 +23,10 @@ package org.neo4j.cypherdsl.query;
 import org.neo4j.cypherdsl.expression.Expression;
 
 /**
-* Represents a regexp operation.
-*/
+ * Represents a regexp operation.
+ */
 public class Regexp
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public Expression left;
     public Expression regexp;
@@ -37,8 +37,10 @@ public class Regexp
     {
         left.asString( builder );
         builder.append( "=~/" );
-        if (!caseSensitive)
+        if ( !caseSensitive )
+        {
             builder.append( "(?i)" );
+        }
         regexp.asString( builder );
         builder.append( '/' );
     }

@@ -23,6 +23,6 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a single node
  */
 public interface NodeExpression
-    extends PropertyContainerExpression
+        extends PropertyContainerExpression
 {
 }

@@ -23,8 +23,9 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a boolean
  */
 public interface BooleanExpression
-    extends ScalarExpression
+        extends ScalarExpression
 {
-    BooleanExpression and(BooleanExpression expression);
-    BooleanExpression or(BooleanExpression expression);
+    BooleanExpression and( BooleanExpression expression );
+
+    BooleanExpression or( BooleanExpression expression );
 }

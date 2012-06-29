@@ -19,15 +19,16 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.mysema.query.types.Expression;
 import com.mysema.query.types.Path;
 import com.mysema.query.types.Projections;
 import com.mysema.query.types.QBean;
 import com.mysema.query.types.path.PathBuilder;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Projection is responsible for converting the results of a query into an iterable of instances
@@ -37,31 +38,31 @@ public class Projection<T>
 {
     private QBean<T> bean;
 
-    public Projection(Class<T> targetClass)
+    public Projection( Class<T> targetClass )
     {
         PathBuilder<T> entity = new PathBuilder<T>( targetClass, "entity" );
         Field[] fields = targetClass.getFields();
         Expression[] fieldExpressions = new Expression[fields.length];
-        for( int i = 0; i < fields.length; i++ )
+        for ( int i = 0; i < fields.length; i++ )
         {
-            fieldExpressions[i] = entity.getString( fields[ i ].getName() );
+            fieldExpressions[i] = entity.getString( fields[i].getName() );
         }
 
-        bean = Projections.fields(targetClass, fieldExpressions);
+        bean = Projections.fields( targetClass, fieldExpressions );
     }
 
 
-    public Iterable<T> iterable( Iterable<Map<String,Object>> result )
+    public Iterable<T> iterable( Iterable<Map<String, Object>> result )
     {
-        List<T> entities = new ArrayList<T>(  );
+        List<T> entities = new ArrayList<T>();
 
-        for( Map<String, Object> stringObjectMap : result )
+        for ( Map<String, Object> stringObjectMap : result )
         {
             Object[] args = new Object[stringObjectMap.size()];
             int idx = 0;
-            for (Expression<?> expression : bean.getArgs())
+            for ( Expression<?> expression : bean.getArgs() )
             {
-                args[idx++] = stringObjectMap.get(((Path)expression).getMetadata().getExpression().toString());
+                args[idx++] = stringObjectMap.get( ((Path) expression).getMetadata().getExpression().toString() );
             }
 
             entities.add( bean.newInstance( args ) );

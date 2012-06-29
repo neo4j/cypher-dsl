@@ -19,13 +19,13 @@
  */
 package org.neo4j.cypherdsl.query.neo4j;
 
+import static org.neo4j.cypherdsl.query.Query.checkNull;
+
 import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Identifier;
-import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.expression.StartExpression;
+import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.graphdb.Node;
-
-import static org.neo4j.cypherdsl.query.Query.*;
 
 /**
  * START expressions that use Neo4j Node objects directly, thus avoiding use of
@@ -42,15 +42,15 @@ public abstract class StartExpressionNeo
     {
         checkNull( name, "Name" );
 
-        for( Node node : nodes )
+        for ( Node node : nodes )
         {
             Query.checkNull( node, "Node" );
         }
 
         long[] ids = new long[nodes.length];
-        for( int i = 0; i < nodes.length; i++ )
+        for ( int i = 0; i < nodes.length; i++ )
         {
-            Node node = nodes[ i ];
+            Node node = nodes[i];
             ids[i] = node.getId();
         }
 

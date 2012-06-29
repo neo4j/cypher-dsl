@@ -23,6 +23,6 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a node or relationship
  */
 public interface PropertyContainerExpression
-    extends ScalarExpression
+        extends ScalarExpression
 {
 }

@@ -19,6 +19,8 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
+import javax.annotation.Nullable;
+
 import com.mysema.query.lucene.LuceneSerializer;
 import com.mysema.query.types.Constant;
 import com.mysema.query.types.FactoryExpression;
@@ -30,14 +32,13 @@ import com.mysema.query.types.Predicate;
 import com.mysema.query.types.SubQueryExpression;
 import com.mysema.query.types.TemplateExpression;
 import com.mysema.query.types.Visitor;
-import javax.annotation.Nullable;
-import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.CypherQuery;
+import org.neo4j.cypherdsl.Identifier;
+import org.neo4j.cypherdsl.Property;
+import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.NumericExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
-import org.neo4j.cypherdsl.Identifier;
-import org.neo4j.cypherdsl.Property;
 import org.neo4j.cypherdsl.query.Value;
 
 /**
@@ -45,32 +46,35 @@ import org.neo4j.cypherdsl.query.Value;
  * and use those as parameters for these methods, which can then be used with the regular Cypher DSL methods.
  */
 public class CypherQueryDSL
-    extends CypherQuery
+        extends CypherQuery
 {
-    private static final LuceneSerializer luceneSerializer = new LuceneSerializer(true, true);
+    private static final LuceneSerializer luceneSerializer = new LuceneSerializer( true, true );
 
     // Additional QueryDSL methods
     public static Identifier identifier( Path<?> entityPath )
     {
-        return identifier(entityPath.getMetadata().getExpression().toString());
+        return identifier( entityPath.getMetadata().getExpression().toString() );
     }
 
     public static Property property( Path<?> entityPath )
     {
-        return identifier(entityPath.getRoot().toString()).property( entityPath.getMetadata().getExpression().toString() );
+        return identifier( entityPath.getRoot().toString() ).property( entityPath.getMetadata().getExpression()
+                .toString() );
     }
 
     public static StringExpression string( Path<?> entityPath )
     {
-        return identifier(entityPath.getRoot().toString()).string( entityPath.getMetadata().getExpression().toString() );
+        return identifier( entityPath.getRoot().toString() ).string( entityPath.getMetadata().getExpression()
+                .toString() );
     }
 
     public static NumericExpression number( Path<?> entityPath )
     {
-        return identifier(entityPath.getRoot().toString()).number( entityPath.getMetadata().getExpression().toString() );
+        return identifier( entityPath.getRoot().toString() ).number( entityPath.getMetadata().getExpression()
+                .toString() );
     }
 
-    public static String toQuery(Predicate query)
+    public static String toQuery( Predicate query )
     {
         return luceneSerializer.toQuery( query, null ).toString();
     }
@@ -78,137 +82,138 @@ public class CypherQueryDSL
     public static BooleanExpression toBooleanExpression( Predicate predicate )
     {
         return predicate.accept( new Visitor<BooleanExpression, BooleanExpression>()
-                                {
-                                    @Override
-                                    public BooleanExpression visit( Constant<?> constant,
-                                                                      @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        return null;
-                                    }
+        {
+            @Override
+            public BooleanExpression visit( Constant<?> constant,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                return null;
+            }
 
-                                    @Override
-                                    public BooleanExpression visit( FactoryExpression<?> factoryExpression,
-                                                                      @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        return null;
-                                    }
+            @Override
+            public BooleanExpression visit( FactoryExpression<?> factoryExpression,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                return null;
+            }
 
-                                    @Override
-                                    public BooleanExpression visit( Operation<?> operation,
-                                                                      @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        String id = operation.getOperator().getId();
-                                        if( id.equals( Ops.AND.getId() ) )
-                                        {
-                                            return and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
-                                                .accept( this, null ) );
-                                        }
-                                        else if( id.equals( Ops.OR.getId() ) )
-                                        {
-                                            return or( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
-                                                .accept( this, null ) );
-                                        }
-                                        else if( id.equals( Ops.NOT.getId() ) )
-                                        {
-                                            return not( operation.getArg( 0 ).accept( this, null ) );
-                                        }
-                                        else if( id.equals( Ops.EQ_PRIMITIVE.getId() ) || id.equals( Ops.EQ_OBJECT.getId() ) )
-                                        {
-                                            return arg( operation.getArg( 0 ) ).eq( (StringExpression) arg( operation.getArg( 1 ) ) );
-                                        }
-                                        else if( id.equals( Ops.NE_PRIMITIVE.getId() ) || id.equals( Ops.NE_OBJECT.getId() ) )
-                                        {
-                                            return arg( operation.getArg( 0 ) ).ne( (StringExpression) arg( operation.getArg( 1 ) ) );
-                                        }
-                                        else if( id.equals( Ops.GT.getId() ) )
-                                        {
-                                            return arg( operation.getArg( 0 ) ).gt( (StringExpression) arg( operation.getArg( 1 ) ) );
-                                        }
-                                        else if( id.equals( Ops.LT.getId() ) )
-                                        {
-                                            return arg( operation.getArg( 0 ) ).lt( (StringExpression) arg( operation.getArg( 1 ) ) );
-                                        }
-                                        else if( id.equals( Ops.GOE.getId() ) )
-                                        {
-                                            return arg( operation.getArg( 0 ) ).gte( (StringExpression) arg( operation.getArg( 1 ) ) );
-                                        }
-                                        else if( id.equals( Ops.LOE.getId() ) )
-                                        {
-                                            return arg( operation.getArg( 0 ) ).lte( (StringExpression) arg( operation.getArg( 1 ) ) );
-                                        }
-                                        else if( id.equals( Ops.EXISTS.getId() ) )
-                                        {
-                                            return has( (Property) arg( operation.getArg( 0 ) ) );
-                                        }
-                                        else if( id.equals( Ops.IS_NULL.getId() ) )
-                                        {
-                                            return isNull( (Expression) arg( operation.getArg( 0 ) ) );
-                                        }
-                                        else if( id.equals( Ops.IS_NOT_NULL.getId() ) )
-                                        {
-                                            return isNotNull( (Expression) arg( operation.getArg( 0 ) ) );
-                                        }
-                                        else
-                                        {
-                                            throw new IllegalArgumentException( "Unknown operator:" + id + " in expression " + operation );
-                                        }
-                                    }
+            @Override
+            public BooleanExpression visit( Operation<?> operation,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                String id = operation.getOperator().getId();
+                if ( id.equals( Ops.AND.getId() ) )
+                {
+                    return and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
+                }
+                else if ( id.equals( Ops.OR.getId() ) )
+                {
+                    return or( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
+                }
+                else if ( id.equals( Ops.NOT.getId() ) )
+                {
+                    return not( operation.getArg( 0 ).accept( this, null ) );
+                }
+                else if ( id.equals( Ops.EQ_PRIMITIVE.getId() ) || id.equals( Ops.EQ_OBJECT.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).eq( (StringExpression) arg( operation.getArg( 1 ) ) );
+                }
+                else if ( id.equals( Ops.NE_PRIMITIVE.getId() ) || id.equals( Ops.NE_OBJECT.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).ne( (StringExpression) arg( operation.getArg( 1 ) ) );
+                }
+                else if ( id.equals( Ops.GT.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).gt( (StringExpression) arg( operation.getArg( 1 ) ) );
+                }
+                else if ( id.equals( Ops.LT.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).lt( (StringExpression) arg( operation.getArg( 1 ) ) );
+                }
+                else if ( id.equals( Ops.GOE.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).gte( (StringExpression) arg( operation.getArg( 1 ) ) );
+                }
+                else if ( id.equals( Ops.LOE.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).lte( (StringExpression) arg( operation.getArg( 1 ) ) );
+                }
+                else if ( id.equals( Ops.EXISTS.getId() ) )
+                {
+                    return has( (Property) arg( operation.getArg( 0 ) ) );
+                }
+                else if ( id.equals( Ops.IS_NULL.getId() ) )
+                {
+                    return isNull( (Expression) arg( operation.getArg( 0 ) ) );
+                }
+                else if ( id.equals( Ops.IS_NOT_NULL.getId() ) )
+                {
+                    return isNotNull( (Expression) arg( operation.getArg( 0 ) ) );
+                }
+                else
+                {
+                    throw new IllegalArgumentException( "Unknown operator:" + id + " in expression " + operation );
+                }
+            }
 
-                                    @Override
-                                    public BooleanExpression visit( ParamExpression<?> paramExpression,
-                                                                    @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        return null;
-                                    }
+            @Override
+            public BooleanExpression visit( ParamExpression<?> paramExpression,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                return null;
+            }
 
-                                    @Override
-                                    public BooleanExpression visit( Path<?> path,
-                                                                    @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        return null;
-                                    }
+            @Override
+            public BooleanExpression visit( Path<?> path,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                return null;
+            }
 
-                                    @Override
-                                    public BooleanExpression visit( SubQueryExpression<?> subQueryExpression,
-                                                                    @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        return null;
-                                    }
+            @Override
+            public BooleanExpression visit( SubQueryExpression<?> subQueryExpression,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                return null;
+            }
 
-                                    @Override
-                                    public BooleanExpression visit( TemplateExpression<?> templateExpression,
-                                                                    @Nullable BooleanExpression booleanExpression
-                                    )
-                                    {
-                                        return null;
-                                    }
+            @Override
+            public BooleanExpression visit( TemplateExpression<?> templateExpression,
+                                            @Nullable BooleanExpression booleanExpression
+            )
+            {
+                return null;
+            }
 
-                                    public Value arg( com.mysema.query.types.Expression expression )
-                                    {
-                                        if( expression instanceof Constant )
-                                        {
-                                            return new Value(literal( ( (Constant) expression ).getConstant() ));
-                                        }
-                                        else if( expression instanceof ParamExpression )
-                                        {
-                                            return new Value(param( ( (ParamExpression) expression ).getName() ));
-                                        }
-                                        else if( expression instanceof Path )
-                                        {
-                                            Path path = (Path) expression;
-                                            return new Value(identifier( path.getRoot() ).string( path.getMetadata().getExpression().toString() ));
-                                        }
-                                        else
-                                        {
-                                            throw new IllegalArgumentException( "Unknown argument type:" + expression );
-                                        }
-                                    }
-                                }, null );
+            public Value arg( com.mysema.query.types.Expression expression )
+            {
+                if ( expression instanceof Constant )
+                {
+                    return new Value( literal( ((Constant) expression).getConstant() ) );
+                }
+                else if ( expression instanceof ParamExpression )
+                {
+                    return new Value( param( ((ParamExpression) expression).getName() ) );
+                }
+                else if ( expression instanceof Path )
+                {
+                    Path path = (Path) expression;
+                    return new Value( identifier( path.getRoot() ).string( path.getMetadata().getExpression()
+                            .toString() ) );
+                }
+                else
+                {
+                    throw new IllegalArgumentException( "Unknown argument type:" + expression );
+                }
+            }
+        }, null );
     }
 }

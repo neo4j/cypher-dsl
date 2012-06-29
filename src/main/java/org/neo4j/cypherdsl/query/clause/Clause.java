@@ -22,27 +22,33 @@ package org.neo4j.cypherdsl.query.clause;
 
 import java.io.Serializable;
 import java.util.List;
+
 import org.neo4j.cypherdsl.AsString;
 
 /**
  * Base class for all clauses
  */
 public abstract class Clause
-    implements AsString, Serializable, Cloneable
+        implements AsString, Serializable, Cloneable
 {
-    protected void clauseAsString( StringBuilder builder, String name, List<? extends AsString> asStringList, String separator )
+    protected void clauseAsString( StringBuilder builder, String name, List<? extends AsString> asStringList,
+                                   String separator )
     {
-        if (!asStringList.isEmpty())
+        if ( !asStringList.isEmpty() )
         {
-            if (builder.length() > 0)
+            if ( builder.length() > 0 )
+            {
                 builder.append( ' ' );
+            }
             builder.append( name ).append( ' ' );
 
-            for( int i = 0; i < asStringList.size(); i++ )
+            for ( int i = 0; i < asStringList.size(); i++ )
             {
                 AsString asString = asStringList.get( i );
-                if (i > 0)
+                if ( i > 0 )
+                {
                     builder.append( separator );
+                }
                 asString.asString( builder );
             }
         }

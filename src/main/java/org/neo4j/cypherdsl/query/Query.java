@@ -21,9 +21,10 @@ package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.AsString;
-import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.Literal;
+import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.clause.Clause;
 import org.neo4j.cypherdsl.query.clause.WhereClause;
 
@@ -32,61 +33,71 @@ import org.neo4j.cypherdsl.query.clause.WhereClause;
  * save on disk or transfer over the wire. Being cloneable also helps with query builder continuation.
  */
 public class Query
-    implements AsString, Serializable, Cloneable
+        implements AsString, Serializable, Cloneable
 {
-    public static boolean isEmpty(String string)
+    public static boolean isEmpty( String string )
     {
         return string == null || string.length() == 0;
     }
 
-    public static void checkNull(Object object, String name)
+    public static void checkNull( Object object, String name )
     {
-        if (object.getClass().isArray())
+        if ( object.getClass().isArray() )
         {
             Object[] array = (Object[]) object;
-            for( Object obj : array )
+            for ( Object obj : array )
             {
-                if (obj == null)
-                    throw new IllegalArgumentException( name+" may not be null" );
+                if ( obj == null )
+                {
+                    throw new IllegalArgumentException( name + " may not be null" );
+                }
             }
-        } else
-            if (object == null)
-                throw new IllegalArgumentException( name+" may not be null" );
-    }
-
-    public static void checkEmpty(String string, String name)
-    {
-        if (isEmpty( string ))
-            throw new IllegalArgumentException( name+" may not be null or empty string" );
-    }
-
-    public static void checkEmpty(Expression value, String name)
-    {
-        if (value instanceof Literal && isEmpty( value.toString() ))
-            throw new IllegalArgumentException( name+" may not be null or empty string" );
-    }
-
-    public static void checkEmpty(String[] strings, String name)
-    {
-        for( String string : strings )
+        }
+        else if ( object == null )
         {
-            if (isEmpty( string ))
-                throw new IllegalArgumentException( name+" may not be null or empty string" );
+            throw new IllegalArgumentException( name + " may not be null" );
         }
     }
 
-    private ArrayList<Clause> clauses = new ArrayList<Clause>(  );
+    public static void checkEmpty( String string, String name )
+    {
+        if ( isEmpty( string ) )
+        {
+            throw new IllegalArgumentException( name + " may not be null or empty string" );
+        }
+    }
 
-    public void add(Clause clause)
+    public static void checkEmpty( Expression value, String name )
+    {
+        if ( value instanceof Literal && isEmpty( value.toString() ) )
+        {
+            throw new IllegalArgumentException( name + " may not be null or empty string" );
+        }
+    }
+
+    public static void checkEmpty( String[] strings, String name )
+    {
+        for ( String string : strings )
+        {
+            if ( isEmpty( string ) )
+            {
+                throw new IllegalArgumentException( name + " may not be null or empty string" );
+            }
+        }
+    }
+
+    private ArrayList<Clause> clauses = new ArrayList<Clause>();
+
+    public void add( Clause clause )
     {
         // Check if we should merge to consecutive WHERE clauses
-        if (!clauses.isEmpty() && clause instanceof WhereClause )
+        if ( !clauses.isEmpty() && clause instanceof WhereClause )
         {
             Clause previousClause = clauses.get( clauses.size() - 1 );
             if ( previousClause instanceof WhereClause )
             {
                 WhereClause previousWhere = (WhereClause) previousClause;
-                previousWhere.mergeWith((WhereClause)clause);
+                previousWhere.mergeWith( (WhereClause) clause );
                 return;
             }
         }
@@ -94,11 +105,11 @@ public class Query
         clauses.add( clause );
     }
 
-    public void asString(StringBuilder builder)
+    public void asString( StringBuilder builder )
     {
         builder.append( "CYPHER 1.8" );
 
-        for( Clause clause : clauses )
+        for ( Clause clause : clauses )
         {
             clause.asString( builder );
         }
@@ -121,7 +132,7 @@ public class Query
 
     @Override
     public Object clone()
-        throws CloneNotSupportedException
+            throws CloneNotSupportedException
     {
         Query query = (Query) super.clone();
         query.clauses = (ArrayList<Clause>) query.clauses.clone();
@@ -131,7 +142,7 @@ public class Query
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder( );
+        StringBuilder builder = new StringBuilder();
         asString( builder );
         return builder.toString();
     }

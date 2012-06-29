@@ -23,32 +23,41 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a number
  */
 public interface NumericExpression
-    extends ScalarExpression
+        extends ScalarExpression
 {
-    public NumericExpression add(Number expression);
-    public NumericExpression add(NumericExpression expression);
+    public NumericExpression add( Number expression );
 
-    public NumericExpression subtract(Number expression);
-    public NumericExpression subtract(NumericExpression expression);
+    public NumericExpression add( NumericExpression expression );
 
-    public NumericExpression times(Number expression);
-    public NumericExpression times(NumericExpression expression);
+    public NumericExpression subtract( Number expression );
 
-    public NumericExpression divideBy(Number expression);
-    public NumericExpression divideBy(NumericExpression expression);
+    public NumericExpression subtract( NumericExpression expression );
 
-    public NumericExpression mod(Number expression);
-    public NumericExpression mod(NumericExpression expression);
+    public NumericExpression times( Number expression );
 
-    public BooleanExpression gt(Number expression);
-    public BooleanExpression gt(NumericExpression expression);
+    public NumericExpression times( NumericExpression expression );
 
-    public BooleanExpression lt(Number expression);
-    public BooleanExpression lt(NumericExpression expression);
+    public NumericExpression divideBy( Number expression );
 
-    public BooleanExpression gte(Number expression);
-    public BooleanExpression gte(NumericExpression expression);
+    public NumericExpression divideBy( NumericExpression expression );
 
-    public BooleanExpression lte(Number expression);
-    public BooleanExpression lte(NumericExpression expression);
+    public NumericExpression mod( Number expression );
+
+    public NumericExpression mod( NumericExpression expression );
+
+    public BooleanExpression gt( Number expression );
+
+    public BooleanExpression gt( NumericExpression expression );
+
+    public BooleanExpression lt( Number expression );
+
+    public BooleanExpression lt( NumericExpression expression );
+
+    public BooleanExpression gte( Number expression );
+
+    public BooleanExpression gte( NumericExpression expression );
+
+    public BooleanExpression lte( Number expression );
+
+    public BooleanExpression lte( NumericExpression expression );
 }

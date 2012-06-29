@@ -19,51 +19,51 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import static org.neo4j.cypherdsl.CypherQuery.literal;
+
+import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.CollectionExpression;
-import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.expression.Expression;
-
-import static org.neo4j.cypherdsl.CypherQuery.literal;
 
 /**
  * Common methods for all expressions
  */
 public abstract class AbstractExpression
-    implements Expression
+        implements Expression
 {
     @Override
     public BooleanExpression eq( Object expression )
     {
-        return new Value(new Operator( this, "=" ), literal(expression));
+        return new Value( new Operator( this, "=" ), literal( expression ) );
     }
 
     @Override
     public BooleanExpression eq( Expression expression )
     {
-        return new Value(new Operator( this, "=" ), expression);
+        return new Value( new Operator( this, "=" ), expression );
     }
 
     @Override
     public BooleanExpression ne( Object expression )
     {
-        return new Value(new Operator( this, "<>" ), literal( expression));
+        return new Value( new Operator( this, "<>" ), literal( expression ) );
     }
 
     @Override
     public BooleanExpression ne( Expression expression )
     {
-        return new Value(new Operator( this, "<>" ), expression);
+        return new Value( new Operator( this, "<>" ), expression );
     }
 
     public BooleanExpression and( BooleanExpression expression )
     {
-        return new CypherQuery.And( new BooleanExpression[]{(BooleanExpression) this, expression});
+        return new CypherQuery.And( new BooleanExpression[]{(BooleanExpression) this, expression} );
     }
 
     public BooleanExpression or( BooleanExpression expression )
     {
-        return new CypherQuery.Or( new BooleanExpression[]{(BooleanExpression) this, expression});
+        return new CypherQuery.Or( new BooleanExpression[]{(BooleanExpression) this, expression} );
     }
 
     public BooleanExpression in( CollectionExpression collection )
@@ -78,7 +78,7 @@ public abstract class AbstractExpression
 
     @Override
     public Object clone()
-        throws CloneNotSupportedException
+            throws CloneNotSupportedException
     {
         return super.clone();
     }
@@ -86,7 +86,7 @@ public abstract class AbstractExpression
     @Override
     public String toString()
     {
-        StringBuilder builder = new StringBuilder( );
+        StringBuilder builder = new StringBuilder();
         asString( builder );
         return builder.toString();
     }

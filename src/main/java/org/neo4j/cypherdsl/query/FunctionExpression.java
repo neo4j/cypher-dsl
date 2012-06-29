@@ -20,18 +20,13 @@
 
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.expression.Expression;
-import org.neo4j.cypherdsl.expression.NodeExpression;
-import org.neo4j.cypherdsl.expression.NumericExpression;
-import org.neo4j.cypherdsl.expression.PathExpression;
-import org.neo4j.cypherdsl.expression.StringExpression;
 
 /**
  * Expresses all functions of the form "f(exp)"
  */
 public class FunctionExpression
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public String name;
     public Expression expression;

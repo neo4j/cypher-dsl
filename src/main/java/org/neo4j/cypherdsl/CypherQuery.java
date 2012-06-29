@@ -19,9 +19,13 @@
  */
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.query.Query.checkEmpty;
+import static org.neo4j.cypherdsl.query.Query.checkNull;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.neo4j.cypherdsl.expression.All;
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.CollectionExpression;
@@ -80,12 +84,10 @@ import org.neo4j.cypherdsl.query.clause.StartClause;
 import org.neo4j.cypherdsl.query.clause.WhereClause;
 import org.neo4j.cypherdsl.query.clause.WithClause;
 
-import static org.neo4j.cypherdsl.query.Query.*;
-
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
  * or retrieve the internal Query model for further processing.
- *
+ * <p/>
  * It is possible to iteratively construct Cypher queries by calling toQuery()
  * and then use the Query as continuation point. When a new CypherQuery is created
  * by using the newQuery() method the Query is cloned, so that the original Query
@@ -114,10 +116,10 @@ public class CypherQuery
      * @param paths
      * @return
      */
-    public static UpdateNext create(PathExpression... paths)
+    public static UpdateNext create( PathExpression... paths )
     {
-        CypherQuery query = new CypherQuery(  );
-        return query.creates(paths);
+        CypherQuery query = new CypherQuery();
+        return query.creates( paths );
     }
 
     /**
@@ -137,7 +139,7 @@ public class CypherQuery
     /**
      * Use this constructor if you want to use the instantiation block style
      * of using the DSL.
-     *
+     * <p/>
      * Example:
      * <pre>
      *     new CypherQuery()
@@ -145,7 +147,6 @@ public class CypherQuery
      *         starts(node("n",1)).returns(identifier("n"));
      *     }}.toString()
      * </pre>
-     *
      */
     public CypherQuery()
     {
@@ -158,7 +159,7 @@ public class CypherQuery
         {
             this.query = (Query) query.clone();
         }
-        catch( CloneNotSupportedException e )
+        catch ( CloneNotSupportedException e )
         {
             throw new IllegalStateException( "Query was not cloneable" );
         }
@@ -167,17 +168,16 @@ public class CypherQuery
     // Common -------------------------------------------------------
 
     /**
-     *
      * Declare a Cypher query parameter.
      * This will be replaced with {name}.
      *
      * @param name of the parameter
      * @return Parameter instance
      */
-    public static Parameter param(String name)
+    public static Parameter param( String name )
     {
         checkEmpty( name, "Name" );
-        return new Parameter(name);
+        return new Parameter( name );
     }
 
     /**
@@ -189,7 +189,7 @@ public class CypherQuery
     public static StringExpression literal( String value )
     {
         checkNull( value, "Value" );
-        return new Literal(value);
+        return new Literal( value );
     }
 
     /**
@@ -201,7 +201,7 @@ public class CypherQuery
     public static NumericExpression literal( Number value )
     {
         checkNull( value, "Value" );
-        return new Literal(value);
+        return new Literal( value );
     }
 
     /**
@@ -212,12 +212,12 @@ public class CypherQuery
      */
     public static BooleanExpression literal( boolean value )
     {
-        return new Literal(value);
+        return new Literal( value );
     }
 
     /**
      * Declare a literal value using an untyped object.
-     *
+     * <p/>
      * If a string is passed in, then output will
      * be quoted appropriately.
      *
@@ -227,13 +227,13 @@ public class CypherQuery
     public static ScalarExpression literal( Object value )
     {
         checkNull( value, "Value" );
-        return new Literal(value);
+        return new Literal( value );
     }
 
     /**
      * Declare an identifier. This is used to
      * refer to names declared elsewhere in the query.
-     *
+     * <p/>
      * If you want to refer to properties, then create
      * this first, and then call e.g. id.property("propname")
      *
@@ -243,13 +243,13 @@ public class CypherQuery
     public static Identifier identifier( String name )
     {
         checkEmpty( name, "Identifier" );
-        return new Identifier(name);
+        return new Identifier( name );
     }
 
     /**
      * Declare a collection of expressions. Values may be Expressions or literal values
      * that are converted to Literal expressions by this method.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * [value1,value2,value3]
@@ -261,12 +261,12 @@ public class CypherQuery
     public static CollectionExpression collection( Object... values )
     {
         Expression[] expressions = new Expression[values.length];
-        for( int i = 0; i < values.length; i++ )
+        for ( int i = 0; i < values.length; i++ )
         {
-            Object value = values[ i ];
+            Object value = values[i];
             expressions[i] = value instanceof Expression ? (Expression) value : literal( value );
         }
-        return new Value(new ExpressionCollection(new Expressions( expressions )));
+        return new Value( new ExpressionCollection( new Expressions( expressions ) ) );
     }
 
     /**
@@ -278,9 +278,9 @@ public class CypherQuery
     public static Identifier[] identifiers( String... values )
     {
         Identifier[] identifiers = new Identifier[values.length];
-        for( int i = 0; i < values.length; i++ )
+        for ( int i = 0; i < values.length; i++ )
         {
-            String value = values[ i ];
+            String value = values[i];
             identifiers[i] = identifier( value );
         }
         return identifiers;
@@ -295,9 +295,9 @@ public class CypherQuery
     public static Parameter[] parameters( String... names )
     {
         Parameter[] parameters = new Parameter[names.length];
-        for( int i = 0; i < names.length; i++ )
+        for ( int i = 0; i < names.length; i++ )
         {
-            String value = names[ i ];
+            String value = names[i];
             parameters[i] = param( value );
         }
         return parameters;
@@ -313,9 +313,9 @@ public class CypherQuery
     public static NumericExpression[] literals( long... values )
     {
         NumericExpression[] literals = new NumericExpression[values.length];
-        for( int i = 0; i < values.length; i++ )
+        for ( int i = 0; i < values.length; i++ )
         {
-            long value = values[ i ];
+            long value = values[i];
             literals[i] = literal( value );
         }
         return literals;
@@ -329,9 +329,9 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static PropertyValue value(String id, Object value )
+    public static PropertyValue value( String id, Object value )
     {
-        return new PropertyValue( identifier( id), literal(value) );
+        return new PropertyValue( identifier( id ), literal( value ) );
     }
 
     /**
@@ -342,9 +342,9 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static PropertyValue value(String id, Expression value )
+    public static PropertyValue value( String id, Expression value )
     {
-        return new PropertyValue( identifier( id), value );
+        return new PropertyValue( identifier( id ), value );
     }
 
     /**
@@ -355,7 +355,7 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static PropertyValue value(Identifier id, Expression value )
+    public static PropertyValue value( Identifier id, Expression value )
     {
         return new PropertyValue( id, value );
     }
@@ -366,10 +366,10 @@ public class CypherQuery
      * @param expressions
      * @return
      */
-    public static BooleanExpression and(BooleanExpression... expressions)
+    public static BooleanExpression and( BooleanExpression... expressions )
     {
         Query.checkNull( expressions, "Expressions" );
-        return new And(expressions);
+        return new And( expressions );
     }
 
     /**
@@ -378,7 +378,7 @@ public class CypherQuery
      * @param expressions
      * @return
      */
-    public static BooleanExpression or(BooleanExpression... expressions)
+    public static BooleanExpression or( BooleanExpression... expressions )
     {
         Query.checkNull( expressions, "Expressions" );
         return new Or( expressions );
@@ -386,7 +386,7 @@ public class CypherQuery
 
     /**
      * Invert the boolean value of a predicate.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * not(expression)
@@ -395,11 +395,11 @@ public class CypherQuery
      * @param expression
      * @return
      */
-    public static BooleanExpression not(BooleanExpression expression)
+    public static BooleanExpression not( BooleanExpression expression )
     {
         Query.checkNull( expression, "Expression" );
 
-        return new Value( new FunctionExpression("not", expression));
+        return new Value( new FunctionExpression( "not", expression ) );
     }
 
     /**
@@ -411,9 +411,9 @@ public class CypherQuery
      * @param property
      * @return
      */
-    public static BooleanExpression has(Property property)
+    public static BooleanExpression has( Property property )
     {
-        return new Value(new FunctionExpression( "has", property ));
+        return new Value( new FunctionExpression( "has", property ) );
     }
 
     /**
@@ -425,9 +425,9 @@ public class CypherQuery
      * @param expression
      * @return
      */
-    public static BooleanExpression isNull(Expression expression)
+    public static BooleanExpression isNull( Expression expression )
     {
-        return new Value(new SuffixFunctionExpression( " is null", expression ));
+        return new Value( new SuffixFunctionExpression( " is null", expression ) );
     }
 
     /**
@@ -439,12 +439,13 @@ public class CypherQuery
      * @param expression
      * @return
      */
-    public static BooleanExpression isNotNull(Expression expression)
+    public static BooleanExpression isNotNull( Expression expression )
     {
-        return new Value(new SuffixFunctionExpression( " is not null", expression ));
+        return new Value( new SuffixFunctionExpression( " is not null", expression ) );
     }
 
     // Start --------------------------------------------------------
+
     /**
      * START clause. Use this with Java initialization block style.
      *
@@ -453,7 +454,7 @@ public class CypherQuery
      */
     protected StartNext starts( StartExpression... startExpressions )
     {
-        query.add( new StartClause( Arrays.asList( startExpressions) ));
+        query.add( new StartClause( Arrays.asList( startExpressions ) ) );
 
         return new Grammar();
     }
@@ -466,7 +467,7 @@ public class CypherQuery
      */
     protected StartNext starts( Iterable<StartExpression> startExpressions )
     {
-        query.add( new StartClause( startExpressions ));
+        query.add( new StartClause( startExpressions ) );
 
         return new Grammar();
     }
@@ -477,7 +478,7 @@ public class CypherQuery
      * @param paths
      * @return
      */
-    protected UpdateNext creates(PathExpression... paths)
+    protected UpdateNext creates( PathExpression... paths )
     {
         query.add( new CreateClause( Arrays.asList( paths ) ) );
 
@@ -513,9 +514,9 @@ public class CypherQuery
     {
         checkNull( name, "Name" );
 
-        for( long i : id )
+        for ( long i : id )
         {
-            if( i < 0 )
+            if ( i < 0 )
             {
                 throw new IllegalArgumentException( "Id may not be below zero" );
             }
@@ -625,7 +626,8 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static StartExpression.StartNodesLookup lookup( Identifier name, Identifier indexName, ReferenceExpression key, StringExpression value )
+    public static StartExpression.StartNodesLookup lookup( Identifier name, Identifier indexName,
+                                                           ReferenceExpression key, StringExpression value )
     {
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
@@ -707,9 +709,9 @@ public class CypherQuery
     {
         checkNull( name, "Name" );
 
-        for( long i : id )
+        for ( long i : id )
         {
-            if( i < 0 )
+            if ( i < 0 )
             {
                 throw new IllegalArgumentException( "Id may not be below zero" );
             }
@@ -753,7 +755,8 @@ public class CypherQuery
         checkNull( name, "Name" );
         checkEmpty( parameter, "Parameter" );
 
-        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression.StartRelationshipsParameters();
+        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression
+                .StartRelationshipsParameters();
         startRelationships.name = name;
         startRelationships.parameter = parameter;
         return startRelationships;
@@ -771,7 +774,8 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName, String key, String value )
+    public static StartExpression.StartRelationshipsIndex relationshipLookup( String name, String indexName,
+                                                                              String key, String value )
     {
         return relationshipLookup( identifier( name ), identifier( indexName ), identifier( key ), literal( value ) );
     }
@@ -788,7 +792,8 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static StartExpression.StartRelationshipsIndex relationshipLookup( Identifier name, Identifier indexName, Identifier key, StringExpression value )
+    public static StartExpression.StartRelationshipsIndex relationshipLookup( Identifier name, Identifier indexName,
+                                                                              Identifier key, StringExpression value )
     {
         checkNull( name, "Name" );
         checkNull( indexName, "Index" );
@@ -807,7 +812,7 @@ public class CypherQuery
 
     /**
      * Start declaring a path for CREATE, RELATE, MATCH or WHERE clauses.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * ()
@@ -817,42 +822,44 @@ public class CypherQuery
      */
     public static Path node()
     {
-        return new Path(null, null);
+        return new Path( null, null );
     }
 
     /**
      * Start declaring a path for CREATE, RELATE, MATCH or WHERE clauses.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (id)
      * </pre>
+     *
      * @param id
      * @return
      */
-    public static Path node(String id)
+    public static Path node( String id )
     {
-        return node( identifier( id ));
+        return node( identifier( id ) );
     }
 
     /**
      * Start declaring a path for CREATE, RELATE, MATCH or WHERE clauses.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (expression)
      * </pre>
+     *
      * @param expression
      * @return
      */
-    public static Path node(Expression expression)
+    public static Path node( Expression expression )
     {
-        return new Path(expression, null);
+        return new Path( expression, null );
     }
 
     /**
      * Declare a named path for MATCH clauses
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * name=path
@@ -861,14 +868,14 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static PathExpression path(String name, PathExpression path)
+    public static PathExpression path( String name, PathExpression path )
     {
-        return path(identifier( name ), path);
+        return path( identifier( name ), path );
     }
 
     /**
      * Declare a named path for MATCH clauses
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * name=path
@@ -877,7 +884,7 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static PathExpression path(Identifier name, PathExpression path)
+    public static PathExpression path( Identifier name, PathExpression path )
     {
         checkNull( name, "Name" );
         return new NamedPath( name, path );
@@ -885,7 +892,7 @@ public class CypherQuery
 
     /**
      * Use this to declare a shortestPath.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * shortestPath(path)
@@ -897,12 +904,12 @@ public class CypherQuery
     public static PathExpression shortestPath( PathExpression path )
     {
         Query.checkNull( path, "Path" );
-        return new Value( new FunctionExpression("shortestPath", path));
+        return new Value( new FunctionExpression( "shortestPath", path ) );
     }
 
     /**
      * Use this to declare a allShortestPaths
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * allShortestPaths(path)
@@ -915,13 +922,14 @@ public class CypherQuery
     {
         Query.checkNull( path, "Path" );
 
-        return new Value( new FunctionExpression("allShortestPaths", path));
+        return new Value( new FunctionExpression( "allShortestPaths", path ) );
     }
 
     // Return -------------------------------------------------------
+
     /**
      * Use this to rename identifiers for RETURN or WITH
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * expression AS name
@@ -931,14 +939,14 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static Expression as(Expression expression, String name)
+    public static Expression as( Expression expression, String name )
     {
-        return new Value(new Operator(expression, " AS "), identifier( name ));
+        return new Value( new Operator( expression, " AS " ), identifier( name ) );
     }
 
     /**
      * Use this to rename identifiers for RETURN or WITH
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * expression AS name
@@ -948,14 +956,14 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static Expression as(Expression expression, Identifier name)
+    public static Expression as( Expression expression, Identifier name )
     {
-        return new Value(new Operator(expression, " AS "), name);
+        return new Value( new Operator( expression, " AS " ), name );
     }
 
     /**
      * Use this to declare DISTINCT
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * DISTINCT expression
@@ -964,9 +972,9 @@ public class CypherQuery
      * @param expression
      * @return
      */
-    public static Expression distinct(Expression expression)
+    public static Expression distinct( Expression expression )
     {
-        return new Value(new Operator("DISTINCT "), expression);
+        return new Value( new Operator( "DISTINCT " ), expression );
     }
 
     /**
@@ -976,14 +984,14 @@ public class CypherQuery
      */
     public static NumericExpression count()
     {
-        return new Value(new FunctionExpression("count", new AbstractExpression()
+        return new Value( new FunctionExpression( "count", new AbstractExpression()
         {
             @Override
             public void asString( StringBuilder builder )
             {
                 builder.append( '*' );
             }
-        }));
+        } ) );
     }
 
     /**
@@ -991,11 +999,11 @@ public class CypherQuery
      *
      * @return
      */
-    public static NumericExpression count(Expression expression)
+    public static NumericExpression count( Expression expression )
     {
         checkNull( expression, "Expression" );
 
-        return new Value(new FunctionExpression("count", expression));
+        return new Value( new FunctionExpression( "count", expression ) );
     }
 
     /**
@@ -1011,10 +1019,10 @@ public class CypherQuery
      *
      * @return
      */
-    public static NumericExpression sum(NumericExpression expression)
+    public static NumericExpression sum( NumericExpression expression )
     {
         checkNull( expression, "Expression" );
-        return new Value( new FunctionExpression("sum", expression));
+        return new Value( new FunctionExpression( "sum", expression ) );
     }
 
     /**
@@ -1022,10 +1030,10 @@ public class CypherQuery
      *
      * @return
      */
-    public static NumericExpression avg(Expression expression)
+    public static NumericExpression avg( Expression expression )
     {
         checkNull( expression, "Expression" );
-        return new Value( new FunctionExpression("avg", expression));
+        return new Value( new FunctionExpression( "avg", expression ) );
     }
 
     /**
@@ -1033,10 +1041,10 @@ public class CypherQuery
      *
      * @return
      */
-    public static NumericExpression max(NumericExpression expression)
+    public static NumericExpression max( NumericExpression expression )
     {
         checkNull( expression, "Expression" );
-        return new Value( new FunctionExpression("max", expression));
+        return new Value( new FunctionExpression( "max", expression ) );
     }
 
     /**
@@ -1044,10 +1052,10 @@ public class CypherQuery
      *
      * @return
      */
-    public static NumericExpression min(NumericExpression expression)
+    public static NumericExpression min( NumericExpression expression )
     {
         checkNull( expression, "Expression" );
-        return new Value( new FunctionExpression("min", expression));
+        return new Value( new FunctionExpression( "min", expression ) );
     }
 
     /**
@@ -1055,13 +1063,14 @@ public class CypherQuery
      *
      * @return
      */
-    public static CollectionExpression collect(ScalarExpression expression)
+    public static CollectionExpression collect( ScalarExpression expression )
     {
         checkNull( expression, "Expression" );
-        return new Value(new FunctionExpression("collect", expression));
+        return new Value( new FunctionExpression( "collect", expression ) );
     }
 
     // Order by -----------------------------------------------------
+
     /**
      * Declare an ORDER clause expression. Typically used with identifier("n").property("property") as
      * parameter.
@@ -1097,6 +1106,7 @@ public class CypherQuery
     }
 
     // For each -----------------------------------------------------
+
     /**
      * Use this to create expressions for use with the FOR EACH clause. Use
      * the fluent API of ForEachStatements to create the statements to be evaluated
@@ -1106,9 +1116,9 @@ public class CypherQuery
      * @param in
      * @return
      */
-    public static ForEachStatements in(String id, Expression in)
+    public static ForEachStatements in( String id, Expression in )
     {
-        return new ForEachClause( identifier(id), in );
+        return new ForEachClause( identifier( id ), in );
     }
 
     /**
@@ -1120,15 +1130,16 @@ public class CypherQuery
      * @param in
      * @return
      */
-    public static ForEachStatements in(Identifier id, Expression in)
+    public static ForEachStatements in( Identifier id, Expression in )
     {
         return new ForEachClause( id, in );
     }
 
     // Set ----------------------------------------------------------
+
     /**
      * Use this to set properties in the SET clause.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * property=value
@@ -1138,12 +1149,13 @@ public class CypherQuery
      * @param value
      * @return
      */
-    public static SetProperty property(Property property, Expression value )
+    public static SetProperty property( Property property, Expression value )
     {
         return new SetProperty( property, value );
     }
 
     // Functions ----------------------------------------------------
+
     /**
      * Declare an ALL expression. Corresponds to:
      * <pre>
@@ -1155,7 +1167,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression all( String name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression all( String name, CollectionExpression iterable,
+                                         BooleanExpression predicateExpression )
     {
         return all( identifier( name ), iterable, predicateExpression );
     }
@@ -1171,7 +1184,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression all( Identifier name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression all( Identifier name, CollectionExpression iterable,
+                                         BooleanExpression predicateExpression )
     {
         Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
@@ -1182,7 +1196,7 @@ public class CypherQuery
         expression.name = name;
         expression.iterable = iterable;
         expression.predicate = predicateExpression;
-        return new Value( expression);
+        return new Value( expression );
     }
 
     /**
@@ -1196,7 +1210,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression any( String name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression any( String name, CollectionExpression iterable,
+                                         BooleanExpression predicateExpression )
     {
         return any( identifier( name ), iterable, predicateExpression );
     }
@@ -1212,7 +1227,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression any( Identifier name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression any( Identifier name, CollectionExpression iterable,
+                                         BooleanExpression predicateExpression )
     {
         Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
@@ -1223,7 +1239,7 @@ public class CypherQuery
         expression.name = name;
         expression.iterable = iterable;
         expression.predicate = predicateExpression;
-        return new Value( expression);
+        return new Value( expression );
     }
 
     /**
@@ -1237,7 +1253,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression none( String name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression none( String name, CollectionExpression iterable,
+                                          BooleanExpression predicateExpression )
     {
         return none( identifier( name ), iterable, predicateExpression );
     }
@@ -1253,7 +1270,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression none( Identifier name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression none( Identifier name, CollectionExpression iterable,
+                                          BooleanExpression predicateExpression )
     {
         Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
@@ -1264,7 +1282,7 @@ public class CypherQuery
         expression.name = name;
         expression.iterable = iterable;
         expression.predicate = predicateExpression;
-        return new Value( expression);
+        return new Value( expression );
     }
 
     /**
@@ -1278,7 +1296,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression single( String name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression single( String name, CollectionExpression iterable,
+                                            BooleanExpression predicateExpression )
     {
         return single( identifier( name ), iterable, predicateExpression );
     }
@@ -1294,7 +1313,8 @@ public class CypherQuery
      * @param predicateExpression
      * @return
      */
-    public static BooleanExpression single( Identifier name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static BooleanExpression single( Identifier name, CollectionExpression iterable,
+                                            BooleanExpression predicateExpression )
     {
         Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
@@ -1305,10 +1325,11 @@ public class CypherQuery
         expression.name = name;
         expression.iterable = iterable;
         expression.predicate = predicateExpression;
-        return new Value( expression);
+        return new Value( expression );
     }
 
     // Scalar expressions
+
     /**
      * Declare a length expression. Corresponds to:
      * <pre>
@@ -1318,10 +1339,10 @@ public class CypherQuery
      * @param expression
      * @return
      */
-    public static NumericExpression length(CollectionExpression expression)
+    public static NumericExpression length( CollectionExpression expression )
     {
         checkNull( expression, "Expression" );
-        return new Value( new FunctionExpression("length", expression));
+        return new Value( new FunctionExpression( "length", expression ) );
     }
 
     /**
@@ -1333,10 +1354,10 @@ public class CypherQuery
      * @param relationshipExpression
      * @return
      */
-    public static StringExpression type(RelationshipExpression relationshipExpression)
+    public static StringExpression type( RelationshipExpression relationshipExpression )
     {
         checkNull( relationshipExpression, "Expression" );
-        return new Value(new FunctionExpression("type", relationshipExpression));
+        return new Value( new FunctionExpression( "type", relationshipExpression ) );
     }
 
     /**
@@ -1348,10 +1369,10 @@ public class CypherQuery
      * @param name
      * @return
      */
-    public static NumericExpression id(String name)
+    public static NumericExpression id( String name )
     {
         checkNull( name, "Name" );
-        return new Value( new FunctionExpression("id", identifier( name )));
+        return new Value( new FunctionExpression( "id", identifier( name ) ) );
     }
 
     /**
@@ -1363,10 +1384,10 @@ public class CypherQuery
      * @param propertyContainerExpression
      * @return
      */
-    public static NumericExpression id(PropertyContainerExpression propertyContainerExpression)
+    public static NumericExpression id( PropertyContainerExpression propertyContainerExpression )
     {
         checkNull( propertyContainerExpression, "Expression" );
-        return new Value( new FunctionExpression("id", propertyContainerExpression));
+        return new Value( new FunctionExpression( "id", propertyContainerExpression ) );
     }
 
     /**
@@ -1378,14 +1399,14 @@ public class CypherQuery
      * @param expressions
      * @return
      */
-    public static Value coalesce(Expression... expressions)
+    public static Value coalesce( Expression... expressions )
     {
-        if( expressions.length < 1 )
+        if ( expressions.length < 1 )
         {
             throw new IllegalArgumentException( "At least one expression must be provided to coalesce function" );
         }
 
-        return new Value( new FunctionExpression("coalesce", new Expressions( expressions )));
+        return new Value( new FunctionExpression( "coalesce", new Expressions( expressions ) ) );
     }
 
     /**
@@ -1397,10 +1418,10 @@ public class CypherQuery
      * @param collectionExpression
      * @return
      */
-    public static Expression head(CollectionExpression collectionExpression)
+    public static Expression head( CollectionExpression collectionExpression )
     {
         checkNull( collectionExpression, "Expression" );
-        return new Value( new FunctionExpression("head", collectionExpression));
+        return new Value( new FunctionExpression( "head", collectionExpression ) );
     }
 
     /**
@@ -1412,10 +1433,10 @@ public class CypherQuery
      * @param collectionExpression
      * @return
      */
-    public static Expression last(CollectionExpression collectionExpression)
+    public static Expression last( CollectionExpression collectionExpression )
     {
         checkNull( collectionExpression, "Expression" );
-        return new Value( new FunctionExpression("last", collectionExpression));
+        return new Value( new FunctionExpression( "last", collectionExpression ) );
     }
 
     // Iterable expressions
@@ -1425,14 +1446,15 @@ public class CypherQuery
      * <pre>
      * nodes(path)
      * </pre>
+     *
      * @param pathExpression
      * @return
      */
-    public static CollectionExpression nodes(PathExpression pathExpression)
+    public static CollectionExpression nodes( PathExpression pathExpression )
     {
         checkNull( pathExpression, "Expression" );
 
-        return new Value( new FunctionExpression("nodes", pathExpression));
+        return new Value( new FunctionExpression( "nodes", pathExpression ) );
     }
 
     /**
@@ -1440,14 +1462,15 @@ public class CypherQuery
      * <pre>
      * relationships(path)
      * </pre>
+     *
      * @param pathExpression
      * @return
      */
-    public static CollectionExpression relationships(PathExpression pathExpression)
+    public static CollectionExpression relationships( PathExpression pathExpression )
     {
         checkNull( pathExpression, "Expression" );
 
-        return new Value( new FunctionExpression("relationships", pathExpression));
+        return new Value( new FunctionExpression( "relationships", pathExpression ) );
     }
 
     /**
@@ -1455,11 +1478,13 @@ public class CypherQuery
      * <pre>
      * extract(name IN iterable : expression)
      * </pre>
+     *
      * @param iterable
      * @param expression
      * @return
      */
-    public static CollectionExpression extract( String name, CollectionExpression iterable, ScalarExpression expression )
+    public static CollectionExpression extract( String name, CollectionExpression iterable,
+                                                ScalarExpression expression )
     {
         return extract( identifier( name ), iterable, expression );
     }
@@ -1469,11 +1494,13 @@ public class CypherQuery
      * <pre>
      * extract(name IN iterable : expression)
      * </pre>
+     *
      * @param iterable
      * @param expression
      * @return
      */
-    public static CollectionExpression extract( Identifier name, CollectionExpression iterable, ScalarExpression expression )
+    public static CollectionExpression extract( Identifier name, CollectionExpression iterable,
+                                                ScalarExpression expression )
     {
         Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
@@ -1483,7 +1510,7 @@ public class CypherQuery
         extract.name = name;
         extract.iterable = iterable;
         extract.expression = expression;
-        return new Value( extract);
+        return new Value( extract );
     }
 
     /**
@@ -1491,11 +1518,13 @@ public class CypherQuery
      * <pre>
      * filter(name IN iterable : predicate)
      * </pre>
+     *
      * @param iterable
      * @param predicateExpression
      * @return
      */
-    public static CollectionExpression filter( String name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static CollectionExpression filter( String name, CollectionExpression iterable,
+                                               BooleanExpression predicateExpression )
     {
         return filter( identifier( name ), iterable, predicateExpression );
     }
@@ -1505,11 +1534,13 @@ public class CypherQuery
      * <pre>
      * filter(name IN iterable : predicate)
      * </pre>
+     *
      * @param iterable
      * @param predicateExpression
      * @return
      */
-    public static CollectionExpression filter( Identifier name, CollectionExpression iterable, BooleanExpression predicateExpression )
+    public static CollectionExpression filter( Identifier name, CollectionExpression iterable,
+                                               BooleanExpression predicateExpression )
     {
         Query.checkNull( name, "Name" );
         Query.checkNull( iterable, "Iterable" );
@@ -1519,7 +1550,7 @@ public class CypherQuery
         filter.name = name;
         filter.iterable = iterable;
         filter.predicate = predicateExpression;
-        return new Value( filter);
+        return new Value( filter );
     }
 
     /**
@@ -1527,13 +1558,14 @@ public class CypherQuery
      * <pre>
      * tail(collectionExpression)
      * </pre>
+     *
      * @param collectionExpression
      * @return
      */
-    public static CollectionExpression tail(CollectionExpression collectionExpression)
+    public static CollectionExpression tail( CollectionExpression collectionExpression )
     {
         checkNull( collectionExpression, "Expression" );
-        return new Value( new FunctionExpression("tail", collectionExpression));
+        return new Value( new FunctionExpression( "tail", collectionExpression ) );
     }
 
     /**
@@ -1541,13 +1573,14 @@ public class CypherQuery
      * <pre>
      * range(start,end)
      * </pre>
+     *
      * @param start
      * @param end
      * @return
      */
-    public static CollectionExpression range(Number start, Number end)
+    public static CollectionExpression range( Number start, Number end )
     {
-        return range( literal( start ), literal( end), null );
+        return range( literal( start ), literal( end ), null );
     }
 
     /**
@@ -1555,12 +1588,13 @@ public class CypherQuery
      * <pre>
      * range(start,end,step)
      * </pre>
+     *
      * @param start
      * @param end
      * @param step
      * @return
      */
-    public static CollectionExpression range(Number start, Number end, Number step)
+    public static CollectionExpression range( Number start, Number end, Number step )
     {
         return range( literal( start ), literal( end ), literal( step ) );
     }
@@ -1570,11 +1604,12 @@ public class CypherQuery
      * <pre>
      * range(start,end)
      * </pre>
+     *
      * @param start
      * @param end
      * @return
      */
-    public static CollectionExpression range(NumericExpression start, NumericExpression end)
+    public static CollectionExpression range( NumericExpression start, NumericExpression end )
     {
         return range( start, end, null );
     }
@@ -1584,30 +1619,36 @@ public class CypherQuery
      * <pre>
      * range(start,end,step)
      * </pre>
+     *
      * @param start
      * @param end
      * @param step
      * @return
      */
-    public static CollectionExpression range(NumericExpression start, NumericExpression end, NumericExpression step)
+    public static CollectionExpression range( NumericExpression start, NumericExpression end, NumericExpression step )
     {
-        if (step == null)
+        if ( step == null )
+        {
             return new Value( new FunctionExpression( "range", new Expressions( new Expression[]{start, end} ) ) );
+        }
         else
-            return new Value( new FunctionExpression( "range", new Expressions( new Expression[]{start, end, step} ) ) );
+        {
+            return new Value( new FunctionExpression( "range", new Expressions( new Expression[]{start, end,
+                    step} ) ) );
+        }
     }
 
     // Mathematical expressions
+
     /**
      * Declare extra parentheses. This can be useful to ensure that operators are performed in the order you desire.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (numericExpression)
      * </pre>
-     *
      */
-    public static NumericExpression p(NumericExpression numericExpression)
+    public static NumericExpression p( NumericExpression numericExpression )
     {
         return new Value( new FunctionExpression( "", numericExpression ) );
     }
@@ -1621,9 +1662,9 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression abs(Number numericalExpression)
+    public static NumericExpression abs( Number numericalExpression )
     {
-        return abs( literal( numericalExpression ));
+        return abs( literal( numericalExpression ) );
     }
 
     /**
@@ -1635,9 +1676,9 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression abs(NumericExpression numericalExpression)
+    public static NumericExpression abs( NumericExpression numericalExpression )
     {
-        return new Value(new FunctionExpression("abs", numericalExpression));
+        return new Value( new FunctionExpression( "abs", numericalExpression ) );
     }
 
     /**
@@ -1649,9 +1690,9 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression round(Number numericalExpression)
+    public static NumericExpression round( Number numericalExpression )
     {
-        return round( literal( numericalExpression) );
+        return round( literal( numericalExpression ) );
     }
 
     /**
@@ -1663,9 +1704,9 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression round(NumericExpression numericalExpression)
+    public static NumericExpression round( NumericExpression numericalExpression )
     {
-        return new Value( new FunctionExpression("round", numericalExpression));
+        return new Value( new FunctionExpression( "round", numericalExpression ) );
     }
 
     /**
@@ -1677,7 +1718,7 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression sqrt(Number numericalExpression)
+    public static NumericExpression sqrt( Number numericalExpression )
     {
         return sqrt( literal( numericalExpression ) );
     }
@@ -1691,9 +1732,9 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression sqrt(NumericExpression numericalExpression)
+    public static NumericExpression sqrt( NumericExpression numericalExpression )
     {
-        return new Value( new FunctionExpression("sqrt", numericalExpression));
+        return new Value( new FunctionExpression( "sqrt", numericalExpression ) );
     }
 
     /**
@@ -1705,7 +1746,7 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression sign(Number numericalExpression)
+    public static NumericExpression sign( Number numericalExpression )
     {
         return sign( literal( numericalExpression ) );
     }
@@ -1719,9 +1760,9 @@ public class CypherQuery
      * @param numericalExpression
      * @return
      */
-    public static NumericExpression sign(NumericExpression numericalExpression)
+    public static NumericExpression sign( NumericExpression numericalExpression )
     {
-        return new Value( new FunctionExpression("sign", numericalExpression));
+        return new Value( new FunctionExpression( "sign", numericalExpression ) );
     }
 
     @Override
@@ -1732,10 +1773,11 @@ public class CypherQuery
 
     // Grammar
     protected class Grammar
-        implements StartNext, With, WithNext, Create, Set, Delete, Relate, UpdateNext, Match, ReturnNext, OrderBy, Skip, Limit, Execute
+            implements StartNext, With, WithNext, Create, Set, Delete, Relate, UpdateNext, Match, ReturnNext, OrderBy,
+            Skip, Limit, Execute
     {
         // With ---------------------------------------------------------
-        public WithNext with(Expression... withExpressions)
+        public WithNext with( Expression... withExpressions )
         {
             query.add( new WithClause( Arrays.asList( withExpressions ) ) );
 
@@ -1745,7 +1787,7 @@ public class CypherQuery
         @Override
         public WithNext with( Iterable<Expression> withExpressions )
         {
-            query.add( new WithClause( withExpressions ) ) ;
+            query.add( new WithClause( withExpressions ) );
 
             return this;
         }
@@ -1768,12 +1810,11 @@ public class CypherQuery
         }
 
 
-
         // Set ----------------------------------------------------------
         @Override
         public UpdateNext set( SetProperty... setProperties )
         {
-            query.add(new SetClause( Arrays.asList( setProperties ) ));
+            query.add( new SetClause( Arrays.asList( setProperties ) ) );
 
             return this;
         }
@@ -1781,7 +1822,7 @@ public class CypherQuery
         @Override
         public UpdateNext set( Iterable<SetProperty> setProperties )
         {
-            query.add(new SetClause( setProperties ) );
+            query.add( new SetClause( setProperties ) );
 
             return this;
         }
@@ -1790,7 +1831,7 @@ public class CypherQuery
         @Override
         public UpdateNext delete( ReferenceExpression... expressions )
         {
-            query.add( new DeleteClause( Arrays.asList( expressions ) ));
+            query.add( new DeleteClause( Arrays.asList( expressions ) ) );
 
             return this;
         }
@@ -1807,7 +1848,7 @@ public class CypherQuery
         @Override
         public UpdateNext relate( PathExpression... expressions )
         {
-            query.add( new RelateClause(Arrays.asList( expressions )) );
+            query.add( new RelateClause( Arrays.asList( expressions ) ) );
 
             return this;
         }
@@ -1815,7 +1856,7 @@ public class CypherQuery
         @Override
         public UpdateNext relate( Iterable<PathExpression> expressions )
         {
-            query.add( new RelateClause(expressions ));
+            query.add( new RelateClause( expressions ) );
 
             return this;
         }
@@ -1853,9 +1894,9 @@ public class CypherQuery
         }
 
         @Override
-        public Match match(Iterable<PathExpression> expressions)
+        public Match match( Iterable<PathExpression> expressions )
         {
-            query.add( new MatchClause(expressions) );
+            query.add( new MatchClause( expressions ) );
             return this;
         }
 
@@ -1864,7 +1905,7 @@ public class CypherQuery
         public Where where( BooleanExpression expression )
         {
             Query.checkNull( expression, "Expression" );
-            query.add( new WhereClause(expression) );
+            query.add( new WhereClause( expression ) );
             return this;
         }
 
@@ -1872,14 +1913,14 @@ public class CypherQuery
         @Override
         public ReturnNext returns( Expression... returnExpressions )
         {
-            query.add( new ReturnClause(Arrays.asList( returnExpressions) ));
+            query.add( new ReturnClause( Arrays.asList( returnExpressions ) ) );
             return this;
         }
 
         @Override
-        public ReturnNext returns(Iterable<Expression> returnExpressions)
+        public ReturnNext returns( Iterable<Expression> returnExpressions )
         {
-            query.add( new ReturnClause(returnExpressions ));
+            query.add( new ReturnClause( returnExpressions ) );
             return this;
         }
 
@@ -1892,7 +1933,7 @@ public class CypherQuery
         }
 
         @Override
-        public OrderBy orderBy(Iterable<Expression> orderByExpressions)
+        public OrderBy orderBy( Iterable<Expression> orderByExpressions )
         {
             query.add( new OrderByClause( orderByExpressions ) );
             return this;
@@ -1902,7 +1943,7 @@ public class CypherQuery
         @Override
         public Limit skip( int skip )
         {
-            if( skip < 0 )
+            if ( skip < 0 )
             {
                 throw new IllegalArgumentException( "Skip may not be below zero" );
             }
@@ -1915,7 +1956,7 @@ public class CypherQuery
         @Override
         public Execute limit( int limit )
         {
-            if( limit < 0 )
+            if ( limit < 0 )
             {
                 throw new IllegalArgumentException( "Limit may not be below zero" );
             }
@@ -1938,16 +1979,16 @@ public class CypherQuery
         }
 
         @Override
-        public ExecuteWithParameters parameter(String name, Object value)
+        public ExecuteWithParameters parameter( String name, Object value )
         {
-            ExecuteWithParams withParams = new ExecuteWithParams(query);
-            return withParams.parameter(name, value);
+            ExecuteWithParams withParams = new ExecuteWithParams( query );
+            return withParams.parameter( name, value );
         }
 
         @Override
-        public ExecuteWithParameters parameters(Map<String,Object> parameters)
+        public ExecuteWithParameters parameters( Map<String, Object> parameters )
         {
-            ExecuteWithParams withParams = new ExecuteWithParams(query);
+            ExecuteWithParams withParams = new ExecuteWithParams( query );
             withParams.getParameters().putAll( parameters );
             return withParams;
         }
@@ -1960,12 +2001,12 @@ public class CypherQuery
     }
 
     protected class ExecuteWithParams
-        implements ExecuteWithParameters
+            implements ExecuteWithParameters
     {
         private Query query;
         private Map<String, Object> parameters = new HashMap<String, Object>();
 
-        public ExecuteWithParams(Query query)
+        public ExecuteWithParams( Query query )
         {
             this.query = query;
         }
@@ -1982,9 +2023,9 @@ public class CypherQuery
         }
 
         @Override
-        public ExecuteWithParameters parameter(String name, Object value)
+        public ExecuteWithParameters parameter( String name, Object value )
         {
-            parameters.put(name, value);
+            parameters.put( name, value );
             return this;
         }
 
@@ -1996,9 +2037,9 @@ public class CypherQuery
         }
 
         @Override
-        public void asString(StringBuilder builder)
+        public void asString( StringBuilder builder )
         {
-            query.asString(builder);
+            query.asString( builder );
         }
 
         @Override
@@ -2010,7 +2051,7 @@ public class CypherQuery
 
 
     public static class And
-        extends Value
+            extends Value
     {
         public And( BooleanExpression[] value )
         {
@@ -2022,24 +2063,29 @@ public class CypherQuery
         {
             Expressions expressions = (Expressions) value;
 
-            for( int i = 0; i < expressions.expressions.length; i++ )
+            for ( int i = 0; i < expressions.expressions.length; i++ )
             {
-                Expression expression = expressions.expressions[ i ];
-                if (i > 0)
+                Expression expression = expressions.expressions[i];
+                if ( i > 0 )
+                {
                     builder.append( " and " );
-                if (expression instanceof And || expression instanceof Or)
+                }
+                if ( expression instanceof And || expression instanceof Or )
                 {
                     builder.append( '(' );
                     expression.asString( builder );
                     builder.append( ')' );
-                } else
+                }
+                else
+                {
                     expression.asString( builder );
+                }
             }
         }
     }
 
     public static class Or
-        extends Value
+            extends Value
     {
         public Or( BooleanExpression[] value )
         {
@@ -2051,18 +2097,23 @@ public class CypherQuery
         {
             Expressions expressions = (Expressions) value;
 
-            for( int i = 0; i < expressions.expressions.length; i++ )
+            for ( int i = 0; i < expressions.expressions.length; i++ )
             {
-                Expression expression = expressions.expressions[ i ];
-                if (i > 0)
+                Expression expression = expressions.expressions[i];
+                if ( i > 0 )
+                {
                     builder.append( " or " );
-                if (expression instanceof And)
+                }
+                if ( expression instanceof And )
                 {
                     builder.append( '(' );
                     expression.asString( builder );
                     builder.append( ')' );
-                } else
+                }
+                else
+                {
                     expression.asString( builder );
+                }
             }
         }
     }

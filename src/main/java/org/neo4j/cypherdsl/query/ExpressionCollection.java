@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.query;
  * Represents a collection of expressions
  */
 public class ExpressionCollection
-    extends AbstractExpression
+        extends AbstractExpression
 {
     private Expressions expressions;
 

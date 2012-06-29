@@ -21,14 +21,14 @@
 package org.neo4j.cypherdsl.query;
 
 import org.neo4j.cypherdsl.AsString;
-import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.Identifier;
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
  * Represents matching a property to a value
  */
 public class PropertyValue
-    implements AsString
+        implements AsString
 {
     private Identifier id;
     private Expression value;

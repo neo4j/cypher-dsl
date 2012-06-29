@@ -21,13 +21,14 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 
 /**
  * WHERE clause
  */
 public class WhereClause
-    extends Clause
+        extends Clause
 {
     public ArrayList<BooleanExpression> expressions = new ArrayList<BooleanExpression>();
 
@@ -44,7 +45,7 @@ public class WhereClause
 
     public void mergeWith( WhereClause clause )
     {
-        for( BooleanExpression expression : clause.expressions )
+        for ( BooleanExpression expression : clause.expressions )
         {
             expressions.add( expression );
         }

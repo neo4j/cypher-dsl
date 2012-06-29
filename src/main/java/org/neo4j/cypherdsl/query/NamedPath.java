@@ -26,8 +26,8 @@ import org.neo4j.cypherdsl.expression.PathExpression;
  * Represents a named path.
  */
 public class NamedPath
-    extends AbstractExpression
-    implements PathExpression
+        extends AbstractExpression
+        implements PathExpression
 {
     private final Identifier identifier;
     private final PathExpression path;

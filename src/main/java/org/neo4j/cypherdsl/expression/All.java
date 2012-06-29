@@ -23,10 +23,10 @@ package org.neo4j.cypherdsl.expression;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 
 /**
-* Expression for *, used in count(*)
-*/
+ * Expression for *, used in count(*)
+ */
 public class All
-    extends AbstractExpression
+        extends AbstractExpression
 {
     @Override
     public void asString( StringBuilder builder )

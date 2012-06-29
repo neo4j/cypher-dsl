@@ -20,35 +20,36 @@
 
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.query.Query.checkNull;
+
 import java.util.regex.Pattern;
+
 import org.neo4j.cypherdsl.expression.NumericExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.Value;
 
-import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.Query.*;
-
 /**
  * Represents an identifier. If the identifier is a node or relationship,
  * then you can use the property() method to get a representation of individual properties.
  */
 public class Identifier
-    extends Value
-    implements ReferenceExpression
+        extends Value
+        implements ReferenceExpression
 {
     private static Pattern simpleName = Pattern.compile( "\\p{Alpha}\\w*" );
 
     Identifier( String name )
     {
-        super( new IdentifierExpression(name) );
+        super( new IdentifierExpression( name ) );
     }
 
     /**
      * If this identifier represents a node or relationship,
      * then you can use this method to denote a property.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * id.name
@@ -57,7 +58,7 @@ public class Identifier
      * @param name
      * @return
      */
-    public Property property(String name)
+    public Property property( String name )
     {
         return property( identifier( name ) );
     }
@@ -65,7 +66,7 @@ public class Identifier
     /**
      * If this identifier represents a node or relationship,
      * then you can use this method to denote a property.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * id.name
@@ -74,16 +75,16 @@ public class Identifier
      * @param name
      * @return
      */
-    public Property property(Identifier name)
+    public Property property( Identifier name )
     {
         checkNull( name, "Name" );
-        return new Property(this, name);
+        return new Property( this, name );
     }
 
     /**
      * If this identifier represents a node or relationship,
      * then you can use this method to denote a string property.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * id.name
@@ -92,7 +93,7 @@ public class Identifier
      * @param name
      * @return
      */
-    public StringExpression string(String name)
+    public StringExpression string( String name )
     {
         return string( identifier( name ) );
     }
@@ -100,7 +101,7 @@ public class Identifier
     /**
      * If this identifier represents a node or relationship,
      * then you can use this method to denote a string property.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * id.name
@@ -109,16 +110,16 @@ public class Identifier
      * @param name
      * @return
      */
-    public StringExpression string(Identifier name)
+    public StringExpression string( Identifier name )
     {
         checkNull( name, "Name" );
-        return new Property(this, name);
+        return new Property( this, name );
     }
 
     /**
      * If this identifier represents a node or relationship,
      * then you can use this method to denote a numeric property.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * id.name
@@ -127,7 +128,7 @@ public class Identifier
      * @param name
      * @return
      */
-    public NumericExpression number(String name)
+    public NumericExpression number( String name )
     {
         return number( identifier( name ) );
     }
@@ -135,7 +136,7 @@ public class Identifier
     /**
      * If this identifier represents a node or relationship,
      * then you can use this method to denote a numeric property.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * id.name
@@ -144,14 +145,14 @@ public class Identifier
      * @param name
      * @return
      */
-    public NumericExpression number(Identifier name)
+    public NumericExpression number( Identifier name )
     {
         checkNull( name, "Name" );
-        return new Property(this, name);
+        return new Property( this, name );
     }
 
     private static class IdentifierExpression
-        extends AbstractExpression
+            extends AbstractExpression
     {
         private String name;
 
@@ -162,10 +163,14 @@ public class Identifier
 
         public void asString( StringBuilder builder )
         {
-            if (simpleName.matcher( name ).matches())
+            if ( simpleName.matcher( name ).matches() )
+            {
                 builder.append( name );
+            }
             else
+            {
                 builder.append( '`' ).append( name ).append( '`' );
+            }
         }
     }
 }

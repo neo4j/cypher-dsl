@@ -23,26 +23,33 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a string
  */
 public interface StringExpression
-    extends ScalarExpression
+        extends ScalarExpression
 {
-    public BooleanExpression gt(String expression);
-    public BooleanExpression gt(StringExpression expression);
+    public BooleanExpression gt( String expression );
 
-    public BooleanExpression gte(String expression);
-    public BooleanExpression gte(StringExpression expression);
+    public BooleanExpression gt( StringExpression expression );
 
-    public BooleanExpression lt(String expression);
-    public BooleanExpression lt(StringExpression expression);
+    public BooleanExpression gte( String expression );
 
-    public BooleanExpression lte(String expression);
-    public BooleanExpression lte(StringExpression expression);
+    public BooleanExpression gte( StringExpression expression );
+
+    public BooleanExpression lt( String expression );
+
+    public BooleanExpression lt( StringExpression expression );
+
+    public BooleanExpression lte( String expression );
+
+    public BooleanExpression lte( StringExpression expression );
 
     public BooleanExpression regexp( String regexp );
+
     public BooleanExpression regexp( StringExpression regexp );
 
     public BooleanExpression regexp( String regexp, boolean caseSensitive );
+
     public BooleanExpression regexp( StringExpression regexp, boolean caseSensitive );
 
-    public StringExpression concat(String expression);
-    public StringExpression concat(StringExpression expression);
+    public StringExpression concat( String expression );
+
+    public StringExpression concat( StringExpression expression );
 }

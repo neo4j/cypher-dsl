@@ -23,6 +23,6 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a node, relationship or property
  */
 public interface ReferenceExpression
-    extends Expression
+        extends Expression
 {
 }

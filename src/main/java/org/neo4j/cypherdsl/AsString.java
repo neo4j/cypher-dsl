@@ -29,5 +29,5 @@ public interface AsString
      *
      * @param builder
      */
-    void asString(StringBuilder builder);
+    void asString( StringBuilder builder );
 }

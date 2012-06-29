@@ -25,8 +25,9 @@ import org.neo4j.cypherdsl.expression.Expression;
  * Represents the RETURN clause.
  */
 public interface Return
-    extends Execute
+        extends Execute
 {
     ReturnNext returns( Expression... returnExpression );
+
     ReturnNext returns( Iterable<Expression> returnExpressions );
 }

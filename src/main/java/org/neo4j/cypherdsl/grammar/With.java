@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.expression.Expression;
  */
 public interface With
 {
-    WithNext with(Expression... withExpressions);
-    WithNext with(Iterable<Expression> withExpressions);
+    WithNext with( Expression... withExpressions );
+
+    WithNext with( Iterable<Expression> withExpressions );
 }

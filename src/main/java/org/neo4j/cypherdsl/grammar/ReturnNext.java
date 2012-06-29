@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.grammar;
  * This specifies what can come after a RETURN clause
  */
 public interface ReturnNext
-    extends Return, OrderBy
+        extends Return, OrderBy
 {
 
 }

@@ -25,7 +25,7 @@ import org.neo4j.cypherdsl.expression.BooleanExpression;
  * Represents the WHERE clause. Several invocations of where() will cause the expressions to be AND'ed together
  */
 public interface Where
-    extends With, Update, Return
+        extends With, Update, Return
 {
-    Where where(BooleanExpression expression);
+    Where where( BooleanExpression expression );
 }

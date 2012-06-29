@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a collection
  */
 public interface CollectionExpression
-    extends Expression
+        extends Expression
 {
-    CollectionExpression union(CollectionExpression expression);
+    CollectionExpression union( CollectionExpression expression );
 }

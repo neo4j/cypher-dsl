@@ -26,8 +26,9 @@ import org.neo4j.cypherdsl.expression.StartExpression;
  * Represents the START clause.
  */
 public interface Start
-    extends Match
+        extends Match
 {
     StartNext starts( StartExpression... startExpression );
+
     StartNext starts( Iterable<StartExpression> startExpression );
 }

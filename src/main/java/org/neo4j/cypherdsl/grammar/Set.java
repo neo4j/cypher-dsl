@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.SetProperty;
  */
 public interface Set
 {
-    UpdateNext set(SetProperty... propertyValues);
-    UpdateNext set(Iterable<SetProperty> propertyValues);
+    UpdateNext set( SetProperty... propertyValues );
+
+    UpdateNext set( Iterable<SetProperty> propertyValues );
 }

@@ -23,32 +23,32 @@ package org.neo4j.cypherdsl.query;
 import org.neo4j.cypherdsl.AsString;
 
 /**
-* Null handling for property references
-*/
+ * Null handling for property references
+ */
 public enum NullHandling
-    implements AsString
+        implements AsString
 {
     NULL
-        {
-            @Override
-            public void asString( StringBuilder builder )
             {
-            }
-        },
+                @Override
+                public void asString( StringBuilder builder )
+                {
+                }
+            },
     TRUE_IF_MISSING
-        {
-            @Override
-            public void asString( StringBuilder builder )
             {
-                builder.append( '?' );
-            }
-        },
+                @Override
+                public void asString( StringBuilder builder )
+                {
+                    builder.append( '?' );
+                }
+            },
     FALSE_IF_MISSING
-        {
-            @Override
-            public void asString( StringBuilder builder )
             {
-                builder.append( '!' );
+                @Override
+                public void asString( StringBuilder builder )
+                {
+                    builder.append( '!' );
+                }
             }
-        }
 }

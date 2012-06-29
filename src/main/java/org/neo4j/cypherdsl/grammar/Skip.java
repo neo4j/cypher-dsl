@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.grammar;
  * Represents the SKIP clause.
  */
 public interface Skip
-    extends Limit
+        extends Limit
 {
-    Limit skip(int nrToBeSkipped);
+    Limit skip( int nrToBeSkipped );
 }

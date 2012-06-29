@@ -20,18 +20,19 @@
 package org.neo4j.cypherdsl.grammar;
 
 import java.util.Map;
+
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.query.Query;
 
 /**
  * Once the query has been constructed, the methods here can be used to either stringify it or extract the
  * Query model for further processing. Can also be used to specify parameters to be used for execution.
- *
+ * <p/>
  * Note that setting parameters will create a new set of parameters for each execution, so that you can reuse
  * this Execute instance for many executions.
  */
 public interface Execute
-    extends AsString
+        extends AsString
 {
     Query toQuery();
 
@@ -43,7 +44,7 @@ public interface Execute
      * @param value
      * @return
      */
-    ExecuteWithParameters parameter(String name, Object value);
+    ExecuteWithParameters parameter( String name, Object value );
 
     /**
      * Create a ExecuteWithParameters that has the given parameters set. The result
@@ -54,5 +55,5 @@ public interface Execute
      * @param value
      * @return
      */
-    ExecuteWithParameters parameters(Map<String,Object> parameters);
+    ExecuteWithParameters parameters( Map<String, Object> parameters );
 }

@@ -22,25 +22,26 @@ package org.neo4j.cypherdsl.query.clause;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.neo4j.cypherdsl.expression.Expression;
-import org.neo4j.cypherdsl.grammar.ForEachStatement;
-import org.neo4j.cypherdsl.grammar.ForEachStatements;
-import org.neo4j.cypherdsl.expression.PathExpression;
-import org.neo4j.cypherdsl.expression.ReferenceExpression;
+
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.SetProperty;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.expression.PathExpression;
+import org.neo4j.cypherdsl.expression.ReferenceExpression;
+import org.neo4j.cypherdsl.grammar.ForEachStatement;
+import org.neo4j.cypherdsl.grammar.ForEachStatements;
 
 /**
  * FOR EACH clause
  */
 public class ForEachClause
-    extends Clause
-    implements AsString, ForEachStatements
+        extends Clause
+        implements AsString, ForEachStatements
 {
     private final Identifier id;
     private final Expression in;
-    private final List<AsString> forEachStatements = new ArrayList<AsString>(  );
+    private final List<AsString> forEachStatements = new ArrayList<AsString>();
 
     public ForEachClause( Identifier id, Expression in )
     {
@@ -49,60 +50,60 @@ public class ForEachClause
     }
 
     @Override
-    public ForEachStatement create(PathExpression... paths)
+    public ForEachStatement create( PathExpression... paths )
     {
-        return new ForEachStatement(add( new CreateClause( Arrays.asList(paths) ) ) );
+        return new ForEachStatement( add( new CreateClause( Arrays.asList( paths ) ) ) );
     }
 
     @Override
-    public ForEachStatement create(Iterable<PathExpression> paths)
+    public ForEachStatement create( Iterable<PathExpression> paths )
     {
-        return new ForEachStatement(add( new CreateClause( paths ) ) );
+        return new ForEachStatement( add( new CreateClause( paths ) ) );
     }
 
     @Override
     public ForEachStatement set( SetProperty... setProperties )
     {
-        return new ForEachStatement(add( new SetClause( Arrays.asList(setProperties) ) ) );
+        return new ForEachStatement( add( new SetClause( Arrays.asList( setProperties ) ) ) );
     }
 
     @Override
     public ForEachStatement set( Iterable<SetProperty> setProperties )
     {
-        return new ForEachStatement(add( new SetClause( setProperties) ) );
+        return new ForEachStatement( add( new SetClause( setProperties ) ) );
     }
 
     @Override
     public ForEachStatement delete( ReferenceExpression... expressions )
     {
-        return new ForEachStatement(add( new DeleteClause( Arrays.asList(expressions) ) ) );
+        return new ForEachStatement( add( new DeleteClause( Arrays.asList( expressions ) ) ) );
     }
 
     @Override
     public ForEachStatement delete( Iterable<ReferenceExpression> expressions )
     {
-        return new ForEachStatement(add( new DeleteClause( expressions) ) );
+        return new ForEachStatement( add( new DeleteClause( expressions ) ) );
     }
 
     @Override
     public ForEachStatement relate( PathExpression... expressions )
     {
-        return new ForEachStatement(add( new RelateClause( Arrays.asList(expressions) ) ) );
+        return new ForEachStatement( add( new RelateClause( Arrays.asList( expressions ) ) ) );
     }
 
     @Override
     public ForEachStatement relate( Iterable<PathExpression> expressions )
     {
-        return new ForEachStatement(add( new RelateClause( expressions) ) );
+        return new ForEachStatement( add( new RelateClause( expressions ) ) );
     }
 
     @Override
     public ForEachStatement forEach( ForEachStatement statement )
     {
-        return new ForEachStatement(add( statement ) );
+        return new ForEachStatement( add( statement ) );
     }
 
-    public ForEachClause add(AsString clause)
+    public ForEachClause add( AsString clause )
     {
         forEachStatements.add( clause );
         return this;
@@ -118,7 +119,7 @@ public class ForEachClause
         builder.append( ":" );
 
         String comma = "";
-        for( AsString forEachStatement : forEachStatements )
+        for ( AsString forEachStatement : forEachStatements )
         {
             builder.append( comma );
             forEachStatement.asString( builder );

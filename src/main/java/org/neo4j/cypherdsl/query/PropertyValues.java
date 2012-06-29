@@ -24,7 +24,7 @@ package org.neo4j.cypherdsl.query;
  * Represents a collection of PropertyValue
  */
 public class PropertyValues
-    extends AbstractExpression
+        extends AbstractExpression
 {
     private Iterable<PropertyValue> propertyValues;
 
@@ -38,7 +38,7 @@ public class PropertyValues
     {
         builder.append( "{" );
         String comma = "";
-        for( PropertyValue propertyValue : propertyValues )
+        for ( PropertyValue propertyValue : propertyValues )
         {
             builder.append( comma );
             propertyValue.asString( builder );

@@ -25,8 +25,9 @@ import org.neo4j.cypherdsl.expression.PathExpression;
  * Represents the MATCH clause.
  */
 public interface Match
-    extends Where, ForEach
+        extends Where, ForEach
 {
-    Match match(PathExpression... expression);
-    Match match(Iterable<PathExpression> expressions);
+    Match match( PathExpression... expression );
+
+    Match match( Iterable<PathExpression> expressions );
 }

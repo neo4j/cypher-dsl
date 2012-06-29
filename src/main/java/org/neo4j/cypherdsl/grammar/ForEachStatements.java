@@ -19,7 +19,6 @@
  */
 package org.neo4j.cypherdsl.grammar;
 
-import org.neo4j.cypherdsl.grammar.ForEachStatement;
 import org.neo4j.cypherdsl.SetProperty;
 import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
@@ -31,13 +30,21 @@ import org.neo4j.cypherdsl.expression.ReferenceExpression;
  */
 public interface ForEachStatements
 {
-    ForEachStatement create(PathExpression... paths);
-    ForEachStatement create(Iterable<PathExpression> paths);
+    ForEachStatement create( PathExpression... paths );
+
+    ForEachStatement create( Iterable<PathExpression> paths );
+
     ForEachStatement set( SetProperty... setProperties );
+
     ForEachStatement set( Iterable<SetProperty> setProperties );
+
     ForEachStatement delete( ReferenceExpression... expressions );
+
     ForEachStatement delete( Iterable<ReferenceExpression> expressions );
+
     ForEachStatement relate( PathExpression... expressions );
+
     ForEachStatement relate( Iterable<PathExpression> expressions );
+
     ForEachStatement forEach( ForEachStatement statement );
 }

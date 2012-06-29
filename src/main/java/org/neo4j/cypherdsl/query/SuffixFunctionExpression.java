@@ -25,7 +25,7 @@ import org.neo4j.cypherdsl.expression.Expression;
  * Expresses all functions of the form "exp f", such as "exp is null"
  */
 public class SuffixFunctionExpression
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public String name;
     public Expression expression;

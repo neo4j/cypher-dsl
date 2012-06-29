@@ -24,6 +24,6 @@ package org.neo4j.cypherdsl.grammar;
  * This specifies what can come after an update clause
  */
 public interface UpdateNext
-    extends Update, ForEach, With, Return
+        extends Update, ForEach, With, Return
 {
 }

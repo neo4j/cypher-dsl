@@ -23,6 +23,6 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a path
  */
 public interface PathExpression
-    extends Expression, CollectionExpression, BooleanExpression
+        extends Expression, CollectionExpression, BooleanExpression
 {
 }

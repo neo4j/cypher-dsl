@@ -21,8 +21,8 @@
 package org.neo4j.cypherdsl;
 
 /**
-* Order enumeration for use with the ORDER BY clause
-*/
+ * Order enumeration for use with the ORDER BY clause
+ */
 public enum Order
 {
     ASCENDING, DESCENDING

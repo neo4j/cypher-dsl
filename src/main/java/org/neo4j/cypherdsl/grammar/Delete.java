@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.expression.ReferenceExpression;
  */
 public interface Delete
 {
-    UpdateNext delete(ReferenceExpression... expressions);
-    UpdateNext delete(Iterable<ReferenceExpression> expressions);
+    UpdateNext delete( ReferenceExpression... expressions );
+
+    UpdateNext delete( Iterable<ReferenceExpression> expressions );
 }

@@ -20,6 +20,7 @@
 package org.neo4j.cypherdsl.query;
 
 import java.io.Serializable;
+
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.expression.Expression;
 
@@ -28,12 +29,12 @@ import org.neo4j.cypherdsl.expression.Expression;
  * with a Value that holds an Operator and deals with the 2.
  */
 public class Operator
-    implements AsString, Serializable
+        implements AsString, Serializable
 {
     public Expression left; // null if this is a unary operator
     public String operator;
 
-    public Operator(String operator)
+    public Operator( String operator )
     {
         this.operator = operator;
     }
@@ -47,8 +48,10 @@ public class Operator
     @Override
     public void asString( StringBuilder builder )
     {
-        if (left != null)
+        if ( left != null )
+        {
             left.asString( builder );
+        }
         builder.append( operator );
     }
 }

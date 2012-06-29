@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.expression;
  * Expression that evaluates to a single value
  */
 public interface ScalarExpression
-    extends Expression
+        extends Expression
 {
-    BooleanExpression in(CollectionExpression collection);
+    BooleanExpression in( CollectionExpression collection );
 }

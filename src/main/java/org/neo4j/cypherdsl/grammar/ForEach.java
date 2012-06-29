@@ -25,5 +25,5 @@ package org.neo4j.cypherdsl.grammar;
  */
 public interface ForEach
 {
-    UpdateNext forEach(ForEachStatement statement);
+    UpdateNext forEach( ForEachStatement statement );
 }

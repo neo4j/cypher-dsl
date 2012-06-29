@@ -19,21 +19,22 @@
  */
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+
 import java.io.Serializable;
 import java.util.Arrays;
+
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
 import org.neo4j.cypherdsl.query.Query;
 
-import static org.neo4j.cypherdsl.CypherQuery.*;
-
 /**
  * Represents a relationship in a path.
  */
 public class PathRelationship
-    implements AsString, Serializable, Cloneable
+        implements AsString, Serializable, Cloneable
 {
     public Path leftNode;
     public Direction direction = null; // null indicates that the path is only a start-node
@@ -56,7 +57,7 @@ public class PathRelationship
      * then you can use this method to specify property values.
      * Use e.g. {@link CypherQuery.value( String,Object )} to create
      * the individual values to be passed in here.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      *     (n)-[:relationship {prop1:value1,prop2:value2})
@@ -65,7 +66,7 @@ public class PathRelationship
      * @param propertyValues
      * @return
      */
-    public PathRelationship values(PropertyValue... propertyValues)
+    public PathRelationship values( PropertyValue... propertyValues )
     {
         relationshipPropertyValues = new PropertyValues( Arrays.asList( propertyValues ) );
         return this;
@@ -76,7 +77,7 @@ public class PathRelationship
      * then you can use this method to specify property values.
      * Use e.g. {@link CypherQuery.value( String,Object )} to create
      * the individual values to be passed in here.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      *     (n)-[:relationship {prop1:value1,prop2:value2})
@@ -85,7 +86,7 @@ public class PathRelationship
      * @param propertyValues
      * @return
      */
-    public PathRelationship values(Iterable<PropertyValue> propertyValues)
+    public PathRelationship values( Iterable<PropertyValue> propertyValues )
     {
         relationshipPropertyValues = new PropertyValues( propertyValues );
         return this;
@@ -93,7 +94,7 @@ public class PathRelationship
 
     /**
      * Use this method to name a relationship
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)-[name]-(m)
@@ -109,7 +110,7 @@ public class PathRelationship
 
     /**
      * Use this method to name a relationship
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)-[name]-(m)
@@ -127,7 +128,7 @@ public class PathRelationship
 
     /**
      * Use this method to mark a relationship as optional
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)-[?]-(m)
@@ -144,7 +145,7 @@ public class PathRelationship
     /**
      * Use this method to declare how many hops are allowed. You can either specify
      * min, max or both.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)-[:*minHops,maxHops]-(m)
@@ -155,12 +156,12 @@ public class PathRelationship
      */
     public PathRelationship hops( Integer minHops, Integer maxHops )
     {
-        if( minHops != null && minHops < 0 )
+        if ( minHops != null && minHops < 0 )
         {
             throw new IllegalArgumentException( "Minimum number of hops must be over zero" );
         }
 
-        if( maxHops != null && maxHops < 0 )
+        if ( maxHops != null && maxHops < 0 )
         {
             throw new IllegalArgumentException( "Maximum number of hops must be over zero" );
         }
@@ -174,7 +175,7 @@ public class PathRelationship
      * Declare the end node of this path. This must be called before using
      * this expression in any clause, as otherwise you would not have a complete
      * path.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)--()
@@ -184,14 +185,14 @@ public class PathRelationship
      */
     public Path node()
     {
-        return new Path(null, this);
+        return new Path( null, this );
     }
 
     /**
      * Declare the end node of this path. This must be called before using
      * this expression in any clause, as otherwise you would not have a complete
      * path.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)--(id)
@@ -199,16 +200,16 @@ public class PathRelationship
      *
      * @return
      */
-    public Path node(String id)
+    public Path node( String id )
     {
-        return node( identifier( id ));
+        return node( identifier( id ) );
     }
 
     /**
      * Declare the end node of this path. This must be called before using
      * this expression in any clause, as otherwise you would not have a complete
      * path.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * (n)--(id)
@@ -216,9 +217,9 @@ public class PathRelationship
      *
      * @return
      */
-    public Path node(Expression id)
+    public Path node( Expression id )
     {
-        return new Path(id, this);
+        return new Path( id, this );
     }
 
     @Override
@@ -229,44 +230,44 @@ public class PathRelationship
         builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
         boolean hasRelationships = relationships.iterator().hasNext();
-        if( as != null || hasRelationships || optional || minHops != null || maxHops != null )
+        if ( as != null || hasRelationships || optional || minHops != null || maxHops != null )
         {
             builder.append( '[' );
-            if( as != null )
+            if ( as != null )
             {
                 as.asString( builder );
             }
-            if( optional )
+            if ( optional )
             {
                 builder.append( '?' );
             }
-            if( hasRelationships )
+            if ( hasRelationships )
             {
                 builder.append( ':' );
                 String or = "";
-                for( Identifier relationship : relationships )
+                for ( Identifier relationship : relationships )
                 {
                     builder.append( or );
                     relationship.asString( builder );
                     or = "|";
                 }
 
-                if (relationshipPropertyValues != null)
+                if ( relationshipPropertyValues != null )
                 {
                     builder.append( ' ' );
                     relationshipPropertyValues.asString( builder );
                 }
             }
 
-            if( minHops != null || maxHops != null )
+            if ( minHops != null || maxHops != null )
             {
                 builder.append( '*' );
-                if( minHops != null )
+                if ( minHops != null )
                 {
                     builder.append( minHops );
                 }
                 builder.append( ".." );
-                if( maxHops != null )
+                if ( maxHops != null )
                 {
                     builder.append( maxHops );
                 }

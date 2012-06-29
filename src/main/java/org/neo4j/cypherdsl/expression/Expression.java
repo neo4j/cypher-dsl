@@ -20,17 +20,20 @@
 package org.neo4j.cypherdsl.expression;
 
 import java.io.Serializable;
+
 import org.neo4j.cypherdsl.AsString;
 
 /**
  * Common interface for all expressions
  */
 public interface Expression
-    extends AsString, Serializable, Cloneable
+        extends AsString, Serializable, Cloneable
 {
-    BooleanExpression eq(Object literal);
-    BooleanExpression eq(Expression expression);
+    BooleanExpression eq( Object literal );
 
-    BooleanExpression ne(Object literal);
-    BooleanExpression ne(Expression expression);
+    BooleanExpression eq( Expression expression );
+
+    BooleanExpression ne( Object literal );
+
+    BooleanExpression ne( Expression expression );
 }

@@ -21,19 +21,20 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.SetProperty;
 
 /**
  * SET clause
  */
 public class SetClause
-    extends Clause
+        extends Clause
 {
     private ArrayList<SetProperty> expressions = new ArrayList<SetProperty>();
 
     public SetClause( Iterable<SetProperty> expressions )
     {
-        for( SetProperty expression : expressions )
+        for ( SetProperty expression : expressions )
         {
             this.expressions.add( expression );
         }

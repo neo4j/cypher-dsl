@@ -21,19 +21,20 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.expression.PathExpression;
 
 /**
  * RELATE clause
  */
 public class RelateClause
-    extends Clause
+        extends Clause
 {
     private ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
 
     public RelateClause( Iterable<PathExpression> expressions )
     {
-        for( PathExpression expression : expressions )
+        for ( PathExpression expression : expressions )
         {
             this.expressions.add( expression );
         }

@@ -20,6 +20,7 @@
 package org.neo4j.cypherdsl.result;
 
 import java.util.Map;
+
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
@@ -33,56 +34,61 @@ public class JSONSerializer
 {
     private ObjectMapper mapper = new ObjectMapper();
 
-    public ArrayNode toJSON(Iterable<Map<String, Object>> result)
+    public ArrayNode toJSON( Iterable<Map<String, Object>> result )
     {
         ArrayNode root = mapper.createArrayNode();
 
-        for (Map<String, Object> stringObjectMap : result)
+        for ( Map<String, Object> stringObjectMap : result )
         {
             ObjectNode entry = root.objectNode();
 
-            for (Map.Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet())
+            for ( Map.Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet() )
             {
-                if (stringObjectEntry.getValue() instanceof Path)
+                if ( stringObjectEntry.getValue() instanceof Path )
                 {
-                    entry.put(stringObjectEntry.getKey(), stringObjectEntry.getValue().toString());
-                } else if (stringObjectEntry.getValue() instanceof Node)
+                    entry.put( stringObjectEntry.getKey(), stringObjectEntry.getValue().toString() );
+                }
+                else if ( stringObjectEntry.getValue() instanceof Node )
                 {
                     Node node = (Node) stringObjectEntry.getValue();
                     ObjectNode nodeNode = entry.objectNode();
-                    nodeNode.put("_id", node.getId());
-                    for (String propertyName : node.getPropertyKeys())
+                    nodeNode.put( "_id", node.getId() );
+                    for ( String propertyName : node.getPropertyKeys() )
                     {
-                        addProperty(nodeNode, propertyName, node.getProperty(propertyName));
+                        addProperty( nodeNode, propertyName, node.getProperty( propertyName ) );
                     }
-                    entry.put(stringObjectEntry.getKey(), nodeNode);
-                } else
+                    entry.put( stringObjectEntry.getKey(), nodeNode );
+                }
+                else
                 {
-                    addProperty(entry, stringObjectEntry.getKey(), stringObjectEntry.getValue());
+                    addProperty( entry, stringObjectEntry.getKey(), stringObjectEntry.getValue() );
                 }
             }
 
-            root.add(entry);
+            root.add( entry );
         }
         return root;
     }
 
-    private void addProperty(ObjectNode node, String name, Object value)
+    private void addProperty( ObjectNode node, String name, Object value )
     {
-        if (value instanceof String)
+        if ( value instanceof String )
         {
-            node.put(name, value.toString());
-        } else if (value instanceof Long)
+            node.put( name, value.toString() );
+        }
+        else if ( value instanceof Long )
         {
             Long number = (Long) value;
-            node.put(name, number);
-        } else if (value instanceof Integer)
+            node.put( name, number );
+        }
+        else if ( value instanceof Integer )
         {
             Integer number = (Integer) value;
-            node.put(name, number);
-        } else
+            node.put( name, number );
+        }
+        else
         {
-            throw new IllegalArgumentException("Unknown value type:" + value.getClass());
+            throw new IllegalArgumentException( "Unknown value type:" + value.getClass() );
         }
     }
 }

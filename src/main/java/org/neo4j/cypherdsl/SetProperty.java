@@ -26,7 +26,7 @@ import org.neo4j.cypherdsl.expression.Expression;
  * Represents a property being assigned to a value. This is used for the SET clause.
  */
 public class SetProperty
-    implements AsString
+        implements AsString
 {
     private Property property;
     private Expression value;

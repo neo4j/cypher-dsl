@@ -21,6 +21,7 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.OrderByExpression;
 
@@ -28,15 +29,15 @@ import org.neo4j.cypherdsl.query.OrderByExpression;
  * ORDER BY clause
  */
 public class OrderByClause
-    extends Clause
+        extends Clause
 {
     private ArrayList<OrderByExpression> expressions = new ArrayList<OrderByExpression>();
 
     public OrderByClause( Iterable<Expression> expressions )
     {
-        for( Expression expression : expressions )
+        for ( Expression expression : expressions )
         {
-            if( expression instanceof OrderByExpression )
+            if ( expression instanceof OrderByExpression )
             {
                 this.expressions.add( (OrderByExpression) expression );
             }

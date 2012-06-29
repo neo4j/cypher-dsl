@@ -19,34 +19,36 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.Order;
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
  * Provides the possible expressions for the ORDER BY clause.
  */
 public class OrderByExpression
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public Expression expression;
     public Order order;
 
-    public OrderByExpression order(Order order)
+    public OrderByExpression order( Order order )
     {
         this.order = order;
         return this;
     }
 
-    public void asString(StringBuilder builder)
+    public void asString( StringBuilder builder )
     {
         expression.asString( builder );
-        if (order != null)
+        if ( order != null )
+        {
             builder.append( ' ' ).append( order.name() );
+        }
     }
 
     @Override
     public Object clone()
-        throws CloneNotSupportedException
+            throws CloneNotSupportedException
     {
         return super.clone();
     }

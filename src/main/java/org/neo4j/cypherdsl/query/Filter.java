@@ -19,15 +19,15 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.CollectionExpression;
-import org.neo4j.cypherdsl.Identifier;
 
 /**
-* Represents a filter function
-*/
+ * Represents a filter function
+ */
 public class Filter
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public Identifier name;
     public CollectionExpression iterable;

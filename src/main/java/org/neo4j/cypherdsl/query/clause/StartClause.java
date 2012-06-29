@@ -21,19 +21,20 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.expression.StartExpression;
 
 /**
  * START clause
  */
 public class StartClause
-    extends Clause
+        extends Clause
 {
     private ArrayList<StartExpression> expressions = new ArrayList<StartExpression>();
 
     public StartClause( Iterable<StartExpression> expressions )
     {
-        for( StartExpression expression : expressions )
+        for ( StartExpression expression : expressions )
         {
             this.expressions.add( expression );
         }

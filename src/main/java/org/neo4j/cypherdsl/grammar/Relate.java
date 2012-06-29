@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.expression.PathExpression;
  */
 public interface Relate
 {
-    UpdateNext relate(PathExpression... expressions);
-    UpdateNext relate(Iterable<PathExpression> expressions);
+    UpdateNext relate( PathExpression... expressions );
+
+    UpdateNext relate( Iterable<PathExpression> expressions );
 }

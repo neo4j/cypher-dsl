@@ -21,19 +21,20 @@
 package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.expression.Expression;
 
 /**
  * RETURN clause
  */
 public class ReturnClause
-    extends Clause
+        extends Clause
 {
     private ArrayList<Expression> expressions = new ArrayList<Expression>();
 
     public ReturnClause( Iterable<Expression> expressions )
     {
-        for( Expression expression : expressions )
+        for ( Expression expression : expressions )
         {
             this.expressions.add( expression );
         }

@@ -26,23 +26,23 @@ import org.neo4j.cypherdsl.query.Operator;
 import org.neo4j.cypherdsl.query.Value;
 
 /**
-* Represents a property reference.
-*/
+ * Represents a property reference.
+ */
 public class Property
-    extends Value
-    implements ReferenceExpression
+        extends Value
+        implements ReferenceExpression
 {
     protected NullHandling nullHandling = NullHandling.NULL;
 
-    Property( Identifier owner, Identifier name)
+    Property( Identifier owner, Identifier name )
     {
-        super( new Operator(owner, "."), name );
+        super( new Operator( owner, "." ), name );
     }
 
     /**
      * Use this method to declare that this property reference
      * should be treated as false if the property is missing.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * n.prop!
@@ -59,7 +59,7 @@ public class Property
     /**
      * Use this method to declare that this property reference
      * should be treated as true if the property is missing.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * n.prop?
@@ -76,7 +76,7 @@ public class Property
     /**
      * Use this method to declare that this property reference
      * should be treated as true if the property is missing.
-     *
+     * <p/>
      * Corresponds to:
      * <pre>
      * n.prop?

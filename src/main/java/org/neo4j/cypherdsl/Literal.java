@@ -24,18 +24,18 @@ import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.Value;
 
 /**
-* Represents a literal value, such as a string or number.
-*/
+ * Represents a literal value, such as a string or number.
+ */
 public class Literal
-    extends Value
+        extends Value
 {
     Literal( Object value )
     {
-        super( new LiteralExpression(value) );
+        super( new LiteralExpression( value ) );
     }
 
     private static class LiteralExpression
-        extends AbstractExpression
+            extends AbstractExpression
     {
         public Object value;
 
@@ -47,15 +47,23 @@ public class Literal
         @Override
         public void asString( StringBuilder builder )
         {
-            if (value instanceof String)
+            if ( value instanceof String )
             {
-                if (builder.toString().endsWith( "/" ) || builder.toString().endsWith( "(?i)" )) // -> Regexp with /literal/ or /(?i)literal/
+                if ( builder.toString().endsWith( "/" ) || builder.toString().endsWith( "(?i)" ) ) // -> Regexp with
+                // /literal/ or /(?i)literal/
+                {
                     builder.append( value.toString().replaceAll( "/", "\\\\/" ) );
+                }
                 else
-                    builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"", "\\\"" ) ).append( "\"" );
+                {
+                    builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"",
+                            "\\\"" ) ).append( "\"" );
+                }
             }
             else
+            {
                 builder.append( value.toString() );
+            }
         }
 
         @Override

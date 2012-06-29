@@ -20,6 +20,7 @@
 package org.neo4j.cypherdsl.grammar;
 
 import java.util.Arrays;
+
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.SetProperty;
 import org.neo4j.cypherdsl.expression.PathExpression;
@@ -35,7 +36,7 @@ import org.neo4j.cypherdsl.query.clause.SetClause;
  * Represents a single statement to be executed with FOREACH
  */
 public class ForEachStatement
-    implements ForEachStatements, AsString
+        implements ForEachStatements, AsString
 {
     private ForEachClause forEachClause;
 
@@ -44,57 +45,57 @@ public class ForEachStatement
         this.forEachClause = forEachClause;
     }
 
-    public ForEachStatement create(PathExpression... paths)
+    public ForEachStatement create( PathExpression... paths )
     {
-        return new ForEachStatement( forEachClause.add(new CreateClause( Arrays.asList( paths ) )));
+        return new ForEachStatement( forEachClause.add( new CreateClause( Arrays.asList( paths ) ) ) );
     }
 
     @Override
     public ForEachStatement create( Iterable<PathExpression> paths )
     {
-        return new ForEachStatement( forEachClause.add(new CreateClause( paths )));
+        return new ForEachStatement( forEachClause.add( new CreateClause( paths ) ) );
     }
 
     @Override
     public ForEachStatement set( SetProperty... setProperties )
     {
-        return new ForEachStatement( forEachClause.add(new SetClause( Arrays.asList( setProperties ) )));
+        return new ForEachStatement( forEachClause.add( new SetClause( Arrays.asList( setProperties ) ) ) );
     }
 
     @Override
     public ForEachStatement set( Iterable<SetProperty> setProperties )
     {
-        return new ForEachStatement( forEachClause.add(new SetClause( setProperties ) ));
+        return new ForEachStatement( forEachClause.add( new SetClause( setProperties ) ) );
     }
 
     @Override
     public ForEachStatement delete( ReferenceExpression... expressions )
     {
-        return new ForEachStatement( forEachClause.add(new DeleteClause( Arrays.asList( expressions ) )));
+        return new ForEachStatement( forEachClause.add( new DeleteClause( Arrays.asList( expressions ) ) ) );
     }
 
     @Override
     public ForEachStatement delete( Iterable<ReferenceExpression> expressions )
     {
-        return new ForEachStatement( forEachClause.add(new DeleteClause( expressions ) ));
+        return new ForEachStatement( forEachClause.add( new DeleteClause( expressions ) ) );
     }
 
     @Override
     public ForEachStatement relate( PathExpression... expressions )
     {
-        return new ForEachStatement( forEachClause.add(new RelateClause( Arrays.asList( expressions ) )));
+        return new ForEachStatement( forEachClause.add( new RelateClause( Arrays.asList( expressions ) ) ) );
     }
 
     @Override
     public ForEachStatement relate( Iterable<PathExpression> expressions )
     {
-        return new ForEachStatement( forEachClause.add(new RelateClause( expressions ) ));
+        return new ForEachStatement( forEachClause.add( new RelateClause( expressions ) ) );
     }
 
     @Override
     public ForEachStatement forEach( ForEachStatement statement )
     {
-        return new ForEachStatement( forEachClause.add(statement.getClause()));
+        return new ForEachStatement( forEachClause.add( statement.getClause() ) );
     }
 
     @Override

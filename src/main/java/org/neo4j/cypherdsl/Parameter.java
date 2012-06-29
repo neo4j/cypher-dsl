@@ -24,10 +24,10 @@ import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.Value;
 
 /**
-* Represents a parameter in a query.
-*/
+ * Represents a parameter in a query.
+ */
 public class Parameter
-    extends Value
+        extends Value
 {
     Parameter( String name )
     {
@@ -35,7 +35,7 @@ public class Parameter
     }
 
     private static class ParameterExpression
-        extends AbstractExpression
+            extends AbstractExpression
     {
         public String name;
 

@@ -22,10 +22,10 @@ package org.neo4j.cypherdsl.query;
 import org.neo4j.cypherdsl.expression.Expression;
 
 /**
-* Collections many expressions into a list
-*/
+ * Collections many expressions into a list
+ */
 public class Expressions
-    extends AbstractExpression
+        extends AbstractExpression
 {
     public Expression[] expressions;
     public String separator;
@@ -36,7 +36,7 @@ public class Expressions
         this.separator = ",";
     }
 
-    public Expressions( Expression[] expressions, String separator)
+    public Expressions( Expression[] expressions, String separator )
     {
         this.expressions = expressions;
         this.separator = separator;
@@ -45,11 +45,13 @@ public class Expressions
     @Override
     public void asString( StringBuilder builder )
     {
-        for( int i = 0; i < expressions.length; i++ )
+        for ( int i = 0; i < expressions.length; i++ )
         {
-            Expression expression = expressions[ i ];
-            if (i>0)
+            Expression expression = expressions[i];
+            if ( i > 0 )
+            {
                 builder.append( separator );
+            }
             expression.asString( builder );
         }
     }

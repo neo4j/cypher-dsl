@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.expression.PathExpression;
  */
 public interface Create
 {
-    UpdateNext create(PathExpression... paths);
-    UpdateNext create(Iterable<PathExpression> paths);
+    UpdateNext create( PathExpression... paths );
+
+    UpdateNext create( Iterable<PathExpression> paths );
 }
