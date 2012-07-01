@@ -20,7 +20,6 @@
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
-import org.neo4j.cypherdsl.query.Query;
 
 import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.*;
