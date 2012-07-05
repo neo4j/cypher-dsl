@@ -128,9 +128,16 @@ public class CypherQuery
      * @param query a previously created query object
      * @return CypherQuery DSL that can be used to continue building the query
      */
-    public static CypherQuery newQuery( Query query )
+    public static <T> T continueQuery( Query query, Class<T> asClause)
+        throws ClassCastException
     {
-        return new CypherQuery( query );
+        try
+        {
+            return new CypherQuery( (Query) query.clone() ).continueQuery(asClause);
+        } catch (CloneNotSupportedException e)
+        {
+            throw new RuntimeException(e);
+        }
     }
 
     // The internal query object. Methods in the DSL work on this
@@ -483,6 +490,12 @@ public class CypherQuery
         query.add( new CreateClause( Arrays.asList( paths ) ) );
 
         return new Grammar();
+    }
+
+    protected <T> T continueQuery(Class<T> asClause)
+            throws ClassCastException
+    {
+        return asClause.cast(new Grammar());
     }
 
     /**

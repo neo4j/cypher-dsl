@@ -21,6 +21,7 @@
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
+import org.neo4j.cypherdsl.grammar.Start;
 import org.neo4j.cypherdsl.query.Query;
 
 import static org.junit.Assert.*;
@@ -44,13 +45,13 @@ public class CypherCookbookTest
                    node( "hyperEdge" ).out( "hasRole" ).node( "role" ) ).toQuery();
 
         assertEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
-                      CypherQuery.newQuery( query ).starts().
+                      CypherQuery.continueQuery(query, Start.class).starts().
                           where( identifier( "group" ).string( "name" ).eq( "Group2" ) ).
                           returns( identifier( "role" ).string( "name" ) ).
                           toString() );
 
         assertEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name,group.name ORDER BY role.name ASCENDING",
-                      CypherQuery.newQuery( query ).starts().
+                      CypherQuery.continueQuery( query, Start.class ).starts().
                           returns( identifier( "role" ).property( "name" ), identifier( "group" ).property( "name" ) ).
                           orderBy( order( identifier( "role" ).string( "name" ), ASCENDING ) ).
                           toString() );

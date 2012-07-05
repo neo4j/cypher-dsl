@@ -20,8 +20,10 @@
 
 package org.neo4j.cypherdsl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.PathExpression;
@@ -29,6 +31,8 @@ import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
+
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
 
 /**
  * Represents either a single node or a path from one node to another.
@@ -133,7 +137,7 @@ public class Path
      */
     public PathRelationship out( String... relationships )
     {
-        return new PathRelationship( this, Direction.OUT, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
+        return new PathRelationship( this, Direction.OUT, Arrays.asList(CypherQuery.identifiers(relationships)) );
     }
 
     /**
@@ -149,6 +153,27 @@ public class Path
     public PathRelationship out( Identifier... relationships )
     {
         return new PathRelationship( this, Direction.OUT, Arrays.asList( relationships ) );
+    }
+
+    /**
+     * Declare a new outgoing relationship from this node.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * (n)-[:relationship1|relationship2]->(m)
+     * </pre>
+     *
+     * @return
+     */
+    public PathRelationship out( Enum<?>... relationships )
+    {
+        List<Identifier> relationshipNames = new ArrayList<Identifier>();
+        for (Enum<?> relationship : relationships)
+        {
+            relationshipNames.add(identifier(relationship.name()));
+        }
+
+        return new PathRelationship( this, Direction.OUT, relationshipNames );
     }
 
     /**
@@ -197,6 +222,27 @@ public class Path
     }
 
     /**
+     * Declare a new incoming relationship to this node.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * (n)<-[:relationship1|relationship2]-(m)
+     * </pre>
+     *
+     * @return
+     */
+    public PathRelationship in( Enum<?>... relationships )
+    {
+        List<Identifier> relationshipNames = new ArrayList<Identifier>();
+        for (Enum<?> relationship : relationships)
+        {
+            relationshipNames.add(identifier(relationship.name()));
+        }
+
+        return new PathRelationship( this, Direction.IN, relationshipNames );
+    }
+
+    /**
      * Declare a new relationship on this node.
      * <p/>
      * Corresponds to:
@@ -239,6 +285,27 @@ public class Path
     public PathRelationship both( Identifier... relationships )
     {
         return new PathRelationship( this, Direction.BOTH, Arrays.asList( relationships ) );
+    }
+
+    /**
+     * Declare a new relationship on this node.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * (n)-[:relationship1|relationship2]-(m)
+     * </pre>
+     *
+     * @return
+     */
+    public PathRelationship both( Enum<?>... relationships )
+    {
+        List<Identifier> relationshipNames = new ArrayList<Identifier>();
+        for (Enum<?> relationship : relationships)
+        {
+            relationshipNames.add(identifier(relationship.name()));
+        }
+
+        return new PathRelationship( this, Direction.BOTH, relationshipNames );
     }
 
     @Override
