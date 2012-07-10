@@ -553,7 +553,7 @@ public class CypherQuery
      */
     public static StartExpression.StartNodes nodeByParameter( String name, String parameter )
     {
-        return nodeByparameter( identifier( name ), parameter );
+        return nodeByParameter( identifier( name ), parameter );
     }
 
     /**
