@@ -566,7 +566,7 @@ public class CypherQuery
      * @param parameter
      * @return
      */
-    public static StartExpression.StartNodes nodeByParameter( Identifier name, String parameter )
+    public static StartExpression.StartNodes nodeByparameter( Identifier name, String parameter )
     {
         checkEmpty( name, "Name" );
         checkEmpty( parameter, "Parameters" );
