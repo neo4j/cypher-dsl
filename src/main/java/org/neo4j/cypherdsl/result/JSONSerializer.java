@@ -86,6 +86,84 @@ public class JSONSerializer
             Integer number = (Integer) value;
             node.put( name, number );
         }
+        else if ( value instanceof Boolean )
+        {
+            Boolean bool = (Boolean) value;
+            node.put( name, bool );
+        }
+        else if ( value instanceof Float )
+        {
+            Float number = (Float) value;
+            node.put( name, number );
+        }
+        else if ( value instanceof Double )
+        {
+            Double number = (Double) value;
+            node.put( name, number );
+        }
+        else if ( value instanceof Byte )
+        {
+            Byte b = (Byte) value;
+            node.put( name, b );
+        }
+        else if ( value instanceof Short )
+        {
+            Short s = (Short) value;
+            node.put( name, s );
+        }
+        else if ( value instanceof String[] ) {
+        	ArrayNode arrayNode = node.putArray(name);
+        	String[] val = (String[]) value;
+        	for (String object : val) {
+				arrayNode.add(object);
+			}
+        }
+        else if ( value.getClass().isArray() && value.getClass().getComponentType().isPrimitive() ) {
+        	Class<?> componentType = value.getClass().getComponentType();
+        	ArrayNode arrayNode = node.putArray(name);
+        	if (componentType.equals(int.class)) {
+        		int[] arr = (int[]) value;
+        		for (int i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        	else if (componentType.equals(float.class)) {
+        		float[] arr = (float[]) value;
+        		for (float i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        	else if (componentType.equals(double.class)) {
+        		double[] arr = (double[]) value;
+        		for (double i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        	else if (componentType.equals(long.class)) {
+        		long[] arr = (long[]) value;
+        		for (long i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        	else if (componentType.equals(boolean.class)) {
+        		boolean[] arr = (boolean[]) value;
+        		for (boolean i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        	else if (componentType.equals(short.class)) {
+        		short[] arr = (short[]) value;
+        		for (short i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        	else if (componentType.equals(byte.class)) {
+        		byte[] arr = (byte[]) value;
+        		for (byte i : arr) {
+					arrayNode.add(i);
+				}
+        	}
+        }
         else
         {
             throw new IllegalArgumentException( "Unknown value type:" + value.getClass() );
