@@ -56,7 +56,7 @@ public class QueryDSLTest
             Path<Person> person = Expressions.path(Person.class, "n");
             Path<String> personFirstName = Expressions.path(String.class, person, "firstName");
             Path<Integer> personAge = Expressions.path(Integer.class, person, "age");
-            BooleanBuilder expr = new BooleanBuilder(predicate(Ops.EQ_PRIMITIVE, personFirstName, constant("P"))).and(predicate(Ops.GT, personAge, constant(25)));
+            BooleanBuilder expr = new BooleanBuilder(predicate(Ops.EQ, personFirstName, constant("P"))).and(predicate(Ops.GT, personAge, constant(25)));
 
             Assert.assertEquals(CYPHER+"START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
                     start( nodesById( identifier( person ), 1, 2, 3 ))
