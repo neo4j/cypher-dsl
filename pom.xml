@@ -14,8 +14,8 @@
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <properties>
-    <neo4j.version>1.8.RC1</neo4j.version>
-    <querydsl.version>2.7.3</querydsl.version>
+    <neo4j.version>1.8</neo4j.version>
+    <querydsl.version>2.8.0</querydsl.version>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
     <license-text.header>GPL-3-header.txt</license-text.header>
