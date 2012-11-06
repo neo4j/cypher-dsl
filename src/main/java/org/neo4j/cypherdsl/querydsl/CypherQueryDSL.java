@@ -39,7 +39,6 @@ import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.NumericExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
-import org.neo4j.cypherdsl.grammar.*;
 import org.neo4j.cypherdsl.query.Value;
 
 /**
