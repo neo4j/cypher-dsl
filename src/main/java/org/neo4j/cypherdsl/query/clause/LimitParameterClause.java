@@ -17,15 +17,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.neo4j.cypherdsl.grammar;
+
+package org.neo4j.cypherdsl.query.clause;
 
 /**
- * Represents the LIMIT clause
+ * LIMIT clause
  */
-public interface Limit
-        extends Execute
+public class LimitParameterClause
+        extends Clause
 {
-    Execute limit( int nrToBeSkipped );
+    private String limit;
 
-    Execute limit( String parameterName );
+    public LimitParameterClause(String limit)
+    {
+        this.limit = limit;
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        builder.append( " LIMIT {" ).append( limit ).append( "}" );
+    }
 }
