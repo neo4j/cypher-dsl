@@ -83,6 +83,13 @@ public class CypherReferenceTest
     }
 
     @Test
+    public void test16_9_7_1()
+    {
+        assertEquals( CYPHER+"START n=node:nodes({paramName}) RETURN n",
+                      start( queryByParameter( "n", "nodes", "paramName" ) ).returns( identifier( "n" ) ).toString() );
+    }
+
+    @Test
     public void test16_9_8()
     {
         assertEquals( CYPHER + "START a=node(1),b=node(2) RETURN a,b",

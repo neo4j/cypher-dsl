@@ -708,6 +708,46 @@ public class CypherQuery
     }
 
     /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName({param}")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param param
+     * @return
+     */
+    public static StartExpression.StartNodesQueryParam queryByParameter( String name, String indexName, String param )
+    {
+        return queryByParameter( identifier( name ), identifier( indexName ), param );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName({param})
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param param
+     * @return
+     */
+    public static StartExpression.StartNodesQueryParam queryByParameter( Identifier name, Identifier indexName, String param )
+    {
+        checkNull( name, "Name" );
+        checkNull( indexName, "Index" );
+        checkEmpty( param, "Param" );
+
+        StartExpression.StartNodesQueryParam  startNodesQuery = new StartExpression.StartNodesQueryParam();
+        startNodesQuery.name = name;
+        startNodesQuery.index = indexName;
+        startNodesQuery.param = param;
+        return startNodesQuery;
+    }
+
+    /**
      * Declare start relationships. Corresponds to:
      * <pre>
      * name=relationship(id1,id2,id3)
