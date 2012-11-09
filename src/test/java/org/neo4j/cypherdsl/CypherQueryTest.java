@@ -50,6 +50,9 @@ public class CypherQueryTest
         // Start with query
         assertEquals( CYPHER+"START john=node:nodes(\"name:John\") RETURN john", start(query( "john", "nodes", "name:John" )).returns( identifier("john" )).toString());
 
+        // Start with query-param
+        assertEquals( CYPHER+"START john=node:nodes({param}) RETURN john", start(queryByParameter( "john", "nodes", "param" )).returns( identifier("john" )).toString());
+
         // Error handling
         try
         {
