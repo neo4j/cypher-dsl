@@ -639,6 +639,18 @@ public class CypherReferenceTest
     }
 
     @Test
+    public void test16_15_1_1()
+    {
+        assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam}",
+                start( nodesById( "n", 3, 4, 5, 1, 2 ) ).
+                        returns( identifier( "n" ) ).
+                        orderBy( identifier( "n" ).property( "name" ) ).
+                        skip( "skipParam" ).
+                        toString() );
+    }
+
+
+    @Test
     public void test16_15_2()
     {
         assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP 1 LIMIT 2",
@@ -648,6 +660,18 @@ public class CypherReferenceTest
                           skip( 1 ).
                           limit( 2 ).
                           toString() );
+    }
+
+    @Test
+    public void test16_15_2_1()
+    {
+        assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam} LIMIT {limitParam}",
+                start( nodesById( "n", 3, 4, 5, 1, 2 ) ).
+                        returns( identifier( "n" ) ).
+                        orderBy( identifier( "n").property( "name" ) ).
+                        skip( "skipParam" ).
+                        limit( "limitParam" ).
+                        toString() );
     }
 
     @Test

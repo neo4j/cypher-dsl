@@ -74,12 +74,14 @@ import org.neo4j.cypherdsl.query.clause.CreateClause;
 import org.neo4j.cypherdsl.query.clause.DeleteClause;
 import org.neo4j.cypherdsl.query.clause.ForEachClause;
 import org.neo4j.cypherdsl.query.clause.LimitClause;
+import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
 import org.neo4j.cypherdsl.query.clause.MatchClause;
 import org.neo4j.cypherdsl.query.clause.OrderByClause;
 import org.neo4j.cypherdsl.query.clause.RelateClause;
 import org.neo4j.cypherdsl.query.clause.ReturnClause;
 import org.neo4j.cypherdsl.query.clause.SetClause;
 import org.neo4j.cypherdsl.query.clause.SkipClause;
+import org.neo4j.cypherdsl.query.clause.SkipParameterClause;
 import org.neo4j.cypherdsl.query.clause.StartClause;
 import org.neo4j.cypherdsl.query.clause.WhereClause;
 import org.neo4j.cypherdsl.query.clause.WithClause;
@@ -1977,6 +1979,14 @@ public class CypherQuery
             return this;
         }
 
+        // Skip ---------------------------------------------------------
+        @Override
+        public Limit skip( String skip )
+        {
+            query.add( new SkipParameterClause( skip ) );
+            return this;
+        }
+
         // Limit --------------------------------------------------------
         @Override
         public Execute limit( int limit )
@@ -1987,6 +1997,15 @@ public class CypherQuery
             }
 
             query.add( new LimitClause( limit ) );
+            return this;
+        }
+
+
+        // Limit --------------------------------------------------------
+        @Override
+        public Execute limit( String limit )
+        {
+            query.add( new LimitParameterClause( limit ) );
             return this;
         }
 
