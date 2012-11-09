@@ -541,19 +541,10 @@ public class CypherQuery
         return startNodes;
     }
 
-    /**
-     * Declare start nodes. Corresponds to:
-     * <pre>
-     * name=node({parameter})
-     * </pre>
-     *
-     * @param name
-     * @param parameter
-     * @return
-     */
-    public static StartExpression.StartNodes nodeByParameter( String name, String parameter )
+    @Deprecated
+    public static StartExpression.StartNodes nodeByParameter(  String name, String parameter )
     {
-        return nodeByparameter( identifier( name ), parameter );
+        return nodesByParameter( name, parameter );
     }
 
     /**
@@ -566,7 +557,28 @@ public class CypherQuery
      * @param parameter
      * @return
      */
+    public static StartExpression.StartNodes nodesByParameter( String name, String parameter )
+    {
+        return nodeByparameter( identifier( name ), parameter );
+    }
+
+    @Deprecated
     public static StartExpression.StartNodes nodeByparameter( Identifier name, String parameter )
+    {
+        return nodesByParameter( name, parameter );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node({parameter})
+     * </pre>
+     *
+     * @param name
+     * @param parameter
+     * @return
+     */
+    public static StartExpression.StartNodes nodesByParameter( Identifier name, String parameter )
     {
         checkEmpty( name, "Name" );
         checkEmpty( parameter, "Parameters" );

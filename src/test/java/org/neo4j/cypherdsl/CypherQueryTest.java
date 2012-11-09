@@ -40,7 +40,7 @@ public class CypherQueryTest
         assertEquals( CYPHER+"START family=node(0,1) RETURN family", start( nodesById( "family", 0, 1 )).returns( identifier("family" )).toString() );
 
         // Start with parameters
-        assertEquals( CYPHER+"START john=node({name}) RETURN john", start( nodeByParameter( "john", "name" )).returns( identifier("john" )).toString());
+        assertEquals( CYPHER+"START john=node({name}) RETURN john", start( nodesByParameter( "john", "name" )).returns( identifier("john" )).toString());
 
         assertEquals( CYPHER+"START family=node(*) RETURN family", start(allNodes( "family" )).returns( identifier("family" )).toString());
 
