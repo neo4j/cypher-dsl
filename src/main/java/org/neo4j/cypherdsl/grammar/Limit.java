@@ -26,4 +26,6 @@ public interface Limit
         extends Execute
 {
     Execute limit( int nrToBeSkipped );
+
+    Execute limit( String parameterName );
 }

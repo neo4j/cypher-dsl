@@ -19,8 +19,6 @@
  */
 package org.neo4j.cypherdsl.query;
 
-import static org.neo4j.cypherdsl.CypherQuery.literal;
-
 import org.neo4j.cypherdsl.expression.BooleanExpression;
 import org.neo4j.cypherdsl.expression.CollectionExpression;
 import org.neo4j.cypherdsl.expression.Expression;
@@ -30,6 +28,8 @@ import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.expression.RelationshipExpression;
 import org.neo4j.cypherdsl.expression.ScalarExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
+
+import static org.neo4j.cypherdsl.CypherQuery.literal;
 
 /**
  * Handles a single value that corresponds to any expression. Optionally
@@ -234,14 +234,13 @@ public class Value
      */
     public BooleanExpression regexp( String regexp )
     {
-        return regexp( regexp, true );
+        return new Value( new Operator( this, "=~" ), literal( regexp ) );
     }
 
     public BooleanExpression regexp( StringExpression regexp )
     {
-        return regexp( regexp, true );
+        return new Value( new Operator( this, "=~" ), regexp );
     }
-
     /**
      * Create a regular expression. Corresponds to:
      * <pre>
@@ -254,16 +253,14 @@ public class Value
      */
     public BooleanExpression regexp( String regexp, boolean caseSensitive )
     {
-        return regexp( literal( regexp ), caseSensitive );
-    }
-
-    public BooleanExpression regexp( StringExpression regexp, boolean caseSensitive )
-    {
-        Regexp regularExpression = new Regexp();
-        regularExpression.caseSensitive = caseSensitive;
-        regularExpression.left = this;
-        regularExpression.regexp = regexp;
-        return new Value( regularExpression );
+        if ( caseSensitive )
+        {
+            return regexp( regexp );
+        }
+        else
+        {
+            return new Value( new Operator( this, "=~" ), literal( "(?i)" + regexp ) );
+        }
     }
 
     public StringExpression concat( String expression )

@@ -74,12 +74,14 @@ import org.neo4j.cypherdsl.query.clause.CreateClause;
 import org.neo4j.cypherdsl.query.clause.DeleteClause;
 import org.neo4j.cypherdsl.query.clause.ForEachClause;
 import org.neo4j.cypherdsl.query.clause.LimitClause;
+import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
 import org.neo4j.cypherdsl.query.clause.MatchClause;
 import org.neo4j.cypherdsl.query.clause.OrderByClause;
 import org.neo4j.cypherdsl.query.clause.RelateClause;
 import org.neo4j.cypherdsl.query.clause.ReturnClause;
 import org.neo4j.cypherdsl.query.clause.SetClause;
 import org.neo4j.cypherdsl.query.clause.SkipClause;
+import org.neo4j.cypherdsl.query.clause.SkipParameterClause;
 import org.neo4j.cypherdsl.query.clause.StartClause;
 import org.neo4j.cypherdsl.query.clause.WhereClause;
 import org.neo4j.cypherdsl.query.clause.WithClause;
@@ -541,19 +543,10 @@ public class CypherQuery
         return startNodes;
     }
 
-    /**
-     * Declare start nodes. Corresponds to:
-     * <pre>
-     * name=node({parameter})
-     * </pre>
-     *
-     * @param name
-     * @param parameter
-     * @return
-     */
-    public static StartExpression.StartNodes nodeByParameter( String name, String parameter )
+    @Deprecated
+    public static StartExpression.StartNodes nodeByParameter(  String name, String parameter )
     {
-        return nodeByparameter( identifier( name ), parameter );
+        return nodesByParameter( name, parameter );
     }
 
     /**
@@ -566,7 +559,28 @@ public class CypherQuery
      * @param parameter
      * @return
      */
+    public static StartExpression.StartNodes nodesByParameter( String name, String parameter )
+    {
+        return nodeByparameter( identifier( name ), parameter );
+    }
+
+    @Deprecated
     public static StartExpression.StartNodes nodeByparameter( Identifier name, String parameter )
+    {
+        return nodesByParameter( name, parameter );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node({parameter})
+     * </pre>
+     *
+     * @param name
+     * @param parameter
+     * @return
+     */
+    public static StartExpression.StartNodes nodesByParameter( Identifier name, String parameter )
     {
         checkEmpty( name, "Name" );
         checkEmpty( parameter, "Parameters" );
@@ -690,6 +704,46 @@ public class CypherQuery
         startNodesQuery.name = name;
         startNodesQuery.index = indexName;
         startNodesQuery.query = query;
+        return startNodesQuery;
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName({param}")
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param param
+     * @return
+     */
+    public static StartExpression.StartNodesQueryParam queryByParameter( String name, String indexName, String param )
+    {
+        return queryByParameter( identifier( name ), identifier( indexName ), param );
+    }
+
+    /**
+     * Declare start nodes. Corresponds to:
+     * <pre>
+     * name=node:indexName({param})
+     * </pre>
+     *
+     * @param name
+     * @param indexName
+     * @param param
+     * @return
+     */
+    public static StartExpression.StartNodesQueryParam queryByParameter( Identifier name, Identifier indexName, String param )
+    {
+        checkNull( name, "Name" );
+        checkNull( indexName, "Index" );
+        checkEmpty( param, "Param" );
+
+        StartExpression.StartNodesQueryParam  startNodesQuery = new StartExpression.StartNodesQueryParam();
+        startNodesQuery.name = name;
+        startNodesQuery.index = indexName;
+        startNodesQuery.param = param;
         return startNodesQuery;
     }
 
@@ -1965,6 +2019,14 @@ public class CypherQuery
             return this;
         }
 
+        // Skip ---------------------------------------------------------
+        @Override
+        public Limit skip( String skip )
+        {
+            query.add( new SkipParameterClause( skip ) );
+            return this;
+        }
+
         // Limit --------------------------------------------------------
         @Override
         public Execute limit( int limit )
@@ -1975,6 +2037,15 @@ public class CypherQuery
             }
 
             query.add( new LimitClause( limit ) );
+            return this;
+        }
+
+
+        // Limit --------------------------------------------------------
+        @Override
+        public Execute limit( String limit )
+        {
+            query.add( new LimitParameterClause( limit ) );
             return this;
         }
 
