@@ -40,7 +40,7 @@ public enum NullHandling
                 @Override
                 public void asString( StringBuilder builder )
                 {
-                    builder.append( '?' );
+                    builder.append( "? " );
                 }
             },
     FALSE_IF_MISSING
@@ -48,7 +48,7 @@ public enum NullHandling
                 @Override
                 public void asString( StringBuilder builder )
                 {
-                    builder.append( '!' );
+                    builder.append( "! " );
                 }
             }
 }
