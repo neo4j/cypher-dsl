@@ -36,12 +36,11 @@ public class Regexp
     public void asString( StringBuilder builder )
     {
         left.asString( builder );
-        builder.append( "=~/" );
+        builder.append( "=~\"" );
         if ( !caseSensitive )
         {
             builder.append( "(?i)" );
         }
-        regexp.asString( builder );
-        builder.append( '/' );
+        builder.append( regexp.toString().replace( "\\", "\\\\" ).replace( "\"", "\\\"" ) ).append( "\"" );
     }
 }
