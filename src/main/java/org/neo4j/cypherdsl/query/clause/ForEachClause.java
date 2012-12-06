@@ -86,18 +86,6 @@ public class ForEachClause
     }
 
     @Override
-    public ForEachStatement relate( PathExpression... expressions )
-    {
-        return new ForEachStatement( add( new RelateClause( Arrays.asList( expressions ) ) ) );
-    }
-
-    @Override
-    public ForEachStatement relate( Iterable<PathExpression> expressions )
-    {
-        return new ForEachStatement( add( new RelateClause( expressions ) ) );
-    }
-
-    @Override
     public ForEachStatement forEach( ForEachStatement statement )
     {
         return new ForEachStatement( add( statement ) );

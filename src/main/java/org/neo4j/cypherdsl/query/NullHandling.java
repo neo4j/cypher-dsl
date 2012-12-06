@@ -48,7 +48,9 @@ public enum NullHandling
                 @Override
                 public void asString( StringBuilder builder )
                 {
-                    builder.append( '!' );
+                    // Add a space after the exclamation mark because otherwise cypher
+                    // gives an error message saying that "!=" is not a valid inequality comparator
+                    builder.append( "! " );
                 }
             }
 }

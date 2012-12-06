@@ -208,7 +208,7 @@ public class CypherCookbookTest
     {
         assertEquals( CYPHER+"START me=node:node_auto_index(name=\"Joe\") " +
                       "MATCH (me)-[r1]->(other)-[r2]->(me) " +
-                      "WHERE type(r1)=type(r2) and type(r1)=~/FOLLOWS|LOVES/ " +
+                      "WHERE type(r1)=type(r2) and type(r1)=~'FOLLOWS|LOVES' " +
                       "RETURN other.name,type(r1)",
                       start( lookup( "me", "node_auto_index", "name", "Joe" ) ).
                       match( node( "me" ).out().as( "r1" ).node( "other" ).out().as( "r2" ).node( "me" ) ).

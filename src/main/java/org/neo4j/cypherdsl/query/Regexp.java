@@ -32,16 +32,18 @@ public class Regexp
     public Expression regexp;
     public boolean caseSensitive;
 
+    private static final char REGEXP_DELIM = '\'';
+
     @Override
     public void asString( StringBuilder builder )
     {
         left.asString( builder );
-        builder.append( "=~/" );
+        builder.append( "=~" ).append( REGEXP_DELIM );
         if ( !caseSensitive )
         {
             builder.append( "(?i)" );
         }
         regexp.asString( builder );
-        builder.append( '/' );
+        builder.append( REGEXP_DELIM );
     }
 }
