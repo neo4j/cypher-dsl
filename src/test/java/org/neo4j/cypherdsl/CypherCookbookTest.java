@@ -206,7 +206,7 @@ public class CypherCookbookTest extends AbstractCypherTest
     {
         assertQueryEquals( CYPHER+"START me=node:node_auto_index(name=\"Joe\") " +
                       "MATCH (me)-[r1]->(other)-[r2]->(me) " +
-                      "WHERE type(r1)=type(r2) and type(r1)=~'FOLLOWS|LOVES' " +
+                      "WHERE type(r1)=type(r2) and type(r1)=~\"FOLLOWS|LOVES\" " +
                       "RETURN other.name,type(r1)",
                       start( lookup( "me", "node_auto_index", "name", "Joe" ) ).
                       match( node( "me" ).out().as( "r1" ).node( "other" ).out().as( "r2" ).node( "me" ) ).
@@ -216,13 +216,27 @@ public class CypherCookbookTest extends AbstractCypherTest
     }
 
     @Test
+    public void test5_7_1_1()
+    {
+        assertQueryEquals( CYPHER+"START me=node:node_auto_index(name=\"Joe\") " +
+                "MATCH (me)-[r1]->(other)-[r2]->(me) " +
+                "WHERE type(r1)=type(r2) and type(r1)=~{param1} " +
+                "RETURN other.name,type(r1)",
+                start( lookup( "me", "node_auto_index", "name", "Joe" ) ).
+                        match( node( "me" ).out().as( "r1" ).node( "other" ).out().as( "r2" ).node( "me" ) ).
+                        where( type( identifier( "r1" ) ).eq( type( identifier( "r2" ) ) )
+                                .and( type( identifier( "r1" ) ).regexp( param("param1") ) ) ).
+                        returns( identifier( "other" ).property( "name" ), type( identifier( "r1" ) ) ).toString());
+    }
+
+    @Test
     public void test5_8_1()
     {
         assertQueryEquals( CYPHER+"START origin=node(1) " +
                       "MATCH (origin)-[r1:KNOWS|WORKSAT]-(c)-[r2:KNOWS|WORKSAT]-(candidate) " +
                       "WHERE type(r1)=type(r2) and not((origin)-[:KNOWS]-(candidate)) " +
                       "RETURN origin.name AS origin,candidate.name AS candidate,sum(round(r2.weight+" +
-                      "coalesce(r2.activity?,0)*2)) AS boost " +
+                      "coalesce(r2.activity? ,0)*2)) AS boost " +
                       "ORDER BY boost DESCENDING "+
                       "LIMIT 10",
                       start( nodesById( "origin", 1 ) ).
@@ -236,6 +250,29 @@ public class CypherCookbookTest extends AbstractCypherTest
                                                                                                 .times( 2 ) ) ) ), "boost" )).
                       orderBy( order( identifier( "boost" ), DESCENDING )).
                       limit( 10 ).toString());
+    }
+
+    @Test
+    public void test5_8_1_1()
+    {
+        assertQueryEquals( CYPHER+"START origin=node(1) " +
+                "MATCH (origin)-[r1:KNOWS|WORKSAT]-(c)-[r2:KNOWS|WORKSAT]-(candidate) " +
+                "WHERE type(r1)=type(r2) and not((origin)-[:KNOWS]-(candidate)) " +
+                "RETURN origin.name AS origin,candidate.name AS candidate,sum(round(r2.weight+" +
+                "coalesce(r2.activity? ,0)*2)) AS boost " +
+                "ORDER BY boost DESCENDING "+
+                "LIMIT {limitParam}",
+                start( nodesById( "origin", 1 ) ).
+                        match( node("origin" ).both("KNOWS","WORKSAT").as( "r1" ).node( "c" ).both("KNOWS","WORKSAT").as( "r2" ).node( "candidate" ) ).
+                        where( type( identifier( "r1" ) ).eq( type( identifier( "r2" ) ) ).and( not( node( "origin" ).both("KNOWS").node( "candidate" ) ) ) ).
+                        returns( as( identifier( "origin" ).property( "name" ) , "origin" ),
+                                as( identifier( "candidate" ).property( "name" ) , "candidate" ),
+                                as( sum( round( identifier( "r2" ).property( "weight" ).add( coalesce( identifier( "r2" )
+                                        .property( "activity" )
+                                        .optional(), literal( 0 ) )
+                                        .times( 2 ) ) ) ), "boost" )).
+                        orderBy( order( identifier( "boost" ), DESCENDING )).
+                        limit( "limitParam" ).toString());
     }
 
     @Test
@@ -337,7 +374,7 @@ public class CypherCookbookTest extends AbstractCypherTest
     {
         assertQueryEquals( CYPHER+"START root=node(4) " +
                       "MATCH (root)-[:LINK*0..]->(before),(after)-[:LINK*0..]->(root),(before)-[old:LINK]->(after) " +
-                      "WHERE before.value?<25 and 25<after.value? " +
+                      "WHERE before.value? <25 and 25<after.value?  " +
                       "CREATE (before)-[:LINK]->({value:25})-[:LINK]->(after) " +
                       "DELETE old",
                       start( nodesById( "root", 4 ) ).

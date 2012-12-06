@@ -39,7 +39,7 @@ public class CypherQueryTest extends AbstractCypherTest
         assertQueryEquals( CYPHER+"START family=node(0,1) RETURN family", start( nodesById( "family", 0, 1 )).returns( identifier("family" )).toString() );
 
         // Start with parameters
-        assertQueryEquals( CYPHER+"START john=node({name}) RETURN john", start( nodeByParameter( "john", "name" )).returns( identifier("john" )).toString());
+       assertQueryEquals( CYPHER+"START john=node({name}) RETURN john", start( nodesByParameter( "john", "name" )).returns( identifier("john" )).toString());
 
         assertQueryEquals( CYPHER+"START family=node(*) RETURN family", start(allNodes( "family" )).returns( identifier("family" )).toString());
 
@@ -48,6 +48,9 @@ public class CypherQueryTest extends AbstractCypherTest
 
         // Start with query
         assertQueryEquals( CYPHER+"START john=node:nodes(\"name:John\") RETURN john", start(query( "john", "nodes", "name:John" )).returns( identifier("john" )).toString());
+
+        // Start with query-param
+        assertEquals( CYPHER+"START john=node:nodes({param}) RETURN john", start(queryByParameter( "john", "nodes", "param" )).returns( identifier("john" )).toString());
 
         // Error handling
         try

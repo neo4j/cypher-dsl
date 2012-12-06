@@ -26,4 +26,6 @@ public interface Skip
         extends Limit
 {
     Limit skip( int nrToBeSkipped );
+
+    Limit skip( String parameterName );
 }

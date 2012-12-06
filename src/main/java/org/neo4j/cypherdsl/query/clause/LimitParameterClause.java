@@ -18,32 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.query;
-
-import org.neo4j.cypherdsl.expression.Expression;
+package org.neo4j.cypherdsl.query.clause;
 
 /**
- * Represents a regexp operation.
+ * LIMIT clause
  */
-public class Regexp
-        extends AbstractExpression
+public class LimitParameterClause
+        extends Clause
 {
-    public Expression left;
-    public Expression regexp;
-    public boolean caseSensitive;
+    private String limit;
 
-    private static final char REGEXP_DELIM = '\'';
+    public LimitParameterClause(String limit)
+    {
+        this.limit = limit;
+    }
 
     @Override
     public void asString( StringBuilder builder )
     {
-        left.asString( builder );
-        builder.append( "=~" ).append( REGEXP_DELIM );
-        if ( !caseSensitive )
-        {
-            builder.append( "(?i)" );
+        builder.append( " LIMIT {" ).append( limit ).append( "}" );
         }
-        regexp.asString( builder );
-        builder.append( REGEXP_DELIM );
     }
-}

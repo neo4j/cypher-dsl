@@ -49,19 +49,10 @@ public class Literal
         {
             if ( value instanceof String )
             {
-                if ( builder.toString().endsWith( "'" ) || builder.toString().endsWith( "(?i)" ) ) // -> Regexp with
-                // 'literal' or '(?i)literal'
-                {
-                    builder.append( value.toString().replaceAll( "'", "\\\\'" ) );
+                builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"", "\\\"" ) ).append( "\"" );
                 }
                 else
                 {
-                    builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"",
-                            "\\\"" ) ).append( "\"" );
-                }
-            }
-            else
-            {
                 builder.append( value.toString() );
             }
         }
