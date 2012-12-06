@@ -75,63 +75,18 @@ import static org.neo4j.cypherdsl.CypherQuery.type;
 import static org.neo4j.cypherdsl.CypherQuery.value;
 import static org.neo4j.cypherdsl.Order.DESCENDING;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.neo4j.cypher.MissingIndexException;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.test.ImpermanentGraphDatabase;
 
 /**
  * Construct Cypher queries corresponding to the Cypher Reference manual
  */
-public class CypherReferenceTest
+public class CypherReferenceTest extends AbstractCypherTest
 {
-    public static final String CYPHER="CYPHER 1.8 ";
-
-    private static ImpermanentGraphDatabase graphdb;
-    private static ExecutionEngine engine;
-
-    @After
-    public void cleanContent() {
-	graphdb.cleanContent(true);
-    }
-    
-    @BeforeClass
-    public static void classSetup()
-        throws IOException
-    {
-        graphdb = new ImpermanentGraphDatabase();
-        graphdb.cleanContent(true);
-
-        engine = new ExecutionEngine( graphdb );
-    }
-    
-    @AfterClass
-    public static void teardown()
-    {
-	graphdb.shutdown();
-    }
-    
-    private void assertQueryEquals(String expected, String query) {
-        assertEquals(expected, query);
-        // Make sure the generated query is actually executable
-        try {
-            engine.execute(query);
-        } catch (MissingIndexException mie) {
-        } catch (NotFoundException nfe) {
-        }
-    }
-    
     @Test
     public void test16_9_1()
     {

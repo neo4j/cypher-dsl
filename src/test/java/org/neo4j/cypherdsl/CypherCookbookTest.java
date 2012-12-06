@@ -24,15 +24,13 @@ import org.junit.Test;
 import org.neo4j.cypherdsl.grammar.Start;
 import org.neo4j.cypherdsl.query.Query;
 
-import static org.junit.Assert.*;
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.CypherReferenceTest.CYPHER;
 import static org.neo4j.cypherdsl.Order.*;
 
 /**
  * Construct Cypher queries corresponding to the Cypher Cookbook in the manual
  */
-public class CypherCookbookTest
+public class CypherCookbookTest extends AbstractCypherTest
 {
     @Test
     public void test5_1_1()
@@ -44,13 +42,13 @@ public class CypherCookbookTest
             match( node( "n" ).out( "hasRoleInGroup" ).node( "hyperEdge" ).out( "hasGroup" ).node( "group" ),
                    node( "hyperEdge" ).out( "hasRole" ).node( "role" ) ).toQuery();
 
-        assertEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
+        assertQueryEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN role.name",
                       CypherQuery.continueQuery(query, Start.class).starts().
                           where( identifier( "group" ).string( "name" ).eq( "Group2" ) ).
                           returns( identifier( "role" ).string( "name" ) ).
                           toString() );
 
-        assertEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name,group.name ORDER BY role.name ASCENDING",
+        assertQueryEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name,group.name ORDER BY role.name ASCENDING",
                       CypherQuery.continueQuery( query, Start.class ).starts().
                           returns( identifier( "role" ).property( "name" ), identifier( "group" ).property( "name" ) ).
                           orderBy( order( identifier( "role" ).string( "name" ), ASCENDING ) ).
@@ -66,7 +64,7 @@ public class CypherCookbookTest
         Identifier group = identifier("group");
         Identifier role = identifier("role");
         Identifier hyperEdge2 = identifier("hyperEdge2");
-        assertEquals( CYPHER + "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
+        assertQueryEquals( CYPHER + "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
                       "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
                       "(hyperEdge1)-[:hasRole]->(role)," +
                       "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
@@ -94,7 +92,7 @@ public class CypherCookbookTest
     @Test
     public void test5_1_3()
     {
-        assertEquals( CYPHER+ "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
+        assertQueryEquals( CYPHER+ "START u1=node:node_auto_index(name=\"User1\"),u2=node:node_auto_index(name=\"User2\") " +
                       "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
                       "(hyperEdge1)-[:hasRole]->(role)," +
                       "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
@@ -120,7 +118,7 @@ public class CypherCookbookTest
     @Test
     public void test5_2_1()
     {
-        assertEquals( CYPHER+"START joe=node:node_auto_index(name=\"Joe\") MATCH (joe)-[:knows]->(friend)-[:knows]->(friend_of_friend),(joe)-[r?:knows]->(friend_of_friend) WHERE r is null RETURN friend_of_friend.name,count(*) ORDER BY count(*) DESCENDING,friend_of_friend.name",
+        assertQueryEquals( CYPHER+"START joe=node:node_auto_index(name=\"Joe\") MATCH (joe)-[:knows]->(friend)-[:knows]->(friend_of_friend),(joe)-[r?:knows]->(friend_of_friend) WHERE r is null RETURN friend_of_friend.name,count(*) ORDER BY count(*) DESCENDING,friend_of_friend.name",
                       start( lookup( "joe", "node_auto_index", "name", "Joe" ) ).
                           match( node( "joe" ).out( "knows" ).node( "friend" )
                                      .out( "knows" ).node( "friend_of_friend" ),
@@ -134,14 +132,14 @@ public class CypherCookbookTest
     @Test
     public void test5_3_1()
     {
-        assertEquals( CYPHER+"START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
+        assertQueryEquals( CYPHER+"START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
                       start( lookup( "place", "node_auto_index", "name", "CoffeShop1" ) ).
                           match( node( "place" ).in( "favorite" ).node( "person" ).out( "favorite" ).node( "stuff" ) ).
                           returns( identifier( "stuff" ).property( "name" ), count() ).
                           orderBy( order( count(), DESCENDING ), identifier( "stuff" ).property( "name" ) ).
                           toString() );
 
-        assertEquals( CYPHER + "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
+        assertQueryEquals( CYPHER + "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
                       start( lookup( "place", "node_auto_index", "name", "CoffeShop1" ) ).
                           match( node( "place" ).out( "tagged" ).node( "tag" ).in( "tagged" ).node( "otherPlace" ) ).
                           returns( identifier( "otherPlace" ).property( "name" ), collect( identifier( "tag" ).property( "name" ) ) ).
@@ -152,7 +150,7 @@ public class CypherCookbookTest
     @Test
     public void test5_3_2()
     {
-        assertEquals( CYPHER+"START place=node:node_auto_index(name=\"CoffeeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
+        assertQueryEquals( CYPHER+"START place=node:node_auto_index(name=\"CoffeeShop1\") MATCH (place)-[:tagged]->(tag)<-[:tagged]-(otherPlace) RETURN otherPlace.name,collect(tag.name) ORDER BY otherPlace.name DESCENDING",
                       start( lookup( "place", "node_auto_index", "name", "CoffeeShop1" ) ).
                       match( node("place" ).out( "tagged" ).node( "tag" ).in( "tagged" ).node( "otherPlace" ) ).
                       returns( identifier( "otherPlace" ).property( "name" ), collect( identifier( "tag" ).property( "name" ) ) ).
@@ -162,7 +160,7 @@ public class CypherCookbookTest
     @Test
     public void test5_4_1()
     {
-        assertEquals( CYPHER + "START me=node:node_auto_index(name=\"Joe\") MATCH (me)-[:favorite]->(stuff)<-[:favorite]-(person) WHERE not((me)-[:friend]-(person)) RETURN person.name,count(stuff) ORDER BY count(stuff) DESCENDING",
+        assertQueryEquals( CYPHER + "START me=node:node_auto_index(name=\"Joe\") MATCH (me)-[:favorite]->(stuff)<-[:favorite]-(person) WHERE not((me)-[:friend]-(person)) RETURN person.name,count(stuff) ORDER BY count(stuff) DESCENDING",
                       start( lookup( "me", "node_auto_index", "name", "Joe" ) ).
                           match( node( "me" ).out( "favorite" ).node( "stuff" ).in( "favorite" ).node( "person" ) ).
                           where( not( node( "me" ).both( "friend" ).node( "person" ) ) ).
@@ -174,7 +172,7 @@ public class CypherCookbookTest
     @Test
     public void test5_5_1()
     {
-        assertEquals( CYPHER+"START me=node(5),other=node(4,3) " +
+        assertQueryEquals( CYPHER+"START me=node(5),other=node(4,3) " +
                       "MATCH pGroups=(me)-[?:member_of_group]->(mg)<-[?:member_of_group]-(other),pMutualFriends=(me)-[?:knows]->(mf)<-[?:knows]-(other) " +
                       "RETURN other.name AS name," +
                       "count(DISTINCT pGroups) AS mutualGroups," +
@@ -191,7 +189,7 @@ public class CypherCookbookTest
     @Test
     public void test5_6_1()
     {
-        assertEquals( CYPHER+"START me=node(9) " +
+        assertQueryEquals( CYPHER+"START me=node(9) " +
                       "MATCH (me)-[:favorite]->(myFavorites)-[:tagged]->(tag)<-[:tagged]-(theirFavorites)<-[:favorite]-(people) " +
                       "WHERE not(me=people) " +
                       "RETURN people.name AS name,count(*) AS similar_favs " +
@@ -206,7 +204,7 @@ public class CypherCookbookTest
     @Test
     public void test5_7_1()
     {
-        assertEquals( CYPHER+"START me=node:node_auto_index(name=\"Joe\") " +
+        assertQueryEquals( CYPHER+"START me=node:node_auto_index(name=\"Joe\") " +
                       "MATCH (me)-[r1]->(other)-[r2]->(me) " +
                       "WHERE type(r1)=type(r2) and type(r1)=~'FOLLOWS|LOVES' " +
                       "RETURN other.name,type(r1)",
@@ -220,7 +218,7 @@ public class CypherCookbookTest
     @Test
     public void test5_8_1()
     {
-        assertEquals( CYPHER+"START origin=node(1) " +
+        assertQueryEquals( CYPHER+"START origin=node(1) " +
                       "MATCH (origin)-[r1:KNOWS|WORKSAT]-(c)-[r2:KNOWS|WORKSAT]-(candidate) " +
                       "WHERE type(r1)=type(r2) and not((origin)-[:KNOWS]-(candidate)) " +
                       "RETURN origin.name AS origin,candidate.name AS candidate,sum(round(r2.weight+" +
@@ -243,7 +241,7 @@ public class CypherCookbookTest
     @Test
     public void test5_9_1()
     {
-        assertEquals( CYPHER+"START a=node(1) " +
+        assertQueryEquals( CYPHER+"START a=node(1) " +
                       "MATCH (a)--(b) "+
                       "WITH a,count(DISTINCT b) AS n "+
                       "MATCH (a)--()-[r]-()--(a) " +
@@ -258,7 +256,7 @@ public class CypherCookbookTest
     @Test
     public void test5_10_1()
     {
-        assertEquals( CYPHER+"CREATE (center) " +
+        assertQueryEquals( CYPHER+"CREATE (center) " +
                       "FOREACH(x in range(1,10): CREATE (leaf),(center)-[:X]->(leaf)) "+
                       "RETURN id(center) AS id",
                       create( node( "center" ) ).
@@ -269,7 +267,7 @@ public class CypherCookbookTest
     @Test
     public void test5_10_2()
     {
-        assertEquals( CYPHER+"CREATE (center) " +
+        assertQueryEquals( CYPHER+"CREATE (center) " +
                       "FOREACH(x in range(1,10): CREATE (leaf {count:x}),(center)-[:X]->(leaf)) " +
                       "WITH center " +
                       "MATCH (large_leaf)<--(center)-->(small_leaf) " +
@@ -296,7 +294,7 @@ public class CypherCookbookTest
     @Test
     public void test5_10_3()
     {
-        assertEquals( CYPHER+"CREATE (center) " +
+        assertQueryEquals( CYPHER+"CREATE (center) " +
                       "FOREACH(x in range(1,10): CREATE (leaf {count:x}),(center)-[:X]->(leaf)) " +
                       "WITH center " +
                       "MATCH (leaf1)<--(center)-->(leaf2) " +
@@ -319,7 +317,7 @@ public class CypherCookbookTest
     @Test
     public void test5_10_4()
     {
-        assertEquals( CYPHER+"CREATE (center) " +
+        assertQueryEquals( CYPHER+"CREATE (center) " +
                       "FOREACH(x in range(1,10): CREATE (leaf1),(leaf2),(center)-[:X]->(leaf1),(center)-[:X]->(leaf2),(leaf1)-[:X]->(leaf2)) " +
                       "RETURN id(center) AS id",
                       create( node( "center" ) ).
@@ -330,14 +328,14 @@ public class CypherCookbookTest
     @Test
     public void test5_12_1()
     {
-        assertEquals( CYPHER+"CREATE (root)-[:LINK]->(root) RETURN root",
+        assertQueryEquals( CYPHER+"CREATE (root)-[:LINK]->(root) RETURN root",
                       create( node( "root" ).out( "LINK" ).node( "root" ) ).returns( identifier( "root" ) ).toString());
     }
 
     @Test
     public void test5_12_2()
     {
-        assertEquals( CYPHER+"START root=node(4) " +
+        assertQueryEquals( CYPHER+"START root=node(4) " +
                       "MATCH (root)-[:LINK*0..]->(before),(after)-[:LINK*0..]->(root),(before)-[old:LINK]->(after) " +
                       "WHERE before.value?<25 and 25<after.value? " +
                       "CREATE (before)-[:LINK]->({value:25})-[:LINK]->(after) " +
@@ -352,7 +350,7 @@ public class CypherCookbookTest
     @Test
     public void test5_12_3()
     {
-        assertEquals( CYPHER+"START root=node(4) " +
+        assertQueryEquals( CYPHER+"START root=node(4) " +
                       "MATCH (root)-[:LINK*0..]->(before),(before)-[delBefore:LINK]->(del)-[delAfter:LINK]->(after),(after)-[:LINK*0..]->(root) " +
                       "WHERE del.value=10 " +
                       "CREATE (before)-[:LINK]->(after) " +
@@ -369,7 +367,7 @@ public class CypherCookbookTest
     @Test
     public void test5_13_1()
     {
-        assertEquals( CYPHER+"START root=node:node_auto_index(name=\"Root\") " +
+        assertQueryEquals( CYPHER+"START root=node:node_auto_index(name=\"Root\") " +
                       "MATCH rootPath=(root)-[:`2010`]->()-[:`12`]->()-[:`31`]->(leaf),(leaf)-[:VALUE]->(event) " +
                       "RETURN event.name " +
                       "ORDER BY event.name ASCENDING",
@@ -382,7 +380,7 @@ public class CypherCookbookTest
     @Test
     public void test5_13_2()
     {
-        assertEquals( CYPHER+"START root=node:node_auto_index(name=\"Root\") " +
+        assertQueryEquals( CYPHER+"START root=node:node_auto_index(name=\"Root\") " +
                       "MATCH startPath=(root)-[:`2010`]->()-[:`12`]->()-[:`31`]->(startLeaf)," +
                       "endPath=(root)-[:`2011`]->()-[:`01`]->()-[:`03`]->(endLeaf)," +
                       "valuePath=(startLeaf)-[:NEXT*0..]->(middle)-[:NEXT*0..]->(endLeaf)," +
@@ -401,7 +399,7 @@ public class CypherCookbookTest
     @Test
     public void test5_13_3()
     {
-        assertEquals( CYPHER+"START root=node:node_auto_index(name=\"Root\") " +
+        assertQueryEquals( CYPHER+"START root=node:node_auto_index(name=\"Root\") " +
                       "MATCH commonPath=(root)-[:`2011`]->()-[:`01`]->(commonRootEnd)," +
                       "startPath=(commonRootEnd)-[:`01`]->(startLeaf)," +
                       "endPath=(commonRootEnd)-[:`03`]->(endLeaf)," +
@@ -422,7 +420,7 @@ public class CypherCookbookTest
     @Test
     public void test5_14_1()
     {
-        assertEquals( CYPHER+"START me=node(*) " +
+        assertQueryEquals( CYPHER+"START me=node(*) " +
                       "MATCH (me)-[r1:ATE]->(food)<-[r2:ATE]-(you) " +
                       "WHERE has(me.name) and me.name=\"me\" " +
                       "WITH me,count(DISTINCT r1) AS H1,count(DISTINCT r2) AS H2,you " +
