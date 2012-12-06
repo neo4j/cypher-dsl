@@ -47,8 +47,6 @@ public interface StringExpression
 
     public BooleanExpression regexp( String regexp, boolean caseSensitive );
 
-    public BooleanExpression regexp( StringExpression regexp, boolean caseSensitive );
-
     public StringExpression concat( String expression );
 
     public StringExpression concat( StringExpression expression );

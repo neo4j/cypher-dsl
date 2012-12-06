@@ -97,6 +97,21 @@ public abstract class StartExpression
         }
     }
 
+    public static class StartNodesQueryParam
+            extends StartExpression
+    {
+        public Identifier index;
+        public String param;
+
+        public void asString( StringBuilder builder )
+        {
+            name.asString( builder );
+            builder.append( "=node:" );
+            index.asString( builder );
+            builder.append( "({" ).append( param ).append( "})" );
+        }
+    }
+
     public static class StartRelationships
             extends StartExpression
     {

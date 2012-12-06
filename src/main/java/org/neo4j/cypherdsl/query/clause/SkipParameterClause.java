@@ -18,37 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.query;
-
-import org.neo4j.cypherdsl.AsString;
+package org.neo4j.cypherdsl.query.clause;
 
 /**
- * Null handling for property references
+ * SKIP clause
  */
-public enum NullHandling
-        implements AsString
+public class SkipParameterClause
+        extends Clause
 {
-    NULL
-            {
-                @Override
-                public void asString( StringBuilder builder )
-                {
-                }
-            },
-    TRUE_IF_MISSING
-            {
-                @Override
-                public void asString( StringBuilder builder )
-                {
-                    builder.append( "? " );
-                }
-            },
-    FALSE_IF_MISSING
-            {
-                @Override
-                public void asString( StringBuilder builder )
-                {
-                    builder.append( "! " );
-                }
-            }
+    private String skip;
+
+    public SkipParameterClause(String skip)
+    {
+        this.skip = skip;
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        builder.append( " SKIP {" ).append( skip ).append( "}" );
+    }
 }

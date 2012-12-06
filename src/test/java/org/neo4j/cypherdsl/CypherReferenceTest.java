@@ -83,6 +83,13 @@ public class CypherReferenceTest
     }
 
     @Test
+    public void test16_9_7_1()
+    {
+        assertEquals( CYPHER+"START n=node:nodes({paramName}) RETURN n",
+                      start( queryByParameter( "n", "nodes", "paramName" ) ).returns( identifier( "n" ) ).toString() );
+    }
+
+    @Test
     public void test16_9_8()
     {
         assertEquals( CYPHER + "START a=node(1),b=node(2) RETURN a,b",
@@ -327,7 +334,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_3()
     {
-        assertEquals( CYPHER+"START n=node(3,1) WHERE n.name=~/Tob.*/ RETURN n",
+        assertEquals( CYPHER+"START n=node(3,1) WHERE n.name=~\"Tob.*\" RETURN n",
                       start( nodesById( "n", 3, 1 ) ).
                           where( identifier( "n" ).string( "name" ).regexp( "Tob.*" ) ).
                           returns( identifier( "n" ) ).
@@ -337,7 +344,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_4()
     {
-        assertEquals( CYPHER+"START n=node(3,1) WHERE n.name=~/Some\\/thing/ RETURN n",
+        assertEquals( CYPHER+"START n=node(3,1) WHERE n.name=~\"Some/thing\" RETURN n",
                       start( nodesById( "n", 3, 1 ) ).
                           where( identifier( "n" ).string( "name" ).regexp( "Some/thing" ) ).
                           returns( identifier( "n" ) ).
@@ -347,7 +354,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_5()
     {
-        assertEquals( CYPHER+"START n=node(3,1) WHERE n.name=~/(?i)ANDR.*/ RETURN n",
+        assertEquals( CYPHER+"START n=node(3,1) WHERE n.name=~\"(?i)ANDR.*\" RETURN n",
                       start( nodesById( "n", 3, 1 ) ).
                           where( identifier( "n" ).string( "name" ).regexp( "ANDR.*", false ) ).
                           returns( identifier( "n" ) ).
@@ -357,7 +364,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_6()
     {
-        assertEquals( CYPHER+"START n=node(3) MATCH (n)-[r]->() WHERE type(r)=~/K.*/ RETURN r",
+        assertEquals( CYPHER+"START n=node(3) MATCH (n)-[r]->() WHERE type(r)=~\"K.*\" RETURN r",
                       start( nodesById( "n", 3 ) ).
                           match( node( "n" ).out().as( "r" ).node() ).
                           where( type( identifier( "r" ) ).regexp( literal( "K.*" ) ) ).
@@ -378,7 +385,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_8()
     {
-        assertEquals( CYPHER+"START n=node(3,1) WHERE n.belt?=\"white\" RETURN n",
+        assertEquals( CYPHER+"START n=node(3,1) WHERE n.belt? =\"white\" RETURN n",
                       start( nodesById( "n", 3, 1 ) ).
                           where( identifier( "n").property( "belt" ).trueIfMissing().eq( "white" ) ).
                           returns( identifier( "n" ) ).
@@ -388,7 +395,7 @@ public class CypherReferenceTest
     @Test
     public void test16_11_9()
     {
-        assertEquals( CYPHER+"START n=node(3,1) WHERE n.belt!=\"white\" RETURN n",
+        assertEquals( CYPHER+"START n=node(3,1) WHERE n.belt! =\"white\" RETURN n",
                       start( nodesById( "n", 3, 1 ) ).
                           where( identifier("n").property( "belt").falseIfMissing().eq( "white" ) ).
                           returns( identifier( "n" ) ).
@@ -487,7 +494,7 @@ public class CypherReferenceTest
     @Test
     public void test16_12_7()
     {
-        assertEquals( CYPHER+"START n=node(1,2) RETURN n.age?",
+        assertEquals( CYPHER+"START n=node(1,2) RETURN n.age? ",
                       start( nodesById( "n", 1, 2 ) ).
                           returns( identifier( "n" ).property( "age" ).optional() ).
                           toString() );
@@ -536,7 +543,7 @@ public class CypherReferenceTest
     @Test
     public void test16_13_6()
     {
-        assertEquals( CYPHER+"START n=node(2,3,4,1) RETURN count(n.property?)",
+        assertEquals( CYPHER+"START n=node(2,3,4,1) RETURN count(n.property? )",
                       start( nodesById( "n", 2, 3, 4, 1 ) ).
                           returns( count( identifier( "n" ).property( "property" ).optional() ) ).
                           toString() );
@@ -620,7 +627,7 @@ public class CypherReferenceTest
     @Test
     public void test16_14_4()
     {
-        assertEquals( CYPHER+"START n=node(3,1,2) RETURN n.length?,n ORDER BY n.length?",
+        assertEquals( CYPHER+"START n=node(3,1,2) RETURN n.length? ,n ORDER BY n.length? ",
                       start( nodesById( "n", 3, 1, 2 ) ).
                           returns( identifier( "n" ).property( "length" ).optional(), identifier( "n" ) ).
                           orderBy( identifier( "n" ).property( "length" ).optional() ).
@@ -639,6 +646,18 @@ public class CypherReferenceTest
     }
 
     @Test
+    public void test16_15_1_1()
+    {
+        assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam}",
+                start( nodesById( "n", 3, 4, 5, 1, 2 ) ).
+                        returns( identifier( "n" ) ).
+                        orderBy( identifier( "n" ).property( "name" ) ).
+                        skip( "skipParam" ).
+                        toString() );
+    }
+
+
+    @Test
     public void test16_15_2()
     {
         assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP 1 LIMIT 2",
@@ -648,6 +667,18 @@ public class CypherReferenceTest
                           skip( 1 ).
                           limit( 2 ).
                           toString() );
+    }
+
+    @Test
+    public void test16_15_2_1()
+    {
+        assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam} LIMIT {limitParam}",
+                start( nodesById( "n", 3, 4, 5, 1, 2 ) ).
+                        returns( identifier( "n" ) ).
+                        orderBy( identifier( "n").property( "name" ) ).
+                        skip( "skipParam" ).
+                        limit( "limitParam" ).
+                        toString() );
     }
 
     @Test
@@ -877,7 +908,7 @@ public class CypherReferenceTest
     @Test
     public void test16_23_2_4()
     {
-        assertEquals( CYPHER+"START a=node(3) RETURN coalesce(a.hairColour?,a.eyes?)",
+        assertEquals( CYPHER+"START a=node(3) RETURN coalesce(a.hairColour? ,a.eyes? )",
                       start( nodesById( "a", 3 ) ).returns( coalesce( identifier( "a" ).property( "hairColour" ).optional(), identifier( "a" ).property( "eyes" ).optional() ) ).toString() );
     }
 
