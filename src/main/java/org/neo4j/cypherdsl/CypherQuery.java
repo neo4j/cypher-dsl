@@ -47,7 +47,6 @@ import org.neo4j.cypherdsl.grammar.ForEachStatements;
 import org.neo4j.cypherdsl.grammar.Limit;
 import org.neo4j.cypherdsl.grammar.Match;
 import org.neo4j.cypherdsl.grammar.OrderBy;
-import org.neo4j.cypherdsl.grammar.Relate;
 import org.neo4j.cypherdsl.grammar.ReturnNext;
 import org.neo4j.cypherdsl.grammar.Set;
 import org.neo4j.cypherdsl.grammar.Skip;
@@ -77,7 +76,6 @@ import org.neo4j.cypherdsl.query.clause.LimitClause;
 import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
 import org.neo4j.cypherdsl.query.clause.MatchClause;
 import org.neo4j.cypherdsl.query.clause.OrderByClause;
-import org.neo4j.cypherdsl.query.clause.RelateClause;
 import org.neo4j.cypherdsl.query.clause.ReturnClause;
 import org.neo4j.cypherdsl.query.clause.SetClause;
 import org.neo4j.cypherdsl.query.clause.SkipClause;
@@ -1840,7 +1838,7 @@ public class CypherQuery
 
     // Grammar
     protected class Grammar
-            implements StartNext, With, WithNext, Create, Set, Delete, Relate, UpdateNext, Match, ReturnNext, OrderBy,
+            implements StartNext, With, WithNext, Create, Set, Delete, UpdateNext, Match, ReturnNext, OrderBy,
             Skip, Limit, Execute
     {
         // With ---------------------------------------------------------
@@ -1907,23 +1905,6 @@ public class CypherQuery
         public UpdateNext delete( Iterable<ReferenceExpression> expressions )
         {
             query.add( new DeleteClause( expressions ) );
-
-            return this;
-        }
-
-        // Relate -------------------------------------------------------
-        @Override
-        public UpdateNext relate( PathExpression... expressions )
-        {
-            query.add( new RelateClause( Arrays.asList( expressions ) ) );
-
-            return this;
-        }
-
-        @Override
-        public UpdateNext relate( Iterable<PathExpression> expressions )
-        {
-            query.add( new RelateClause( expressions ) );
 
             return this;
         }

@@ -37,5 +37,5 @@ public class LimitParameterClause
     public void asString( StringBuilder builder )
     {
         builder.append( " LIMIT {" ).append( limit ).append( "}" );
+        }
     }
-}

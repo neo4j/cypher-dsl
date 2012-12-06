@@ -42,9 +42,5 @@ public interface ForEachStatements
 
     ForEachStatement delete( Iterable<ReferenceExpression> expressions );
 
-    ForEachStatement relate( PathExpression... expressions );
-
-    ForEachStatement relate( Iterable<PathExpression> expressions );
-
     ForEachStatement forEach( ForEachStatement statement );
 }
