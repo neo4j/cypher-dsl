@@ -86,15 +86,15 @@ public class ForEachClause
     }
 
     @Override
-    public ForEachStatement relate( PathExpression... expressions )
+    public ForEachStatement createUnique( PathExpression... expressions )
     {
-        return new ForEachStatement( add( new RelateClause( Arrays.asList( expressions ) ) ) );
+        return new ForEachStatement( add( new CreateUniqueClause( Arrays.asList( expressions ) ) ) );
     }
 
     @Override
-    public ForEachStatement relate( Iterable<PathExpression> expressions )
+    public ForEachStatement createUnique( Iterable<PathExpression> expressions )
     {
-        return new ForEachStatement( add( new RelateClause( expressions ) ) );
+        return new ForEachStatement( add( new CreateUniqueClause( expressions ) ) );
     }
 
     @Override

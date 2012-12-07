@@ -52,7 +52,7 @@ public class Path
     }
 
     /**
-     * If this node is used in a CREATE or RELATE clause,
+     * If this node is used in a CREATE or CREATE UNIQUE clause,
      * then you can use this method to specify property values.
      * Use e.g. {@link CypherQuery.value( String,Object )} to create
      * the individual values to be passed in here.
@@ -72,7 +72,7 @@ public class Path
     }
 
     /**
-     * If this node is used in a CREATE or RELATE clause,
+     * If this node is used in a CREATE or CREATE UNIQUE clause,
      * then you can use this method to specify property values.
      * Use e.g. {@link CypherQuery.value( String,Object )} to create
      * the individual values to be passed in here.
@@ -92,7 +92,7 @@ public class Path
     }
 
     /**
-     * If this node is used in a CREATE or RELATE clause,
+     * If this node is used in a CREATE or CREATE UNIQUE clause,
      * then you can use this method to specify property values which
      * should be taken from a map parameter.
      * <p/>

@@ -18,31 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.query.clause;
-
-import java.util.ArrayList;
+package org.neo4j.cypherdsl.grammar;
 
 import org.neo4j.cypherdsl.expression.PathExpression;
 
 /**
- * RELATE clause
+ * Represents the CREATE UNIQUE clause
  */
-public class RelateClause
-        extends Clause
+public interface CreateUnique
 {
-    private ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
+    UpdateNext createUnique( PathExpression... expressions );
 
-    public RelateClause( Iterable<PathExpression> expressions )
-    {
-        for ( PathExpression expression : expressions )
-        {
-            this.expressions.add( expression );
-        }
-    }
-
-    @Override
-    public void asString( StringBuilder builder )
-    {
-        clauseAsString( builder, "RELATE", expressions, "," );
-    }
+    UpdateNext createUnique( Iterable<PathExpression> expressions );
 }

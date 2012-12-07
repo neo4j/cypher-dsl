@@ -29,7 +29,7 @@ import org.neo4j.cypherdsl.query.clause.Clause;
 import org.neo4j.cypherdsl.query.clause.CreateClause;
 import org.neo4j.cypherdsl.query.clause.DeleteClause;
 import org.neo4j.cypherdsl.query.clause.ForEachClause;
-import org.neo4j.cypherdsl.query.clause.RelateClause;
+import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
 import org.neo4j.cypherdsl.query.clause.SetClause;
 
 /**
@@ -81,15 +81,15 @@ public class ForEachStatement
     }
 
     @Override
-    public ForEachStatement relate( PathExpression... expressions )
+    public ForEachStatement createUnique( PathExpression... expressions )
     {
-        return new ForEachStatement( forEachClause.add( new RelateClause( Arrays.asList( expressions ) ) ) );
+        return new ForEachStatement( forEachClause.add( new CreateUniqueClause( Arrays.asList( expressions ) ) ) );
     }
 
     @Override
-    public ForEachStatement relate( Iterable<PathExpression> expressions )
+    public ForEachStatement createUnique( Iterable<PathExpression> expressions )
     {
-        return new ForEachStatement( forEachClause.add( new RelateClause( expressions ) ) );
+        return new ForEachStatement( forEachClause.add( new CreateUniqueClause( expressions ) ) );
     }
 
     @Override
