@@ -20,10 +20,14 @@
 
 package org.neo4j.cypherdsl.grammar;
 
+import org.neo4j.cypherdsl.expression.PathExpression;
+
 /**
- * This collects all the update clauses.
+ * Represents the CREATE UNIQUE clause
  */
-public interface Update
-        extends Create, Set, Delete, CreateUnique
+public interface CreateUnique
 {
+    UpdateNext createUnique( PathExpression... expressions );
+
+    UpdateNext createUnique( Iterable<PathExpression> expressions );
 }

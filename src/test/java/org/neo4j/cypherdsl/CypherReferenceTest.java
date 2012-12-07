@@ -141,7 +141,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_9_7_1()
     {
-        assertEquals( CYPHER+"START n=node:nodes({paramName}) RETURN n",
+        assertQueryEquals( CYPHER+"START n=node:nodes({paramName}) RETURN n",
                       start( queryByParameter( "n", "nodes", "paramName" ) ).returns( identifier( "n" ) ).toString() );
     }
 
@@ -673,7 +673,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_14_3()
     {
-        assertEquals(CYPHER+ "START n=node(3,1,2) RETURN n ORDER BY n.name DESCENDING",
+        assertQueryEquals(CYPHER+ "START n=node(3,1,2) RETURN n ORDER BY n.name DESCENDING",
                       start( nodesById( "n", 3, 1, 2 ) ).
                           returns( identifier( "n" ) ).
                           orderBy( order( identifier( "n" ).property( "name" ), DESCENDING ) ).
@@ -704,7 +704,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_15_1_1()
     {
-        assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam}",
+        assertQueryEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam}",
                 start( nodesById( "n", 3, 4, 5, 1, 2 ) ).
                         returns( identifier( "n" ) ).
                         orderBy( identifier( "n" ).property( "name" ) ).
@@ -728,7 +728,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_15_2_1()
     {
-        assertEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam} LIMIT {limitParam}",
+        assertQueryEquals( CYPHER+"START n=node(3,4,5,1,2) RETURN n ORDER BY n.name SKIP {skipParam} LIMIT {limitParam}",
                 start( nodesById( "n", 3, 4, 5, 1, 2 ) ).
                         returns( identifier( "n" ) ).
                         orderBy( identifier( "n").property( "name" ) ).
@@ -855,6 +855,41 @@ public class CypherReferenceTest extends AbstractCypherTest
     {
         assertQueryEquals( CYPHER+"START n=node(2) SET n.surname=\"Taylor\" RETURN n",
                       start( nodesById( "n", 2 ) ).set(property( identifier( "n" ).property( "surname" ), literal( "Taylor" ))).returns( identifier( "n" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_1()
+    {
+        assertQueryEquals( CYPHER+"START left=node(1),right=node(3,4) CREATE UNIQUE (left)-[r:KNOWS]->(right) RETURN r",
+                      start( nodesById( "left", 1 ), nodesById( "right", 3, 4 ) ).createUnique(node( "left" ).out( "KNOWS" ).as( "r" ).node( "right" )).returns( identifier( "r" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_2()
+    {
+        assertQueryEquals( CYPHER+"START root=node(2) CREATE UNIQUE (root)-[:LOVES]-(someone) RETURN someone",
+                      start( nodesById( "root", 2 ) ).createUnique( node( "root" ).both( "LOVES" ).node( "someone" ) ).returns( identifier( "someone" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_3()
+    {
+        assertQueryEquals( CYPHER+"START root=node(2) CREATE UNIQUE (root)-[:X]-(leaf {name:\"D\"}) RETURN leaf",
+                      start( nodesById( "root", 2 ) ).createUnique( node( "root" ).both( "X" ).node( identifier( "leaf" )).values( value( "name", "D" ) ) ).returns( identifier( "leaf" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_4()
+    {
+        assertQueryEquals( CYPHER+"START root=node(2) CREATE UNIQUE (root)-[r:X {since:\"forever\"}]-() RETURN r",
+                      start( nodesById( "root", 2 ) ).createUnique( node( "root" ).both( identifier("X")).values( value("since", "forever" ) ).as( "r" ).node() ).returns( identifier( "r" ) ).toString());
+    }
+
+    @Test
+    public void test16_21_5()
+    {
+        assertQueryEquals( CYPHER+"START root=node(2) CREATE UNIQUE (root)-[:FOO]->(x),(root)-[:BAR]->(x) RETURN x",
+                      start( nodesById( "root", 2 ) ).createUnique( node( "root" ).out( "FOO" ).node( "x" ), node( "root" ).out( "BAR" ).node( "x" ) ).returns( identifier( "x" ) ) .toString());
     }
 
     @Test

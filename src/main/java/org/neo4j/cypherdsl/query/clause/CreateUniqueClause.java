@@ -18,12 +18,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.grammar;
+package org.neo4j.cypherdsl.query.clause;
+
+import java.util.ArrayList;
+
+import org.neo4j.cypherdsl.expression.PathExpression;
 
 /**
- * This collects all the update clauses.
+ * CREATE UNIQUE clause
  */
-public interface Update
-        extends Create, Set, Delete, CreateUnique
+public class CreateUniqueClause
+        extends Clause
 {
+    private ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
+
+    public CreateUniqueClause( Iterable<PathExpression> expressions )
+    {
+        for ( PathExpression expression : expressions )
+        {
+            this.expressions.add( expression );
+        }
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        clauseAsString( builder, "CREATE UNIQUE", expressions, "," );
+    }
 }

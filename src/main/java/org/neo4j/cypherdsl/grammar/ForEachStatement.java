@@ -29,6 +29,7 @@ import org.neo4j.cypherdsl.query.clause.Clause;
 import org.neo4j.cypherdsl.query.clause.CreateClause;
 import org.neo4j.cypherdsl.query.clause.DeleteClause;
 import org.neo4j.cypherdsl.query.clause.ForEachClause;
+import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
 import org.neo4j.cypherdsl.query.clause.SetClause;
 
 /**
@@ -77,6 +78,18 @@ public class ForEachStatement
     public ForEachStatement delete( Iterable<ReferenceExpression> expressions )
     {
         return new ForEachStatement( forEachClause.add( new DeleteClause( expressions ) ) );
+    }
+
+    @Override
+    public ForEachStatement createUnique( PathExpression... expressions )
+    {
+        return new ForEachStatement( forEachClause.add( new CreateUniqueClause( Arrays.asList( expressions ) ) ) );
+    }
+
+    @Override
+    public ForEachStatement createUnique( Iterable<PathExpression> expressions )
+    {
+        return new ForEachStatement( forEachClause.add( new CreateUniqueClause( expressions ) ) );
     }
 
     @Override
