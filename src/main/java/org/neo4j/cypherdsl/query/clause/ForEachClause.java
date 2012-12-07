@@ -86,6 +86,18 @@ public class ForEachClause
     }
 
     @Override
+    public ForEachStatement createUnique( PathExpression... expressions )
+    {
+        return new ForEachStatement( add( new CreateUniqueClause( Arrays.asList( expressions ) ) ) );
+    }
+
+    @Override
+    public ForEachStatement createUnique( Iterable<PathExpression> expressions )
+    {
+        return new ForEachStatement( add( new CreateUniqueClause( expressions ) ) );
+    }
+
+    @Override
     public ForEachStatement forEach( ForEachStatement statement )
     {
         return new ForEachStatement( add( statement ) );
