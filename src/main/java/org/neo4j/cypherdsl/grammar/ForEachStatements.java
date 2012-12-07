@@ -42,5 +42,9 @@ public interface ForEachStatements
 
     ForEachStatement delete( Iterable<ReferenceExpression> expressions );
 
+    ForEachStatement createUnique( PathExpression... expressions );
+
+    ForEachStatement createUnique( Iterable<PathExpression> expressions );
+
     ForEachStatement forEach( ForEachStatement statement );
 }

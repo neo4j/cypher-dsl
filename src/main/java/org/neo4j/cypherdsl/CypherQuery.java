@@ -47,6 +47,7 @@ import org.neo4j.cypherdsl.grammar.ForEachStatements;
 import org.neo4j.cypherdsl.grammar.Limit;
 import org.neo4j.cypherdsl.grammar.Match;
 import org.neo4j.cypherdsl.grammar.OrderBy;
+import org.neo4j.cypherdsl.grammar.CreateUnique;
 import org.neo4j.cypherdsl.grammar.ReturnNext;
 import org.neo4j.cypherdsl.grammar.Set;
 import org.neo4j.cypherdsl.grammar.Skip;
@@ -76,6 +77,7 @@ import org.neo4j.cypherdsl.query.clause.LimitClause;
 import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
 import org.neo4j.cypherdsl.query.clause.MatchClause;
 import org.neo4j.cypherdsl.query.clause.OrderByClause;
+import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
 import org.neo4j.cypherdsl.query.clause.ReturnClause;
 import org.neo4j.cypherdsl.query.clause.SetClause;
 import org.neo4j.cypherdsl.query.clause.SkipClause;
@@ -330,7 +332,7 @@ public class CypherQuery
 
     /**
      * Declare a value, which can be used for setting or matching
-     * properties in the CREATE or RELATE clauses.
+     * properties in the CREATE or CREATE UNIQUE clauses.
      *
      * @param id
      * @param value
@@ -343,7 +345,7 @@ public class CypherQuery
 
     /**
      * Declare a value, which can be used for setting or matching
-     * properties in the CREATE or RELATE clauses.
+     * properties in the CREATE or CREATE UNIQUE clauses.
      *
      * @param id
      * @param value
@@ -356,7 +358,7 @@ public class CypherQuery
 
     /**
      * Declare a value, which can be used for setting or matching
-     * properties in the CREATE or RELATE clauses.
+     * properties in the CREATE or CREATE UNIQUE clauses.
      *
      * @param id
      * @param value
@@ -876,7 +878,7 @@ public class CypherQuery
     // Match --------------------------------------------------------
 
     /**
-     * Start declaring a path for CREATE, RELATE, MATCH or WHERE clauses.
+     * Start declaring a path for CREATE, CREATE UNIQUE, MATCH or WHERE clauses.
      * <p/>
      * Corresponds to:
      * <pre>
@@ -891,7 +893,7 @@ public class CypherQuery
     }
 
     /**
-     * Start declaring a path for CREATE, RELATE, MATCH or WHERE clauses.
+     * Start declaring a path for CREATE, CREATE UNIQUE, MATCH or WHERE clauses.
      * <p/>
      * Corresponds to:
      * <pre>
@@ -907,7 +909,7 @@ public class CypherQuery
     }
 
     /**
-     * Start declaring a path for CREATE, RELATE, MATCH or WHERE clauses.
+     * Start declaring a path for CREATE, CREATE UNIQUE, MATCH or WHERE clauses.
      * <p/>
      * Corresponds to:
      * <pre>
@@ -1838,7 +1840,7 @@ public class CypherQuery
 
     // Grammar
     protected class Grammar
-            implements StartNext, With, WithNext, Create, Set, Delete, UpdateNext, Match, ReturnNext, OrderBy,
+            implements StartNext, With, WithNext, Create, Set, Delete, CreateUnique, UpdateNext, Match, ReturnNext, OrderBy,
             Skip, Limit, Execute
     {
         // With ---------------------------------------------------------
@@ -1905,6 +1907,23 @@ public class CypherQuery
         public UpdateNext delete( Iterable<ReferenceExpression> expressions )
         {
             query.add( new DeleteClause( expressions ) );
+
+            return this;
+        }
+
+        // createUnique -------------------------------------------------------
+        @Override
+        public UpdateNext createUnique( PathExpression... expressions )
+        {
+            query.add( new CreateUniqueClause( Arrays.asList( expressions ) ) );
+
+            return this;
+        }
+
+        @Override
+        public UpdateNext createUnique( Iterable<PathExpression> expressions )
+        {
+            query.add( new CreateUniqueClause( expressions ) );
 
             return this;
         }

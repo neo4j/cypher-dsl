@@ -53,7 +53,7 @@ public class PathRelationship
     }
 
     /**
-     * If this relationship is used in a CREATE or RELATE clause,
+     * If this relationship is used in a CREATE or CREATE UNIQUE clause,
      * then you can use this method to specify property values.
      * Use e.g. {@link CypherQuery.value( String,Object )} to create
      * the individual values to be passed in here.
@@ -73,7 +73,7 @@ public class PathRelationship
     }
 
     /**
-     * If this relationship is used in a CREATE or RELATE clause,
+     * If this relationship is used in a CREATE or CREATE UNIQUE clause,
      * then you can use this method to specify property values.
      * Use e.g. {@link CypherQuery.value( String,Object )} to create
      * the individual values to be passed in here.
