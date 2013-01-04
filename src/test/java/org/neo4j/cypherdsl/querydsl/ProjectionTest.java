@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2012 "Neo Technology,"
+ * Copyright (c) 2002-2013 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -19,15 +19,12 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import java.io.IOException;
-import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.grammar.Execute;
-import org.neo4j.cypherdsl.querydsl.Projection;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.test.GraphDescription;
@@ -35,8 +32,11 @@ import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
+import java.io.IOException;
+import java.util.Map;
+
 import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.*;
+import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.nodeById;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database and project the results.

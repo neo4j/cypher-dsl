@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2012 "Neo Technology,"
+ * Copyright (c) 2002-2013 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -19,72 +19,17 @@
  */
 package org.neo4j.cypherdsl;
 
-import static org.neo4j.cypherdsl.query.Query.checkEmpty;
-import static org.neo4j.cypherdsl.query.Query.checkNull;
+import org.neo4j.cypherdsl.expression.*;
+import org.neo4j.cypherdsl.grammar.*;
+import org.neo4j.cypherdsl.query.*;
+import org.neo4j.cypherdsl.query.clause.*;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.cypherdsl.expression.All;
-import org.neo4j.cypherdsl.expression.BooleanExpression;
-import org.neo4j.cypherdsl.expression.CollectionExpression;
-import org.neo4j.cypherdsl.expression.Expression;
-import org.neo4j.cypherdsl.expression.NumericExpression;
-import org.neo4j.cypherdsl.expression.PathExpression;
-import org.neo4j.cypherdsl.expression.PropertyContainerExpression;
-import org.neo4j.cypherdsl.expression.ReferenceExpression;
-import org.neo4j.cypherdsl.expression.RelationshipExpression;
-import org.neo4j.cypherdsl.expression.ScalarExpression;
-import org.neo4j.cypherdsl.expression.StartExpression;
-import org.neo4j.cypherdsl.expression.StringExpression;
-import org.neo4j.cypherdsl.grammar.Create;
-import org.neo4j.cypherdsl.grammar.Delete;
-import org.neo4j.cypherdsl.grammar.Execute;
-import org.neo4j.cypherdsl.grammar.ExecuteWithParameters;
-import org.neo4j.cypherdsl.grammar.ForEachStatement;
-import org.neo4j.cypherdsl.grammar.ForEachStatements;
-import org.neo4j.cypherdsl.grammar.Limit;
-import org.neo4j.cypherdsl.grammar.Match;
-import org.neo4j.cypherdsl.grammar.OrderBy;
-import org.neo4j.cypherdsl.grammar.CreateUnique;
-import org.neo4j.cypherdsl.grammar.ReturnNext;
-import org.neo4j.cypherdsl.grammar.Set;
-import org.neo4j.cypherdsl.grammar.Skip;
-import org.neo4j.cypherdsl.grammar.StartNext;
-import org.neo4j.cypherdsl.grammar.UpdateNext;
-import org.neo4j.cypherdsl.grammar.Where;
-import org.neo4j.cypherdsl.grammar.With;
-import org.neo4j.cypherdsl.grammar.WithNext;
-import org.neo4j.cypherdsl.query.AbstractExpression;
-import org.neo4j.cypherdsl.query.ExpressionCollection;
-import org.neo4j.cypherdsl.query.Expressions;
-import org.neo4j.cypherdsl.query.Extract;
-import org.neo4j.cypherdsl.query.Filter;
-import org.neo4j.cypherdsl.query.FunctionExpression;
-import org.neo4j.cypherdsl.query.IterablePredicateExpression;
-import org.neo4j.cypherdsl.query.NamedPath;
-import org.neo4j.cypherdsl.query.Operator;
-import org.neo4j.cypherdsl.query.OrderByExpression;
-import org.neo4j.cypherdsl.query.PropertyValue;
-import org.neo4j.cypherdsl.query.Query;
-import org.neo4j.cypherdsl.query.SuffixFunctionExpression;
-import org.neo4j.cypherdsl.query.Value;
-import org.neo4j.cypherdsl.query.clause.CreateClause;
-import org.neo4j.cypherdsl.query.clause.DeleteClause;
-import org.neo4j.cypherdsl.query.clause.ForEachClause;
-import org.neo4j.cypherdsl.query.clause.LimitClause;
-import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
-import org.neo4j.cypherdsl.query.clause.MatchClause;
-import org.neo4j.cypherdsl.query.clause.OrderByClause;
-import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
-import org.neo4j.cypherdsl.query.clause.ReturnClause;
-import org.neo4j.cypherdsl.query.clause.SetClause;
-import org.neo4j.cypherdsl.query.clause.SkipClause;
-import org.neo4j.cypherdsl.query.clause.SkipParameterClause;
-import org.neo4j.cypherdsl.query.clause.StartClause;
-import org.neo4j.cypherdsl.query.clause.WhereClause;
-import org.neo4j.cypherdsl.query.clause.WithClause;
+import static org.neo4j.cypherdsl.query.Query.checkEmpty;
+import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,

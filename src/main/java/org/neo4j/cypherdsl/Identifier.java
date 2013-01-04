@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2012 "Neo Technology,"
+ * Copyright (c) 2002-2013 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -20,16 +20,16 @@
 
 package org.neo4j.cypherdsl;
 
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
-import static org.neo4j.cypherdsl.query.Query.checkNull;
-
-import java.util.regex.Pattern;
-
 import org.neo4j.cypherdsl.expression.NumericExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.Value;
+
+import java.util.regex.Pattern;
+
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 /**
  * Represents an identifier. If the identifier is a node or relationship,

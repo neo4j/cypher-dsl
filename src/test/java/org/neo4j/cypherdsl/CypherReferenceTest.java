@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2012 "Neo Technology,"
+ * Copyright (c) 2002-2013 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -19,69 +19,16 @@
  */
 package org.neo4j.cypherdsl;
 
-import static org.junit.Assert.assertEquals;
-import static org.neo4j.cypherdsl.CypherQuery.abs;
-import static org.neo4j.cypherdsl.CypherQuery.all;
-import static org.neo4j.cypherdsl.CypherQuery.allNodes;
-import static org.neo4j.cypherdsl.CypherQuery.allShortestPaths;
-import static org.neo4j.cypherdsl.CypherQuery.any;
-import static org.neo4j.cypherdsl.CypherQuery.as;
-import static org.neo4j.cypherdsl.CypherQuery.avg;
-import static org.neo4j.cypherdsl.CypherQuery.coalesce;
-import static org.neo4j.cypherdsl.CypherQuery.collect;
-import static org.neo4j.cypherdsl.CypherQuery.collection;
-import static org.neo4j.cypherdsl.CypherQuery.count;
-import static org.neo4j.cypherdsl.CypherQuery.create;
-import static org.neo4j.cypherdsl.CypherQuery.distinct;
-import static org.neo4j.cypherdsl.CypherQuery.extract;
-import static org.neo4j.cypherdsl.CypherQuery.filter;
-import static org.neo4j.cypherdsl.CypherQuery.has;
-import static org.neo4j.cypherdsl.CypherQuery.head;
-import static org.neo4j.cypherdsl.CypherQuery.id;
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
-import static org.neo4j.cypherdsl.CypherQuery.identifiers;
-import static org.neo4j.cypherdsl.CypherQuery.in;
-import static org.neo4j.cypherdsl.CypherQuery.isNotNull;
-import static org.neo4j.cypherdsl.CypherQuery.isNull;
-import static org.neo4j.cypherdsl.CypherQuery.last;
-import static org.neo4j.cypherdsl.CypherQuery.length;
-import static org.neo4j.cypherdsl.CypherQuery.literal;
-import static org.neo4j.cypherdsl.CypherQuery.lookup;
-import static org.neo4j.cypherdsl.CypherQuery.max;
-import static org.neo4j.cypherdsl.CypherQuery.min;
-import static org.neo4j.cypherdsl.CypherQuery.node;
-import static org.neo4j.cypherdsl.CypherQuery.nodes;
-import static org.neo4j.cypherdsl.CypherQuery.nodesById;
-import static org.neo4j.cypherdsl.CypherQuery.none;
-import static org.neo4j.cypherdsl.CypherQuery.not;
-import static org.neo4j.cypherdsl.CypherQuery.order;
-import static org.neo4j.cypherdsl.CypherQuery.param;
-import static org.neo4j.cypherdsl.CypherQuery.path;
-import static org.neo4j.cypherdsl.CypherQuery.property;
-import static org.neo4j.cypherdsl.CypherQuery.query;
-import static org.neo4j.cypherdsl.CypherQuery.queryByParameter;
-import static org.neo4j.cypherdsl.CypherQuery.range;
-import static org.neo4j.cypherdsl.CypherQuery.relationshipLookup;
-import static org.neo4j.cypherdsl.CypherQuery.relationships;
-import static org.neo4j.cypherdsl.CypherQuery.relationshipsById;
-import static org.neo4j.cypherdsl.CypherQuery.round;
-import static org.neo4j.cypherdsl.CypherQuery.shortestPath;
-import static org.neo4j.cypherdsl.CypherQuery.sign;
-import static org.neo4j.cypherdsl.CypherQuery.single;
-import static org.neo4j.cypherdsl.CypherQuery.sqrt;
-import static org.neo4j.cypherdsl.CypherQuery.start;
-import static org.neo4j.cypherdsl.CypherQuery.sum;
-import static org.neo4j.cypherdsl.CypherQuery.tail;
-import static org.neo4j.cypherdsl.CypherQuery.type;
-import static org.neo4j.cypherdsl.CypherQuery.value;
-import static org.neo4j.cypherdsl.Order.DESCENDING;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.neo4j.cypherdsl.CypherQuery.*;
+import static org.neo4j.cypherdsl.Order.DESCENDING;
 
 /**
  * Construct Cypher queries corresponding to the Cypher Reference manual

@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2012 "Neo Technology,"
+ * Copyright (c) 2002-2013 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -19,16 +19,16 @@
  */
 package org.neo4j.cypherdsl;
 
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
-
-import java.io.Serializable;
-import java.util.Arrays;
-
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
 import org.neo4j.cypherdsl.query.Query;
+
+import java.io.Serializable;
+import java.util.Arrays;
+
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
 
 /**
  * Represents a relationship in a path.

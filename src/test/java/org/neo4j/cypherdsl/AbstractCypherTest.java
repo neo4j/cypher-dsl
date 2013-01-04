@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2012 "Neo Technology,"
+ * Copyright (c) 2002-2013 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -19,10 +19,6 @@
  */
 package org.neo4j.cypherdsl;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -30,6 +26,10 @@ import org.neo4j.cypher.MissingIndexException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.test.ImpermanentGraphDatabase;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractCypherTest {
 
