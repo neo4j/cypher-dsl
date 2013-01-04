@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.expression.PathExpression;
 public class CreateClause
         extends Clause
 {
-    private ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
+    private final ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
 
     public CreateClause( Iterable<PathExpression> expressions )
     {

@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.query.OrderByExpression;
 public class OrderByClause
         extends Clause
 {
-    private ArrayList<OrderByExpression> expressions = new ArrayList<OrderByExpression>();
+    private final ArrayList<OrderByExpression> expressions = new ArrayList<OrderByExpression>();
 
     public OrderByClause( Iterable<Expression> expressions )
     {
@@ -43,8 +43,7 @@ public class OrderByClause
             }
             else
             {
-                OrderByExpression returnExpression = new OrderByExpression();
-                returnExpression.expression = expression;
+                OrderByExpression returnExpression = new OrderByExpression( expression, null );
                 this.expressions.add( returnExpression );
             }
         }

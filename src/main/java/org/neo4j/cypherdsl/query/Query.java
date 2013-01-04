@@ -86,7 +86,7 @@ public class Query
         }
     }
 
-    private ArrayList<Clause> clauses = new ArrayList<Clause>();
+    private final ArrayList<Clause> clauses;
 
     public void add( Clause clause )
     {
@@ -130,13 +130,21 @@ public class Query
 */
     }
 
+    public Query()
+    {
+        this( new ArrayList<Clause>() );
+    }
+
+    private Query( ArrayList<Clause> clauses )
+    {
+        this.clauses = clauses;
+    }
+
     @Override
     public Object clone()
             throws CloneNotSupportedException
     {
-        Query query = (Query) super.clone();
-        query.clauses = (ArrayList<Clause>) query.clauses.clone();
-        return query;
+        return new Query( (ArrayList<Clause>) clauses.clone() );
     }
 
     @Override

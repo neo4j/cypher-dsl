@@ -28,8 +28,8 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class SetProperty
         implements AsString
 {
-    private Property property;
-    private Expression value;
+    private final Property property;
+    private final Expression value;
 
     SetProperty( Property property, Expression value )
     {

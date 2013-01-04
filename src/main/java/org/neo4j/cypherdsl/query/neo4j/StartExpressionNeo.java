@@ -19,9 +19,10 @@
  */
 package org.neo4j.cypherdsl.query.neo4j;
 
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.CypherQuery.literals;
 import static org.neo4j.cypherdsl.query.Query.checkNull;
 
-import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.expression.StartExpression;
 import org.neo4j.cypherdsl.query.Query;
@@ -35,7 +36,7 @@ public abstract class StartExpressionNeo
 {
     public static StartExpression.StartNodes nodeById( String name, Node... nodes )
     {
-        return nodeById( CypherQuery.identifier( name ), nodes );
+        return nodeById( identifier( name ), nodes );
     }
 
     public static StartExpression.StartNodes nodeById( Identifier name, Node... nodes )
@@ -54,10 +55,7 @@ public abstract class StartExpressionNeo
             ids[i] = node.getId();
         }
 
-        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
-        startNodes.name = name;
-        startNodes.nodes = CypherQuery.literals( ids );
-        return startNodes;
+        return new StartExpression.StartNodes( name, literals( ids ) );
     }
 
 }

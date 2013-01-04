@@ -25,7 +25,7 @@ package org.neo4j.cypherdsl.query;
 public class ExpressionCollection
         extends AbstractExpression
 {
-    private Expressions expressions;
+    private final Expressions expressions;
 
     public ExpressionCollection( Expressions expressions )
     {

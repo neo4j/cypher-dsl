@@ -28,7 +28,12 @@ import org.neo4j.cypherdsl.query.AbstractExpression;
 public abstract class StartExpression
         extends AbstractExpression
 {
-    public Identifier name;
+    public final Identifier name;
+
+    protected StartExpression( Identifier name )
+    {
+        this.name = name;
+    }
 
     public static class AllNodes
             extends AbstractExpression
@@ -43,7 +48,13 @@ public abstract class StartExpression
     public static class StartNodes
             extends StartExpression
     {
-        public Expression[] nodes;
+        public final Expression[] nodes;
+
+        public StartNodes( Identifier name, Expression[] nodes )
+        {
+            super( name );
+            this.nodes = nodes;
+        }
 
         public void asString( StringBuilder builder )
         {
@@ -65,9 +76,17 @@ public abstract class StartExpression
     public static class StartNodesLookup
             extends StartExpression
     {
-        public Identifier index;
-        public ReferenceExpression key;
-        public Expression value;
+        public final Identifier index;
+        public final ReferenceExpression key;
+        public final Expression value;
+
+        public StartNodesLookup( Identifier name, Identifier index, ReferenceExpression key, Expression value )
+        {
+            super( name );
+            this.index = index;
+            this.key = key;
+            this.value = value;
+        }
 
         public void asString( StringBuilder builder )
         {
@@ -85,8 +104,15 @@ public abstract class StartExpression
     public static class StartNodesQuery
             extends StartExpression
     {
-        public Identifier index;
-        public String query;
+        public final Identifier index;
+        public final String query;
+
+        public StartNodesQuery( Identifier name, Identifier index, String query )
+        {
+            super( name );
+            this.index = index;
+            this.query = query;
+        }
 
         public void asString( StringBuilder builder )
         {
@@ -100,8 +126,15 @@ public abstract class StartExpression
     public static class StartNodesQueryParam
             extends StartExpression
     {
-        public Identifier index;
-        public String param;
+        public final Identifier index;
+        public final String param;
+
+        public StartNodesQueryParam( Identifier name, Identifier index, String param )
+        {
+            super( name );
+            this.index = index;
+            this.param = param;
+        }
 
         public void asString( StringBuilder builder )
         {
@@ -115,7 +148,13 @@ public abstract class StartExpression
     public static class StartRelationships
             extends StartExpression
     {
-        public Expression[] relationships;
+        public final Expression[] relationships;
+
+        public StartRelationships( Identifier name, Expression[] relationships )
+        {
+            super( name );
+            this.relationships = relationships;
+        }
 
         public void asString( StringBuilder builder )
         {
@@ -137,7 +176,13 @@ public abstract class StartExpression
     public static class StartRelationshipsParameters
             extends StartExpression
     {
-        public String parameter;
+        public final String parameter;
+
+        public StartRelationshipsParameters( Identifier name, String parameter )
+        {
+            super( name );
+            this.parameter = parameter;
+        }
 
         public void asString( StringBuilder builder )
         {
@@ -149,9 +194,17 @@ public abstract class StartExpression
     public static class StartRelationshipsIndex
             extends StartExpression
     {
-        public Identifier index;
-        public Identifier key;
-        public StringExpression value;
+        public final Identifier index;
+        public final Identifier key;
+        public final StringExpression value;
+
+        public StartRelationshipsIndex( Identifier name, Identifier index, Identifier key, StringExpression value )
+        {
+            super( name );
+            this.index = index;
+            this.key = key;
+            this.value = value;
+        }
 
         public void asString( StringBuilder builder )
         {

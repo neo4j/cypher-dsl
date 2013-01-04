@@ -31,12 +31,12 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class Operator
         implements AsString, Serializable
 {
-    public Expression left; // null if this is a unary operator
-    public String operator;
+    public final Expression left; // null if this is a unary operator
+    public final String operator;
 
     public Operator( String operator )
     {
-        this.operator = operator;
+        this( null, operator );
     }
 
     public Operator( Expression left, String operator )

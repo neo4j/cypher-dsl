@@ -29,9 +29,16 @@ import org.neo4j.cypherdsl.expression.CollectionExpression;
 public class Filter
         extends AbstractExpression
 {
-    public Identifier name;
-    public CollectionExpression iterable;
-    public BooleanExpression predicate;
+    public final Identifier name;
+    public final CollectionExpression iterable;
+    public final BooleanExpression predicate;
+
+    public Filter( Identifier name, CollectionExpression iterable, BooleanExpression predicate )
+    {
+        this.name = name;
+        this.iterable = iterable;
+        this.predicate = predicate;
+    }
 
     @Override
     public void asString( StringBuilder builder )
