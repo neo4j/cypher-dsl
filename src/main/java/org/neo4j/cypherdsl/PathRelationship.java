@@ -19,16 +19,16 @@
  */
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+
+import java.io.Serializable;
+import java.util.Arrays;
+
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
 import org.neo4j.cypherdsl.query.Query;
-
-import java.io.Serializable;
-import java.util.Arrays;
-
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
 
 /**
  * Represents a relationship in a path.

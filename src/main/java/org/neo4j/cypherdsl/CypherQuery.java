@@ -19,17 +19,72 @@
  */
 package org.neo4j.cypherdsl;
 
-import org.neo4j.cypherdsl.expression.*;
-import org.neo4j.cypherdsl.grammar.*;
-import org.neo4j.cypherdsl.query.*;
-import org.neo4j.cypherdsl.query.clause.*;
+import static org.neo4j.cypherdsl.query.Query.checkEmpty;
+import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.neo4j.cypherdsl.query.Query.checkEmpty;
-import static org.neo4j.cypherdsl.query.Query.checkNull;
+import org.neo4j.cypherdsl.expression.All;
+import org.neo4j.cypherdsl.expression.BooleanExpression;
+import org.neo4j.cypherdsl.expression.CollectionExpression;
+import org.neo4j.cypherdsl.expression.Expression;
+import org.neo4j.cypherdsl.expression.NumericExpression;
+import org.neo4j.cypherdsl.expression.PathExpression;
+import org.neo4j.cypherdsl.expression.PropertyContainerExpression;
+import org.neo4j.cypherdsl.expression.ReferenceExpression;
+import org.neo4j.cypherdsl.expression.RelationshipExpression;
+import org.neo4j.cypherdsl.expression.ScalarExpression;
+import org.neo4j.cypherdsl.expression.StartExpression;
+import org.neo4j.cypherdsl.expression.StringExpression;
+import org.neo4j.cypherdsl.grammar.Create;
+import org.neo4j.cypherdsl.grammar.CreateUnique;
+import org.neo4j.cypherdsl.grammar.Delete;
+import org.neo4j.cypherdsl.grammar.Execute;
+import org.neo4j.cypherdsl.grammar.ExecuteWithParameters;
+import org.neo4j.cypherdsl.grammar.ForEachStatement;
+import org.neo4j.cypherdsl.grammar.ForEachStatements;
+import org.neo4j.cypherdsl.grammar.Limit;
+import org.neo4j.cypherdsl.grammar.Match;
+import org.neo4j.cypherdsl.grammar.OrderBy;
+import org.neo4j.cypherdsl.grammar.ReturnNext;
+import org.neo4j.cypherdsl.grammar.Set;
+import org.neo4j.cypherdsl.grammar.Skip;
+import org.neo4j.cypherdsl.grammar.StartNext;
+import org.neo4j.cypherdsl.grammar.UpdateNext;
+import org.neo4j.cypherdsl.grammar.Where;
+import org.neo4j.cypherdsl.grammar.With;
+import org.neo4j.cypherdsl.grammar.WithNext;
+import org.neo4j.cypherdsl.query.AbstractExpression;
+import org.neo4j.cypherdsl.query.ExpressionCollection;
+import org.neo4j.cypherdsl.query.Expressions;
+import org.neo4j.cypherdsl.query.Extract;
+import org.neo4j.cypherdsl.query.Filter;
+import org.neo4j.cypherdsl.query.FunctionExpression;
+import org.neo4j.cypherdsl.query.IterablePredicateExpression;
+import org.neo4j.cypherdsl.query.NamedPath;
+import org.neo4j.cypherdsl.query.Operator;
+import org.neo4j.cypherdsl.query.OrderByExpression;
+import org.neo4j.cypherdsl.query.PropertyValue;
+import org.neo4j.cypherdsl.query.Query;
+import org.neo4j.cypherdsl.query.SuffixFunctionExpression;
+import org.neo4j.cypherdsl.query.Value;
+import org.neo4j.cypherdsl.query.clause.CreateClause;
+import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
+import org.neo4j.cypherdsl.query.clause.DeleteClause;
+import org.neo4j.cypherdsl.query.clause.ForEachClause;
+import org.neo4j.cypherdsl.query.clause.LimitClause;
+import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
+import org.neo4j.cypherdsl.query.clause.MatchClause;
+import org.neo4j.cypherdsl.query.clause.OrderByClause;
+import org.neo4j.cypherdsl.query.clause.ReturnClause;
+import org.neo4j.cypherdsl.query.clause.SetClause;
+import org.neo4j.cypherdsl.query.clause.SkipClause;
+import org.neo4j.cypherdsl.query.clause.SkipParameterClause;
+import org.neo4j.cypherdsl.query.clause.StartClause;
+import org.neo4j.cypherdsl.query.clause.WhereClause;
+import org.neo4j.cypherdsl.query.clause.WithClause;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -75,15 +130,16 @@ public class CypherQuery
      * @param query a previously created query object
      * @return CypherQuery DSL that can be used to continue building the query
      */
-    public static <T> T continueQuery( Query query, Class<T> asClause)
-        throws ClassCastException
+    public static <T> T continueQuery( Query query, Class<T> asClause )
+            throws ClassCastException
     {
         try
         {
-            return new CypherQuery( (Query) query.clone() ).continueQuery(asClause);
-        } catch (CloneNotSupportedException e)
+            return new CypherQuery( (Query) query.clone() ).continueQuery( asClause );
+        }
+        catch ( CloneNotSupportedException e )
         {
-            throw new RuntimeException(e);
+            throw new RuntimeException( e );
         }
     }
 
@@ -439,10 +495,10 @@ public class CypherQuery
         return new Grammar();
     }
 
-    protected <T> T continueQuery(Class<T> asClause)
+    protected <T> T continueQuery( Class<T> asClause )
             throws ClassCastException
     {
-        return asClause.cast(new Grammar());
+        return asClause.cast( new Grammar() );
     }
 
     /**
@@ -489,7 +545,7 @@ public class CypherQuery
     }
 
     @Deprecated
-    public static StartExpression.StartNodes nodeByParameter(  String name, String parameter )
+    public static StartExpression.StartNodes nodeByParameter( String name, String parameter )
     {
         return nodesByParameter( name, parameter );
     }
@@ -679,13 +735,14 @@ public class CypherQuery
      * @param param
      * @return
      */
-    public static StartExpression.StartNodesQueryParam queryByParameter( Identifier name, Identifier indexName, String param )
+    public static StartExpression.StartNodesQueryParam queryByParameter( Identifier name, Identifier indexName,
+                                                                         String param )
     {
         checkNull( name, "Name" );
         checkNull( indexName, "Index" );
         checkEmpty( param, "Param" );
 
-        StartExpression.StartNodesQueryParam  startNodesQuery = new StartExpression.StartNodesQueryParam();
+        StartExpression.StartNodesQueryParam startNodesQuery = new StartExpression.StartNodesQueryParam();
         startNodesQuery.name = name;
         startNodesQuery.index = indexName;
         startNodesQuery.param = param;
@@ -1785,7 +1842,8 @@ public class CypherQuery
 
     // Grammar
     protected class Grammar
-            implements StartNext, With, WithNext, Create, Set, Delete, CreateUnique, UpdateNext, Match, ReturnNext, OrderBy,
+            implements StartNext, With, WithNext, Create, Set, Delete, CreateUnique, UpdateNext, Match, ReturnNext,
+            OrderBy,
             Skip, Limit, Execute
     {
         // With ---------------------------------------------------------

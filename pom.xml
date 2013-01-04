@@ -1,10 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.neo4j.build</groupId>
     <artifactId>parent-central</artifactId>
     <version>35</version>
-    <relativePath />
+    <relativePath/>
   </parent>
   <groupId>org.neo4j</groupId>
   <artifactId>neo4j-cypher-dsl</artifactId>
@@ -62,10 +63,10 @@
       <version>${querydsl.version}</version>
       <optional>true</optional>
       <exclusions>
-          <exclusion>
-              <groupId>org.apache.lucene</groupId>
-              <artifactId>lucene-core</artifactId>
-          </exclusion>
+        <exclusion>
+          <groupId>org.apache.lucene</groupId>
+          <artifactId>lucene-core</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <dependency>
@@ -97,17 +98,17 @@
     </dependency>
 
     <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-core-asl</artifactId>
-        <version>1.9.1</version>
-        <optional>true</optional>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-core-asl</artifactId>
+      <version>1.9.1</version>
+      <optional>true</optional>
     </dependency>
-      
+
     <dependency>
-        <groupId>org.codehaus.jackson</groupId>
-        <artifactId>jackson-mapper-asl</artifactId>
-        <version>1.9.1</version>
-        <optional>true</optional>
+      <groupId>org.codehaus.jackson</groupId>
+      <artifactId>jackson-mapper-asl</artifactId>
+      <version>1.9.1</version>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
@@ -126,7 +127,7 @@
 
   <build>
     <plugins>
-	  <plugin>
+      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
         <configuration>
@@ -165,7 +166,9 @@
         <executions>
           <execution>
             <phase>generate-test-sources</phase>
-            <goals><goal>add-source</goal></goals>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
             <configuration>
               <sources>
                 <source>target/generated-test-sources/querydsl</source>
@@ -176,23 +179,23 @@
       </plugin>
 
       <plugin>
-          <artifactId>maven-assembly-plugin</artifactId>
-          <executions>
-              <execution>
-                  <id>docs-assembly</id>
-                  <phase>package</phase>
-                  <configuration>
-                      <attach>true</attach>
-                      <appendAssemblyId>true</appendAssemblyId>
-                      <descriptors>
-                          <descriptor>src/main/assemblies/docs-assembly.xml</descriptor>
-                      </descriptors>
-                  </configuration>
-                  <goals>
-                      <goal>single</goal>
-                  </goals>
-              </execution>
-          </executions>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>docs-assembly</id>
+            <phase>package</phase>
+            <configuration>
+              <attach>true</attach>
+              <appendAssemblyId>true</appendAssemblyId>
+              <descriptors>
+                <descriptor>src/main/assemblies/docs-assembly.xml</descriptor>
+              </descriptors>
+            </configuration>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <artifactId>maven-site-plugin</artifactId>
@@ -240,7 +243,7 @@
                     </goals>
                   </pluginExecutionFilter>
                   <action>
-                    <execute />
+                    <execute/>
                   </action>
                 </pluginExecution>
               </pluginExecutions>

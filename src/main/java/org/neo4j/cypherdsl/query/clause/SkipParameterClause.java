@@ -28,7 +28,7 @@ public class SkipParameterClause
 {
     private String skip;
 
-    public SkipParameterClause(String skip)
+    public SkipParameterClause( String skip )
     {
         this.skip = skip;
     }

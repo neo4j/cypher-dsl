@@ -22,8 +22,8 @@ package org.neo4j.cypherdsl.querydsl;
 import com.mysema.query.annotations.QueryEntity;
 
 /**
-* Person entity
-*/
+ * Person entity
+ */
 @QueryEntity
 public class Person
 {

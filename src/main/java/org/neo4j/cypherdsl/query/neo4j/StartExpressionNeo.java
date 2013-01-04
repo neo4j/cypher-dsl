@@ -19,13 +19,13 @@
  */
 package org.neo4j.cypherdsl.query.neo4j;
 
+import static org.neo4j.cypherdsl.query.Query.checkNull;
+
 import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.expression.StartExpression;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.graphdb.Node;
-
-import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 /**
  * START expressions that use Neo4j Node objects directly, thus avoiding use of

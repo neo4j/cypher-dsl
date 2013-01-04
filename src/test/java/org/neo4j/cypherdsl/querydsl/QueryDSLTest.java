@@ -19,21 +19,14 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.support.Expressions;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.expr.Param;
-import org.junit.Assert;
-import org.junit.Test;
-import org.neo4j.cypherdsl.Order;
-
-import static com.mysema.query.alias.Alias.*;
-import static com.mysema.query.support.Expressions.*;
-import static org.junit.Assert.*;
+import static com.mysema.query.alias.Alias.$;
+import static com.mysema.query.alias.Alias.alias;
+import static com.mysema.query.support.Expressions.constant;
+import static com.mysema.query.support.Expressions.predicate;
+import static org.junit.Assert.assertEquals;
 import static org.neo4j.cypherdsl.CypherQuery.nodesById;
-import static org.neo4j.cypherdsl.CypherReferenceTest.*;
-import static org.neo4j.cypherdsl.Order.*;
+import static org.neo4j.cypherdsl.CypherReferenceTest.CYPHER;
+import static org.neo4j.cypherdsl.Order.DESCENDING;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.count;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.identifier;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.literal;
@@ -42,7 +35,18 @@ import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.node;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.order;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.query;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.start;
-import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.*;
+import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.string;
+import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.toBooleanExpression;
+import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.toQuery;
+
+import com.mysema.query.BooleanBuilder;
+import com.mysema.query.support.Expressions;
+import com.mysema.query.types.Ops;
+import com.mysema.query.types.Path;
+import com.mysema.query.types.expr.Param;
+import org.junit.Assert;
+import org.junit.Test;
+import org.neo4j.cypherdsl.Order;
 
 /**
  * Test for integration with QueryDSL
@@ -53,77 +57,83 @@ public class QueryDSLTest
     public void testQueryDSL()
     {
         {
-            Path<Person> person = Expressions.path(Person.class, "n");
-            Path<String> personFirstName = Expressions.path(String.class, person, "firstName");
-            Path<Integer> personAge = Expressions.path(Integer.class, person, "age");
-            BooleanBuilder expr = new BooleanBuilder(predicate(Ops.EQ, personFirstName, constant("P"))).and(predicate(Ops.GT, personAge, constant(25)));
+            Path<Person> person = Expressions.path( Person.class, "n" );
+            Path<String> personFirstName = Expressions.path( String.class, person, "firstName" );
+            Path<Integer> personAge = Expressions.path( Integer.class, person, "age" );
+            BooleanBuilder expr = new BooleanBuilder( predicate( Ops.EQ, personFirstName,
+                    constant( "P" ) ) ).and( predicate( Ops.GT, personAge, constant( 25 ) ) );
 
-            Assert.assertEquals(CYPHER+"START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
-                    start( nodesById( identifier( person ), 1, 2, 3 ))
-                            .where( toBooleanExpression( expr ))
+            Assert.assertEquals( CYPHER + "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
+                    start( nodesById( identifier( person ), 1, 2, 3 ) )
+                            .where( toBooleanExpression( expr ) )
                             .returns( identifier( person ) )
-                            .toString());
+                            .toString() );
         }
 
         {
-            Person person = alias(Person.class, "n");
-            Assert.assertEquals(CYPHER+"START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
-                    start( nodesById( person.toString(), 1, 2, 3 ))
+            Person person = alias( Person.class, "n" );
+            Assert.assertEquals( CYPHER + "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
+                    start( nodesById( person.toString(), 1, 2, 3 ) )
                             .where( toBooleanExpression( $( person.getFirstName() ).eq( "P" )
-                                                             .and( $( person.getAge() ).gt( 25 ) ) ))
+                                    .and( $( person.getAge() ).gt( 25 ) ) ) )
                             .returns( identifier( person.toString() ) )
-                            .toString());
+                            .toString() );
         }
 
         {
             QPerson person = QPerson.person;
-            Assert.assertEquals(CYPHER+"START person=node(1,2,3) WHERE person.firstName=\"P\" and person.age>25 RETURN person",
-                    start(nodesById(identifier(person), 1, 2, 3))
-                            .where( toBooleanExpression( person.firstName.eq( "P" ).and( person.age.gt( 25 ) ) ))
+            Assert.assertEquals( CYPHER + "START person=node(1,2,3) WHERE person.firstName=\"P\" and person.age>25 " +
+                    "RETURN person",
+                    start( nodesById( identifier( person ), 1, 2, 3 ) )
+                            .where( toBooleanExpression( person.firstName.eq( "P" ).and( person.age.gt( 25 ) ) ) )
                             .returns( identifier( person ) )
-                            .toString());
+                            .toString() );
         }
 
         {
             QPerson person = QPerson.person;
-            Assert.assertEquals(CYPHER+"START person=node:node_auto_index(\"firstName:rickard\") RETURN person.firstName ORDER BY person.firstName DESCENDING",
-                    start(query(identifier(person), identifier("node_auto_index"), toQuery(person.firstName.eq("Rickard"))))
-                            .returns(string( person.firstName ))
-                            .orderBy(order( string( person.firstName), Order.DESCENDING ))
-                            .toString());
+            Assert.assertEquals( CYPHER + "START person=node:node_auto_index(\"firstName:rickard\") RETURN person" +
+                    ".firstName ORDER BY person.firstName DESCENDING",
+                    start( query( identifier( person ), identifier( "node_auto_index" ),
+                            toQuery( person.firstName.eq( "Rickard" ) ) ) )
+                            .returns( string( person.firstName ) )
+                            .orderBy( order( string( person.firstName ), Order.DESCENDING ) )
+                            .toString() );
         }
 
         {
-            Assert.assertEquals(CYPHER+"START person=node:node_auto_index(\"firstName:rickard\") RETURN person.firstName ORDER BY person.firstName DESCENDING",
+            Assert.assertEquals( CYPHER + "START person=node:node_auto_index(\"firstName:rickard\") RETURN person" +
+                    ".firstName ORDER BY person.firstName DESCENDING",
                     new CypherQueryDSL()
                     {{
                             QPerson person = QPerson.person;
-                            starts(query(identifier( person), identifier("node_auto_index"), toQuery(person.firstName.eq("Rickard"))))
-                                    .returns(string( person.firstName ))
+                            starts( query( identifier( person ), identifier( "node_auto_index" ),
+                                    toQuery( person.firstName.eq( "Rickard" ) ) ) )
+                                    .returns( string( person.firstName ) )
                                     .orderBy( order( string( person.firstName ), Order.DESCENDING ) );
                         }}
-                            .toString());
+                            .toString() );
         }
 
         {
-            QPerson n = new QPerson("n");
-            Assert.assertEquals(CYPHER+"START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
-                    start(nodesById(identifier(n), 1, 2, 3))
-                            .where( toBooleanExpression( n.firstName.eq( "P" ).and( n.age.gt( 25 ) ) ))
+            QPerson n = new QPerson( "n" );
+            Assert.assertEquals( CYPHER + "START n=node(1,2,3) WHERE n.firstName=\"P\" and n.age>25 RETURN n",
+                    start( nodesById( identifier( n ), 1, 2, 3 ) )
+                            .where( toBooleanExpression( n.firstName.eq( "P" ).and( n.age.gt( 25 ) ) ) )
                             .returns( identifier( n ) )
-                            .toString());
+                            .toString() );
         }
 
         {
-            QPerson n = new QPerson("n");
-            Assert.assertEquals(CYPHER+"START n=node(1,2,3) WHERE n.firstName={name} and n.age>{age} RETURN n",
-                    start(nodesById(identifier(n), 1, 2, 3))
+            QPerson n = new QPerson( "n" );
+            Assert.assertEquals( CYPHER + "START n=node(1,2,3) WHERE n.firstName={name} and n.age>{age} RETURN n",
+                    start( nodesById( identifier( n ), 1, 2, 3 ) )
                             .where( toBooleanExpression( n.firstName
-                                                             .eq( new Param<String>( String.class, "name" ) )
-                                                             .and( n.age
-                                                                       .gt( new Param<Integer>( Integer.class, "age" ) ) ) ))
+                                    .eq( new Param<String>( String.class, "name" ) )
+                                    .and( n.age
+                                            .gt( new Param<Integer>( Integer.class, "age" ) ) ) ) )
                             .returns( identifier( n ) )
-                            .toString());
+                            .toString() );
         }
     }
 
@@ -134,26 +144,31 @@ public class QueryDSLTest
         QStuff stuff = QStuff.stuff;
         QPlace place = QPlace.place;
         QPerson person = QPerson.person;
-        assertEquals(CYPHER+"START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
-                start( lookup( identifier( place ), identifier("node_auto_index"), identifier( place.name ), literal("CoffeShop1" )) ).
-                        match( node( identifier( place )).in( "favorite" ).node( identifier( person )).out( "favorite" ).node( identifier(stuff )) ).
+        assertEquals( CYPHER + "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-" +
+                "(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
+                start( lookup( identifier( place ), identifier( "node_auto_index" ), identifier( place.name ),
+                        literal( "CoffeShop1" ) ) ).
+                        match( node( identifier( place ) ).in( "favorite" ).node( identifier( person ) ).out(
+                                "favorite" ).node( identifier( stuff ) ) ).
                         returns( string( stuff.name ), count() ).
                         orderBy( order( count(), DESCENDING ), string( stuff.name ) ).
-                            toString() );
+                        toString() );
 
         // Java instance initialization block style
-        assertEquals(CYPHER+"START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
+        assertEquals( CYPHER + "START place=node:node_auto_index(name=\"CoffeShop1\") MATCH (place)<-[:favorite]-" +
+                "(person)-[:favorite]->(stuff) RETURN stuff.name,count(*) ORDER BY count(*) DESCENDING,stuff.name",
                 new CypherQueryDSL()
                 {{
-                    QStuff stuff = QStuff.stuff;
-                    QPlace place = QPlace.place;
-                    QPerson person = QPerson.person;
+                        QStuff stuff = QStuff.stuff;
+                        QPlace place = QPlace.place;
+                        QPerson person = QPerson.person;
 
-                    starts(lookup(identifier( place), identifier("node_auto_index"), identifier(place.name), literal("CoffeShop1"))).
-                    match(node(identifier(place)).in("favorite").node(identifier( person)).out("favorite").node(identifier( stuff))).
-                    returns( string( stuff.name ), count() ).
-                    orderBy( order( count(), DESCENDING ), string( stuff.name ) );
-                }}.toString());
+                        starts( lookup( identifier( place ), identifier( "node_auto_index" ),
+                                identifier( place.name ), literal( "CoffeShop1" ) ) ).
+                                match( node( identifier( place ) ).in( "favorite" ).node( identifier( person ) ).out( "favorite" ).node( identifier( stuff ) ) ).
+                                returns( string( stuff.name ), count() ).
+                                orderBy( order( count(), DESCENDING ), string( stuff.name ) );
+                    }}.toString() );
 
     }
 

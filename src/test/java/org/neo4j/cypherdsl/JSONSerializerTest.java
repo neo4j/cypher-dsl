@@ -19,6 +19,18 @@
  */
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.CypherQuery.as;
+import static org.neo4j.cypherdsl.CypherQuery.count;
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.CypherQuery.lookup;
+import static org.neo4j.cypherdsl.CypherQuery.node;
+import static org.neo4j.cypherdsl.CypherQuery.path;
+import static org.neo4j.cypherdsl.CypherQuery.shortestPath;
+import static org.neo4j.cypherdsl.CypherQuery.start;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,63 +43,61 @@ import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
-import java.io.IOException;
-import java.util.Map;
-
-import static org.neo4j.cypherdsl.CypherQuery.*;
-
 /**
  * Test of JSON serialization of results.
  */
 public class JSONSerializerTest
-    implements GraphHolder
+        implements GraphHolder
 {
-    public @Rule
-    TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor(this, true ) );
+    public
+    @Rule
+    TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor( this, true ) );
 
     private ImpermanentGraphDatabase graphdb;
     private ExecutionEngine engine;
 
     @Test
-    @GraphDescription.Graph( value = {
-        "John friend Sara", "John friend Joe",
-        "Sara friend Maria", "Joe friend Steve"
-    }, autoIndexNodes = true )
+    @GraphDescription.Graph(value = {
+            "John friend Sara", "John friend Joe",
+            "Sara friend Maria", "Joe friend Steve"
+    }, autoIndexNodes = true)
     public void testJSONSerialization()
     {
         data.get();
 
         JSONSerializer serializer = new JSONSerializer();
-        String query = start(lookup("john", "node_auto_index", "name", "John")).
-                        match( node( "john" ).out( "friend" ).node().out( "friend" ).node( "fof" ) ).
-                        returns( as( identifier( "john" ).property( "name" ) , "name" ), as( identifier( "fof" ).property( "name" ) ,"friend" ), identifier( "john" ), as( count(), "count" ) )
-                        .toString();
-        String json = serializer.toJSON( engine.execute(query) ).toString();
+        String query = start( lookup( "john", "node_auto_index", "name", "John" ) ).
+                match( node( "john" ).out( "friend" ).node().out( "friend" ).node( "fof" ) ).
+                returns( as( identifier( "john" ).property( "name" ), "name" ), as( identifier( "fof" ).property(
+                        "name" ), "friend" ), identifier( "john" ), as( count(), "count" ) )
+                .toString();
+        String json = serializer.toJSON( engine.execute( query ) ).toString();
         System.out.println( json );
     }
 
     @Test
-    @GraphDescription.Graph( value = {
-        "John friend Sara", "John friend Joe",
-        "Sara friend Maria", "Joe friend Steve"
-    }, autoIndexNodes = true )
+    @GraphDescription.Graph(value = {
+            "John friend Sara", "John friend Joe",
+            "Sara friend Maria", "Joe friend Steve"
+    }, autoIndexNodes = true)
     public void testIterableJSONSerialization()
     {
         data.get();
 
         JSONSerializer serializer = new JSONSerializer();
-        String query = start( lookup( "john", "node_auto_index", "name", "John" ), lookup( "maria", "node_auto_index", "name", "Maria" ) )
-            .match( path( "p", shortestPath( node( "john" ).out().hops( null,3 ).node( "maria" ) )))
-            .returns( identifier( "p" ) )
-            .toString();
+        String query = start( lookup( "john", "node_auto_index", "name", "John" ), lookup( "maria",
+                "node_auto_index", "name", "Maria" ) )
+                .match( path( "p", shortestPath( node( "john" ).out().hops( null, 3 ).node( "maria" ) ) ) )
+                .returns( identifier( "p" ) )
+                .toString();
         System.out.println( query );
-        String json = serializer.toJSON(engine.execute(query)).toString();
+        String json = serializer.toJSON( engine.execute( query ) ).toString();
         System.out.println( json );
     }
 
     @Before
     public void setup()
-        throws IOException
+            throws IOException
     {
         graphdb = new ImpermanentGraphDatabase();
         graphdb.cleanContent( false );

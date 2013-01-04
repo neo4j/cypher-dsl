@@ -19,13 +19,18 @@
  */
 package org.neo4j.cypherdsl.grammar;
 
+import java.util.Arrays;
+
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.SetProperty;
 import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
-import org.neo4j.cypherdsl.query.clause.*;
-
-import java.util.Arrays;
+import org.neo4j.cypherdsl.query.clause.Clause;
+import org.neo4j.cypherdsl.query.clause.CreateClause;
+import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
+import org.neo4j.cypherdsl.query.clause.DeleteClause;
+import org.neo4j.cypherdsl.query.clause.ForEachClause;
+import org.neo4j.cypherdsl.query.clause.SetClause;
 
 /**
  * Represents a single statement to be executed with FOREACH

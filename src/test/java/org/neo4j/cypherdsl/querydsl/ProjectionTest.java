@@ -19,6 +19,16 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
+import static org.neo4j.cypherdsl.CypherQuery.as;
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.CypherQuery.lookup;
+import static org.neo4j.cypherdsl.CypherQuery.node;
+import static org.neo4j.cypherdsl.CypherQuery.start;
+import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.nodeById;
+
+import java.io.IOException;
+import java.util.Map;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,81 +42,78 @@ import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestData;
 
-import java.io.IOException;
-import java.util.Map;
-
-import static org.neo4j.cypherdsl.CypherQuery.*;
-import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.nodeById;
-
 /**
- * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database and project the results.
+ * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database and project
+ * the results.
  */
 public class ProjectionTest
-    implements GraphHolder
+        implements GraphHolder
 {
-    public @Rule
+    public
+    @Rule
     TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor(
-        this, true ) );
+            this, true ) );
 
     private ImpermanentGraphDatabase graphdb;
     private ExecutionEngine engine;
 
     @Test
-    @GraphDescription.Graph( value = {
-        "John friend Sara", "John friend Joe",
-        "Sara friend Maria", "Joe friend Steve"
-    }, autoIndexNodes = true )
+    @GraphDescription.Graph(value = {
+            "John friend Sara", "John friend Joe",
+            "Sara friend Maria", "Joe friend Steve"
+    }, autoIndexNodes = true)
     public void testCypherExecution()
-        throws Exception
+            throws Exception
     {
         data.get();
 
-        String query = start(lookup("john", "node_auto_index", "name", "John"))
-                                              .match(node("john").out("friend").node().out( "friend" ).node( "fof" ))
-                                              .returns( identifier( "john" ).property( "name" ), identifier( "fof" ).property( "name" ), identifier( "john" ) )
-                                              .toString();
+        String query = start( lookup( "john", "node_auto_index", "name", "John" ) )
+                .match( node( "john" ).out( "friend" ).node().out( "friend" ).node( "fof" ) )
+                .returns( identifier( "john" ).property( "name" ), identifier( "fof" ).property( "name" ),
+                        identifier( "john" ) )
+                .toString();
 
-        System.out.println(query);
+        System.out.println( query );
         ExecutionResult result = engine.execute( query );
         Node john = null;
-        for( Map<String, Object> stringObjectMap : result )
+        for ( Map<String, Object> stringObjectMap : result )
         {
-            john = ((Node)stringObjectMap.get( "john" ));
+            john = ((Node) stringObjectMap.get( "john" ));
         }
         System.out.println( result.toString() );
 
         {
             Execute q = start( nodeById( "john", john ) )
-                                                  .match( node( "john" ).out( "friend" )
-                                                              .node()
-                                                              .out( "friend" )
-                                                              .node( "fof" ) )
-                                                  .returns( identifier( "john" ).property( "name" ), identifier( "fof" )
-                                                      .property( "name" ) );
+                    .match( node( "john" ).out( "friend" )
+                            .node()
+                            .out( "friend" )
+                            .node( "fof" ) )
+                    .returns( identifier( "john" ).property( "name" ), identifier( "fof" )
+                            .property( "name" ) );
 
-            System.out.println(q);
+            System.out.println( q );
             System.out.println( engine.execute( q.toString() ).toString() );
         }
-        
+
         {
-            Projection<Friend> projection = new Projection<Friend>(Friend.class);
+            Projection<Friend> projection = new Projection<Friend>( Friend.class );
             Iterable<Friend> friends = projection.iterable( engine.execute( start( nodeById( "john", john ) )
-                                                                                .match( node( "john" ).out( "friend" )
-                                                                                            .node()
-                                                                                            .out( "friend" )
-                                                                                            .node( "fof" ) )
-                                                                                .returns( as( identifier( "john" ).property( "name" ) ,"name" ),
-                                                                                          as( identifier( "fof" ).property( "name" ) , "friend" ) ).toString() ));
+                    .match( node( "john" ).out( "friend" )
+                            .node()
+                            .out( "friend" )
+                            .node( "fof" ) )
+                    .returns( as( identifier( "john" ).property( "name" ), "name" ),
+                            as( identifier( "fof" ).property( "name" ), "friend" ) ).toString() ) );
             System.out.println( friends );
         }
     }
 
     @Before
     public void setup()
-        throws IOException
+            throws IOException
     {
         graphdb = new ImpermanentGraphDatabase();
-        graphdb.cleanContent(true);
+        graphdb.cleanContent( true );
 
         engine = new ExecutionEngine( graphdb );
     }
@@ -125,7 +132,7 @@ public class ProjectionTest
         @Override
         public String toString()
         {
-            return name+" is friend with "+friend;
+            return name + " is friend with " + friend;
         }
     }
 }

@@ -49,10 +49,11 @@ public class Literal
         {
             if ( value instanceof String )
             {
-                builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"", "\\\"" ) ).append( "\"" );
-                }
-                else
-                {
+                builder.append( "\"" ).append( value.toString().replace( "\\", "\\\\" ).replace( "\"",
+                        "\\\"" ) ).append( "\"" );
+            }
+            else
+            {
                 builder.append( value.toString() );
             }
         }

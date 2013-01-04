@@ -20,10 +20,10 @@
 
 package org.neo4j.cypherdsl.query.clause;
 
+import java.util.ArrayList;
+
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.OrderByExpression;
-
-import java.util.ArrayList;
 
 /**
  * ORDER BY clause

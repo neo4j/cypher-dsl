@@ -19,8 +19,19 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
+import javax.annotation.Nullable;
+
 import com.mysema.query.lucene.LuceneSerializer;
-import com.mysema.query.types.*;
+import com.mysema.query.types.Constant;
+import com.mysema.query.types.FactoryExpression;
+import com.mysema.query.types.Operation;
+import com.mysema.query.types.Ops;
+import com.mysema.query.types.ParamExpression;
+import com.mysema.query.types.Path;
+import com.mysema.query.types.Predicate;
+import com.mysema.query.types.SubQueryExpression;
+import com.mysema.query.types.TemplateExpression;
+import com.mysema.query.types.Visitor;
 import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.Property;
@@ -29,8 +40,6 @@ import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.NumericExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
 import org.neo4j.cypherdsl.query.Value;
-
-import javax.annotation.Nullable;
 
 /**
  * Methods here are used to integrate Cypher DSL with the QueryDSL library. Create QBeans with QueryDSL
@@ -98,37 +107,37 @@ public class CypherQueryDSL
                 String id = operation.getOperator().getId();
                 if ( id.equals( Ops.AND.getId() ) )
                 {
-                    return and(operation.getArg(0).accept(this, null), operation.getArg(1)
-                            .accept(this, null));
+                    return and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
                 }
                 else if ( id.equals( Ops.OR.getId() ) )
                 {
-                    return or(operation.getArg(0).accept(this, null), operation.getArg(1)
-                            .accept(this, null));
+                    return or( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
+                            .accept( this, null ) );
                 }
                 else if ( id.equals( Ops.NOT.getId() ) )
                 {
-                    return not(operation.getArg(0).accept(this, null));
+                    return not( operation.getArg( 0 ).accept( this, null ) );
                 }
                 else if ( id.equals( Ops.EQ.getId() ) )
                 {
-                    return arg( operation.getArg( 0 ) ).eq((StringExpression) arg(operation.getArg(1)));
+                    return arg( operation.getArg( 0 ) ).eq( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
                 else if ( id.equals( Ops.NE.getId() ) )
                 {
-                    return arg( operation.getArg( 0 ) ).ne((StringExpression) arg(operation.getArg(1)));
+                    return arg( operation.getArg( 0 ) ).ne( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
                 else if ( id.equals( Ops.GT.getId() ) )
                 {
-                    return arg( operation.getArg( 0 ) ).gt((StringExpression) arg(operation.getArg(1)));
+                    return arg( operation.getArg( 0 ) ).gt( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
                 else if ( id.equals( Ops.LT.getId() ) )
                 {
-                    return arg( operation.getArg( 0 ) ).lt((StringExpression) arg(operation.getArg(1)));
+                    return arg( operation.getArg( 0 ) ).lt( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
                 else if ( id.equals( Ops.GOE.getId() ) )
                 {
-                    return arg( operation.getArg( 0 ) ).gte((StringExpression) arg(operation.getArg(1)));
+                    return arg( operation.getArg( 0 ) ).gte( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
                 else if ( id.equals( Ops.LOE.getId() ) )
                 {

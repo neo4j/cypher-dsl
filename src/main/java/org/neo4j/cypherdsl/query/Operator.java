@@ -19,10 +19,10 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import java.io.Serializable;
+
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.expression.Expression;
-
-import java.io.Serializable;
 
 /**
  * Represents the left part and the operator in an operation. E.g. 1 + 2 -> 1 and + are handled here. This is used

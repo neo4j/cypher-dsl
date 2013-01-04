@@ -21,7 +21,7 @@
 -->
 <assembly>
   <id>docs</id>
-  <includeBaseDirectory>false</includeBaseDirectory>  
+  <includeBaseDirectory>false</includeBaseDirectory>
   <formats>
     <format>jar</format>
   </formats>

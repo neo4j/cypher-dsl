@@ -20,9 +20,9 @@
 
 package org.neo4j.cypherdsl.query.clause;
 
-import org.neo4j.cypherdsl.expression.Expression;
-
 import java.util.ArrayList;
+
+import org.neo4j.cypherdsl.expression.Expression;
 
 /**
  * WITH clause

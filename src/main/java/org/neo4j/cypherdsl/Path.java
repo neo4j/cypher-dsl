@@ -20,6 +20,8 @@
 
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -31,8 +33,6 @@ import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
-
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
 
 /**
  * Represents either a single node or a path from one node to another.
@@ -137,7 +137,7 @@ public class Path
      */
     public PathRelationship out( String... relationships )
     {
-        return new PathRelationship( this, Direction.OUT, Arrays.asList(CypherQuery.identifiers(relationships)) );
+        return new PathRelationship( this, Direction.OUT, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
     }
 
     /**
@@ -168,9 +168,9 @@ public class Path
     public PathRelationship out( Enum<?>... relationships )
     {
         List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for (Enum<?> relationship : relationships)
+        for ( Enum<?> relationship : relationships )
         {
-            relationshipNames.add(identifier(relationship.name()));
+            relationshipNames.add( identifier( relationship.name() ) );
         }
 
         return new PathRelationship( this, Direction.OUT, relationshipNames );
@@ -234,9 +234,9 @@ public class Path
     public PathRelationship in( Enum<?>... relationships )
     {
         List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for (Enum<?> relationship : relationships)
+        for ( Enum<?> relationship : relationships )
         {
-            relationshipNames.add(identifier(relationship.name()));
+            relationshipNames.add( identifier( relationship.name() ) );
         }
 
         return new PathRelationship( this, Direction.IN, relationshipNames );
@@ -300,9 +300,9 @@ public class Path
     public PathRelationship both( Enum<?>... relationships )
     {
         List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for (Enum<?> relationship : relationships)
+        for ( Enum<?> relationship : relationships )
         {
-            relationshipNames.add(identifier(relationship.name()));
+            relationshipNames.add( identifier( relationship.name() ) );
         }
 
         return new PathRelationship( this, Direction.BOTH, relationshipNames );
