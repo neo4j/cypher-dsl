@@ -20,17 +20,20 @@
 
 package org.neo4j.cypherdsl;
 
+import static java.util.Arrays.asList;
 import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.CypherQuery.identifiers;
+import static org.neo4j.cypherdsl.query.Direction.BOTH;
+import static org.neo4j.cypherdsl.query.Direction.IN;
+import static org.neo4j.cypherdsl.query.Direction.OUT;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.query.AbstractExpression;
-import org.neo4j.cypherdsl.query.Direction;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
 
@@ -41,14 +44,15 @@ public class Path
         extends AbstractExpression
         implements PathExpression
 {
-    private Expression node;
-    private Expression nodePropertyValues;
-    private PathRelationship relationship;
+    private final Expression node;
+    private final Expression nodePropertyValues;
+    private final PathRelationship relationship;
 
-    Path( Expression node, PathRelationship relationship )
+    Path( Expression node, PathRelationship relationship, Expression nodePropertyValues )
     {
         this.node = node;
         this.relationship = relationship;
+        this.nodePropertyValues = nodePropertyValues;
     }
 
     /**
@@ -67,8 +71,7 @@ public class Path
      */
     public Path values( PropertyValue... propertyValues )
     {
-        nodePropertyValues = new PropertyValues( Arrays.asList( propertyValues ) );
-        return this;
+        return new Path( node, relationship, new PropertyValues( asList( propertyValues ) ) );
     }
 
     /**
@@ -87,8 +90,7 @@ public class Path
      */
     public Path values( Iterable<PropertyValue> propertyValues )
     {
-        nodePropertyValues = new PropertyValues( propertyValues );
-        return this;
+        return new Path( node, relationship, new PropertyValues( propertyValues ) );
     }
 
     /**
@@ -106,8 +108,7 @@ public class Path
      */
     public Path values( Parameter propertyValues )
     {
-        nodePropertyValues = propertyValues;
-        return this;
+        return new Path( node, relationship, propertyValues );
     }
 
     /**
@@ -122,7 +123,7 @@ public class Path
      */
     public PathRelationship out()
     {
-        return new PathRelationship( this, Direction.OUT, Collections.<Identifier>emptyList() );
+        return new PathRelationship( this, OUT, null, Collections.<Identifier>emptyList(), null, false, null, null );
     }
 
     /**
@@ -137,7 +138,7 @@ public class Path
      */
     public PathRelationship out( String... relationships )
     {
-        return new PathRelationship( this, Direction.OUT, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
+        return new PathRelationship( this, OUT, null, asList( identifiers( relationships ) ), null, false, null, null );
     }
 
     /**
@@ -152,7 +153,7 @@ public class Path
      */
     public PathRelationship out( Identifier... relationships )
     {
-        return new PathRelationship( this, Direction.OUT, Arrays.asList( relationships ) );
+        return new PathRelationship( this, OUT, null, asList( relationships ), null, false, null, null );
     }
 
     /**
@@ -173,7 +174,7 @@ public class Path
             relationshipNames.add( identifier( relationship.name() ) );
         }
 
-        return new PathRelationship( this, Direction.OUT, relationshipNames );
+        return new PathRelationship( this, OUT, null, relationshipNames, null, false, null, null );
     }
 
     /**
@@ -188,7 +189,7 @@ public class Path
      */
     public PathRelationship in()
     {
-        return new PathRelationship( this, Direction.IN, Collections.<Identifier>emptyList() );
+        return new PathRelationship( this, IN, null, Collections.<Identifier>emptyList(), null, false, null, null );
     }
 
     /**
@@ -203,7 +204,7 @@ public class Path
      */
     public PathRelationship in( String... relationships )
     {
-        return new PathRelationship( this, Direction.IN, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
+        return new PathRelationship( this, IN, null, asList( identifiers( relationships ) ), null, false, null, null );
     }
 
     /**
@@ -218,7 +219,7 @@ public class Path
      */
     public PathRelationship in( Identifier... relationships )
     {
-        return new PathRelationship( this, Direction.IN, Arrays.asList( relationships ) );
+        return new PathRelationship( this, IN, null, asList( relationships ), null, false, null, null );
     }
 
     /**
@@ -239,7 +240,7 @@ public class Path
             relationshipNames.add( identifier( relationship.name() ) );
         }
 
-        return new PathRelationship( this, Direction.IN, relationshipNames );
+        return new PathRelationship( this, IN, null, relationshipNames, null, false, null, null );
     }
 
     /**
@@ -254,7 +255,7 @@ public class Path
      */
     public PathRelationship both()
     {
-        return new PathRelationship( this, Direction.BOTH, Collections.<Identifier>emptyList() );
+        return new PathRelationship( this, BOTH, null, Collections.<Identifier>emptyList(), null, false, null, null );
     }
 
     /**
@@ -269,7 +270,8 @@ public class Path
      */
     public PathRelationship both( String... relationships )
     {
-        return new PathRelationship( this, Direction.BOTH, Arrays.asList( CypherQuery.identifiers( relationships ) ) );
+        return new PathRelationship( this, BOTH, null, asList( identifiers( relationships ) ), null, false, null,
+                null );
     }
 
     /**
@@ -284,7 +286,7 @@ public class Path
      */
     public PathRelationship both( Identifier... relationships )
     {
-        return new PathRelationship( this, Direction.BOTH, Arrays.asList( relationships ) );
+        return new PathRelationship( this, BOTH, null, asList( relationships ), null, false, null, null );
     }
 
     /**
@@ -305,7 +307,7 @@ public class Path
             relationshipNames.add( identifier( relationship.name() ) );
         }
 
-        return new PathRelationship( this, Direction.BOTH, relationshipNames );
+        return new PathRelationship( this, BOTH, null, relationshipNames, null, false, null, null );
     }
 
     @Override

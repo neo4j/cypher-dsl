@@ -37,7 +37,7 @@ public class Parameter
     private static class ParameterExpression
             extends AbstractExpression
     {
-        public String name;
+        public final String name;
 
         private ParameterExpression( String name )
         {

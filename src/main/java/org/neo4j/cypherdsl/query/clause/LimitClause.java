@@ -26,7 +26,7 @@ package org.neo4j.cypherdsl.query.clause;
 public class LimitClause
         extends Clause
 {
-    private int limit;
+    private final int limit;
 
     public LimitClause( int limit )
     {

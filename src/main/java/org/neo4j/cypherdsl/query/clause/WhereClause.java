@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.expression.BooleanExpression;
 public class WhereClause
         extends Clause
 {
-    public ArrayList<BooleanExpression> expressions = new ArrayList<BooleanExpression>();
+    public final ArrayList<BooleanExpression> expressions = new ArrayList<BooleanExpression>();
 
     public WhereClause( BooleanExpression expression )
     {

@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class ReturnClause
         extends Clause
 {
-    private ArrayList<Expression> expressions = new ArrayList<Expression>();
+    private final ArrayList<Expression> expressions = new ArrayList<Expression>();
 
     public ReturnClause( Iterable<Expression> expressions )
     {

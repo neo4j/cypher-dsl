@@ -32,7 +32,7 @@ import org.neo4j.graphdb.Path;
  */
 public class JSONSerializer
 {
-    private ObjectMapper mapper = new ObjectMapper();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public ArrayNode toJSON( Iterable<Map<String, Object>> result )
     {

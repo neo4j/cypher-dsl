@@ -29,9 +29,16 @@ import org.neo4j.cypherdsl.expression.ScalarExpression;
 public class Extract
         extends AbstractExpression
 {
-    public Identifier name;
-    public CollectionExpression iterable;
-    public ScalarExpression expression;
+    public final Identifier name;
+    public final CollectionExpression iterable;
+    public final ScalarExpression expression;
+
+    public Extract( Identifier name, CollectionExpression iterable, ScalarExpression expression )
+    {
+        this.name = name;
+        this.iterable = iterable;
+        this.expression = expression;
+    }
 
     @Override
     public void asString( StringBuilder builder )

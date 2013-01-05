@@ -27,8 +27,8 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class Expressions
         extends AbstractExpression
 {
-    public Expression[] expressions;
-    public String separator;
+    public final Expression[] expressions;
+    public final String separator;
 
     public Expressions( Expression[] expressions )
     {

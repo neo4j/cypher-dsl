@@ -30,8 +30,8 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class PropertyValue
         implements AsString
 {
-    private Identifier id;
-    private Expression value;
+    private final Identifier id;
+    private final Expression value;
 
     public PropertyValue( Identifier id, Expression value )
     {

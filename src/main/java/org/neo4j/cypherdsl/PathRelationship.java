@@ -19,10 +19,10 @@
  */
 package org.neo4j.cypherdsl;
 
+import static java.util.Arrays.asList;
 import static org.neo4j.cypherdsl.CypherQuery.identifier;
 
 import java.io.Serializable;
-import java.util.Arrays;
 
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.Direction;
@@ -36,20 +36,26 @@ import org.neo4j.cypherdsl.query.Query;
 public class PathRelationship
         implements AsString, Serializable, Cloneable
 {
-    public Path leftNode;
-    public Direction direction = null; // null indicates that the path is only a start-node
-    public Identifier as;
-    public Iterable<Identifier> relationships;
-    public PropertyValues relationshipPropertyValues;
-    public boolean optional;
-    public Integer minHops;
-    public Integer maxHops;
+    public final Path leftNode;
+    public final Direction direction; // null indicates that the path is only a start-node
+    public final Identifier as;
+    public final Iterable<Identifier> relationships;
+    public final PropertyValues relationshipPropertyValues;
+    public final boolean optional;
+    public final Integer minHops;
+    public final Integer maxHops;
 
-    PathRelationship( Path leftNode, Direction direction, Iterable<Identifier> relationships )
+    PathRelationship( Path leftNode, Direction direction, Identifier as, Iterable<Identifier> relationships,
+                      PropertyValues relationshipPropertyValues, boolean optional, Integer minHops, Integer maxHops )
     {
         this.leftNode = leftNode;
         this.direction = direction;
+        this.as = as;
         this.relationships = relationships;
+        this.relationshipPropertyValues = relationshipPropertyValues;
+        this.optional = optional;
+        this.minHops = minHops;
+        this.maxHops = maxHops;
     }
 
     /**
@@ -68,8 +74,8 @@ public class PathRelationship
      */
     public PathRelationship values( PropertyValue... propertyValues )
     {
-        relationshipPropertyValues = new PropertyValues( Arrays.asList( propertyValues ) );
-        return this;
+        return new PathRelationship( leftNode, direction, as, relationships,
+                new PropertyValues( asList( propertyValues ) ), optional, minHops, maxHops );
     }
 
     /**
@@ -88,8 +94,8 @@ public class PathRelationship
      */
     public PathRelationship values( Iterable<PropertyValue> propertyValues )
     {
-        relationshipPropertyValues = new PropertyValues( propertyValues );
-        return this;
+        return new PathRelationship( leftNode, direction, as, relationships, new PropertyValues( propertyValues ),
+                optional, minHops, maxHops );
     }
 
     /**
@@ -122,8 +128,8 @@ public class PathRelationship
     public PathRelationship as( Identifier name )
     {
         Query.checkNull( name, "Name" );
-        this.as = name;
-        return this;
+        return new PathRelationship( leftNode, direction, name, relationships, relationshipPropertyValues, optional,
+                minHops, maxHops );
     }
 
     /**
@@ -138,8 +144,8 @@ public class PathRelationship
      */
     public PathRelationship optional()
     {
-        this.optional = true;
-        return this;
+        return new PathRelationship( leftNode, direction, as, relationships, relationshipPropertyValues, true,
+                minHops, maxHops );
     }
 
     /**
@@ -166,9 +172,8 @@ public class PathRelationship
             throw new IllegalArgumentException( "Maximum number of hops must be over zero" );
         }
 
-        this.minHops = minHops;
-        this.maxHops = maxHops;
-        return this;
+        return new PathRelationship( leftNode, direction, as, relationships, relationshipPropertyValues, optional,
+                minHops, maxHops );
     }
 
     /**
@@ -185,7 +190,7 @@ public class PathRelationship
      */
     public Path node()
     {
-        return new Path( null, this );
+        return new Path( null, this, null );
     }
 
     /**
@@ -219,7 +224,7 @@ public class PathRelationship
      */
     public Path node( Expression id )
     {
-        return new Path( id, this );
+        return new Path( id, this, null );
     }
 
     @Override

@@ -28,13 +28,18 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class OrderByExpression
         extends AbstractExpression
 {
-    public Expression expression;
-    public Order order;
+    public final Expression expression;
+    public final Order order;
+
+    public OrderByExpression( Expression expression, Order order )
+    {
+        this.expression = expression;
+        this.order = order;
+    }
 
     public OrderByExpression order( Order order )
     {
-        this.order = order;
-        return this;
+        return new OrderByExpression( expression, order );
     }
 
     public void asString( StringBuilder builder )
