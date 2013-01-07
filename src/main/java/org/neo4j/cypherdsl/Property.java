@@ -20,6 +20,9 @@
 
 package org.neo4j.cypherdsl;
 
+import static org.neo4j.cypherdsl.query.NullHandling.FALSE_IF_MISSING;
+import static org.neo4j.cypherdsl.query.NullHandling.TRUE_IF_MISSING;
+
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
 import org.neo4j.cypherdsl.query.NullHandling;
 import org.neo4j.cypherdsl.query.Operator;
@@ -32,11 +35,16 @@ public class Property
         extends Value
         implements ReferenceExpression
 {
-    protected NullHandling nullHandling = NullHandling.NULL;
+    protected final NullHandling nullHandling;
+    private final Identifier owner;
+    private final Identifier name;
 
-    Property( Identifier owner, Identifier name )
+    Property( Identifier owner, Identifier name, NullHandling nullHandling )
     {
         super( new Operator( owner, "." ), name );
+        this.nullHandling = nullHandling;
+        this.owner = owner;
+        this.name = name;
     }
 
     /**
@@ -52,8 +60,7 @@ public class Property
      */
     public Property falseIfMissing()
     {
-        nullHandling = NullHandling.FALSE_IF_MISSING;
-        return (Property) this;
+        return new Property( owner, name, FALSE_IF_MISSING );
     }
 
     /**
@@ -69,8 +76,7 @@ public class Property
      */
     public Property trueIfMissing()
     {
-        nullHandling = NullHandling.TRUE_IF_MISSING;
-        return (Property) this;
+        return new Property( owner, name, TRUE_IF_MISSING );
     }
 
     /**
@@ -86,8 +92,7 @@ public class Property
      */
     public Property optional()
     {
-        nullHandling = NullHandling.TRUE_IF_MISSING;
-        return (Property) this;
+        return trueIfMissing();
     }
 
     @Override

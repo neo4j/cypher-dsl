@@ -144,7 +144,7 @@ public class CypherQuery
     }
 
     // The internal query object. Methods in the DSL work on this
-    protected Query query;
+    protected final Query query;
 
     /**
      * Use this constructor if you want to use the instantiation block style
@@ -538,10 +538,7 @@ public class CypherQuery
             }
         }
 
-        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
-        startNodes.name = name;
-        startNodes.nodes = literals( id );
-        return startNodes;
+        return new StartExpression.StartNodes( name, literals( id ) );
     }
 
     @Deprecated
@@ -586,10 +583,7 @@ public class CypherQuery
         checkEmpty( name, "Name" );
         checkEmpty( parameter, "Parameters" );
 
-        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
-        startNodes.name = name;
-        startNodes.nodes = parameters( parameter );
-        return startNodes;
+        return new StartExpression.StartNodes( name, parameters( parameter ) );
     }
 
     /**
@@ -619,10 +613,7 @@ public class CypherQuery
     {
         checkNull( name, "Name" );
 
-        StartExpression.StartNodes startNodes = new StartExpression.StartNodes();
-        startNodes.name = name;
-        startNodes.nodes = new Expression[]{new StartExpression.AllNodes()};
-        return startNodes;
+        return new StartExpression.StartNodes( name, new Expression[]{new StartExpression.AllNodes()} );
     }
 
     /**
@@ -660,12 +651,7 @@ public class CypherQuery
         checkEmpty( name, "Name" );
         checkEmpty( indexName, "Index" );
 
-        StartExpression.StartNodesLookup startNodesLookup = new StartExpression.StartNodesLookup();
-        startNodesLookup.name = name;
-        startNodesLookup.index = indexName;
-        startNodesLookup.key = key;
-        startNodesLookup.value = value;
-        return startNodesLookup;
+        return new StartExpression.StartNodesLookup( name, indexName, key, value );
     }
 
     /**
@@ -701,11 +687,7 @@ public class CypherQuery
         checkNull( indexName, "Index" );
         checkEmpty( query, "Query" );
 
-        StartExpression.StartNodesQuery startNodesQuery = new StartExpression.StartNodesQuery();
-        startNodesQuery.name = name;
-        startNodesQuery.index = indexName;
-        startNodesQuery.query = query;
-        return startNodesQuery;
+        return new StartExpression.StartNodesQuery( name, indexName, query );
     }
 
     /**
@@ -741,12 +723,7 @@ public class CypherQuery
         checkNull( name, "Name" );
         checkNull( indexName, "Index" );
         checkEmpty( param, "Param" );
-
-        StartExpression.StartNodesQueryParam startNodesQuery = new StartExpression.StartNodesQueryParam();
-        startNodesQuery.name = name;
-        startNodesQuery.index = indexName;
-        startNodesQuery.param = param;
-        return startNodesQuery;
+        return new StartExpression.StartNodesQueryParam( name, indexName, param );
     }
 
     /**
@@ -786,10 +763,7 @@ public class CypherQuery
             }
         }
 
-        StartExpression.StartRelationships startRelationships = new StartExpression.StartRelationships();
-        startRelationships.name = name;
-        startRelationships.relationships = literals( id );
-        return startRelationships;
+        return new StartExpression.StartRelationships( name, literals( id ) );
     }
 
     /**
@@ -824,11 +798,7 @@ public class CypherQuery
         checkNull( name, "Name" );
         checkEmpty( parameter, "Parameter" );
 
-        StartExpression.StartRelationshipsParameters startRelationships = new StartExpression
-                .StartRelationshipsParameters();
-        startRelationships.name = name;
-        startRelationships.parameter = parameter;
-        return startRelationships;
+        return new StartExpression.StartRelationshipsParameters( name, parameter );
     }
 
     /**
@@ -869,12 +839,7 @@ public class CypherQuery
         checkNull( key, "Key" );
         checkNull( value, "Value" );
 
-        StartExpression.StartRelationshipsIndex startRelationshipsIndex = new StartExpression.StartRelationshipsIndex();
-        startRelationshipsIndex.name = name;
-        startRelationshipsIndex.index = indexName;
-        startRelationshipsIndex.key = key;
-        startRelationshipsIndex.value = value;
-        return startRelationshipsIndex;
+        return new StartExpression.StartRelationshipsIndex( name, indexName, key, value );
     }
 
     // Match --------------------------------------------------------
@@ -891,7 +856,7 @@ public class CypherQuery
      */
     public static Path node()
     {
-        return new Path( null, null );
+        return new Path( null, null, null );
     }
 
     /**
@@ -923,7 +888,7 @@ public class CypherQuery
      */
     public static Path node( Expression expression )
     {
-        return new Path( expression, null );
+        return new Path( expression, null, null );
     }
 
     /**
@@ -1150,9 +1115,7 @@ public class CypherQuery
     public static OrderByExpression order( Expression expression )
     {
         Query.checkNull( expression, "Expression" );
-        OrderByExpression orderBy = new OrderByExpression();
-        orderBy.expression = expression;
-        return orderBy;
+        return new OrderByExpression( expression, null );
     }
 
     /**
@@ -1168,10 +1131,7 @@ public class CypherQuery
     {
         Query.checkNull( expression, "Name" );
         Query.checkNull( order, "Order" );
-        OrderByExpression orderBy = new OrderByExpression();
-        orderBy.expression = expression;
-        orderBy.order = order;
-        return orderBy;
+        return new OrderByExpression( expression, order );
     }
 
     // For each -----------------------------------------------------
@@ -1260,12 +1220,7 @@ public class CypherQuery
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "all";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return new Value( expression );
+        return new Value( new IterablePredicateExpression( "all", name, iterable, predicateExpression ) );
     }
 
     /**
@@ -1303,12 +1258,7 @@ public class CypherQuery
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "any";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return new Value( expression );
+        return new Value( new IterablePredicateExpression( "any", name, iterable, predicateExpression ) );
     }
 
     /**
@@ -1346,12 +1296,7 @@ public class CypherQuery
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "none";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return new Value( expression );
+        return new Value( new IterablePredicateExpression( "none", name, iterable, predicateExpression ) );
     }
 
     /**
@@ -1389,12 +1334,7 @@ public class CypherQuery
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
-        IterablePredicateExpression expression = new IterablePredicateExpression();
-        expression.function = "single";
-        expression.name = name;
-        expression.iterable = iterable;
-        expression.predicate = predicateExpression;
-        return new Value( expression );
+        return new Value( new IterablePredicateExpression( "single", name, iterable, predicateExpression ) );
     }
 
     // Scalar expressions
@@ -1575,11 +1515,7 @@ public class CypherQuery
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( expression, "Expression" );
 
-        Extract extract = new Extract();
-        extract.name = name;
-        extract.iterable = iterable;
-        extract.expression = expression;
-        return new Value( extract );
+        return new Value( new Extract( name, iterable, expression ) );
     }
 
     /**
@@ -1615,11 +1551,7 @@ public class CypherQuery
         Query.checkNull( iterable, "Iterable" );
         Query.checkNull( predicateExpression, "Predicate" );
 
-        Filter filter = new Filter();
-        filter.name = name;
-        filter.iterable = iterable;
-        filter.predicate = predicateExpression;
-        return new Value( filter );
+        return new Value( new Filter( name, iterable, predicateExpression ) );
     }
 
     /**
@@ -2090,8 +2022,8 @@ public class CypherQuery
     protected class ExecuteWithParams
             implements ExecuteWithParameters
     {
-        private Query query;
-        private Map<String, Object> parameters = new HashMap<String, Object>();
+        private final Query query;
+        private final Map<String, Object> parameters = new HashMap<String, Object>();
 
         public ExecuteWithParams( Query query )
         {

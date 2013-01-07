@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.SetProperty;
 public class SetClause
         extends Clause
 {
-    private ArrayList<SetProperty> expressions = new ArrayList<SetProperty>();
+    private final ArrayList<SetProperty> expressions = new ArrayList<SetProperty>();
 
     public SetClause( Iterable<SetProperty> expressions )
     {

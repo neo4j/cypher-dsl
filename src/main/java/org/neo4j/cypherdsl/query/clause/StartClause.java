@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.expression.StartExpression;
 public class StartClause
         extends Clause
 {
-    private ArrayList<StartExpression> expressions = new ArrayList<StartExpression>();
+    private final ArrayList<StartExpression> expressions = new ArrayList<StartExpression>();
 
     public StartClause( Iterable<StartExpression> expressions )
     {

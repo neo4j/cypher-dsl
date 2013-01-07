@@ -40,13 +40,14 @@ public class Value
         implements ScalarExpression, NumericExpression, StringExpression, BooleanExpression, NodeExpression,
         RelationshipExpression, PathExpression, CollectionExpression
 {
-    public Operator operator;
-    public Expression value;
+    public final Operator operator;
+    public final Expression value;
 
     public Value( Expression value )
     {
         Query.checkNull( value, "Value" );
         this.value = value;
+        this.operator = null;
     }
 
     public Value( Operator operator, Expression value )

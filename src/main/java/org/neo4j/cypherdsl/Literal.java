@@ -37,7 +37,7 @@ public class Literal
     private static class LiteralExpression
             extends AbstractExpression
     {
-        public Object value;
+        public final Object value;
 
         private LiteralExpression( Object value )
         {

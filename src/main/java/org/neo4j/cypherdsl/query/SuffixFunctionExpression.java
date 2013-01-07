@@ -27,8 +27,8 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class SuffixFunctionExpression
         extends AbstractExpression
 {
-    public String name;
-    public Expression expression;
+    public final String name;
+    public final Expression expression;
 
     public SuffixFunctionExpression( String name, Expression expression )
     {

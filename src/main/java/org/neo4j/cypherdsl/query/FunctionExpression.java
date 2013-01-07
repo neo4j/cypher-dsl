@@ -28,8 +28,8 @@ import org.neo4j.cypherdsl.expression.Expression;
 public class FunctionExpression
         extends AbstractExpression
 {
-    public String name;
-    public Expression expression;
+    public final String name;
+    public final Expression expression;
 
     public FunctionExpression( String name, Expression expression )
     {

@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.expression.ReferenceExpression;
 public class DeleteClause
         extends Clause
 {
-    private ArrayList<ReferenceExpression> expressions = new ArrayList<ReferenceExpression>();
+    private final ArrayList<ReferenceExpression> expressions = new ArrayList<ReferenceExpression>();
 
     public DeleteClause( Iterable<ReferenceExpression> expressions )
     {

@@ -26,7 +26,7 @@ package org.neo4j.cypherdsl.query.clause;
 public class SkipClause
         extends Clause
 {
-    private int skip;
+    private final int skip;
 
     public SkipClause( int skip )
     {

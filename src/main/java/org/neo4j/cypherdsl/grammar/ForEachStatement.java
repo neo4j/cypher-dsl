@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl.grammar;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 
 import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.SetProperty;
@@ -38,7 +38,7 @@ import org.neo4j.cypherdsl.query.clause.SetClause;
 public class ForEachStatement
         implements ForEachStatements, AsString
 {
-    private ForEachClause forEachClause;
+    private final ForEachClause forEachClause;
 
     public ForEachStatement( ForEachClause forEachClause )
     {
@@ -47,7 +47,7 @@ public class ForEachStatement
 
     public ForEachStatement create( PathExpression... paths )
     {
-        return new ForEachStatement( forEachClause.add( new CreateClause( Arrays.asList( paths ) ) ) );
+        return new ForEachStatement( forEachClause.add( new CreateClause( asList( paths ) ) ) );
     }
 
     @Override
@@ -59,7 +59,7 @@ public class ForEachStatement
     @Override
     public ForEachStatement set( SetProperty... setProperties )
     {
-        return new ForEachStatement( forEachClause.add( new SetClause( Arrays.asList( setProperties ) ) ) );
+        return new ForEachStatement( forEachClause.add( new SetClause( asList( setProperties ) ) ) );
     }
 
     @Override
@@ -71,7 +71,7 @@ public class ForEachStatement
     @Override
     public ForEachStatement delete( ReferenceExpression... expressions )
     {
-        return new ForEachStatement( forEachClause.add( new DeleteClause( Arrays.asList( expressions ) ) ) );
+        return new ForEachStatement( forEachClause.add( new DeleteClause( asList( expressions ) ) ) );
     }
 
     @Override
@@ -83,7 +83,7 @@ public class ForEachStatement
     @Override
     public ForEachStatement createUnique( PathExpression... expressions )
     {
-        return new ForEachStatement( forEachClause.add( new CreateUniqueClause( Arrays.asList( expressions ) ) ) );
+        return new ForEachStatement( forEachClause.add( new CreateUniqueClause( asList( expressions ) ) ) );
     }
 
     @Override

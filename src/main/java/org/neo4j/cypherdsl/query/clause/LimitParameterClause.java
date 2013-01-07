@@ -26,7 +26,7 @@ package org.neo4j.cypherdsl.query.clause;
 public class LimitParameterClause
         extends Clause
 {
-    private String limit;
+    private final String limit;
 
     public LimitParameterClause( String limit )
     {

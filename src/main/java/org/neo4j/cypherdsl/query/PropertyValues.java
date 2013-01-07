@@ -26,7 +26,7 @@ package org.neo4j.cypherdsl.query;
 public class PropertyValues
         extends AbstractExpression
 {
-    private Iterable<PropertyValue> propertyValues;
+    private final Iterable<PropertyValue> propertyValues;
 
     public PropertyValues( Iterable<PropertyValue> propertyValues )
     {

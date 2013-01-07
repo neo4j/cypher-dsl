@@ -30,10 +30,19 @@ import org.neo4j.cypherdsl.expression.CollectionExpression;
 public class IterablePredicateExpression
         extends AbstractExpression
 {
-    public String function;
-    public Identifier name;
-    public CollectionExpression iterable;
-    public BooleanExpression predicate;
+    public final String function;
+    public final Identifier name;
+    public final CollectionExpression iterable;
+    public final BooleanExpression predicate;
+
+    public IterablePredicateExpression( String function, Identifier name, CollectionExpression iterable,
+                                        BooleanExpression predicate )
+    {
+        this.function = function;
+        this.name = name;
+        this.iterable = iterable;
+        this.predicate = predicate;
+    }
 
     @Override
     public void asString( StringBuilder builder )

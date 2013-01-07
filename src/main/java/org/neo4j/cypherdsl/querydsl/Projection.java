@@ -36,7 +36,7 @@ import com.mysema.query.types.path.PathBuilder;
  */
 public class Projection<T>
 {
-    private QBean<T> bean;
+    private final QBean<T> bean;
 
     public Projection( Class<T> targetClass )
     {
