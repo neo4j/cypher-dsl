@@ -25,9 +25,11 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.result.JSONSerializer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.GraphDescription;
 import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -61,6 +63,23 @@ public class JSONSerializerTest
                         match( node( "john" ).out( "friend" ).node().out( "friend" ).node( "fof" ) ).
                         returns( as( identifier( "john" ).property( "name" ) , "name" ), as( identifier( "fof" ).property( "name" ) ,"friend" ), identifier( "john" ), as( count(), "count" ) )
                         .toString();
+        
+        // set properties on a node so we can requery it later and see it can be serialized into json
+        ExecutionResult result = engine.execute(query);
+        
+        Transaction tx = graphdb.beginTx();
+        for (Map<String, Object> map : result) {
+			Node n = (Node) map.get("john");
+			n.setProperty("doubleValue", 3.14d);
+			n.setProperty("floatValue", 3.14f);
+			n.setProperty("byteValue", Byte.MAX_VALUE);
+			n.setProperty("boolValue", true);
+			n.setProperty("stringArray", new String[] {"one", "two", "three"});
+			n.setProperty("primitiveArray", new int[] {1, 2, 3});
+		}
+        tx.success();
+        
+        // requery and serialize into json
         String json = serializer.toJSON( engine.execute(query) ).toString();
         System.out.println( json );
     }
