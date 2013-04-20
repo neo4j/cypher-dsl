@@ -31,12 +31,13 @@ import org.neo4j.cypher.MissingIndexException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.ImpermanentGraphDatabase;
 
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER 1.8 ";
+    public static final String CYPHER = "CYPHER " + GraphDatabaseSettings.CypherParserSetting.v1_9 + " ";
     private static ImpermanentGraphDatabase graphdb;
     protected static ExecutionEngine engine;
     private Transaction tx;

@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.Literal;
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.query.clause.Clause;
 import org.neo4j.cypherdsl.query.clause.WhereClause;
+import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 
 /**
  * Model for a Cypher Query. The model is serializable and cloneable, to make it easy to
@@ -35,6 +36,10 @@ import org.neo4j.cypherdsl.query.clause.WhereClause;
 public class Query
         implements AsString, Serializable, Cloneable
 {
+    
+    private static final String QUERY_PREFIX = "CYPHER ";
+    private static final String DEFAULT_CYPHER_VERSION = GraphDatabaseSettings.CypherParserSetting.v1_9; 
+    
     public static boolean isEmpty( String string )
     {
         return string == null || string.length() == 0;
@@ -107,7 +112,13 @@ public class Query
 
     public void asString( StringBuilder builder )
     {
-        builder.append( "CYPHER 1.8" );
+        asString(builder, DEFAULT_CYPHER_VERSION);
+    }
+    
+    public void asString( StringBuilder builder, String cypherVersion )
+    {
+        builder.append( QUERY_PREFIX );
+        builder.append( cypherVersion );
 
         for ( Clause clause : clauses )
         {
