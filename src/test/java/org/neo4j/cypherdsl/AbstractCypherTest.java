@@ -27,6 +27,7 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.neo4j.cypher.EntityNotFoundException;
 import org.neo4j.cypher.MissingIndexException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.NotFoundException;
@@ -87,6 +88,9 @@ public abstract class AbstractCypherTest
             engine.execute( query );
         }
         catch ( MissingIndexException mie )
+        {
+        }
+        catch ( EntityNotFoundException enfe )
         {
         }
         catch ( NotFoundException nfe )
