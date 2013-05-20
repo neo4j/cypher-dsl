@@ -62,7 +62,7 @@ public class Projection<T>
             int idx = 0;
             for ( Expression<?> expression : bean.getArgs() )
             {
-                args[idx++] = stringObjectMap.get( ((Path) expression).getMetadata().getExpression().toString() );
+                args[idx++] = stringObjectMap.get( ((Path) expression).getMetadata().getElement().toString() );
             }
 
             entities.add( bean.newInstance( args ) );

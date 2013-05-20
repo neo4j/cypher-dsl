@@ -53,24 +53,24 @@ public class CypherQueryDSL
     // Additional QueryDSL methods
     public static Identifier identifier( Path<?> entityPath )
     {
-        return identifier( entityPath.getMetadata().getExpression().toString() );
+        return identifier( entityPath.getMetadata().getElement().toString() );
     }
 
     public static Property property( Path<?> entityPath )
     {
-        return identifier( entityPath.getRoot().toString() ).property( entityPath.getMetadata().getExpression()
+        return identifier( entityPath.getRoot().toString() ).property( entityPath.getMetadata().getElement()
                 .toString() );
     }
 
     public static StringExpression string( Path<?> entityPath )
     {
-        return identifier( entityPath.getRoot().toString() ).string( entityPath.getMetadata().getExpression()
+        return identifier( entityPath.getRoot().toString() ).string( entityPath.getMetadata().getElement()
                 .toString() );
     }
 
     public static NumericExpression number( Path<?> entityPath )
     {
-        return identifier( entityPath.getRoot().toString() ).number( entityPath.getMetadata().getExpression()
+        return identifier( entityPath.getRoot().toString() ).number( entityPath.getMetadata().getElement()
                 .toString() );
     }
 
@@ -206,7 +206,7 @@ public class CypherQueryDSL
                 else if ( expression instanceof Path )
                 {
                     Path path = (Path) expression;
-                    return new Value( identifier( path.getRoot() ).string( path.getMetadata().getExpression()
+                    return new Value( identifier( path.getRoot() ).string( path.getMetadata().getElement()
                             .toString() ) );
                 }
                 else
