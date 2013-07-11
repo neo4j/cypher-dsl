@@ -24,6 +24,6 @@ package org.neo4j.cypherdsl.grammar;
  * This specifies what can come after a WITH clause
  */
 public interface WithNext
-        extends Start, Create
+        extends Start, Create, OrderBy
 {
 }
