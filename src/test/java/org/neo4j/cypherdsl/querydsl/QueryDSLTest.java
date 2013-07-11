@@ -135,6 +135,15 @@ public class QueryDSLTest
                             .returns( identifier( n ) )
                             .toString() );
         }
+
+        {
+            QPerson n = new QPerson( "n" );
+            Assert.assertEquals( CYPHER + "START n=node(1,2,3) WHERE n.firstName=~\"(?i).*rick.*\" RETURN n",
+                    start( nodesById( identifier( n ), 1, 2, 3 ) )
+                            .where( toBooleanExpression( n.firstName.like( "(?i).*rick.*" )))
+                            .returns( identifier( n ) )
+                            .toString() );
+        }
     }
 
     @Test
