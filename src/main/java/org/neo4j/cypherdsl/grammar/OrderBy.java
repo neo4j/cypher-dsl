@@ -25,7 +25,7 @@ import org.neo4j.cypherdsl.expression.Expression;
  * Represents the ORDER BY clause.
  */
 public interface OrderBy
-        extends Skip
+        extends Skip, Return
 {
     OrderBy orderBy( Expression... orderByExpression );
 
