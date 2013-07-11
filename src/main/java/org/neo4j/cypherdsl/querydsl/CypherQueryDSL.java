@@ -155,6 +155,10 @@ public class CypherQueryDSL
                 {
                     return isNotNull( (Expression) arg( operation.getArg( 0 ) ) );
                 }
+                else if ( id.equals( Ops.LIKE.getId() ) )
+                {
+                    return arg( operation.getArg( 0 ) ).regexp( arg( operation.getArg( 1 ) ) );
+                }
                 else
                 {
                     throw new IllegalArgumentException( "Unknown operator:" + id + " in expression " + operation );
