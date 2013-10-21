@@ -38,7 +38,7 @@ import org.neo4j.test.ImpermanentGraphDatabase;
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + GraphDatabaseSettings.CypherParserSetting.v1_9 + " ";
+    public static final String CYPHER = "CYPHER " + "1.9" + " ";
     private static ImpermanentGraphDatabase graphdb;
     protected static ExecutionEngine engine;
     private Transaction tx;

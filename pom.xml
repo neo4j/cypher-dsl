@@ -8,7 +8,7 @@
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <properties>
-    <neo4j.version>1.9</neo4j.version>
+    <neo4j.version>2.0.0-M06</neo4j.version>
     <querydsl.version>3.1.1</querydsl.version>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
@@ -123,7 +123,15 @@
   </dependencies>
 
   <build>
-    <plugins>
+      <plugins>
+          <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-compiler-plugin</artifactId>
+              <configuration>
+                  <source>1.7</source>
+                  <target>1.7</target>
+              </configuration>
+          </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-gpg-plugin</artifactId>
@@ -191,31 +199,6 @@
             <goals>
               <goal>single</goal>
             </goals>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <artifactId>maven-site-plugin</artifactId>
-        <configuration>
-          <reportPlugins combine.children="append">
-            <plugin>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <configuration>
-                <detectJavaApiLink>true</detectJavaApiLink>
-                <detectLinks>true</detectLinks>
-                <quiet>true</quiet>
-                <excludePackageNames>*.impl.*</excludePackageNames>
-              </configuration>
-              <reports>
-                <report>javadoc</report>
-              </reports>
-            </plugin>
-          </reportPlugins>
-        </configuration>
-        <executions>
-          <execution>
-            <id>attach-descriptor</id>
-            <phase>none</phase>
           </execution>
         </executions>
       </plugin>

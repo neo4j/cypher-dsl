@@ -38,7 +38,7 @@ public class Query
 {
     
     private static final String QUERY_PREFIX = "CYPHER ";
-    private static final String DEFAULT_CYPHER_VERSION = GraphDatabaseSettings.CypherParserSetting.v1_9; 
+    private static final String DEFAULT_CYPHER_VERSION = "1.9";
     
     public static boolean isEmpty( String string )
     {
@@ -47,6 +47,10 @@ public class Query
 
     public static void checkNull( Object object, String name )
     {
+        if ( object == null )
+        {
+            throw new IllegalArgumentException( name + " may not be null" );
+        }
         if ( object.getClass().isArray() )
         {
             Object[] array = (Object[]) object;
@@ -57,10 +61,6 @@ public class Query
                     throw new IllegalArgumentException( name + " may not be null" );
                 }
             }
-        }
-        else if ( object == null )
-        {
-            throw new IllegalArgumentException( name + " may not be null" );
         }
     }
 

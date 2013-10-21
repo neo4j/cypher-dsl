@@ -38,6 +38,7 @@ import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypherdsl.result.JSONSerializer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Transaction;
 import org.neo4j.test.GraphDescription;
 import org.neo4j.test.GraphHolder;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -71,8 +72,11 @@ public class JSONSerializerTest
                 returns( as( identifier( "john" ).property( "name" ), "name" ), as( identifier( "fof" ).property(
                         "name" ), "friend" ), identifier( "john" ), as( count(), "count" ) )
                 .toString();
-        String json = serializer.toJSON( engine.execute( query ) ).toString();
-        System.out.println( json );
+        try (Transaction tx = graphdb.beginTx()) {
+            String json = serializer.toJSON( engine.execute( query ) ).toString();
+            System.out.println( json );
+            tx.success();
+        }
     }
 
     @Test
@@ -91,8 +95,11 @@ public class JSONSerializerTest
                 .returns( identifier( "p" ) )
                 .toString();
         System.out.println( query );
-        String json = serializer.toJSON( engine.execute( query ) ).toString();
-        System.out.println( json );
+        try (Transaction tx = graphdb.beginTx()) {
+            String json = serializer.toJSON( engine.execute( query ) ).toString();
+            System.out.println( json );
+            tx.success();
+        }
     }
 
     @Before
