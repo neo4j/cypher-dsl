@@ -39,10 +39,7 @@ import org.neo4j.cypherdsl.result.JSONSerializer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.test.GraphDescription;
-import org.neo4j.test.GraphHolder;
-import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.test.TestData;
+import org.neo4j.test.*;
 
 /**
  * Test of JSON serialization of results.
@@ -106,8 +103,8 @@ public class JSONSerializerTest
     public void setup()
             throws IOException
     {
-        graphdb = new ImpermanentGraphDatabase();
-        graphdb.cleanContent( false );
+        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graphdb.cleanContent(  );
 
         engine = new ExecutionEngine( graphdb );
     }

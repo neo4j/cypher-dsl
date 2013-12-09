@@ -8,8 +8,8 @@
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <properties>
-    <neo4j.version>2.0.0-M06</neo4j.version>
-    <querydsl.version>3.1.1</querydsl.version>
+    <neo4j.version>2.0.0-RC1</neo4j.version>
+    <querydsl.version>3.2.4</querydsl.version>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
     <license-text.header>GPL-3-header.txt</license-text.header>
@@ -52,7 +52,7 @@
     </dependency>
     <dependency>
       <groupId>com.mysema.querydsl</groupId>
-      <artifactId>querydsl-lucene</artifactId>
+      <artifactId>querydsl-lucene3</artifactId>
       <version>${querydsl.version}</version>
       <optional>true</optional>
       <exclusions>

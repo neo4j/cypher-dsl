@@ -34,6 +34,7 @@ import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.test.TestGraphDatabaseFactory;
 
 public abstract class AbstractCypherTest
 {
@@ -46,8 +47,8 @@ public abstract class AbstractCypherTest
     @BeforeClass
     public static void classSetup() throws IOException
     {
-        graphdb = new ImpermanentGraphDatabase();
-        graphdb.cleanContent( true );
+        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graphdb.cleanContent(  );
 
         engine = new ExecutionEngine( graphdb );
     }
@@ -65,7 +66,7 @@ public abstract class AbstractCypherTest
             tx.finish();
             tx = null;
         }
-        graphdb.cleanContent( true );
+        graphdb.cleanContent(  );
     }
 
     @AfterClass

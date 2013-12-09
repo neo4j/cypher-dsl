@@ -37,10 +37,7 @@ import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.grammar.Execute;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
-import org.neo4j.test.GraphDescription;
-import org.neo4j.test.GraphHolder;
-import org.neo4j.test.ImpermanentGraphDatabase;
-import org.neo4j.test.TestData;
+import org.neo4j.test.*;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database and project
@@ -112,8 +109,8 @@ public class ProjectionTest
     public void setup()
             throws IOException
     {
-        graphdb = new ImpermanentGraphDatabase();
-        graphdb.cleanContent( true );
+        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graphdb.cleanContent(  );
 
         engine = new ExecutionEngine( graphdb );
     }
