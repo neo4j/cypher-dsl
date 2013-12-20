@@ -173,7 +173,7 @@ public class PathRelationship
      */
     public Path node()
     {
-        return new Path( null, this, null );
+        return new Path( null, this, null, null );
     }
 
     /**
@@ -207,7 +207,7 @@ public class PathRelationship
      */
     public Path node( Expression id )
     {
-        return new Path( id, this, null );
+        return new Path( id, this, null, null );
     }
 
     @Override

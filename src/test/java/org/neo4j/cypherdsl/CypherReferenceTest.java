@@ -46,6 +46,7 @@ import static org.neo4j.cypherdsl.CypherQuery.in;
 import static org.neo4j.cypherdsl.CypherQuery.isNotNull;
 import static org.neo4j.cypherdsl.CypherQuery.isNull;
 import static org.neo4j.cypherdsl.CypherQuery.last;
+import static org.neo4j.cypherdsl.CypherQuery.label;
 import static org.neo4j.cypherdsl.CypherQuery.length;
 import static org.neo4j.cypherdsl.CypherQuery.literal;
 import static org.neo4j.cypherdsl.CypherQuery.lookup;
@@ -1205,4 +1206,81 @@ public class CypherReferenceTest extends AbstractCypherTest
 //                        returns( sign( -17 ), sign( 0.1 ) ).
 //                        toString() );
 //    }
+
+    @Test
+    public void test10_1_2_Match_with_labels()
+    {
+        assertQueryEquals( CYPHER + "MATCH (charlie:Person {name:\"Charlie Sheen\"})--(movie:Movie) RETURN movie",
+                match( node( "charlie" ).label( "Person" ).values( value("name", "Charlie Sheen") ).
+                        both().node( "movie" ).label( "Movie" ) ).
+                        returns( identifier( "movie" ) ).
+                        toString() );
+    }
+
+    @Test
+    public void test10_1_4_Match_with_properties_on_a_variable_length_path()
+    {
+        assertQueryEquals( CYPHER + "MATCH (charlie:Person {name:\"Charlie Sheen\"}),(martin:Person {name:\"Martin Sheen\"}) " +
+                                    "CREATE (charlie)-[:X {blocked:false}]->(:Unblocked)<-[:X {blocked:false}]-(martin) " +
+                                    "CREATE (charlie)-[:X {blocked:true}]->(:Blocked)<-[:X {blocked:false}]-(martin)",
+                match( node( "charlie" ).label( "Person" ).values( value("name", "Charlie Sheen") ),
+                        node( "martin" ).label( "Person" ).values( value("name", "Martin Sheen") ) ).
+                create( node( "charlie" ).
+                        out( "X" ).values( value( "blocked", false ) ).
+                        node().label( "Unblocked" ).
+                        in( "X").values( value( "blocked", false) ).
+                        node( "martin" ) ).
+                create( node( "charlie" ).
+                        out( "X" ).values( value( "blocked", true ) ).
+                        node().label( "Blocked" ).
+                        in( "X" ).values( value( "blocked", false ) ).
+                        node( "martin" ) ).
+                toString() );
+    }
+
+    @Test
+    public void test11_1_1_Create_a_node_with_a_label()
+    {
+        assertQueryEquals( CYPHER + "CREATE (n:Person)",
+                create( node( "n" ).label( "Person" ) ).toString() );
+    }
+
+    @Test
+    public void test11_1_1_Create_a_node_with_multiple_labels()
+    {
+        assertQueryEquals( CYPHER + "CREATE (n:Person:Swedish)",
+                create( node( "n" ).labels( label("Person"), label("Swedish") ) ).toString() );
+    }
+
+    @Test
+    public void test11_1_1_Create_node_and_add_labels_and_properties()
+    {
+        assertQueryEquals( CYPHER + "CREATE (n:Person {name:\"Andres\",title:\"Developer\"})",
+                create( node( "n" ).label("Person" ).values( value( "name", "Andres" ), value( "title", "Developer" ) ) ).toString() );
+    }
+
+    @Test
+    public void test10_1_2_Get_all_nodes_with_a_label()
+    {
+        assertQueryEquals( CYPHER + "MATCH (movie:Movie) RETURN movie",
+                match( node( "movie" ).label( "Movie" ) ).
+                        returns( identifier( "movie" ) ).
+                        toString() );
+    }
+
+    @Test
+    public void test11_1_2_Create_a_relationship_between_two_nodes()
+    {
+        assertQueryEquals( CYPHER + "MATCH (a:Person),(b:Person) " +
+                                    "WHERE a.name=\"Node A\" and b.name=\"Node B\" " +
+                                    "CREATE (a)-[r:RELTYPE]->(b) " +
+                                    "RETURN r",
+                match( node( "a" ).label( "Person" ), node( "b" ).label( "Person" ) ).
+                where( identifier( "a" ).string( "name" ).eq( "Node A" ).
+                        and( identifier( "b" ).string( "name" ).eq( "Node B" ) ) ).
+                create( node( "a" ).out( "RELTYPE" ).as( "r" ).node( "b" ) ).
+                returns( identifier( "r" ) ).
+                toString() );
+    }
+
 }

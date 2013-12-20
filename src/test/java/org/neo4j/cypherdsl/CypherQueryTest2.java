@@ -68,4 +68,15 @@ public class CypherQueryTest2 extends AbstractCypherTest
                                 returns( identifier( "n" ) );
                     }}.toString() );
     }
+
+    @Test
+    public void testLabel()
+    {
+        assertQueryEquals( CYPHER + "CREATE (n:Person:Swedish)",
+                new CypherQuery()
+                {{
+                        creates( node("n").labels( label("Person"), label("Swedish") ) );
+                    }}.toString() );
+    }
+
 }

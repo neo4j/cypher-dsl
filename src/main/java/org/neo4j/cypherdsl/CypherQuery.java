@@ -46,6 +46,7 @@ import org.neo4j.cypherdsl.query.Extract;
 import org.neo4j.cypherdsl.query.Filter;
 import org.neo4j.cypherdsl.query.FunctionExpression;
 import org.neo4j.cypherdsl.query.IterablePredicateExpression;
+import org.neo4j.cypherdsl.query.LabelValue;
 import org.neo4j.cypherdsl.query.NamedPath;
 import org.neo4j.cypherdsl.query.Operator;
 import org.neo4j.cypherdsl.query.OrderByExpression;
@@ -87,7 +88,7 @@ public class CypherQuery
      * @param paths
      * @return
      */
-    public static UpdateNext match( PathExpression... paths )
+    public static StartNext match( PathExpression... paths )
     {
         CypherQuery query = new CypherQuery();
         return query.matches(paths);
@@ -181,6 +182,18 @@ public class CypherQuery
     {
         checkEmpty( name, "Name" );
         return new Parameter( name );
+    }
+
+    /**
+     * Declare a label.
+     *
+     * @param label literal value
+     * @return Label instance
+     */
+    public static LabelValue label( String label )
+    {
+        checkNull( label, "Label" );
+        return new LabelValue( label );
     }
 
     /**
@@ -507,7 +520,7 @@ public class CypherQuery
      * @param paths
      * @return
      */
-    protected UpdateNext matches( PathExpression... paths )
+    protected StartNext matches( PathExpression... paths )
     {
         query.add( new MatchClause( Arrays.asList( paths ) ) );
 
@@ -875,7 +888,7 @@ public class CypherQuery
      */
     public static Path node()
     {
-        return new Path( null, null, null );
+        return new Path( null, null, null, null );
     }
 
     /**
@@ -907,7 +920,7 @@ public class CypherQuery
      */
     public static Path node( Expression expression )
     {
-        return new Path( expression, null, null );
+        return new Path( expression, null, null, null );
     }
 
     /**
