@@ -21,7 +21,6 @@
 package org.neo4j.cypherdsl;
 
 import static org.neo4j.cypherdsl.CypherQuery.identifier;
-import static org.neo4j.cypherdsl.query.NullHandling.NULL;
 import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 import java.util.regex.Pattern;
@@ -79,7 +78,7 @@ public class Identifier
     public Property property( Identifier name )
     {
         checkNull( name, "Name" );
-        return new Property( this, name, NULL );
+        return new Property( this, name);
     }
 
     /**
@@ -114,7 +113,7 @@ public class Identifier
     public StringExpression string( Identifier name )
     {
         checkNull( name, "Name" );
-        return new Property( this, name, NULL );
+        return new Property( this, name);
     }
 
     /**
@@ -149,7 +148,7 @@ public class Identifier
     public NumericExpression number( Identifier name )
     {
         checkNull( name, "Name" );
-        return new Property( this, name, NULL );
+        return new Property( this, name);
     }
 
     private static class IdentifierExpression

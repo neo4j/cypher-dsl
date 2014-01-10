@@ -35,71 +35,19 @@ public class Property
         extends Value
         implements ReferenceExpression
 {
-    protected final NullHandling nullHandling;
     private final Identifier owner;
     private final Identifier name;
 
-    Property( Identifier owner, Identifier name, NullHandling nullHandling )
+    Property(Identifier owner, Identifier name)
     {
         super( new Operator( owner, "." ), name );
-        this.nullHandling = nullHandling;
         this.owner = owner;
         this.name = name;
-    }
-
-    /**
-     * Use this method to declare that this property reference
-     * should be treated as false if the property is missing.
-     * <p/>
-     * Corresponds to:
-     * <pre>
-     * n.prop!
-     * </pre>
-     *
-     * @return
-     */
-    public Property falseIfMissing()
-    {
-        return new Property( owner, name, FALSE_IF_MISSING );
-    }
-
-    /**
-     * Use this method to declare that this property reference
-     * should be treated as true if the property is missing.
-     * <p/>
-     * Corresponds to:
-     * <pre>
-     * n.prop?
-     * </pre>
-     *
-     * @return
-     */
-    public Property trueIfMissing()
-    {
-        return new Property( owner, name, TRUE_IF_MISSING );
-    }
-
-    /**
-     * Use this method to declare that this property reference
-     * should be treated as true if the property is missing.
-     * <p/>
-     * Corresponds to:
-     * <pre>
-     * n.prop?
-     * </pre>
-     *
-     * @return
-     */
-    public Property optional()
-    {
-        return trueIfMissing();
     }
 
     @Override
     public void asString( StringBuilder builder )
     {
-        super.asString( builder );
-        AsString nullHandling1 = (AsString) nullHandling;
-        nullHandling1.asString( builder );
+        super.asString(builder);
     }
 }

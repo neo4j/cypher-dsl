@@ -20,22 +20,21 @@
 
 package org.neo4j.cypherdsl.query.clause;
 
+import org.neo4j.cypherdsl.expression.ReferenceExpression;
+
 import java.util.ArrayList;
 
-import org.neo4j.cypherdsl.expression.PathExpression;
-
 /**
- * MATCH clause
+ * CREATE clause
  */
-public class MatchClause
+public class RemoveClause
         extends Clause
 {
-    private final ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
-    private boolean optional;
+    private final ArrayList<ReferenceExpression> expressions = new ArrayList<ReferenceExpression>();
 
-    public MatchClause( Iterable<PathExpression> expressions )
+    public RemoveClause(Iterable<ReferenceExpression> expressions)
     {
-        for ( PathExpression expression : expressions )
+        for ( ReferenceExpression expression : expressions )
         {
             this.expressions.add( expression );
         }
@@ -44,11 +43,6 @@ public class MatchClause
     @Override
     public void asString( StringBuilder builder )
     {
-        String name = (optional ? "OPTIONAL " : "") + "MATCH";
-        clauseAsString( builder, name, expressions, "," );
-    }
-
-    public void optional() {
-        this.optional = true;
+        clauseAsString( builder, "REMOVE", expressions, "," );
     }
 }

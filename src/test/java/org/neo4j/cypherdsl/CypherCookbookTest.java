@@ -156,13 +156,13 @@ public class CypherCookbookTest extends AbstractCypherTest
     @Test
     public void test5_2_1()
     {
-        assertQueryEquals( CYPHER + "START joe=node:node_auto_index(name=\"Joe\") MATCH (joe)-[:knows]->(friend)" +
-                "-[:knows]->(friend_of_friend),(joe)-[r?:knows]->(friend_of_friend) WHERE r is null RETURN " +
+        assertQueryEquals( CYPHER + "START joe=node:node_auto_index(name=\"Joe\") OPTIONAL MATCH (joe)-[:knows]->(friend)" +
+                "-[:knows]->(friend_of_friend),(joe)-[r:knows]->(friend_of_friend) WHERE r is null RETURN " +
                 "friend_of_friend.name,count(*) ORDER BY count(*) DESCENDING,friend_of_friend.name",
                 start( lookup( "joe", "node_auto_index", "name", "Joe" ) ).
                         match( node( "joe" ).out( "knows" ).node( "friend" )
                                 .out( "knows" ).node( "friend_of_friend" ),
-                                node( "joe" ).out( "knows" ).as( "r" ).optional().node( "friend_of_friend" ) ).
+                                node( "joe" ).out( "knows" ).as( "r" ).node( "friend_of_friend" ) ).optional().
                         where( isNull( identifier( "r" ) ) ).
                         returns( identifier( "friend_of_friend" ).property( "name" ), count() ).
                         orderBy( order( count(), DESCENDING ), identifier( "friend_of_friend" ).property( "name" ) ).
@@ -223,16 +223,16 @@ public class CypherCookbookTest extends AbstractCypherTest
     public void test5_5_1()
     {
         assertQueryEquals( CYPHER + "START me=node(5),other=node(4,3) " +
-                "MATCH pGroups=(me)-[?:member_of_group]->(mg)<-[?:member_of_group]-(other)," +
-                "pMutualFriends=(me)-[?:knows]->(mf)<-[?:knows]-(other) " +
+                "OPTIONAL MATCH pGroups=(me)-[:member_of_group]->(mg)<-[:member_of_group]-(other)," +
+                "pMutualFriends=(me)-[:knows]->(mf)<-[:knows]-(other) " +
                 "RETURN other.name AS name," +
                 "count(DISTINCT pGroups) AS mutualGroups," +
                 "count(DISTINCT pMutualFriends) AS mutualFriends ORDER BY mutualFriends DESCENDING",
                 start( nodesById( "me", 5 ), nodesById( "other", 4, 3 ) ).
-                        match( path( "pGroups", node( "me" ).out( "member_of_group" ).optional().node( "mg" ).in(
-                                "member_of_group" ).optional().node( "other" ) ),
-                                path( "pMutualFriends", node( "me" ).out( "knows" ).optional().node( "mf" ).in(
-                                        "knows" ).optional().node( "other" ) ) ).
+                        match( path( "pGroups", node( "me" ).out( "member_of_group" ).node( "mg" ).in(
+                                "member_of_group" ).node( "other" ) ),
+                                path( "pMutualFriends", node( "me" ).out( "knows" ).node( "mf" ).in(
+                                        "knows" ).node( "other" ) ) ).optional().
                         returns( as( identifier( "other" ).property( "name" ), "name" ),
                                 as( count( distinct( identifier( "pGroups" ) ) ), "mutualGroups" ),
                                 as( count( distinct( identifier( "pMutualFriends" ) ) ), "mutualFriends" ) ).
@@ -292,7 +292,7 @@ public class CypherCookbookTest extends AbstractCypherTest
                 "MATCH (origin)-[r1:KNOWS|WORKSAT]-(c)-[r2:KNOWS|WORKSAT]-(candidate) " +
                 "WHERE type(r1)=type(r2) and not((origin)-[:KNOWS]-(candidate)) " +
                 "RETURN origin.name AS origin,candidate.name AS candidate,sum(round(r2.weight+" +
-                "coalesce(r2.activity? ,0)*2)) AS boost " +
+                "coalesce(r2.activity,0)*2)) AS boost " +
                 "ORDER BY boost DESCENDING " +
                 "LIMIT 10",
                 start( nodesById( "origin", 1 ) ).
@@ -305,7 +305,7 @@ public class CypherCookbookTest extends AbstractCypherTest
                                 as( sum( round( identifier( "r2" ).property( "weight" ).add( coalesce( identifier(
                                         "r2" )
                                         .property( "activity" )
-                                        .optional(), literal( 0 ) )
+                                        , literal( 0 ) )
                                         .times( 2 ) ) ) ), "boost" ) ).
                         orderBy( order( identifier( "boost" ), DESCENDING ) ).
                         limit( 10 ).toString() );
@@ -318,7 +318,7 @@ public class CypherCookbookTest extends AbstractCypherTest
                 "MATCH (origin)-[r1:KNOWS|WORKSAT]-(c)-[r2:KNOWS|WORKSAT]-(candidate) " +
                 "WHERE type(r1)=type(r2) and not((origin)-[:KNOWS]-(candidate)) " +
                 "RETURN origin.name AS origin,candidate.name AS candidate,sum(round(r2.weight+" +
-                "coalesce(r2.activity? ,0)*2)) AS boost " +
+                "coalesce(r2.activity,0)*2)) AS boost " +
                 "ORDER BY boost DESCENDING " +
                 "LIMIT {limitParam}",
                 start( nodesById( "origin", 1 ) ).
@@ -331,7 +331,7 @@ public class CypherCookbookTest extends AbstractCypherTest
                                 as( sum( round( identifier( "r2" ).property( "weight" ).add( coalesce( identifier(
                                         "r2" )
                                         .property( "activity" )
-                                        .optional(), literal( 0 ) )
+                                        , literal( 0 ) )
                                         .times( 2 ) ) ) ), "boost" ) ).
                         orderBy( order( identifier( "boost" ), DESCENDING ) ).
                         limit( "limitParam" ).toString() );
@@ -356,7 +356,7 @@ public class CypherCookbookTest extends AbstractCypherTest
     public void test5_10_1()
     {
         assertQueryEquals( CYPHER + "CREATE (center) " +
-                "FOREACH(x in range(1,10): CREATE (leaf),(center)-[:X]->(leaf)) " +
+                "FOREACH(x in range(1,10)| CREATE (leaf),(center)-[:X]->(leaf)) " +
                 "RETURN id(center) AS id",
                 create( node( "center" ) ).
                         forEach( in( identifier( "x" ), range( 1, 10 ) ).create( node( "leaf" ),
@@ -368,7 +368,7 @@ public class CypherCookbookTest extends AbstractCypherTest
     public void test5_10_2()
     {
         assertQueryEquals( CYPHER + "CREATE (center) " +
-                "FOREACH(x in range(1,10): CREATE (leaf {count:x}),(center)-[:X]->(leaf)) " +
+                "FOREACH(x in range(1,10)| CREATE (leaf {count:x}),(center)-[:X]->(leaf)) " +
                 "WITH center " +
                 "MATCH (large_leaf)<--(center)-->(small_leaf) " +
                 "WHERE large_leaf.count=small_leaf.count+1 " +
@@ -399,7 +399,7 @@ public class CypherCookbookTest extends AbstractCypherTest
     public void test5_10_3()
     {
         assertQueryEquals( CYPHER + "CREATE (center) " +
-                "FOREACH(x in range(1,10): CREATE (leaf {count:x}),(center)-[:X]->(leaf)) " +
+                "FOREACH(x in range(1,10)| CREATE (leaf {count:x}),(center)-[:X]->(leaf)) " +
                 "WITH center " +
                 "MATCH (leaf1)<--(center)-->(leaf2) " +
                 "WHERE id(leaf1)<id(leaf2) " +
@@ -423,7 +423,7 @@ public class CypherCookbookTest extends AbstractCypherTest
     public void test5_10_4()
     {
         assertQueryEquals( CYPHER + "CREATE (center) " +
-                "FOREACH(x in range(1,10): CREATE (leaf1),(leaf2),(center)-[:X]->(leaf1),(center)-[:X]->(leaf2)," +
+                "FOREACH(x in range(1,10)| CREATE (leaf1),(leaf2),(center)-[:X]->(leaf1),(center)-[:X]->(leaf2)," +
                 "(leaf1)-[:X]->(leaf2)) " +
                 "RETURN id(center) AS id",
                 create( node( "center" ) ).
@@ -445,15 +445,15 @@ public class CypherCookbookTest extends AbstractCypherTest
     {
         assertQueryEquals( CYPHER + "START root=node(4) " +
                 "MATCH (root)-[:LINK*0..]->(before),(after)-[:LINK*0..]->(root),(before)-[old:LINK]->(after) " +
-                "WHERE before.value? <25 and 25<after.value?  " +
+                "WHERE before.value<25 and 25<after.value " +
                 "CREATE (before)-[:LINK]->({value:25})-[:LINK]->(after) " +
                 "DELETE old",
                 start( nodesById( "root", 4 ) ).
                         match( node( "root" ).out( "LINK" ).hops( 0, null ).node( "before" ),
                                 node( "after" ).out( "LINK" ).hops( 0, null ).node( "root" ),
                                 node( "before" ).out( "LINK" ).as( "old" ).node( "after" ) ).
-                        where( identifier( "before" ).property( "value" ).optional().lt( 25 ).and( literal( 25 ).lt(
-                                identifier( "after" ).property( "value" ).optional() ) ) ).
+                        where( identifier( "before" ).property( "value" ).lt( 25 ).and( literal( 25 ).lt(
+                                identifier( "after" ).property( "value" ) ) ) ).
                         create( node( "before" ).out( "LINK" ).node().values( value( "value",
                                 25 ) ).out( "LINK" ).node( "after" ) ).
                         delete( identifier( "old" ) ).toString() );

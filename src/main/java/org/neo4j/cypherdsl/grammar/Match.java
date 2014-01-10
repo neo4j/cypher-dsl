@@ -30,4 +30,6 @@ public interface Match
     Match match( PathExpression... expression );
 
     Match match( Iterable<PathExpression> expressions );
+
+    Match optional();
 }

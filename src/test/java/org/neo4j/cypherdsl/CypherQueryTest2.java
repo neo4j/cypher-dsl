@@ -34,12 +34,11 @@ public class CypherQueryTest2 extends AbstractCypherTest
                 starts( nodesById( "john", 0 ) ).returns( identifier( "john" ) );
             }}.toString() );
 
-        assertQueryEquals( CYPHER + "START john=node(0) MATCH r=(john)-[?:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
+        assertQueryEquals( CYPHER + "START john=node(0) MATCH r=(john)-[:KNOWS*1..3]->(x) RETURN x", new CypherQuery()
         {{
                 starts( nodesById( "john", 0 ) ).
                         match( path( "r", node( "john" )
                                 .out( "KNOWS" )
-                                .optional()
                                 .hops( 1, 3 )
                                 .node( "x" ) ) ).
                         returns( identifier( "x" ) );

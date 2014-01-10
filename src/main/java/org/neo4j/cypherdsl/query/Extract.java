@@ -47,7 +47,7 @@ public class Extract
         name.asString( builder );
         builder.append( " IN " );
         iterable.asString( builder );
-        builder.append( ":" );
+        builder.append( "|" );
         expression.asString( builder );
         builder.append( ')' );
     }

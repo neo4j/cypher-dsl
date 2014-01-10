@@ -116,7 +116,7 @@ public class ForEachClause
         id.asString( builder );
         builder.append( " in " );
         in.asString( builder );
-        builder.append( ":" );
+        builder.append( "|" );
 
         String comma = "";
         for ( AsString forEachStatement : forEachStatements )

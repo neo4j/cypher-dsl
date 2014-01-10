@@ -38,24 +38,7 @@ import org.neo4j.cypherdsl.expression.RelationshipExpression;
 import org.neo4j.cypherdsl.expression.ScalarExpression;
 import org.neo4j.cypherdsl.expression.StartExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
-import org.neo4j.cypherdsl.grammar.Create;
-import org.neo4j.cypherdsl.grammar.CreateUnique;
-import org.neo4j.cypherdsl.grammar.Delete;
-import org.neo4j.cypherdsl.grammar.Execute;
-import org.neo4j.cypherdsl.grammar.ExecuteWithParameters;
-import org.neo4j.cypherdsl.grammar.ForEachStatement;
-import org.neo4j.cypherdsl.grammar.ForEachStatements;
-import org.neo4j.cypherdsl.grammar.Limit;
-import org.neo4j.cypherdsl.grammar.Match;
-import org.neo4j.cypherdsl.grammar.OrderBy;
-import org.neo4j.cypherdsl.grammar.ReturnNext;
-import org.neo4j.cypherdsl.grammar.Set;
-import org.neo4j.cypherdsl.grammar.Skip;
-import org.neo4j.cypherdsl.grammar.StartNext;
-import org.neo4j.cypherdsl.grammar.UpdateNext;
-import org.neo4j.cypherdsl.grammar.Where;
-import org.neo4j.cypherdsl.grammar.With;
-import org.neo4j.cypherdsl.grammar.WithNext;
+import org.neo4j.cypherdsl.grammar.*;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.ExpressionCollection;
 import org.neo4j.cypherdsl.query.Expressions;
@@ -70,21 +53,7 @@ import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.Query;
 import org.neo4j.cypherdsl.query.SuffixFunctionExpression;
 import org.neo4j.cypherdsl.query.Value;
-import org.neo4j.cypherdsl.query.clause.CreateClause;
-import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
-import org.neo4j.cypherdsl.query.clause.DeleteClause;
-import org.neo4j.cypherdsl.query.clause.ForEachClause;
-import org.neo4j.cypherdsl.query.clause.LimitClause;
-import org.neo4j.cypherdsl.query.clause.LimitParameterClause;
-import org.neo4j.cypherdsl.query.clause.MatchClause;
-import org.neo4j.cypherdsl.query.clause.OrderByClause;
-import org.neo4j.cypherdsl.query.clause.ReturnClause;
-import org.neo4j.cypherdsl.query.clause.SetClause;
-import org.neo4j.cypherdsl.query.clause.SkipClause;
-import org.neo4j.cypherdsl.query.clause.SkipParameterClause;
-import org.neo4j.cypherdsl.query.clause.StartClause;
-import org.neo4j.cypherdsl.query.clause.WhereClause;
-import org.neo4j.cypherdsl.query.clause.WithClause;
+import org.neo4j.cypherdsl.query.clause.*;
 
 /**
  * DSL for creating Cypher queries. Once created you can serialize to a string,
@@ -113,6 +82,18 @@ public class CypherQuery
     }
 
     /**
+     * Start building a new Cypher query, starting with a MATCH clause
+     *
+     * @param paths
+     * @return
+     */
+    public static UpdateNext match( PathExpression... paths )
+    {
+        CypherQuery query = new CypherQuery();
+        return query.matches(paths);
+    }
+
+    /**
      * Start building a new Cypher query, starting with a CREATE clause
      *
      * @param paths
@@ -122,6 +103,18 @@ public class CypherQuery
     {
         CypherQuery query = new CypherQuery();
         return query.creates( paths );
+    }
+
+    /**
+     * Start building a new Cypher query, starting with a MERGE clause
+     *
+     * @param paths
+     * @return
+     */
+    public static UpdateNext merge( PathExpression... paths )
+    {
+        CypherQuery query = new CypherQuery();
+        return query.merges(paths);
     }
 
     /**
@@ -491,6 +484,32 @@ public class CypherQuery
     protected UpdateNext creates( PathExpression... paths )
     {
         query.add( new CreateClause( Arrays.asList( paths ) ) );
+
+        return new Grammar();
+    }
+
+    /**
+     * MERGE clause. Use this with Java initialization block style.
+     *
+     * @param paths
+     * @return
+     */
+    protected UpdateNext merges( PathExpression... paths )
+    {
+        query.add( new MergeClause( Arrays.asList( paths ) ) );
+
+        return new Grammar();
+    }
+
+    /**
+     * MATCH clause. Use this with Java initialization block style.
+     *
+     * @param paths
+     * @return
+     */
+    protected UpdateNext matches( PathExpression... paths )
+    {
+        query.add( new MatchClause( Arrays.asList( paths ) ) );
 
         return new Grammar();
     }
@@ -1774,7 +1793,7 @@ public class CypherQuery
 
     // Grammar
     protected class Grammar
-            implements StartNext, With, WithNext, Create, Set, Delete, CreateUnique, UpdateNext, Match, ReturnNext,
+            implements StartNext, With, WithNext, Create, Set, Delete, Remove, CreateUnique, Merge, UpdateNext, Match, ReturnNext,
             OrderBy,
             Skip, Limit, Execute
     {
@@ -1846,6 +1865,23 @@ public class CypherQuery
             return this;
         }
 
+        // Remove -------------------------------------------------------
+        @Override
+        public UpdateNext remove( ReferenceExpression... expressions )
+        {
+            query.add( new RemoveClause( Arrays.asList( expressions ) ) );
+
+            return this;
+        }
+
+        @Override
+        public UpdateNext remove( Iterable<ReferenceExpression> expressions )
+        {
+            query.add( new RemoveClause( expressions ) );
+
+            return this;
+        }
+
         // createUnique -------------------------------------------------------
         @Override
         public UpdateNext createUnique( PathExpression... expressions )
@@ -1859,6 +1895,23 @@ public class CypherQuery
         public UpdateNext createUnique( Iterable<PathExpression> expressions )
         {
             query.add( new CreateUniqueClause( expressions ) );
+
+            return this;
+        }
+
+        // merge -------------------------------------------------------
+        @Override
+        public UpdateNext merge( PathExpression... expressions )
+        {
+            query.add( new MergeClause( Arrays.asList( expressions ) ) );
+
+            return this;
+        }
+
+        @Override
+        public UpdateNext merge( Iterable<PathExpression> expressions )
+        {
+            query.add( new MergeClause( expressions ) );
 
             return this;
         }
@@ -1899,6 +1952,15 @@ public class CypherQuery
         public Match match( Iterable<PathExpression> expressions )
         {
             query.add( new MatchClause( expressions ) );
+            return this;
+        }
+
+        @Override
+        public Match optional() {
+            MatchClause matchClause = query.lastClause(MatchClause.class);
+            if (matchClause != null) {
+                matchClause.optional();
+            }
             return this;
         }
 

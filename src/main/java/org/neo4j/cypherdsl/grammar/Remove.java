@@ -18,37 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.query.clause;
+package org.neo4j.cypherdsl.grammar;
 
-import java.util.ArrayList;
-
-import org.neo4j.cypherdsl.expression.PathExpression;
+import org.neo4j.cypherdsl.expression.ReferenceExpression;
 
 /**
- * MATCH clause
+ * Represents the DELETE clause
  */
-public class MatchClause
-        extends Clause
+public interface Remove
 {
-    private final ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
-    private boolean optional;
+    UpdateNext remove(ReferenceExpression... expressions);
 
-    public MatchClause( Iterable<PathExpression> expressions )
-    {
-        for ( PathExpression expression : expressions )
-        {
-            this.expressions.add( expression );
-        }
-    }
-
-    @Override
-    public void asString( StringBuilder builder )
-    {
-        String name = (optional ? "OPTIONAL " : "") + "MATCH";
-        clauseAsString( builder, name, expressions, "," );
-    }
-
-    public void optional() {
-        this.optional = true;
-    }
+    UpdateNext remove(Iterable<ReferenceExpression> expressions);
 }

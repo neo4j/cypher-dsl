@@ -47,7 +47,7 @@ public class Filter
         name.asString( builder );
         builder.append( " IN " );
         iterable.asString( builder );
-        builder.append( ":" );
+        builder.append( " WHERE " );
         predicate.asString( builder );
         builder.append( ')' );
     }

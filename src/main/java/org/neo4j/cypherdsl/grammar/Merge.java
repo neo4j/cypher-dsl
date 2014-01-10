@@ -18,37 +18,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.query.clause;
-
-import java.util.ArrayList;
+package org.neo4j.cypherdsl.grammar;
 
 import org.neo4j.cypherdsl.expression.PathExpression;
 
 /**
- * MATCH clause
+ * Represents the MERGE clause
  */
-public class MatchClause
-        extends Clause
+public interface Merge
 {
-    private final ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
-    private boolean optional;
+    UpdateNext merge(PathExpression... expressions);
 
-    public MatchClause( Iterable<PathExpression> expressions )
-    {
-        for ( PathExpression expression : expressions )
-        {
-            this.expressions.add( expression );
-        }
-    }
-
-    @Override
-    public void asString( StringBuilder builder )
-    {
-        String name = (optional ? "OPTIONAL " : "") + "MATCH";
-        clauseAsString( builder, name, expressions, "," );
-    }
-
-    public void optional() {
-        this.optional = true;
-    }
+    UpdateNext merge(Iterable<PathExpression> expressions);
 }

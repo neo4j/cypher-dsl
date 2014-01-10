@@ -24,6 +24,6 @@ package org.neo4j.cypherdsl.grammar;
  * This collects all the update clauses.
  */
 public interface Update
-        extends Create, Set, Delete, CreateUnique
+        extends Create, Set, Delete, Remove, CreateUnique, Merge
 {
 }

@@ -38,7 +38,7 @@ public class Query
 {
     
     private static final String QUERY_PREFIX = "CYPHER ";
-    private static final String DEFAULT_CYPHER_VERSION = "1.9";
+    private static final String DEFAULT_CYPHER_VERSION = "2.0";
     
     public static boolean isEmpty( String string )
     {
@@ -98,16 +98,20 @@ public class Query
         // Check if we should merge to consecutive WHERE clauses
         if ( !clauses.isEmpty() && clause instanceof WhereClause )
         {
-            Clause previousClause = clauses.get( clauses.size() - 1 );
-            if ( previousClause instanceof WhereClause )
+            WhereClause previousWhere = lastClause(WhereClause.class);
+            if ( previousWhere != null )
             {
-                WhereClause previousWhere = (WhereClause) previousClause;
                 previousWhere.mergeWith( (WhereClause) clause );
                 return;
             }
         }
 
         clauses.add( clause );
+    }
+
+    public  <T extends Clause> T lastClause(Class<T> type) {
+        Clause clause = clauses.get(clauses.size() - 1);
+        return type.isInstance(clause) ? type.cast(clause) : null;
     }
 
     public void asString( StringBuilder builder )

@@ -41,19 +41,17 @@ public class PathRelationship
     public final Identifier as;
     public final Iterable<Identifier> relationships;
     public final PropertyValues relationshipPropertyValues;
-    public final boolean optional;
     public final Integer minHops;
     public final Integer maxHops;
 
-    PathRelationship( Path leftNode, Direction direction, Identifier as, Iterable<Identifier> relationships,
-                      PropertyValues relationshipPropertyValues, boolean optional, Integer minHops, Integer maxHops )
+    PathRelationship(Path leftNode, Direction direction, Identifier as, Iterable<Identifier> relationships,
+                     PropertyValues relationshipPropertyValues, Integer minHops, Integer maxHops)
     {
         this.leftNode = leftNode;
         this.direction = direction;
         this.as = as;
         this.relationships = relationships;
         this.relationshipPropertyValues = relationshipPropertyValues;
-        this.optional = optional;
         this.minHops = minHops;
         this.maxHops = maxHops;
     }
@@ -75,7 +73,7 @@ public class PathRelationship
     public PathRelationship values( PropertyValue... propertyValues )
     {
         return new PathRelationship( leftNode, direction, as, relationships,
-                new PropertyValues( asList( propertyValues ) ), optional, minHops, maxHops );
+                new PropertyValues( asList( propertyValues ) ), minHops, maxHops );
     }
 
     /**
@@ -95,7 +93,7 @@ public class PathRelationship
     public PathRelationship values( Iterable<PropertyValue> propertyValues )
     {
         return new PathRelationship( leftNode, direction, as, relationships, new PropertyValues( propertyValues ),
-                optional, minHops, maxHops );
+                minHops, maxHops );
     }
 
     /**
@@ -128,23 +126,7 @@ public class PathRelationship
     public PathRelationship as( Identifier name )
     {
         Query.checkNull( name, "Name" );
-        return new PathRelationship( leftNode, direction, name, relationships, relationshipPropertyValues, optional,
-                minHops, maxHops );
-    }
-
-    /**
-     * Use this method to mark a relationship as optional
-     * <p/>
-     * Corresponds to:
-     * <pre>
-     * (n)-[?]-(m)
-     * </pre>
-     *
-     * @return
-     */
-    public PathRelationship optional()
-    {
-        return new PathRelationship( leftNode, direction, as, relationships, relationshipPropertyValues, true,
+        return new PathRelationship( leftNode, direction, name, relationships, relationshipPropertyValues,
                 minHops, maxHops );
     }
 
@@ -157,7 +139,8 @@ public class PathRelationship
      * (n)-[:*minHops,maxHops]-(m)
      * </pre>
      *
-     * @param name
+     * @param minHops
+     * @param maxHops
      * @return
      */
     public PathRelationship hops( Integer minHops, Integer maxHops )
@@ -172,7 +155,7 @@ public class PathRelationship
             throw new IllegalArgumentException( "Maximum number of hops must be over zero" );
         }
 
-        return new PathRelationship( leftNode, direction, as, relationships, relationshipPropertyValues, optional,
+        return new PathRelationship( leftNode, direction, as, relationships, relationshipPropertyValues,
                 minHops, maxHops );
     }
 
@@ -235,16 +218,12 @@ public class PathRelationship
         builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
         boolean hasRelationships = relationships.iterator().hasNext();
-        if ( as != null || hasRelationships || optional || minHops != null || maxHops != null )
+        if ( as != null || hasRelationships || minHops != null || maxHops != null )
         {
             builder.append( '[' );
             if ( as != null )
             {
-                as.asString( builder );
-            }
-            if ( optional )
-            {
-                builder.append( '?' );
+                as.asString(builder);
             }
             if ( hasRelationships )
             {

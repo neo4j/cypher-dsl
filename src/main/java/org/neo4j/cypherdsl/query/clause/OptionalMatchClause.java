@@ -20,20 +20,19 @@
 
 package org.neo4j.cypherdsl.query.clause;
 
-import java.util.ArrayList;
-
 import org.neo4j.cypherdsl.expression.PathExpression;
+
+import java.util.ArrayList;
 
 /**
  * MATCH clause
  */
-public class MatchClause
+public class OptionalMatchClause
         extends Clause
 {
     private final ArrayList<PathExpression> expressions = new ArrayList<PathExpression>();
-    private boolean optional;
 
-    public MatchClause( Iterable<PathExpression> expressions )
+    public OptionalMatchClause(Iterable<PathExpression> expressions)
     {
         for ( PathExpression expression : expressions )
         {
@@ -44,11 +43,6 @@ public class MatchClause
     @Override
     public void asString( StringBuilder builder )
     {
-        String name = (optional ? "OPTIONAL " : "") + "MATCH";
-        clauseAsString( builder, name, expressions, "," );
-    }
-
-    public void optional() {
-        this.optional = true;
+        clauseAsString( builder, "OPTIONAL MATCH", expressions, "," );
     }
 }

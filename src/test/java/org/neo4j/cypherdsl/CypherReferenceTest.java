@@ -32,6 +32,8 @@ import static org.neo4j.cypherdsl.CypherQuery.collect;
 import static org.neo4j.cypherdsl.CypherQuery.collection;
 import static org.neo4j.cypherdsl.CypherQuery.count;
 import static org.neo4j.cypherdsl.CypherQuery.create;
+import static org.neo4j.cypherdsl.CypherQuery.merge;
+import static org.neo4j.cypherdsl.CypherQuery.match;
 import static org.neo4j.cypherdsl.CypherQuery.distinct;
 import static org.neo4j.cypherdsl.CypherQuery.extract;
 import static org.neo4j.cypherdsl.CypherQuery.filter;
@@ -269,9 +271,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_10_13()
     {
-        assertQueryEquals( CYPHER + "START a=node(2) MATCH (a)-[?]->(x) RETURN a,x",
+        assertQueryEquals( CYPHER + "START a=node(2) OPTIONAL MATCH (a)-->(x) RETURN a,x",
                 start( nodesById( "a", 2 ) ).
-                        match( node( "a" ).out().optional().node( "x" ) ).
+                        match( node( "a" ).out().node( "x" ) ).optional().
                         returns( identifiers( "a", "x" ) ).
                         toString() );
     }
@@ -279,9 +281,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_10_14()
     {
-        assertQueryEquals( CYPHER + "START a=node(3) MATCH (a)-[r?:LOVES]->() RETURN a,r",
+        assertQueryEquals( CYPHER + "START a=node(3) OPTIONAL MATCH (a)-[r:LOVES]->() RETURN a,r",
                 start( nodesById( "a", 3 ) ).
-                        match( node( "a" ).out( "LOVES" ).as( "r" ).optional().node() ).
+                        match( node( "a" ).out( "LOVES" ).as( "r" ).node() ).optional().
                         returns( identifier( "a" ), identifier( "r" ) ).
                         toString() );
     }
@@ -289,9 +291,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_10_15()
     {
-        assertQueryEquals( CYPHER + "START a=node(2) MATCH (a)-[?]->(x) RETURN x,x.name",
+        assertQueryEquals( CYPHER + "START a=node(2) OPTIONAL MATCH (a)-->(x) RETURN x,x.name",
                 start( nodesById( "a", 2 ) ).
-                        match( node( "a" ).out().optional().node( "x" ) ).
+                        match( node( "a" ).out().node( "x" ) ).optional().
                         returns( identifier( "x" ), identifier( "x" ).string( "name" ) ).
                         toString() );
     }
@@ -358,13 +360,13 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_10_21()
     {
-        assertQueryEquals( CYPHER + "START a=node(3),b=node(2) MATCH (a)-[?:KNOWS]-(x)-[?:KNOWS]-(b) RETURN x",
+        assertQueryEquals( CYPHER + "START a=node(3),b=node(2) OPTIONAL MATCH (a)-[:KNOWS]-(x)-[:KNOWS]-(b) RETURN x",
                 start( nodesById( "a", 3 ), nodesById( "b", 2 ) ).
                         match( node( "a" ).
-                                both( "KNOWS" ).optional().
+                                both( "KNOWS" ).
                                 node( "x" ).
-                                both( "KNOWS" ).optional().
-                                node( "b" ) ).
+                                both( "KNOWS" ).
+                                node( "b" ) ).optional().
                         returns( identifier( "x" ) ).
                         toString() );
     }
@@ -446,9 +448,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_11_8()
     {
-        assertQueryEquals( CYPHER + "START n=node(3,1) WHERE n.belt? =\"white\" RETURN n",
+        assertQueryEquals( CYPHER + "START n=node(3,1) WHERE n.belt=\"white\" RETURN n",
                 start( nodesById( "n", 3, 1 ) ).
-                        where( identifier( "n" ).property( "belt" ).trueIfMissing().eq( "white" ) ).
+                        where( identifier( "n" ).property( "belt" ).eq( "white" ) ).
                         returns( identifier( "n" ) ).
                         toString() );
     }
@@ -456,9 +458,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_11_9()
     {
-        assertQueryEquals( CYPHER + "START n=node(3,1) WHERE n.belt! =\"white\" RETURN n",
+        assertQueryEquals( CYPHER + "START n=node(3,1) WHERE n.belt=\"white\" RETURN n",
                 start( nodesById( "n", 3, 1 ) ).
-                        where( identifier( "n" ).property( "belt" ).falseIfMissing().eq( "white" ) ).
+                        where( identifier( "n" ).property( "belt" ).eq( "white" ) ).
                         returns( identifier( "n" ) ).
                         toString() );
     }
@@ -467,9 +469,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_11_10()
     {
-        assertQueryEquals( CYPHER + "START a=node(1),b=node(3,2) MATCH (a)<-[r?]-(b) WHERE r is null RETURN b",
+        assertQueryEquals( CYPHER + "START a=node(1),b=node(3,2) OPTIONAL MATCH (a)<-[r]-(b) WHERE r is null RETURN b",
                 start( nodesById( "a", 1 ), nodesById( "b", 3, 2 ) ).
-                        match( node( "a" ).in().as( "r" ).optional().node( "b" ) ).
+                        match( node( "a" ).in().as( "r" ).node( "b" ) ).optional().
                         where( isNull( identifier( "r" ) ) ).
                         returns( identifier( "b" ) ).
                         toString() );
@@ -478,9 +480,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_11_10_2()
     {
-        assertQueryEquals( CYPHER + "START a=node(1),b=node(3,2) MATCH (a)<-[r?]-(b) WHERE r is not null RETURN b",
+        assertQueryEquals( CYPHER + "START a=node(1),b=node(3,2) OPTIONAL MATCH (a)<-[r]-(b) WHERE r is not null RETURN b",
                 start( nodesById( "a", 1 ), nodesById( "b", 3, 2 ) ).
-                        match( node( "a" ).in().as( "r" ).optional().node( "b" ) ).
+                        match( node( "a" ).in().as( "r" ).node( "b" ) ).optional().
                         where( isNotNull( identifier( "r" ) ) ).
                         returns( identifier( "b" ) ).
                         toString() );
@@ -558,9 +560,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_12_7()
     {
-        assertQueryEquals( CYPHER + "START n=node(1,2) RETURN n.age? ",
+        assertQueryEquals( CYPHER + "START n=node(1,2) RETURN n.age",
                 start( nodesById( "n", 1, 2 ) ).
-                        returns( identifier( "n" ).property( "age" ).optional() ).
+                        returns( identifier( "n" ).property( "age" ) ).
                         toString() );
     }
 
@@ -607,9 +609,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_13_6()
     {
-        assertQueryEquals( CYPHER + "START n=node(2,3,4,1) RETURN count(n.property? )",
+        assertQueryEquals( CYPHER + "START n=node(2,3,4,1) RETURN count(n.property)",
                 start( nodesById( "n", 2, 3, 4, 1 ) ).
-                        returns( count( identifier( "n" ).property( "property" ).optional() ) ).
+                        returns( count( identifier( "n" ).property( "property" ) ) ).
                         toString() );
     }
 
@@ -696,10 +698,10 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_14_4()
     {
-        assertQueryEquals( CYPHER + "START n=node(3,1,2) RETURN n.length? ,n ORDER BY n.length? ",
+        assertQueryEquals( CYPHER + "START n=node(3,1,2) RETURN n.length,n ORDER BY n.length",
                 start( nodesById( "n", 3, 1, 2 ) ).
-                        returns( identifier( "n" ).property( "length" ).optional(), identifier( "n" ) ).
-                        orderBy( identifier( "n" ).property( "length" ).optional() ).
+                        returns( identifier( "n" ).property( "length" ), identifier( "n" ) ).
+                        orderBy( identifier( "n" ).property( "length" )).
                         toString() );
     }
 
@@ -783,6 +785,20 @@ public class CypherReferenceTest extends AbstractCypherTest
     }
 
     @Test
+    public void test16_18_1_merge()
+    {
+        assertQueryEquals( CYPHER + "MERGE (n)",
+                merge( node( "n" ) ).toString() );
+    }
+
+    @Test
+    public void test16_18_1_match()
+    {
+        assertQueryEquals( CYPHER + "MATCH (n) RETURN n",
+                match( node( "n" ) ).returns( identifier("n") ).toString() );
+    }
+
+    @Test
     public void test16_18_2()
     {
         assertQueryEquals( CYPHER + "CREATE (n {name:\"Andres\",title:\"Developer\"})",
@@ -791,10 +807,24 @@ public class CypherReferenceTest extends AbstractCypherTest
     }
 
     @Test
+    public void test16_18_2_merge()
+    {
+        assertQueryEquals( CYPHER + "MERGE (n {name:\"Andres\",title:\"Developer\"})",
+                merge( node( identifier( "n" ) ).values( value( "name", "Andres" ), value( "title",
+                        "Developer" ) ) ).toString() );
+    }
+
+    @Test
     public void test16_18_3()
     {
         assertQueryEquals( CYPHER + "CREATE (a {name:\"Andres\"}) RETURN a",
                 create( node( "a" ).values( value( "name", "Andres" ) ) ).returns( identifier( "a" ) ).toString() );
+    }
+    @Test
+    public void test16_18_3_merge()
+    {
+        assertQueryEquals( CYPHER + "MERGE (a {name:\"Andres\"}) RETURN a",
+                merge( node( "a" ).values( value( "name", "Andres" ) ) ).returns( identifier( "a" ) ).toString() );
     }
 
     @Test
@@ -868,8 +898,8 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_19_3()
     {
-        assertQueryEquals( CYPHER + "START andres=node(3) DELETE andres.age RETURN andres",
-                start( nodesById( "andres", 3 ) ).delete( identifier( "andres" ).property( "age" ) ).returns(
+        assertQueryEquals( CYPHER + "START andres=node(3) REMOVE andres.age RETURN andres",
+                start( nodesById( "andres", 3 ) ).remove( identifier( "andres" ).property( "age" ) ).returns(
                         identifier( "andres" ) ).toString() );
     }
 
@@ -891,10 +921,27 @@ public class CypherReferenceTest extends AbstractCypherTest
     }
 
     @Test
+    public void test16_21_1_merge()
+    {
+        assertQueryEquals( CYPHER + "START left=node(1),right=node(3,4) MERGE (left)-[r:KNOWS]->(right) " +
+                "RETURN r",
+                start( nodesById( "left", 1 ), nodesById( "right", 3, 4 ) ).merge( node( "left" ).out( "KNOWS"
+                ).as( "r" ).node( "right" ) ).returns( identifier( "r" ) ).toString() );
+    }
+
+    @Test
     public void test16_21_2()
     {
         assertQueryEquals( CYPHER + "START root=node(2) CREATE UNIQUE (root)-[:LOVES]-(someone) RETURN someone",
                 start( nodesById( "root", 2 ) ).createUnique( node( "root" ).both( "LOVES" ).node( "someone" ) )
+                        .returns( identifier( "someone" ) ).toString() );
+    }
+
+    @Test
+    public void test16_21_2_merge()
+    {
+        assertQueryEquals( CYPHER + "START root=node(2) MERGE (root)-[:LOVES]->(someone) RETURN someone",
+                start( nodesById( "root", 2 ) ).merge( node( "root" ).out( "LOVES" ).node( "someone" ) )
                         .returns( identifier( "someone" ) ).toString() );
     }
 
@@ -907,10 +954,26 @@ public class CypherReferenceTest extends AbstractCypherTest
     }
 
     @Test
+    public void test16_21_3_merge()
+    {
+        assertQueryEquals( CYPHER + "START root=node(2) MERGE (root)-[:X]->(leaf {name:\"D\"}) RETURN leaf",
+                start( nodesById( "root", 2 ) ).merge( node( "root" ).out( "X" ).node( identifier( "leaf" ) )
+                        .values( value( "name", "D" ) ) ).returns( identifier( "leaf" ) ).toString() );
+    }
+
+    @Test
     public void test16_21_4()
     {
         assertQueryEquals( CYPHER + "START root=node(2) CREATE UNIQUE (root)-[r:X {since:\"forever\"}]-() RETURN r",
                 start( nodesById( "root", 2 ) ).createUnique( node( "root" ).both( identifier( "X" ) ).values( value(
+                        "since", "forever" ) ).as( "r" ).node() ).returns( identifier( "r" ) ).toString() );
+    }
+
+    @Test
+    public void test16_21_4_merge()
+    {
+        assertQueryEquals( CYPHER + "START root=node(2) MERGE (root)-[r:X {since:\"forever\"}]->() RETURN r",
+                start( nodesById( "root", 2 ) ).merge( node( "root" ).out( identifier( "X" ) ).values( value(
                         "since", "forever" ) ).as( "r" ).node() ).returns( identifier( "r" ) ).toString() );
     }
 
@@ -925,7 +988,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_22_1()
     {
-        assertQueryEquals( CYPHER + "START begin=node(2),end=node(1) MATCH p=(begin)-->(end) FOREACH(n in nodes(p): " +
+        assertQueryEquals( CYPHER + "START begin=node(2),end=node(1) MATCH p=(begin)-->(end) FOREACH(n in nodes(p)| " +
                 "SET n.marked=true)",
                 start( nodesById( "begin", 2 ), nodesById( "end", 1 ) ).
                         match( path( "p", node( "begin" ).out().node( "end" ) ) ).
@@ -1013,9 +1076,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_23_2_4()
     {
-        assertQueryEquals( CYPHER + "START a=node(3) RETURN coalesce(a.hairColour? ,a.eyes? )",
-                start( nodesById( "a", 3 ) ).returns( coalesce( identifier( "a" ).property( "hairColour" ).optional()
-                        , identifier( "a" ).property( "eyes" ).optional() ) ).toString() );
+        assertQueryEquals( CYPHER + "START a=node(3) RETURN coalesce(a.hairColour,a.eyes)",
+                start( nodesById( "a", 3 ) ).returns( coalesce( identifier( "a" ).property( "hairColour" )
+                        , identifier( "a" ).property( "eyes" )) ).toString() );
     }
 
     @Test
@@ -1058,7 +1121,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     public void test16_23_3_3()
     {
         assertQueryEquals( CYPHER + "START a=node(3),b=node(4),c=node(1) MATCH p=(a)-->(b)-->(c) RETURN extract(n IN " +
-                "nodes(p):n.age)",
+                "nodes(p)|n.age)",
                 start( nodesById( "a", 3 ), nodesById( "b", 4 ), nodesById( "c", 1 ) ).
                         match( path( "p", node( "a" ).out().node( "b" ).out().node( "c" ) ) ).
                         returns( extract( "n", nodes( identifier( "p" ) ), identifier( "n" ).number( "age" ) ) ).
@@ -1068,7 +1131,7 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_23_3_4()
     {
-        assertQueryEquals( CYPHER + "START a=node(2) RETURN a.array,filter(x IN a.array:length(x)=3)",
+        assertQueryEquals( CYPHER + "START a=node(2) RETURN a.array,filter(x IN a.array WHERE length(x)=3)",
                 start( nodesById( "a", 2 ) ).
                         returns( identifier( "a" ).property( "array" ), filter( "x",
                                 identifier( "a" ).property( "array" ), length( identifier( "x" ) )
@@ -1134,4 +1197,12 @@ public class CypherReferenceTest extends AbstractCypherTest
                         returns( sign( -17 ), sign( 0.1 ) ).
                         toString() );
     }
+
+//    @Test
+//    public void testMerge_single_node_with_a_label() throws Exception {
+//        assertQueryEquals( CYPHER + "MERGE (robert:Critic) RETURN robert, labels(robert)",
+//                merge( node( "a", 1 ) ).
+//                        returns( sign( -17 ), sign( 0.1 ) ).
+//                        toString() );
+//    }
 }

@@ -123,7 +123,7 @@ public class Path
      */
     public PathRelationship out()
     {
-        return new PathRelationship( this, OUT, null, Collections.<Identifier>emptyList(), null, false, null, null );
+        return new PathRelationship( this, OUT, null, Collections.<Identifier>emptyList(), null, null, null );
     }
 
     /**
@@ -138,7 +138,7 @@ public class Path
      */
     public PathRelationship out( String... relationships )
     {
-        return new PathRelationship( this, OUT, null, asList( identifiers( relationships ) ), null, false, null, null );
+        return new PathRelationship( this, OUT, null, asList( identifiers( relationships ) ), null, null, null );
     }
 
     /**
@@ -153,7 +153,7 @@ public class Path
      */
     public PathRelationship out( Identifier... relationships )
     {
-        return new PathRelationship( this, OUT, null, asList( relationships ), null, false, null, null );
+        return new PathRelationship( this, OUT, null, asList( relationships ), null, null, null );
     }
 
     /**
@@ -174,7 +174,7 @@ public class Path
             relationshipNames.add( identifier( relationship.name() ) );
         }
 
-        return new PathRelationship( this, OUT, null, relationshipNames, null, false, null, null );
+        return new PathRelationship( this, OUT, null, relationshipNames, null, null, null );
     }
 
     /**
@@ -189,7 +189,7 @@ public class Path
      */
     public PathRelationship in()
     {
-        return new PathRelationship( this, IN, null, Collections.<Identifier>emptyList(), null, false, null, null );
+        return new PathRelationship( this, IN, null, Collections.<Identifier>emptyList(), null, null, null );
     }
 
     /**
@@ -204,7 +204,7 @@ public class Path
      */
     public PathRelationship in( String... relationships )
     {
-        return new PathRelationship( this, IN, null, asList( identifiers( relationships ) ), null, false, null, null );
+        return new PathRelationship( this, IN, null, asList( identifiers( relationships ) ), null, null, null );
     }
 
     /**
@@ -219,7 +219,7 @@ public class Path
      */
     public PathRelationship in( Identifier... relationships )
     {
-        return new PathRelationship( this, IN, null, asList( relationships ), null, false, null, null );
+        return new PathRelationship( this, IN, null, asList( relationships ), null, null, null );
     }
 
     /**
@@ -240,7 +240,7 @@ public class Path
             relationshipNames.add( identifier( relationship.name() ) );
         }
 
-        return new PathRelationship( this, IN, null, relationshipNames, null, false, null, null );
+        return new PathRelationship( this, IN, null, relationshipNames, null, null, null );
     }
 
     /**
@@ -255,7 +255,7 @@ public class Path
      */
     public PathRelationship both()
     {
-        return new PathRelationship( this, BOTH, null, Collections.<Identifier>emptyList(), null, false, null, null );
+        return new PathRelationship( this, BOTH, null, Collections.<Identifier>emptyList(), null, null, null );
     }
 
     /**
@@ -270,7 +270,7 @@ public class Path
      */
     public PathRelationship both( String... relationships )
     {
-        return new PathRelationship( this, BOTH, null, asList( identifiers( relationships ) ), null, false, null,
+        return new PathRelationship( this, BOTH, null, asList( identifiers( relationships ) ), null, null,
                 null );
     }
 
@@ -286,7 +286,7 @@ public class Path
      */
     public PathRelationship both( Identifier... relationships )
     {
-        return new PathRelationship( this, BOTH, null, asList( relationships ), null, false, null, null );
+        return new PathRelationship( this, BOTH, null, asList( relationships ), null, null, null );
     }
 
     /**
@@ -307,7 +307,7 @@ public class Path
             relationshipNames.add( identifier( relationship.name() ) );
         }
 
-        return new PathRelationship( this, BOTH, null, relationshipNames, null, false, null, null );
+        return new PathRelationship( this, BOTH, null, relationshipNames, null, null, null );
     }
 
     @Override
