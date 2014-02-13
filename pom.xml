@@ -8,7 +8,7 @@
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <properties>
-    <neo4j.version>2.0.0</neo4j.version>
+    <neo4j.version>2.0.1</neo4j.version>
     <querydsl.version>3.2.4</querydsl.version>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
