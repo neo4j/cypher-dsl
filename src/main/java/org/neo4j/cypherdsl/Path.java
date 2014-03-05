@@ -34,6 +34,8 @@ import java.util.List;
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.query.AbstractExpression;
+import org.neo4j.cypherdsl.query.LabelValue;
+import org.neo4j.cypherdsl.query.LabelValues;
 import org.neo4j.cypherdsl.query.PropertyValue;
 import org.neo4j.cypherdsl.query.PropertyValues;
 
@@ -46,13 +48,30 @@ public class Path
 {
     private final Expression node;
     private final Expression nodePropertyValues;
+    private final Expression nodeLabels;
     private final PathRelationship relationship;
 
-    Path( Expression node, PathRelationship relationship, Expression nodePropertyValues )
+    Path( Expression node, PathRelationship relationship, Expression nodePropertyValues, Expression labels )
     {
         this.node = node;
         this.relationship = relationship;
         this.nodePropertyValues = nodePropertyValues;
+        this.nodeLabels = labels;
+    }
+
+    public Path labels( LabelValue... labels )
+    {
+        return new Path( node, relationship, nodePropertyValues, new LabelValues( asList( labels ) ) );
+    }
+
+    public Path labels( Iterable<LabelValue> labels )
+    {
+        return new Path( node, relationship, nodePropertyValues, new LabelValues( labels ) );
+    }
+
+    public Path label( String label )
+    {
+        return new Path( node, relationship, nodePropertyValues, new LabelValue( label ) );
     }
 
     /**
@@ -71,7 +90,7 @@ public class Path
      */
     public Path values( PropertyValue... propertyValues )
     {
-        return new Path( node, relationship, new PropertyValues( asList( propertyValues ) ) );
+        return new Path( node, relationship, new PropertyValues( asList( propertyValues ) ), nodeLabels );
     }
 
     /**
@@ -90,7 +109,7 @@ public class Path
      */
     public Path values( Iterable<PropertyValue> propertyValues )
     {
-        return new Path( node, relationship, new PropertyValues( propertyValues ) );
+        return new Path( node, relationship, new PropertyValues( propertyValues ), nodeLabels );
     }
 
     /**
@@ -108,7 +127,7 @@ public class Path
      */
     public Path values( Parameter propertyValues )
     {
-        return new Path( node, relationship, propertyValues );
+        return new Path( node, relationship, propertyValues, nodeLabels );
     }
 
     /**
@@ -322,7 +341,10 @@ public class Path
         if ( node != null )
         {
             node.asString( builder );
-
+            if ( nodeLabels != null )
+            {
+                nodeLabels.asString( builder );
+            }
             if ( nodePropertyValues != null )
             {
                 builder.append( ' ' );
@@ -331,6 +353,10 @@ public class Path
         }
         else
         {
+            if ( nodeLabels != null )
+            {
+                nodeLabels.asString( builder );
+            }
             if ( nodePropertyValues != null )
             {
                 nodePropertyValues.asString( builder );
