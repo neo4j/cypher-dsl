@@ -71,6 +71,11 @@ public class Path
 
     public Path label( String label )
     {
+        return new Path( node, relationship, nodePropertyValues, new LabelValue( identifier(label) ) );
+    }
+
+    public Path label( Identifier label )
+    {
         return new Path( node, relationship, nodePropertyValues, new LabelValue( label ) );
     }
 

@@ -21,6 +21,10 @@ package org.neo4j.cypherdsl;
 
 import org.junit.Test;
 
+import static org.neo4j.cypherdsl.CypherQuery.identifier;
+import static org.neo4j.cypherdsl.CypherQuery.match;
+import static org.neo4j.cypherdsl.CypherQuery.node;
+
 /**
  * Tests for all parts of the Cypher DSL.
  */
@@ -77,6 +81,24 @@ public class CypherQueryTest2 extends AbstractCypherTest
                 {{
                         creates( node("n").labels( label("Person"), label("Swedish") ) );
                     }}.toString() );
+    }
+
+    @Test
+    public void testLabelWithSpaces()
+    {
+        assertQueryEquals( CYPHER + "MATCH (movie:`Movie With Spaces`) RETURN movie",
+                match( node( "movie" ).label( "Movie With Spaces" ) ).
+                        returns( identifier( "movie" ) ).
+                        toString() );
+    }
+
+    @Test
+    public void testLabelWithSpecialCharacters()
+    {
+        assertQueryEquals( CYPHER + "MATCH (movie:`Movie\"#'?!`) RETURN movie",
+                match( node( "movie" ).label( "Movie\"#'?!" ) ).
+                        returns( identifier( "movie" ) ).
+                        toString() );
     }
 
 }

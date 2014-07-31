@@ -19,21 +19,23 @@
  */
 package org.neo4j.cypherdsl.query;
 
+import org.neo4j.cypherdsl.Identifier;
+
 /**
  * Represents matching a label to a value
  */
 public class LabelValue extends AbstractExpression {
 
-	private final String label;
+	private final Identifier label;
 
-	public LabelValue(String label) {
+	public LabelValue( Identifier label ) {
 		this.label = label;
 	}
 
 	@Override
-	public void asString(StringBuilder builder) {
-		builder.append(":");
-		builder.append(label);
+	public void asString( StringBuilder builder ) {
+        builder.append( ":" );
+		label.asString( builder );
 	}
 
 }

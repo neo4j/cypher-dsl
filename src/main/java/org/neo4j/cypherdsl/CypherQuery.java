@@ -192,7 +192,17 @@ public class CypherQuery
      */
     public static LabelValue label( String label )
     {
-        checkNull( label, "Label" );
+        return new LabelValue( identifier( label ) );
+    }
+
+    /**
+     * Declare a label.
+     *
+     * @param label literal value
+     * @return Label instance
+     */
+    public static LabelValue label( Identifier label )
+    {
         return new LabelValue( label );
     }
 
