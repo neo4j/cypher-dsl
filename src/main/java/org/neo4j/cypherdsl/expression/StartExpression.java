@@ -119,7 +119,11 @@ public abstract class StartExpression
             name.asString( builder );
             builder.append( "=node:" );
             index.asString( builder );
-            builder.append( "(\"" ).append( query ).append( "\")" );
+            if (query.contains(" ")) {
+                builder.append( "('" ).append( query ).append( "')" );
+            } else {
+                builder.append( "(\"" ).append( query ).append( "\")" );
+            }
         }
     }
 
