@@ -43,6 +43,7 @@ import com.mysema.query.BooleanBuilder;
 import com.mysema.query.support.Expressions;
 import com.mysema.query.types.Ops;
 import com.mysema.query.types.Path;
+import com.mysema.query.types.expr.BooleanOperation;
 import com.mysema.query.types.expr.Param;
 import org.junit.Assert;
 import org.junit.Test;
@@ -143,6 +144,15 @@ public class QueryDSLTest
                             .where( toBooleanExpression( n.firstName.like( "(?i).*rick.*" )))
                             .returns( identifier( n ) )
                             .toString() );
+        }
+
+        {
+            QPerson n = new QPerson( "n" );
+            Assert.assertEquals(CYPHER + "START n=node(1,2,3) WHERE has(n.firstName) RETURN n",
+                    start(nodesById(identifier(n), 1, 2, 3))
+                            .where(toBooleanExpression(BooleanOperation.create(Ops.EXISTS, n.firstName)))
+                                    .returns(identifier(n))
+                                    .toString());
         }
     }
 
