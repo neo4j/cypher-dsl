@@ -70,6 +70,10 @@ public class CypherQueryTest extends AbstractCypherTest
         assertQueryEquals( CYPHER + "START john=node:nodes(\"name:John\") RETURN john", start( query( "john",
                 "nodes", "name:John" ) ).returns( identifier( "john" ) ).toString() );
 
+        // Start with query with spaces
+        assertQueryEquals( CYPHER + "START john=node:nodes('name:\"John doe\"') RETURN john", start( query( "john",
+                "nodes", "name:\"John doe\"" ) ).returns( identifier( "john" ) ).toString() );
+
         // Start with query-param
         assertEquals( CYPHER + "START john=node:nodes({param}) RETURN john", start( queryByParameter( "john",
                 "nodes", "param" ) ).returns( identifier( "john" ) ).toString() );
