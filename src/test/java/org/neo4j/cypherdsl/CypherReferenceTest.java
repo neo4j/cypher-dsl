@@ -1283,4 +1283,30 @@ public class CypherReferenceTest extends AbstractCypherTest
                 toString() );
     }
 
+    @Test
+    public void test_9_7_2_Union()
+    {
+        assertQueryEquals( CYPHER + "MATCH (n:Actor) " +
+                                    "RETURN n.name AS name " +
+                                    "UNION " +
+                                    "MATCH (n:Movie) " +
+                                    "RETURN n.title AS name",
+                match( node( "n" ).label( "Actor" )).returns(as(identifier("n").property("name"), "name")).union().
+                match( node( "n" ).label( "Movie" )).returns(as(identifier("n").property("title"), "name")).
+                toString() );
+    }
+
+    @Test
+    public void test_9_7_1_UnionAll()
+    {
+        assertQueryEquals( CYPHER + "MATCH (n:Actor) " +
+                        "RETURN n.name AS name " +
+                        "UNION ALL " +
+                        "MATCH (n:Movie) " +
+                        "RETURN n.title AS name",
+                match( node( "n" ).label( "Actor" )).returns(as(identifier("n").property("name"), "name")).union().all().
+                        match( node( "n" ).label( "Movie" )).returns(as(identifier("n").property("title"), "name")).
+                        toString() );
+    }
+
 }
