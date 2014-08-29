@@ -2119,16 +2119,13 @@ public class CypherQuery
         @Override
         public ExecuteWithParameters parameter( String name, Object value )
         {
-            ExecuteWithParams withParams = new ExecuteWithParams( query );
-            return withParams.parameter( name, value );
+            return new ExecuteWithParams( query ).parameter( name, value );
         }
 
         @Override
         public ExecuteWithParameters parameters( Map<String, Object> parameters )
         {
-            ExecuteWithParams withParams = new ExecuteWithParams( query );
-            withParams.getParameters().putAll( parameters );
-            return withParams;
+            return new ExecuteWithParams( query ).parameters( parameters );
         }
 
         @Override
@@ -2163,14 +2160,14 @@ public class CypherQuery
         @Override
         public ExecuteWithParameters parameter( String name, Object value )
         {
-            parameters.put( name, value );
+            this.parameters.put( name, value );
             return this;
         }
 
         @Override
         public ExecuteWithParameters parameters( Map<String, Object> parameters )
         {
-            parameters.putAll( parameters );
+            this.parameters.putAll( parameters );
             return this;
         }
 
