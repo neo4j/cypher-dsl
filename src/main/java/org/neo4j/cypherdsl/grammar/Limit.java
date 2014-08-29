@@ -23,7 +23,7 @@ package org.neo4j.cypherdsl.grammar;
  * Represents the LIMIT clause
  */
 public interface Limit
-        extends Execute
+        extends Execute, Union
 {
     Execute limit( int nrToBeSkipped );
 

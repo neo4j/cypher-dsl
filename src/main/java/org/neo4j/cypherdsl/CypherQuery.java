@@ -1832,7 +1832,7 @@ public class CypherQuery
     protected class Grammar
             implements StartNext, With, WithNext, Create, Set, Delete, Remove, CreateUnique, Merge, UpdateNext, Match, ReturnNext,
             OrderBy,
-            Skip, Limit, Execute
+            Skip, Limit, Execute, Union, UnionNext
     {
         // With ---------------------------------------------------------
         public WithNext with( Expression... withExpressions )
@@ -1846,6 +1846,26 @@ public class CypherQuery
         public WithNext with( Iterable<Expression> withExpressions )
         {
             query.add( new WithClause( withExpressions ) );
+
+            return this;
+        }
+
+        // Union ---------------------------------------------------------
+        @Override
+        public UnionNext union()
+        {
+            query.add( new UnionClause() );
+
+            return this;
+        }
+
+        @Override
+        public UnionNext all()
+        {
+            UnionClause unionClause = query.lastClause(UnionClause.class);
+            if (unionClause != null) {
+                unionClause.all();
+            }
 
             return this;
         }

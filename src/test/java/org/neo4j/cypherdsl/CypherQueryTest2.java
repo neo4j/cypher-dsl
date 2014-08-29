@@ -21,9 +21,7 @@ package org.neo4j.cypherdsl;
 
 import org.junit.Test;
 
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
-import static org.neo4j.cypherdsl.CypherQuery.match;
-import static org.neo4j.cypherdsl.CypherQuery.node;
+import static org.neo4j.cypherdsl.CypherQuery.*;
 
 /**
  * Tests for all parts of the Cypher DSL.
@@ -99,6 +97,14 @@ public class CypherQueryTest2 extends AbstractCypherTest
                 match( node( "movie" ).label( "Movie\"#'?!" ) ).
                         returns( identifier( "movie" ) ).
                         toString() );
+    }
+
+    @Test
+    public void testVariableLengthRelationshipWithProperties()
+    {
+        assertQueryEquals(CYPHER + "MATCH ()-[r:RATED*1.. {rating:5}]->() RETURN r",
+                match(node().out("RATED").hops(1, null).values(value("rating", 5)).as("r").node()).
+                        returns(identifier("r")).toString());
     }
 
 }

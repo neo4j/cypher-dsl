@@ -235,12 +235,6 @@ public class PathRelationship
                     relationship.asString( builder );
                     or = "|";
                 }
-
-                if ( relationshipPropertyValues != null )
-                {
-                    builder.append( ' ' );
-                    relationshipPropertyValues.asString( builder );
-                }
             }
 
             if ( minHops != null || maxHops != null )
@@ -255,6 +249,12 @@ public class PathRelationship
                 {
                     builder.append( maxHops );
                 }
+            }
+
+            if ( relationshipPropertyValues != null )
+            {
+                builder.append( ' ' );
+                relationshipPropertyValues.asString( builder );
             }
 
             builder.append( ']' );
