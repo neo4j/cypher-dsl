@@ -445,6 +445,20 @@ public class CypherQuery
     /**
      * Corresponds to:
      * <pre>
+     * has(expression)
+     * </pre>
+     *
+     * @param expression
+     * @return
+     */
+    public static BooleanExpression has( Expression expression )
+    {
+        return new Value( new FunctionExpression( "has", expression ) );
+    }
+
+    /**
+     * Corresponds to:
+     * <pre>
      * expression is null
      * </pre>
      *
