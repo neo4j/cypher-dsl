@@ -9,7 +9,7 @@
 
   <properties>
     <neo4j.version>2.0.4</neo4j.version>
-    <querydsl.version>3.2.4</querydsl.version>
+    <querydsl.version>3.4.2</querydsl.version>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
     <license-text.header>GPL-3-header.txt</license-text.header>
@@ -49,6 +49,12 @@
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-core</artifactId>
       <version>${querydsl.version}</version>
+      <optional>true</optional>
+    </dependency>
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+      <version>2.2.2</version>
       <optional>true</optional>
     </dependency>
     <dependency>
