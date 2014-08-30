@@ -38,6 +38,7 @@ import org.neo4j.cypherdsl.expression.RelationshipExpression;
 import org.neo4j.cypherdsl.expression.ScalarExpression;
 import org.neo4j.cypherdsl.expression.StartExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
+import org.neo4j.cypherdsl.expression.NodeExpression;
 import org.neo4j.cypherdsl.grammar.*;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.ExpressionCollection;
@@ -1536,6 +1537,22 @@ public class CypherQuery
         checkNull( pathExpression, "Expression" );
 
         return new Value( new FunctionExpression( "relationships", pathExpression ) );
+    }
+
+    /**
+     * Declare a labels expression. Corresponds to:
+     * <pre>
+     * labels(node)
+     * </pre>
+     *
+     * @param nodeExpression
+     * @return
+     */
+    public static CollectionExpression labels( NodeExpression nodeExpression )
+    {
+        checkNull( nodeExpression, "Expression" );
+
+        return new Value( new FunctionExpression( "labels", nodeExpression ) );
     }
 
     /**

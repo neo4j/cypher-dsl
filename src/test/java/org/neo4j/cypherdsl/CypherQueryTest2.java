@@ -107,4 +107,18 @@ public class CypherQueryTest2 extends AbstractCypherTest
                         returns(identifier("r")).toString());
     }
 
+    @Test
+    public void testRelationshipWithOnlyProperties()
+    {
+        assertQueryEquals(CYPHER + "MATCH ()-[ {rating:5}]->(n) RETURN n",
+                match(node().out().values(value("rating", 5)).node("n")).
+                        returns(identifier("n")).toString());
+    }
+
+    @Test
+    public void testLabelsFunction()
+    {
+        assertQueryEquals(CYPHER + "MATCH (n) RETURN labels(n)",
+                match(node("n")).returns(labels(identifier("n"))).toString());
+    }
 }
