@@ -218,7 +218,7 @@ public class PathRelationship
         builder.append( direction.equals( Direction.IN ) ? "<-" : "-" );
 
         boolean hasRelationships = relationships.iterator().hasNext();
-        if ( as != null || hasRelationships || minHops != null || maxHops != null )
+        if ( as != null || hasRelationships || minHops != null || maxHops != null || relationshipPropertyValues!= null )
         {
             builder.append( '[' );
             if ( as != null )
