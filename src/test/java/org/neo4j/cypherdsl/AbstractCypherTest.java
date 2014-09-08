@@ -39,7 +39,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "2.0" + " ";
+    public static final String CYPHER = "CYPHER " + "2.1" + " ";
     private static ImpermanentGraphDatabase graphdb;
     protected static ExecutionEngine engine;
     private Transaction tx;
