@@ -1309,4 +1309,41 @@ public class CypherReferenceTest extends AbstractCypherTest
                         toString() );
     }
 
+        @Test
+    public void test_13_2_1_MergeOnCreate()
+    {
+        assertQueryEquals(CYPHER + "MERGE (keanu:Person {name:\"Keanu Reeves\"}) " +
+                        "ON CREATE SET keanu.movie=\"Matrix\"",
+                merge(node(identifier("keanu")).label("Person").values(value("name", "Keanu Reeves")))
+                        .onCreate(property(identifier("keanu").property("movie"),
+                                literal("Matrix"))).toString());
+    }
+
+    @Test
+    public void test_13_2_1_MergeOnMatch()
+    {
+        assertQueryEquals(CYPHER + "MERGE (keanu:Person {name:\"Keanu Reeves\"}) " +
+                        "ON MATCH SET keanu.movie=\"Matrix\"",
+                merge(node(identifier("keanu")).label("Person").values(value("name", "Keanu Reeves")))
+                        .onMatch(property(identifier("keanu").property("movie"),
+                                literal("Matrix"))).toString());
+    }
+
+    @Test
+    public void test_13_2_1_MergeOnMatchAndOnCreate()
+    {
+        assertQueryEquals(CYPHER + "MERGE (keanu:Person {name:\"Keanu Reeves\"}) " +
+                        "ON CREATE SET keanu.movie=\"Matrix\" " +
+                        "ON MATCH SET keanu.movie=\"Matrix\",keanu.found=true " +
+                        "RETURN keanu",
+                merge(node(identifier("keanu")).label("Person").values(value("name", "Keanu Reeves")))
+                        .onCreate(property(identifier("keanu").property("movie"),
+                                literal("Matrix")))
+                        .onMatch(property(identifier("keanu").property("movie"),
+                                literal("Matrix")), property(identifier("keanu").property("found"),
+                                literal(true)))
+                        .returns(identifier("keanu"))
+                        .toString());
+    }
+
 }
