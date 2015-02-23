@@ -1922,6 +1922,73 @@ public class CypherQuery
             return this;
         }
 
+
+        // On Create ------------------------------------------------------
+        @Override
+        public UpdateNext onCreate(SetProperty... setProperties) {
+            Clause clause = query.lastClause(Clause.class);
+            if (clause instanceof MergeClause || clause instanceof OnMatchClause)
+            {
+                query.add(new OnCreateClause(Arrays.asList(setProperties)));
+            }
+            else
+            {
+                throw new IllegalArgumentException("ON CREATE must follow a MERGE or ON MATCH Clause");
+            }
+
+
+            return this;
+        }
+
+        @Override
+        public UpdateNext onCreate(Iterable<SetProperty> setProperties) {
+            Clause clause = query.lastClause(Clause.class);
+            if (clause instanceof MergeClause || clause instanceof OnMatchClause)
+            {
+                query.add( new OnCreateClause( setProperties ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException("ON CREATE must follow a MERGE or ON MATCH Clause");
+            }
+
+
+            return this;
+        }
+
+        // On Match ------------------------------------------------------
+        @Override
+        public UpdateNext onMatch(SetProperty... setProperties) {
+            Clause clause = query.lastClause(Clause.class);
+            if (clause instanceof MergeClause || clause instanceof OnCreateClause)
+            {
+                query.add( new OnMatchClause( Arrays.asList( setProperties ) ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException("ON MATCH must follow a MERGE or ON CREATE Clause");
+            }
+
+
+            return this;
+        }
+
+        @Override
+        public UpdateNext onMatch(Iterable<SetProperty> setProperties) {
+            Clause clause = query.lastClause(Clause.class);
+            if (clause instanceof MergeClause || clause instanceof OnCreateClause)
+            {
+                query.add( new OnMatchClause( setProperties ) );
+            }
+            else
+            {
+                throw new IllegalArgumentException("ON MATCH must follow a MERGE or ON CREATE Clause");
+            }
+
+
+            return this;
+        }
+
         // Delete -------------------------------------------------------
         @Override
         public UpdateNext delete( ReferenceExpression... expressions )
