@@ -23,6 +23,7 @@ package org.neo4j.cypherdsl;
 import static org.neo4j.cypherdsl.CypherQuery.identifier;
 import static org.neo4j.cypherdsl.query.Query.checkNull;
 
+import java.util.Arrays;
 import java.util.regex.Pattern;
 
 import org.neo4j.cypherdsl.expression.NumericExpression;
@@ -44,6 +45,11 @@ public class Identifier
     Identifier( String name )
     {
         super( new IdentifierExpression( name ) );
+    }
+
+    Identifier ( Iterable<String> names, String prefix )
+    {
+        super( new IdentifierExpression(names, prefix) );
     }
 
     /**
@@ -79,6 +85,77 @@ public class Identifier
     {
         checkNull( name, "Name" );
         return new Property( this, name);
+    }
+
+    /**
+     * If this identifier represents a node,
+     * then you can use this method to denote a label.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * id:label
+     * </pre>
+     *
+     * @param label
+     * @return
+     */
+    public LabelReference label( String label )
+    {
+        return label(identifier(label));
+    }
+
+    /**
+     * If this identifier represents a node,
+     * then you can use this method to denote labels.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * id:label1:label2
+     * </pre>
+     *
+     * @param labels
+     * @return
+     */
+    public LabelReference labels( String... labels )
+    {
+        checkNull( labels, "Labels" );
+        return label(new Identifier( Arrays.asList(labels), ":"));
+    }
+
+    /**
+     * If this identifier represents a node,
+     * then you can use this method to denote labels.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * id:label1:label2
+     * </pre>
+     *
+     * @param labels
+     * @return
+     */
+    public LabelReference labels( Iterable<String> labels )
+    {
+        checkNull( labels, "Labels" );
+        return label(new Identifier( labels, ":"));
+    }
+
+    /**
+     * If this identifier represents a node,
+     * then you can use this method to denote a label.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * id:label
+     * </pre>
+     *
+     * @param label
+     * @return
+     */
+    public LabelReference label( Identifier label )
+    {
+        checkNull( label, "Label" );
+        return new LabelReference( this, label );
     }
 
     /**
@@ -155,15 +232,47 @@ public class Identifier
             extends AbstractExpression
     {
         private final String name;
+        private String prefix;
 
         private IdentifierExpression( String name )
         {
             this.name = name;
         }
 
+        private IdentifierExpression( Iterable<String> names, String prefix )
+        {
+            StringBuilder nameBuilder = new StringBuilder();
+            boolean first = true;
+            for ( String name : names )
+            {
+                if ( simpleName.matcher( name ).matches() )
+                {
+                    if( !first )
+                    {
+                        nameBuilder.append( prefix );
+                    }
+
+                    nameBuilder.append( name );
+                    first = false;
+                }
+                else
+                {
+                    if( !first )
+                    {
+                        nameBuilder.append( prefix );
+                    }
+
+                    nameBuilder.append( '`' ).append( name ).append( '`' );
+                    first = false;
+                }
+            }
+            this.prefix = prefix;
+            this.name = nameBuilder.toString();
+        }
+
         public void asString( StringBuilder builder )
         {
-            if ( simpleName.matcher( name ).matches() )
+            if ( prefix != null || simpleName.matcher( name ).matches() )
             {
                 builder.append( name );
             }

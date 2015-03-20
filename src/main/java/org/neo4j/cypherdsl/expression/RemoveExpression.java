@@ -17,17 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-package org.neo4j.cypherdsl.grammar;
-
-import org.neo4j.cypherdsl.expression.RemoveExpression;
+package org.neo4j.cypherdsl.expression;
 
 /**
- * Represents the REMOVE clause
+ * Expression that evaluates to a node or relationship property or label
  */
-public interface Remove
+public interface RemoveExpression
+        extends Expression
 {
-    UpdateNext remove(RemoveExpression... expressions);
-
-    UpdateNext remove(Iterable<RemoveExpression> expressions);
 }
