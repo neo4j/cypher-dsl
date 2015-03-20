@@ -20,21 +20,21 @@
 
 package org.neo4j.cypherdsl.query.clause;
 
-import org.neo4j.cypherdsl.expression.ReferenceExpression;
+import org.neo4j.cypherdsl.expression.RemoveExpression;
 
 import java.util.ArrayList;
 
 /**
- * CREATE clause
+ * REMOVE clause
  */
 public class RemoveClause
         extends Clause
 {
-    private final ArrayList<ReferenceExpression> expressions = new ArrayList<ReferenceExpression>();
+    private final ArrayList<RemoveExpression> expressions = new ArrayList<>();
 
-    public RemoveClause(Iterable<ReferenceExpression> expressions)
+    public RemoveClause(Iterable<RemoveExpression> expressions)
     {
-        for ( ReferenceExpression expression : expressions )
+        for ( RemoveExpression expression : expressions )
         {
             this.expressions.add( expression );
         }

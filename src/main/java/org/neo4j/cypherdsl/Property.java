@@ -20,11 +20,8 @@
 
 package org.neo4j.cypherdsl;
 
-import static org.neo4j.cypherdsl.query.NullHandling.FALSE_IF_MISSING;
-import static org.neo4j.cypherdsl.query.NullHandling.TRUE_IF_MISSING;
-
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
-import org.neo4j.cypherdsl.query.NullHandling;
+import org.neo4j.cypherdsl.expression.RemoveExpression;
 import org.neo4j.cypherdsl.query.Operator;
 import org.neo4j.cypherdsl.query.Value;
 
@@ -33,7 +30,7 @@ import org.neo4j.cypherdsl.query.Value;
  */
 public class Property
         extends Value
-        implements ReferenceExpression
+        implements ReferenceExpression, RemoveExpression
 {
     private final Identifier owner;
     private final Identifier name;

@@ -19,6 +19,8 @@
  */
 package org.neo4j.cypherdsl;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.cypherdsl.CypherQuery.abs;
 import static org.neo4j.cypherdsl.CypherQuery.all;
@@ -1346,4 +1348,40 @@ public class CypherReferenceTest extends AbstractCypherTest
                         .toString());
     }
 
+    @Test
+    public void test_11_5_1_RemoveLabel()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) REMOVE n:Swedish",
+                start(nodesById(identifier("n"), 1L)).remove(identifier("n").label("Swedish")).toString());
+    }
+
+    @Test
+    public void test_11_5_1_RemoveLabelSpaces()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) REMOVE n:`Swedish Guy`",
+                start(nodesById(identifier("n"), 1L)).remove(identifier("n").label("Swedish Guy")).toString());
+    }
+
+    @Test
+    public void test_11_5_1_RemoveLabelAndProperty()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) REMOVE n:`Swedish Guy`,n.name",
+                start(nodesById(identifier("n"), 1L)).remove(identifier("n").label("Swedish Guy"),
+                        identifier("n").property("name")).toString());
+    }
+
+    @Test
+    public void test_11_5_1_RemoveMultipleLabelsWithSpacesAndProperty()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) REMOVE n:`Swedish Guy`:`German Guy`,n.name",
+                start(nodesById(identifier("n"), 1L)).remove(identifier("n").labels("Swedish Guy", "German Guy"),
+                        identifier("n").property("name")).toString());
+    }
+
+    @Test
+    public void test_11_5_1_RemoveMultipleLabels()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) REMOVE n:Swedish:German",
+                start(nodesById(identifier("n"), 1L)).remove(identifier("n").labels("Swedish", "German")).toString());
+    }
 }

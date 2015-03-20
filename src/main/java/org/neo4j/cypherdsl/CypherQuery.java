@@ -35,6 +35,7 @@ import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.expression.PropertyContainerExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
 import org.neo4j.cypherdsl.expression.RelationshipExpression;
+import org.neo4j.cypherdsl.expression.RemoveExpression;
 import org.neo4j.cypherdsl.expression.ScalarExpression;
 import org.neo4j.cypherdsl.expression.StartExpression;
 import org.neo4j.cypherdsl.expression.StringExpression;
@@ -2008,7 +2009,7 @@ public class CypherQuery
 
         // Remove -------------------------------------------------------
         @Override
-        public UpdateNext remove( ReferenceExpression... expressions )
+        public UpdateNext remove( RemoveExpression... expressions )
         {
             query.add( new RemoveClause( Arrays.asList( expressions ) ) );
 
@@ -2016,7 +2017,7 @@ public class CypherQuery
         }
 
         @Override
-        public UpdateNext remove( Iterable<ReferenceExpression> expressions )
+        public UpdateNext remove( Iterable<RemoveExpression> expressions )
         {
             query.add( new RemoveClause( expressions ) );
 

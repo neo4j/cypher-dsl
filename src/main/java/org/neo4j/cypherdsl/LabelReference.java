@@ -18,16 +18,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.neo4j.cypherdsl.grammar;
+package org.neo4j.cypherdsl;
 
 import org.neo4j.cypherdsl.expression.RemoveExpression;
+import org.neo4j.cypherdsl.query.Operator;
+import org.neo4j.cypherdsl.query.Value;
 
 /**
- * Represents the REMOVE clause
+ * Represents a label reference.
  */
-public interface Remove
+public class LabelReference
+        extends Value
+        implements RemoveExpression
 {
-    UpdateNext remove(RemoveExpression... expressions);
+    private final Identifier owner;
+    private final Identifier name;
 
-    UpdateNext remove(Iterable<RemoveExpression> expressions);
+    LabelReference(Identifier owner, Identifier name)
+    {
+        super( new Operator( owner, ":" ), name );
+        this.owner = owner;
+        this.name = name;
+    }
+
+    @Override
+    public void asString( StringBuilder builder )
+    {
+        super.asString(builder);
+    }
 }
