@@ -1,13 +1,13 @@
 package org.neo4j.cypherdsl.grammar;
 
-import org.neo4j.cypherdsl.SetProperty;
+import org.neo4j.cypherdsl.expression.SetExpression;
 
 /**
  * Represents the ON MATCH clause
  */
 public interface OnMatch
 {
-    UpdateNext onMatch( SetProperty... propertyValues );
+    UpdateNext onMatch( SetExpression... setExpressions );
 
-    UpdateNext onMatch( Iterable<SetProperty> propertyValues );
+    UpdateNext onMatch( Iterable<SetExpression> setExpressions );
 }

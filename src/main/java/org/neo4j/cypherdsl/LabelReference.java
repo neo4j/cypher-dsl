@@ -21,6 +21,7 @@
 package org.neo4j.cypherdsl;
 
 import org.neo4j.cypherdsl.expression.RemoveExpression;
+import org.neo4j.cypherdsl.expression.SetExpression;
 import org.neo4j.cypherdsl.query.Operator;
 import org.neo4j.cypherdsl.query.Value;
 
@@ -29,7 +30,7 @@ import org.neo4j.cypherdsl.query.Value;
  */
 public class LabelReference
         extends Value
-        implements RemoveExpression
+        implements RemoveExpression, SetExpression
 {
     private final Identifier owner;
     private final Identifier name;

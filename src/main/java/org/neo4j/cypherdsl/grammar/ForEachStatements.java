@@ -19,9 +19,9 @@
  */
 package org.neo4j.cypherdsl.grammar;
 
-import org.neo4j.cypherdsl.SetProperty;
 import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
+import org.neo4j.cypherdsl.expression.SetExpression;
 
 /**
  * Used to create statements for the FOREACH clause. When you
@@ -34,9 +34,9 @@ public interface ForEachStatements
 
     ForEachStatement create( Iterable<PathExpression> paths );
 
-    ForEachStatement set( SetProperty... setProperties );
+    ForEachStatement set( SetExpression... setExpressions );
 
-    ForEachStatement set( Iterable<SetProperty> setProperties );
+    ForEachStatement set( Iterable<SetExpression> setExpressions );
 
     ForEachStatement delete( ReferenceExpression... expressions );
 

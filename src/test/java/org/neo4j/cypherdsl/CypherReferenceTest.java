@@ -1384,4 +1384,41 @@ public class CypherReferenceTest extends AbstractCypherTest
         assertQueryEquals(CYPHER + "START n=node(1) REMOVE n:Swedish:German",
                 start(nodesById(identifier("n"), 1L)).remove(identifier("n").labels("Swedish", "German")).toString());
     }
+
+    @Test
+    public void test_12_3_1_SetLabelOnNode()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) SET n:Swedish",
+            start(nodesById(identifier("n"), 1L)).set(identifier("n").label("Swedish")).toString());
+    }
+
+    @Test
+    public void test_12_3_1_SetMultipleLabelsOnNode()
+    {
+        assertQueryEquals(CYPHER + "START n=node(1) SET n:Swedish:German",
+            start(nodesById(identifier("n"), 1L)).set(
+                identifier("n").labels("Swedish", "German")).toString());
+    }
+
+    @Test
+    public void test_11_5_1_SetMultipleLabelsWithSpacesAndProperty()
+    {
+        assertQueryEquals(CYPHER
+                + "START n=node(1) SET n:`Swedish Guy`:`German Guy`,n.name=\"Michael\"",
+            start(nodesById(identifier("n"), 1L))
+                .set(identifier("n").labels("Swedish Guy", "German Guy"),
+                    property(identifier("n").property("name"), literal("Michael")) ).toString() );
+    }
+
+    @Test
+    public void testForEachSetPropertyAndLabel()
+    {
+        assertQueryEquals( CYPHER + "START begin=node(2),end=node(1) MATCH p=(begin)-->(end) FOREACH(n in nodes(p)| " +
+                "SET n.marked=true,n:Person)",
+            start( nodesById( "begin", 2 ), nodesById( "end", 1 ) ).
+                match( path( "p", node( "begin" ).out().node( "end" ) ) ).
+                forEach( in( identifier( "n" ), nodes( identifier( "p" ) ) ).
+                    set( property( identifier( "n" ).property( "marked" ),
+                        literal( true ) ) , identifier("n").label("Person") ) ).toString() );
+    }
 }

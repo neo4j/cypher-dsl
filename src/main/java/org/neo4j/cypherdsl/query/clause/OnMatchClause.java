@@ -1,6 +1,6 @@
 package org.neo4j.cypherdsl.query.clause;
 
-import org.neo4j.cypherdsl.SetProperty;
+import org.neo4j.cypherdsl.expression.SetExpression;
 
 import java.util.ArrayList;
 
@@ -10,11 +10,11 @@ import java.util.ArrayList;
 public class OnMatchClause
         extends Clause
 {
-    private final ArrayList<SetProperty> expressions = new ArrayList<SetProperty>();
+    private final ArrayList<SetExpression> expressions = new ArrayList<>();
 
-    public OnMatchClause( Iterable<SetProperty> expressions )
+    public OnMatchClause( Iterable<SetExpression> expressions )
     {
-        for ( SetProperty expression : expressions )
+        for ( SetExpression expression : expressions )
         {
             this.expressions.add( expression );
         }
