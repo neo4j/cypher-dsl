@@ -17,33 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+package org.neo4j.cypherdsl.expression;
 
-package org.neo4j.cypherdsl;
+import org.neo4j.cypherdsl.AsString;
 
-import org.neo4j.cypherdsl.expression.Expression;
-import org.neo4j.cypherdsl.expression.SetExpression;
+import java.io.Serializable;
 
 /**
- * Represents a property being assigned to a value. This is used for the SET clause,
- * as well as the MERGE ON CREATE and ON MATCH clauses.
+ * Expression that defines a property to set on a relationship or a
+ * property or label to be set on a node
  */
-public class SetProperty
-        implements AsString, SetExpression
+public interface SetExpression extends AsString, Serializable, Cloneable
 {
-    private final Property property;
-    private final Expression value;
-
-    SetProperty( Property property, Expression value )
-    {
-        this.property = property;
-        this.value = value;
-    }
-
-    @Override
-    public void asString( StringBuilder builder )
-    {
-        property.asString( builder );
-        builder.append( '=' );
-        value.asString( builder );
-    }
 }

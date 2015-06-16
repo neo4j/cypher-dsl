@@ -23,6 +23,7 @@ package org.neo4j.cypherdsl.query.clause;
 import java.util.ArrayList;
 
 import org.neo4j.cypherdsl.SetProperty;
+import org.neo4j.cypherdsl.expression.SetExpression;
 
 /**
  * SET clause
@@ -30,11 +31,11 @@ import org.neo4j.cypherdsl.SetProperty;
 public class SetClause
         extends Clause
 {
-    private final ArrayList<SetProperty> expressions = new ArrayList<SetProperty>();
+    private final ArrayList<SetExpression> expressions = new ArrayList<>();
 
-    public SetClause( Iterable<SetProperty> expressions )
+    public SetClause( Iterable<SetExpression> expressions )
     {
-        for ( SetProperty expression : expressions )
+        for ( SetExpression expression : expressions )
         {
             this.expressions.add( expression );
         }

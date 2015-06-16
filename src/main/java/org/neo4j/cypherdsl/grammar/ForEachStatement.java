@@ -25,6 +25,7 @@ import org.neo4j.cypherdsl.AsString;
 import org.neo4j.cypherdsl.SetProperty;
 import org.neo4j.cypherdsl.expression.PathExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
+import org.neo4j.cypherdsl.expression.SetExpression;
 import org.neo4j.cypherdsl.query.clause.Clause;
 import org.neo4j.cypherdsl.query.clause.CreateClause;
 import org.neo4j.cypherdsl.query.clause.CreateUniqueClause;
@@ -57,15 +58,15 @@ public class ForEachStatement
     }
 
     @Override
-    public ForEachStatement set( SetProperty... setProperties )
+    public ForEachStatement set( SetExpression... setExpressions )
     {
-        return new ForEachStatement( forEachClause.add( new SetClause( asList( setProperties ) ) ) );
+        return new ForEachStatement( forEachClause.add( new SetClause( asList( setExpressions ) ) ) );
     }
 
     @Override
-    public ForEachStatement set( Iterable<SetProperty> setProperties )
+    public ForEachStatement set( Iterable<SetExpression> setExpressions )
     {
-        return new ForEachStatement( forEachClause.add( new SetClause( setProperties ) ) );
+        return new ForEachStatement( forEachClause.add( new SetClause( setExpressions ) ) );
     }
 
     @Override

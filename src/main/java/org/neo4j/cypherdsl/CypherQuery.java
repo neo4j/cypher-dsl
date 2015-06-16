@@ -26,20 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.cypherdsl.expression.All;
-import org.neo4j.cypherdsl.expression.BooleanExpression;
-import org.neo4j.cypherdsl.expression.CollectionExpression;
-import org.neo4j.cypherdsl.expression.Expression;
-import org.neo4j.cypherdsl.expression.NumericExpression;
-import org.neo4j.cypherdsl.expression.PathExpression;
-import org.neo4j.cypherdsl.expression.PropertyContainerExpression;
-import org.neo4j.cypherdsl.expression.ReferenceExpression;
-import org.neo4j.cypherdsl.expression.RelationshipExpression;
-import org.neo4j.cypherdsl.expression.RemoveExpression;
-import org.neo4j.cypherdsl.expression.ScalarExpression;
-import org.neo4j.cypherdsl.expression.StartExpression;
-import org.neo4j.cypherdsl.expression.StringExpression;
-import org.neo4j.cypherdsl.expression.NodeExpression;
+import org.neo4j.cypherdsl.expression.*;
 import org.neo4j.cypherdsl.grammar.*;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.ExpressionCollection;
@@ -1908,17 +1895,17 @@ public class CypherQuery
 
         // Set ----------------------------------------------------------
         @Override
-        public UpdateNext set( SetProperty... setProperties )
+        public UpdateNext set( SetExpression... setExpressions )
         {
-            query.add( new SetClause( Arrays.asList( setProperties ) ) );
+            query.add( new SetClause( Arrays.asList( setExpressions ) ) );
 
             return this;
         }
 
         @Override
-        public UpdateNext set( Iterable<SetProperty> setProperties )
+        public UpdateNext set( Iterable<SetExpression> setExpressions )
         {
-            query.add( new SetClause( setProperties ) );
+            query.add( new SetClause( setExpressions ) );
 
             return this;
         }
