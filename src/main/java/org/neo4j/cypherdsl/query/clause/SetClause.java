@@ -22,6 +22,7 @@ package org.neo4j.cypherdsl.query.clause;
 
 import java.util.ArrayList;
 
+import org.neo4j.cypherdsl.SetProperty;
 import org.neo4j.cypherdsl.expression.SetExpression;
 
 /**
