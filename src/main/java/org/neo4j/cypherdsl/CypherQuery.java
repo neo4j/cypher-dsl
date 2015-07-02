@@ -26,20 +26,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.neo4j.cypherdsl.expression.All;
-import org.neo4j.cypherdsl.expression.BooleanExpression;
-import org.neo4j.cypherdsl.expression.CollectionExpression;
-import org.neo4j.cypherdsl.expression.Expression;
-import org.neo4j.cypherdsl.expression.NumericExpression;
-import org.neo4j.cypherdsl.expression.PathExpression;
-import org.neo4j.cypherdsl.expression.PropertyContainerExpression;
-import org.neo4j.cypherdsl.expression.ReferenceExpression;
-import org.neo4j.cypherdsl.expression.RelationshipExpression;
-import org.neo4j.cypherdsl.expression.RemoveExpression;
-import org.neo4j.cypherdsl.expression.ScalarExpression;
-import org.neo4j.cypherdsl.expression.StartExpression;
-import org.neo4j.cypherdsl.expression.StringExpression;
-import org.neo4j.cypherdsl.expression.NodeExpression;
+import org.neo4j.cypherdsl.expression.*;
 import org.neo4j.cypherdsl.grammar.*;
 import org.neo4j.cypherdsl.query.AbstractExpression;
 import org.neo4j.cypherdsl.query.ExpressionCollection;
@@ -1908,17 +1895,17 @@ public class CypherQuery
 
         // Set ----------------------------------------------------------
         @Override
-        public UpdateNext set( SetProperty... setProperties )
+        public UpdateNext set( SetExpression... setExpressions )
         {
-            query.add( new SetClause( Arrays.asList( setProperties ) ) );
+            query.add( new SetClause( Arrays.asList( setExpressions ) ) );
 
             return this;
         }
 
         @Override
-        public UpdateNext set( Iterable<SetProperty> setProperties )
+        public UpdateNext set( Iterable<SetExpression> setExpressions )
         {
-            query.add( new SetClause( setProperties ) );
+            query.add( new SetClause( setExpressions ) );
 
             return this;
         }
@@ -1926,11 +1913,11 @@ public class CypherQuery
 
         // On Create ------------------------------------------------------
         @Override
-        public UpdateNext onCreate(SetProperty... setProperties) {
+        public UpdateNext onCreate(SetExpression... setExpressions) {
             Clause clause = query.lastClause(Clause.class);
             if (clause instanceof MergeClause || clause instanceof OnMatchClause)
             {
-                query.add(new OnCreateClause(Arrays.asList(setProperties)));
+                query.add(new OnCreateClause(Arrays.asList(setExpressions)));
             }
             else
             {
@@ -1942,11 +1929,11 @@ public class CypherQuery
         }
 
         @Override
-        public UpdateNext onCreate(Iterable<SetProperty> setProperties) {
+        public UpdateNext onCreate(Iterable<SetExpression> setExpressions) {
             Clause clause = query.lastClause(Clause.class);
             if (clause instanceof MergeClause || clause instanceof OnMatchClause)
             {
-                query.add( new OnCreateClause( setProperties ) );
+                query.add( new OnCreateClause( setExpressions ) );
             }
             else
             {
@@ -1959,11 +1946,11 @@ public class CypherQuery
 
         // On Match ------------------------------------------------------
         @Override
-        public UpdateNext onMatch(SetProperty... setProperties) {
+        public UpdateNext onMatch(SetExpression... setExpressions) {
             Clause clause = query.lastClause(Clause.class);
             if (clause instanceof MergeClause || clause instanceof OnCreateClause)
             {
-                query.add( new OnMatchClause( Arrays.asList( setProperties ) ) );
+                query.add( new OnMatchClause( Arrays.asList( setExpressions ) ) );
             }
             else
             {
@@ -1975,11 +1962,11 @@ public class CypherQuery
         }
 
         @Override
-        public UpdateNext onMatch(Iterable<SetProperty> setProperties) {
+        public UpdateNext onMatch(Iterable<SetExpression> setExpressions) {
             Clause clause = query.lastClause(Clause.class);
             if (clause instanceof MergeClause || clause instanceof OnCreateClause)
             {
-                query.add( new OnMatchClause( setProperties ) );
+                query.add( new OnMatchClause( setExpressions ) );
             }
             else
             {

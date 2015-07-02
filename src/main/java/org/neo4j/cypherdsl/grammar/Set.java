@@ -20,14 +20,14 @@
 
 package org.neo4j.cypherdsl.grammar;
 
-import org.neo4j.cypherdsl.SetProperty;
+import org.neo4j.cypherdsl.expression.SetExpression;
 
 /**
  * Represents the SET clause.
  */
 public interface Set
 {
-    UpdateNext set( SetProperty... propertyValues );
+    UpdateNext set( SetExpression... setExpressions );
 
-    UpdateNext set( Iterable<SetProperty> propertyValues );
+    UpdateNext set( Iterable<SetExpression> setExpressions );
 }

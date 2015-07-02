@@ -245,26 +245,20 @@ public class Identifier
             boolean first = true;
             for ( String name : names )
             {
+                if( !first )
+                {
+                    nameBuilder.append( prefix );
+                }
+
                 if ( simpleName.matcher( name ).matches() )
                 {
-                    if( !first )
-                    {
-                        nameBuilder.append( prefix );
-                    }
-
                     nameBuilder.append( name );
-                    first = false;
                 }
                 else
                 {
-                    if( !first )
-                    {
-                        nameBuilder.append( prefix );
-                    }
-
                     nameBuilder.append( '`' ).append( name ).append( '`' );
-                    first = false;
                 }
+                first = false;
             }
             this.prefix = prefix;
             this.name = nameBuilder.toString();
