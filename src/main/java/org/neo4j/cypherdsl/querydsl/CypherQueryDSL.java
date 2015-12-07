@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2013 "Neo Technology,"
+ * Copyright (c) 2002-2015 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -21,17 +21,17 @@ package org.neo4j.cypherdsl.querydsl;
 
 import javax.annotation.Nullable;
 
-import com.mysema.query.lucene.LuceneSerializer;
-import com.mysema.query.types.Constant;
-import com.mysema.query.types.FactoryExpression;
-import com.mysema.query.types.Operation;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.ParamExpression;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.Predicate;
-import com.mysema.query.types.SubQueryExpression;
-import com.mysema.query.types.TemplateExpression;
-import com.mysema.query.types.Visitor;
+import com.querydsl.lucene3.LuceneSerializer;
+import com.querydsl.core.types.Constant;
+import com.querydsl.core.types.FactoryExpression;
+import com.querydsl.core.types.Operation;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.ParamExpression;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.SubQueryExpression;
+import com.querydsl.core.types.TemplateExpression;
+import com.querydsl.core.types.Visitor;
 import org.neo4j.cypherdsl.CypherQuery;
 import org.neo4j.cypherdsl.Identifier;
 import org.neo4j.cypherdsl.Property;
@@ -104,58 +104,58 @@ public class CypherQueryDSL
                                             @Nullable BooleanExpression booleanExpression
             )
             {
-                String id = operation.getOperator().getId();
-                if ( id.equals( Ops.AND.getId() ) )
+                String id = operation.getOperator().name();
+                if ( id.equals( Ops.AND.name() ) )
                 {
                     return and( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
                             .accept( this, null ) );
                 }
-                else if ( id.equals( Ops.OR.getId() ) )
+                else if ( id.equals( Ops.OR.name() ) )
                 {
                     return or( operation.getArg( 0 ).accept( this, null ), operation.getArg( 1 )
                             .accept( this, null ) );
                 }
-                else if ( id.equals( Ops.NOT.getId() ) )
+                else if ( id.equals( Ops.NOT.name() ) )
                 {
                     return not( operation.getArg( 0 ).accept( this, null ) );
                 }
-                else if ( id.equals( Ops.EQ.getId() ) )
+                else if ( id.equals( Ops.EQ.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).eq( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
-                else if ( id.equals( Ops.NE.getId() ) )
+                else if ( id.equals( Ops.NE.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).ne( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
-                else if ( id.equals( Ops.GT.getId() ) )
+                else if ( id.equals( Ops.GT.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).gt( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
-                else if ( id.equals( Ops.LT.getId() ) )
+                else if ( id.equals( Ops.LT.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).lt( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
-                else if ( id.equals( Ops.GOE.getId() ) )
+                else if ( id.equals( Ops.GOE.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).gte( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
-                else if ( id.equals( Ops.LOE.getId() ) )
+                else if ( id.equals( Ops.LOE.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).lte( (StringExpression) arg( operation.getArg( 1 ) ) );
                 }
-                else if ( id.equals( Ops.EXISTS.getId() ) )
+                else if ( id.equals( Ops.EXISTS.name() ) )
                 {
                     return has( (Expression) arg( operation.getArg( 0 ) ) );
                 }
-                else if ( id.equals( Ops.IS_NULL.getId() ) )
+                else if ( id.equals( Ops.IS_NULL.name() ) )
                 {
                     return isNull( (Expression) arg( operation.getArg( 0 ) ) );
                 }
-                else if ( id.equals( Ops.IS_NOT_NULL.getId() ) )
+                else if ( id.equals( Ops.IS_NOT_NULL.name() ) )
                 {
                     return isNotNull( (Expression) arg( operation.getArg( 0 ) ) );
                 }
-                else if ( id.equals( Ops.LIKE.getId() ) )
+                else if ( id.equals( Ops.LIKE.name() ) )
                 {
                     return arg( operation.getArg( 0 ) ).regexp( arg( operation.getArg( 1 ) ) );
                 }
@@ -197,7 +197,7 @@ public class CypherQueryDSL
                 return null;
             }
 
-            public Value arg( com.mysema.query.types.Expression expression )
+            public Value arg( com.querydsl.core.types.Expression expression )
             {
                 if ( expression instanceof Constant )
                 {

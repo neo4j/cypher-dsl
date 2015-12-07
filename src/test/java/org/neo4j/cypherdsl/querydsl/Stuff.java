@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import com.mysema.query.annotations.QueryEntity;
+import com.querydsl.core.annotations.QueryEntity;
 
 /**
  * Stuff entity
