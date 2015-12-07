@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2002-2013 "Neo Technology,"
+ * Copyright (c) 2002-2015 "Neo Technology,"
  * Network Engine for Objects in Lund AB [http://neotechnology.com]
  *
  * This file is part of Neo4j.
@@ -24,11 +24,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.mysema.query.types.Expression;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.Projections;
-import com.mysema.query.types.QBean;
-import com.mysema.query.types.path.PathBuilder;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.QBean; 
+import com.querydsl.core.types.dsl.PathBuilder;
 
 /**
  * Projection is responsible for converting the results of a query into an iterable of instances

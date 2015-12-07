@@ -19,10 +19,10 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import static com.mysema.query.alias.Alias.$;
-import static com.mysema.query.alias.Alias.alias;
-import static com.mysema.query.support.Expressions.constant;
-import static com.mysema.query.support.Expressions.predicate;
+import static com.querydsl.core.alias.Alias.$;
+import static com.querydsl.core.alias.Alias.alias;
+import static com.querydsl.core.types.dsl.Expressions.constant;
+import static com.querydsl.core.types.dsl.Expressions.predicate;
 import static org.junit.Assert.assertEquals;
 import static org.neo4j.cypherdsl.CypherQuery.nodesById;
 import static org.neo4j.cypherdsl.CypherReferenceTest.CYPHER;
@@ -39,12 +39,14 @@ import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.string;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.toBooleanExpression;
 import static org.neo4j.cypherdsl.querydsl.CypherQueryDSL.toQuery;
 
-import com.mysema.query.BooleanBuilder;
-import com.mysema.query.support.Expressions;
-import com.mysema.query.types.Ops;
-import com.mysema.query.types.Path;
-import com.mysema.query.types.expr.BooleanOperation;
-import com.mysema.query.types.expr.Param;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.ExpressionUtils;
+import com.querydsl.core.types.Ops;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.PredicateOperation;
+import com.querydsl.core.types.dsl.BooleanOperation;
+import com.querydsl.core.types.dsl.Param;
 import org.junit.Assert;
 import org.junit.Test;
 import org.neo4j.cypherdsl.Order;
@@ -89,8 +91,8 @@ public class QueryDSLTest
                             .where( toBooleanExpression( person.firstName.eq( "P" ).and( person.age.gt( 25 ) ) ) )
                             .returns( identifier( person ) )
                             .toString() );
+            
         }
-
         {
             QPerson person = QPerson.person;
             Assert.assertEquals( CYPHER + "START person=node:node_auto_index(\"firstName:rickard\") RETURN person" +
@@ -150,7 +152,7 @@ public class QueryDSLTest
             QPerson n = new QPerson( "n" );
             Assert.assertEquals(CYPHER + "START n=node(1,2,3) WHERE has(n.firstName) RETURN n",
                     start(nodesById(identifier(n), 1, 2, 3))
-                            .where(toBooleanExpression(BooleanOperation.create(Ops.EXISTS, n.firstName)))
+                    		.where(toBooleanExpression((PredicateOperation)ExpressionUtils.operation(Boolean.class,Ops.EXISTS, n.firstName)))
                                     .returns(identifier(n))
                                     .toString());
         }
