@@ -29,6 +29,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.neo4j.cypher.EntityNotFoundException;
 import org.neo4j.cypher.MissingIndexException;
+import org.neo4j.cypher.ParameterNotFoundException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.Transaction;
@@ -39,7 +40,7 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "2.1" + " ";
+    public static final String CYPHER = "CYPHER " + "2.2" + " ";
     private static ImpermanentGraphDatabase graphdb;
     protected static ExecutionEngine engine;
     private Transaction tx;
@@ -84,19 +85,9 @@ public abstract class AbstractCypherTest
     {
         assertEquals( expected, query );
         // Make sure the generated query is actually executable
-        try
-        {
-            engine.execute( query );
-        }
-        catch ( MissingIndexException mie )
-        {
-        }
-        catch ( EntityNotFoundException enfe )
-        {
-        }
-        catch ( NotFoundException nfe )
-        {
-        }
+        try {
+            engine.execute( "EXPLAIN "+ query ).close();
+        } catch ( ParameterNotFoundException | MissingIndexException | EntityNotFoundException | NotFoundException ignored) { }
     }
 
 }
