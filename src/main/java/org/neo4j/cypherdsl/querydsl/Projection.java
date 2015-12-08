@@ -29,6 +29,7 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.QBean; 
 import com.querydsl.core.types.dsl.PathBuilder;
+import org.neo4j.graphdb.Result;
 
 /**
  * Projection is responsible for converting the results of a query into an iterable of instances
@@ -52,17 +53,18 @@ public class Projection<T>
     }
 
 
-    public Iterable<T> iterable( Iterable<Map<String, Object>> result )
+    public Iterable<T> iterable( Result result )
     {
         List<T> entities = new ArrayList<T>();
 
-        for ( Map<String, Object> stringObjectMap : result )
+        while ( result.hasNext() )
         {
-            Object[] args = new Object[stringObjectMap.size()];
+            Map<String,Object> row = result.next();
+            Object[] args = new Object[row.size()];
             int idx = 0;
             for ( Expression<?> expression : bean.getArgs() )
             {
-                args[idx++] = stringObjectMap.get( ((Path) expression).getMetadata().getElement().toString() );
+                args[idx++] = row.get( ((Path) expression).getMetadata().getElement().toString() );
             }
 
             entities.add( bean.newInstance( args ) );

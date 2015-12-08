@@ -880,7 +880,7 @@ public class CypherReferenceTest extends AbstractCypherTest
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> maps = Arrays.asList( n1, n2 );
         params.put( "props", maps );
-        engine.execute( query, params );
+        graphdb.execute( query, params );
     }
 
     @Test

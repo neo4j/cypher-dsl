@@ -31,7 +31,9 @@ import org.neo4j.cypher.EntityNotFoundException;
 import org.neo4j.cypher.MissingIndexException;
 import org.neo4j.cypher.ParameterNotFoundException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
+import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.QueryExecutionException;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -40,18 +42,15 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "2.2" + " ";
-    private static ImpermanentGraphDatabase graphdb;
-    protected static ExecutionEngine engine;
+    public static final String CYPHER = "CYPHER " + "2.3" + " ";
+    protected static GraphDatabaseService graphdb;
     private Transaction tx;
 
     @BeforeClass
     public static void classSetup() throws IOException
     {
-        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.cleanContent(  );
-
-        engine = new ExecutionEngine( graphdb );
+        graphdb =  new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graphdb.execute( "MATCH (n) DETACH DELETE n" );
     }
 
     @Before
@@ -64,10 +63,10 @@ public abstract class AbstractCypherTest
     {
         if (tx!=null) {
             tx.failure();
-            tx.finish();
+            tx.close();
             tx = null;
         }
-        graphdb.cleanContent(  );
+        graphdb.execute( "MATCH (n) DETACH DELETE n" );
     }
 
     @AfterClass
@@ -86,8 +85,10 @@ public abstract class AbstractCypherTest
         assertEquals( expected, query );
         // Make sure the generated query is actually executable
         try {
-            engine.execute( "EXPLAIN "+ query ).close();
-        } catch ( ParameterNotFoundException | MissingIndexException | EntityNotFoundException | NotFoundException ignored) { }
+            graphdb.execute( "EXPLAIN "+ query ).close();
+        } catch ( QueryExecutionException qee) {
+            if (!qee.getMessage().matches("Index `.*` does not exist") ) throw qee;
+        } /*| ParameterNotFoundException | MissingIndexException | EntityNotFoundException | NotFoundException ignored*/
     }
 
 }

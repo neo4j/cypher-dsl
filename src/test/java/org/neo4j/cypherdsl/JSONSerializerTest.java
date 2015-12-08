@@ -51,7 +51,7 @@ public class JSONSerializerTest
     @Rule
     TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor( this, true ) );
 
-    private ImpermanentGraphDatabase graphdb;
+    private GraphDatabaseService graphdb;
     private ExecutionEngine engine;
 
     @Test
@@ -103,8 +103,8 @@ public class JSONSerializerTest
     public void setup()
             throws IOException
     {
-        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.cleanContent(  );
+        graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graphdb.execute( "MATCH (n) DETACH DELETE n" );
 
         engine = new ExecutionEngine( graphdb );
     }

@@ -37,6 +37,7 @@ import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.grammar.Execute;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Result;
 import org.neo4j.test.*;
 
 /**
@@ -51,8 +52,7 @@ public class ProjectionTest
     TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor(
             this, true ) );
 
-    private ImpermanentGraphDatabase graphdb;
-    private ExecutionEngine engine;
+    private GraphDatabaseService graphdb;
 
     @Test
     @GraphDescription.Graph(value = {
@@ -71,13 +71,12 @@ public class ProjectionTest
                 .toString();
 
         System.out.println( query );
-        ExecutionResult result = engine.execute( query );
+        Result result = graphdb.execute( query );
         Node john = null;
-        for ( Map<String, Object> stringObjectMap : result )
-        {
-            john = ((Node) stringObjectMap.get( "john" ));
+        while (result.hasNext()) {
+            Map<String, Object> row = result.next();
+            john = ((Node) row.get( "john" ));
         }
-        System.out.println( result.toString() );
 
         {
             Execute q = start( nodeById( "john", john ) )
@@ -89,12 +88,12 @@ public class ProjectionTest
                             .property( "name" ) );
 
             System.out.println( q );
-            System.out.println( engine.execute( q.toString() ).toString() );
+            System.out.println( graphdb.execute( q.toString() ).toString() );
         }
 
         {
             Projection<Friend> projection = new Projection<Friend>( Friend.class );
-            Iterable<Friend> friends = projection.iterable( engine.execute( start( nodeById( "john", john ) )
+            Iterable<Friend> friends = projection.iterable( graphdb.execute( start( nodeById( "john", john ) )
                     .match( node( "john" ).out( "friend" )
                             .node()
                             .out( "friend" )
@@ -109,10 +108,8 @@ public class ProjectionTest
     public void setup()
             throws IOException
     {
-        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.cleanContent(  );
-
-        engine = new ExecutionEngine( graphdb );
+        graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
+        graphdb.execute( "MATCH (n) DETACH DELETE n"  );
     }
 
     @Override
