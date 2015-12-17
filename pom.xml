@@ -2,14 +2,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.neo4j</groupId>
   <artifactId>neo4j-cypher-dsl</artifactId>
-  <version>2.1.8</version>
+  <version>2.2.7-SNAPSHOT</version>
   <name>Neo4j Cypher DSL</name>
   <description>Neo4j Cypher DSL</description>
   <url>http://components.neo4j.org/${project.artifactId}/${project.version}</url>
 
   <properties>
-    <neo4j.version>2.1.8</neo4j.version>
-    <querydsl.version>3.4.2</querydsl.version>
+    <neo4j.version>2.2.7</neo4j.version>
+    <querydsl.version>3.6.8</querydsl.version>
     <bundle.namespace>org.neo4j.cypherdsl</bundle.namespace>
     <short-name>cypher-dsl</short-name>
     <license-text.header>GPL-3-header.txt</license-text.header>
@@ -116,6 +116,14 @@
     <dependency>
       <groupId>org.neo4j</groupId>
       <artifactId>neo4j-kernel</artifactId>
+      <version>${neo4j.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.neo4j</groupId>
+      <artifactId>neo4j-io</artifactId>
       <version>${neo4j.version}</version>
       <type>test-jar</type>
       <scope>test</scope>

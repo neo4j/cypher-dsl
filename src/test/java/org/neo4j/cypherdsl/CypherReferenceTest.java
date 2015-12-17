@@ -87,6 +87,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
+import org.neo4j.graphdb.Result;
 
 /**
  * Construct Cypher queries corresponding to the Cypher Reference manual
@@ -880,7 +881,9 @@ public class CypherReferenceTest extends AbstractCypherTest
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> maps = Arrays.asList( n1, n2 );
         params.put( "props", maps );
-        engine.execute( query, params );
+        try (Result result = graphdb.execute(query, params)) {
+            while (result.hasNext()) result.next();
+        }
     }
 
     @Test

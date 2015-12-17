@@ -29,8 +29,11 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.neo4j.cypher.EntityNotFoundException;
 import org.neo4j.cypher.MissingIndexException;
+import org.neo4j.cypher.ParameterNotFoundException;
 import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.NotFoundException;
+import org.neo4j.graphdb.QueryExecutionException;
+import org.neo4j.graphdb.Result;
 import org.neo4j.graphdb.Transaction;
 import org.neo4j.graphdb.factory.GraphDatabaseSettings;
 import org.neo4j.test.ImpermanentGraphDatabase;
@@ -39,9 +42,8 @@ import org.neo4j.test.TestGraphDatabaseFactory;
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "2.1" + " ";
-    private static ImpermanentGraphDatabase graphdb;
-    protected static ExecutionEngine engine;
+    public static final String CYPHER = "CYPHER " + "2.2" + " ";
+    protected static ImpermanentGraphDatabase graphdb;
     private Transaction tx;
 
     @BeforeClass
@@ -49,8 +51,6 @@ public abstract class AbstractCypherTest
     {
         graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
         graphdb.cleanContent(  );
-
-        engine = new ExecutionEngine( graphdb );
     }
 
     @Before
@@ -63,7 +63,7 @@ public abstract class AbstractCypherTest
     {
         if (tx!=null) {
             tx.failure();
-            tx.finish();
+            tx.close();
             tx = null;
         }
         graphdb.cleanContent(  );
@@ -86,15 +86,11 @@ public abstract class AbstractCypherTest
         // Make sure the generated query is actually executable
         try
         {
-            engine.execute( query );
+            Result result = graphdb.execute(query);
+            result.hasNext();
+            result.close();
         }
-        catch ( MissingIndexException mie )
-        {
-        }
-        catch ( EntityNotFoundException enfe )
-        {
-        }
-        catch ( NotFoundException nfe )
+        catch ( QueryExecutionException | ParameterNotFoundException | MissingIndexException | EntityNotFoundException | NotFoundException ignore )
         {
         }
     }
