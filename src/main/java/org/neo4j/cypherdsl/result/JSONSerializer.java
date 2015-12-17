@@ -26,6 +26,7 @@ import org.codehaus.jackson.node.ArrayNode;
 import org.codehaus.jackson.node.ObjectNode;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Path;
+import org.neo4j.graphdb.Result;
 
 /**
  * Serializer that converts Cypher execution results to JSON.
@@ -34,15 +35,16 @@ public class JSONSerializer
 {
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ArrayNode toJSON( Iterable<Map<String, Object>> result )
+    public ArrayNode toJSON( Result result )
     {
         ArrayNode root = mapper.createArrayNode();
 
-        for ( Map<String, Object> stringObjectMap : result )
+        while ( result.hasNext() )
         {
+            Map<String, Object> row = result.next();
             ObjectNode entry = root.objectNode();
 
-            for ( Map.Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet() )
+            for ( Map.Entry<String, Object> stringObjectEntry : row.entrySet() )
             {
                 if ( stringObjectEntry.getValue() instanceof Path )
                 {

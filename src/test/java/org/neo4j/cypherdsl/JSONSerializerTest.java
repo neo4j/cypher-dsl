@@ -34,7 +34,6 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.cypherdsl.result.JSONSerializer;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
@@ -51,8 +50,7 @@ public class JSONSerializerTest
     @Rule
     TestData<Map<String, Node>> data = TestData.producedThrough( GraphDescription.createGraphFor( this, true ) );
 
-    private ImpermanentGraphDatabase graphdb;
-    private ExecutionEngine engine;
+    private GraphDatabaseService graphdb;
 
     @Test
     @GraphDescription.Graph(value = {
@@ -70,7 +68,7 @@ public class JSONSerializerTest
                         "name" ), "friend" ), identifier( "john" ), as( count(), "count" ) )
                 .toString();
         try (Transaction tx = graphdb.beginTx()) {
-            String json = serializer.toJSON( engine.execute( query ) ).toString();
+            String json = serializer.toJSON( graphdb.execute( query ) ).toString();
             System.out.println( json );
             tx.success();
         }
@@ -93,7 +91,7 @@ public class JSONSerializerTest
                 .toString();
         System.out.println( query );
         try (Transaction tx = graphdb.beginTx()) {
-            String json = serializer.toJSON( engine.execute( query ) ).toString();
+            String json = serializer.toJSON( graphdb.execute( query ) ).toString();
             System.out.println( json );
             tx.success();
         }
@@ -103,10 +101,7 @@ public class JSONSerializerTest
     public void setup()
             throws IOException
     {
-        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.cleanContent(  );
-
-        engine = new ExecutionEngine( graphdb );
+        graphdb =  new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
 
     @Override

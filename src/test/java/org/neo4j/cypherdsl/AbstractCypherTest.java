@@ -30,31 +30,24 @@ import org.junit.BeforeClass;
 import org.neo4j.cypher.EntityNotFoundException;
 import org.neo4j.cypher.MissingIndexException;
 import org.neo4j.cypher.ParameterNotFoundException;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.graphdb.NotFoundException;
-import org.neo4j.graphdb.QueryExecutionException;
-import org.neo4j.graphdb.Result;
-import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.test.ImpermanentGraphDatabase;
+import org.neo4j.graphdb.*;
 import org.neo4j.test.TestGraphDatabaseFactory;
 
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "2.2" + " ";
-    protected static ImpermanentGraphDatabase graphdb;
+    public static final String CYPHER = "CYPHER " + "2.3" + " ";
+    protected GraphDatabaseService graphdb;
     private Transaction tx;
 
     @BeforeClass
     public static void classSetup() throws IOException
     {
-        graphdb = (ImpermanentGraphDatabase) new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.cleanContent(  );
     }
 
     @Before
     public void setUp() throws Exception {
+        graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
         tx = graphdb.beginTx();
     }
 
@@ -66,13 +59,12 @@ public abstract class AbstractCypherTest
             tx.close();
             tx = null;
         }
-        graphdb.cleanContent(  );
+        graphdb.shutdown();
     }
 
     @AfterClass
     public static void teardown()
     {
-        graphdb.shutdown();
     }
 
     public AbstractCypherTest()
@@ -84,14 +76,12 @@ public abstract class AbstractCypherTest
     {
         assertEquals( expected, query );
         // Make sure the generated query is actually executable
-        try
+        try (Result result = graphdb.execute("EXPLAIN "+ query))
         {
-            Result result = graphdb.execute(query);
             result.hasNext();
             result.close();
-        }
-        catch ( QueryExecutionException | ParameterNotFoundException | MissingIndexException | EntityNotFoundException | NotFoundException ignore )
-        {
+        } catch (QueryExecutionException qee) {
+            if (!qee.getMessage().matches("Index `.+` does not exist")) throw qee;
         }
     }
 
