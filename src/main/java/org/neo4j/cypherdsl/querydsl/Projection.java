@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.querydsl;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -53,13 +54,13 @@ public class Projection<T>
     }
 
 
-    public Iterable<T> iterable( Result result )
+    public Iterable<T> iterable( Iterator<Map<String, Object>> result )
     {
         List<T> entities = new ArrayList<T>();
 
-        while ( result.hasNext() )
+        while (result.hasNext())
         {
-            Map<String,Object> row = result.next();
+            Map<String, Object> row = result.next();
             Object[] args = new Object[row.size()];
             int idx = 0;
             for ( Expression<?> expression : bean.getArgs() )

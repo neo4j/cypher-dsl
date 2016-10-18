@@ -145,7 +145,7 @@ public class CypherQueryDSL
                 }
                 else if ( id.equals( Ops.EXISTS.name() ) )
                 {
-                    return has( (Expression) arg( operation.getArg( 0 ) ) );
+                    return exists( (Expression) arg( operation.getArg( 0 ) ) );
                 }
                 else if ( id.equals( Ops.IS_NULL.name() ) )
                 {

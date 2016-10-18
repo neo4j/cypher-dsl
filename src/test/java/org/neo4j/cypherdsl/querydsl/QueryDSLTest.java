@@ -150,7 +150,7 @@ public class QueryDSLTest
 
         {
             QPerson n = new QPerson( "n" );
-            Assert.assertEquals(CYPHER + "START n=node(1,2,3) WHERE has(n.firstName) RETURN n",
+            Assert.assertEquals(CYPHER + "START n=node(1,2,3) WHERE exists(n.firstName) RETURN n",
                     start(nodesById(identifier(n), 1, 2, 3))
                     		.where(toBooleanExpression((PredicateOperation)ExpressionUtils.operation(Boolean.class,Ops.EXISTS, n.firstName)))
                                     .returns(identifier(n))

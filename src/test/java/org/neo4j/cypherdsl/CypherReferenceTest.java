@@ -39,7 +39,7 @@ import static org.neo4j.cypherdsl.CypherQuery.match;
 import static org.neo4j.cypherdsl.CypherQuery.distinct;
 import static org.neo4j.cypherdsl.CypherQuery.extract;
 import static org.neo4j.cypherdsl.CypherQuery.filter;
-import static org.neo4j.cypherdsl.CypherQuery.has;
+import static org.neo4j.cypherdsl.CypherQuery.exists;
 import static org.neo4j.cypherdsl.CypherQuery.head;
 import static org.neo4j.cypherdsl.CypherQuery.id;
 import static org.neo4j.cypherdsl.CypherQuery.identifier;
@@ -85,8 +85,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Test;
 
 /**
  * Construct Cypher queries corresponding to the Cypher Reference manual
@@ -441,9 +439,9 @@ public class CypherReferenceTest extends AbstractCypherTest
     @Test
     public void test16_11_7()
     {
-        assertQueryEquals( CYPHER + "START n=node(3,1) WHERE has(n.belt) RETURN n",
+        assertQueryEquals( CYPHER + "START n=node(3,1) WHERE exists(n.belt) RETURN n",
                 start( nodesById( "n", 3, 1 ) ).
-                        where( has( identifier( "n" ).property( "belt" ) ) ).
+                        where( exists( identifier( "n" ).property( "belt" ) ) ).
                         returns( identifier( "n" ) ).
                         toString() );
     }
@@ -872,14 +870,8 @@ public class CypherReferenceTest extends AbstractCypherTest
         n1.put( "name", "Andres" );
         n1.put( "position", "Developer" );
 
-        Map<String, Object> n2 = new HashMap<String, Object>();
-        n2.put( "name", "Michael" );
-        n2.put( "position", "Developer" );
-
         Map<String, Object> params = new HashMap<String, Object>();
-        @SuppressWarnings("unchecked")
-        List<Map<String, Object>> maps = Arrays.asList( n1, n2 );
-        params.put( "props", maps );
+        params.put( "props", n1 );
         graphdb.execute( query, params );
     }
 

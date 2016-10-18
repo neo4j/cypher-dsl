@@ -19,6 +19,7 @@
  */
 package org.neo4j.cypherdsl.result;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.codehaus.jackson.map.ObjectMapper;
@@ -34,15 +35,16 @@ public class JSONSerializer
 {
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public ArrayNode toJSON( Iterable<Map<String, Object>> result )
+    public ArrayNode toJSON( Iterator<Map<String, Object>> result )
     {
         ArrayNode root = mapper.createArrayNode();
 
-        for ( Map<String, Object> stringObjectMap : result )
+        while (result.hasNext())
         {
+            Map<String, Object> row = result.next();
             ObjectNode entry = root.objectNode();
 
-            for ( Map.Entry<String, Object> stringObjectEntry : stringObjectMap.entrySet() )
+            for ( Map.Entry<String, Object> stringObjectEntry : row.entrySet() )
             {
                 if ( stringObjectEntry.getValue() instanceof Path )
                 {

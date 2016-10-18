@@ -28,7 +28,7 @@ import static org.neo4j.cypherdsl.CypherQuery.collect;
 import static org.neo4j.cypherdsl.CypherQuery.count;
 import static org.neo4j.cypherdsl.CypherQuery.create;
 import static org.neo4j.cypherdsl.CypherQuery.distinct;
-import static org.neo4j.cypherdsl.CypherQuery.has;
+import static org.neo4j.cypherdsl.CypherQuery.exists;
 import static org.neo4j.cypherdsl.CypherQuery.id;
 import static org.neo4j.cypherdsl.CypherQuery.identifier;
 import static org.neo4j.cypherdsl.CypherQuery.in;
@@ -69,19 +69,19 @@ public class CypherCookbookTest extends AbstractCypherTest
         // it is cloned, so any modifications do not affect the original query
 
         Query query = start( lookup( "n", "node_auto_index", "name", "User1" ) ).
-                match( node( "n" ).out( "hasRoleInGroup" ).node( "hyperEdge" ).out( "hasGroup" ).node( "group" ),
-                        node( "hyperEdge" ).out( "hasRole" ).node( "role" ) ).toQuery();
+                match( node( "n" ).out( "existsRoleInGroup" ).node( "hyperEdge" ).out( "existsGroup" ).node( "group" ),
+                        node( "hyperEdge" ).out( "existsRole" ).node( "role" ) ).toQuery();
 
-        assertQueryEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->" +
-                "(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) WHERE group.name=\"Group2\" RETURN " +
+        assertQueryEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:existsRoleInGroup]->" +
+                "(hyperEdge)-[:existsGroup]->(group),(hyperEdge)-[:existsRole]->(role) WHERE group.name=\"Group2\" RETURN " +
                 "role.name",
                 CypherQuery.continueQuery( query, Start.class ).starts().
                         where( identifier( "group" ).string( "name" ).eq( "Group2" ) ).
                         returns( identifier( "role" ).string( "name" ) ).
                         toString() );
 
-        assertQueryEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:hasRoleInGroup]->" +
-                "(hyperEdge)-[:hasGroup]->(group),(hyperEdge)-[:hasRole]->(role) RETURN role.name," +
+        assertQueryEquals( CYPHER + "START n=node:node_auto_index(name=\"User1\") MATCH (n)-[:existsRoleInGroup]->" +
+                "(hyperEdge)-[:existsGroup]->(group),(hyperEdge)-[:existsRole]->(role) RETURN role.name," +
                 "group.name ORDER BY role.name ASCENDING",
                 CypherQuery.continueQuery( query, Start.class ).starts().
                         returns( identifier( "role" ).property( "name" ), identifier( "group" ).property( "name" ) ).
@@ -100,26 +100,26 @@ public class CypherCookbookTest extends AbstractCypherTest
         Identifier hyperEdge2 = identifier( "hyperEdge2" );
         assertQueryEquals( CYPHER + "START u1=node:node_auto_index(name=\"User1\")," +
                 "u2=node:node_auto_index(name=\"User2\") " +
-                "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
-                "(hyperEdge1)-[:hasRole]->(role)," +
-                "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
-                "(hyperEdge2)-[:hasRole]->(role) " +
+                "MATCH (u1)-[:existsRoleInGroup]->(hyperEdge1)-[:existsGroup]->(group)," +
+                "(hyperEdge1)-[:existsRole]->(role)," +
+                "(u2)-[:existsRoleInGroup]->(hyperEdge2)-[:existsGroup]->(group)," +
+                "(hyperEdge2)-[:existsRole]->(role) " +
                 "RETURN group.name,count(role) " +
                 "ORDER BY group.name ASCENDING",
                 start( lookup( u1, identifier( "node_auto_index" ), identifier( "name" ), literal( "User1" ) ),
                         lookup( u2, identifier( "node_auto_index" ), identifier( "name" ), literal( "User2" ) ) ).
                         match( node( u1 )
-                                .out( "hasRoleInGroup" )
+                                .out( "existsRoleInGroup" )
                                 .node( hyperEdge1 )
-                                .out( "hasGroup" )
+                                .out( "existsGroup" )
                                 .node( group ),
-                                node( hyperEdge1 ).out( "hasRole" ).node( role ),
+                                node( hyperEdge1 ).out( "existsRole" ).node( role ),
                                 node( u2 )
-                                        .out( "hasRoleInGroup" )
+                                        .out( "existsRoleInGroup" )
                                         .node( hyperEdge2 )
-                                        .out( "hasGroup" )
+                                        .out( "existsGroup" )
                                         .node( group ),
-                                node( hyperEdge2 ).out( "hasRole" ).node( role ) ).
+                                node( hyperEdge2 ).out( "existsRole" ).node( role ) ).
                         returns( group.property( "name" ), count( role ) ).
                         orderBy( order( group.property( "name" ), ASCENDING ) )
                         .toString() );
@@ -130,24 +130,24 @@ public class CypherCookbookTest extends AbstractCypherTest
     {
         assertQueryEquals( CYPHER + "START u1=node:node_auto_index(name=\"User1\")," +
                 "u2=node:node_auto_index(name=\"User2\") " +
-                "MATCH (u1)-[:hasRoleInGroup]->(hyperEdge1)-[:hasGroup]->(group)," +
-                "(hyperEdge1)-[:hasRole]->(role)," +
-                "(u2)-[:hasRoleInGroup]->(hyperEdge2)-[:hasGroup]->(group)," +
-                "(hyperEdge2)-[:hasRole]->(role) " +
+                "MATCH (u1)-[:existsRoleInGroup]->(hyperEdge1)-[:existsGroup]->(group)," +
+                "(hyperEdge1)-[:existsRole]->(role)," +
+                "(u2)-[:existsRoleInGroup]->(hyperEdge2)-[:existsGroup]->(group)," +
+                "(hyperEdge2)-[:existsRole]->(role) " +
                 "RETURN group.name,count(role) " +
                 "ORDER BY group.name ASCENDING",
                 start( lookup( "u1", "node_auto_index", "name", "User1" ), lookup( "u2", "node_auto_index", "name",
                         "User2" ) ).
-                        match( node( "u1" ).out( "hasRoleInGroup" )
+                        match( node( "u1" ).out( "existsRoleInGroup" )
                                 .node( "hyperEdge1" )
-                                .out( "hasGroup" )
+                                .out( "existsGroup" )
                                 .node( "group" ),
-                                node( "hyperEdge1" ).out( "hasRole" ).node( "role" ),
-                                node( "u2" ).out( "hasRoleInGroup" )
+                                node( "hyperEdge1" ).out( "existsRole" ).node( "role" ),
+                                node( "u2" ).out( "existsRoleInGroup" )
                                         .node( "hyperEdge2" )
-                                        .out( "hasGroup" )
+                                        .out( "existsGroup" )
                                         .node( "group" ),
-                                node( "hyperEdge2" ).out( "hasRole" ).node( "role" ) ).
+                                node( "hyperEdge2" ).out( "existsRole" ).node( "role" ) ).
                         returns( identifier( "group" ).property( "name" ), count( identifier( "role" ) ) ).
                         orderBy( order( identifier( "group" ).property( "name" ), Order.ASCENDING ) ).toString()
         );
@@ -542,14 +542,14 @@ public class CypherCookbookTest extends AbstractCypherTest
     {
         assertQueryEquals( CYPHER + "START me=node(*) " +
                 "MATCH (me)-[r1:ATE]->(food)<-[r2:ATE]-(you) " +
-                "WHERE has(me.name) and me.name=\"me\" " +
+                "WHERE exists(me.name) and me.name=\"me\" " +
                 "WITH me,count(DISTINCT r1) AS H1,count(DISTINCT r2) AS H2,you " +
                 "MATCH (me)-[r1:ATE]->(food)<-[r2:ATE]-(you) " +
                 "RETURN sum((1-abs(r1.times/H1-r2.times/H2))*(r1.times+r2.times)/(H1+H2)) AS similarity",
                 start( allNodes( "me" ) ).
                         match( node( "me" ).out( "ATE" ).as( "r1" ).node( "food" ).in( "ATE" ).as( "r2" ).node( "you"
                         ) ).
-                        where( has( identifier( "me" ).property( "name" ) ).and( identifier( "me" ).property( "name" )
+                        where( exists( identifier( "me" ).property( "name" ) ).and( identifier( "me" ).property( "name" )
                                 .eq( "me" ) ) ).
                         with( identifier( "me" ), as( count( distinct( identifier( "r1" ) ) ), "H1" ),
                                 as( count( distinct( identifier( "r2" ) ) ), "H2" ), identifier( "you" ) ).

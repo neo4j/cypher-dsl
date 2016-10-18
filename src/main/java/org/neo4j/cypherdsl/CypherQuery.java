@@ -426,9 +426,9 @@ public class CypherQuery
      * @param property
      * @return
      */
-    public static BooleanExpression has( Property property )
+    public static BooleanExpression exists(Property property )
     {
-        return new Value( new FunctionExpression( "has", property ) );
+        return new Value( new FunctionExpression( "exists", property ) );
     }
 
     /**
@@ -440,9 +440,9 @@ public class CypherQuery
      * @param expression
      * @return
      */
-    public static BooleanExpression has( Expression expression )
+    public static BooleanExpression exists(Expression expression )
     {
-        return new Value( new FunctionExpression( "has", expression ) );
+        return new Value( new FunctionExpression( "exists", expression ) );
     }
 
     /**

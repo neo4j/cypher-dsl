@@ -38,7 +38,7 @@ public class Query
 {
     
     private static final String QUERY_PREFIX = "CYPHER ";
-    private static final String DEFAULT_CYPHER_VERSION = "2.3";
+    private static final String DEFAULT_CYPHER_VERSION = "3.0";
     
     public static boolean isEmpty( String string )
     {

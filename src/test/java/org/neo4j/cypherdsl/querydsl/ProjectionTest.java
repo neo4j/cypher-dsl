@@ -19,26 +19,24 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import static org.neo4j.cypherdsl.CypherQuery.as;
-import static org.neo4j.cypherdsl.CypherQuery.identifier;
-import static org.neo4j.cypherdsl.CypherQuery.lookup;
-import static org.neo4j.cypherdsl.CypherQuery.node;
-import static org.neo4j.cypherdsl.CypherQuery.start;
-import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.nodeById;
-
-import java.io.IOException;
-import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
-import org.neo4j.cypher.javacompat.ExecutionResult;
 import org.neo4j.cypherdsl.grammar.Execute;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Result;
 import org.neo4j.test.*;
+import org.neo4j.test.GraphDescription;
+import org.neo4j.test.GraphHolder;
+import org.neo4j.test.TestData;
+import org.neo4j.test.TestGraphDatabaseFactory;
+
+import java.io.IOException;
+import java.util.Map;
+
+import static org.neo4j.cypherdsl.CypherQuery.*;
+import static org.neo4j.cypherdsl.query.neo4j.StartExpressionNeo.nodeById;
 
 /**
  * Set up a query using the CypherQuery builder, and then use it to execute a query to a test database and project
@@ -109,7 +107,6 @@ public class ProjectionTest
             throws IOException
     {
         graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.execute( "MATCH (n) DETACH DELETE n"  );
     }
 
     @Override

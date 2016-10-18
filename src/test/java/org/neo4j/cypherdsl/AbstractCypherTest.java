@@ -19,38 +19,33 @@
  */
 package org.neo4j.cypherdsl;
 
-import static org.junit.Assert.assertEquals;
-
-import java.io.IOException;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.neo4j.cypher.EntityNotFoundException;
 import org.neo4j.cypher.MissingIndexException;
-import org.neo4j.cypher.ParameterNotFoundException;
-import org.neo4j.cypher.javacompat.ExecutionEngine;
 import org.neo4j.graphdb.GraphDatabaseService;
 import org.neo4j.graphdb.NotFoundException;
 import org.neo4j.graphdb.QueryExecutionException;
 import org.neo4j.graphdb.Transaction;
-import org.neo4j.graphdb.factory.GraphDatabaseSettings;
-import org.neo4j.test.ImpermanentGraphDatabase;
 import org.neo4j.test.TestGraphDatabaseFactory;
+
+import java.io.IOException;
+
+import static org.junit.Assert.assertEquals;
 
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "2.3" + " ";
-    protected static GraphDatabaseService graphdb;
+    public static final String CYPHER = "CYPHER " + "3.0" + " ";
+    static GraphDatabaseService graphdb;
     private Transaction tx;
 
     @BeforeClass
     public static void classSetup() throws IOException
     {
-        graphdb =  new TestGraphDatabaseFactory().newImpermanentDatabase();
-        graphdb.execute( "MATCH (n) DETACH DELETE n" );
+        graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
     }
 
     @Before
@@ -75,12 +70,7 @@ public abstract class AbstractCypherTest
         graphdb.shutdown();
     }
 
-    public AbstractCypherTest()
-    {
-        super();
-    }
-
-    protected void assertQueryEquals( String expected, String query )
+    void assertQueryEquals( String expected, String query )
     {
         assertEquals( expected, query );
         // Make sure the generated query is actually executable
