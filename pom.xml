@@ -170,7 +170,7 @@
                 <artifactId>maven-license-plugin</artifactId>
                 <version>1.10.b1</version>
                 <configuration>
-                    <header>gplv3-header.txt</header>
+                    <header>${license-text.header}</header>
                     <strictCheck>true</strictCheck>
                     <failIfMissing>true</failIfMissing>
                     <includes>
