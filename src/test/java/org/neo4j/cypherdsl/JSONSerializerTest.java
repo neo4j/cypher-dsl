@@ -30,7 +30,7 @@ import static org.neo4j.cypherdsl.CypherQuery.start;
 import java.io.IOException;
 import java.util.Map;
 
-import org.junit.Before;
+import org.junit.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypherdsl.result.JSONSerializer;
@@ -101,6 +101,13 @@ public class JSONSerializerTest
             throws IOException
     {
         graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
+    }
+
+    @After
+    public void tearDown() 
+    {
+	    data.get().clear();
+	    graphdb.shutdown();
     }
 
     @Override

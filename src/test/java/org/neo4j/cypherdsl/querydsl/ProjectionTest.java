@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.querydsl;
 
-import org.junit.Before;
+import org.junit.*;
 import org.junit.Rule;
 import org.junit.Test;
 import org.neo4j.cypherdsl.grammar.Execute;
@@ -106,6 +106,13 @@ public class ProjectionTest
             throws IOException
     {
         graphdb = new TestGraphDatabaseFactory().newImpermanentDatabase();
+    }
+
+    @After
+    public void tearDown() 
+    {
+        data.get().clear();
+	    graphdb.shutdown();
     }
 
     @Override

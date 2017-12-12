@@ -37,7 +37,7 @@ import static org.junit.Assert.assertEquals;
 public abstract class AbstractCypherTest
 {
 
-    public static final String CYPHER = "CYPHER " + "3.1" + " ";
+    public static final String CYPHER = "CYPHER " + "3.3" + " ";
     static GraphDatabaseService graphdb;
     private Transaction tx;
 
