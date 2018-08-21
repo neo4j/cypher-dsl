@@ -898,6 +898,14 @@ public class CypherReferenceTest extends AbstractCypherTest
     }
 
     @Test
+    public void test16_19_4()
+    {
+        assertQueryEquals( CYPHER + "START n=node(3) MATCH (n)-[r]-() DETACH DELETE n,r",
+                start( nodesById( "n", 3 ) ).match( node( "n" ).both().as( "r" ).node() ).detachDelete( identifier( "n" ),
+                        identifier( "r" ) ).toString() );
+    }
+
+    @Test
     public void test16_20_1()
     {
         assertQueryEquals( CYPHER + "START n=node(2) SET n.surname=\"Taylor\" RETURN n",

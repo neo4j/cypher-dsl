@@ -28,4 +28,8 @@ public interface Delete
     UpdateNext delete( ReferenceExpression... expressions );
 
     UpdateNext delete( Iterable<ReferenceExpression> expressions );
+
+    UpdateNext detachDelete( ReferenceExpression... expressions );
+
+    UpdateNext detachDelete( Iterable<ReferenceExpression> expressions );
 }
