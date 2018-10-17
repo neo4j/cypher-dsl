@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to Neo Technology under one or more contributor
  * license agreements. See the NOTICE file distributed with
  * this work for additional information regarding copyright
@@ -63,6 +63,11 @@ public class CypherQuery {
     public static StartNext match(PathExpression... paths) {
         CypherQuery query = new CypherQuery();
         return query.matches(paths);
+    }
+
+    public static StartNext unwind(Expression values, Identifier id) {
+        CypherQuery query = new CypherQuery();
+        return query.unwinds(values, id);
     }
 
     /**
@@ -476,6 +481,12 @@ public class CypherQuery {
      */
     protected StartNext matches(PathExpression... paths) {
         query.add(new MatchClause(Arrays.asList(paths)));
+
+        return new Grammar();
+    }
+
+    protected StartNext unwinds(Expression values, Identifier id) {
+        query.add(new UnwindClause(values, id));
 
         return new Grammar();
     }
@@ -1685,7 +1696,7 @@ public class CypherQuery {
     // Grammar
     protected class Grammar
             implements StartNext, With, WithNext, Create, Set, Delete, Remove, CreateUnique, Merge, UpdateNext, Match, ReturnNext,
-            OrderBy,
+            OrderBy, Unwind,
             Skip, Limit, Execute, Union, UnionNext {
         // With ---------------------------------------------------------
         public WithNext with(Expression... withExpressions) {
@@ -2018,12 +2029,18 @@ public class CypherQuery {
         public String toString() {
             return CypherQuery.this.toString();
         }
+
+        @Override
+        public UpdateNext unwind(Expression values, Identifier identifier) {
+            query.add(new UnwindClause(values, identifier));
+            return this;
+        }
     }
 
     protected class ExecuteWithParams
             implements ExecuteWithParameters {
         private final Query query;
-        private final Map<String, Object> parameters = new HashMap<String, Object>();
+        private final Map<String, Object> parameters = new HashMap<>();
 
         public ExecuteWithParams(Query query) {
             this.query = query;
