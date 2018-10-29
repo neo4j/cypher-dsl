@@ -62,4 +62,20 @@ public class CypherQueryTest3 extends AbstractCypherTest {
                     .returns(identifier("n"));
         }}.toString());
     }
+
+    @Test
+    public void enumValueString() {
+        assertQueryEquals(CYPHER + "MATCH (n {Type:\"Object\"}) RETURN n", new CypherQuery() {{
+            matches(node(identifier("n")).values(value(Attribute.Type, "Object")))
+                    .returns(identifier("n"));
+        }}.toString());
+    }
+
+    @Test
+    public void enumValueExpression() {
+        assertQueryEquals(CYPHER + "MATCH (n {Type:n.Id}) RETURN n", new CypherQuery() {{
+            matches(node(identifier("n")).values(value(Attribute.Type, identifier("n").property(Attribute.Id))))
+                    .returns(identifier("n"));
+        }}.toString());
+    }
 }

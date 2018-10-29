@@ -308,6 +308,10 @@ public class CypherQuery {
         return new PropertyValue(identifier(id), literal(value));
     }
 
+    public static PropertyValue value(Enum id, Object value) {
+        return value(id.name(), value);
+    }
+
     /**
      * Declare a value, which can be used for setting or matching
      * properties in the CREATE or CREATE UNIQUE clauses.
@@ -318,6 +322,10 @@ public class CypherQuery {
      */
     public static PropertyValue value(String id, Expression value) {
         return new PropertyValue(identifier(id), value);
+    }
+
+    public static PropertyValue value(Enum id, Expression value) {
+        return value(id.name(), value);
     }
 
     /**
