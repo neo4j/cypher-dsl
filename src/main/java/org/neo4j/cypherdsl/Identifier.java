@@ -6,9 +6,9 @@
  * the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -23,6 +23,7 @@ import static org.neo4j.cypherdsl.query.Query.checkNull;
 
 import java.util.Arrays;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.expression.NumericExpression;
 import org.neo4j.cypherdsl.expression.ReferenceExpression;
@@ -36,18 +37,15 @@ import org.neo4j.cypherdsl.query.Value;
  */
 public class Identifier
         extends Value
-        implements ReferenceExpression
-{
-    private static final Pattern simpleName = Pattern.compile( "\\p{Alpha}\\w*" );
+        implements ReferenceExpression {
+    private static final Pattern simpleName = Pattern.compile("\\p{Alpha}\\w*");
 
-    Identifier( String name )
-    {
-        super( new IdentifierExpression( name ) );
+    Identifier(String name) {
+        super(new IdentifierExpression(name));
     }
 
-    Identifier ( Iterable<String> names, String prefix )
-    {
-        super( new IdentifierExpression(names, prefix) );
+    Identifier(Iterable<String> names, String prefix) {
+        super(new IdentifierExpression(names, prefix));
     }
 
     /**
@@ -62,9 +60,12 @@ public class Identifier
      * @param name
      * @return
      */
-    public Property property( String name )
-    {
-        return property( identifier( name ) );
+    public Property property(String name) {
+        return property(identifier(name));
+    }
+
+    public Property property(Enum name) {
+        return property(name.name());
     }
 
     /**
@@ -79,10 +80,9 @@ public class Identifier
      * @param name
      * @return
      */
-    public Property property( Identifier name )
-    {
-        checkNull( name, "Name" );
-        return new Property( this, name);
+    public Property property(Identifier name) {
+        checkNull(name, "Name");
+        return new Property(this, name);
     }
 
     /**
@@ -97,27 +97,12 @@ public class Identifier
      * @param label
      * @return
      */
-    public LabelReference label( String label )
-    {
+    public LabelReference label(String label) {
         return label(identifier(label));
     }
 
-    /**
-     * If this identifier represents a node,
-     * then you can use this method to denote labels.
-     * <p/>
-     * Corresponds to:
-     * <pre>
-     * id:label1:label2
-     * </pre>
-     *
-     * @param labels
-     * @return
-     */
-    public LabelReference labels( String... labels )
-    {
-        checkNull( labels, "Labels" );
-        return label(new Identifier( Arrays.asList(labels), ":"));
+    public LabelReference label(Enum label) {
+        return label(label.name());
     }
 
     /**
@@ -132,10 +117,31 @@ public class Identifier
      * @param labels
      * @return
      */
-    public LabelReference labels( Iterable<String> labels )
-    {
-        checkNull( labels, "Labels" );
-        return label(new Identifier( labels, ":"));
+    public LabelReference labels(String... labels) {
+        checkNull(labels, "Labels");
+        return label(new Identifier(Arrays.asList(labels), ":"));
+    }
+
+    public LabelReference labels(Enum... labels) {
+        checkNull(labels, "Labels");
+        return label(new Identifier(Arrays.asList(labels).stream().map(Enum::name).collect(Collectors.toList()), ":"));
+    }
+
+    /**
+     * If this identifier represents a node,
+     * then you can use this method to denote labels.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     * id:label1:label2
+     * </pre>
+     *
+     * @param labels
+     * @return
+     */
+    public LabelReference labels(Iterable<String> labels) {
+        checkNull(labels, "Labels");
+        return label(new Identifier(labels, ":"));
     }
 
     /**
@@ -150,10 +156,9 @@ public class Identifier
      * @param label
      * @return
      */
-    public LabelReference label( Identifier label )
-    {
-        checkNull( label, "Label" );
-        return new LabelReference( this, label );
+    public LabelReference label(Identifier label) {
+        checkNull(label, "Label");
+        return new LabelReference(this, label);
     }
 
     /**
@@ -168,9 +173,8 @@ public class Identifier
      * @param name
      * @return
      */
-    public StringExpression string( String name )
-    {
-        return string( identifier( name ) );
+    public StringExpression string(String name) {
+        return string(identifier(name));
     }
 
     /**
@@ -185,10 +189,9 @@ public class Identifier
      * @param name
      * @return
      */
-    public StringExpression string( Identifier name )
-    {
-        checkNull( name, "Name" );
-        return new Property( this, name);
+    public StringExpression string(Identifier name) {
+        checkNull(name, "Name");
+        return new Property(this, name);
     }
 
     /**
@@ -203,9 +206,8 @@ public class Identifier
      * @param name
      * @return
      */
-    public NumericExpression number( String name )
-    {
-        return number( identifier( name ) );
+    public NumericExpression number(String name) {
+        return number(identifier(name));
     }
 
     /**
@@ -220,41 +222,32 @@ public class Identifier
      * @param name
      * @return
      */
-    public NumericExpression number( Identifier name )
-    {
-        checkNull( name, "Name" );
-        return new Property( this, name);
+    public NumericExpression number(Identifier name) {
+        checkNull(name, "Name");
+        return new Property(this, name);
     }
 
     private static class IdentifierExpression
-            extends AbstractExpression
-    {
+            extends AbstractExpression {
         private final String name;
         private String prefix;
 
-        private IdentifierExpression( String name )
-        {
+        private IdentifierExpression(String name) {
             this.name = name;
         }
 
-        private IdentifierExpression( Iterable<String> names, String prefix )
-        {
+        private IdentifierExpression(Iterable<String> names, String prefix) {
             StringBuilder nameBuilder = new StringBuilder();
             boolean first = true;
-            for ( String name : names )
-            {
-                if( !first )
-                {
-                    nameBuilder.append( prefix );
+            for (String name : names) {
+                if (!first) {
+                    nameBuilder.append(prefix);
                 }
 
-                if ( simpleName.matcher( name ).matches() )
-                {
-                    nameBuilder.append( name );
-                }
-                else
-                {
-                    nameBuilder.append( '`' ).append( name ).append( '`' );
+                if (simpleName.matcher(name).matches()) {
+                    nameBuilder.append(name);
+                } else {
+                    nameBuilder.append('`').append(name).append('`');
                 }
                 first = false;
             }
@@ -262,15 +255,11 @@ public class Identifier
             this.name = nameBuilder.toString();
         }
 
-        public void asString( StringBuilder builder )
-        {
-            if ( prefix != null || simpleName.matcher( name ).matches() )
-            {
-                builder.append( name );
-            }
-            else
-            {
-                builder.append( '`' ).append( name ).append( '`' );
+        public void asString(StringBuilder builder) {
+            if (prefix != null || simpleName.matcher(name).matches()) {
+                builder.append(name);
+            } else {
+                builder.append('`').append(name).append('`');
             }
         }
     }

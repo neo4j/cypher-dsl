@@ -30,6 +30,8 @@ public interface Expression
 {
     BooleanExpression eq( Object literal );
 
+    BooleanExpression eq( Enum literal );
+
     BooleanExpression eq( Expression expression );
 
     BooleanExpression ne( Object literal );

@@ -38,6 +38,11 @@ public abstract class AbstractExpression
     }
 
     @Override
+    public BooleanExpression eq(Enum literal) {
+        return eq(literal.name());
+    }
+
+    @Override
     public BooleanExpression eq( Expression expression )
     {
         return new Value( new Operator( this, "=" ), expression );

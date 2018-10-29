@@ -1,6 +1,7 @@
 package org.neo4j.cypherdsl;
 
 import org.junit.Test;
+import org.neo4j.cypherdsl.querydsl.Attribute;
 
 public class CypherQueryTest3 extends AbstractCypherTest {
 
@@ -30,19 +31,35 @@ public class CypherQueryTest3 extends AbstractCypherTest {
     @Test
     public void unwindMatch() {
         assertQueryEquals(CYPHER + "MATCH (n)-[r*1..2]-(m) UNWIND r as item RETURN DISTINCT item", new CypherQuery() {{
-            matches(node(identifier("n")).both().hops(1,2).as(identifier("r")).node(identifier("m")))
+            matches(node(identifier("n")).both().hops(1, 2).as(identifier("r")).node(identifier("m")))
                     .unwind(identifier("r"), identifier("item"))
-            .returns(distinct(identifier("item")));
+                    .returns(distinct(identifier("item")));
         }}.toString());
     }
 
     @Test
     public void unwindWhere() {
         assertQueryEquals(CYPHER + "MATCH (n)-[r*1..2]-(m) WHERE n.id=\"1\" UNWIND r as item RETURN DISTINCT item", new CypherQuery() {{
-            matches(node(identifier("n")).both().hops(1,2).as(identifier("r")).node(identifier("m")))
+            matches(node(identifier("n")).both().hops(1, 2).as(identifier("r")).node(identifier("m")))
                     .where(identifier("n").property("id").eq(literal("1")))
                     .unwind(identifier("r"), identifier("item"))
                     .returns(distinct(identifier("item")));
+        }}.toString());
+    }
+
+    @Test
+    public void enumProperty() {
+        assertQueryEquals(CYPHER + "MATCH (n) WHERE n.Id=\"1\" RETURN n", new CypherQuery() {{
+            matches(node(identifier("n"))).where(identifier("n").property(Attribute.Id).eq("1"))
+                    .returns(identifier("n"));
+        }}.toString());
+    }
+
+    @Test
+    public void enumLabel() {
+        assertQueryEquals(CYPHER + "MATCH (n:Type) RETURN n", new CypherQuery() {{
+            matches(node(identifier("n").label(Attribute.Type)))
+                    .returns(identifier("n"));
         }}.toString());
     }
 }
