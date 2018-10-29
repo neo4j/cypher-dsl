@@ -18,7 +18,7 @@ public class UnwindClause extends Clause
 
     @Override
     public void asString(StringBuilder builder) {
-        builder.append(" UNWIND");
+        builder.append(" UNWIND ");
         list.asString(builder);
         builder.append(" as ");
         id.asString(builder);

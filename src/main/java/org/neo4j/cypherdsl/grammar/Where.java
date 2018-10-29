@@ -6,9 +6,9 @@
  * the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -24,7 +24,7 @@ import org.neo4j.cypherdsl.expression.BooleanExpression;
  * Represents the WHERE clause. Several invocations of where() will cause the expressions to be AND'ed together
  */
 public interface Where
-        extends With, Update, Return
-{
-    Where where( BooleanExpression expression );
+        extends With, Update, Return, Unwind {
+
+    Where where(BooleanExpression expression);
 }
