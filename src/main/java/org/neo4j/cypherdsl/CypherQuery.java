@@ -158,6 +158,10 @@ public class CypherQuery {
         return new LabelValue(identifier(label));
     }
 
+    public static LabelValue label(Enum label) {
+        return label(label.name());
+    }
+
     /**
      * Declare a label.
      *
@@ -310,6 +314,10 @@ public class CypherQuery {
 
     public static PropertyValue value(Enum id, Object value) {
         return value(id.name(), value);
+    }
+
+    public static PropertyValue value(Enum id, Enum value) {
+        return value(id.name(), value.name());
     }
 
     /**

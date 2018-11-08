@@ -39,9 +39,6 @@ import static org.neo4j.cypherdsl.CypherQuery.start;
 import org.junit.Assert;
 import org.junit.Test;
 
-/**
- * Tests for all parts of the Cypher DSL.
- */
 public class CypherQueryTest extends AbstractCypherTest
 {
     @Test

@@ -22,9 +22,6 @@ import org.junit.Test;
 
 import static org.neo4j.cypherdsl.CypherQuery.*;
 
-/**
- * Tests for all parts of the Cypher DSL.
- */
 public class CypherQueryTest2 extends AbstractCypherTest
 {
     @Test

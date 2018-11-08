@@ -6,9 +6,9 @@
  * the Apache License, Version 2.0 (the "License"); you may
  * not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -42,58 +42,37 @@ import org.neo4j.cypherdsl.query.PropertyValues;
  */
 public class Path
         extends AbstractExpression
-        implements PathExpression
-{
+        implements PathExpression {
     private final Expression node;
     private final Expression nodePropertyValues;
     private final Expression nodeLabels;
     private final PathRelationship relationship;
 
-    Path( Expression node, PathRelationship relationship, Expression nodePropertyValues, Expression labels )
-    {
+    Path(Expression node, PathRelationship relationship, Expression nodePropertyValues, Expression labels) {
         this.node = node;
         this.relationship = relationship;
         this.nodePropertyValues = nodePropertyValues;
         this.nodeLabels = labels;
     }
 
-    public Path labels( LabelValue... labels )
-    {
-        return new Path( node, relationship, nodePropertyValues, new LabelValues( asList( labels ) ) );
+    public Path labels(LabelValue... labels) {
+        return new Path(node, relationship, nodePropertyValues, new LabelValues(asList(labels)));
     }
 
-    public Path labels( Iterable<LabelValue> labels )
-    {
-        return new Path( node, relationship, nodePropertyValues, new LabelValues( labels ) );
+    public Path labels(Iterable<LabelValue> labels) {
+        return new Path(node, relationship, nodePropertyValues, new LabelValues(labels));
     }
 
-    public Path label( String label )
-    {
-        return new Path( node, relationship, nodePropertyValues, new LabelValue( identifier(label) ) );
+    public Path label(String label) {
+        return new Path(node, relationship, nodePropertyValues, new LabelValue(identifier(label)));
     }
 
-    public Path label( Identifier label )
-    {
-        return new Path( node, relationship, nodePropertyValues, new LabelValue( label ) );
+    public Path label(Enum label) {
+        return label(label.name());
     }
 
-    /**
-     * If this node is used in a CREATE or CREATE UNIQUE clause,
-     * then you can use this method to specify property values.
-     * Use e.g. {@link CypherQuery.value( String,Object )} to create
-     * the individual values to be passed in here.
-     * <p/>
-     * Corresponds to:
-     * <pre>
-     *     (n {prop1:value1,prop2:value2})
-     * </pre>
-     *
-     * @param propertyValues
-     * @return
-     */
-    public Path values( PropertyValue... propertyValues )
-    {
-        return new Path( node, relationship, new PropertyValues( asList( propertyValues ) ), nodeLabels );
+    public Path label(Identifier label) {
+        return new Path(node, relationship, nodePropertyValues, new LabelValue(label));
     }
 
     /**
@@ -110,9 +89,26 @@ public class Path
      * @param propertyValues
      * @return
      */
-    public Path values( Iterable<PropertyValue> propertyValues )
-    {
-        return new Path( node, relationship, new PropertyValues( propertyValues ), nodeLabels );
+    public Path values(PropertyValue... propertyValues) {
+        return new Path(node, relationship, new PropertyValues(asList(propertyValues)), nodeLabels);
+    }
+
+    /**
+     * If this node is used in a CREATE or CREATE UNIQUE clause,
+     * then you can use this method to specify property values.
+     * Use e.g. {@link CypherQuery.value( String,Object )} to create
+     * the individual values to be passed in here.
+     * <p/>
+     * Corresponds to:
+     * <pre>
+     *     (n {prop1:value1,prop2:value2})
+     * </pre>
+     *
+     * @param propertyValues
+     * @return
+     */
+    public Path values(Iterable<PropertyValue> propertyValues) {
+        return new Path(node, relationship, new PropertyValues(propertyValues), nodeLabels);
     }
 
     /**
@@ -128,9 +124,8 @@ public class Path
      * @param propertyValues
      * @return
      */
-    public Path values( Parameter propertyValues )
-    {
-        return new Path( node, relationship, propertyValues, nodeLabels );
+    public Path values(Parameter propertyValues) {
+        return new Path(node, relationship, propertyValues, nodeLabels);
     }
 
     /**
@@ -143,9 +138,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship out()
-    {
-        return new PathRelationship( this, OUT, null, Collections.<Identifier>emptyList(), null, null, null );
+    public PathRelationship out() {
+        return new PathRelationship(this, OUT, null, Collections.<Identifier>emptyList(), null, null, null);
     }
 
     /**
@@ -158,9 +152,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship out( String... relationships )
-    {
-        return new PathRelationship( this, OUT, null, asList( identifiers( relationships ) ), null, null, null );
+    public PathRelationship out(String... relationships) {
+        return new PathRelationship(this, OUT, null, asList(identifiers(relationships)), null, null, null);
     }
 
     /**
@@ -173,9 +166,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship out( Identifier... relationships )
-    {
-        return new PathRelationship( this, OUT, null, asList( relationships ), null, null, null );
+    public PathRelationship out(Identifier... relationships) {
+        return new PathRelationship(this, OUT, null, asList(relationships), null, null, null);
     }
 
     /**
@@ -188,15 +180,13 @@ public class Path
      *
      * @return
      */
-    public PathRelationship out( Enum<?>... relationships )
-    {
+    public PathRelationship out(Enum<?>... relationships) {
         List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for ( Enum<?> relationship : relationships )
-        {
-            relationshipNames.add( identifier( relationship.name() ) );
+        for (Enum<?> relationship : relationships) {
+            relationshipNames.add(identifier(relationship.name()));
         }
 
-        return new PathRelationship( this, OUT, null, relationshipNames, null, null, null );
+        return new PathRelationship(this, OUT, null, relationshipNames, null, null, null);
     }
 
     /**
@@ -209,9 +199,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship in()
-    {
-        return new PathRelationship( this, IN, null, Collections.<Identifier>emptyList(), null, null, null );
+    public PathRelationship in() {
+        return new PathRelationship(this, IN, null, Collections.<Identifier>emptyList(), null, null, null);
     }
 
     /**
@@ -224,9 +213,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship in( String... relationships )
-    {
-        return new PathRelationship( this, IN, null, asList( identifiers( relationships ) ), null, null, null );
+    public PathRelationship in(String... relationships) {
+        return new PathRelationship(this, IN, null, asList(identifiers(relationships)), null, null, null);
     }
 
     /**
@@ -239,9 +227,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship in( Identifier... relationships )
-    {
-        return new PathRelationship( this, IN, null, asList( relationships ), null, null, null );
+    public PathRelationship in(Identifier... relationships) {
+        return new PathRelationship(this, IN, null, asList(relationships), null, null, null);
     }
 
     /**
@@ -254,15 +241,13 @@ public class Path
      *
      * @return
      */
-    public PathRelationship in( Enum<?>... relationships )
-    {
+    public PathRelationship in(Enum<?>... relationships) {
         List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for ( Enum<?> relationship : relationships )
-        {
-            relationshipNames.add( identifier( relationship.name() ) );
+        for (Enum<?> relationship : relationships) {
+            relationshipNames.add(identifier(relationship.name()));
         }
 
-        return new PathRelationship( this, IN, null, relationshipNames, null, null, null );
+        return new PathRelationship(this, IN, null, relationshipNames, null, null, null);
     }
 
     /**
@@ -275,9 +260,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship both()
-    {
-        return new PathRelationship( this, BOTH, null, Collections.<Identifier>emptyList(), null, null, null );
+    public PathRelationship both() {
+        return new PathRelationship(this, BOTH, null, Collections.<Identifier>emptyList(), null, null, null);
     }
 
     /**
@@ -290,10 +274,9 @@ public class Path
      *
      * @return
      */
-    public PathRelationship both( String... relationships )
-    {
-        return new PathRelationship( this, BOTH, null, asList( identifiers( relationships ) ), null, null,
-                null );
+    public PathRelationship both(String... relationships) {
+        return new PathRelationship(this, BOTH, null, asList(identifiers(relationships)), null, null,
+                null);
     }
 
     /**
@@ -306,9 +289,8 @@ public class Path
      *
      * @return
      */
-    public PathRelationship both( Identifier... relationships )
-    {
-        return new PathRelationship( this, BOTH, null, asList( relationships ), null, null, null );
+    public PathRelationship both(Identifier... relationships) {
+        return new PathRelationship(this, BOTH, null, asList(relationships), null, null, null);
     }
 
     /**
@@ -321,50 +303,39 @@ public class Path
      *
      * @return
      */
-    public PathRelationship both( Enum<?>... relationships )
-    {
+    public PathRelationship both(Enum<?>... relationships) {
         List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for ( Enum<?> relationship : relationships )
-        {
-            relationshipNames.add( identifier( relationship.name() ) );
+        for (Enum<?> relationship : relationships) {
+            relationshipNames.add(identifier(relationship.name()));
         }
 
-        return new PathRelationship( this, BOTH, null, relationshipNames, null, null, null );
+        return new PathRelationship(this, BOTH, null, relationshipNames, null, null, null);
     }
 
     @Override
-    public void asString( StringBuilder builder )
-    {
-        if ( relationship != null )
-        {
-            relationship.asString( builder );
+    public void asString(StringBuilder builder) {
+        if (relationship != null) {
+            relationship.asString(builder);
         }
 
-        builder.append( '(' );
-        if ( node != null )
-        {
-            node.asString( builder );
-            if ( nodeLabels != null )
-            {
-                nodeLabels.asString( builder );
+        builder.append('(');
+        if (node != null) {
+            node.asString(builder);
+            if (nodeLabels != null) {
+                nodeLabels.asString(builder);
             }
-            if ( nodePropertyValues != null )
-            {
-                builder.append( ' ' );
-                nodePropertyValues.asString( builder );
+            if (nodePropertyValues != null) {
+                builder.append(' ');
+                nodePropertyValues.asString(builder);
             }
-        }
-        else
-        {
-            if ( nodeLabels != null )
-            {
-                nodeLabels.asString( builder );
+        } else {
+            if (nodeLabels != null) {
+                nodeLabels.asString(builder);
             }
-            if ( nodePropertyValues != null )
-            {
-                nodePropertyValues.asString( builder );
+            if (nodePropertyValues != null) {
+                nodePropertyValues.asString(builder);
             }
         }
-        builder.append( ')' );
+        builder.append(')');
     }
 }
