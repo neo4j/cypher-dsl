@@ -18,30 +18,25 @@
  */
 package org.springframework.data.neo4j.core.cypher;
 
-import org.springframework.data.neo4j.core.cypher.CompoundCondition.LogicalOperator;
-import org.springframework.data.neo4j.core.cypher.support.Visitable;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 /**
- * Shared interface for all conditions.
- *
+ * @author Gerrit Meier
  * @author Michael J. Simons
  * @since 1.0
  */
-public interface Condition extends Visitable {
+public class ListLiteral extends Literal<Iterable> {
 
-	default Condition and(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.AND, condition);
+	ListLiteral(Iterable content) {
+		super(content);
 	}
 
-	default Condition or(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.OR, condition);
-	}
+	@Override
+	public String asString() {
 
-	default Condition xor(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.XOR, condition);
-	}
-
-	default Condition not() {
-		return new NotCondition(this);
+		return "["
+				+ StreamSupport.stream(getContent().spliterator(), false).map(Object::toString).collect(Collectors.joining(","))
+				+ "]";
 	}
 }

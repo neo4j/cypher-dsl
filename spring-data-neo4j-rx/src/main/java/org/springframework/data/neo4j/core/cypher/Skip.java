@@ -18,30 +18,27 @@
  */
 package org.springframework.data.neo4j.core.cypher;
 
-import org.springframework.data.neo4j.core.cypher.CompoundCondition.LogicalOperator;
 import org.springframework.data.neo4j.core.cypher.support.Visitable;
+import org.springframework.data.neo4j.core.cypher.support.Visitor;
 
 /**
- * Shared interface for all conditions.
- *
- * @author Michael J. Simons
- * @since 1.0
+ * @author Gerrit Meier
  */
-public interface Condition extends Visitable {
+public class Skip implements Visitable {
 
-	default Condition and(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.AND, condition);
+	public static Skip of(Number value) {
+		return new Skip(new NumberLiteral(value));
 	}
 
-	default Condition or(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.OR, condition);
+	private final NumberLiteral skipAmount;
+
+	private Skip(NumberLiteral skipAmount) {
+		this.skipAmount = skipAmount;
 	}
 
-	default Condition xor(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.XOR, condition);
-	}
-
-	default Condition not() {
-		return new NotCondition(this);
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		skipAmount.accept(visitor);
 	}
 }

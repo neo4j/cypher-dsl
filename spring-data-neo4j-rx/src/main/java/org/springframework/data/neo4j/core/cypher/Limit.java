@@ -18,30 +18,27 @@
  */
 package org.springframework.data.neo4j.core.cypher;
 
-import org.springframework.data.neo4j.core.cypher.CompoundCondition.LogicalOperator;
 import org.springframework.data.neo4j.core.cypher.support.Visitable;
+import org.springframework.data.neo4j.core.cypher.support.Visitor;
 
 /**
- * Shared interface for all conditions.
- *
- * @author Michael J. Simons
- * @since 1.0
+ * @author Gerrit Meier
  */
-public interface Condition extends Visitable {
+public class Limit implements Visitable {
 
-	default Condition and(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.AND, condition);
+	public static Limit of(Number value) {
+		return new Limit(new NumberLiteral(value));
 	}
 
-	default Condition or(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.OR, condition);
+	private final NumberLiteral limitAmount;
+
+	private Limit(NumberLiteral limitAmount) {
+		this.limitAmount = limitAmount;
 	}
 
-	default Condition xor(Condition condition) {
-		return CompoundCondition.create(this, LogicalOperator.XOR, condition);
-	}
-
-	default Condition not() {
-		return new NotCondition(this);
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		limitAmount.accept(visitor);
 	}
 }
