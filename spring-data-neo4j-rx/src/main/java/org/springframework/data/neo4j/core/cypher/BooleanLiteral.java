@@ -19,41 +19,26 @@
 package org.springframework.data.neo4j.core.cypher;
 
 import org.apiguardian.api.API;
-import org.springframework.data.neo4j.core.cypher.support.Visitable;
-import org.springframework.data.neo4j.core.cypher.support.Visitor;
-import org.springframework.lang.Nullable;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/Match.html">Match</a>.
+ * The boolean literal.
  *
  * @author Michael J. Simons
+ * @soundtrack Bad Religion - Age Of Unreason
  * @since 1.0
  */
 @API(status = API.Status.INTERNAL, since = "1.0")
-public final class Match implements ReadingClause {
+public final class BooleanLiteral extends Literal<Boolean> {
 
-	private final boolean optional;
+	static BooleanLiteral TRUE = new BooleanLiteral(true);
+	static BooleanLiteral FALSE = new BooleanLiteral(false);
 
-	private final Pattern pattern;
-
-	private @Nullable final Where optionalWhere;
-
-	Match(boolean optional, Pattern pattern, @Nullable Where optionalWhere) {
-		this.optional = optional;
-		this.pattern = pattern;
-		this.optionalWhere = optionalWhere;
-	}
-
-	public boolean isOptional() {
-		return optional;
+	private BooleanLiteral(boolean content) {
+		super(content);
 	}
 
 	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		this.pattern.accept(visitor);
-		Visitable.visitIfNotNull(optionalWhere, visitor);
-		visitor.leave(this);
+	public String asString() {
+		return getContent().toString();
 	}
 }

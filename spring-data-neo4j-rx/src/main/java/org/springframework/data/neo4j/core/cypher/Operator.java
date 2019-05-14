@@ -20,40 +20,28 @@ package org.springframework.data.neo4j.core.cypher;
 
 import org.apiguardian.api.API;
 import org.springframework.data.neo4j.core.cypher.support.Visitable;
-import org.springframework.data.neo4j.core.cypher.support.Visitor;
-import org.springframework.lang.Nullable;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/Match.html">Match</a>.
+ * An operator
  *
  * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = API.Status.INTERNAL, since = "1.0")
-public final class Match implements ReadingClause {
+public enum Operator implements Visitable {
 
-	private final boolean optional;
+	/**
+	 * The {@code +} operator.
+	 */
+	PLUS("+");
 
-	private final Pattern pattern;
+	private final String representation;
 
-	private @Nullable final Where optionalWhere;
-
-	Match(boolean optional, Pattern pattern, @Nullable Where optionalWhere) {
-		this.optional = optional;
-		this.pattern = pattern;
-		this.optionalWhere = optionalWhere;
+	Operator(String representation) {
+		this.representation = representation;
 	}
 
-	public boolean isOptional() {
-		return optional;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		this.pattern.accept(visitor);
-		Visitable.visitIfNotNull(optionalWhere, visitor);
-		visitor.leave(this);
+	public String getRepresentation() {
+		return representation;
 	}
 }

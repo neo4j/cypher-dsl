@@ -19,41 +19,31 @@
 package org.springframework.data.neo4j.core.cypher;
 
 import org.apiguardian.api.API;
-import org.springframework.data.neo4j.core.cypher.support.Visitable;
-import org.springframework.data.neo4j.core.cypher.support.Visitor;
-import org.springframework.lang.Nullable;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/Match.html">Match</a>.
+ * A set of operations.
  *
  * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = API.Status.INTERNAL, since = "1.0")
-public final class Match implements ReadingClause {
+public final class Operations {
 
-	private final boolean optional;
+	/**
+	 * Creates a {@code +} operation. Both operands must evaluate to a compatible type.
+	 *
+	 * @param op1 first operand
+	 * @param op2 second operation
+	 * @return A new operation.
+	 */
+	static Operation plus(Expression op1, Expression op2) {
 
-	private final Pattern pattern;
-
-	private @Nullable final Where optionalWhere;
-
-	Match(boolean optional, Pattern pattern, @Nullable Where optionalWhere) {
-		this.optional = optional;
-		this.pattern = pattern;
-		this.optionalWhere = optionalWhere;
+		return Operation.create(op1, Operator.PLUS, op2);
 	}
 
-	public boolean isOptional() {
-		return optional;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		this.pattern.accept(visitor);
-		Visitable.visitIfNotNull(optionalWhere, visitor);
-		visitor.leave(this);
+	/**
+	 * Not to be instantiated.
+	 */
+	private Operations() {
 	}
 }
