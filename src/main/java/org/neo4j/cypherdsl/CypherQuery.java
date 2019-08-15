@@ -309,6 +309,7 @@ public class CypherQuery {
      * @return
      */
     public static PropertyValue value(String id, Object value) {
+        checkNull(value, "Value", id);
         return new PropertyValue(identifier(id), literal(value));
     }
 
