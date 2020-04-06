@@ -31,11 +31,7 @@ import java.util.List;
 
 import org.neo4j.cypherdsl.expression.Expression;
 import org.neo4j.cypherdsl.expression.PathExpression;
-import org.neo4j.cypherdsl.query.AbstractExpression;
-import org.neo4j.cypherdsl.query.LabelValue;
-import org.neo4j.cypherdsl.query.LabelValues;
-import org.neo4j.cypherdsl.query.PropertyValue;
-import org.neo4j.cypherdsl.query.PropertyValues;
+import org.neo4j.cypherdsl.query.*;
 
 /**
  * Represents either a single node or a path from one node to another.
@@ -128,6 +124,53 @@ public class Path
         return new Path(node, relationship, propertyValues, nodeLabels);
     }
 
+
+    /**
+     * Declare a new relationship for this node.
+     *
+     * @param direction relationship direction
+     * @return
+     */
+    public PathRelationship direction(Direction direction) {
+        return new PathRelationship(this, direction, null, Collections.<Identifier>emptyList(), null, null, null);
+    }
+
+    /**
+     * Declare a new relationship for this node.
+     *
+     * @param direction relationship direction
+     * @return
+     */
+    public PathRelationship direction(Direction direction, String... relationships) {
+        return new PathRelationship(this, direction, null, asList(identifiers(relationships)), null, null, null);
+    }
+
+
+    /**
+     * Declare a new relationship for this node.
+     *
+     * @param direction relationship direction
+     * @return
+     */
+    public PathRelationship direction(Direction direction, Identifier... relationships) {
+        return new PathRelationship(this, direction, null, asList(relationships), null, null, null);
+    }
+
+    /**
+     * Declare a new relationship for this node.
+     *
+     * @param direction relationship direction
+     * @return
+     */
+    public PathRelationship direction(Direction direction, Enum<?>... relationships) {
+        List<Identifier> relationshipNames = new ArrayList<Identifier>();
+        for (Enum<?> relationship : relationships) {
+            relationshipNames.add(identifier(relationship.name()));
+        }
+
+        return new PathRelationship(this, direction, null, relationshipNames, null, null, null);
+    }
+
     /**
      * Declare a new outgoing relationship from this node.
      * <p/>
@@ -139,7 +182,7 @@ public class Path
      * @return
      */
     public PathRelationship out() {
-        return new PathRelationship(this, OUT, null, Collections.<Identifier>emptyList(), null, null, null);
+        return direction(OUT);
     }
 
     /**
@@ -153,7 +196,7 @@ public class Path
      * @return
      */
     public PathRelationship out(String... relationships) {
-        return new PathRelationship(this, OUT, null, asList(identifiers(relationships)), null, null, null);
+        return direction(OUT, relationships);
     }
 
     /**
@@ -167,7 +210,7 @@ public class Path
      * @return
      */
     public PathRelationship out(Identifier... relationships) {
-        return new PathRelationship(this, OUT, null, asList(relationships), null, null, null);
+        return direction(OUT, relationships);
     }
 
     /**
@@ -181,12 +224,7 @@ public class Path
      * @return
      */
     public PathRelationship out(Enum<?>... relationships) {
-        List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for (Enum<?> relationship : relationships) {
-            relationshipNames.add(identifier(relationship.name()));
-        }
-
-        return new PathRelationship(this, OUT, null, relationshipNames, null, null, null);
+        return direction(OUT, relationships);
     }
 
     /**
@@ -200,7 +238,7 @@ public class Path
      * @return
      */
     public PathRelationship in() {
-        return new PathRelationship(this, IN, null, Collections.<Identifier>emptyList(), null, null, null);
+        return direction(IN);
     }
 
     /**
@@ -214,7 +252,7 @@ public class Path
      * @return
      */
     public PathRelationship in(String... relationships) {
-        return new PathRelationship(this, IN, null, asList(identifiers(relationships)), null, null, null);
+        return direction(IN, relationships);
     }
 
     /**
@@ -228,7 +266,7 @@ public class Path
      * @return
      */
     public PathRelationship in(Identifier... relationships) {
-        return new PathRelationship(this, IN, null, asList(relationships), null, null, null);
+        return direction(IN, relationships);
     }
 
     /**
@@ -242,12 +280,7 @@ public class Path
      * @return
      */
     public PathRelationship in(Enum<?>... relationships) {
-        List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for (Enum<?> relationship : relationships) {
-            relationshipNames.add(identifier(relationship.name()));
-        }
-
-        return new PathRelationship(this, IN, null, relationshipNames, null, null, null);
+        return direction(IN, relationships);
     }
 
     /**
@@ -261,7 +294,7 @@ public class Path
      * @return
      */
     public PathRelationship both() {
-        return new PathRelationship(this, BOTH, null, Collections.<Identifier>emptyList(), null, null, null);
+        return direction(BOTH);
     }
 
     /**
@@ -275,8 +308,7 @@ public class Path
      * @return
      */
     public PathRelationship both(String... relationships) {
-        return new PathRelationship(this, BOTH, null, asList(identifiers(relationships)), null, null,
-                null);
+        return direction(BOTH, relationships);
     }
 
     /**
@@ -290,7 +322,7 @@ public class Path
      * @return
      */
     public PathRelationship both(Identifier... relationships) {
-        return new PathRelationship(this, BOTH, null, asList(relationships), null, null, null);
+        return direction(BOTH, relationships);
     }
 
     /**
@@ -304,12 +336,7 @@ public class Path
      * @return
      */
     public PathRelationship both(Enum<?>... relationships) {
-        List<Identifier> relationshipNames = new ArrayList<Identifier>();
-        for (Enum<?> relationship : relationships) {
-            relationshipNames.add(identifier(relationship.name()));
-        }
-
-        return new PathRelationship(this, BOTH, null, relationshipNames, null, null, null);
+        return direction(BOTH, relationships);
     }
 
     @Override
