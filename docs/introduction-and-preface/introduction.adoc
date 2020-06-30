@@ -1,0 +1,34 @@
+[[introduction]]
+= Introduction
+
+== Purpose
+
+The Cypher-DSL has been developed with the needs of https://github.com/neo4j/sdn-rx[SDN/RX] in mind:
+We wanted to avoid string concatenations in our query generation and decided do go with a builder approach, much like we
+find with https://www.jooq.org[jOOQ] or in the relational module of https://github.com/spring-projects/spring-data-jdbc/tree/1.1.6.RELEASE/spring-data-relational/src/main/java/org/springframework/data/relational/core/sql[Spring Data JDBC], but for Cypher.
+
+What we don't have - and don't need for our mapping purpose - at the moment is a code generator that reads the database schema
+and generates static classes representing labels and relationship types.
+That is still up to the mapping framework (in our case SDN/RX).
+We however have a type safe API for Cypher that allows only generating valid Cypher constructs.
+
+We worked closely with the https://www.opencypher.org[OpenCypher spec] here and you find a lot of these concepts in the API.
+
+The Cypher-DSL can also be seen in the same area as the https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/core/query/Criteria.html[Criteria API] of Spring Data Mongo.
+
+== Where to use it
+
+The Cypher-DSL returns Cypher as literal Java-Strings.
+Those can be used anywhere, for example with the https://github.com/neo4j/neo4j-java-driver[Neo4j Java driver],
+inside embedded procedures or with the `Neo4jOperations` respectively `ReactiveNeo4jOperations` inside SDN/RX respectivly SDN 6.
+Those are the basic interfaces implemented by the Neo4j templates of the same names.
+
+Both the imperative and the reactive framework allow the retrieval and counting of entities with a `org.neo4j.springframework.data.core.cypher.Statement`,
+for example through `Neo4jTemplate#findAll(Statement, Class<T>)` and similar.
+
+An instance of a `org.neo4j.springframework.data.core.cypher.Statement` is provided at the end of query building step.
+
+A `Statement` represents an in-memory https://en.wikipedia.org/wiki/Abstract_syntax_tree[Abstract syntax tree] and can be
+transformed and rendered as such.
+
+This string representation of a statement can also be used with the https://neo4j.github.io/sdn-rx/current/#neo4j-client[Neo4j-Client].

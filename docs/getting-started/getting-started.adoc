@@ -1,0 +1,117 @@
+[[getting-started]]
+= Getting started
+
+== How to use it
+
+You use the Cypher-DSL as you would write Cypher:
+It allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.
+
+The examples to follow are using JDK 11.
+We find the `var` keyword especially appealing in such a DSL as the types returned by the DSL much less important than
+the further building methods they offer.
+
+IMPORTANT: The AST parts and intermediate build steps are immutable. That is, the methods create new intermediate steps.
+For example, you cannot reuse an `ExposesLimit` step, but have to use the returned object from its `skip` method.
+
+An instance of a `org.neo4j.springframework.data.core.cypher.Statement` is provided at the end of every query building step.
+This `Statement` needs to be rendered into a string or passed to methods supporting it as input.
+
+We are still on a JDK 8 baseline and cannot hide our renderer in an internal module.
+This class is therefor marked as `@API(status = INTERNAL)`.
+Please get an instance of the default renderer via `org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()` instead
+and then use the `render` method to get a string representation of the statement.
+
+We do however give no guarantees to the render API until it is marked as `EXPERIMENTAL` or `STABLE`.
+
+=== Examples
+
+The following examples are 1:1 copies of the queries you will find in the Neo4j browser after running `:play movies`.
+
+They use the following imports:
+
+.Imports needed for the examples to compile
+[source, java]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-imports]
+----
+
+To match and return all the movie, build your statement like this:
+
+.Simple match
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e1]
+----
+<.> Declare a variable storing your node labeled `Movie` and named `m`, so that you can
+<.> reuse it in both the match and the return part.
+<.> The `build` method becomes only available when a compilable Cypher statement can be rendered.
+
+==== Find
+
+Match all nodes with a given set of properties:
+
+.Find the actor named "Tom Hanks"...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e2]
+----
+
+Limit the number of returned things and return only one attribute
+
+.Find 10 people...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e4]
+----
+
+Create complex conditions
+
+.Find movies released in the 1990s...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e5]
+----
+
+==== Query
+
+Build relationships
+
+.List all Tom Hanks movies...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e6]
+----
+
+.Who directed "Cloud Atlas"?
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e7]
+----
+
+.Tom Hanks' co-actors...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e8]
+----
+
+.How people are related to "Cloud Atlas"...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e9]
+----
+
+==== Solve
+
+.Movies and actors up to 4 "hops" away from Kevin Bacon
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-bacon]
+----
+
+==== Recommend
+
+.Extend Tom Hanks co-actors, to find co-co-actors who haven't worked with Tom Hanks...
+[source, java,indent=0]
+----
+include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
+----
