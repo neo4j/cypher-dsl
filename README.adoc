@@ -1,0 +1,136 @@
+= The Neo4j Cypher-DSL
+:sectanchors:
+
+// tag::properties[]
+:groupId: org.neo4j
+:artifactId: neo4j-cypher-dsl
+
+:neo4j-cypher-dsl-version: 2020.0.0-SNAPSHOT
+
+// end::properties[]
+
+image:https://img.shields.io/maven-central/v/org.neo4j/neo4j-cypher-dsl.svg[Maven Central,link=http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j%22%20AND%20a%3A%22neo4j-cypher-dsl%22]
+
+[abstract]
+--
+The Neo4j Cypher-DSL in its current form is a spin-off from Spring Data Neo4j⚡️RX, where it is used to generate all Cypher queries.
+We thank all contributors to all branches prior to 2020.0 for their effort in creating the previous verions.
+--
+
+The primary goal of this project is to have a type safe way of creating Cypher queries targeted at https://neo4j.com[Neo4j 4.0+].
+Most of the constructs used here are modelled after https://www.opencypher.org[openCypher], but we include several constructs specific to Neo4j.
+
+The core module of the Neo4j Cypher-DSL has no required runtime dependencies.
+
+== Versioning
+
+This rebooted version of the Neo4j Cypher-DSL uses https://calver.org[CalVer] in the same way Spring does
+since early 2020 (see https://spring.io/blog/2020/04/30/updates-to-spring-versions[Updates to Spring Versions]),
+starting at _2020.0.0_.
+
+== Manual
+
+For a gentle introduction and some getting started guides, please use our
+https://neo4j-contrib.github.io/neo4j-cypher-dsl[Manual].
+
+== Getting Started
+
+Here is a quick example:
+
+[source,java,tabsize=4]
+----
+import static org.assertj.core.api.Assertions.*;
+import static org.neo4j.cypherdsl.Conditions.*;
+import static org.neo4j.cypherdsl.Cypher.*;
+import static org.neo4j.cypherdsl.Functions.*;
+
+import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.Cypher;
+import org.neo4j.cypherdsl.renderer.Renderer;
+
+class CypherDSLExamplesTest {
+
+	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+
+	@Test
+	void findAllMovies() {
+
+		var m = node("Movie").named("m");
+		var statement = Cypher.match(m)
+			.returning(m)
+			.build();
+
+		assertThat(cypherRenderer.render(statement))
+			.isEqualTo("MATCH (m:`Movie`) RETURN m");
+	}
+}
+----
+
+=== Maven configuration
+
+[source,xml,subs="verbatim,attributes"]
+.Inclusion of the Neo4j Cypher-DSL in a Maven project
+----
+<dependency>
+	<groupId>{groupId}</groupId>
+	<artifactId>{artifactId}</artifactId>
+	<version>{neo4j-cypher-dsl-version}</version>
+</dependency>
+----
+
+=== Gradle configuration
+
+[source,groovy,subs="verbatim,attributes"]
+.Inclusion of the Neo4j Cypher-DSL in a Gradle project
+----
+dependencies {
+    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version}'
+}
+----
+
+== Building the Neo4j Cypher-DSL
+
+=== Requirements
+
+* JDK 11+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
+* Maven 3.6.3 (We provide the Maven wrapper, see `mvnw` respectively `mvnw.cmd` in the project root; the wrapper downloads the appropriate Maven version automatically)
+
+The build requires a local copy of the project:
+
+[source,console,subs="verbatim,attributes"]
+[[clone-cypher-dsl]]
+.Clone the Neo4j Cypher-DSL
+----
+$ git clone git@github.com:neo4j-contrib/cypher-dsl.git
+----
+
+Before you proceed, verify your locally installed JDK version.
+The output should be similar:
+
+[source,console,subs="verbatim,attributes"]
+[[verify-jdk]]
+.Verify your JDK
+----
+$ java -version
+java 11.0.7 2020-04-14 LTS
+Java(TM) SE Runtime Environment 18.9 (build 11.0.7+8-LTS)
+Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.7+8-LTS, mixed mode)
+----
+
+On a Unix-like operating system, use `./mvnw`:
+
+[source,console,subs="verbatim,attributes"]
+[[build-default-bash]]
+.Build with default settings on Linux / macOS
+----
+$ ./mvnw clean verify
+----
+
+On a Windows machine, use
+
+[source,console,subs="verbatim,attributes"]
+[[build-default-windows]]
+.Build with default settings on Windows
+----
+$ mvnw.cmd clean verify
+----

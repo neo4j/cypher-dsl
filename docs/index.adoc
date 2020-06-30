@@ -1,0 +1,47 @@
+= The Neo4j Cypher-DSL
+Gerrit Meier <gerrit.meier@neo4j.com>; Michael Simons <michael.simons@neo4j.com>
+:toc:
+:doctype: book
+:lang: en
+:listing-caption: Listing
+:source-highlighter: coderay
+:icons: font
+:sectlink: true
+:sectanchors: true
+:numbered: true
+:xrefstyle: short
+
+ifndef::manualIncludeDir[]
+:manualIncludeDir: ../
+endif::[]
+
+include::{manualIncludeDir}/README.adoc[tags=properties]
+
+:copyright: 2020 Neo4j, Inc.,
+:gh-base: https://github.com/neo4j/sdn-rx
+:java-driver-starter-href: https://github.com/neo4j/neo4j-java-driver-spring-boot-starter
+:springVersion: 5.2.0.RELEASE
+:spring-framework-docs: https://docs.spring.io/spring/docs/{springVersion}/spring-framework-reference
+:spring-framework-javadoc: https://docs.spring.io/spring/docs/{springVersion}/javadoc-api
+
+
+(C) {copyright}
+
+[abstract]
+--
+This is the Neo4j Cypher-DSL manual version {neo4j-cypher-dsl-version}.
+--
+
+_Who should read this?_
+
+This manual is written for people interested in creating Cypher queries in a typesafe way on the JVM.
+
+WARNING: The Cypher-DSL is considered _EXPERIMENTAL_ at the time of writing.
+This means you can and should use it and that we are looking actively for feedback, issues and problems.
+We will try to keep breaking changes to a minimum, but we reserve the right to modify public methods, parameters
+and behaviour in case we need those changes for the https://github.com/neo4j/sdn-rx[SDN/RX] project, the origin of the Cypher-DSL.
+All public classes inside `org.neo4j.cypherdsl` still subject to breaking changes are annotated with `@API(status = EXPERIMENTAL)`.
+
+include::introduction-and-preface/index.adoc[]
+
+include::getting-started/index.adoc[]

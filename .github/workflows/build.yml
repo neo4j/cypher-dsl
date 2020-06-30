@@ -1,0 +1,52 @@
+name: build
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Neo4j Cypher-DSL
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
+      - name: Run Maven build
+        run: >
+          ./mvnw --no-transfer-progress clean deploy -Dchangelist= -Dsha1=-$GITHUB_SHA
+          -DaltDeploymentRepository=releases::default::file://$GITHUB_WORKSPACE/target/repository
+          -pl !org.neo4j:neo4j-cypher-dsl-examples-docs
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v1
+        with:
+          name: artifacts
+          path: target/repository
+
+  build_examples:
+    name: Verify examples with ${{ matrix.java }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ '11', '14' ]
+    needs: build
+    steps:
+      - uses: actions/checkout@v1
+      - name: Download artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: artifacts
+          path: repository
+      - name: Install dependencies
+        run: "mkdir -p $HOME/.m2 && mv $GITHUB_WORKSPACE/repository $HOME/.m2/"
+      - uses: actions/setup-java@v1
+        with:
+          java-version: ${{ matrix.java }}
+      - name: Run Maven build
+        run: >
+          ./mvnw --no-transfer-progress clean verify -Drevision=1.1 -Dchangelist= -Dsha1=-$GITHUB_SHA
+          -pl org.neo4j:neo4j-cypher-dsl-examples-docs
