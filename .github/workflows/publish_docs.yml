@@ -31,7 +31,7 @@ jobs:
           java-version: 8
       - name: Run docs generation
         run: >
-          ./mvnw asciidoctor:process-asciidoc@generate-docs -pl org.neo4j.springframework.data:spring-data-neo4j-rx-parent -Dproject.build.docs=target/gh-pages/${refName}
+          ./mvnw asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName}
       - name: Create symlink
         if: (github.event_name == 'create' && github.event.ref_type == 'tag')
         working-directory: ./target/gh-pages
