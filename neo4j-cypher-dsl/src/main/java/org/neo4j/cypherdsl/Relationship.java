@@ -103,11 +103,11 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 		this.details = details;
 	}
 
-	public Node getLeft() {
+	Node getLeft() {
 		return left;
 	}
 
-	public Node getRight() {
+	Node getRight() {
 		return right;
 	}
 
