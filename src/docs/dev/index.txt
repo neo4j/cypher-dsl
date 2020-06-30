@@ -1,5 +1,0 @@
-[[cypher-query-lang-dsl]]
-Cypher Query Language DSL
-=========================
-
-There is a DSL for the Cypher query language.
