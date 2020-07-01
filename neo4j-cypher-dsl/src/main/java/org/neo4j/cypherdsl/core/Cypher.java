@@ -204,10 +204,11 @@ public final class Cypher {
 	 * Starts building a statement based on a {@code CREATE} clause.
 	 *
 	 * @param pattern The patterns to create
-	 * @param <T> The type of the next step
+	 * @param <T>     The type of the next step
 	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
-	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T create(PatternElement... pattern) {
+	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T create(
+		PatternElement... pattern) {
 
 		return Statement.builder().create(pattern);
 	}
@@ -229,10 +230,11 @@ public final class Cypher {
 	 * Starts building a statement based on a {@code MERGE} clause.
 	 *
 	 * @param pattern The patterns to merge
-	 * @param <T> The type of the next step
+	 * @param <T>     The type of the next step
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
-	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T merge(PatternElement... pattern) {
+	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T merge(
+		PatternElement... pattern) {
 
 		return Statement.builder().merge(pattern);
 	}
@@ -314,6 +316,9 @@ public final class Cypher {
 		}
 		if (object instanceof Iterable) {
 			return new ListLiteral((Iterable<Literal<?>>) object);
+		}
+		if (object instanceof Boolean) {
+			return BooleanLiteral.of((Boolean) object);
 		}
 		throw new IllegalArgumentException("Unsupported literal type: " + object.getClass());
 	}

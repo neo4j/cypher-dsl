@@ -35,6 +35,15 @@ public final class BooleanLiteral extends Literal<Boolean> {
 	static final BooleanLiteral TRUE = new BooleanLiteral(true);
 	static final BooleanLiteral FALSE = new BooleanLiteral(false);
 
+	static Literal<Boolean> of(Boolean value) {
+
+		if (value) {
+			return TRUE;
+		} else {
+			return FALSE;
+		}
+	}
+
 	private BooleanLiteral(boolean content) {
 		super(content);
 	}
