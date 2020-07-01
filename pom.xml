@@ -27,7 +27,7 @@
 
 	<name>Neo4j Cypher DSL</name>
 	<description>A DSL for generating Cypher statements for Neo4j</description>
-	<url>http://neo4j-contrib.github.io/cypher-dsl/</url>
+	<url>https://neo4j-contrib.github.io/cypher-dsl</url>
 
 	<inceptionYear>2011</inceptionYear>
 	<organization>

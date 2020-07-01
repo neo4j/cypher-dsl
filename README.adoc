@@ -31,11 +31,13 @@ starting at _2020.0.0_.
 == Manual
 
 For a gentle introduction and some getting started guides, please use our
-https://neo4j-contrib.github.io/neo4j-cypher-dsl[Manual].
+https://neo4j-contrib.github.io/cypher-dsl[Manual].
 
 == Getting Started
 
-Here is a quick example:
+Here is a quick example to get you started.
+First, include the dependency to the Neo4j Cypher-DSL under the following coordinates: `{groupId}:{artifactId}`.
+Then build your query starting with the static methods provided through `org.neo4j.cypherdsl.core.Cypher` like this:
 
 [source,java,tabsize=4]
 ----
@@ -63,28 +65,6 @@ class CypherDSLExamplesTest {
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("MATCH (m:`Movie`) RETURN m");
 	}
-}
-----
-
-=== Maven configuration
-
-[source,xml,subs="verbatim,attributes"]
-.Inclusion of the Neo4j Cypher-DSL in a Maven project
-----
-<dependency>
-	<groupId>{groupId}</groupId>
-	<artifactId>{artifactId}</artifactId>
-	<version>{neo4j-cypher-dsl-version}</version>
-</dependency>
-----
-
-=== Gradle configuration
-
-[source,groovy,subs="verbatim,attributes"]
-.Inclusion of the Neo4j Cypher-DSL in a Gradle project
-----
-dependencies {
-    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version}'
 }
 ----
 

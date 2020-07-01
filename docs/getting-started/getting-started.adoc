@@ -1,6 +1,32 @@
 [[getting-started]]
 = Getting started
 
+== Prepare dependencies
+
+Please use a dependency management system. We recommend either Maven or Gradle.
+
+=== Maven configuration
+
+[source,xml,subs="verbatim,attributes"]
+.Inclusion of the Neo4j Cypher-DSL in a Maven project
+----
+<dependency>
+	<groupId>{groupId}</groupId>
+	<artifactId>{artifactId}</artifactId>
+	<version>{neo4j-cypher-dsl-version}</version>
+</dependency>
+----
+
+=== Gradle configuration
+
+[source,groovy,subs="verbatim,attributes"]
+.Inclusion of the Neo4j Cypher-DSL in a Gradle project
+----
+dependencies {
+    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version}'
+}
+----
+
 == How to use it
 
 You use the Cypher-DSL as you would write Cypher:
