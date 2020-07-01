@@ -11,6 +11,8 @@ jobs:
     name: Neo4j Cypher-DSL
     runs-on: ubuntu-latest
     steps:
+      - name: Determine revision
+        run: echo "::set-output name=revision::$(date +'%Y').0.0"
       - uses: actions/checkout@v1
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -18,7 +20,7 @@ jobs:
           java-version: 8
       - name: Run Maven build
         run: >
-          ./mvnw --no-transfer-progress clean deploy -Drevision=0 -Dsha1=$GITHUB_SHA -Dchangelist=
+          ./mvnw --no-transfer-progress clean deploy -Drevision=$revision -Dsha1=-$GITHUB_SHA -Dchangelist=
           -DaltDeploymentRepository=releases::default::file://$GITHUB_WORKSPACE/target/repository
           -pl !org.neo4j:neo4j-cypher-dsl-examples-docs
       - name: Archive artifacts
@@ -35,6 +37,8 @@ jobs:
         java: [ '11', '14' ]
     needs: build
     steps:
+      - name: Determine revision
+          run: echo "::set-output name=revision::$(date +'%Y').0.0"
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
@@ -48,5 +52,5 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Run Maven build
         run: >
-          ./mvnw --no-transfer-progress clean verify -Drevision=0 -Dsha1=$GITHUB_SHA -Dchangelist=
+          ./mvnw --no-transfer-progress clean verify  -Drevision=$revision -Dsha1=-$GITHUB_SHA -Dchangelist=
           -pl org.neo4j:neo4j-cypher-dsl-examples-docs

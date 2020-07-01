@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-cypher-dsl-parent</artifactId>
-		<version>2020.${revision}.${sha1}${changelist}</version>
+		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl</artifactId>

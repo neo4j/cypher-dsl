@@ -22,8 +22,7 @@
 
 	<groupId>org.neo4j</groupId>
 	<artifactId>neo4j-cypher-dsl-parent</artifactId>
-	<!-- Have a look here https://spring.io/blog/2020/04/30/updates-to-spring-versions -->
-	<version>2020.${revision}.${sha1}${changelist}</version>
+	<version>${revision}${sha1}${changelist}</version>
 	<packaging>pom</packaging>
 
 	<name>Neo4j Cypher DSL</name>
@@ -88,7 +87,7 @@
 		<asciidoctorj-diagram.version>2.0.1</asciidoctorj-diagram.version>
 		<asciidoctor-maven-plugin.version>1.6.0</asciidoctor-maven-plugin.version>
 		<assertj.version>3.15.0</assertj.version>
-		<changelist>-SNAPSHOT</changelist> <!-- MODIFIER of YYYY.MINOR.MICRO[-MODIFIER] -->
+		<changelist>-SNAPSHOT</changelist>
 		<checkstyle.version>8.29</checkstyle.version>
 		<flatten-maven-plugin.version>1.2.1</flatten-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
@@ -109,8 +108,8 @@
 		<mockito.version>3.2.4</mockito.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<revision>0</revision> <!-- MINOR of YYYY.MINOR.MICRO[-MODIFIER] -->
-		<sha1>0</sha1> <!-- MICRO of YYYY.MINOR.MICRO[-MODIFIER] -->
+		<revision>202x.0.0</revision> <!-- Have a look here https://spring.io/blog/2020/04/30/updates-to-spring-versions -->
+		<sha1 />
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
@@ -382,8 +381,8 @@
 					<sourceDirectory>${basedir}/docs</sourceDirectory>
 					<sourceDocumentName>index.adoc</sourceDocumentName>
 					<sourceHighlighter>coderay</sourceHighlighter>
-					<icons>font</icons>
 					<attributes>
+						<icons>font</icons>
 						<toc>left</toc>
 						<setanchors></setanchors>
 						<idprefix></idprefix>

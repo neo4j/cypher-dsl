@@ -23,7 +23,7 @@
 	<parent>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-cypher-dsl-parent</artifactId>
-		<version>2020.${revision}.${sha1}${changelist}</version>
+		<version>${revision}${sha1}${changelist}</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
 
@@ -35,7 +35,7 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<neo4j-cypher-dsl.version>2020.${revision}.${sha1}${changelist}</neo4j-cypher-dsl.version>
+		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
 		<java-module-name>org.neo4j.cypherdsl.examples</java-module-name>
 	</properties>
 
@@ -105,7 +105,7 @@
 				</property>
 			</activation>
 			<properties>
-				<revision>0</revision>
+				<revision>202x.0.0</revision>
 			</properties>
 		</profile>
 		<profile>
@@ -116,7 +116,7 @@
 				</property>
 			</activation>
 			<properties>
-				<sha1>0</sha1>
+				<sha1/>
 			</properties>
 		</profile>
 		<profile>
