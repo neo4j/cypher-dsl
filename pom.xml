@@ -82,6 +82,13 @@
 		<module>neo4j-cypher-dsl-examples</module>
 	</modules>
 
+	<scm>
+		<connection>scm:git:git@github.com:neo4j-contrib/cypher-dsl.git</connection>
+		<developerConnection>scm:git:git@github.com:neo4j-contrib/cypher-dsl.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/neo4j-contrib/cypher-dsl</url>
+	</scm>
+
 	<properties>
 		<apiguardian.version>1.1.0</apiguardian.version>
 		<asciidoctorj-diagram.version>2.0.1</asciidoctorj-diagram.version>
