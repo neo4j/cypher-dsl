@@ -32,7 +32,7 @@ They use the following imports:
 .Imports needed for the examples to compile
 [source, java]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-imports]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-imports]
 ----
 
 To match and return all the movie, build your statement like this:
@@ -40,7 +40,7 @@ To match and return all the movie, build your statement like this:
 .Simple match
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e1]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e1]
 ----
 <.> Declare a variable storing your node labeled `Movie` and named `m`, so that you can
 <.> reuse it in both the match and the return part.
@@ -53,7 +53,7 @@ Match all nodes with a given set of properties:
 .Find the actor named "Tom Hanks"...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e2]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e2]
 ----
 
 Limit the number of returned things and return only one attribute
@@ -61,7 +61,7 @@ Limit the number of returned things and return only one attribute
 .Find 10 people...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e4]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e4]
 ----
 
 Create complex conditions
@@ -69,7 +69,7 @@ Create complex conditions
 .Find movies released in the 1990s...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e5]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e5]
 ----
 
 ==== Query
@@ -79,25 +79,25 @@ Build relationships
 .List all Tom Hanks movies...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e6]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e6]
 ----
 
 .Who directed "Cloud Atlas"?
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e7]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e7]
 ----
 
 .Tom Hanks' co-actors...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e8]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e8]
 ----
 
 .How people are related to "Cloud Atlas"...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-e9]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e9]
 ----
 
 ==== Solve
@@ -105,7 +105,7 @@ include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/Cyp
 .Movies and actors up to 4 "hops" away from Kevin Bacon
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-bacon]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-bacon]
 ----
 
 ==== Recommend
@@ -113,5 +113,5 @@ include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/Cyp
 .Extend Tom Hanks co-actors, to find co-co-actors who haven't worked with Tom Hanks...
 [source, java,indent=0]
 ----
-include::../../examples/docs/src/test/java/org/neo4j/cypherdsl/docs/examples/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
 ----

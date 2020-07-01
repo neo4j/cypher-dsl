@@ -32,7 +32,7 @@
 	<name>Neo4j Cypher DSL (Core)</name>
 
 	<properties>
-		<java-module-name>org.neo4j.cypherdsl</java-module-name>
+		<java-module-name>org.neo4j.cypherdsl.core</java-module-name>
 	</properties>
 
 	<dependencies>

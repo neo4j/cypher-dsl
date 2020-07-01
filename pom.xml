@@ -79,7 +79,7 @@
 
 	<modules>
 		<module>neo4j-cypher-dsl</module>
-		<module>examples/docs</module>
+		<module>neo4j-cypher-dsl-examples</module>
 	</modules>
 
 	<properties>
