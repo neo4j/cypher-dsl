@@ -30,8 +30,9 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  */
 public final class StandaloneCall implements Visitable, Statement {
 
-
 	private final ProcedureName name;
+
+	private final Arguments arguments;
 
 	static StandaloneCall of(String procedureName) {
 
@@ -43,9 +44,42 @@ public final class StandaloneCall implements Visitable, Statement {
 		return new StandaloneCall(new ProcedureName(new Namespace(namespace), procedureName));
 	}
 
-	public StandaloneCall(ProcedureName name) {
+	static StandaloneCall of(SymbolicName namespace, String procedureName, Expression... arguments) {
+
+		Arguments argumentsList = null;
+		if (arguments != null && arguments.length > 0) {
+			argumentsList = new Arguments(arguments);
+		}
+
+		return new StandaloneCall(new ProcedureName(new Namespace(namespace), procedureName), argumentsList);
+	}
+
+	StandaloneCall(ProcedureName name) {
 
 		this.name = name;
+		this.arguments = null;
+	}
+
+	StandaloneCall(ProcedureName name, Arguments arguments) {
+
+		this.name = name;
+		this.arguments = arguments;
+	}
+
+	/**
+	 * Creates a new standalone call with the given argument list.
+	 *
+	 * @param args The new arguments.
+	 * @return A new call (the old one is not changed).
+	 */
+	public StandaloneCall withArgs(Expression... args) {
+
+		if (args == null || args.length == 0) {
+
+			return new StandaloneCall(this.name);
+		}
+
+		return new StandaloneCall(this.name, new Arguments(args));
 	}
 
 	@Override
@@ -53,6 +87,7 @@ public final class StandaloneCall implements Visitable, Statement {
 
 		visitor.enter(this);
 		this.name.accept(visitor);
+		Visitable.visitIfNotNull(arguments, visitor);
 		visitor.leave(this);
 	}
 }
