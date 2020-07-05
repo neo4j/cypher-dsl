@@ -400,6 +400,22 @@ public final class Cypher {
 		return Case.create(expression);
 	}
 
+	public static StandaloneCall call(String procedureName) {
+
+		return StandaloneCall.of(procedureName);
+	}
+
+	public static StandaloneCall call(String namespace, String procedureName) {
+
+		return StandaloneCall.of(SymbolicName.create(namespace), procedureName);
+	}
+
+	public static StandaloneCall call(SymbolicName namespace, String procedureName) {
+
+		return StandaloneCall.of(namespace, procedureName);
+	}
+
+
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {
 
 		Assert.isTrue(statements != null && statements.length >= 2, "At least two statements are required!");

@@ -470,6 +470,21 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(" END");
 	}
 
+	void leave(Namespace namespace) {
+
+		builder.append(".");
+	}
+
+	void leave(ProcedureName procedureName) {
+
+		builder.append(procedureName.getValue());
+	}
+
+	void enter(StandaloneCall call) {
+
+		builder.append("CALL ");
+	}
+
 	public String getRenderedContent() {
 		return this.builder.toString();
 	}
