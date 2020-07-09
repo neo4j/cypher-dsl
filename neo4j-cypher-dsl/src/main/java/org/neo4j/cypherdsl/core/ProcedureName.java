@@ -18,7 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.*;
+
+import java.util.Arrays;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -27,16 +29,29 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 /**
  * @author Michael J. Simons
  * @soundtrack Apocalyptica - Cell-0
- * @since 2020.1
+ * @since 2020.1.0
  */
-@API(status = INTERNAL, since = "2020.1")
+@API(status = INTERNAL, since = "2020.1.0")
 public final class ProcedureName implements Visitable {
 
 	private final Namespace optionalNamespace;
 
 	private final String value;
 
-	ProcedureName(Namespace namespace, String value) {
+	static ProcedureName from(String... namespaceAndProcedure) {
+		if (namespaceAndProcedure.length == 1) {
+			return new ProcedureName(namespaceAndProcedure[0]);
+		} else {
+			Namespace namespace = new Namespace(Arrays.copyOf(namespaceAndProcedure, namespaceAndProcedure.length - 1));
+			return new ProcedureName(namespace, namespaceAndProcedure[namespaceAndProcedure.length - 1]);
+		}
+	}
+
+	private ProcedureName(String value) {
+		this(null, value);
+	}
+
+	private ProcedureName(Namespace namespace, String value) {
 
 		this.optionalNamespace = namespace;
 		this.value = value;
@@ -50,7 +65,7 @@ public final class ProcedureName implements Visitable {
 		visitor.leave(this);
 	}
 
-	@API(status = INTERNAL, since = "2020.1")
+	@API(status = INTERNAL, since = "2020.1.0")
 	public String getValue() {
 		return value;
 	}

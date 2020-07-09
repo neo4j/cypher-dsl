@@ -20,34 +20,31 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.*;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.support.TypedSubtree;
 
 /**
+ * Items yielded by a stand alone or in query call.
+ *
+ * @param <T>    The children's type
+ * @param <SELF> The concrete type of this class.
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
- * @since 2020.1.0
+ * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
+ * @since 2020.1.0.0
  */
 @API(status = INTERNAL, since = "2020.1.0")
-public final class Namespace extends Literal<String[]> {
+public final class YieldItems<T extends Expression, SELF extends YieldItems<T, SELF>> extends TypedSubtree<T, SELF> {
 
-	Namespace(String[] value) {
-		super(value);
+	static <C extends Expression, SELF extends YieldItems<C, SELF>> YieldItems<C, SELF> yieldAllOf(C... c) {
+
+		if (c == null || c.length == 0) {
+			throw new IllegalArgumentException("Cannot yield an empty list of items.");
+		}
+
+		return new YieldItems<C, SELF>(c);
 	}
 
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		visitor.leave(this);
-	}
-
-	@Override
-	public String asString() {
-
-		return Arrays.stream(getContent()).collect(Collectors.joining("."));
+	private YieldItems(T... children) {
+		super(children);
 	}
 }

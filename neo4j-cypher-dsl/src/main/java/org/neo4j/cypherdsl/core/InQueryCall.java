@@ -22,7 +22,7 @@ package org.neo4j.cypherdsl.core;
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/InQueryCall.html">StandaloneCall</a>.
  *
  * @author Michael J. Simons
- * @since 2020.1
+ * @since 2020.1.0
  * @soundtrack Apocalyptica - Cell-0
  */
 final class InQueryCall {

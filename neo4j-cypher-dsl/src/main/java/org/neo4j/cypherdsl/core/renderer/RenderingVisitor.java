@@ -18,10 +18,8 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import static java.util.stream.Collectors.joining;
-import static org.neo4j.cypherdsl.core.renderer.Symbols.NODE_LABEL_START;
-import static org.neo4j.cypherdsl.core.renderer.Symbols.REL_TYPE_START;
-import static org.neo4j.cypherdsl.core.renderer.Symbols.REL_TYP_SEPARATOR;
+import static java.util.stream.Collectors.*;
+import static org.neo4j.cypherdsl.core.renderer.Symbols.*;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -29,50 +27,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.neo4j.cypherdsl.core.AliasedExpression;
-import org.neo4j.cypherdsl.core.Arguments;
-import org.neo4j.cypherdsl.core.Case;
-import org.neo4j.cypherdsl.core.CompoundCondition;
-import org.neo4j.cypherdsl.core.Create;
-import org.neo4j.cypherdsl.core.Delete;
-import org.neo4j.cypherdsl.core.Distinct;
-import org.neo4j.cypherdsl.core.FunctionInvocation;
-import org.neo4j.cypherdsl.core.KeyValueMapEntry;
-import org.neo4j.cypherdsl.core.Limit;
-import org.neo4j.cypherdsl.core.ListComprehension;
-import org.neo4j.cypherdsl.core.ListExpression;
-import org.neo4j.cypherdsl.core.Literal;
-import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.Match;
-import org.neo4j.cypherdsl.core.Merge;
-import org.neo4j.cypherdsl.core.Named;
-import org.neo4j.cypherdsl.core.Namespace;
-import org.neo4j.cypherdsl.core.NestedExpression;
-import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.NodeLabel;
-import org.neo4j.cypherdsl.core.Operation;
-import org.neo4j.cypherdsl.core.Operator;
-import org.neo4j.cypherdsl.core.Order;
-import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.PatternComprehension;
-import org.neo4j.cypherdsl.core.ProcedureName;
-import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.PropertyLookup;
-import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.RelationshipDetail;
-import org.neo4j.cypherdsl.core.RelationshipLength;
-import org.neo4j.cypherdsl.core.RelationshipTypes;
-import org.neo4j.cypherdsl.core.Remove;
-import org.neo4j.cypherdsl.core.Return;
-import org.neo4j.cypherdsl.core.Set;
-import org.neo4j.cypherdsl.core.Skip;
-import org.neo4j.cypherdsl.core.SortItem;
-import org.neo4j.cypherdsl.core.StandaloneCall;
-import org.neo4j.cypherdsl.core.SymbolicName;
-import org.neo4j.cypherdsl.core.UnionPart;
-import org.neo4j.cypherdsl.core.Unwind;
-import org.neo4j.cypherdsl.core.Where;
-import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.*;
 import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.support.TypedSubtree;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -258,25 +213,25 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	void enter(SortItem.Direction direction) {
 		builder
-				.append(" ")
-				.append(direction.getSymbol());
+			.append(" ")
+			.append(direction.getSymbol());
 	}
 
 	void enter(PropertyLookup propertyLookup) {
 		builder
-				.append(".")
-				.append(propertyLookup.getPropertyKeyName());
+			.append(".")
+			.append(propertyLookup.getPropertyKeyName());
 	}
 
 	void enter(FunctionInvocation functionInvocation) {
 		builder
-				.append(functionInvocation.getFunctionName())
-				.append("(");
+			.append(functionInvocation.getFunctionName())
+			.append("(");
 	}
 
 	void leave(FunctionInvocation functionInvocation) {
 		builder
-				.append(")");
+			.append(")");
 	}
 
 	void enter(Operation operation) {
@@ -369,9 +324,9 @@ class RenderingVisitor extends ReflectiveVisitor {
 	void enter(RelationshipTypes types) {
 
 		builder
-				.append(types.getValues().stream()
-						.map(RenderingVisitor::escapeName)
-						.map(Optional::get).collect(joining(REL_TYP_SEPARATOR, REL_TYPE_START, "")));
+			.append(types.getValues().stream()
+				.map(RenderingVisitor::escapeName)
+				.map(Optional::get).collect(joining(REL_TYP_SEPARATOR, REL_TYPE_START, "")));
 	}
 
 	void enter(RelationshipLength length) {
@@ -445,8 +400,8 @@ class RenderingVisitor extends ReflectiveVisitor {
 	void leave(Unwind unwind) {
 
 		builder.append(" AS ")
-				.append(unwind.getVariable())
-				.append(" ");
+			.append(unwind.getVariable())
+			.append(" ");
 	}
 
 	void enter(UnionPart unionPart) {
@@ -515,7 +470,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(" END");
 	}
 
-	void enter(StandaloneCall call) {
+	void enter(ProcedureCall procedureCall) {
 
 		builder.append("CALL ");
 	}
@@ -535,10 +490,19 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append("(");
 	}
 
-
 	void leave(Arguments arguments) {
 
 		builder.append(")");
+	}
+
+	void enter(YieldItems yieldItems) {
+
+		builder.append(" YIELD ");
+	}
+
+	void leave(ProcedureCall procedureCall) {
+
+		builder.append(" ");
 	}
 
 	public String getRenderedContent() {

@@ -26,6 +26,9 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
+import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithArguments;
+import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithReturnFields;
+import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
 import org.neo4j.cypherdsl.core.support.Visitable;
 
 /**
@@ -61,6 +64,18 @@ class DefaultStatementBuilder
 	 */
 	private final List<MultiPartElement> multiPartElements = new ArrayList<>();
 
+	/**
+	 * Current ongoing call.
+	 */
+	private ProcedureCall.Builder currentOngoingCall;
+
+	DefaultStatementBuilder() {
+	}
+
+	DefaultStatementBuilder(ProcedureCall.Builder currentOngoingCall) {
+		this.currentOngoingCall = currentOngoingCall;
+	}
+
 	@Override
 	public OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
 
@@ -81,6 +96,12 @@ class DefaultStatementBuilder
 		if (this.currentOngoingMatch != null) {
 			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
 		}
+
+		if (this.currentOngoingCall != null) {
+			this.currentSinglePartElements.add(this.currentOngoingCall.build());
+			this.currentOngoingCall = null;
+		}
+
 		this.currentOngoingMatch = new MatchBuilder(optional);
 		this.currentOngoingMatch.patternList.addAll(Arrays.asList(pattern));
 		return this;
@@ -116,9 +137,13 @@ class DefaultStatementBuilder
 
 		if (this.currentOngoingMatch != null) {
 			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
+			this.currentOngoingMatch = null;
 		}
 
-		this.currentOngoingMatch = null;
+		if (this.currentOngoingCall != null) {
+			this.currentSinglePartElements.add(this.currentOngoingCall.build());
+			this.currentOngoingCall = null;
+		}
 
 		if (this.currentOngoingUpdate != null) {
 			this.currentSinglePartElements.add(this.currentOngoingUpdate.buildUpdatingClause());
@@ -257,13 +282,18 @@ class DefaultStatementBuilder
 
 		if (this.currentOngoingMatch != null) {
 			visitables.add(this.currentOngoingMatch.buildMatch());
+			this.currentOngoingMatch = null;
 		}
-		this.currentOngoingMatch = null;
 
 		if (this.currentOngoingUpdate != null) {
 			visitables.add(this.currentOngoingUpdate.buildUpdatingClause());
+			this.currentOngoingUpdate = null;
 		}
-		this.currentOngoingUpdate = null;
+
+		if (this.currentOngoingCall != null) {
+			visitables.add(this.currentOngoingCall.build());
+			this.currentOngoingCall = null;
+		}
 
 		this.currentSinglePartElements.clear();
 		return visitables;
@@ -347,7 +377,8 @@ class DefaultStatementBuilder
 			if (!returnList.isEmpty()) {
 
 				ExpressionList returnItems = new ExpressionList(this.returnList);
-				returning = new Return(distinct, returnItems, orderBuilder.buildOrder().orElse(null), orderBuilder.getSkip(),
+				returning = new Return(distinct, returnItems, orderBuilder.buildOrder().orElse(null),
+					orderBuilder.getSkip(),
 					orderBuilder.getLimit());
 			}
 
@@ -367,7 +398,6 @@ class DefaultStatementBuilder
 	 * Adds support for With to a return builder.
 	 */
 	protected abstract class WithBuilderSupport {
-
 
 	}
 
@@ -552,6 +582,14 @@ class DefaultStatementBuilder
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.unwind(expression);
+		}
+
+		@Override
+		public InQueryCallBuilder call(String... namespaceAndProcedure) {
+
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.call(namespaceAndProcedure);
 		}
 
 		@Override
@@ -821,6 +859,76 @@ class DefaultStatementBuilder
 		public OngoingReading as(String variable) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(new Unwind(expressionToUnwind, variable));
 			return DefaultStatementBuilder.this;
+		}
+	}
+
+	@Override
+	public InQueryCallBuilder call(String... namespaceAndProcedure) {
+
+		Assert.notEmpty(namespaceAndProcedure, "The procedure namespace and name must not be null or empty.");
+
+		if (this.currentOngoingMatch != null) {
+			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
+		}
+
+		if (this.currentOngoingCall != null) {
+			this.currentSinglePartElements.add(this.currentOngoingCall.build());
+			this.currentOngoingCall = null;
+		}
+
+		InQueryCallBuilder inQueryCallBuilder = new InQueryCallBuilder(ProcedureName.from(namespaceAndProcedure));
+		this.currentOngoingCall = inQueryCallBuilder;
+		return inQueryCallBuilder;
+	}
+
+	private final class InQueryCallBuilder extends ProcedureCall.Builder implements
+		OngoingInQueryCallWithoutArguments, OngoingInQueryCallWithArguments,
+		OngoingInQueryCallWithReturnFields {
+
+		InQueryCallBuilder(ProcedureName procedureName) {
+			super(procedureName);
+		}
+
+		@Override
+		public InQueryCallBuilder withArgs(Expression... arguments) {
+
+			super.arguments = arguments;
+			return this;
+		}
+
+		@Override
+		public InQueryCallBuilder yield(SymbolicName... resultFields) {
+
+			super.yieldItems = YieldItems.yieldAllOf(resultFields);
+			return this;
+		}
+
+		@Override
+		public InQueryCallBuilder yield(AliasedExpression... aliasedResultFields) {
+
+			super.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
+			return this;
+		}
+
+		@Override
+		public OngoingReadingWithWhere where(Condition newCondition) {
+
+			conditionBuilder.where(newCondition);
+			DefaultStatementBuilder.this.currentOngoingCall = this;
+			return DefaultStatementBuilder.this;
+		}
+
+		@Override
+		public OngoingReadingAndReturn returning(Expression... expressions) {
+
+			DefaultStatementBuilder.this.currentOngoingCall = this;
+			return DefaultStatementBuilder.this.returning(expressions);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
+			DefaultStatementBuilder.this.currentOngoingCall = this;
+			return DefaultStatementBuilder.this.returningDistinct(expressions);
 		}
 	}
 
