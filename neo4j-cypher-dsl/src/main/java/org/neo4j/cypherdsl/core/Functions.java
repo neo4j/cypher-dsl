@@ -255,6 +255,20 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for the {@code point()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
+	 *
+	 * @param parameter A parameter referencing a {@code point()}
+	 * @return A function call for {@code point()}
+	 */
+	public static FunctionInvocation point(Parameter parameter) {
+
+		Assert.notNull(parameter, "The parameter is required.");
+
+		return new FunctionInvocation("point", parameter);
+	}
+
+	/**
 	 * Creates a function invocation for the {@code avg()} function.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-avg">avg</a>.
 	 *

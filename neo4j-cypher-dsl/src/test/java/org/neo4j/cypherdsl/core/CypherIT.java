@@ -2059,6 +2059,20 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (n) RETURN point({latitude: $latitude, longitude: $longitude, crs: 4326})");
 		}
+
+		@Test
+		void shouldRenderPointFunction() {
+			Statement statement;
+			Node n = Cypher.anyNode("n");
+			statement = Cypher.match(n)
+					.where(Functions.distance(n.property("location"), Functions.point(Cypher.parameter("point.point")))
+							.gt(Cypher.parameter("point.distance")))
+					.returning(n)
+					.build();
+
+			assertThat(cypherRenderer.render(statement))
+					.isEqualTo("MATCH (n) WHERE distance(n.location, point($point.point)) > $point.distance RETURN n");
+		}
 	}
 
 	@Nested
