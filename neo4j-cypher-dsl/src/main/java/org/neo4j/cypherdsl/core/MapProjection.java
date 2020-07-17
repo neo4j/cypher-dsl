@@ -39,14 +39,14 @@ public final class MapProjection implements Expression {
 
 	private SymbolicName name;
 
-	private MapExpression<?> map;
+	private MapExpression map;
 
 	static MapProjection create(SymbolicName name, Object... content) {
 
 		return new MapProjection(name, MapExpression.withEntries(createNewContent(content)));
 	}
 
-	MapProjection(SymbolicName name, MapExpression<?> map) {
+	MapProjection(SymbolicName name, MapExpression map) {
 		this.name = name;
 		this.map = map;
 	}

@@ -32,11 +32,10 @@ import org.neo4j.cypherdsl.core.support.TypedSubtree;
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Pattern.html">Pattern</a>.
  *
  * @author Michael J. Simons
- * @param <S> The pattern's entry type
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public final class Pattern<S extends Pattern<S>> extends TypedSubtree<PatternElement, S> {
+public final class Pattern extends TypedSubtree<PatternElement, Pattern> {
 
 	Pattern(List<PatternElement> patternElements) {
 		super(patternElements);

@@ -35,7 +35,7 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return The new property container.
 	 */
-	T withProperties(MapExpression<?> newProperties);
+	T withProperties(MapExpression newProperties);
 
 	/**
 	 * Creates a a copy of this property container with additional properties.

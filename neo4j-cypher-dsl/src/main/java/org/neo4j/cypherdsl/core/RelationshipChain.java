@@ -133,7 +133,7 @@ public final class RelationshipChain implements RelationshipPattern, ExposesRela
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return This chain
 	 */
-	public RelationshipChain properties(MapExpression<?> newProperties) {
+	public RelationshipChain properties(MapExpression newProperties) {
 
 		Relationship lastElement = this.relationships.removeLast();
 		return this.add(lastElement.withProperties(newProperties));

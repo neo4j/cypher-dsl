@@ -185,7 +185,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	}
 
 	@Override
-	public Relationship withProperties(MapExpression<?> newProperties) {
+	public Relationship withProperties(MapExpression newProperties) {
 
 		if (newProperties == null && this.details.getProperties() == null) {
 			return this;
@@ -197,7 +197,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	@Override
 	public Relationship withProperties(Object... keysAndValues) {
 
-		MapExpression<?> newProperties = null;
+		MapExpression newProperties = null;
 		if (keysAndValues != null && keysAndValues.length != 0) {
 			newProperties = MapExpression.create(keysAndValues);
 		}

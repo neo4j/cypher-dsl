@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithArguments;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithReturnFields;
@@ -802,7 +803,7 @@ class DefaultStatementBuilder
 		private UpdatingClause buildUpdatingClause() {
 
 			if (MERGE_OR_CREATE.contains(updateType)) {
-				final Pattern pattern = new Pattern(this.expressions);
+				final Pattern pattern = new Pattern(this.expressions.stream().map(PatternElement.class::cast).collect(Collectors.toList()));
 				switch (updateType) {
 					case CREATE:
 						return new Create(pattern);
@@ -810,7 +811,7 @@ class DefaultStatementBuilder
 						return new Merge(pattern);
 				}
 			} else {
-				final ExpressionList expressionsList = new ExpressionList(this.expressions);
+				final ExpressionList expressionsList = new ExpressionList(this.expressions.stream().map(Expression.class::cast).collect(Collectors.toList()));
 				switch (updateType) {
 					case DETACH_DELETE:
 						return new Delete(expressionsList, true);
