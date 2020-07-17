@@ -43,7 +43,7 @@ class CypherTest {
 		params.add(Cypher.literalFalse());
 		params.add(Cypher.literalTrue());
 
-		Literal listLiteral = Cypher.literalOf(params);
+		Literal<?> listLiteral = Cypher.literalOf(params);
 
 		assertThat(listLiteral).isInstanceOf(ListLiteral.class)
 			.returns("[false, true]", v -> v.asString());

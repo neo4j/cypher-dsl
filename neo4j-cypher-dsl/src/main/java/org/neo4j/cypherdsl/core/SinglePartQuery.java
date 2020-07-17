@@ -52,7 +52,7 @@ public final class SinglePartQuery implements SingleQuery {
 
 	private SinglePartQuery(List<Visitable> precedingClauses, Return aReturn) {
 
-		this.precedingClauses = new ArrayList(precedingClauses);
+		this.precedingClauses = new ArrayList<>(precedingClauses);
 		this.aReturn = aReturn;
 	}
 

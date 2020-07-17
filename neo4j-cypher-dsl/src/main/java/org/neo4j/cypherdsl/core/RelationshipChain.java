@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class RelationshipChain implements RelationshipPattern, ExposesRelationships<RelationshipChain> {
+public final class RelationshipChain implements RelationshipPattern {
 
 	private final LinkedList<Relationship> relationships = new LinkedList<>();
 

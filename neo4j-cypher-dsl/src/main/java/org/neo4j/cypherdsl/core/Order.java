@@ -30,11 +30,10 @@ import org.neo4j.cypherdsl.core.support.TypedSubtree;
  *
  * @author Gerrit Meier
  * @author Michael J. Simons
- * @param <S> The order's entry type
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Order<S extends Order<S>> extends TypedSubtree<SortItem, S> {
+public final class Order extends TypedSubtree<SortItem, Order> {
 
 	Order(List<SortItem> sortItems) {
 		super(sortItems);
