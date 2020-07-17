@@ -2061,7 +2061,7 @@ class CypherIT {
 		}
 
 		@Test
-		void shouldRenderParameter() {
+		void shouldRenderPointFunction() {
 			Statement statement;
 			Node n = Cypher.anyNode("n");
 			statement = Cypher.match(n)
