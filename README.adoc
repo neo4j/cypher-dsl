@@ -5,7 +5,7 @@
 :groupId: org.neo4j
 :artifactId: neo4j-cypher-dsl
 
-:neo4j-cypher-dsl-version: 2020.0.1
+:neo4j-cypher-dsl-version: 2020.0.2-SNAPSHOT
 
 // end::properties[]
 
