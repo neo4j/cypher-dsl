@@ -69,6 +69,14 @@ public final class MapProjection implements Expression {
 		visitor.leave(this);
 	}
 
+	private static Object contentAt(Object[] content, int i) {
+
+		if (content[i] instanceof Expression) {
+			return nameOrExpression((Expression) content[i]);
+		}
+		return content[i];
+	}
+
 	private static List<Expression> createNewContent(Object... content) {
 		final List<Expression> newContent = new ArrayList<>(content.length);
 		final Set<String> knownKeys = new HashSet<>();
@@ -82,9 +90,9 @@ public final class MapProjection implements Expression {
 			if (i + 1 >= content.length) {
 				next = null;
 			} else {
-				next = nameOrExpression(content[i + 1]);
+				next = contentAt(content, i + 1);
 			}
-			Object current = nameOrExpression(content[i]);
+			Object current = contentAt(content, i);
 
 			if (current instanceof String) {
 				if (next instanceof Expression) {

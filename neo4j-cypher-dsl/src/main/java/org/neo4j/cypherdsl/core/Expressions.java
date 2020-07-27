@@ -38,10 +38,10 @@ final class Expressions {
 	 * @param <T> The type being returned
 	 * @return The name of the expression if the expression is named or the expression itself.
 	 */
-	static <T> T nameOrExpression(T expression) {
+	static <T extends Expression> Expression nameOrExpression(T expression) {
 
 		if (expression instanceof Named) {
-			return ((Named) expression).getSymbolicName().map(v -> (T) v).orElse(expression);
+			return ((Named) expression).getSymbolicName().map(Expression.class::cast).orElse(expression);
 		} else {
 			return expression;
 		}
