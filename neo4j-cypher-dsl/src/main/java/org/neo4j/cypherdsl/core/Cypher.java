@@ -318,7 +318,15 @@ public final class Cypher {
 			return new NumberLiteral((Number) object);
 		}
 		if (object instanceof Iterable) {
-			return new ListLiteral((Iterable<Literal<?>>) object);
+			for (Object element : ((Iterable<?>) object)) {
+				if (!(element instanceof Literal)) {
+					throw new IllegalArgumentException("Unsupported literal type in iterable: " + element.getClass());
+				}
+			}
+
+			@SuppressWarnings("unchecked") // See above
+			ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
+			return listLiteral;
 		}
 		if (object instanceof Boolean) {
 			return BooleanLiteral.of((Boolean) object);
