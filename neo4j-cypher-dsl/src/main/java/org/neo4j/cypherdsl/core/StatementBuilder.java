@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.*;
 import static org.neo4j.cypherdsl.core.Expressions.*;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
 
 /**
  * @author Michael J. Simons
@@ -29,7 +30,8 @@ import org.apiguardian.api.API;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind {
+public interface StatementBuilder
+	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning {
 
 	/**
 	 * Allows for queries starting with {@code with range(1,10) as x return x} or similar.
@@ -55,31 +57,8 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingReadingWithoutWhere extends OngoingReading, ExposesMatch, ExposesCreate, ExposesMerge {
-
-		/**
-		 * Adds a where clause to this match.
-		 *
-		 * @param condition The new condition, must not be {@literal null}
-		 * @return A match restricted by a where clause with no return items yet.
-		 */
-		OngoingReadingWithWhere where(Condition condition);
-
-		/**
-		 * Adds a where clause based on a path pattern to this match.
-		 * See <a href="https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using path patterns in WHERE</a>.
-		 *
-		 * @param pathPattern The path pattern to add to the where clause.
-		 *                    This path pattern must not be {@literal null} and must
-		 *                    not introduce new variables not available in the match.
-		 * @return A match restricted by a where clause with no return items yet.
-		 * @since 1.0.1
-		 */
-		default OngoingReadingWithWhere where(RelationshipPattern pathPattern) {
-
-			Assert.notNull(pathPattern, "The path pattern must not be null.");
-			return this.where(new RelationshipPatternCondition(pathPattern));
-		}
+	interface OngoingReadingWithoutWhere
+		extends OngoingReading, ExposesWhere, ExposesMatch, ExposesCreate, ExposesMerge {
 	}
 
 	/**
@@ -98,7 +77,8 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * @since 1.0
 	 */
 	interface OngoingReading
-		extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate {
+		extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate,
+		ExposesCall<OngoingInQueryCallWithoutArguments> {
 	}
 
 	/**

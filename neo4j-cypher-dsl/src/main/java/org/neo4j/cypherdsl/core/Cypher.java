@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
+import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
+import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
 
 /**
@@ -353,14 +356,14 @@ public final class Cypher {
 	 * @since 1.0.1
 	 */
 	public static StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
-		return new DefaultStatementBuilder().returning(expressions);
+		return Statement.builder().returning(expressions);
 	}
 
-	public static PatternComprehension.OngoingDefinitionWithPattern listBasedOn(Relationship pattern) {
+	public static OngoingDefinitionWithPattern listBasedOn(Relationship pattern) {
 		return PatternComprehension.basedOn(pattern);
 	}
 
-	public static PatternComprehension.OngoingDefinitionWithPattern listBasedOn(RelationshipChain pattern) {
+	public static OngoingDefinitionWithPattern listBasedOn(RelationshipChain pattern) {
 		return PatternComprehension.basedOn(pattern);
 	}
 
@@ -371,7 +374,7 @@ public final class Cypher {
 	 * @return An ongoing definition of a list comprehension
 	 * @since 1.0.1
 	 */
-	public static ListComprehension.OngoingDefinitionWithVariable listWith(SymbolicName variable) {
+	public static OngoingDefinitionWithVariable listWith(SymbolicName variable) {
 		return ListComprehension.with(variable);
 	}
 
@@ -398,6 +401,29 @@ public final class Cypher {
 	 */
 	public static Case caseExpression(Expression expression) {
 		return Case.create(expression);
+	}
+
+	/**
+	 * Starts defining a procedure call of the procedure with the given {@literal procedureName}. That
+	 * procedure name might be fully qualified - that is, including a namespace - or just a simple name.
+	 *
+	 * @param procedureName The procedure name of the procedure to call. Might be fully qualified.
+	 * @return An ongoing definition of a call
+	 */
+	public static OngoingStandaloneCallWithoutArguments call(String procedureName) {
+
+		Assert.hasText(procedureName, "The procedure name must not be null or empty.");
+		return call(procedureName.split("\\."));
+	}
+
+	/**
+	 * Starts defining a procedure call of the procedure with the given qualified name.
+	 *
+	 * @param namespaceAndProcedure The procedure name of the procedure to call.
+	 * @return An ongoing definition of a call
+	 */
+	public static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
+		return Statement.call(namespaceAndProcedure);
 	}
 
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {

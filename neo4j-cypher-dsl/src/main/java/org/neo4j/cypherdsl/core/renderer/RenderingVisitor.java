@@ -470,6 +470,41 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(" END");
 	}
 
+	void enter(ProcedureCall procedureCall) {
+
+		builder.append("CALL ");
+	}
+
+	void leave(Namespace namespace) {
+
+		builder.append(".");
+	}
+
+	void leave(ProcedureName procedureName) {
+
+		builder.append(procedureName.getValue());
+	}
+
+	void enter(Arguments arguments) {
+
+		builder.append("(");
+	}
+
+	void leave(Arguments arguments) {
+
+		builder.append(")");
+	}
+
+	void enter(YieldItems yieldItems) {
+
+		builder.append(" YIELD ");
+	}
+
+	void leave(ProcedureCall procedureCall) {
+
+		builder.append(" ");
+	}
+
 	public String getRenderedContent() {
 		return this.builder.toString();
 	}

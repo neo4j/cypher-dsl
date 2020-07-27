@@ -36,6 +36,11 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface Statement extends Visitable {
 
+	static ProcedureCall.OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
+
+		return new ProcedureCall.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
+	}
+
 	static StatementBuilder builder() {
 
 		return new DefaultStatementBuilder();
@@ -43,13 +48,15 @@ public interface Statement extends Visitable {
 
 	/**
 	 * Represents {@code RegularQuery}.
+	 *
 	 * @since 1.0
 	 */
 	interface RegularQuery extends Statement {
 	}
 
 	/**
-	 * Represents a {@code StandaloneCall}.
+	 * Represents a {@code SingleQuery}.
+	 *
 	 * @since 1.0
 	 */
 	interface SingleQuery extends RegularQuery {
