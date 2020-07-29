@@ -24,11 +24,13 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Statement;
 
 /**
- * Instances of this class are supposed to be thread-safe.
+ * Instances of this class are supposed to be thread-safe. Please use {@link Renderer#getDefaultRenderer()} to get hold
+ * of an implementation.
+ *
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = INTERNAL, since = "1.0")
+@API(status = EXPERIMENTAL, since = "1.0")
 public interface Renderer {
 
 	/**

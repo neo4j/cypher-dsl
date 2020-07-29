@@ -18,17 +18,13 @@ The Cypher-DSL can also be seen in the same area as the https://docs.spring.io/s
 
 == Where to use it
 
-The Cypher-DSL returns Cypher as literal Java-Strings.
-Those can be used anywhere, for example with the https://github.com/neo4j/neo4j-java-driver[Neo4j Java driver],
-inside embedded procedures or with the `Neo4jOperations` respectively `ReactiveNeo4jOperations` inside SDN/RX respectivly SDN 6.
-Those are the basic interfaces implemented by the Neo4j templates of the same names.
+The Cypher-DSL creates an https://en.wikipedia.org/wiki/Abstract_syntax_tree[Abstract Syntax Tree (AST)] representing your Cypher-Statements.
+An instance of a `org.neo4j.cypherdsl.core.Statement` representing that AST is provided at the end of query building step.
+A `Renderer` is then used to create literal Java-Strings.
+Those can be used in any context supporting String-based queries, for example with the https://github.com/neo4j/neo4j-java-driver[Neo4j Java driver] or inside embedded procedures and of course with Spring Data's https://github.com/spring-projects/spring-data-neo4j/blob/master/src/main/java/org/springframework/data/neo4j/core/Neo4jClient.java[Neo4j-Client].
 
-Both the imperative and the reactive framework allow the retrieval and counting of entities with a `org.neo4j.springframework.data.core.cypher.Statement`,
-for example through `Neo4jTemplate#findAll(Statement, Class<T>)` and similar.
+Parameters in the generated queries will use the `$form` and as such be compatible with all current versions of Neo4j.
 
-An instance of a `org.neo4j.springframework.data.core.cypher.Statement` is provided at the end of query building step.
-
-A `Statement` represents an in-memory https://en.wikipedia.org/wiki/Abstract_syntax_tree[Abstract syntax tree] and can be
-transformed and rendered as such.
-
-This string representation of a statement can also be used with the https://neo4j.github.io/sdn-rx/current/#neo4j-client[Neo4j-Client].
+Users of SDN/RX respectivly SDN 6 can use the generated `org.neo4j.cypherdsl.core.Statement` directly with the `Neo4jTemplate` or the `ReactiveNeo4jTemplate`. 
+Both the imperative and the reactive variants allow the retrieval and counting of entities without rendering a String first,
+for example through `Neo4jTemplate#findAll(Statement, Class<T>)`.

@@ -39,15 +39,12 @@ the further building methods they offer.
 IMPORTANT: The AST parts and intermediate build steps are immutable. That is, the methods create new intermediate steps.
 For example, you cannot reuse an `ExposesLimit` step, but have to use the returned object from its `skip` method.
 
-An instance of a `org.neo4j.springframework.data.core.cypher.Statement` is provided at the end of every query building step.
+An instance of a `org.neo4j.cypherdsl.core.Statement` is provided at the end of every query building step.
 This `Statement` needs to be rendered into a string or passed to methods supporting it as input.
 
-We are still on a JDK 8 baseline and cannot hide our renderer in an internal module.
-This class is therefor marked as `@API(status = INTERNAL)`.
-Please get an instance of the default renderer via `org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()` instead
-and then use the `render` method to get a string representation of the statement.
+Please get an instance of the default renderer via `org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()`.
+The renderer provides a single method `render` for rendering the AST into a string representation.
 
-We do however give no guarantees to the render API until it is marked as `EXPERIMENTAL` or `STABLE`.
 
 === Examples
 
