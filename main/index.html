@@ -613,24 +613,18 @@ We however have a type safe API for Cypher that allows only generating valid Cyp
 <div class="sect2">
 <h3 id="wheretouseit"><a class="anchor" href="#wheretouseit"></a>1.2. Where to use it</h3>
 <div class="paragraph">
-<p>The Cypher-DSL returns Cypher as literal Java-Strings.
-Those can be used anywhere, for example with the <a href="https://github.com/neo4j/neo4j-java-driver">Neo4j Java driver</a>,
-inside embedded procedures or with the <code>Neo4jOperations</code> respectively <code>ReactiveNeo4jOperations</code> inside SDN/RX respectivly SDN 6.
-Those are the basic interfaces implemented by the Neo4j templates of the same names.</p>
+<p>The Cypher-DSL creates an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree (AST)</a> representing your Cypher-Statements.
+An instance of a <code>org.neo4j.cypherdsl.core.Statement</code> representing that AST is provided at the end of query building step.
+A <code>Renderer</code> is then used to create literal Java-Strings.
+Those can be used in any context supporting String-based queries, for example with the <a href="https://github.com/neo4j/neo4j-java-driver">Neo4j Java driver</a> or inside embedded procedures and of course with Spring Data&#8217;s <a href="https://github.com/spring-projects/spring-data-neo4j/blob/master/src/main/java/org/springframework/data/neo4j/core/Neo4jClient.java">Neo4j-Client</a>.</p>
 </div>
 <div class="paragraph">
-<p>Both the imperative and the reactive framework allow the retrieval and counting of entities with a <code>org.neo4j.springframework.data.core.cypher.Statement</code>,
-for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code> and similar.</p>
+<p>Parameters in the generated queries will use the <code>$form</code> and as such be compatible with all current versions of Neo4j.</p>
 </div>
 <div class="paragraph">
-<p>An instance of a <code>org.neo4j.springframework.data.core.cypher.Statement</code> is provided at the end of query building step.</p>
-</div>
-<div class="paragraph">
-<p>A <code>Statement</code> represents an in-memory <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract syntax tree</a> and can be
-transformed and rendered as such.</p>
-</div>
-<div class="paragraph">
-<p>This string representation of a statement can also be used with the <a href="https://neo4j.github.io/sdn-rx/current/#neo4j-client">Neo4j-Client</a>.</p>
+<p>Users of SDN/RX respectivly SDN 6 can use the generated <code>org.neo4j.cypherdsl.core.Statement</code> directly with the <code>Neo4jTemplate</code> or the <code>ReactiveNeo4jTemplate</code>.
+Both the imperative and the reactive variants allow the retrieval and counting of entities without rendering a String first,
+for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code>.</p>
 </div>
 </div>
 </div>
@@ -693,17 +687,12 @@ For example, you cannot reuse an <code>ExposesLimit</code> step, but have to use
 </table>
 </div>
 <div class="paragraph">
-<p>An instance of a <code>org.neo4j.springframework.data.core.cypher.Statement</code> is provided at the end of every query building step.
+<p>An instance of a <code>org.neo4j.cypherdsl.core.Statement</code> is provided at the end of every query building step.
 This <code>Statement</code> needs to be rendered into a string or passed to methods supporting it as input.</p>
 </div>
 <div class="paragraph">
-<p>We are still on a JDK 8 baseline and cannot hide our renderer in an internal module.
-This class is therefor marked as <code>@API(status = INTERNAL)</code>.
-Please get an instance of the default renderer via <code>org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()</code> instead
-and then use the <code>render</code> method to get a string representation of the statement.</p>
-</div>
-<div class="paragraph">
-<p>We do however give no guarantees to the render API until it is marked as <code>EXPERIMENTAL</code> or <code>STABLE</code>.</p>
+<p>Please get an instance of the default renderer via <code>org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()</code>.
+The renderer provides a single method <code>render</code> for rendering the AST into a string representation.</p>
 </div>
 <div class="sect3">
 <h4 id="examples"><a class="anchor" href="#examples"></a>2.2.1. Examples</h4>
@@ -934,7 +923,7 @@ assertThat(cypherRenderer.render(statement))
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-07-27 12:03:18 UTC
+Last updated 2020-07-29 06:04:33 UTC
 </div>
 </div>
 </body>
