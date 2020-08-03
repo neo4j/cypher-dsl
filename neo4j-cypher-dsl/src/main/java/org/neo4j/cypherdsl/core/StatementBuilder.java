@@ -57,8 +57,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingReadingWithoutWhere
-		extends OngoingReading, ExposesWhere, ExposesMatch, ExposesCreate, ExposesMerge {
+	interface OngoingReadingWithoutWhere extends OngoingReading, ExposesWhere, ExposesMatch {
 	}
 
 	/**
@@ -147,8 +146,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingReadingAndWith
-		extends OngoingReading, ExposesMatch, ExposesReturning, ExposesCreate, ExposesMerge {
+	interface OngoingReadingAndWith extends OngoingReading, ExposesMatch {
 	}
 
 	/**
@@ -386,10 +384,9 @@ public interface StatementBuilder
 		 * all expression with {@link Cypher#sort(Expression)} or directly from properties.
 		 *
 		 * @param sortItem One or more sort items
-		 * @param <T>      The type of the step being returned
 		 * @return A build step that still offers methods for defining skip and limit
 		 */
-		<T extends ExposesSkip & ExposesLimit & OngoingReadingAndWith> T orderBy(SortItem... sortItem);
+		OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem);
 
 		/**
 		 * Order the result set by an expression.

@@ -28,7 +28,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
-public final class ProcedureCall implements Visitable, Statement {
+public final class ProcedureCall implements Statement {
 
 	private final ProcedureName name;
 
@@ -95,7 +95,7 @@ public final class ProcedureCall implements Visitable, Statement {
 
 		protected Expression[] arguments;
 
-		protected YieldItems<?, ?> yieldItems;
+		protected YieldItems yieldItems;
 
 		protected final DefaultStatementBuilder.ConditionBuilder conditionBuilder = new DefaultStatementBuilder.ConditionBuilder();
 

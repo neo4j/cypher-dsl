@@ -26,25 +26,23 @@ import org.neo4j.cypherdsl.core.support.TypedSubtree;
 /**
  * Items yielded by a stand alone or in query call.
  *
- * @param <T>    The children's type
- * @param <SELF> The concrete type of this class.
  * @author Michael J. Simons
  * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
-public final class YieldItems<T extends Expression, SELF extends YieldItems<T, SELF>> extends TypedSubtree<T, SELF> {
+public final class YieldItems extends TypedSubtree<Expression, YieldItems> {
 
-	static <C extends Expression, SELF extends YieldItems<C, SELF>> YieldItems<C, SELF> yieldAllOf(C... c) {
+	static YieldItems yieldAllOf(Expression... c) {
 
 		if (c == null || c.length == 0) {
 			throw new IllegalArgumentException("Cannot yield an empty list of items.");
 		}
 
-		return new YieldItems<C, SELF>(c);
+		return new YieldItems(c);
 	}
 
-	private YieldItems(T... children) {
+	private YieldItems(Expression... children) {
 		super(children);
 	}
 }
