@@ -19,8 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.*;
-
-import java.util.Collections;
+import static org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates.*;
 
 import org.apiguardian.api.API;
 
@@ -43,9 +42,7 @@ public final class Predicates {
 	 */
 	public static Condition exists(Property property) {
 
-		Assert.notNull(property, "The property for exists() is required.");
-
-		return new BooleanFunctionCondition(new FunctionInvocation("exists", property));
+		return new BooleanFunctionCondition(FunctionInvocation.create(EXISTS, property));
 	}
 
 	/**
@@ -57,10 +54,7 @@ public final class Predicates {
 	 */
 	public static Condition exists(RelationshipPattern pattern) {
 
-		Assert.notNull(pattern, "The pattern for exists() is required.");
-
-		return new BooleanFunctionCondition(
-			new FunctionInvocation("exists", new Pattern(Collections.singletonList(pattern))));
+		return new BooleanFunctionCondition(FunctionInvocation.create(EXISTS, pattern));
 	}
 
 	/**
@@ -84,7 +78,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction all(SymbolicName variable) {
 
-		return new Builder("all", variable);
+		return new Builder(ALL, variable);
 	}
 
 	/**
@@ -108,7 +102,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction any(SymbolicName variable) {
 
-		return new Builder("any", variable);
+		return new Builder(ANY, variable);
 	}
 
 	/**
@@ -132,7 +126,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction none(SymbolicName variable) {
 
-		return new Builder("none", variable);
+		return new Builder(NONE, variable);
 	}
 
 	/**
@@ -156,7 +150,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction single(SymbolicName variable) {
 
-		return new Builder("single", variable);
+		return new Builder(SINGLE, variable);
 	}
 
 	/**
@@ -186,11 +180,11 @@ public final class Predicates {
 	private static class Builder implements OngoingListBasedPredicateFunction,
 		OngoingListBasedPredicateFunctionWithList {
 
-		private final String predicate;
+		private final BuiltInFunctions.Predicates predicate;
 		private final SymbolicName name;
 		private Expression listExpression;
 
-		Builder(String predicate, SymbolicName name) {
+		Builder(BuiltInFunctions.Predicates predicate, SymbolicName name) {
 
 			Assert.notNull(predicate, "The predicate is required");
 			Assert.notNull(name, "The name is required");
@@ -211,7 +205,7 @@ public final class Predicates {
 
 			Assert.notNull(condition, "The condition is required");
 			return new BooleanFunctionCondition(
-				new FunctionInvocation(predicate, new ListPredicate(name, listExpression, new Where(condition))));
+				FunctionInvocation.create(predicate, new ListPredicate(name, listExpression, new Where(condition))));
 		}
 	}
 

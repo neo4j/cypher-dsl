@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Answers;
 
 /**
  * @author Michael J. Simons
@@ -44,14 +45,15 @@ class FunctionsTest {
 		@Test
 		void preconditionsShouldBeAsserted() {
 
+			String message = "The expression for coalesce() is required.";
 			assertThatIllegalArgumentException().isThrownBy(() -> Functions.coalesce((Expression[]) null))
-				.withMessage("At least one expression is required.");
+				.withMessage(message);
 
 			assertThatIllegalArgumentException().isThrownBy(() -> Functions.coalesce(new Expression[0]))
-				.withMessage("At least one expression is required.");
+				.withMessage(message);
 
 			assertThatIllegalArgumentException().isThrownBy(() -> Functions.coalesce(new Expression[] { null }))
-				.withMessage("At least one expression is required.");
+				.withMessage(message);
 		}
 
 		@Test
@@ -83,7 +85,7 @@ class FunctionsTest {
 		Method method = findMethod(Functions.class, functionName, argumentType);
 		assertThatIllegalArgumentException()
 			.isThrownBy(() -> invokeMethod(method, null, (Expression) null))
-			.withMessageEndingWith("is required.");
+			.withMessageMatching("The (node|relationship|expression|pattern) for " + functionName + "\\(\\) is required.");
 	}
 
 	@ParameterizedTest
@@ -91,7 +93,7 @@ class FunctionsTest {
 	void functionInvocationsShouldBeCreated(String functionName, Class<?> argumentType) {
 
 		Method method = findMethod(Functions.class, functionName, argumentType);
-		FunctionInvocation invocation = (FunctionInvocation) invokeMethod(method, null, mock(argumentType));
+		FunctionInvocation invocation = (FunctionInvocation) invokeMethod(method, null, mock(argumentType, Answers.RETURNS_DEEP_STUBS));
 		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, functionName);
 	}
 }

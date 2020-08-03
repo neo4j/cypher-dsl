@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-
-import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
@@ -29,8 +26,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = INTERNAL, since = "1.0")
-public final class DistinctExpression implements Expression {
+final class DistinctExpression implements Expression {
 
 	private final Expression delegate;
 
