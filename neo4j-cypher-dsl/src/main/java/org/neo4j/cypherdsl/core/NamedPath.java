@@ -20,10 +20,10 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.*;
 
-import java.util.Collections;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
@@ -58,12 +58,12 @@ public final class NamedPath implements PatternElement, Named {
 		return new Builder(name);
 	}
 
-	static OngoingShortestPathDefinitionWithName named(String name, String algorithm) {
+	static OngoingShortestPathDefinitionWithName named(String name, FunctionDefinition algorithm) {
 
 		return new ShortestPathBuilder(SymbolicName.create(name), algorithm);
 	}
 
-	static OngoingShortestPathDefinitionWithName named(SymbolicName name, String algorithm) {
+	static OngoingShortestPathDefinitionWithName named(SymbolicName name, FunctionDefinition algorithm) {
 
 		Assert.notNull(name, "A name is required");
 		return new ShortestPathBuilder(name, algorithm);
@@ -102,16 +102,16 @@ public final class NamedPath implements PatternElement, Named {
 	private static class ShortestPathBuilder implements OngoingShortestPathDefinitionWithName {
 
 		private final SymbolicName name;
-		private final String algorithm;
+		private final FunctionDefinition algorithm;
 
-		private ShortestPathBuilder(SymbolicName name, String algorithm) {
+		private ShortestPathBuilder(SymbolicName name, FunctionDefinition algorithm) {
 			this.name = name;
 			this.algorithm = algorithm;
 		}
 
 		@Override
 		public NamedPath definedBy(Relationship relationship) {
-			return new NamedPath(name, new FunctionInvocation(algorithm, new Pattern(Collections.singletonList(relationship))));
+			return new NamedPath(name, FunctionInvocation.create(algorithm, relationship));
 		}
 	}
 

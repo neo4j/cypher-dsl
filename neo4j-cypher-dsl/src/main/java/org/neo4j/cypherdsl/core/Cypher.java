@@ -145,7 +145,7 @@ public final class Cypher {
 	 * @since 1.1.1
 	 */
 	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(String name) {
-		return NamedPath.named(name, "shortestPath");
+		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
 	}
 
 	/**
@@ -156,7 +156,7 @@ public final class Cypher {
 	 * @since 1.1.1
 	 */
 	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(SymbolicName name) {
-		return NamedPath.named(name, "shortestPath");
+		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
 	}
 
 	/**
