@@ -27,9 +27,9 @@ import org.apiguardian.api.API;
  *
  * @author Michael J. Simons
  * @soundtrack Smoke Blow - Dark Angel
- * @since 2020.1.0
+ * @since 2020.0.1
  */
-@API(status = EXPERIMENTAL, since = "2020.1.0")
+@API(status = EXPERIMENTAL, since = "2020.0.1")
 public interface ExposesWhere {
 
 	/**

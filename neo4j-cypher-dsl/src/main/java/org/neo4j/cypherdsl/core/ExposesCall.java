@@ -30,9 +30,9 @@ import org.apiguardian.api.API;
  * @param <T> The type of the returned builder
  * @author Michael J. Simons
  * @soundtrack Erik Cohen - Nostalgie für die Zukunft
- * @since 2020.1.0
+ * @since 2020.0.1
  */
-@API(status = EXPERIMENTAL, since = "2020.1.0")
+@API(status = EXPERIMENTAL, since = "2020.0.1")
 public interface ExposesCall<T> {
 
 	/**

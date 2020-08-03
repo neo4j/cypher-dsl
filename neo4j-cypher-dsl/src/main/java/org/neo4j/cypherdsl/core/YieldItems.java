@@ -30,9 +30,9 @@ import org.neo4j.cypherdsl.core.support.TypedSubtree;
  * @param <SELF> The concrete type of this class.
  * @author Michael J. Simons
  * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
- * @since 2020.1.0.0
+ * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.1.0")
+@API(status = INTERNAL, since = "2020.0.1")
 public final class YieldItems<T extends Expression, SELF extends YieldItems<T, SELF>> extends TypedSubtree<T, SELF> {
 
 	static <C extends Expression, SELF extends YieldItems<C, SELF>> YieldItems<C, SELF> yieldAllOf(C... c) {

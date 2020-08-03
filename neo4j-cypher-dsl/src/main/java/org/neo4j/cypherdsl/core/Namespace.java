@@ -29,9 +29,9 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 /**
  * @author Michael J. Simons
  * @soundtrack Apocalyptica - Cell-0
- * @since 2020.1.0
+ * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.1.0")
+@API(status = INTERNAL, since = "2020.0.1")
 public final class Namespace extends Literal<String[]> {
 
 	Namespace(String[] value) {

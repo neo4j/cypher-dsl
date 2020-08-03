@@ -29,9 +29,9 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 /**
  * @author Michael J. Simons
  * @soundtrack Apocalyptica - Cell-0
- * @since 2020.1.0
+ * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.1.0")
+@API(status = INTERNAL, since = "2020.0.1")
 public final class ProcedureName implements Visitable {
 
 	private final Namespace optionalNamespace;
@@ -65,7 +65,6 @@ public final class ProcedureName implements Visitable {
 		visitor.leave(this);
 	}
 
-	@API(status = INTERNAL, since = "2020.1.0")
 	public String getValue() {
 		return value;
 	}
