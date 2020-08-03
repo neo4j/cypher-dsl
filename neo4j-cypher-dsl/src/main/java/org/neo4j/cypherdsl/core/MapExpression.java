@@ -37,14 +37,13 @@ import org.neo4j.cypherdsl.core.support.Visitable;
  * or {@link Relationship relationships}.
  *
  * @author Michael J. Simons
- * @param <S> type of properties or parameter
  * @soundtrack Rammstein - RAMMSTEIN
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public final class MapExpression<S extends MapExpression<S>> extends TypedSubtree<Expression, S> implements Expression {
+public final class MapExpression extends TypedSubtree<Expression, MapExpression> implements Expression {
 
-	static MapExpression<?> create(Object... input) {
+	static MapExpression create(Object... input) {
 
 		Assert.isTrue(input.length % 2 == 0, "Need an even number of input parameters");
 		List<Expression> newContent = new ArrayList<>(input.length / 2);
@@ -60,22 +59,22 @@ public final class MapExpression<S extends MapExpression<S>> extends TypedSubtre
 			knownKeys.add(entry.getKey());
 		}
 
-		return new MapExpression<>(newContent);
+		return new MapExpression(newContent);
 	}
 
-	static MapExpression<?> withEntries(List<Expression> entries) {
-		return new MapExpression<>(entries);
+	static MapExpression withEntries(List<Expression> entries) {
+		return new MapExpression(entries);
 	}
 
 	private MapExpression(List<Expression> children) {
 		super(children);
 	}
 
-	MapExpression<?> addEntries(List<Expression> entries) {
+	MapExpression addEntries(List<Expression> entries) {
 		List<Expression> newContent = new ArrayList<>(super.children.size() + entries.size());
 		newContent.addAll(super.children);
 		newContent.addAll(entries);
-		return new MapExpression<>(newContent);
+		return new MapExpression(newContent);
 	}
 
 	@Override

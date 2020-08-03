@@ -35,6 +35,8 @@ public abstract class TypedSubtree<T extends Visitable, SELF extends TypedSubtre
 
 	protected final List<T> children;
 
+	@SafeVarargs
+	@SuppressWarnings("varargs")
 	protected TypedSubtree(T... children) {
 
 		this.children = Arrays.asList(children);

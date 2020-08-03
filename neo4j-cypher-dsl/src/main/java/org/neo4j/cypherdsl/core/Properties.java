@@ -33,9 +33,9 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Properties implements Visitable {
 
-	private final MapExpression<?> properties;
+	private final MapExpression properties;
 
-	Properties(MapExpression<?> properties) {
+	Properties(MapExpression properties) {
 		this.properties = properties;
 	}
 

@@ -47,12 +47,12 @@ public final class ListExpression implements Expression {
 
 	static ListExpression create(Expression... expressions) {
 
-		return new ListExpression(new ExpressionList<>(expressions));
+		return new ListExpression(new ExpressionList(expressions));
 	}
 
-	private final ExpressionList<?> content;
+	private final ExpressionList content;
 
-	private ListExpression(ExpressionList<?> content) {
+	private ListExpression(ExpressionList content) {
 		this.content = content;
 	}
 

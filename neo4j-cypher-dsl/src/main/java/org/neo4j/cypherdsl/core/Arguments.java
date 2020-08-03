@@ -27,13 +27,12 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 /**
  * Specialized list of expressions that represents the arguments of a procedure call.
  *
- * @param <S> The concrete type of this class.
  * @author Michael J. Simons
  * @soundtrack Apocalyptica - Cell-0
- * @since 2020.1.0
+ * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.1.0")
-public final class Arguments<S extends Arguments<S>> extends TypedSubtree<Expression, S> {
+@API(status = INTERNAL, since = "2020.0.1")
+public final class Arguments extends TypedSubtree<Expression, Arguments> {
 
 	Arguments(Expression... children) {
 		super(children);

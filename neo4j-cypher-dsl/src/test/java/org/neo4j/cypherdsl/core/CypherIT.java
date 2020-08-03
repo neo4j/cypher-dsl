@@ -880,8 +880,8 @@ class CypherIT {
 		void chainingOnWhere() {
 			Statement statement;
 
-			Literal test = Cypher.literalOf("Test");
-			Literal foobar = Cypher.literalOf("foobar");
+			Literal<?> test = Cypher.literalOf("Test");
+			Literal<?> foobar = Cypher.literalOf("foobar");
 
 			statement = Cypher.match(userNode)
 				.where(userNode.property("name").isEqualTo(test))
@@ -982,9 +982,9 @@ class CypherIT {
 		void chainingOnConditions() {
 			Statement statement;
 
-			Literal test = Cypher.literalOf("Test");
-			Literal foobar = Cypher.literalOf("foobar");
-			Literal bazbar = Cypher.literalOf("bazbar");
+			Literal<?> test = Cypher.literalOf("Test");
+			Literal<?> foobar = Cypher.literalOf("foobar");
+			Literal<?> bazbar = Cypher.literalOf("bazbar");
 
 			statement = Cypher.match(userNode)
 				.where(
@@ -1060,9 +1060,9 @@ class CypherIT {
 		void chainingCombined() {
 			Statement statement;
 
-			Literal test = Cypher.literalOf("Test");
-			Literal foobar = Cypher.literalOf("foobar");
-			Literal bazbar = Cypher.literalOf("bazbar");
+			Literal<?> test = Cypher.literalOf("Test");
+			Literal<?> foobar = Cypher.literalOf("foobar");
+			Literal<?> bazbar = Cypher.literalOf("bazbar");
 
 			statement = Cypher.match(userNode)
 				.where(
@@ -1666,7 +1666,6 @@ class CypherIT {
 				.isEqualTo(
 					"MERGE (u:`User`) WITH u RETURN u");
 
-			Relationship r = userNode.relationshipTo(bikeNode, "OWNS").named("o");
 			statement = Cypher.merge(userNode)
 				.with(userNode)
 				.set(userNode.property("x").to(Cypher.literalOf("y")))
@@ -1831,7 +1830,6 @@ class CypherIT {
 				.isEqualTo(
 					"CREATE (u:`User`) WITH u RETURN u");
 
-			Relationship r = userNode.relationshipTo(bikeNode, "OWNS").named("o");
 			statement = Cypher.create(userNode)
 				.with(userNode)
 				.set(userNode.property("x").to(Cypher.literalOf("y")))

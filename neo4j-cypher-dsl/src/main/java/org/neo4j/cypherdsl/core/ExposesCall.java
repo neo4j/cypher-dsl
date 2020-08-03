@@ -54,18 +54,25 @@ public interface ExposesCall<T> {
 		 * Adds the given arguments to the ongoing call and procedes.
 		 *
 		 * @param arguments The list of new arguments, might be null or empty.
-		 * @return An oingoing standalone call on which yielded arguments might be configured.
+		 * @return An ongoing standalone call on which yielded arguments might be configured.
 		 */
 		T withArgs(Expression... arguments);
 	}
 
 	/**
-	 * Used to yield procedure result fields.
+	 * Used to yield procedure result fields. There are no checks involved whether the procedure being called
+	 * actually returns items with the given names.
 	 *
 	 * @param <T> The type of the next step
 	 */
 	interface ExposesYield<T> {
 
+		/**
+		 * Adds the given items to the {@literal YIELD} clause of the generated call.
+		 *
+		 * @param yieldedItems The list of items to be yielded.
+		 * @return The ongoing standalone call to be configured.
+		 */
 		default T yield(String... yieldedItems) {
 
 			SymbolicName[] names = new SymbolicName[0];
@@ -76,8 +83,21 @@ public interface ExposesCall<T> {
 			return yield(names);
 		}
 
+		/**
+	     * Adds the given items to the {@literal YIELD} clause of the generated call.
+		 *
+		 * @param resultFields The list of result fields to be returned.
+		 * @return The ongoing standalone call to be configured.
+		 */
 		T yield(SymbolicName... resultFields);
 
+		/**
+		 * Adds the given items to the {@literal YIELD} clause of the generated call and uses new
+		 * aliases in the generated call.
+		 *
+		 * @param aliasedResultFields The list of result fields to be returned with new aliases given.
+		 * @return The ongoing standalone call to be configured.
+		 */
 		T yield(AliasedExpression... aliasedResultFields);
 	}
 

@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class RelationshipChain implements RelationshipPattern, ExposesRelationships<RelationshipChain> {
+public final class RelationshipChain implements RelationshipPattern {
 
 	private final LinkedList<Relationship> relationships = new LinkedList<>();
 
@@ -133,7 +133,7 @@ public final class RelationshipChain implements RelationshipPattern, ExposesRela
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return This chain
 	 */
-	public RelationshipChain properties(MapExpression<?> newProperties) {
+	public RelationshipChain properties(MapExpression newProperties) {
 
 		Relationship lastElement = this.relationships.removeLast();
 		return this.add(lastElement.withProperties(newProperties));

@@ -114,7 +114,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	}
 
 	@Override
-	public Node withProperties(MapExpression<?> newProperties) {
+	public Node withProperties(MapExpression newProperties) {
 
 		return new Node(this.symbolicName, newProperties == null ? null : new Properties(newProperties), labels);
 	}
@@ -122,7 +122,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	@Override
 	public Node withProperties(Object... keysAndValues) {
 
-		MapExpression<?> newProperties = null;
+		MapExpression newProperties = null;
 		if (keysAndValues != null && keysAndValues.length != 0) {
 			newProperties = MapExpression.create(keysAndValues);
 		}

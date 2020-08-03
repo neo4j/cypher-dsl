@@ -74,6 +74,9 @@ enum CypherRenderer implements Renderer {
 	}
 
 	private static class LRUCache<K, V> extends LinkedHashMap<K, V> {
+
+		private static final long serialVersionUID = -6819899594092598277L;
+
 		private int cacheSize;
 
 		LRUCache(int cacheSize) {
