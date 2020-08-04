@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.neo4j.cypherdsl.core.DefaultStatementBuilder.UpdateType.*;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -112,14 +110,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public OngoingUpdate create(PatternElement... pattern) {
 
-		return update(CREATE, pattern);
+		return update(UpdateType.CREATE, pattern);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public OngoingUpdate merge(PatternElement... pattern) {
 
-		return update(MERGE, pattern);
+		return update(UpdateType.MERGE, pattern);
 	}
 
 	@Override
@@ -207,14 +205,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public OngoingUpdate delete(Expression... expressions) {
 
-		return update(DELETE, expressions);
+		return update(UpdateType.DELETE, expressions);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public OngoingUpdate detachDelete(Expression... expressions) {
 
-		return update(DETACH_DELETE, expressions);
+		return update(UpdateType.DETACH_DELETE, expressions);
 	}
 
 	@Override
@@ -224,28 +222,28 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.currentSinglePartElements.add(this.currentOngoingUpdate.buildUpdatingClause());
 			this.currentOngoingUpdate = null;
 		}
-		return new DefaultStatementWithUpdateBuilder(SET, expressions);
+		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate set(Node named, String... label) {
 
-		return new DefaultStatementWithUpdateBuilder(SET, Operations.set(named, label));
+		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, label));
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate remove(Property... properties) {
 
-		return new DefaultStatementWithUpdateBuilder(REMOVE, properties);
+		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate remove(Node named, String... label) {
 
-		return new DefaultStatementWithUpdateBuilder(REMOVE, Operations.remove(named, label));
+		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, label));
 	}
 
 	@Override
@@ -666,7 +664,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		CREATE, MERGE;
 	}
 
-	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(CREATE, MERGE);
+	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
 
 	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder
 		implements OngoingMatchAndUpdate {
@@ -769,7 +767,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		private OngoingUpdate delete(boolean nextDetach, Expression... deletedExpressions) {
 			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
-			return DefaultStatementBuilder.this.update(nextDetach ? DETACH_DELETE : DELETE, deletedExpressions);
+			return DefaultStatementBuilder.this.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
 		}
 
 		@Override
@@ -777,7 +775,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public OngoingMatchAndUpdate set(Expression... keyValuePairs) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(SET, keyValuePairs);
+			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
 		}
 
 		@Override
@@ -785,7 +783,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public OngoingMatchAndUpdate set(Node node, String... label) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(SET, Operations.set(node, label));
+			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+				UpdateType.SET, Operations.set(node, label));
 		}
 
 		@Override
@@ -793,7 +792,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public OngoingMatchAndUpdate remove(Node node, String... label) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(REMOVE,
+			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
 				Operations.set(node, label));
 		}
 
@@ -802,7 +801,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public OngoingMatchAndUpdate remove(Property... properties) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(REMOVE, properties);
+			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 		}
 
 		@Override

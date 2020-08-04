@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static java.util.stream.Collectors.*;
-import static org.apiguardian.api.API.Status.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Relationship.Direction;
@@ -77,7 +77,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 		if (!(primaryLabel == null || primaryLabel.isEmpty())) {
 			this.labels.add(new NodeLabel(primaryLabel));
 		}
-		this.labels.addAll(Arrays.stream(additionalLabels).map(NodeLabel::new).collect(toList()));
+		this.labels.addAll(Arrays.stream(additionalLabels).map(NodeLabel::new).collect(Collectors.toList()));
 		this.properties = properties;
 	}
 

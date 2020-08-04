@@ -19,7 +19,7 @@
 package org.neo4j.cypherdsl.examples.core;
 
 // tag::cypher-dsl-imports[]
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 // end::cypher-dsl-imports[]
 

@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static java.util.regex.Pattern.*;
-import static org.apiguardian.api.API.Status.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -38,7 +37,7 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class StringLiteral extends Literal<CharSequence> {
 
-	private static final Pattern RESERVED_CHARS = Pattern.compile("([" + quote("\\'\"") + "])");
+	private static final Pattern RESERVED_CHARS = Pattern.compile("([" + Pattern.quote("\\'\"") + "])");
 	private static final String QUOTED_LITERAL_FORMAT = "'%s'";
 
 	StringLiteral(CharSequence content) {

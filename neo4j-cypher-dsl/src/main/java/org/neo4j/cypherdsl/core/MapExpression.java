@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Expressions.*;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -79,6 +78,6 @@ public final class MapExpression extends TypedSubtree<Expression, MapExpression>
 
 	@Override
 	protected Visitable prepareVisit(Expression child) {
-		return nameOrExpression(child);
+		return Expressions.nameOrExpression(child);
 	}
 }

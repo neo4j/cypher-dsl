@@ -56,6 +56,11 @@
         <module name="com.puppycrawl.tools.checkstyle.checks.coding.OneStatementPerLineCheck" />
 
         <!-- Imports -->
+        <module name="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck" />
+        <module name="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStaticImportCheck">
+            <property name="excludes"
+                      value="org.apiguardian.api.API.Status.*, org.assertj.core.api.Assertions.*, org.junit.Assert.*, org.junit.Assume.*, org.junit.internal.matchers.ThrowableMessageMatcher.*, org.hamcrest.CoreMatchers.*, org.hamcrest.Matchers.*, org.mockito.Mockito.*" />
+        </module>
         <module name="com.puppycrawl.tools.checkstyle.checks.imports.IllegalImportCheck">
             <property name="regexp" value="true" />
             <property name="illegalPkgs"

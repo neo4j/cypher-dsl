@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 
@@ -42,7 +41,7 @@ public final class Predicates {
 	 */
 	public static Condition exists(Property property) {
 
-		return new BooleanFunctionCondition(FunctionInvocation.create(EXISTS, property));
+		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, property));
 	}
 
 	/**
@@ -54,7 +53,7 @@ public final class Predicates {
 	 */
 	public static Condition exists(RelationshipPattern pattern) {
 
-		return new BooleanFunctionCondition(FunctionInvocation.create(EXISTS, pattern));
+		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, pattern));
 	}
 
 	/**
@@ -78,7 +77,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction all(SymbolicName variable) {
 
-		return new Builder(ALL, variable);
+		return new Builder(BuiltInFunctions.Predicates.ALL, variable);
 	}
 
 	/**
@@ -102,7 +101,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction any(SymbolicName variable) {
 
-		return new Builder(ANY, variable);
+		return new Builder(BuiltInFunctions.Predicates.ANY, variable);
 	}
 
 	/**
@@ -126,7 +125,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction none(SymbolicName variable) {
 
-		return new Builder(NONE, variable);
+		return new Builder(BuiltInFunctions.Predicates.NONE, variable);
 	}
 
 	/**
@@ -150,7 +149,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction single(SymbolicName variable) {
 
-		return new Builder(SINGLE, variable);
+		return new Builder(BuiltInFunctions.Predicates.SINGLE, variable);
 	}
 
 	/**

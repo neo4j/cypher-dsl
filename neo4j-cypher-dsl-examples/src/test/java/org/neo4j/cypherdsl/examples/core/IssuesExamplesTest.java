@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.examples.core;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;

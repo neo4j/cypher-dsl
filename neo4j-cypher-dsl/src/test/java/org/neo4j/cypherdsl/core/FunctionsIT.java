@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.neo4j.cypherdsl.core.Cypher.*;
-
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
@@ -48,8 +46,10 @@ class FunctionsIT {
 		Relationship r = n.relationshipTo(m).named("r");
 		Expression e1 = Cypher.name("e1");
 		Expression e2 = Cypher.name("e2");
-		FunctionInvocation p1 = Functions.point(Cypher.mapOf("latitude", literalOf(1), "longitude", literalOf(2)));
-		FunctionInvocation p2 = Functions.point(Cypher.mapOf("latitude", literalOf(3), "longitude", literalOf(4)));
+		FunctionInvocation p1 = Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(1), "longitude", Cypher
+			.literalOf(2)));
+		FunctionInvocation p2 = Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(3), "longitude", Cypher
+			.literalOf(4)));
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
 		return Stream.of(
@@ -88,8 +88,8 @@ class FunctionsIT {
 			Arguments.of(Functions.stDevPDistinct(e1), "RETURN stDevP(DISTINCT e1)"),
 			Arguments.of(Functions.sum(e1), "RETURN sum(e1)"),
 			Arguments.of(Functions.sumDistinct(e1), "RETURN sum(DISTINCT e1)"),
-			Arguments.of(Functions.range(literalOf(1), literalOf(3)), "RETURN range(1, 3)"),
-			Arguments.of(Functions.range(literalOf(1), literalOf(3), literalOf(2)), "RETURN range(1, 3, 2)"),
+			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN range(1, 3)"),
+			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3), Cypher.literalOf(2)), "RETURN range(1, 3, 2)"),
 			Arguments.of(Functions.head(e1), "RETURN head(e1)"),
 			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
 			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),

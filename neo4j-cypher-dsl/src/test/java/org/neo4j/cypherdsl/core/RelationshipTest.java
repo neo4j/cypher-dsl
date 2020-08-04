@@ -18,8 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.TestInstance.Lifecycle.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -51,7 +52,7 @@ class RelationshipTest {
 	}
 
 	@Nested
-	@TestInstance(PER_CLASS)
+	@TestInstance(Lifecycle.PER_CLASS)
 	class PropertiesShouldBeHandled {
 
 		private Stream<Arguments> createNodesWithProperties() {
