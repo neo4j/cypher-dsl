@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.neo4j.cypherdsl.core.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
@@ -47,9 +47,9 @@ class PredicatesTest {
 	@MethodSource("predicatesToTest")
 	void preconditionsShouldBeAsserted(String predicateName, Class<?> argumentType) {
 
-		Method method = findMethod(Predicates.class, predicateName, argumentType);
+		Method method = TestUtils.findMethod(Predicates.class, predicateName, argumentType);
 		assertThatIllegalArgumentException()
-			.isThrownBy(() -> invokeMethod(method, null, (Expression) null))
+			.isThrownBy(() -> TestUtils.invokeMethod(method, null, (Expression) null))
 			.withMessageEndingWith("is required.");
 	}
 
@@ -57,8 +57,8 @@ class PredicatesTest {
 	@MethodSource("predicatesToTest")
 	void functionInvocationsShouldBeCreated(String functionName, Class<?> argumentType) {
 
-		Method method = findMethod(Predicates.class, functionName, argumentType);
-		BooleanFunctionCondition invocation = (BooleanFunctionCondition) invokeMethod(method, null, mock(argumentType));
+		Method method = TestUtils.findMethod(Predicates.class, functionName, argumentType);
+		BooleanFunctionCondition invocation = (BooleanFunctionCondition) TestUtils.invokeMethod(method, null, mock(argumentType));
 		assertThat(invocation).extracting("delegate")
 			.hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, functionName);
 	}

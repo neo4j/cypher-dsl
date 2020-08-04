@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static java.util.stream.Collectors.*;
-import static org.apiguardian.api.API.Status.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -82,7 +82,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 
 		List<String> listOfTypes = Arrays.stream(types)
 			.filter(type -> !(type == null || type.isEmpty()))
-			.collect(toList());
+			.collect(Collectors.toList());
 
 		RelationshipDetail details = RelationshipDetail.create(
 			Optional.ofNullable(direction).orElse(Direction.UNI),

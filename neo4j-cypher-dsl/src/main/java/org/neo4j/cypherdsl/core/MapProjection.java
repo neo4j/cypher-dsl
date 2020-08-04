@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Expressions.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -72,7 +71,7 @@ public final class MapProjection implements Expression {
 	private static Object contentAt(Object[] content, int i) {
 
 		if (content[i] instanceof Expression) {
-			return nameOrExpression((Expression) content[i]);
+			return Expressions.nameOrExpression((Expression) content[i]);
 		}
 		return content[i];
 	}

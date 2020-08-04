@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Expressions.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -78,11 +77,11 @@ public final class Comparison implements Condition {
 
 		visitor.enter(this);
 		if (left != null) {
-			nameOrExpression(left).accept(visitor);
+			Expressions.nameOrExpression(left).accept(visitor);
 		}
 		comparator.accept(visitor);
 		if (right != null) {
-			nameOrExpression(right).accept(visitor);
+			Expressions.nameOrExpression(right).accept(visitor);
 		}
 		visitor.leave(this);
 	}

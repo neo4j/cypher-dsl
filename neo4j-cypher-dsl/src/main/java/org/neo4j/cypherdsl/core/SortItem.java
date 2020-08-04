@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Expressions.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.Optional;
 
@@ -60,7 +59,7 @@ public final class SortItem implements Visitable {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		nameOrExpression(this.expression).accept(visitor);
+		Expressions.nameOrExpression(this.expression).accept(visitor);
 
 		if (this.direction != Direction.UNDEFINED) {
 			this.direction.accept(visitor);

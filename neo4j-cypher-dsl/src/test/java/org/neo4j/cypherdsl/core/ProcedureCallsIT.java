@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.neo4j.cypherdsl.core.Cypher.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,7 +48,7 @@ class ProcedureCallsIT {
 
 		Statement call = Cypher
 			.call("dbms.security.createUser")
-			.withArgs(literalOf("johnsmith"), literalOf("h6u4%kr"), BooleanLiteral.FALSE)
+			.withArgs(Cypher.literalOf("johnsmith"), Cypher.literalOf("h6u4%kr"), BooleanLiteral.FALSE)
 			.build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL dbms.security.createUser('johnsmith', 'h6u4%kr', false)");
@@ -83,7 +82,7 @@ class ProcedureCallsIT {
 
 		Statement call = Cypher
 			.call("dbms.listConfig")
-			.withArgs(literalOf("browser"))
+			.withArgs(Cypher.literalOf("browser"))
 			.yield("name")
 			.build();
 		assertThat(cypherRenderer.render(call)).isEqualTo("CALL dbms.listConfig('browser') YIELD name");
@@ -95,10 +94,10 @@ class ProcedureCallsIT {
 		SymbolicName name = Cypher.name("name");
 		Statement call = Cypher
 			.call("dbms.listConfig")
-			.withArgs(literalOf("browser"))
+			.withArgs(Cypher.literalOf("browser"))
 			.yield(name)
 			.where(name.matches("browser\\.allow.*"))
-			.returning(asterisk())
+			.returning(Cypher.asterisk())
 			.build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser\\\\.allow.*' RETURN *");
@@ -126,12 +125,12 @@ class ProcedureCallsIT {
 			SymbolicName name = Cypher.name("name");
 			Statement call = Cypher
 				.call("dbms.listConfig")
-				.withArgs(literalOf("browser"))
+				.withArgs(Cypher.literalOf("browser"))
 				.yield(name)
 				.where(name.matches("browser\\.allow.*"))
 				.match(Cypher.anyNode("n"))
 				.with(name)
-				.returning(asterisk())
+				.returning(Cypher.asterisk())
 				.build();
 			assertThat(cypherRenderer.render(call))
 				.isEqualTo(
@@ -145,12 +144,12 @@ class ProcedureCallsIT {
 			SymbolicName description = Cypher.name("description");
 			Statement call = Cypher
 				.call("dbms.listConfig")
-				.withArgs(literalOf("browser"))
+				.withArgs(Cypher.literalOf("browser"))
 				.yield(name, description)
 				.where(name.matches("browser\\.allow.*"))
 				.with(Cypher.asterisk())
-				.create(node("Config").withProperties("name", name, "description", description).named("n"))
-				.returning(name("n"))
+				.create(Cypher.node("Config").withProperties("name", name, "description", description).named("n"))
+				.returning(Cypher.name("n"))
 				.build();
 			assertThat(cypherRenderer.render(call))
 				.isEqualTo(
@@ -161,11 +160,11 @@ class ProcedureCallsIT {
 		void relatedInner() {
 
 			SymbolicName name = Cypher.name("name");
-			AliasedExpression parameters = listOf(literalOf("browser"), literalOf("causal_clustering"))
+			AliasedExpression parameters = Cypher.listOf(Cypher.literalOf("browser"), Cypher.literalOf("causal_clustering"))
 				.as("parameters");
 			Statement call = Cypher.with(parameters)
 				.unwind(parameters).as("p")
-				.call("dbms.listConfig").withArgs(name("p"))
+				.call("dbms.listConfig").withArgs(Cypher.name("p"))
 				.yield(name)
 				.where(name.matches(".*allow.*"))
 				.returning(name)

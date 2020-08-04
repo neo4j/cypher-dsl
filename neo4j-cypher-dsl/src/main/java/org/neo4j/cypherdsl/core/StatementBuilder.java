@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Expressions.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
@@ -265,7 +264,7 @@ public interface StatementBuilder
 		 * @see #with(Expression...)
 		 */
 		default OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
-			return with(createSymbolicNames(variables));
+			return with(Expressions.createSymbolicNames(variables));
 		}
 
 		/**
@@ -274,7 +273,7 @@ public interface StatementBuilder
 		 * @see #with(Expression...)
 		 */
 		default OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
-			return with(createSymbolicNames(variables));
+			return with(Expressions.createSymbolicNames(variables));
 		}
 
 		/**
@@ -291,7 +290,7 @@ public interface StatementBuilder
 		 * @see #withDistinct(Expression...)
 		 */
 		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(String... variables) {
-			return withDistinct(createSymbolicNames(variables));
+			return withDistinct(Expressions.createSymbolicNames(variables));
 		}
 
 		/**
@@ -300,7 +299,7 @@ public interface StatementBuilder
 		 * @see #withDistinct(Expression...)
 		 */
 		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(Named... variables) {
-			return withDistinct(createSymbolicNames(variables));
+			return withDistinct(Expressions.createSymbolicNames(variables));
 		}
 
 		/**
@@ -447,11 +446,11 @@ public interface StatementBuilder
 	interface ExposesDelete {
 
 		default <T extends OngoingUpdate & BuildableStatement> T delete(String... variables) {
-			return delete(createSymbolicNames(variables));
+			return delete(Expressions.createSymbolicNames(variables));
 		}
 
 		default <T extends OngoingUpdate & BuildableStatement> T delete(Named... variables) {
-			return delete(createSymbolicNames(variables));
+			return delete(Expressions.createSymbolicNames(variables));
 		}
 
 		/**
@@ -464,11 +463,11 @@ public interface StatementBuilder
 		<T extends OngoingUpdate & BuildableStatement> T delete(Expression... expressions);
 
 		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(String... variables) {
-			return detachDelete(createSymbolicNames(variables));
+			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
 
 		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(Named... variables) {
-			return detachDelete(createSymbolicNames(variables));
+			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
 
 		/**

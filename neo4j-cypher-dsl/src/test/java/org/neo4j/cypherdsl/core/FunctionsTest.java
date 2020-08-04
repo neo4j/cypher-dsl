@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.*;
-import static org.mockito.Mockito.*;
-import static org.neo4j.cypherdsl.core.TestUtils.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
@@ -82,9 +82,9 @@ class FunctionsTest {
 	@MethodSource("functionsToTest")
 	void preconditionsShouldBeAsserted(String functionName, Class<?> argumentType) {
 
-		Method method = findMethod(Functions.class, functionName, argumentType);
+		Method method = TestUtils.findMethod(Functions.class, functionName, argumentType);
 		assertThatIllegalArgumentException()
-			.isThrownBy(() -> invokeMethod(method, null, (Expression) null))
+			.isThrownBy(() -> TestUtils.invokeMethod(method, null, (Expression) null))
 			.withMessageMatching("The (node|relationship|expression|pattern) for " + functionName + "\\(\\) is required.");
 	}
 
@@ -92,8 +92,9 @@ class FunctionsTest {
 	@MethodSource("functionsToTest")
 	void functionInvocationsShouldBeCreated(String functionName, Class<?> argumentType) {
 
-		Method method = findMethod(Functions.class, functionName, argumentType);
-		FunctionInvocation invocation = (FunctionInvocation) invokeMethod(method, null, mock(argumentType, Answers.RETURNS_DEEP_STUBS));
+		Method method = TestUtils.findMethod(Functions.class, functionName, argumentType);
+		FunctionInvocation invocation = (FunctionInvocation) TestUtils
+			.invokeMethod(method, null, mock(argumentType, Answers.RETURNS_DEEP_STUBS));
 		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, functionName);
 	}
 }

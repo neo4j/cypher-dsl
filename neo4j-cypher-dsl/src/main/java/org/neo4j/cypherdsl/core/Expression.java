@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Cypher.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -75,7 +74,7 @@ public interface Expression extends Visitable {
 	 * @return A new condition
 	 */
 	default Condition isTrue() {
-		return Conditions.isEqualTo(this, literalTrue());
+		return Conditions.isEqualTo(this, Cypher.literalTrue());
 	}
 
 	/**
@@ -84,7 +83,7 @@ public interface Expression extends Visitable {
 	 * @return A new condition
 	 */
 	default Condition isFalse() {
-		return Conditions.isEqualTo(this, literalFalse());
+		return Conditions.isEqualTo(this, Cypher.literalFalse());
 	}
 
 	/**

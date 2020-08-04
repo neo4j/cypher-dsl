@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static java.util.stream.Collectors.*;
-import static org.apiguardian.api.API.Status.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apiguardian.api.API;
@@ -43,6 +43,6 @@ public final class ListLiteral extends Literal<Iterable<Literal<?>>> {
 	public String asString() {
 
 		return StreamSupport.stream(getContent().spliterator(), false).map(Literal::asString).collect(
-			joining(", ", "[", "]"));
+			Collectors.joining(", ", "[", "]"));
 	}
 }

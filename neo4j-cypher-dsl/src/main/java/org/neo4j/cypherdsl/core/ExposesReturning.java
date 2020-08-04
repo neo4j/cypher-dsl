@@ -18,8 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.*;
-import static org.neo4j.cypherdsl.core.Expressions.*;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 
@@ -33,11 +32,11 @@ import org.apiguardian.api.API;
 public interface ExposesReturning {
 
 	default StatementBuilder.OngoingReadingAndReturn returning(String... variables) {
-		return returning(createSymbolicNames(variables));
+		return returning(Expressions.createSymbolicNames(variables));
 	}
 
 	default StatementBuilder.OngoingReadingAndReturn returning(Named... variables) {
-		return returning(createSymbolicNames(variables));
+		return returning(Expressions.createSymbolicNames(variables));
 	}
 
 	/**
@@ -49,11 +48,11 @@ public interface ExposesReturning {
 	StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions);
 
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(String... variables) {
-		return returningDistinct(createSymbolicNames(variables));
+		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
 
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Named... variables) {
-		return returningDistinct(createSymbolicNames(variables));
+		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
 
 	/**
