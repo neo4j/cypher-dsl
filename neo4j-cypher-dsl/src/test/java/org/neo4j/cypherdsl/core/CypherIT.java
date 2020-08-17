@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.util.function.Function;
 
@@ -2441,11 +2440,11 @@ class CypherIT {
 			}
 
 			@Test
-			void requiresSymbolicName() {
-				assertThatIllegalStateException().isThrownBy(() -> {
-					Node n = Cypher.node("Person");
-					n.project("something");
-				}).withMessage("No name present.");
+			void requiredSymbolicNameShouldBeGenerated() {
+
+				Node person = Cypher.node("Person");
+				Statement statement = Cypher.match(person).returning(person.project("something")).build();
+				assertThat(cypherRenderer.render(statement)).matches("MATCH \\([a-zA-Z].*\\d{3}:`Person`\\) RETURN [a-zA-Z].*\\d{3}\\{\\.something\\}");
 			}
 		}
 
@@ -2495,13 +2494,15 @@ class CypherIT {
 			}
 
 			@Test
-			void requiresSymbolicName() {
-				assertThatIllegalStateException().isThrownBy(() -> {
-					Node n = Cypher.node("Person").named("p");
-					Node m = Cypher.node("Movie").named("m");
-					Relationship rel = n.relationshipTo(m, "ACTED_IN");
-					rel.project("something");
-				}).withMessage("No name present.");
+			void requiredSymbolicNameShouldBeGenerated() {
+
+				Node n = Cypher.node("Person");
+				Node m = Cypher.node("Movie");
+				Relationship rel = n.relationshipTo(m, "ACTED_IN");
+
+				Statement statement = Cypher.match(rel).returning(rel.project("something")).build();
+				assertThat(cypherRenderer.render(statement)).matches(
+					"MATCH \\(:`Person`\\)-\\[[a-zA-Z]*\\d{3}:`ACTED_IN`\\]->\\(:`Movie`\\) RETURN [a-zA-Z]*\\d{3}\\{\\.something\\}");
 			}
 		}
 
@@ -2900,6 +2901,17 @@ class CypherIT {
 
 	@Nested
 	class Issues {
+
+		@Test
+		void gh70() {
+			Node strawberry = Cypher.node("Fruit", Cypher.mapOf("kind", Cypher.literalOf("strawberry")));
+			Statement statement = Cypher
+				.match(strawberry).set(strawberry.property("color").to(Cypher.literalOf("red")))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.matches("MATCH \\([a-zA-Z]*\\d{3}:`Fruit` \\{kind: 'strawberry'\\}\\) SET [a-zA-Z]*\\d{3}\\.color = 'red'");
+		}
 
 		@Test
 		void gh167() {

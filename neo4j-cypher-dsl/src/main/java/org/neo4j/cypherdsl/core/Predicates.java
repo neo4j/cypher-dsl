@@ -64,7 +64,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction all(String variable) {
 
-		return all(SymbolicName.create(variable));
+		return all(SymbolicName.of(variable));
 	}
 
 	/**
@@ -88,7 +88,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction any(String variable) {
 
-		return any(SymbolicName.create(variable));
+		return any(SymbolicName.of(variable));
 	}
 
 	/**
@@ -112,7 +112,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction none(String variable) {
 
-		return none(SymbolicName.create(variable));
+		return none(SymbolicName.of(variable));
 	}
 
 	/**
@@ -136,7 +136,7 @@ public final class Predicates {
 	 */
 	public static OngoingListBasedPredicateFunction single(String variable) {
 
-		return single(SymbolicName.create(variable));
+		return single(SymbolicName.of(variable));
 	}
 
 	/**

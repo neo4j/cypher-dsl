@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import java.util.Objects;
 
 import org.apiguardian.api.API;
+import org.apiguardian.api.API.Status;
+import org.neo4j.cypherdsl.core.utils.StringUtils;
 
 /**
  * A symbolic name to identify nodes, relationships and aliased items.
@@ -36,17 +36,22 @@ import org.apiguardian.api.API;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class SymbolicName implements Expression {
+@API(status = Status.EXPERIMENTAL, since = "1.0")
+public class SymbolicName implements Expression {
 
-	private final String value;
-
-	static SymbolicName create(String name) {
+	static SymbolicName of(String name) {
 
 		Assert.hasText(name, "Name must not be empty.");
-		Assert.isTrue(Cypher.isIdentifier(name), "Name must be a valid identifier.");
+		Assert.isTrue(StringUtils.isIdentifier(name), "Name must be a valid identifier.");
 		return new SymbolicName(name);
 	}
+
+	static SymbolicName unresolved() {
+
+		return new SymbolicName(null);
+	}
+
+	private final String value;
 
 	private SymbolicName(String value) {
 		this.value = value;
@@ -56,20 +61,11 @@ public final class SymbolicName implements Expression {
 		return value;
 	}
 
-	public SymbolicName concat(String otherValue) {
-
-		Assert.notNull(otherValue, "Value to concat must not be null.");
-		if (otherValue.isEmpty()) {
-			return this;
-		}
-		return SymbolicName.create(this.value + otherValue);
-	}
-
 	@Override
 	public String toString() {
-		return "SymbolicName{" +
+		return value == null ? "SymbolicName{" +
 			"name='" + value + '\'' +
-			'}';
+			'}' : "Unresolved SymbolicName";
 	}
 
 	@Override
@@ -80,12 +76,16 @@ public final class SymbolicName implements Expression {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
+		// Unresolved values are only equal to themselves
+		if (value == null) {
+			return false;
+		}
 		SymbolicName that = (SymbolicName) o;
 		return value.equals(that.value);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(value);
+		return value == null ? super.hashCode() : Objects.hash(value);
 	}
 }

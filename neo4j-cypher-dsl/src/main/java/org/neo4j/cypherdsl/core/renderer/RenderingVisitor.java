@@ -20,7 +20,9 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -73,6 +75,7 @@ import org.neo4j.cypherdsl.core.YieldItems;
 import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.support.TypedSubtree;
 import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.utils.StringUtils;
 
 /**
  * This is a simple (some would call it naive) implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -113,6 +116,11 @@ class RenderingVisitor extends ReflectiveVisitor {
 	private final java.util.Set<Named> visitedNamed = new HashSet<>();
 
 	/**
+	 * Keeps track of unresolved symbolic names.
+	 */
+	private final Map<SymbolicName, String> resolvedSymbolicNames = new ConcurrentHashMap<>();
+
+	/**
 	 * The current level in the tree of cypher elements.
 	 */
 	private int currentLevel = 0;
@@ -133,6 +141,17 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	private boolean needsSeparator() {
 		return separatorOnLevel.contains(currentLevel);
+	}
+
+	private String resolve(SymbolicName symbolicName) {
+
+		return this.resolvedSymbolicNames.computeIfAbsent(symbolicName, k -> {
+			String value = k.getValue();
+			if (StringUtils.hasText(value)) {
+				return symbolicName.getValue();
+			}
+			return String.format("%s%03d", StringUtils.randomIdentifier(8), resolvedSymbolicNames.size());
+		});
 	}
 
 	@Override
@@ -351,7 +370,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 	}
 
 	void enter(SymbolicName symbolicName) {
-		builder.append(symbolicName.getValue());
+		builder.append(resolve(symbolicName));
 	}
 
 	void enter(RelationshipDetail details) {

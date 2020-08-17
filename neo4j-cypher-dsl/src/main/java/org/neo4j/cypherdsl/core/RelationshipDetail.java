@@ -42,7 +42,7 @@ public final class RelationshipDetail implements Visitable {
 	 */
 	private final Direction direction;
 
-	private final SymbolicName symbolicName;
+	private volatile SymbolicName symbolicName;
 
 	private final RelationshipTypes types;
 
@@ -82,7 +82,7 @@ public final class RelationshipDetail implements Visitable {
 	RelationshipDetail named(String newSymbolicName) {
 
 		Assert.hasText(newSymbolicName, "Symbolic name is required.");
-		return named(SymbolicName.create(newSymbolicName));
+		return named(SymbolicName.of(newSymbolicName));
 	}
 
 	RelationshipDetail named(SymbolicName newSymbolicName) {
@@ -133,6 +133,21 @@ public final class RelationshipDetail implements Visitable {
 
 	Optional<SymbolicName> getSymbolicName() {
 		return Optional.ofNullable(symbolicName);
+	}
+
+	SymbolicName getRequiredSymbolicName() {
+
+		SymbolicName requiredSymbolicName = this.symbolicName;
+		if (requiredSymbolicName == null) {
+			synchronized (this) {
+				requiredSymbolicName = this.symbolicName;
+				if (requiredSymbolicName == null) {
+					this.symbolicName = SymbolicName.unresolved();
+					requiredSymbolicName = this.symbolicName;
+				}
+			}
+		}
+		return requiredSymbolicName;
 	}
 
 	public RelationshipTypes getTypes() {

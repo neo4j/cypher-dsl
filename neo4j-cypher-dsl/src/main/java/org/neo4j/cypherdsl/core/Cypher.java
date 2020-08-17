@@ -167,7 +167,7 @@ public final class Cypher {
 	 */
 	public static SymbolicName name(String value) {
 
-		return SymbolicName.create(value);
+		return SymbolicName.of(value);
 	}
 
 	/**
@@ -457,34 +457,6 @@ public final class Cypher {
 		} else {
 			return existingUnionQuery.addAdditionalQueries(listOfQueries);
 		}
-	}
-
-	/**
-	 * This is a literal copy of {@link javax.lang.model.SourceVersion#isIdentifier(CharSequence)} included here to
-	 * be not dependent on the compiler module.
-	 *
-	 * @param name A possible Java identifier
-	 * @return True, if {@code name} represents an identifier.
-	 */
-	static boolean isIdentifier(CharSequence name) {
-		String id = name.toString();
-
-		if (id.length() == 0) {
-			return false;
-		}
-		int cp = id.codePointAt(0);
-		if (!Character.isJavaIdentifierStart(cp)) {
-			return false;
-		}
-		for (int i = Character.charCount(cp);
-			 i < id.length();
-			 i += Character.charCount(cp)) {
-			cp = id.codePointAt(i);
-			if (!Character.isJavaIdentifierPart(cp)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**

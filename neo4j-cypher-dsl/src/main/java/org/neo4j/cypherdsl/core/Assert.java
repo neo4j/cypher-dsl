@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import org.neo4j.cypherdsl.core.utils.StringUtils;
+
 /**
  * Assertions used throughout the Cypher-DSL. Mostly copied over from {@literal org.springframework.util.Assert}. Thanks
  * to the original authors: Keith Donald, Juergen Hoeller, Sam Brannen, Colin Sampaleanu and Rob Harrop.
@@ -34,7 +36,7 @@ final class Assert {
 	 * @throws IllegalArgumentException if the text does not contain valid text content
 	 */
 	public static void hasText(String text, String message) {
-		if (!hasText(text)) {
+		if (!StringUtils.hasText(text)) {
 			throw new IllegalArgumentException(message);
 		}
 	}
@@ -97,20 +99,6 @@ final class Assert {
 		if (isEmpty(array)) {
 			throw new IllegalArgumentException(message);
 		}
-	}
-
-	private static boolean hasText(String str) {
-		return (str != null && !str.isEmpty() && containsText(str));
-	}
-
-	private static boolean containsText(CharSequence str) {
-		int strLen = str.length();
-		for (int i = 0; i < strLen; i++) {
-			if (!Character.isWhitespace(str.charAt(i))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private static boolean isEmpty(Object[] array) {

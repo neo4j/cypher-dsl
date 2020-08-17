@@ -48,7 +48,7 @@ final class Expressions {
 	}
 
 	static Expression[] createSymbolicNames(String[] variables) {
-		return Arrays.stream(variables).map(SymbolicName::create).toArray(Expression[]::new);
+		return Arrays.stream(variables).map(SymbolicName::of).toArray(Expression[]::new);
 	}
 
 	static Expression[] createSymbolicNames(Named[] variables) {

@@ -63,7 +63,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 		return new Node(null, null);
 	}
 
-	private final SymbolicName symbolicName;
+	private volatile SymbolicName symbolicName;
 
 	private final List<NodeLabel> labels;
 
@@ -98,7 +98,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	public Node named(String newSymbolicName) {
 
 		Assert.hasText(newSymbolicName, "Symbolic name is required.");
-		return new Node(SymbolicName.create(newSymbolicName), properties, labels);
+		return new Node(SymbolicName.of(newSymbolicName), properties, labels);
 	}
 
 	/**
@@ -164,6 +164,22 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	 */
 	public Optional<SymbolicName> getSymbolicName() {
 		return Optional.ofNullable(symbolicName);
+	}
+
+	@Override
+	public SymbolicName getRequiredSymbolicName() {
+
+		SymbolicName requiredSymbolicName = this.symbolicName;
+		if (requiredSymbolicName == null) {
+			synchronized (this) {
+				requiredSymbolicName = this.symbolicName;
+				if (requiredSymbolicName == null) {
+					this.symbolicName = SymbolicName.unresolved();
+					requiredSymbolicName = this.symbolicName;
+				}
+			}
+		}
+		return requiredSymbolicName;
 	}
 
 	public FunctionInvocation internalId() {

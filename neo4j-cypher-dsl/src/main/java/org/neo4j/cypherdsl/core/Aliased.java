@@ -45,6 +45,6 @@ public interface Aliased {
 	 * @return A new symbolic name
 	 */
 	default SymbolicName asName() {
-		return SymbolicName.create(this.getAlias());
+		return SymbolicName.of(this.getAlias());
 	}
 }

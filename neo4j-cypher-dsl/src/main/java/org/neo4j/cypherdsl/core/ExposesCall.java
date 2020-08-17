@@ -77,7 +77,7 @@ public interface ExposesCall<T> {
 
 			SymbolicName[] names = new SymbolicName[0];
 			if (yieldedItems != null) {
-				names = Arrays.stream(yieldedItems).map(SymbolicName::create)
+				names = Arrays.stream(yieldedItems).map(SymbolicName::of)
 					.toArray(SymbolicName[]::new);
 			}
 			return yield(names);
