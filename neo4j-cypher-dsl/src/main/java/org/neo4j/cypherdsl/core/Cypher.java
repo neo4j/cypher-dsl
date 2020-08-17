@@ -28,6 +28,7 @@ import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * The main entry point into the Cypher DSL.
@@ -420,7 +421,7 @@ public final class Cypher {
 	 */
 	public static OngoingStandaloneCallWithoutArguments call(String procedureName) {
 
-		Assert.hasText(procedureName, "The procedure name must not be null or empty.");
+		Assertions.hasText(procedureName, "The procedure name must not be null or empty.");
 		return call(procedureName.split("\\."));
 	}
 
@@ -436,19 +437,19 @@ public final class Cypher {
 
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {
 
-		Assert.isTrue(statements != null && statements.length >= 2, "At least two statements are required!");
+		Assertions.isTrue(statements != null && statements.length >= 2, "At least two statements are required!");
 
 		int i = 0;
 		UnionQuery existingUnionQuery = null;
 		if (statements[0] instanceof UnionQuery) {
 			existingUnionQuery = (UnionQuery) statements[0];
-			Assert.isTrue(existingUnionQuery.isAll() == unionAll, "Cannot mix union and union all!");
+			Assertions.isTrue(existingUnionQuery.isAll() == unionAll, "Cannot mix union and union all!");
 			i = 1;
 		}
 
 		List<SingleQuery> listOfQueries = new ArrayList<>();
 		do {
-			Assert.isInstanceOf(SingleQuery.class, statements[i], "Can only union single queries!");
+			Assertions.isInstanceOf(SingleQuery.class, statements[i], "Can only union single queries!");
 			listOfQueries.add((SingleQuery) statements[i]);
 		} while (++i < statements.length);
 

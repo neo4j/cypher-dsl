@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * An expression can be used in many places, i.e. in return statements, pattern elements etc.
@@ -40,7 +41,7 @@ public interface Expression extends Visitable {
 	 */
 	default AliasedExpression as(String alias) {
 
-		Assert.hasText(alias, "The alias may not be null or empty.");
+		Assertions.hasText(alias, "The alias may not be null or empty.");
 		return new AliasedExpression(this, alias);
 	}
 

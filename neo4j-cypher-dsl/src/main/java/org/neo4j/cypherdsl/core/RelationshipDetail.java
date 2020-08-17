@@ -26,6 +26,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Relationship.Direction;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/RelationshipDetail.html">RelationshipDetail</a>
@@ -81,13 +82,13 @@ public final class RelationshipDetail implements Visitable {
 
 	RelationshipDetail named(String newSymbolicName) {
 
-		Assert.hasText(newSymbolicName, "Symbolic name is required.");
+		Assertions.hasText(newSymbolicName, "Symbolic name is required.");
 		return named(SymbolicName.of(newSymbolicName));
 	}
 
 	RelationshipDetail named(SymbolicName newSymbolicName) {
 
-		Assert.notNull(newSymbolicName, "Symbolic name is required.");
+		Assertions.notNull(newSymbolicName, "Symbolic name is required.");
 		return new RelationshipDetail(this.direction, newSymbolicName, this.types, this.length, this.properties);
 	}
 

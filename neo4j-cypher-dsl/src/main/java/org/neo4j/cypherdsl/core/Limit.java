@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Gerrit Meier
@@ -34,7 +35,7 @@ public final class Limit implements Visitable {
 
 	static Limit create(Number value) {
 
-		Assert.notNull(value, "A limit cannot have a null value.");
+		Assertions.notNull(value, "A limit cannot have a null value.");
 
 		return new Limit(new NumberLiteral(value));
 	}

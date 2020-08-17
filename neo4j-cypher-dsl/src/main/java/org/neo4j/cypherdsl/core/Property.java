@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A property that belongs to a property container (either Node or Relationship).
@@ -41,15 +42,15 @@ public final class Property implements Expression {
 			throw new IllegalArgumentException(
 				"A property derived from a node or a relationship needs a parent with a symbolic name.");
 		}
-		Assert.hasText(name, "The properties name is required.");
+		Assertions.hasText(name, "The properties name is required.");
 
 		return new Property(requiredSymbolicName, new PropertyLookup((name)));
 	}
 
 	static Property create(Expression container, String name) {
 
-		Assert.notNull(container, "The property container is required.");
-		Assert.hasText(name, "The properties name is required.");
+		Assertions.notNull(container, "The property container is required.");
+		Assertions.hasText(name, "The properties name is required.");
 
 		return new Property(container, new PropertyLookup(name));
 

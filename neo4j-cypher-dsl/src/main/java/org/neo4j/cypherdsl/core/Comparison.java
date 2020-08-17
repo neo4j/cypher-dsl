@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A concrete condition representing a comparision between two expressions.
@@ -35,8 +36,8 @@ public final class Comparison implements Condition {
 
 	static Comparison create(Operator operator, Expression expression) {
 
-		Assert.isTrue(operator.isUnary(), "Operator must be unary.");
-		Assert.notNull(expression, "Expression must not be null.");
+		Assertions.isTrue(operator.isUnary(), "Operator must be unary.");
+		Assertions.notNull(expression, "Expression must not be null.");
 
 		switch (operator.getType()) {
 			case PREFIX:
@@ -50,9 +51,9 @@ public final class Comparison implements Condition {
 
 	static Comparison create(Expression lhs, Operator operator, Expression rhs) {
 
-		Assert.notNull(lhs, "Left expression must not be null.");
-		Assert.notNull(operator, "Operator must not be empty.");
-		Assert.notNull(rhs, "Right expression must not be null.");
+		Assertions.notNull(lhs, "Left expression must not be null.");
+		Assertions.notNull(operator, "Operator must not be empty.");
+		Assertions.notNull(rhs, "Right expression must not be null.");
 
 		return new Comparison(lhs, operator, rhs);
 	}

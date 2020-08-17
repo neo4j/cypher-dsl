@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Factory methods for creating predicates.
@@ -185,8 +186,8 @@ public final class Predicates {
 
 		Builder(BuiltInFunctions.Predicates predicate, SymbolicName name) {
 
-			Assert.notNull(predicate, "The predicate is required");
-			Assert.notNull(name, "The name is required");
+			Assertions.notNull(predicate, "The predicate is required");
+			Assertions.notNull(name, "The name is required");
 			this.predicate = predicate;
 			this.name = name;
 		}
@@ -194,7 +195,7 @@ public final class Predicates {
 		@Override
 		public OngoingListBasedPredicateFunctionWithList in(Expression list) {
 
-			Assert.notNull(list, "The list expression is required");
+			Assertions.notNull(list, "The list expression is required");
 			this.listExpression = list;
 			return this;
 		}
@@ -202,7 +203,7 @@ public final class Predicates {
 		@Override
 		public Condition where(Condition condition) {
 
-			Assert.notNull(condition, "The condition is required");
+			Assertions.notNull(condition, "The condition is required");
 			return new BooleanFunctionCondition(
 				FunctionInvocation.create(predicate, new ListPredicate(name, listExpression, new Where(condition))));
 		}

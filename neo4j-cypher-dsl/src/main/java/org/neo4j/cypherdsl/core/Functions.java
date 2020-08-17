@@ -24,6 +24,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Aggregates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Scalars;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Factory methods for creating instances of {@link FunctionInvocation functions}.
@@ -45,7 +46,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation id(Node node) {
 
-		Assert.notNull(node, "The node for id() is required.");
+		Assertions.notNull(node, "The node for id() is required.");
 
 		return FunctionInvocation.create(Scalars.ID, node.getRequiredSymbolicName());
 	}
@@ -59,7 +60,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation id(Relationship relationship) {
 
-		Assert.notNull(relationship, "The relationship for id() is required.");
+		Assertions.notNull(relationship, "The relationship for id() is required.");
 
 		return FunctionInvocation.create(Scalars.ID, relationship.getRequiredSymbolicName());
 	}
@@ -73,7 +74,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation labels(Node node) {
 
-		Assert.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, "The node parameter is required.");
 
 		return FunctionInvocation.create(Scalars.LABELS, node.getRequiredSymbolicName());
 	}
@@ -87,7 +88,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation type(Relationship relationship) {
 
-		Assert.notNull(relationship, "The relationship parameter is required.");
+		Assertions.notNull(relationship, "The relationship parameter is required.");
 
 		return FunctionInvocation.create(Scalars.TYPE, relationship.getRequiredSymbolicName());
 	}
@@ -99,7 +100,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation count(Node node) {
 
-		Assert.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, "The node parameter is required.");
 
 		return FunctionInvocation.create(Aggregates.COUNT, node.getRequiredSymbolicName());
 	}
@@ -125,7 +126,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation countDistinct(Node node) {
 
-		Assert.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, "The node parameter is required.");
 
 		return FunctionInvocation.createDistinct(Aggregates.COUNT, node.getRequiredSymbolicName());
 	}
@@ -218,8 +219,8 @@ public final class Functions {
 	 */
 	public static FunctionInvocation distance(Expression point1, Expression point2) {
 
-		Assert.notNull(point1, "The distance function requires two points.");
-		Assert.notNull(point2, "The distance function requires two points.");
+		Assertions.notNull(point1, "The distance function requires two points.");
+		Assertions.notNull(point2, "The distance function requires two points.");
 
 		return FunctionInvocation.create(Scalars.DISTANCE, point1, point2);
 	}
@@ -281,7 +282,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation collect(Named variable) {
 
-		Assert.notNull(variable, "The variable parameter is required.");
+		Assertions.notNull(variable, "The variable parameter is required.");
 
 		return FunctionInvocation.create(Aggregates.COLLECT, variable.getRequiredSymbolicName());
 	}
@@ -295,7 +296,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation collectDistinct(Named variable) {
 
-		Assert.notNull(variable, "The variable parameter is required.");
+		Assertions.notNull(variable, "The variable parameter is required.");
 
 		return FunctionInvocation.createDistinct(Aggregates.COLLECT, variable.getRequiredSymbolicName());
 	}
@@ -373,10 +374,10 @@ public final class Functions {
 	}
 
 	private static void assertPercentileArguments(Aggregates builtIn, Expression expression, Number percentile) {
-		Assert.notNull(expression, "The numeric expression for " + builtIn.getImplementationName() + " is required.");
-		Assert.notNull(percentile, "The percentile for " + builtIn.getImplementationName() + " is required.");
+		Assertions.notNull(expression, "The numeric expression for " + builtIn.getImplementationName() + " is required.");
+		Assertions.notNull(percentile, "The percentile for " + builtIn.getImplementationName() + " is required.");
 		final double p = percentile.doubleValue();
-		Assert.isTrue(p >= 0D && p <= 1D,
+		Assertions.isTrue(p >= 0D && p <= 1D,
 			"The percentile for " + builtIn.getImplementationName() + " must be between 0.0 and 1.0.");
 	}
 
@@ -533,8 +534,8 @@ public final class Functions {
 	 */
 	public static FunctionInvocation range(Expression start, Expression end, Expression step) {
 
-		Assert.notNull(start, "The expression for range is required.");
-		Assert.notNull(end, "The expression for range is required.");
+		Assertions.notNull(start, "The expression for range is required.");
+		Assertions.notNull(end, "The expression for range is required.");
 
 		if (step == null) {
 			return FunctionInvocation.create(Scalars.RANGE, start, end);
@@ -577,7 +578,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation nodes(NamedPath path) {
 
-		Assert.notNull(path, "The path for nodes is required.");
+		Assertions.notNull(path, "The path for nodes is required.");
 		return FunctionInvocation.create(Scalars.NODES,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
 	}

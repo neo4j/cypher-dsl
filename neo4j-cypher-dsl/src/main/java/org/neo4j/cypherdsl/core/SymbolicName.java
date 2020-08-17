@@ -22,7 +22,8 @@ import java.util.Objects;
 
 import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
-import org.neo4j.cypherdsl.core.utils.StringUtils;
+import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
  * A symbolic name to identify nodes, relationships and aliased items.
@@ -41,8 +42,8 @@ public class SymbolicName implements Expression {
 
 	static SymbolicName of(String name) {
 
-		Assert.hasText(name, "Name must not be empty.");
-		Assert.isTrue(StringUtils.isIdentifier(name), "Name must be a valid identifier.");
+		Assertions.hasText(name, "Name must not be empty.");
+		Assertions.isTrue(Strings.isIdentifier(name), "Name must be a valid identifier.");
 		return new SymbolicName(name);
 	}
 

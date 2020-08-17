@@ -26,6 +26,7 @@ import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Michael J. Simons
@@ -36,7 +37,7 @@ public final class UnionQuery implements Statement.RegularQuery {
 
 	static UnionQuery create(boolean unionAll, List<SingleQuery> queries) {
 
-		Assert.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
+		Assertions.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
 
 		List<UnionPart> unionParts = queries.stream().skip(1).map(q -> new UnionPart(unionAll, q)).collect(
 			Collectors.toList());

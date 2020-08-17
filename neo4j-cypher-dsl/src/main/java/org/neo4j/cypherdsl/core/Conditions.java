@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Builder for various conditions.
@@ -118,13 +119,13 @@ public final class Conditions {
 	 */
 	public static Condition not(Condition condition) {
 
-		Assert.notNull(condition, "Condition to negate must not be null.");
+		Assertions.notNull(condition, "Condition to negate must not be null.");
 		return condition.not();
 	}
 
 	public static Condition not(PatternElement patternElement) {
 
-		Assert.notNull(patternElement, "Pattern to negate must not be null.");
+		Assertions.notNull(patternElement, "Pattern to negate must not be null.");
 		return new ExcludedPattern(patternElement);
 	}
 

@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a chain of relationships. The chain is meant to be in order and the right node of an element is related to
@@ -46,7 +47,7 @@ public final class RelationshipChain implements RelationshipPattern {
 
 	RelationshipChain add(Relationship element) {
 
-		Assert.notNull(element, "Elements of a relationship chain must not be null.");
+		Assertions.notNull(element, "Elements of a relationship chain must not be null.");
 		this.relationships.add(element);
 		return this;
 	}

@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/PatternComprehension.html">PatternComprehension</a>
@@ -40,13 +41,13 @@ public final class PatternComprehension implements Expression {
 
 	static OngoingDefinitionWithPattern basedOn(Relationship pattern) {
 
-		Assert.notNull(pattern, "A pattern is required");
+		Assertions.notNull(pattern, "A pattern is required");
 		return new Builder(pattern);
 	}
 
 	static OngoingDefinitionWithPattern basedOn(RelationshipChain pattern) {
 
-		Assert.notNull(pattern, "A pattern is required");
+		Assertions.notNull(pattern, "A pattern is required");
 		return new Builder(pattern);
 	}
 

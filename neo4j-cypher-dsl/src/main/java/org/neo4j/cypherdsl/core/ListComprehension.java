@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Atom.html#ListComprehension">ListComprehension</a>
@@ -59,7 +60,7 @@ public final class ListComprehension implements Expression {
 
 	static OngoingDefinitionWithVariable with(SymbolicName variable) {
 
-		Assert.notNull(variable, "A variable is required");
+		Assertions.notNull(variable, "A variable is required");
 		return new Builder(variable);
 	}
 
