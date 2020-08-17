@@ -33,17 +33,12 @@
 	<description>Examples used in the documentation.</description>
 
 	<properties>
+		<java-module-name>org.neo4j.cypherdsl.examples</java-module-name>
 		<java.version>11</java.version>
 		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
-		<java-module-name>org.neo4j.cypherdsl.examples</java-module-name>
 	</properties>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${neo4j-cypher-dsl.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
@@ -53,6 +48,11 @@
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-dsl</artifactId>
+			<version>${neo4j-cypher-dsl.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -104,7 +104,7 @@
 				</property>
 			</activation>
 			<properties>
-				<revision>202x.0.0</revision>
+				<revision>9999</revision>
 			</properties>
 		</profile>
 		<profile>
@@ -115,7 +115,7 @@
 				</property>
 			</activation>
 			<properties>
-				<sha1/>
+				<sha1></sha1>
 			</properties>
 		</profile>
 		<profile>
