@@ -49,7 +49,7 @@ public final class NamedPath implements PatternElement, Named {
 
 	static OngoingDefinitionWithName named(String name) {
 
-		return named(SymbolicName.create(name));
+		return named(SymbolicName.of(name));
 	}
 
 	static OngoingDefinitionWithName named(SymbolicName name) {
@@ -60,7 +60,7 @@ public final class NamedPath implements PatternElement, Named {
 
 	static OngoingShortestPathDefinitionWithName named(String name, FunctionDefinition algorithm) {
 
-		return new ShortestPathBuilder(SymbolicName.create(name), algorithm);
+		return new ShortestPathBuilder(SymbolicName.of(name), algorithm);
 	}
 
 	static OngoingShortestPathDefinitionWithName named(SymbolicName name, FunctionDefinition algorithm) {

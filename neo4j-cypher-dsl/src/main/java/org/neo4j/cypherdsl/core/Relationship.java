@@ -216,6 +216,11 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	}
 
 	@Override
+	public SymbolicName getRequiredSymbolicName() {
+		return details.getRequiredSymbolicName();
+	}
+
+	@Override
 	public RelationshipChain relationshipTo(Node other, String... types) {
 		return RelationshipChain
 			.create(this)

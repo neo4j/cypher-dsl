@@ -18,9 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
+import org.apiguardian.api.API.Status;
 import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
 
 /**
@@ -30,7 +29,7 @@ import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
  * @soundtrack Metallica - ReLoad
  * @since 2020.1.0
  */
-@API(status = INTERNAL, since = "2020.1.0")
+@API(status = Status.INTERNAL, since = "2020.1.0")
 final class BuiltInFunctions {
 
 	enum Predicates implements FunctionDefinition {
