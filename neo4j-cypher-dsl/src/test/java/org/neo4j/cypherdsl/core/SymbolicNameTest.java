@@ -89,7 +89,7 @@ public class SymbolicNameTest {
 
 			assertThat(name1).isEqualTo(name2);
 			assertThat(name1).isNotEqualTo(name3);
-			assertThat(name1).isNotEqualTo(name3);
+			assertThat(name2).isNotEqualTo(name3);
 		}
 
 		@Test
