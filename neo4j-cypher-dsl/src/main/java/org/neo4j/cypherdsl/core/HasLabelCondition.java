@@ -25,6 +25,7 @@ import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A condition checking for the presence of labels on nodes.
@@ -40,9 +41,9 @@ public final class HasLabelCondition implements Condition {
 
 	static HasLabelCondition create(SymbolicName nodeName, String... labels) {
 
-		Assert.notNull(nodeName, "A symbolic name for the node is required.");
-		Assert.notNull(labels, "Labels to query are required.");
-		Assert.notEmpty(labels, "At least one label to query is required.");
+		Assertions.notNull(nodeName, "A symbolic name for the node is required.");
+		Assertions.notNull(labels, "Labels to query are required.");
+		Assertions.notEmpty(labels, "At least one label to query is required.");
 
 		final List<NodeLabel> nodeLabels = new ArrayList<>(labels.length);
 		for (String label : labels) {

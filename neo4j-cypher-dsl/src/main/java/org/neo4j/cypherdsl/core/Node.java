@@ -30,6 +30,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Relationship.Direction;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/NodePattern.html">NodePattern</a>.
@@ -47,10 +48,10 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 
 	static Node create(String primaryLabel, MapExpression properties, String... additionalLabels) {
 
-		Assert.hasText(primaryLabel, "A primary label is required.");
+		Assertions.hasText(primaryLabel, "A primary label is required.");
 
 		for (String additionalLabel : additionalLabels) {
-			Assert.hasText(additionalLabel, "An empty label is not allowed.");
+			Assertions.hasText(additionalLabel, "An empty label is not allowed.");
 		}
 
 		return new Node(primaryLabel, properties == null ? null : new Properties(properties), additionalLabels);
@@ -97,7 +98,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	 */
 	public Node named(String newSymbolicName) {
 
-		Assert.hasText(newSymbolicName, "Symbolic name is required.");
+		Assertions.hasText(newSymbolicName, "Symbolic name is required.");
 		return new Node(SymbolicName.of(newSymbolicName), properties, labels);
 	}
 
@@ -109,7 +110,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	 */
 	public Node named(SymbolicName newSymbolicName) {
 
-		Assert.notNull(newSymbolicName, "Symbolic name is required.");
+		Assertions.notNull(newSymbolicName, "Symbolic name is required.");
 		return new Node(newSymbolicName, properties, labels);
 	}
 

@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A binary operation.
@@ -48,20 +49,20 @@ public final class Operation implements Expression {
 
 	static Operation create(Expression op1, Operator operator, Expression op2) {
 
-		Assert.notNull(op1, "The first operand must not be null.");
-		Assert.notNull(operator, "Operator must not be empty.");
-		Assert.notNull(op2, "The second operand must not be null.");
+		Assertions.notNull(op1, "The first operand must not be null.");
+		Assertions.notNull(operator, "Operator must not be empty.");
+		Assertions.notNull(op2, "The second operand must not be null.");
 
 		return new Operation(op1, operator, op2);
 	}
 
 	static Operation create(Node op1, Operator operator, String... nodeLabels) {
 
-		Assert.notNull(op1, "The first operand must not be null.");
-		Assert.isTrue(op1.getSymbolicName().isPresent(), "The node must have a name.");
-		Assert.isTrue(LABEL_OPERATORS.contains(operator),
+		Assertions.notNull(op1, "The first operand must not be null.");
+		Assertions.isTrue(op1.getSymbolicName().isPresent(), "The node must have a name.");
+		Assertions.isTrue(LABEL_OPERATORS.contains(operator),
 			String.format("Only operators %s can be used to modify labels", LABEL_OPERATORS));
-		Assert.notEmpty(nodeLabels, "The labels cannot be empty.");
+		Assertions.notEmpty(nodeLabels, "The labels cannot be empty.");
 
 		List<NodeLabel> listOfNodeLabels = Arrays.stream(nodeLabels).map(NodeLabel::new).collect(Collectors.toList());
 		return new Operation(op1.getRequiredSymbolicName(), operator, new NodeLabels(listOfNodeLabels));

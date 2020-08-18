@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a list expression as in {@code [expression1, expression2, ..., expressionN]}
@@ -35,8 +36,8 @@ public final class ListExpression implements Expression {
 
 	static Expression listOrSingleExpression(Expression... expressions) {
 
-		Assert.notNull(expressions, "Expressions are required.");
-		Assert.notEmpty(expressions, "At least one expression is required.");
+		Assertions.notNull(expressions, "Expressions are required.");
+		Assertions.notEmpty(expressions, "At least one expression is required.");
 
 		if (expressions.length == 1) {
 			return expressions[0];

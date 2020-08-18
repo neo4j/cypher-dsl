@@ -16,15 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.utils;
 
-import org.neo4j.cypherdsl.core.utils.StringUtils;
+import org.apiguardian.api.API;
 
 /**
  * Assertions used throughout the Cypher-DSL. Mostly copied over from {@literal org.springframework.util.Assert}. Thanks
  * to the original authors: Keith Donald, Juergen Hoeller, Sam Brannen, Colin Sampaleanu and Rob Harrop.
+ * Not supported for external use in anyway.
+ *
+ * @since 2020.0.0
  */
-final class Assert {
+@API(status = API.Status.INTERNAL, since = "2020.0.0")
+public final class Assertions {
 
 	/**
 	 * Assert that the given String contains valid text content; that is, it must not
@@ -36,7 +40,7 @@ final class Assert {
 	 * @throws IllegalArgumentException if the text does not contain valid text content
 	 */
 	public static void hasText(String text, String message) {
-		if (!StringUtils.hasText(text)) {
+		if (!Strings.hasText(text)) {
 			throw new IllegalArgumentException(message);
 		}
 	}
@@ -105,6 +109,6 @@ final class Assert {
 		return (array == null || array.length == 0);
 	}
 
-	private Assert() {
+	private Assertions() {
 	}
 }

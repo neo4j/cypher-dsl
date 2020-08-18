@@ -27,6 +27,7 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A condition that consists of one or two {@link Condition conditions} connected by a
@@ -46,12 +47,12 @@ public final class CompoundCondition implements Condition {
 
 	static CompoundCondition create(Condition left, Operator operator, Condition right) {
 
-		Assert.isTrue(VALID_OPERATORS.contains(operator),
+		Assertions.isTrue(VALID_OPERATORS.contains(operator),
 			"Operator " + operator + " is not a valid operator for a compound condition.");
 
-		Assert.notNull(left, "Left hand side condition is required.");
-		Assert.notNull(operator, "Operator is required.");
-		Assert.notNull(right, "Right hand side condition is required.");
+		Assertions.notNull(left, "Left hand side condition is required.");
+		Assertions.notNull(operator, "Operator is required.");
+		Assertions.notNull(right, "Right hand side condition is required.");
 		return new CompoundCondition(operator)
 			.add(operator, left)
 			.add(operator, right);

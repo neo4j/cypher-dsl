@@ -26,10 +26,10 @@ import org.junit.jupiter.api.RepeatedTest;
  * @author Michael J. Simons
  * @soundtrack Genesis - We Can't Dance
  */
-class StringUtilsTest {
+class StringsTest {
 
 	@RepeatedTest(8)
 	void shouldGeneratedValidSymbolicNames() {
-		assertThat(StringUtils.isIdentifier(StringUtils.randomIdentifier(32))).isTrue();
+		assertThat(Strings.isIdentifier(Strings.randomIdentifier(32))).isTrue();
 	}
 }

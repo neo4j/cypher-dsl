@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/RelationshipPattern.html">RelationshipPattern</a>.
@@ -77,8 +78,8 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 
 	static Relationship create(Node left, Direction direction, Node right, String... types) {
 
-		Assert.notNull(left, "Left node is required.");
-		Assert.notNull(right, "Right node is required.");
+		Assertions.notNull(left, "Left node is required.");
+		Assertions.notNull(right, "Right node is required.");
 
 		List<String> listOfTypes = Arrays.stream(types)
 			.filter(type -> !(type == null || type.isEmpty()))

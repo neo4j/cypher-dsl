@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a named parameter inside a Cypher statement.
@@ -35,7 +36,7 @@ public final class Parameter implements Expression {
 
 	static Parameter create(String name) {
 
-		Assert.hasText(name, "The name of the parameter is required!");
+		Assertions.hasText(name, "The name of the parameter is required!");
 
 		if (name.startsWith("$")) {
 			return create(name.substring(1));

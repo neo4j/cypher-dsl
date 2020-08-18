@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Gerrit Meier
@@ -34,7 +35,7 @@ public final class Skip implements Visitable {
 
 	static Skip create(Number value) {
 
-		Assert.notNull(value, "Cannot skip a value of null.");
+		Assertions.notNull(value, "Cannot skip a value of null.");
 
 		return new Skip(new NumberLiteral(value));
 	}

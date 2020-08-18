@@ -27,6 +27,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/SinglePartQuery.html">SinglePartQuery</a>.
@@ -44,7 +45,7 @@ public final class SinglePartQuery implements SingleQuery {
 	static SinglePartQuery create(List<Visitable> precedingClauses, Return aReturn) {
 
 		if (precedingClauses.isEmpty() || precedingClauses.get(precedingClauses.size() - 1) instanceof Match) {
-			Assert.notNull(aReturn, "A return clause is required.");
+			Assertions.notNull(aReturn, "A return clause is required.");
 		}
 
 		return new SinglePartQuery(precedingClauses, aReturn);

@@ -26,6 +26,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a named named path as in {@code p := (a)-->(b)}.
@@ -54,7 +55,7 @@ public final class NamedPath implements PatternElement, Named {
 
 	static OngoingDefinitionWithName named(SymbolicName name) {
 
-		Assert.notNull(name, "A name is required");
+		Assertions.notNull(name, "A name is required");
 		return new Builder(name);
 	}
 
@@ -65,7 +66,7 @@ public final class NamedPath implements PatternElement, Named {
 
 	static OngoingShortestPathDefinitionWithName named(SymbolicName name, FunctionDefinition algorithm) {
 
-		Assert.notNull(name, "A name is required");
+		Assertions.notNull(name, "A name is required");
 		return new ShortestPathBuilder(name, algorithm);
 	}
 

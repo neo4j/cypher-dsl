@@ -31,7 +31,7 @@ import org.apiguardian.api.API;
  * @since 2020.1.0
  */
 @API(status = API.Status.INTERNAL, since = "2020.1.0")
-public final class StringUtils {
+public final class Strings {
 
 	public static boolean hasText(String str) {
 		return (str != null && !str.isEmpty() && containsText(str));
@@ -88,6 +88,6 @@ public final class StringUtils {
 		return false;
 	}
 
-	private StringUtils() {
+	private Strings() {
 	}
 }

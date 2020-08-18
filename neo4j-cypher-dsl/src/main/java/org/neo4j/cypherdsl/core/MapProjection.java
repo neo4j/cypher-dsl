@@ -27,6 +27,7 @@ import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a map projection as described <a href="https://medium.com/neo4j/loading-graph-data-for-an-object-graph-mapper-or-graphql-5103b1a8b66e">here</a>.
@@ -115,7 +116,7 @@ public final class MapProjection implements Expression {
 
 			final Expression entry;
 			if (lastKey != null) {
-				Assert.isTrue(!knownKeys.contains(lastKey), "Duplicate key '" + lastKey + "'");
+				Assertions.isTrue(!knownKeys.contains(lastKey), "Duplicate key '" + lastKey + "'");
 				entry = new KeyValueMapEntry(lastKey, lastExpression);
 				knownKeys.add(lastKey);
 			} else if (lastExpression instanceof SymbolicName || lastExpression instanceof PropertyLookup) {

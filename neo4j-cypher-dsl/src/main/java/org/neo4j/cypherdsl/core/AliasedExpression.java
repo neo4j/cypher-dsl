@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * An aliased expression, that deals with named expressions when accepting visitors.
@@ -59,7 +60,7 @@ public final class AliasedExpression implements Aliased, Expression {
 	@Override
 	public AliasedExpression as(String newAlias) {
 
-		Assert.hasText(newAlias, "The alias may not be null or empty.");
+		Assertions.hasText(newAlias, "The alias may not be null or empty.");
 		return new AliasedExpression(this.delegate, newAlias);
 	}
 

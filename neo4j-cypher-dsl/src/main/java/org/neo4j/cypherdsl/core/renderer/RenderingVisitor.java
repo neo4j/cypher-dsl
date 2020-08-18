@@ -75,7 +75,7 @@ import org.neo4j.cypherdsl.core.YieldItems;
 import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.support.TypedSubtree;
 import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.utils.StringUtils;
+import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
  * This is a simple (some would call it naive) implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -147,10 +147,10 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		return this.resolvedSymbolicNames.computeIfAbsent(symbolicName, k -> {
 			String value = k.getValue();
-			if (StringUtils.hasText(value)) {
+			if (Strings.hasText(value)) {
 				return symbolicName.getValue();
 			}
-			return String.format("%s%03d", StringUtils.randomIdentifier(8), resolvedSymbolicNames.size());
+			return String.format("%s%03d", Strings.randomIdentifier(8), resolvedSymbolicNames.size());
 		});
 	}
 

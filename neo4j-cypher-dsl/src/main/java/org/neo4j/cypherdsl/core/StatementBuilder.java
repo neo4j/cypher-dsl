@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Michael J. Simons
@@ -125,7 +126,7 @@ public interface StatementBuilder
 		 */
 		default OrderableOngoingReadingAndWithWithWhere where(RelationshipPattern pathPattern) {
 
-			Assert.notNull(pathPattern, "The path pattern must not be null.");
+			Assertions.notNull(pathPattern, "The path pattern must not be null.");
 			return this.where(new RelationshipPatternCondition(pathPattern));
 		}
 	}

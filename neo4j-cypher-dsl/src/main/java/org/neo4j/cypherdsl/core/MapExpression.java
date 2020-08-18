@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.TypedSubtree;
 import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A dedicated map expression.<p>
@@ -44,14 +45,14 @@ public final class MapExpression extends TypedSubtree<Expression, MapExpression>
 
 	static MapExpression create(Object... input) {
 
-		Assert.isTrue(input.length % 2 == 0, "Need an even number of input parameters");
+		Assertions.isTrue(input.length % 2 == 0, "Need an even number of input parameters");
 		List<Expression> newContent = new ArrayList<>(input.length / 2);
 		Set<String> knownKeys = new HashSet<>();
 
 		for (int i = 0; i < input.length; i += 2) {
-			Assert.isInstanceOf(String.class, input[i], "Key needs to be of type String.");
-			Assert.isInstanceOf(Expression.class, input[i + 1], "Value needs to be of type Expression.");
-			Assert.isTrue(!knownKeys.contains(input[i]), "Duplicate key '" + input[i] + "'");
+			Assertions.isInstanceOf(String.class, input[i], "Key needs to be of type String.");
+			Assertions.isInstanceOf(Expression.class, input[i + 1], "Value needs to be of type Expression.");
+			Assertions.isTrue(!knownKeys.contains(input[i]), "Duplicate key '" + input[i] + "'");
 
 			final KeyValueMapEntry entry = new KeyValueMapEntry((String) input[i], (Expression) input[i + 1]);
 			newContent.add(entry);

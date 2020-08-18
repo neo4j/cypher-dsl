@@ -33,6 +33,7 @@ import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingUpdate;
 import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Michael J. Simons
@@ -89,8 +90,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	private OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
-		Assert.notNull(pattern, "Patterns to match are required.");
-		Assert.notEmpty(pattern, "At least one pattern to match is required.");
+		Assertions.notNull(pattern, "Patterns to match are required.");
+		Assertions.notEmpty(pattern, "At least one pattern to match is required.");
 
 		if (this.currentOngoingMatch != null) {
 			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
@@ -133,8 +134,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	private DefaultStatementBuilder update(UpdateType updateType, Object[] pattern) {
 
-		Assert.notNull(pattern, "Patterns to create are required.");
-		Assert.notEmpty(pattern, "At least one pattern to create is required.");
+		Assertions.notNull(pattern, "Patterns to create are required.");
+		Assertions.notEmpty(pattern, "At least one pattern to create is required.");
 
 		if (this.currentOngoingMatch != null) {
 			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
@@ -397,8 +398,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected final void addExpressions(Expression... expressions) {
 
-			Assert.notNull(expressions, "Expressions to return are required.");
-			Assert.notEmpty(expressions, "At least one expressions to return is required.");
+			Assertions.notNull(expressions, "Expressions to return are required.");
+			Assertions.notEmpty(expressions, "At least one expressions to return is required.");
 
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
@@ -447,8 +448,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected void addExpressions(Expression... expressions) {
 
-			Assert.notNull(expressions, "Expressions to return are required.");
-			Assert.notEmpty(expressions, "At least one expressions to return is required.");
+			Assertions.notNull(expressions, "Expressions to return are required.");
+			Assertions.notEmpty(expressions, "At least one expressions to return is required.");
 
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
@@ -677,8 +678,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			this.updateType = updateType;
 
-			Assert.notNull(pattern, "Patterns to create are required.");
-			Assert.notEmpty(pattern, "At least one pattern to create is required.");
+			Assertions.notNull(pattern, "Patterns to create are required.");
+			Assertions.notEmpty(pattern, "At least one pattern to create is required.");
 
 			this.expressions = Arrays.asList(pattern);
 		}
@@ -688,8 +689,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			this.updateType = updateType;
 
-			Assert.notNull(expressions, "Modifying expressions are required.");
-			Assert.notEmpty(expressions, "At least one expressions is required.");
+			Assertions.notNull(expressions, "Modifying expressions are required.");
+			Assertions.notEmpty(expressions, "At least one expressions is required.");
 
 			switch (this.updateType) {
 				case DETACH_DELETE:
@@ -733,8 +734,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public OngoingReadingAndReturn returning(Expression... returnedExpressions) {
 
-			Assert.notNull(returnedExpressions, "Expressions to return are required.");
-			Assert.notEmpty(returnedExpressions, "At least one expressions to return is required.");
+			Assertions.notNull(returnedExpressions, "Expressions to return are required.");
+			Assertions.notEmpty(returnedExpressions, "At least one expressions to return is required.");
 
 			super.returnList.addAll(Arrays.asList(returnedExpressions));
 			return this;
@@ -896,7 +897,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public InQueryCallBuilder call(String... namespaceAndProcedure) {
 
-		Assert.notEmpty(namespaceAndProcedure, "The procedure namespace and name must not be null or empty.");
+		Assertions.notEmpty(namespaceAndProcedure, "The procedure namespace and name must not be null or empty.");
 
 		if (this.currentOngoingMatch != null) {
 			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
@@ -968,7 +969,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		void where(Condition newCondition) {
 
-			Assert.notNull(newCondition, "The new condition must not be null.");
+			Assertions.notNull(newCondition, "The new condition must not be null.");
 			this.condition = newCondition;
 		}
 

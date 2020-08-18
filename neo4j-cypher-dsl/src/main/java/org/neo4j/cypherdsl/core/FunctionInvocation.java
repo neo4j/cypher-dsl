@@ -25,6 +25,7 @@ import java.util.Collections;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.TypedSubtree;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See
@@ -59,21 +60,21 @@ public final class FunctionInvocation implements Expression {
 
 		String message = "The expression for " + definition.getImplementationName() + "() is required.";
 
-		Assert.notEmpty(expressions, message);
-		Assert.notNull(expressions[0], message);
+		Assertions.notEmpty(expressions, message);
+		Assertions.notNull(expressions[0], message);
 
 		return new FunctionInvocation(definition.getImplementationName(), expressions);
 	}
 
 	static FunctionInvocation createDistinct(FunctionDefinition definition, Expression... expressions) {
 
-		Assert
+		Assertions
 			.isTrue(definition.isAggregate(), "The distinct operator can only be applied within aggregate functions.");
 
 		String message = "The expression for " + definition.getImplementationName() + "() is required.";
 
-		Assert.notEmpty(expressions, message);
-		Assert.notNull(expressions[0], message);
+		Assertions.notEmpty(expressions, message);
+		Assertions.notNull(expressions[0], message);
 
 		Expression[] newExpressions = new Expression[expressions.length];
 		newExpressions[0] = new DistinctExpression(expressions[0]);
@@ -84,7 +85,7 @@ public final class FunctionInvocation implements Expression {
 
 	static FunctionInvocation create(FunctionDefinition definition, PatternElement pattern) {
 
-		Assert.notNull(pattern, "The pattern for " + definition.getImplementationName() + "() is required.");
+		Assertions.notNull(pattern, "The pattern for " + definition.getImplementationName() + "() is required.");
 
 		return new FunctionInvocation(definition.getImplementationName(),
 			new Pattern(Collections.singletonList(pattern)));
