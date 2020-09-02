@@ -67,7 +67,8 @@ final class BuiltInFunctions {
 		HEAD("head"),
 		LAST("last"),
 		SHORTEST_PATH("shortestPath"),
-		NODES("nodes");
+		NODES("nodes"),
+		PROPERTIES("properties");
 
 		private final String implementationName;
 

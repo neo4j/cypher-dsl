@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -32,6 +33,20 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 class FunctionsIT {
 
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+
+	@Test
+	void propertiesInvocationShouldBeReusable() {
+
+		Node source = Cypher.node("Movie", Cypher.mapOf("title", Cypher.literalOf("The Matrix"))).named("src");
+		FunctionInvocation p = Functions.properties(source);
+		Node copy = Cypher.node("MovieCopy").named("copy");
+
+		String query = cypherRenderer.render(
+			Cypher.match(source).create(copy).set(copy, p).returning(copy).build()
+		);
+		Assertions.assertThat(query).isEqualTo(
+			"MATCH (src:`Movie` {title: 'The Matrix'}) CREATE (copy:`MovieCopy`) SET copy = properties(src) RETURN copy");
+	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("functionsToTest")
@@ -93,7 +108,10 @@ class FunctionsIT {
 			Arguments.of(Functions.head(e1), "RETURN head(e1)"),
 			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
 			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
-			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))")
+			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
+			Arguments.of(Functions.properties(n), "RETURN properties(n)"),
+			Arguments.of(Functions.properties(r), "RETURN properties(r)"),
+			Arguments.of(Functions.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})")
 		);
 	}
 }

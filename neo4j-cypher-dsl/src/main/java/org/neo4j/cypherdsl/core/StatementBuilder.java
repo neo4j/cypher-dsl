@@ -499,8 +499,7 @@ public interface StatementBuilder
 		<T extends OngoingMatchAndUpdate & BuildableStatement> T set(Expression... expressions);
 
 		default <T extends OngoingMatchAndUpdate & BuildableStatement> T set(Named variable, Expression expression) {
-			return set(variable.getSymbolicName()
-				.orElseThrow(() -> new IllegalArgumentException("No name present on the named item.")), expression);
+			return set(variable.getRequiredSymbolicName(), expression);
 		}
 	}
 
