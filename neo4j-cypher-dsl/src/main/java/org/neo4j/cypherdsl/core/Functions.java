@@ -144,6 +144,40 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for {@code properties())} on nodes.
+	 *
+	 * @param node The node who's properties should be returned.
+	 * @return A function call for {@code properties())}
+	 */
+	public static FunctionInvocation properties(Node node) {
+
+		return FunctionInvocation.create(Scalars.PROPERTIES, node.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a function invocation for {@code properties())} on relationships.
+	 *
+	 * @param relationship The relationship who's properties should be returned.
+	 * @return A function call for {@code properties())}
+	 */
+	public static FunctionInvocation properties(Relationship relationship) {
+
+		return FunctionInvocation.create(Scalars.PROPERTIES, relationship.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a function invocation for {@code properties())} on maps.
+	 *
+	 * @param map The map who's properties should be returned.
+	 * @return A function call for {@code properties())}
+	 */
+	public static FunctionInvocation properties(MapExpression map) {
+
+		return FunctionInvocation.create(Scalars.PROPERTIES, map);
+	}
+
+
+	/**
 	 * Creates a function invocation for the {@code coalesce()} function.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-coalesce">coalesce</a>.
 	 *
@@ -374,7 +408,8 @@ public final class Functions {
 	}
 
 	private static void assertPercentileArguments(Aggregates builtIn, Expression expression, Number percentile) {
-		Assertions.notNull(expression, "The numeric expression for " + builtIn.getImplementationName() + " is required.");
+		Assertions
+			.notNull(expression, "The numeric expression for " + builtIn.getImplementationName() + " is required.");
 		Assertions.notNull(percentile, "The percentile for " + builtIn.getImplementationName() + " is required.");
 		final double p = percentile.doubleValue();
 		Assertions.isTrue(p >= 0D && p <= 1D,
