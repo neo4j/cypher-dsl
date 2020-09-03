@@ -25,6 +25,8 @@ import org.neo4j.cypherdsl.core.BuiltInFunctions.Aggregates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Lists;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Scalars;
+import org.neo4j.cypherdsl.core.BuiltInFunctions.Spatials;
+import org.neo4j.cypherdsl.core.BuiltInFunctions.Strings;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -77,7 +79,7 @@ public final class Functions {
 
 		Assertions.notNull(node, "The node parameter is required.");
 
-		return FunctionInvocation.create(Scalars.LABELS, node.getRequiredSymbolicName());
+		return FunctionInvocation.create(Lists.LABELS, node.getRequiredSymbolicName());
 	}
 
 	/**
@@ -199,7 +201,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation toLower(Expression expression) {
 
-		return FunctionInvocation.create(Scalars.TO_LOWER, expression);
+		return FunctionInvocation.create(Strings.TO_LOWER, expression);
 	}
 
 	/**
@@ -257,7 +259,7 @@ public final class Functions {
 		Assertions.notNull(point1, "The distance function requires two points.");
 		Assertions.notNull(point2, "The distance function requires two points.");
 
-		return FunctionInvocation.create(Scalars.DISTANCE, point1, point2);
+		return FunctionInvocation.create(Spatials.DISTANCE, point1, point2);
 	}
 
 	/**
@@ -269,7 +271,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation point(MapExpression parameterMap) {
 
-		return FunctionInvocation.create(Scalars.POINT, parameterMap);
+		return FunctionInvocation.create(Spatials.POINT, parameterMap);
 	}
 
 	/**
@@ -281,7 +283,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation point(Parameter parameter) {
 
-		return FunctionInvocation.create(Scalars.POINT, parameter);
+		return FunctionInvocation.create(Spatials.POINT, parameter);
 	}
 
 	/**
@@ -574,9 +576,9 @@ public final class Functions {
 		Assertions.notNull(end, "The expression for range is required.");
 
 		if (step == null) {
-			return FunctionInvocation.create(Scalars.RANGE, start, end);
+			return FunctionInvocation.create(Lists.RANGE, start, end);
 		} else {
-			return FunctionInvocation.create(Scalars.RANGE, start, end, step);
+			return FunctionInvocation.create(Lists.RANGE, start, end, step);
 		}
 	}
 
@@ -615,7 +617,7 @@ public final class Functions {
 	public static FunctionInvocation nodes(NamedPath path) {
 
 		Assertions.notNull(path, "The path for nodes is required.");
-		return FunctionInvocation.create(Scalars.NODES,
+		return FunctionInvocation.create(Lists.NODES,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
 	}
 

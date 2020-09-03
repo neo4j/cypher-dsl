@@ -54,24 +54,18 @@ final class BuiltInFunctions {
 
 	enum Scalars implements FunctionDefinition {
 
-		ID("id"),
-		LABELS("labels"),
-		TYPE("type"),
-
 		COALESCE("coalesce"),
-		TO_LOWER("toLower"),
-		SIZE("size"),
-		DISTANCE("distance"),
-		POINT("point"),
-		RANGE("range"),
-		HEAD("head"),
-		LAST("last"),
-		SHORTEST_PATH("shortestPath"),
-		NODES("nodes"),
-		PROPERTIES("properties"),
-
 		END_NODE("endNode"),
-		START_NODE("startNode");
+		HEAD("head"),
+		ID("id"),
+		LAST("last"),
+
+		PROPERTIES("properties"),
+		SHORTEST_PATH("shortestPath"),
+		SIZE("size"),
+
+		START_NODE("startNode"),
+		TYPE("type");
 
 		private final String implementationName;
 
@@ -85,11 +79,44 @@ final class BuiltInFunctions {
 		}
 	}
 
+	enum Strings implements FunctionDefinition {
+
+		TO_LOWER("toLower");
+
+		private final String implementationName;
+
+		Strings(String implementationName) {
+			this.implementationName = implementationName;
+		}
+
+		@Override
+		public String getImplementationName() {
+			return implementationName;
+		}
+	}
+
+	enum Spatials implements FunctionDefinition {
+
+		POINT("point"),
+		DISTANCE("distance");
+
+		private final String implementationName;
+
+		Spatials(String implementationName) {
+			this.implementationName = implementationName;
+		}
+
+		@Override
+		public String getImplementationName() {
+			return implementationName;
+		}
+	}
+
 	enum Aggregates implements FunctionDefinition {
 
-		COUNT("count"),
 		AVG("avg"),
 		COLLECT("collect"),
+		COUNT("count"),
 		MAX("max"),
 		MIN("min"),
 		PERCENTILE_CONT("percentileCont"),
@@ -116,7 +143,9 @@ final class BuiltInFunctions {
 	}
 
 	enum Lists implements FunctionDefinition {
-
+		LABELS("labels"),
+		NODES("nodes"),
+		RANGE("range"),
 		RELATIONSHIPS("relationships");
 
 		private final String implementationName;
