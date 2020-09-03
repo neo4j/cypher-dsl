@@ -111,7 +111,10 @@ class FunctionsIT {
 			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
 			Arguments.of(Functions.properties(n), "RETURN properties(n)"),
 			Arguments.of(Functions.properties(r), "RETURN properties(r)"),
-			Arguments.of(Functions.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})")
+			Arguments.of(Functions.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})"),
+			Arguments.of(Functions.relationships(Cypher.path("p").definedBy(r)), "RETURN relationships(p)"),
+			Arguments.of(Functions.startNode(r), "RETURN startNode(r)"),
+			Arguments.of(Functions.endNode(r), "RETURN endNode(r)")
 		);
 	}
 }

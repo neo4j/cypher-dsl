@@ -22,8 +22,11 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Aggregates;
+import org.neo4j.cypherdsl.core.BuiltInFunctions.Lists;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Scalars;
+import org.neo4j.cypherdsl.core.BuiltInFunctions.Spatials;
+import org.neo4j.cypherdsl.core.BuiltInFunctions.Strings;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -76,7 +79,7 @@ public final class Functions {
 
 		Assertions.notNull(node, "The node parameter is required.");
 
-		return FunctionInvocation.create(Scalars.LABELS, node.getRequiredSymbolicName());
+		return FunctionInvocation.create(Lists.LABELS, node.getRequiredSymbolicName());
 	}
 
 	/**
@@ -198,7 +201,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation toLower(Expression expression) {
 
-		return FunctionInvocation.create(Scalars.TO_LOWER, expression);
+		return FunctionInvocation.create(Strings.TO_LOWER, expression);
 	}
 
 	/**
@@ -256,7 +259,7 @@ public final class Functions {
 		Assertions.notNull(point1, "The distance function requires two points.");
 		Assertions.notNull(point2, "The distance function requires two points.");
 
-		return FunctionInvocation.create(Scalars.DISTANCE, point1, point2);
+		return FunctionInvocation.create(Spatials.DISTANCE, point1, point2);
 	}
 
 	/**
@@ -268,7 +271,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation point(MapExpression parameterMap) {
 
-		return FunctionInvocation.create(Scalars.POINT, parameterMap);
+		return FunctionInvocation.create(Spatials.POINT, parameterMap);
 	}
 
 	/**
@@ -280,7 +283,7 @@ public final class Functions {
 	 */
 	public static FunctionInvocation point(Parameter parameter) {
 
-		return FunctionInvocation.create(Scalars.POINT, parameter);
+		return FunctionInvocation.create(Spatials.POINT, parameter);
 	}
 
 	/**
@@ -573,9 +576,9 @@ public final class Functions {
 		Assertions.notNull(end, "The expression for range is required.");
 
 		if (step == null) {
-			return FunctionInvocation.create(Scalars.RANGE, start, end);
+			return FunctionInvocation.create(Lists.RANGE, start, end);
 		} else {
-			return FunctionInvocation.create(Scalars.RANGE, start, end, step);
+			return FunctionInvocation.create(Lists.RANGE, start, end, step);
 		}
 	}
 
@@ -614,8 +617,55 @@ public final class Functions {
 	public static FunctionInvocation nodes(NamedPath path) {
 
 		Assertions.notNull(path, "The path for nodes is required.");
-		return FunctionInvocation.create(Scalars.NODES,
+		return FunctionInvocation.create(Lists.NODES,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code relationships{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
+	 *
+	 * @param path The path for which the relationships should be retrieved
+	 * @return A function call for {@code relationships()} on a path.
+	 * @since 2020.0.2
+	 */
+	public static FunctionInvocation relationships(NamedPath path) {
+
+		Assertions.notNull(path, "The path for relationships is required.");
+		return FunctionInvocation.create(Lists.RELATIONSHIPS,
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code startNode{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-startnode">startNode</a>.
+	 *
+	 * @param relationship The relationship for which the start node be retrieved
+	 * @return A function call for {@code startNode()} on a path.
+	 * @since 2020.0.2
+	 */
+	public static FunctionInvocation startNode(Relationship relationship) {
+
+		Assertions.notNull(relationship, "The relationship for endNode is required.");
+		return FunctionInvocation.create(Scalars.START_NODE,
+				relationship.getSymbolicName()
+						.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code endNode{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-endnode">endNode</a>.
+	 *
+	 * @param relationship The relationship for which the end node be retrieved
+	 * @return A function call for {@code endNode()} on a path.
+	 * @since 2020.0.2
+	 */
+	public static FunctionInvocation endNode(Relationship relationship) {
+
+		Assertions.notNull(relationship, "The relationship for endNode is required.");
+		return FunctionInvocation.create(Scalars.END_NODE,
+			relationship.getSymbolicName()
+					.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
 	}
 
 	public static FunctionInvocation shortestPath(Relationship relationship) {
