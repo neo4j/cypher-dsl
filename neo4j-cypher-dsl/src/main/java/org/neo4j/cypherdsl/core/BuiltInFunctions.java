@@ -112,6 +112,23 @@ final class BuiltInFunctions {
 
 	}
 
+	enum Lists implements FunctionDefinition {
+
+		RELATIONSHIPS("relationships");
+
+		private final String implementationName;
+
+		Lists(String implementationName) {
+			this.implementationName = implementationName;
+		}
+
+		@Override
+		public String getImplementationName() {
+			return implementationName;
+		}
+
+	}
+
 	private BuiltInFunctions() {
 	}
 }

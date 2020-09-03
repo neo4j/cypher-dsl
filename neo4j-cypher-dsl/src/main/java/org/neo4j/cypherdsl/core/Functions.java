@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Aggregates;
+import org.neo4j.cypherdsl.core.BuiltInFunctions.Lists;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Scalars;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -615,6 +616,21 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for nodes is required.");
 		return FunctionInvocation.create(Scalars.NODES,
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code relationships{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
+	 *
+	 * @param path The path for which the number of nodes should be retrieved
+	 * @return A function call for {@code relationships()} on a path.
+	 * @since 2020.0.2
+	 */
+	public static FunctionInvocation relationships(NamedPath path) {
+
+		Assertions.notNull(path, "The path for relationships is required.");
+		return FunctionInvocation.create(Lists.RELATIONSHIPS,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
 	}
 
