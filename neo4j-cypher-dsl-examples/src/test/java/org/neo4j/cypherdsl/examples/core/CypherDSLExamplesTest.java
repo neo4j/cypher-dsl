@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Functions;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 // end::cypher-dsl-imports[]
 
@@ -210,5 +211,16 @@ class CypherDSLExamplesTest {
 				+ "WHERE (NOT (tom)-[:`ACTED_IN`]->()<-[:`ACTED_IN`]-(cocoActors) AND tom <> cocoActors) "
 				+ "RETURN cocoActors.name AS Recommended, count(*) AS Strength ORDER BY Strength DESC");
 		// end::cypher-dsl-r[]
+	}
+
+	@Test // GH-82
+	void storedProceduresCanBeCalled() {
+
+		Statement call = Cypher
+			.call("dbms.listConfig")
+			.withArgs(Cypher.literalOf("browser"))
+			.yield("name")
+			.build();
+		assertThat(cypherRenderer.render(call)).isEqualTo("CALL dbms.listConfig('browser') YIELD name");
 	}
 }

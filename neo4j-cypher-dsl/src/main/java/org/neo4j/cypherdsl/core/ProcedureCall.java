@@ -38,10 +38,6 @@ public final class ProcedureCall implements Statement {
 
 	private final Where optionalWhere;
 
-	ProcedureCall(ProcedureName name, Arguments arguments, YieldItems yieldItems) {
-		this(name, arguments, yieldItems, null);
-	}
-
 	ProcedureCall(ProcedureName name, Arguments arguments, YieldItems yieldItems, Where optionalWhere) {
 
 		this.name = name;
@@ -61,30 +57,49 @@ public final class ProcedureCall implements Statement {
 		visitor.leave(this);
 	}
 
-	interface OngoingStandaloneCallWithoutArguments extends
+	/**
+	 * The union of a buildable statement and call exposing new arguments and yields.
+	 */
+	public interface OngoingStandaloneCallWithoutArguments extends
 		StatementBuilder.BuildableStatement, ExposesCall.ExposesWithArgs<OngoingStandaloneCallWithArguments>,
 		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields> {
 	}
 
-	interface OngoingStandaloneCallWithArguments extends
+	/**
+	 * The union of a buildable statement and call exposing yields.
+	 */
+	public interface OngoingStandaloneCallWithArguments extends
 		StatementBuilder.BuildableStatement, ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields> {
 	}
 
-	interface OngoingStandaloneCallWithReturnFields extends
+	/**
+	 * A buildable statement exposing where and return clauses.
+	 */
+	public interface OngoingStandaloneCallWithReturnFields extends
 		StatementBuilder.BuildableStatement,
 		ExposesWhere, ExposesReturning {
 	}
 
-	interface OngoingInQueryCallWithoutArguments extends
+	/**
+	 * The union of an in-query call exposing new arguments and yields.
+	 */
+	public interface OngoingInQueryCallWithoutArguments extends
 		ExposesCall.ExposesWithArgs<OngoingInQueryCallWithArguments>,
 		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
 	}
 
-	interface OngoingInQueryCallWithArguments extends
+	/**
+	 * The union of an in-query call exposing yields.
+	 */
+	public interface OngoingInQueryCallWithArguments extends
 		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
 	}
 
-	interface OngoingInQueryCallWithReturnFields extends
+
+	/**
+	 * An in-query call exposing where and return clauses.
+	 */
+	public interface OngoingInQueryCallWithReturnFields extends
 		ExposesWhere, ExposesReturning {
 	}
 
