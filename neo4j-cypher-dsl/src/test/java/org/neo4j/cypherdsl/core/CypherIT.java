@@ -2444,7 +2444,8 @@ class CypherIT {
 
 				Node person = Cypher.node("Person");
 				Statement statement = Cypher.match(person).returning(person.project("something")).build();
-				assertThat(cypherRenderer.render(statement)).matches("MATCH \\([a-zA-Z].*\\d{3}:`Person`\\) RETURN [a-zA-Z].*\\d{3}\\{\\.something\\}");
+				assertThat(cypherRenderer.render(statement))
+					.matches("MATCH \\([a-zA-Z].*\\d{3}:`Person`\\) RETURN [a-zA-Z].*\\d{3}\\{\\.something\\}");
 			}
 		}
 
@@ -2910,7 +2911,8 @@ class CypherIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.matches("MATCH \\([a-zA-Z]*\\d{3}:`Fruit` \\{kind: 'strawberry'\\}\\) SET [a-zA-Z]*\\d{3}\\.color = 'red'");
+				.matches(
+					"MATCH \\([a-zA-Z]*\\d{3}:`Fruit` \\{kind: 'strawberry'\\}\\) SET [a-zA-Z]*\\d{3}\\.color = 'red'");
 		}
 
 		@Test
@@ -3163,6 +3165,28 @@ class CypherIT {
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (n) RETURN collect(DISTINCT n) AS distinctNodes");
+		}
+
+		@Test
+		void gh84() {
+
+			Node parent = Cypher.node("Parent").named("parent");
+			Node child = Cypher.node("Child").named("child");
+			Statement statement = Cypher.call("apoc.create.relationship")
+				.withArgs(
+					parent.getRequiredSymbolicName(),
+					Cypher.literalOf("ChildEdge"),
+					Cypher.mapOf(
+						"score", Cypher.literalOf(0.33),
+						"weight", Cypher.literalOf(1.7)
+					),
+					child.getRequiredSymbolicName()
+				)
+				.yield("rel").build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CALL apoc.create.relationship(parent, 'ChildEdge', {score: 0.33, weight: 1.7}, child) YIELD rel");
+
 		}
 	}
 

@@ -64,9 +64,4 @@ public abstract class TypedSubtree<T extends Visitable, SELF extends TypedSubtre
 	protected Visitable prepareVisit(T child) {
 		return child;
 	}
-
-	public String getSeparator() {
-
-		return ", ";
-	}
 }
