@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -101,14 +102,9 @@ class RenderingVisitor extends ReflectiveVisitor {
 	private final StringBuilder builder = new StringBuilder();
 
 	/**
-	 * Optional separator between elements.
-	 */
-	private String separator = null;
-
-	/**
 	 * This keeps track on which level of the tree a separator is needed.
 	 */
-	private final java.util.Set<Integer> separatorOnLevel = new HashSet<>();
+	private final java.util.Map<Integer, AtomicReference<String>> separatorOnLevel = new ConcurrentHashMap<>();
 
 	/**
 	 * Keeps track of named objects that have been already visited.
@@ -132,15 +128,15 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	private void enableSeparator(int level, boolean on) {
 		if (on) {
-			separatorOnLevel.add(level);
+			separatorOnLevel.put(level, new AtomicReference<>(""));
 		} else {
 			separatorOnLevel.remove(level);
 		}
-		this.separator = null;
 	}
 
-	private boolean needsSeparator() {
-		return separatorOnLevel.contains(currentLevel);
+	private Optional<AtomicReference<String>> separatorOnCurrentLevel() {
+
+		return Optional.ofNullable(separatorOnLevel.get(currentLevel));
 	}
 
 	private String resolve(SymbolicName symbolicName) {
@@ -166,10 +162,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 			enableSeparator(nextLevel, true);
 		}
 
-		if (needsSeparator() && separator != null) {
-			builder.append(separator);
-			separator = null;
-		}
+		separatorOnCurrentLevel().ifPresent(ref -> builder.append(ref.getAndSet("")));
 
 		return !skipNodeContent;
 	}
@@ -177,9 +170,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 	@Override
 	protected void postLeave(Visitable visitable) {
 
-		if (needsSeparator()) {
-			separator = ", ";
-		}
+		separatorOnCurrentLevel().ifPresent(ref -> ref.set(", "));
 
 		if (visitable instanceof TypedSubtree) {
 			enableSeparator(currentLevel + 1, false);
