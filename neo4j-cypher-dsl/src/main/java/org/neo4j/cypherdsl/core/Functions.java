@@ -623,7 +623,7 @@ public final class Functions {
 	 * Creates a function invocation for {@code relationships{}}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
 	 *
-	 * @param path The path for which the number of nodes should be retrieved
+	 * @param path The path for which the relationships should be retrieved
 	 * @return A function call for {@code relationships()} on a path.
 	 * @since 2020.0.2
 	 */
@@ -632,6 +632,38 @@ public final class Functions {
 		Assertions.notNull(path, "The path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code startNode{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-startnode">startNode</a>.
+	 *
+	 * @param relationship The relationship for which the start node be retrieved
+	 * @return A function call for {@code startNode()} on a path.
+	 * @since 2020.0.2
+	 */
+	public static FunctionInvocation startNode(Relationship relationship) {
+
+		Assertions.notNull(relationship, "The relationship for endNode is required.");
+		return FunctionInvocation.create(Scalars.START_NODE,
+				relationship.getSymbolicName()
+						.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code endNode{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-endnode">endNode</a>.
+	 *
+	 * @param relationship The relationship for which the end node be retrieved
+	 * @return A function call for {@code endNode()} on a path.
+	 * @since 2020.0.2
+	 */
+	public static FunctionInvocation endNode(Relationship relationship) {
+
+		Assertions.notNull(relationship, "The relationship for endNode is required.");
+		return FunctionInvocation.create(Scalars.END_NODE,
+			relationship.getSymbolicName()
+					.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
 	}
 
 	public static FunctionInvocation shortestPath(Relationship relationship) {
