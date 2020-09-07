@@ -59,7 +59,6 @@ import org.neo4j.cypherdsl.core.ProcedureName;
 import org.neo4j.cypherdsl.core.Properties;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.RelationshipDetail;
 import org.neo4j.cypherdsl.core.RelationshipLength;
 import org.neo4j.cypherdsl.core.RelationshipTypes;
 import org.neo4j.cypherdsl.core.Remove;
@@ -364,7 +363,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(resolve(symbolicName));
 	}
 
-	void enter(RelationshipDetail details) {
+	void enter(Relationship.Details details) {
 
 		Relationship.Direction direction = details.getDirection();
 		builder.append(direction.getSymbolLeft());
@@ -405,7 +404,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void leave(RelationshipDetail details) {
+	void leave(Relationship.Details details) {
 
 		Relationship.Direction direction = details.getDirection();
 		if (details.hasContent()) {
