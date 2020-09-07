@@ -1,1 +1,4 @@
+[[introduction]]
+= Introduction
+
 include::introduction.adoc[leveloffset=+1]

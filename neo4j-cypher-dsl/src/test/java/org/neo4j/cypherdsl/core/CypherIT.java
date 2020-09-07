@@ -3274,4 +3274,57 @@ class CypherIT {
 					"MATCH p = (n)-->(b) WHERE (n.name = 'Alice' AND single(var IN nodes(p) WHERE var.eyes = 'blue')) RETURN p");
 		}
 	}
+
+	@Nested
+	class Ranges {
+
+		@Test
+		void valueAtShouldWork() {
+
+			Statement statement = Cypher.returning(Cypher.valueAt(Functions.range(0, 10), 3)).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[3]");
+		}
+
+		@Test
+		void subListUntilShouldWork() {
+
+			Statement statement = Cypher.returning(Cypher.subListUntil(Functions.range(0, 10), 3)).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[..3]");
+		}
+
+		@Test
+		void subListFromShouldWork() {
+
+			Statement statement = Cypher.returning(Cypher.subListFrom(Functions.range(0, 10), -3)).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[-3..]");
+		}
+
+		@Test
+		void subListShouldWork() {
+
+			Statement statement = Cypher.returning(Cypher.subList(Functions.range(0, 10), 2, 4)).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[2..4]");
+		}
+
+		@Test
+		void shouldWorkWithMapProjections() {
+
+			Node person = Cypher.node("Person").named("person");
+			Node location = Cypher.node("Location").named("personLivesIn");
+
+			Statement statement = Cypher.match(person)
+				.returning(
+					person.project(
+						"livesIn",
+						Cypher.valueAt(Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN")).returning(location.project("name")), 0)
+					)
+				).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][0]}");
+		}
+	}
 }

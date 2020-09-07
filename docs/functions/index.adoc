@@ -1,0 +1,6 @@
+[[functions]]
+= Functions
+
+NOTE: There are many more functions implemented in `org.neo4j.cypherdsl.core.Functions`. Not all of them are already documented here.
+
+include::lists.adoc[leveloffset=+1]
