@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -76,6 +78,147 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 		}
 	}
 
+	/**
+	 * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/RelationshipDetail.html">RelationshipDetail</a>.
+	 * This is not a public API and just used internally for structuring the tree.
+	 */
+	@API(status = INTERNAL, since = "1.0")
+	public static final class Details implements Visitable {
+
+		/**
+		 * The direction between the nodes of the relationship.
+		 */
+		private final Direction direction;
+
+		private volatile SymbolicName symbolicName;
+
+		private final RelationshipTypes types;
+
+		private final RelationshipLength length;
+
+		private final Properties properties;
+
+		static Details create(Direction direction, SymbolicName symbolicName,
+			RelationshipTypes types) {
+
+			return new Details(direction, symbolicName, types, null, null);
+		}
+
+		private Details(Direction direction,
+			SymbolicName symbolicName,
+			RelationshipTypes types,
+			RelationshipLength length,
+			Properties properties
+		) {
+
+			this.direction = direction;
+			this.symbolicName = symbolicName;
+			this.types = types;
+			this.length = length;
+			this.properties = properties;
+		}
+
+		/**
+		 * Internal helper method indicating whether the details have content or not.
+		 *
+		 * @return true if any of the details are filled
+		 */
+		public boolean hasContent() {
+			return this.symbolicName != null || this.types != null || this.length != null || this.properties != null;
+		}
+
+		Details named(String newSymbolicName) {
+
+			Assertions.hasText(newSymbolicName, "Symbolic name is required.");
+			return named(SymbolicName.of(newSymbolicName));
+		}
+
+		Details named(SymbolicName newSymbolicName) {
+
+			Assertions.notNull(newSymbolicName, "Symbolic name is required.");
+			return new Details(this.direction, newSymbolicName, this.types, this.length, this.properties);
+		}
+
+		Details with(Properties newProperties) {
+
+			return new Details(this.direction, this.symbolicName, this.types, this.length, newProperties);
+		}
+
+		Details unbounded() {
+
+			return new Details(this.direction, this.symbolicName, this.types, new RelationshipLength(),
+				properties);
+		}
+
+		Details min(Integer minimum) {
+
+			if (minimum == null && (this.length == null || this.length.getMinimum() == null)) {
+				return this;
+			}
+
+			RelationshipLength newLength = Optional.ofNullable(this.length)
+				.map(l -> new RelationshipLength(minimum, l.getMaximum()))
+				.orElseGet(() -> new RelationshipLength(minimum, null));
+
+			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
+		}
+
+		Details max(Integer maximum) {
+
+			if (maximum == null && (this.length == null || this.length.getMaximum() == null)) {
+				return this;
+			}
+
+			RelationshipLength newLength = Optional.ofNullable(this.length)
+				.map(l -> new RelationshipLength(l.getMinimum(), maximum))
+				.orElseGet(() -> new RelationshipLength(null, maximum));
+
+			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
+		}
+
+		public Direction getDirection() {
+			return direction;
+		}
+
+		Optional<SymbolicName> getSymbolicName() {
+			return Optional.ofNullable(symbolicName);
+		}
+
+		SymbolicName getRequiredSymbolicName() {
+
+			SymbolicName requiredSymbolicName = this.symbolicName;
+			if (requiredSymbolicName == null) {
+				synchronized (this) {
+					requiredSymbolicName = this.symbolicName;
+					if (requiredSymbolicName == null) {
+						this.symbolicName = SymbolicName.unresolved();
+						requiredSymbolicName = this.symbolicName;
+					}
+				}
+			}
+			return requiredSymbolicName;
+		}
+
+		public RelationshipTypes getTypes() {
+			return types;
+		}
+
+		public Properties getProperties() {
+			return properties;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+
+			visitor.enter(this);
+			Visitable.visitIfNotNull(this.symbolicName, visitor);
+			Visitable.visitIfNotNull(this.types, visitor);
+			Visitable.visitIfNotNull(this.length, visitor);
+			Visitable.visitIfNotNull(this.properties, visitor);
+			visitor.leave(this);
+		}
+	}
+
 	static Relationship create(Node left, Direction direction, Node right, String... types) {
 
 		Assertions.notNull(left, "Left node is required.");
@@ -85,7 +228,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 			.filter(type -> !(type == null || type.isEmpty()))
 			.collect(Collectors.toList());
 
-		RelationshipDetail details = RelationshipDetail.create(
+		Details details = Details.create(
 			Optional.ofNullable(direction).orElse(Direction.UNI),
 			null,
 			listOfTypes.isEmpty() ? null : new RelationshipTypes(listOfTypes));
@@ -96,9 +239,9 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 
 	private final Node right;
 
-	private final RelationshipDetail details;
+	private final Details details;
 
-	Relationship(Node left, RelationshipDetail details, Node right) {
+	Relationship(Node left, Details details, Node right) {
 		this.left = left;
 		this.right = right;
 		this.details = details;
@@ -112,7 +255,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 		return right;
 	}
 
-	public RelationshipDetail getDetails() {
+	public Details getDetails() {
 		return details;
 	}
 
