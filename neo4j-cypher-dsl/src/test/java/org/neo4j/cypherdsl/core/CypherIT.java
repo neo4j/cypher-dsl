@@ -3338,7 +3338,7 @@ class CypherIT {
 						"livesIn",
 						Cypher.subList(
 							Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN")).returning(location.project("name")),
-							Cypher.parameter("$personLivedInOffset"), Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
+							Cypher.parameter("personLivedInOffset"), Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
 						)
 					)
 				).build();
