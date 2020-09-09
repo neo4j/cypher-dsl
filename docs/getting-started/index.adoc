@@ -1,1 +1,4 @@
+[[getting-started]]
+= Getting started
+
 include::getting-started.adoc[leveloffset=+1]

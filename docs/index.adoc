@@ -42,6 +42,8 @@ We will try to keep breaking changes to a minimum, but we reserve the right to m
 and behaviour in case we need those changes for the https://github.com/neo4j/sdn-rx[SDN/RX] project, the origin of the Cypher-DSL.
 All public classes inside `org.neo4j.cypherdsl` still subject to breaking changes are annotated with `@API(status = EXPERIMENTAL)`.
 
-include::introduction-and-preface/index.adoc[]
+include::introduction-and-preface/index.adoc[leveloffset=+1]
 
-include::getting-started/index.adoc[]
+include::getting-started/index.adoc[leveloffset=+1]
+
+include::functions/index.adoc[leveloffset=+1]

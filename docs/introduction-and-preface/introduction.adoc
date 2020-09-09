@@ -1,6 +1,3 @@
-[[introduction]]
-= Introduction
-
 == Purpose
 
 The Cypher-DSL has been developed with the needs of https://github.com/neo4j/sdn-rx[SDN/RX] in mind:

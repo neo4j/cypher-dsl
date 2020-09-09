@@ -1,0 +1,43 @@
+== Lists
+
+[[functions-list-range]]
+=== range()
+
+Creates an invocation of https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range[`range()`].
+
+Given the following imports
+
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range-imports]
+----
+
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range]
+----
+
+Gives you `range(0,10)`.
+The step size can be specified as well:
+
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range-step]
+----
+
+This gives you `range(0,10,1)`.
+
+Both variants of `range` also take a `NumberLiteral` for the start and end index and the step size.
+
+=== Inserting a list operator
+
+The _list operator_ `[]` selects a specific value of a list or a range of values from a list.
+A range can either be closed or open.
+
+Find examples to select a value at a given index, a sublist based on a closed range and sublist based on open ranges below.
+While the examples use <<functions-list-range>>, the list operator doesn't put any restrictions on the expression at the moment.
+
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-operator]
+----

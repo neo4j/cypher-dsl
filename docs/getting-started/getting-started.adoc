@@ -1,6 +1,3 @@
-[[getting-started]]
-= Getting started
-
 == Prepare dependencies
 
 Please use a dependency management system. We recommend either Maven or Gradle.

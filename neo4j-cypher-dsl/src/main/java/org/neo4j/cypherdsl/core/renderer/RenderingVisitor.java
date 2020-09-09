@@ -40,6 +40,7 @@ import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
 import org.neo4j.cypherdsl.core.ListExpression;
+import org.neo4j.cypherdsl.core.ListOperator;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
@@ -148,6 +149,8 @@ class RenderingVisitor extends ReflectiveVisitor {
 			return String.format("%s%03d", Strings.randomIdentifier(8), resolvedSymbolicNames.size());
 		});
 	}
+
+	boolean inc;
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
@@ -554,6 +557,16 @@ class RenderingVisitor extends ReflectiveVisitor {
 	void leave(ProcedureCall procedureCall) {
 
 		builder.append(" ");
+	}
+
+	void enter(ListOperator.Details details) {
+
+		builder.append("[");
+	}
+
+	void leave(ListOperator.Details details) {
+
+		builder.append("]");
 	}
 
 	public String getRenderedContent() {

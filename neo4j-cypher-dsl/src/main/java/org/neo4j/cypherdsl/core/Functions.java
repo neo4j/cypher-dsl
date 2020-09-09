@@ -179,7 +179,6 @@ public final class Functions {
 		return FunctionInvocation.create(Scalars.PROPERTIES, map);
 	}
 
-
 	/**
 	 * Creates a function invocation for the {@code coalesce()} function.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-coalesce">coalesce</a>.
@@ -555,10 +554,36 @@ public final class Functions {
 	 * @param start the range's start
 	 * @param end   the range's end
 	 * @return A function call for {@code range()}
+	 * @see #range(Expression, Expression)
+	 */
+	public static FunctionInvocation range(Integer start, Integer end) {
+
+		return range(Cypher.literalOf(start), Cypher.literalOf(end));
+	}
+
+	/**
+	 * @param start the range's start
+	 * @param end   the range's end
+	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
 	 */
 	public static FunctionInvocation range(Expression start, Expression end) {
 		return range(start, end, null);
+	}
+
+	/**
+	 * Creates a function invocation for the {@code range()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range">range</a>.
+	 *
+	 * @param start the range's start
+	 * @param end   the range's end
+	 * @param step  the range's step
+	 * @return A function call for {@code range()}
+	 * @see #range(Expression, Expression, Expression)
+	 */
+	public static FunctionInvocation range(Integer start, Integer end, Integer step) {
+
+		return range(Cypher.literalOf(start), Cypher.literalOf(end), Cypher.literalOf(step));
 	}
 
 	/**
@@ -648,8 +673,8 @@ public final class Functions {
 
 		Assertions.notNull(relationship, "The relationship for endNode is required.");
 		return FunctionInvocation.create(Scalars.START_NODE,
-				relationship.getSymbolicName()
-						.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+			relationship.getSymbolicName()
+				.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
 	}
 
 	/**
@@ -665,7 +690,7 @@ public final class Functions {
 		Assertions.notNull(relationship, "The relationship for endNode is required.");
 		return FunctionInvocation.create(Scalars.END_NODE,
 			relationship.getSymbolicName()
-					.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+				.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
 	}
 
 	public static FunctionInvocation shortestPath(Relationship relationship) {

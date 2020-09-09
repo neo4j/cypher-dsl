@@ -307,16 +307,16 @@ public final class Cypher {
 	 * @return a new {@link NullLiteral}.
 	 * @throws IllegalArgumentException when the object cannot be represented as a literal
 	 */
-	public static Literal<?> literalOf(Object object) {
+	public static <T> Literal<T> literalOf(Object object) {
 
 		if (object == null) {
-			return NullLiteral.INSTANCE;
+			return (Literal<T>) NullLiteral.INSTANCE;
 		}
 		if (object instanceof CharSequence) {
-			return new StringLiteral((CharSequence) object);
+			return (Literal<T>) new StringLiteral((CharSequence) object);
 		}
 		if (object instanceof Number) {
-			return new NumberLiteral((Number) object);
+			return (Literal<T>) new NumberLiteral((Number) object);
 		}
 		if (object instanceof Iterable) {
 			for (Object element : ((Iterable<?>) object)) {
@@ -326,11 +326,11 @@ public final class Cypher {
 			}
 
 			@SuppressWarnings("unchecked") // See above
-			ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
-			return listLiteral;
+				ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
+			return (Literal<T>) listLiteral;
 		}
 		if (object instanceof Boolean) {
-			return BooleanLiteral.of((Boolean) object);
+			return (Literal<T>) BooleanLiteral.of((Boolean) object);
 		}
 		throw new IllegalArgumentException("Unsupported literal type: " + object.getClass());
 	}
@@ -433,6 +433,112 @@ public final class Cypher {
 	 */
 	public static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 		return Statement.call(namespaceAndProcedure);
+	}
+
+	/**
+	 * Creates a closed range with given boundaries.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param start            The inclusive start
+	 * @param end              The exclusive end
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static Expression subList(Expression targetExpression, Integer start, Integer end) {
+
+		return ListOperator.subList(targetExpression, Cypher.literalOf(start), Cypher.literalOf(end));
+	}
+
+	/**
+	 * Creates a closed range with given boundaries.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param start            The inclusive start
+	 * @param end              The exclusive end
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static Expression subList(Expression targetExpression, Expression start, Expression end) {
+
+		return ListOperator.subList(targetExpression, start, end);
+	}
+
+	/**
+	 * Creates an open range starting at {@code start}.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param start            The inclusive start
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static Expression subListFrom(Expression targetExpression, Integer start) {
+
+		return ListOperator.subListFrom(targetExpression, Cypher.literalOf(start));
+	}
+
+	/**
+	 * Creates an open range starting at {@code start}.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param start            The inclusive start
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static Expression subListFrom(Expression targetExpression, Expression start) {
+
+		return ListOperator.subListFrom(targetExpression, start);
+	}
+
+	/**
+	 * Creates an open range starting at {@code start}.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param end              The exclusive end
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static Expression subListUntil(Expression targetExpression, Integer end) {
+
+		return ListOperator.subListUntil(targetExpression, Cypher.literalOf(end));
+	}
+
+	/**
+	 * Creates an open range starting at {@code start}.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param end              The exclusive end
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static Expression subListUntil(Expression targetExpression, Expression end) {
+
+		return ListOperator.subListUntil(targetExpression, end);
+	}
+
+	/**
+	 * Creates a single valued range at {@code index}.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param index            The index of the range
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static ListOperator valueAt(Expression targetExpression, Integer index) {
+
+		return ListOperator.valueAt(targetExpression, Cypher.literalOf(index));
+	}
+
+	/**
+	 * Creates a single valued range at {@code index}.
+	 *
+	 * @param targetExpression The target expression for the range
+	 * @param index            The index of the range
+	 * @return A range literal.
+	 * @since 2020.1.0
+	 */
+	public static ListOperator valueAt(Expression targetExpression, Expression index) {
+
+		return ListOperator.valueAt(targetExpression, index);
 	}
 
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {
