@@ -880,7 +880,7 @@ public final class Functions {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.DATETIME, Cypher.mapOf("timezone", Cypher.literalOf(timeZone)));
+			.create(BuiltInFunctions.Temporals.DATETIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	/**
@@ -951,7 +951,7 @@ public final class Functions {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.LOCALDATETIME, Cypher.mapOf("timezone", Cypher.literalOf(timeZone)));
+			.create(BuiltInFunctions.Temporals.LOCALDATETIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	/**
@@ -1022,7 +1022,7 @@ public final class Functions {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.LOCALTIME, Cypher.mapOf("timezone", Cypher.literalOf(timeZone)));
+			.create(BuiltInFunctions.Temporals.LOCALTIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	/**
@@ -1093,7 +1093,11 @@ public final class Functions {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.TIME, Cypher.mapOf("timezone", Cypher.literalOf(timeZone)));
+			.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
+	}
+
+	private static MapExpression timezoneMapLiteralOf(TimeZone timeZone) {
+		return Cypher.mapOf("timezone", Cypher.literalOf(timeZone.getID()));
 	}
 
 	/**
