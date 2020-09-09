@@ -3276,7 +3276,7 @@ class CypherIT {
 	}
 
 	@Nested
-	class Ranges {
+	class ListOperator {
 
 		@Test
 		void valueAtShouldWork() {
@@ -3325,6 +3325,25 @@ class CypherIT {
 				).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][0]}");
+		}
+
+		@Test
+		void shouldSupportExpressions() {
+
+			Node person = Cypher.node("Person").named("person");
+			Node location = Cypher.node("Location").named("personLivesIn");
+			Statement statement = Cypher.match(person)
+				.returning(
+					person.project(
+						"livesIn",
+						Cypher.subList(
+							Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN")).returning(location.project("name")),
+							Cypher.parameter("$personLivedInOffset"), Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
+						)
+					)
+				).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}");
 		}
 	}
 }

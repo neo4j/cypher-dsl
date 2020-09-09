@@ -53,7 +53,7 @@ public final class ListOperator implements Expression {
 		/**
 		 * An optional start for the range (inclusive if given).
 		 */
-		private final Literal<Number> optionalStart;
+		private final Expression optionalStart;
 
 		/**
 		 * Optional dots between the start and end.
@@ -63,9 +63,9 @@ public final class ListOperator implements Expression {
 		/**
 		 * An optional end for the range (exclusive if given).
 		 */
-		private final Literal<Number> optionalEnd;
+		private final Expression optionalEnd;
 
-		Details(Literal<Number> optionalStart, Literal<String> dots, Literal<Number> optionalEnd) {
+		Details(Expression optionalStart, Literal<String> dots, Expression optionalEnd) {
 			this.optionalStart = optionalStart;
 			this.dots = dots;
 			this.optionalEnd = optionalEnd;
@@ -100,8 +100,7 @@ public final class ListOperator implements Expression {
 	 * @param end              The exclusive end
 	 * @return A range literal.
 	 */
-	static ListOperator subList(Expression targetExpression, Literal<Number> start,
-		Literal<Number> end) {
+	static ListOperator subList(Expression targetExpression, Expression start, Expression end) {
 
 		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
 		Assertions.notNull(start, "The start of the range must not be null.");
@@ -117,7 +116,7 @@ public final class ListOperator implements Expression {
 	 * @param start            The inclusive start
 	 * @return A range literal.
 	 */
-	static ListOperator subListFrom(Expression targetExpression, Literal<Number> start) {
+	static ListOperator subListFrom(Expression targetExpression, Expression start) {
 
 		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
 		Assertions.notNull(start, "The start of the range must not be null.");
@@ -132,7 +131,7 @@ public final class ListOperator implements Expression {
 	 * @param end              The exclusive end
 	 * @return A range literal.
 	 */
-	static ListOperator subListUntil(Expression targetExpression, Literal<Number> end) {
+	static ListOperator subListUntil(Expression targetExpression, Expression end) {
 
 		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
 		Assertions.notNull(end, "The end of the range must not be null.");
@@ -147,7 +146,7 @@ public final class ListOperator implements Expression {
 	 * @param index            The index of the range
 	 * @return A range literal.
 	 */
-	static ListOperator valueAt(Expression targetExpression, Literal<Number> index) {
+	static ListOperator valueAt(Expression targetExpression, Expression index) {
 
 		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
 		Assertions.notNull(index, "The index of the range must not be null.");
@@ -155,8 +154,8 @@ public final class ListOperator implements Expression {
 		return new ListOperator(targetExpression, index, null, null);
 	}
 
-	private ListOperator(Expression targetExpression, Literal<Number> optionalStart,
-		Literal<String> dots, Literal<Number> optionalEnd) {
+	private ListOperator(Expression targetExpression, Expression optionalStart,
+		Literal<String> dots, Expression optionalEnd) {
 
 		this.targetExpression = targetExpression;
 		this.details = new Details(optionalStart, dots, optionalEnd);

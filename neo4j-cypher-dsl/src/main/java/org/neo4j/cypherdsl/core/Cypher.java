@@ -458,7 +458,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
-	public static Expression subList(Expression targetExpression, Literal<Number> start, Literal<Number> end) {
+	public static Expression subList(Expression targetExpression, Expression start, Expression end) {
 
 		return ListOperator.subList(targetExpression, start, end);
 	}
@@ -484,7 +484,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
-	public static Expression subListFrom(Expression targetExpression, Literal<Number> start) {
+	public static Expression subListFrom(Expression targetExpression, Expression start) {
 
 		return ListOperator.subListFrom(targetExpression, start);
 	}
@@ -510,7 +510,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
-	public static Expression subListUntil(Expression targetExpression, Literal<Number> end) {
+	public static Expression subListUntil(Expression targetExpression, Expression end) {
 
 		return ListOperator.subListUntil(targetExpression, end);
 	}
@@ -536,7 +536,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
-	public static ListOperator valueAt(Expression targetExpression, Literal<Number> index) {
+	public static ListOperator valueAt(Expression targetExpression, Expression index) {
 
 		return ListOperator.valueAt(targetExpression, index);
 	}
