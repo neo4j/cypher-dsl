@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.support;
 
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -61,10 +59,10 @@ public abstract class ReflectiveVisitor implements Visitor {
 	}
 
 	/**
-	 * A shared cache of unbound method handles for entering and leaving phases.
+	 * A shared cache of unbound methods for entering and leaving phases.
 	 * The key is the concrete class of the visitor as well as the hierarchy of the visitable.
 	 */
-	private static final Map<TargetAndPhase, Optional<MethodHandle>> VISITING_METHODS_CACHE = new ConcurrentHashMap<>();
+	private static final Map<TargetAndPhase, Optional<Method>> VISITING_METHODS_CACHE = new ConcurrentHashMap<>();
 
 	/** Keeps track of the ASTs current level. */
 	private Deque<Visitable> currentVisitedElements = new LinkedList<>();
@@ -108,9 +106,9 @@ public abstract class ReflectiveVisitor implements Visitor {
 	}
 
 	private void executeConcreteMethodIn(TargetAndPhase targetAndPhase, Visitable onVisitable) {
-		Optional<MethodHandle> optionalHandle = VISITING_METHODS_CACHE
+		Optional<Method> optionalMethod = VISITING_METHODS_CACHE
 			.computeIfAbsent(targetAndPhase, ReflectiveVisitor::findHandleFor);
-		optionalHandle.ifPresent(handle -> {
+		optionalMethod.ifPresent(handle -> {
 			try {
 				handle.invoke(this, onVisitable);
 			} catch (Throwable throwable) {
@@ -119,16 +117,15 @@ public abstract class ReflectiveVisitor implements Visitor {
 		});
 	}
 
-	private static Optional<MethodHandle> findHandleFor(TargetAndPhase targetAndPhase) {
+	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
 
 		for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
 			try {
-				// Using MethodHandles.lookup().findVirtual() doesn't allow to make a protected method accessible.
 				Method method = targetAndPhase.visitorClass
 					.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
 				method.setAccessible(true);
-				return Optional.of(MethodHandles.lookup().in(targetAndPhase.visitorClass).unreflect(method));
-			} catch (IllegalAccessException | NoSuchMethodException e) {
+				return Optional.of(method);
+			} catch (NoSuchMethodException e) {
 				// We don't do anything if the method doesn't exists
 				// Try the next parameter type in the hierarchy
 			}

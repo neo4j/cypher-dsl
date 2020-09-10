@@ -1,0 +1,3 @@
+== Native tests.
+
+This is a sample project to ensure that the Cypher-DSL works with GraalVM native.
