@@ -1,0 +1,6 @@
+[
+  {
+    "name" : "org.neo4j.cypherdsl.core.renderer.RenderingVisitor",
+    "allDeclaredMethods" : true
+  }
+]

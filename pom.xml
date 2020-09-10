@@ -81,6 +81,7 @@
 	<modules>
 		<module>neo4j-cypher-dsl</module>
 		<module>neo4j-cypher-dsl-examples</module>
+		<module>neo4j-cypher-dsl-native-tests</module>
 	</modules>
 
 	<scm>

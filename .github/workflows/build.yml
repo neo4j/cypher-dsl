@@ -22,12 +22,33 @@ jobs:
         run: >
           ./mvnw --no-transfer-progress clean deploy -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
           -DaltDeploymentRepository=releases::default::file://$GITHUB_WORKSPACE/target/repository
-          -pl !org.neo4j:neo4j-cypher-dsl-examples
+          -pl !org.neo4j:neo4j-cypher-dsl-examples,!org.neo4j:neo4j-cypher-dsl-native-tests
       - name: Archive artifacts
         uses: actions/upload-artifact@v1
         with:
           name: artifacts
           path: target/repository
+
+  test_native:
+    name: Verify compilation on GraalVM native
+    runs-on: ubuntu-latest
+    needs: build
+    container:
+      image: oracle/graalvm-ce:20.1.0-java11
+      steps:
+        - name: setup native-image
+          run: fc-cache -f -v && gu install native-image
+        - name: Download artifacts
+          uses: actions/download-artifact@v1
+          with:
+            name: artifacts
+            path: repository
+        - name: Install dependencies
+          run: "mkdir -p $HOME/.m2 && mv $GITHUB_WORKSPACE/repository $HOME/.m2/"
+        - name: Run Maven build
+          run: >
+            ./mvnw --no-transfer-progress clean verify -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
+            -pl org.neo4j:neo4j-cypher-dsl-native-tests
 
   build_examples:
     name: Verify examples with ${{ matrix.java }}
