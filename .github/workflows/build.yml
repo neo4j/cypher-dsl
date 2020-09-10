@@ -47,7 +47,7 @@ jobs:
           name: artifacts
           path: repository
       - name: Install dependencies
-        run: "mkdir -p $HOME/.m2 && mv $GITHUB_WORKSPACE/repository $HOME/.m2/"
+        run: "mkdir -p /root/.m2 && mv $GITHUB_WORKSPACE/repository /root/.m2"
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
