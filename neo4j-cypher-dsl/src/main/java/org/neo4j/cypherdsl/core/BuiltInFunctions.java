@@ -161,6 +161,27 @@ final class BuiltInFunctions {
 
 	}
 
+	enum Temporals implements FunctionDefinition {
+
+		DATE("date"),
+		DATETIME("datetime"),
+		LOCALDATETIME("localdatetime"),
+		LOCALTIME("localtime"),
+		TIME("time"),
+		DURATION("duration");
+
+		private final String implementationName;
+
+		Temporals(String implementationName) {
+			this.implementationName = implementationName;
+		}
+
+		@Override
+		public String getImplementationName() {
+			return implementationName;
+		}
+	}
+
 	private BuiltInFunctions() {
 	}
 }

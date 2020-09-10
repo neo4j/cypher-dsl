@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TimeZone;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
@@ -331,6 +332,9 @@ public final class Cypher {
 		}
 		if (object instanceof Boolean) {
 			return (Literal<T>) BooleanLiteral.of((Boolean) object);
+		}
+		if (object instanceof TimeZone) {
+			return new StringLiteral(((TimeZone) object).getID());
 		}
 		throw new IllegalArgumentException("Unsupported literal type: " + object.getClass());
 	}
