@@ -38,6 +38,7 @@ jobs:
     steps:
       - name: setup native-image
         run: fc-cache -f -v && gu install native-image
+      - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
