@@ -38,6 +38,8 @@ jobs:
     steps:
       - name: setup native-image
         run: fc-cache -f -v && gu install native-image
+      - name: Determine revision
+        run: echo "::set-env name=REVISION::$(date +'%Y.0.0')"
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
