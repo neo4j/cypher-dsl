@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import java.util.TimeZone;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
@@ -51,7 +52,6 @@ class FunctionsIT {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("functionsToTest")
 	void functionShouldBeRenderedAsExpected(FunctionInvocation functionInvocation, String expected) {
-
 		Assertions.assertThat(cypherRenderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
 	}
 
@@ -104,7 +104,8 @@ class FunctionsIT {
 			Arguments.of(Functions.sum(e1), "RETURN sum(e1)"),
 			Arguments.of(Functions.sumDistinct(e1), "RETURN sum(DISTINCT e1)"),
 			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN range(1, 3)"),
-			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3), Cypher.literalOf(2)), "RETURN range(1, 3, 2)"),
+			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3), Cypher.literalOf(2)),
+				"RETURN range(1, 3, 2)"),
 			Arguments.of(Functions.head(e1), "RETURN head(e1)"),
 			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
 			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
@@ -114,7 +115,83 @@ class FunctionsIT {
 			Arguments.of(Functions.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})"),
 			Arguments.of(Functions.relationships(Cypher.path("p").definedBy(r)), "RETURN relationships(p)"),
 			Arguments.of(Functions.startNode(r), "RETURN startNode(r)"),
-			Arguments.of(Functions.endNode(r), "RETURN endNode(r)")
+			Arguments.of(Functions.endNode(r), "RETURN endNode(r)"),
+			Arguments.of(Functions.date(), "RETURN date()"),
+			Arguments.of(Functions.calendarDate(2020, 9, 21), "RETURN date({year: 2020, month: 9, day: 21})"),
+			Arguments.of(Functions.weekDate(1984, 10, 3), "RETURN date({year: 1984, week: 10, dayOfWeek: 3})"),
+			Arguments.of(Functions.weekDate(1984, 10, null), "RETURN date({year: 1984, week: 10})"),
+			Arguments.of(Functions.weekDate(1984, null, null), "RETURN date({year: 1984})"),
+			Arguments
+				.of(Functions.quarterDate(1984, 10, 45), "RETURN date({year: 1984, quarter: 10, dayOfQuarter: 45})"),
+			Arguments.of(Functions.quarterDate(1984, 10, null), "RETURN date({year: 1984, quarter: 10})"),
+			Arguments.of(Functions.quarterDate(1984, null, null), "RETURN date({year: 1984})"),
+			Arguments.of(Functions.ordinalDate(1984, 202), "RETURN date({year: 1984, ordinalDay: 202})"),
+			Arguments.of(Functions.ordinalDate(1984, null), "RETURN date({year: 1984})"),
+			Arguments.of(Functions.date(Cypher.mapOf("year", Cypher.literalOf(2020))), "RETURN date({year: 2020})"),
+			Arguments.of(Functions.date("2020-09-15"), "RETURN date('2020-09-15')"),
+			Arguments.of(Functions.date(Cypher.parameter("$myDateParameter")), "RETURN date($myDateParameter)"),
+			Arguments.of(Functions.datetime(), "RETURN datetime()"),
+			Arguments.of(Functions.datetime(
+				Cypher.mapOf("year", Cypher.literalOf(1984), "month", Cypher.literalOf(10), "day",
+					Cypher.literalOf(11), "hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "timezone",
+					Cypher.literalOf("Europe/Stockholm")
+				)
+			), "RETURN datetime({year: 1984, month: 10, day: 11, hour: 12, minute: 31, timezone: 'Europe/Stockholm'})"),
+			Arguments
+				.of(Functions.datetime("2015-07-21T21:40:32.142+0100"),
+					"RETURN datetime('2015-07-21T21:40:32.142+0100')"),
+			Arguments.of(Functions.datetime(Cypher.parameter("$myDateParameter")), "RETURN datetime($myDateParameter)"),
+			Arguments.of(Functions.datetime(TimeZone.getTimeZone("America/Los_Angeles")),
+				"RETURN datetime({timezone: 'America/Los_Angeles'})"),
+			Arguments.of(Functions.localdatetime(), "RETURN localdatetime()"),
+			Arguments.of(Functions.localdatetime(
+				Cypher.mapOf("year", Cypher.literalOf(1984), "month", Cypher.literalOf(10), "day",
+					Cypher.literalOf(11), "hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "second",
+					Cypher.literalOf(14), "millisecond", Cypher.literalOf(123), "microsecond", Cypher.literalOf(456),
+					"nanosecond", Cypher.literalOf(789)
+				)
+				),
+				"RETURN localdatetime({year: 1984, month: 10, day: 11, hour: 12, minute: 31, second: 14, millisecond: 123, microsecond: 456, nanosecond: 789})"),
+			Arguments
+				.of(Functions.localdatetime("2015-07-21T21:40:32.142"),
+					"RETURN localdatetime('2015-07-21T21:40:32.142')"),
+			Arguments.of(Functions.localdatetime(Cypher.parameter("$myDateParameter")),
+				"RETURN localdatetime($myDateParameter)"),
+			Arguments.of(Functions.localdatetime(TimeZone.getTimeZone("America/Los_Angeles")),
+				"RETURN localdatetime({timezone: 'America/Los_Angeles'})"),
+			Arguments.of(Functions.localtime(), "RETURN localtime()"),
+			Arguments.of(Functions.localtime(
+				Cypher.mapOf("hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "second",
+					Cypher.literalOf(14), "millisecond", Cypher.literalOf(123), "microsecond", Cypher.literalOf(456),
+					"nanosecond", Cypher.literalOf(789)
+				)
+				),
+				"RETURN localtime({hour: 12, minute: 31, second: 14, millisecond: 123, microsecond: 456, nanosecond: 789})"),
+			Arguments
+				.of(Functions.localtime("21:40:32.142"), "RETURN localtime('21:40:32.142')"),
+			Arguments
+				.of(Functions.localtime(Cypher.parameter("$myDateParameter")), "RETURN localtime($myDateParameter)"),
+			Arguments.of(Functions.localtime(TimeZone.getTimeZone("America/Los_Angeles")),
+				"RETURN localtime({timezone: 'America/Los_Angeles'})"),
+			Arguments.of(Functions.time(), "RETURN time()"),
+			Arguments.of(Functions.time(
+				Cypher.mapOf("hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "second",
+					Cypher.literalOf(14), "millisecond", Cypher.literalOf(123), "microsecond", Cypher.literalOf(456),
+					"nanosecond", Cypher.literalOf(789)
+				)
+			), "RETURN time({hour: 12, minute: 31, second: 14, millisecond: 123, microsecond: 456, nanosecond: 789})"),
+			Arguments
+				.of(Functions.time("21:40:32.142"), "RETURN time('21:40:32.142')"),
+			Arguments.of(Functions.time(Cypher.parameter("$myDateParameter")), "RETURN time($myDateParameter)"),
+			Arguments.of(Functions.time(TimeZone.getTimeZone("America/Los_Angeles")),
+				"RETURN time({timezone: 'America/Los_Angeles'})"),
+			Arguments.of(Functions.duration(
+				Cypher
+					.mapOf("days", Cypher.literalOf(14), "hours", Cypher.literalOf(16), "minutes", Cypher.literalOf(12))
+			), "RETURN duration({days: 14, hours: 16, minutes: 12})"),
+			Arguments
+				.of(Functions.duration("P14DT16H12M"), "RETURN duration('P14DT16H12M')"),
+			Arguments.of(Functions.duration(Cypher.parameter("$myDateParameter")), "RETURN duration($myDateParameter)")
 		);
 	}
 }

@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.TimeZone;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Aggregates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Lists;
@@ -691,6 +693,501 @@ public final class Functions {
 		return FunctionInvocation.create(Scalars.END_NODE,
 			relationship.getSymbolicName()
 				.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code date()}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * This is the most simple form.
+	 *
+	 * @return A function call for {@code date()}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation date() {
+
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE);
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 *
+	 * @param year  The year
+	 * @param month The month
+	 * @param day   The day
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation calendarDate(Integer year, Integer month, Integer day) {
+
+		Assertions.notNull(year, "The year is required.");
+		Assertions.notNull(month, "The month is required.");
+		Assertions.notNull(day, "The year is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher
+			.mapOf("year", Cypher.literalOf(year), "month", Cypher.literalOf(month), "day", Cypher.literalOf(day)));
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 *
+	 * @param year      The year
+	 * @param week      The optional week
+	 * @param dayOfWeek The optional day of the week
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation weekDate(Integer year, Integer week, Integer dayOfWeek) {
+
+		Assertions.notNull(year, "The year is required.");
+		Object[] parameters = new Object[2 + (week == null ? 0 : 2) + (dayOfWeek == null ? 0 : 2)];
+		int i = 0;
+		parameters[i++] = "year";
+		parameters[i++] = Cypher.literalOf(year);
+		if (week != null) {
+			parameters[i++] = "week";
+			parameters[i++] = Cypher.literalOf(week);
+		}
+		if (dayOfWeek != null) {
+			if (week == null) {
+				throw new IllegalArgumentException("week is required when using dayOfWeek.");
+			}
+			parameters[i++] = "dayOfWeek";
+			parameters[i++] = Cypher.literalOf(dayOfWeek);
+		}
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf(parameters));
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 *
+	 * @param year         The year
+	 * @param quarter      The optional week
+	 * @param dayOfQuarter The optional day of the week
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation quarterDate(Integer year, Integer quarter, Integer dayOfQuarter) {
+
+		Assertions.notNull(year, "The year is required.");
+		Object[] parameters = new Object[2 + (quarter == null ? 0 : 2) + (dayOfQuarter == null ? 0 : 2)];
+		int i = 0;
+		parameters[i++] = "year";
+		parameters[i++] = Cypher.literalOf(year);
+		if (quarter != null) {
+			parameters[i++] = "quarter";
+			parameters[i++] = Cypher.literalOf(quarter);
+		}
+		if (dayOfQuarter != null) {
+			if (dayOfQuarter == null) {
+				throw new IllegalArgumentException("quarter is required when using dayOfQuarter.");
+			}
+			parameters[i++] = "dayOfQuarter";
+			parameters[i++] = Cypher.literalOf(dayOfQuarter);
+		}
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf(parameters));
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 *
+	 * @param year       The year
+	 * @param ordinalDay The ordinal day of the year.
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation ordinalDate(Integer year, Integer ordinalDay) {
+
+		Assertions.notNull(year, "The year is required.");
+		Object[] parameters = new Object[2 + (ordinalDay == null ? 0 : 2)];
+		int i = 0;
+		parameters[i++] = "year";
+		parameters[i++] = Cypher.literalOf(year);
+		if (ordinalDay != null) {
+			parameters[i++] = "ordinalDay";
+			parameters[i++] = Cypher.literalOf(ordinalDay);
+		}
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf(parameters));
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * This is the most generic form.
+	 *
+	 * @param components The map to pass to {@code date({})}
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation date(MapExpression components) {
+
+		Assertions.notNull(components, "The components is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, components);
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * This creates a date from a string.
+	 *
+	 * @param temporalValue A string representing a temporal value.
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation date(String temporalValue) {
+
+		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.literalOf(temporalValue));
+	}
+
+	/**
+	 * Creates a function invocation for {@code date({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * This creates a date from a string.
+	 *
+	 * @param temporalValue An expression representing a temporal value.
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation date(Expression temporalValue) {
+
+		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, temporalValue);
+	}
+
+	/**
+	 * Creates a function invocation for {@code datetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
+	 *
+	 * @return A function call for {@code datetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation datetime() {
+
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME);
+	}
+
+	/**
+	 * Creates a function invocation for {@code datetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
+	 *
+	 * @return A function call for {@code datetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation datetime(TimeZone timeZone) {
+
+		Assertions.notNull(timeZone, "The timezone is required.");
+		return FunctionInvocation
+			.create(BuiltInFunctions.Temporals.DATETIME, timezoneMapLiteralOf(timeZone));
+	}
+
+	/**
+	 * Creates a function invocation for {@code datetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
+	 * This is the most generic form.
+	 *
+	 * @param components The map to pass to {@code datetime({})}
+	 * @return A function call for {@code datetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation datetime(MapExpression components) {
+
+		Assertions.notNull(components, "The components is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, components);
+	}
+
+	/**
+	 * Creates a function invocation for {@code datetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">datetime</a>.
+	 * This creates a datetime from a string.
+	 *
+	 * @param temporalValue A string representing a temporal value.
+	 * @return A function call for {@code datetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation datetime(String temporalValue) {
+
+		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, Cypher.literalOf(temporalValue));
+	}
+
+	/**
+	 * Creates a function invocation for {@code datetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">datetime</a>.
+	 * This creates a datetime from a string.
+	 *
+	 * @param temporalValue An expression representing a temporal value.
+	 * @return A function call for {@code date({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation datetime(Expression temporalValue) {
+
+		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, temporalValue);
+	}
+
+	/**
+	 * Creates a function invocation for {@code localdatetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 *
+	 * @return A function call for {@code localdatetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localdatetime() {
+
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME);
+	}
+
+	/**
+	 * Creates a function invocation for {@code localdatetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 *
+	 * @return A function call for {@code localdatetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localdatetime(TimeZone timeZone) {
+
+		Assertions.notNull(timeZone, "The timezone is required.");
+		return FunctionInvocation
+			.create(BuiltInFunctions.Temporals.LOCALDATETIME, timezoneMapLiteralOf(timeZone));
+	}
+
+	/**
+	 * Creates a function invocation for {@code localdatetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * This is the most generic form.
+	 *
+	 * @param components The map to pass to {@code localdatetime({})}
+	 * @return A function call for {@code localdatetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localdatetime(MapExpression components) {
+
+		Assertions.notNull(components, "The components is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, components);
+	}
+
+	/**
+	 * Creates a function invocation for {@code localdatetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * This creates a localdatetime from a string.
+	 *
+	 * @param temporalValue A string representing a temporal value.
+	 * @return A function call for {@code localdatetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localdatetime(String temporalValue) {
+
+		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, Cypher.literalOf(temporalValue));
+	}
+
+	/**
+	 * Creates a function invocation for {@code localdatetime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * This creates a localdatetime from a string.
+	 *
+	 * @param temporalValue An expression representing a temporal value.
+	 * @return A function call for {@code localdatetime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localdatetime(Expression temporalValue) {
+
+		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, temporalValue);
+	}
+
+	/**
+	 * Creates a function invocation for {@code localtime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
+	 *
+	 * @return A function call for {@code localtime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localtime() {
+
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME);
+	}
+
+	/**
+	 * Creates a function invocation for {@code localtime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
+	 *
+	 * @return A function call for {@code localtime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localtime(TimeZone timeZone) {
+
+		Assertions.notNull(timeZone, "The timezone is required.");
+		return FunctionInvocation
+			.create(BuiltInFunctions.Temporals.LOCALTIME, timezoneMapLiteralOf(timeZone));
+	}
+
+	/**
+	 * Creates a function invocation for {@code localtime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
+	 * This is the most generic form.
+	 *
+	 * @param components The map to pass to {@code localtime({})}
+	 * @return A function call for {@code localtime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localtime(MapExpression components) {
+
+		Assertions.notNull(components, "The components is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, components);
+	}
+
+	/**
+	 * Creates a function invocation for {@code localtime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
+	 * This creates a localtime from a string.
+	 *
+	 * @param temporalValue A string representing a temporal value.
+	 * @return A function call for {@code localtime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localtime(String temporalValue) {
+
+		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, Cypher.literalOf(temporalValue));
+	}
+
+	/**
+	 * Creates a function invocation for {@code localtime({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
+	 * This creates a localtime from a string.
+	 *
+	 * @param temporalValue An expression representing a temporal value.
+	 * @return A function call for {@code localtime({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation localtime(Expression temporalValue) {
+
+		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, temporalValue);
+	}
+
+	/**
+	 * Creates a function invocation for {@code time({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 *
+	 * @return A function call for {@code time({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation time() {
+
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME);
+	}
+
+	/**
+	 * Creates a function invocation for {@code time({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 *
+	 * @return A function call for {@code time({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation time(TimeZone timeZone) {
+
+		Assertions.notNull(timeZone, "The timezone is required.");
+		return FunctionInvocation
+			.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
+	}
+
+	private static MapExpression timezoneMapLiteralOf(TimeZone timeZone) {
+		return Cypher.mapOf("timezone", Cypher.literalOf(timeZone.getID()));
+	}
+
+	/**
+	 * Creates a function invocation for {@code time({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * This is the most generic form.
+	 *
+	 * @param components The map to pass to {@code time({})}
+	 * @return A function call for {@code time({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation time(MapExpression components) {
+
+		Assertions.notNull(components, "The components is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, components);
+	}
+
+	/**
+	 * Creates a function invocation for {@code time({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * This creates a time from a string.
+	 *
+	 * @param temporalValue A string representing a temporal value.
+	 * @return A function call for {@code time({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation time(String temporalValue) {
+
+		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, Cypher.literalOf(temporalValue));
+	}
+
+	/**
+	 * Creates a function invocation for {@code time({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * This creates a time from a string.
+	 *
+	 * @param temporalValue An expression representing a temporal value.
+	 * @return A function call for {@code time({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation time(Expression temporalValue) {
+
+		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, temporalValue);
+	}
+
+	/**
+	 * Creates a function invocation for {@code duration({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
+	 * This is the most generic form.
+	 *
+	 * @param components The map to pass to {@code duration({})}
+	 * @return A function call for {@code duration({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation duration(MapExpression components) {
+
+		Assertions.notNull(components, "The components is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, components);
+	}
+
+	/**
+	 * Creates a function invocation for {@code duration({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
+	 * This creates a duration from a string.
+	 *
+	 * @param temporalAmount A string representing a temporal amount.
+	 * @return A function call for {@code duration({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation duration(String temporalAmount) {
+
+		Assertions.hasText(temporalAmount, "The temporalAmount is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, Cypher.literalOf(temporalAmount));
+	}
+
+	/**
+	 * Creates a function invocation for {@code duration({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
+	 * This creates a duration from a string.
+	 *
+	 * @param temporalAmount An expression representing a temporal amount.
+	 * @return A function call for {@code duration({})}.
+	 * @since 2020.1.0
+	 */
+	public static FunctionInvocation duration(Expression temporalAmount) {
+
+		Assertions.notNull(temporalAmount, "The temporalAmount is required.");
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, temporalAmount);
 	}
 
 	public static FunctionInvocation shortestPath(Relationship relationship) {
