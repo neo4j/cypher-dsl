@@ -62,6 +62,22 @@ public class SymbolicName implements Expression {
 		return value;
 	}
 
+	/**
+	 * Creates a new symbolic name by concatenating {@code otherValue} to this names value.
+	 * Returns {@literal this} if {@code otherValue} is empty.
+	 *
+	 * @param otherValue The value to concat.
+	 * @return A new symbolic name
+	 */
+	public SymbolicName concat(String otherValue) {
+
+		Assertions.notNull(otherValue, "Value to concat must not be null.");
+		if (otherValue.isEmpty()) {
+			return this;
+		}
+		return SymbolicName.of(this.value + otherValue);
+	}
+
 	@Override
 	public String toString() {
 		return value == null ? "SymbolicName{" +
