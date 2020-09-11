@@ -2447,6 +2447,27 @@ class CypherIT {
 				assertThat(cypherRenderer.render(statement))
 					.matches("MATCH \\([a-zA-Z].*\\d{3}:`Person`\\) RETURN [a-zA-Z].*\\d{3}\\{\\.something\\}");
 			}
+
+			@Test
+			void addedProjections() {
+
+				Statement statement;
+				Node p = Cypher.node("Person").named("p");
+				Node m = Cypher.node("Movie").named("m");
+				Relationship rel = p.relationshipTo(m, "ACTED_IN").named("r");
+
+				statement = Cypher.match(rel)
+					.returning(p.project("__internalNeo4jId__", Functions.id(p), "name")
+						.and(rel)
+						.and(m)
+						.and(p.property("foo"))
+						.and("a", p.property("x"))
+					)
+					.build();
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo(
+						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN p{__internalNeo4jId__: id(p), .name, r, m, .foo, a: p.x}");
+			}
 		}
 
 		@Nested
