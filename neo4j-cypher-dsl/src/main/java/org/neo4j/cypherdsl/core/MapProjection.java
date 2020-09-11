@@ -71,10 +71,13 @@ public final class MapProjection implements Expression {
 
 	private static Object contentAt(Object[] content, int i) {
 
-		if (content[i] instanceof Expression) {
-			return Expressions.nameOrExpression((Expression) content[i]);
+		Object currentObject = content[i];
+		if (currentObject instanceof Expression) {
+			return Expressions.nameOrExpression((Expression) currentObject);
+		} else if (currentObject instanceof Named) {
+			return ((Named) currentObject).getSymbolicName().map(Object.class::cast).orElse(currentObject);
 		}
-		return content[i];
+		return currentObject;
 	}
 
 	private static List<Expression> createNewContent(Object... content) {
@@ -126,6 +129,8 @@ public final class MapProjection implements Expression {
 			} else if (lastExpression instanceof AliasedExpression) {
 				AliasedExpression aliasedExpression = (AliasedExpression) lastExpression;
 				entry = new KeyValueMapEntry(aliasedExpression.getAlias(), aliasedExpression.getDelegate());
+			} else if (lastExpression == null) {
+				throw new IllegalArgumentException("Could not determine an expression from the given content!");
 			} else {
 				throw new IllegalArgumentException(lastExpression + " of type " + lastExpression.getClass()
 					+ " cannot be used with an implicit name as map entry.");
