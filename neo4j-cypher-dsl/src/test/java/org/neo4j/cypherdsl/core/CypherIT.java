@@ -3341,11 +3341,13 @@ class CypherIT {
 				.returning(
 					person.project(
 						"livesIn",
-						Cypher.valueAt(Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN")).returning(location.project("name")), 0)
+						Cypher.valueAt(Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN"))
+							.returning(location.project("name")), 0)
 					)
 				).build();
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][0]}");
+				.isEqualTo(
+					"MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][0]}");
 		}
 
 		@Test
@@ -3358,13 +3360,58 @@ class CypherIT {
 					person.project(
 						"livesIn",
 						Cypher.subList(
-							Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN")).returning(location.project("name")),
-							Cypher.parameter("personLivedInOffset"), Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
+							Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN"))
+								.returning(location.project("name")),
+							Cypher.parameter("personLivedInOffset"),
+							Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
 						)
 					)
 				).build();
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}");
+				.isEqualTo(
+					"MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}");
+		}
+	}
+
+	@Nested
+	class DoubleRendering {
+
+		@Test
+		void aliasedFunctionsShouldNotBeRenderedTwiceInProjection() {
+
+			Node o = Cypher.node("Order").named("o");
+			Node li = Cypher.node("LineItem").named("li");
+			Relationship hasLineItems = o.relationshipTo(li).named("h");
+
+			Expression netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
+				.as("netAmount");
+			Expression totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
+				.as("totalAmount");
+			Statement statement = Cypher.match(hasLineItems)
+				.where(o.property("id").isEqualTo(Cypher.parameter("id")))
+				.with(o.getRequiredSymbolicName(), netAmount, totalAmount)
+				.returning(o.project(o.property("x"), netAmount, totalAmount, netAmount.multiply(Cypher.parameter("taxRate"))
+					.as("taxAmount"))).build();
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+				"MATCH (o:`Order`)-[h]->(li:`LineItem`) WHERE o.id = $id WITH o, sum((li.price * li.quantity)) AS netAmount, (netAmount * (1 + $taxRate)) AS totalAmount RETURN o{.x, netAmount: netAmount, totalAmount: totalAmount, taxAmount: (netAmount * $taxRate)}");
+		}
+
+		@Test
+		void aliasedFunctionsShouldNotBeRenrederedTwiceInReturn() {
+			Node o = Cypher.node("Order").named("o");
+			Node li = Cypher.node("LineItem").named("li");
+			Relationship hasLineItems = o.relationshipTo(li).named("h");
+
+			Expression netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
+				.as("netAmount");
+			Expression totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
+				.as("totalAmount");
+			Statement statement = Cypher.match(hasLineItems)
+				.where(o.property("id").isEqualTo(Cypher.parameter("id")))
+				.with(o.getRequiredSymbolicName(), netAmount, totalAmount)
+				.returning(netAmount, totalAmount).build();
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+				"MATCH (o:`Order`)-[h]->(li:`LineItem`) WHERE o.id = $id WITH o, sum((li.price * li.quantity)) AS netAmount, (netAmount * (1 + $taxRate)) AS totalAmount RETURN netAmount, totalAmount");
 		}
 	}
 }

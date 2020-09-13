@@ -18,7 +18,9 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -112,6 +114,11 @@ class RenderingVisitor extends ReflectiveVisitor {
 	private final java.util.Set<Named> visitedNamed = new HashSet<>();
 
 	/**
+	 * Keeps track if currently in an aliased expression so that the content can be skipped when already visited.
+	 */
+	private final Deque<AliasedExpression> currentAliasedElements = new LinkedList<>();
+
+	/**
 	 * Keeps track of unresolved symbolic names.
 	 */
 	private final Map<SymbolicName, String> resolvedSymbolicNames = new ConcurrentHashMap<>();
@@ -150,13 +157,16 @@ class RenderingVisitor extends ReflectiveVisitor {
 		});
 	}
 
-	boolean inc;
-
 	@Override
 	protected boolean preEnter(Visitable visitable) {
 
-		if (skipNodeContent) {
+		Visitable lastAliased = currentAliasedElements.peek();
+		if (skipNodeContent || visitableToAliased.containsValue(lastAliased)) {
 			return false;
+		}
+
+		if (visitable instanceof AliasedExpression) {
+			currentAliasedElements.push((AliasedExpression) visitable);
 		}
 
 		int nextLevel = ++currentLevel + 1;
@@ -176,6 +186,10 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		if (visitable instanceof TypedSubtree) {
 			enableSeparator(currentLevel + 1, false);
+		}
+
+		if (currentAliasedElements.peek() == visitable) {
+			currentAliasedElements.pop();
 		}
 
 		--currentLevel;
@@ -241,8 +255,18 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(" ");
 	}
 
+	void enter(AliasedExpression aliased) {
+
+		if (this.visitableToAliased.containsValue(aliased)) {
+			builder.append(aliased.getAlias());
+		}
+	}
+
 	void leave(AliasedExpression aliased) {
-		builder.append(" AS ").append(aliased.getAlias());
+
+		if (!this.visitableToAliased.containsValue(aliased)) {
+			builder.append(" AS ").append(aliased.getAlias());
+		}
 	}
 
 	void enter(NestedExpression nested) {

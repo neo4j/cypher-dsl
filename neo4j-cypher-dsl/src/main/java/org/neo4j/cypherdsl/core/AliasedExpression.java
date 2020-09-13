@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -47,7 +48,8 @@ public final class AliasedExpression implements Aliased, Expression {
 		return alias;
 	}
 
-	Expression getDelegate() {
+	@API(status = INTERNAL)
+	public Expression getDelegate() {
 		return delegate;
 	}
 
