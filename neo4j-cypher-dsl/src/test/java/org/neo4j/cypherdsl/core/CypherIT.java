@@ -3397,7 +3397,8 @@ class CypherIT {
 		}
 
 		@Test
-		void aliasedFunctionsShouldNotBeRenrederedTwiceInReturn() {
+		void aliasedFunctionsShouldNotBeRenderedTwiceInReturn() {
+
 			Node o = Cypher.node("Order").named("o");
 			Node li = Cypher.node("LineItem").named("li");
 			Relationship hasLineItems = o.relationshipTo(li).named("h");
