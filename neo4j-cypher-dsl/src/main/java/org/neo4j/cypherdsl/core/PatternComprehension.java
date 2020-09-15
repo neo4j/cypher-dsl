@@ -35,17 +35,17 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class PatternComprehension implements Expression {
 
-	private final RelationshipPattern pattern;
+	private final PatternElement pattern;
 	private final Where where;
 	private final Expression listDefinition;
 
-	static OngoingDefinitionWithPattern basedOn(Relationship pattern) {
+	static OngoingDefinitionWithPattern basedOn(RelationshipPattern pattern) {
 
 		Assertions.notNull(pattern, "A pattern is required");
 		return new Builder(pattern);
 	}
 
-	static OngoingDefinitionWithPattern basedOn(RelationshipChain pattern) {
+	static OngoingDefinitionWithPattern basedOn(NamedPath pattern) {
 
 		Assertions.notNull(pattern, "A pattern is required");
 		return new Builder(pattern);
@@ -90,10 +90,10 @@ public final class PatternComprehension implements Expression {
 	 * Ongoing definition of a pattern comprehension. Can be defined without a where-clause now.
 	 */
 	private static class Builder implements OngoingDefinitionWithPattern, OngoingDefinitionWithPatternAndWhere  {
-		private final RelationshipPattern pattern;
+		private final PatternElement pattern;
 		private final DefaultStatementBuilder.ConditionBuilder conditionBuilder = new DefaultStatementBuilder.ConditionBuilder();
 
-		private Builder(RelationshipPattern pattern) {
+		private Builder(PatternElement pattern) {
 			this.pattern = pattern;
 		}
 
@@ -122,7 +122,7 @@ public final class PatternComprehension implements Expression {
 		}
 	}
 
-	private PatternComprehension(RelationshipPattern pattern, Where where, Expression listDefinition) {
+	private PatternComprehension(PatternElement pattern, Where where, Expression listDefinition) {
 		this.pattern = pattern;
 		this.where = where;
 		this.listDefinition = listDefinition;

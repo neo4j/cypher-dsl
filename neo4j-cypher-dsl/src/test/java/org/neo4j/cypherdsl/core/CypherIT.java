@@ -3221,10 +3221,21 @@ class CypherIT {
 			NamedPath p = Cypher.path("p").definedBy(
 				Cypher.anyNode("michael").withProperties("name", Cypher.literalOf("Michael Douglas"))
 					.relationshipTo(Cypher.anyNode()));
-			Statement statement = Cypher.match(p).returning(p.getRequiredSymbolicName()).build();
+			Statement statement = Cypher.match(p).returning(p).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH p = (michael {name: 'Michael Douglas'})-->() RETURN p");
+		}
+
+		@Test
+		void shouldWorkInListComprehensions() {
+
+			NamedPath p = Cypher.path("p").definedBy(
+				Cypher.anyNode("n").relationshipTo(Cypher.anyNode(), "LIKES", "OWNS").unbounded());
+			Statement statement = Cypher.returning(Cypher.listBasedOn(p).returning(p)).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN [p = (n)-[:`LIKES`|`OWNS`*]->() | p]");
 		}
 	}
 
