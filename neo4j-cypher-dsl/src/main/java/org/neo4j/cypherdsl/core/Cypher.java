@@ -326,7 +326,7 @@ public final class Cypher {
 			}
 
 			@SuppressWarnings("unchecked") // See above
-				ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
+			ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
 			return (Literal<T>) listLiteral;
 		}
 		if (object instanceof Boolean) {
@@ -368,12 +368,26 @@ public final class Cypher {
 		return Statement.builder().returning(expressions);
 	}
 
-	public static OngoingDefinitionWithPattern listBasedOn(Relationship pattern) {
-		return PatternComprehension.basedOn(pattern);
+	/**
+	 * Creates a list comprehension starting with a {@link Relationship} or a {@link RelationshipChain chain of relationships}.
+	 *
+	 * @param relationshipPattern The relationship pattern on which the new list comprehension is based on.
+	 * @return An ongoing definition.
+	 * @since 2020.0.0
+	 */
+	public static OngoingDefinitionWithPattern listBasedOn(RelationshipPattern relationshipPattern) {
+		return PatternComprehension.basedOn(relationshipPattern);
 	}
 
-	public static OngoingDefinitionWithPattern listBasedOn(RelationshipChain pattern) {
-		return PatternComprehension.basedOn(pattern);
+	/**
+	 * Creates a list comprehension starting with a {@link NamedPath named path}.
+	 *
+	 * @param namedPath The named path on which the new list comprehension is based on.
+	 * @return An ongoing definition.
+	 * @since 2020.1.1
+	 */
+	public static OngoingDefinitionWithPattern listBasedOn(NamedPath namedPath) {
+		return PatternComprehension.basedOn(namedPath);
 	}
 
 	/**
