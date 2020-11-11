@@ -415,6 +415,42 @@ class CypherIT {
 	}
 
 	@Nested
+	class ExplainedAndProfiledQueries {
+
+		@Test // GH-98
+		void shouldRenderExplain() {
+
+			Statement statement = Cypher
+				.match(userNode.relationshipTo(bikeNode, "OWNS"))
+				.where(userNode.property("a").isNull())
+				.with(bikeNode, userNode)
+				.returning(bikeNode)
+				.explain();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("EXPLAIN MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`) WHERE u.a IS NULL WITH b, u RETURN b");
+		}
+
+		@Test // GH-99
+		void shouldRenderProfile() {
+
+			Node tripNode = Cypher.node("Trip").named("tt");
+			Statement statement = Cypher
+				.match(userNode.relationshipTo(bikeNode, "OWNS"))
+				.where(userNode.property("a").isNull())
+				.with(bikeNode, userNode)
+				.match(tripNode)
+				.where(tripNode.property("name").isEqualTo(Cypher.literalOf("Festive500")))
+				.with(bikeNode, userNode, tripNode)
+				.returning(bikeNode, userNode, tripNode)
+				.profile();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("PROFILE MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`) WHERE u.a IS NULL WITH b, u MATCH (tt:`Trip`) WHERE tt.name = 'Festive500' WITH b, u, tt RETURN b, u, tt");
+		}
+	}
+
+	@Nested
 	class SingleQueryMultiPart {
 		@Test
 		void simpleWith() {
@@ -451,13 +487,13 @@ class CypherIT {
 				.with(bikeNode, userNode)
 				.match(tripNode)
 				.where(tripNode.property("name").isEqualTo(Cypher.literalOf("Festive500")))
-				.with(tripNode)
+				.with(bikeNode, userNode, tripNode)
 				.returning(bikeNode, userNode, tripNode)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
-					"MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`) WHERE u.a IS NULL WITH b, u MATCH (t:`Trip`) WHERE t.name = 'Festive500' WITH t RETURN b, u, t");
+					"MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`) WHERE u.a IS NULL WITH b, u MATCH (t:`Trip`) WHERE t.name = 'Festive500' WITH b, u, t RETURN b, u, t");
 		}
 
 		@Test
