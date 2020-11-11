@@ -593,6 +593,11 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append("]");
 	}
 
+	void enter(Enum<?> statement) {
+
+		builder.append(statement.name()).append(" ");
+	}
+
 	public String getRenderedContent() {
 		return this.builder.toString();
 	}

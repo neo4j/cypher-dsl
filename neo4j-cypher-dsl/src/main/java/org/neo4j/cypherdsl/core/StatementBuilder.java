@@ -250,6 +250,24 @@ public interface StatementBuilder
 		 * @return The statement ready to be used, i.e. in a renderer.
 		 */
 		Statement build();
+
+		/**
+		 * @return Creates a statement that returns an explain plan for the original statement.
+		 * @since 2020.1.1
+		 */
+		default Statement explain() {
+
+			return DecoratedQuery.explain(build());
+		}
+
+		/**
+		 * @return Creates a profiled statement that includes both the result and the actually executed and profiled plan.
+		 * @since 2020.1.1
+		 */
+		default Statement profile() {
+
+			return DecoratedQuery.profile(build());
+		}
 	}
 
 	/**
