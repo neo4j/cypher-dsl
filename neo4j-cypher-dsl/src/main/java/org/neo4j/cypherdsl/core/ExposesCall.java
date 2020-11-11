@@ -60,6 +60,20 @@ public interface ExposesCall<T> {
 	}
 
 	/**
+	 * Interface to allow creating an expression instead of a statement from an ongoing definition. To make this
+	 * generate valid Cypher the stored procedure in question must be a valid function.
+	 *
+	 * @since 2020.1.1
+	 */
+	interface AsFunction {
+
+		/**
+		 * @return A function invocation that can be used as an expression, for example as a property or inside a condition.
+		 */
+		Expression asFunction();
+	}
+
+	/**
 	 * Used to yield procedure result fields. There are no checks involved whether the procedure being called
 	 * actually returns items with the given names.
 	 *
