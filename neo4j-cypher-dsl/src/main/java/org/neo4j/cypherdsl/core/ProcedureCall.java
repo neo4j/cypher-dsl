@@ -62,14 +62,14 @@ public final class ProcedureCall implements Statement {
 	 */
 	public interface OngoingStandaloneCallWithoutArguments extends
 		StatementBuilder.BuildableStatement, ExposesCall.ExposesWithArgs<OngoingStandaloneCallWithArguments>,
-		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields> {
+		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
 	}
 
 	/**
 	 * The union of a buildable statement and call exposing yields.
 	 */
 	public interface OngoingStandaloneCallWithArguments extends
-		StatementBuilder.BuildableStatement, ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields> {
+		StatementBuilder.BuildableStatement, ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
 	}
 
 	/**
@@ -175,6 +175,15 @@ public final class ProcedureCall implements Statement {
 		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 
 			return new DefaultStatementBuilder(this).returningDistinct(expressions);
+		}
+
+		@Override
+		public Expression asFunction() {
+
+			if (super.arguments == null || super.arguments.length == 0) {
+				return FunctionInvocation.create(() -> procedureName.getQualifiedName());
+			}
+			return FunctionInvocation.create(() -> procedureName.getQualifiedName(), super.arguments);
 		}
 	}
 }

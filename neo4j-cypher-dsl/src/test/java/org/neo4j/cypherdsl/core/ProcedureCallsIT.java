@@ -116,6 +116,35 @@ class ProcedureCallsIT {
 			.isEqualTo("CALL db.labels() YIELD label RETURN count(label) AS numLabels");
 	}
 
+	@Test // GH-101
+	void shouldBeUsableAsExpression() {
+
+		Node p = Cypher.node("Person").named("p");
+		Statement stmt = Cypher.merge(p.withProperties(Cypher.mapOf("id", Cypher.call("apoc.create.uuid").asFunction())))
+			.set(
+				p.property("firstName").to(Cypher.literalOf("Michael")),
+				p.property("surname").to(Cypher.literalOf("Hunger"))
+			)
+			.returning(p)
+			.build();
+		assertThat(cypherRenderer.render(stmt))
+			.isEqualTo("MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.firstName = 'Michael', p.surname = 'Hunger' RETURN p");
+	}
+
+	@Test // GH-101
+	void shouldBeUsableWithParametersAsExpression() {
+
+		Node p = Cypher.node("Person").named("p");
+		Statement stmt = Cypher.merge(p.withProperties(Cypher.mapOf("id", Cypher.call("apoc.create.uuid").asFunction())))
+			.set(p.property("surname").to(Cypher.literalOf("Simons")))
+			.with(p)
+			.call("apoc.create.setProperty").withArgs(p.getRequiredSymbolicName(), Cypher.call("apoc.text.camelCase").withArgs(Cypher.literalOf("first name")).asFunction(), Cypher.literalOf("Michael")).yield("node")
+			.returning("node")
+			.build();
+		assertThat(cypherRenderer.render(stmt))
+			.isEqualTo("MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.surname = 'Simons' WITH p CALL apoc.create.setProperty(p, apoc.text.camelCase('first name'), 'Michael') YIELD node RETURN node");
+	}
+
 	@Nested
 	class MultipartQueries {
 
