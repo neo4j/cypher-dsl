@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,14 +33,14 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @soundtrack Ferris MC - Ferris MC's Audiobiographie
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class MultiPartQuery implements Statement.SingleQuery {
+@API(status = INTERNAL, since = "1.0")
+final class MultiPartQuery implements Statement.SingleQuery {
 
 	private final List<MultiPartElement> parts;
 
 	private final SinglePartQuery remainder;
 
-	public MultiPartQuery(List<MultiPartElement> parts, SinglePartQuery remainder) {
+	MultiPartQuery(List<MultiPartElement> parts, SinglePartQuery remainder) {
 
 		this.parts = new ArrayList<>(parts);
 		this.remainder = remainder;
