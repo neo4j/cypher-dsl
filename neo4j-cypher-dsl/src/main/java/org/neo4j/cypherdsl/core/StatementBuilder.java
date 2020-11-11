@@ -253,7 +253,7 @@ public interface StatementBuilder
 
 		/**
 		 * @return Creates a statement that returns an explain plan for the original statement.
-		 * @since 2020.1.1
+		 * @since 2020.1.2
 		 */
 		default Statement explain() {
 
@@ -262,7 +262,7 @@ public interface StatementBuilder
 
 		/**
 		 * @return Creates a profiled statement that includes both the result and the actually executed and profiled plan.
-		 * @since 2020.1.1
+		 * @since 2020.1.2
 		 */
 		default Statement profile() {
 

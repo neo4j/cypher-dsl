@@ -63,7 +63,7 @@ public interface ExposesCall<T> {
 	 * Interface to allow creating an expression instead of a statement from an ongoing definition. To make this
 	 * generate valid Cypher the stored procedure in question must be a valid function.
 	 *
-	 * @since 2020.1.1
+	 * @since 2020.1.2
 	 */
 	interface AsFunction {
 

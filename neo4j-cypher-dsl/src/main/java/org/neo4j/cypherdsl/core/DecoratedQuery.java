@@ -28,7 +28,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * A decorated statement. Used for <code>EXPLAIN</code> and <code>PROFILE</code>'d queries.
  *
  * @soundtrack Blind Guardian - Blind Guardian Live
- * @since 2020.1.1
+ * @since 2020.1.2
  */
 @API(status = INTERNAL, since = "1.0")
 class DecoratedQuery implements Statement {
@@ -43,12 +43,12 @@ class DecoratedQuery implements Statement {
 
 	static DecoratedQuery explain(Statement target) {
 
-		return new DecoratedQuery(target, Decoration.EXPLAIN);
+		return DecoratedQuery.decorate(target, Decoration.EXPLAIN);
 	}
 
 	static DecoratedQuery profile(Statement target) {
 
-		return new DecoratedQuery(target, Decoration.PROFILE);
+		return DecoratedQuery.decorate(target, Decoration.PROFILE);
 	}
 
 	private static DecoratedQuery decorate(Statement target, Decoration decoration) {
