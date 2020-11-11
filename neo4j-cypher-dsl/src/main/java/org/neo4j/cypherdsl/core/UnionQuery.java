@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +32,8 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class UnionQuery implements Statement.RegularQuery {
+@API(status = INTERNAL, since = "1.0")
+final class UnionQuery implements Statement.RegularQuery {
 
 	static UnionQuery create(boolean unionAll, List<SingleQuery> queries) {
 
