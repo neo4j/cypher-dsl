@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Prepare branch name
         run: >
-          echo "::set-env name=refName::${GITHUB_REF##*/}"
+          echo "refName=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Checkout relevant branch
         uses: actions/checkout@v2
         with:
