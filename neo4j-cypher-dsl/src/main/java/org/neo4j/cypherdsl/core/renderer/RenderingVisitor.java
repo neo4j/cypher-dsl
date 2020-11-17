@@ -47,6 +47,7 @@ import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
+import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Namespace;
 import org.neo4j.cypherdsl.core.NestedExpression;
@@ -223,6 +224,20 @@ class RenderingVisitor extends ReflectiveVisitor {
 	}
 
 	void leave(Merge merge) {
+		if (!merge.hasEvents()) { // The last SET will include this
+			builder.append(" ");
+		}
+	}
+
+	void enter(MergeAction onCreateOrMatchEvent) {
+		switch (onCreateOrMatchEvent.getType()) {
+			case ON_CREATE:
+				builder.append("ON CREATE");
+				break;
+			case ON_MATCH:
+				builder.append("ON MATCH");
+				break;
+		}
 		builder.append(" ");
 	}
 

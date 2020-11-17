@@ -35,10 +35,6 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class PatternComprehension implements Expression {
 
-	private final PatternElement pattern;
-	private final Where where;
-	private final Expression listDefinition;
-
 	static OngoingDefinitionWithPattern basedOn(RelationshipPattern pattern) {
 
 		Assertions.notNull(pattern, "A pattern is required");
@@ -121,6 +117,10 @@ public final class PatternComprehension implements Expression {
 			return new PatternComprehension(pattern, where, ListExpression.listOrSingleExpression(expressions));
 		}
 	}
+
+	private final PatternElement pattern;
+	private final Where where;
+	private final Expression listDefinition;
 
 	private PatternComprehension(PatternElement pattern, Where where, Expression listDefinition) {
 		this.pattern = pattern;

@@ -20,60 +20,53 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Create.html">Create</a>.
+ * An action or event that happens after a {@code MERGE} clause. It can either be one of two types:
+ * {@link Type#ON_CREATE} or {@link Type#ON_MATCH}.
+ *
+ *  <p>Both events supports the setting of properties, but not removing or adding labels. Multiple
+ * properties should be set in one action, but Cypher and
+ * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Merge.html">openCypher</a>
+ * allow for multiple {@link MergeAction merge actions}, with the same or different types.
  *
  * @author Michael J. Simons
- * @soundtrack Die Ärzte - Seitenhirsch
- * @since 1.0
+ * @soundtrack System Of A Down - Protect The Land &amp; Genocidal Humanoidz
+ * @since 2020.1.2
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Merge implements UpdatingClause {
+public final class MergeAction implements Visitable {
 
 	/**
-	 * A literal for the blank.
+	 * The type of the action.
 	 */
-	private static final Literal<String> BLANK = new Literal<String>(" ") {
-		@Override public String asString() {
-			return super.getContent();
-		}
-	};
-
-	private final Pattern pattern;
-	private final List<Visitable> onCreateOrMatchEvents;
-
-	Merge(Pattern pattern) {
-		this.pattern = pattern;
-		this.onCreateOrMatchEvents = Collections.emptyList();
+	public enum Type {
+		/** Triggered when a pattern has been created. */
+		ON_CREATE,
+		/** Triggered when a pattern has been fully matched. */
+		ON_MATCH
 	}
 
-	Merge(Pattern pattern, List<MergeAction> mergeActions) {
-		this.pattern = pattern;
+	private final Type type;
+	private final Set set;
 
-		this.onCreateOrMatchEvents = new ArrayList<>();
-		this.onCreateOrMatchEvents.add(BLANK);
-		this.onCreateOrMatchEvents.addAll(mergeActions);
+	MergeAction(Type type, Set set) {
+		this.type = type;
+		this.set = set;
 	}
 
-	public boolean hasEvents() {
-		return !this.onCreateOrMatchEvents.isEmpty();
+	public Type getType() {
+		return type;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		this.pattern.accept(visitor);
-		this.onCreateOrMatchEvents.forEach(s -> s.accept(visitor));
+		this.set.accept(visitor);
 		visitor.leave(this);
 	}
 }
-

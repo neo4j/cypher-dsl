@@ -47,7 +47,8 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingUpdate
-		extends BuildableStatement, ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith {
+		extends BuildableStatement, ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith,
+		ExposesMergeAction {
 	}
 
 	/**
@@ -540,6 +541,37 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingMatchAndUpdate extends ExposesReturning, ExposesWith, ExposesUpdatingClause {
+	interface OngoingMatchAndUpdate extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesCreate {
+	}
+
+	/**
+	 * @since 2020.1.2
+	 */
+	interface ExposesMergeAction {
+
+		OngoingMergeAction onCreate();
+
+		OngoingMergeAction onMatch();
+	}
+
+	/**
+	 * A variant of {@link ExposesSet} that allows for further chaining of actions.
+	 * @since 2020.1.2
+	 */
+	interface OngoingMergeAction {
+
+		/**
+		 * Adds a {@code SET} clause to the statement. The list of expressions must be even, each pair will be turned into
+		 * SET operation.
+		 *
+		 * @param expressions The list of expressions to use in a set clause.
+		 * @param <T>         The type of the next step
+		 * @return An ongoing match and update
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Expression... expressions);
+
+		default <T extends OngoingMatchAndUpdate & BuildableStatement  & ExposesMergeAction> T set(Named variable, Expression expression) {
+			return set(variable.getRequiredSymbolicName(), expression);
+		}
 	}
 }

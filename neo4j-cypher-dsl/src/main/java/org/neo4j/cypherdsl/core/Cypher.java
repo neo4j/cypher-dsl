@@ -237,7 +237,7 @@ public final class Cypher {
 	 * @param <T>     The type of the next step
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
-	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T merge(
+	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet & StatementBuilder.ExposesMergeAction> T merge(
 		PatternElement... pattern) {
 
 		return Statement.builder().merge(pattern);

@@ -1786,6 +1786,152 @@ class CypherIT {
 				.isEqualTo(
 					"CREATE (u:`User`) MERGE (u)-[o:`OWNS`]->(b:`Bike`) WITH DISTINCT b MERGE (t:`Trip`)<-[:`USED_ON`]-(b) RETURN *");
 		}
+
+		@Test // GH-104
+		void singleCreateAction() {
+
+			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
+			for (Statement statement : new Statement[] {
+				Cypher.merge(userNode)
+					.onCreate().set(userNode.property("p").to(halloWeltString))
+					.build(),
+				Cypher.merge(userNode)
+					.onCreate().set(userNode.property("p"), halloWeltString)
+					.build()
+			}) {
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo("MERGE (u:`User`) ON CREATE SET u.p = 'Hallo, Welt'");
+			}
+		}
+
+		@Test // GH-104
+		void singleMatchAction() {
+
+			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
+			for (Statement statement : new Statement[] {
+				Cypher.merge(userNode)
+					.onMatch().set(userNode.property("p").to(halloWeltString))
+					.build(),
+				Cypher.merge(userNode)
+					.onMatch().set(userNode.property("p"), halloWeltString)
+					.build(),
+			}) {
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p = 'Hallo, Welt'");
+			}
+		}
+
+		@Test
+		void stuffThanSingleMatchAction() {
+
+			for (Statement statement : new Statement[] {
+				Cypher
+					.create(bikeNode).set(bikeNode.property("nice").to(Cypher.literalTrue()))
+					.merge(userNode).onMatch().set(userNode.property("happy").to(Cypher.literalTrue()))
+					.create(userNode.relationshipTo(bikeNode, "OWNS"))
+					.build(),
+			}) {
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo("CREATE (b:`Bike`) SET b.nice = true MERGE (u:`User`) ON MATCH SET u.happy = true CREATE (u)-[:`OWNS`]->(b)");
+			}
+		}
+
+		@Test
+		void singleActionMultipleProperties() {
+
+			for (Statement statement : new Statement[] {
+				Cypher.merge(userNode).onMatch().set(
+					userNode.property("p1").to(Cypher.literalOf("v1")),
+					userNode.property("p2").to(Cypher.literalOf("v2"))
+				).build(),
+				Cypher.merge(userNode).onCreate().set(
+					userNode.property("p1").to(Cypher.literalOf("v1")),
+					userNode.property("p2").to(Cypher.literalOf("v2"))
+				).build(),
+			}) {
+				assertThat(cypherRenderer.render(statement))
+					.matches("\\QMERGE (u:`User`) ON \\E(CREATE|MATCH)\\Q SET u.p1 = 'v1', u.p2 = 'v2'\\E");
+			}
+		}
+
+		@Test
+		void multipleActionMultipleProperties() {
+
+			Statement statement = Cypher.merge(userNode).onMatch().set(
+				userNode.property("p1").to(Cypher.literalOf("v1")),
+				userNode.property("p2").to(Cypher.literalOf("v2"))
+			).onCreate().set(
+				userNode.property("p3").to(Cypher.literalOf("v3")),
+				userNode.property("p4").to(Cypher.literalOf("v4"))
+			).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`) ON MATCH SET u.p1 = 'v1', u.p2 = 'v2' ON CREATE SET u.p3 = 'v3', u.p4 = 'v4'");
+		}
+
+		@Test // GH-104
+		void singleCreateThanMatchAction() {
+
+			Literal<String> helloWorldString = Cypher.literalOf("Hello, World");
+			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
+			Statement statement = Cypher.merge(userNode)
+				.onCreate().set(userNode.property("p").to(helloWorldString))
+				.onMatch().set(userNode.property("p").to(halloWeltString))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`) ON CREATE SET u.p = 'Hello, World' ON MATCH SET u.p = 'Hallo, Welt'");
+		}
+
+		@Test // GH-104
+		void singleMatchThanCreateAction() {
+
+			Literal<String> helloWorldString = Cypher.literalOf("Hello, World");
+			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
+			Statement statement = Cypher.merge(userNode)
+				.onMatch().set(userNode.property("p").to(halloWeltString))
+				.onCreate().set(userNode.property("p").to(helloWorldString))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p = 'Hallo, Welt' ON CREATE SET u.p = 'Hello, World'");
+		}
+
+		@Test // GH-104
+		void multipleMatchesAndCreates() {
+
+			Statement statement = Cypher.merge(userNode)
+				.onMatch().set(userNode.property("p1").to(Cypher.literalOf("v1")))
+				.onCreate().set(userNode.property("p2").to(Cypher.literalOf("v2")))
+				.onCreate().set(userNode.property("p3").to(Cypher.literalOf("v3")))
+				.onMatch().set(userNode.property("p4").to(Cypher.literalOf("v4")))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`) ON MATCH SET u.p1 = 'v1' ON CREATE SET u.p2 = 'v2' ON CREATE SET u.p3 = 'v3' ON MATCH SET u.p4 = 'v4'");
+		}
+
+		@Test // GH-104
+		void actionThanSet() {
+
+			Statement statement = Cypher.merge(userNode)
+				.onMatch().set(userNode.property("p1").to(Cypher.literalOf("v1")))
+				.set(userNode.property("p2").to(Cypher.literalOf("v2")))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p1 = 'v1' SET u.p2 = 'v2' RETURN u");
+		}
+
+		@Test // GH-104
+		void actionThanContinue() {
+
+			Statement statement = Cypher.merge(userNode)
+				.onMatch().set(userNode.property("p1").to(Cypher.literalOf("v1")))
+				.with(userNode)
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p1 = 'v1' WITH u RETURN u");
+		}
 	}
 
 	@Nested

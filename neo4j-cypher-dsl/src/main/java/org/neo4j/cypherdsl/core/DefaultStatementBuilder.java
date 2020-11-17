@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithArguments;
@@ -122,6 +123,32 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
+	public OngoingMergeAction onCreate() {
+		return ongoingOnAfterMerge(MergeAction.Type.ON_CREATE);
+	}
+
+	@Override
+	public OngoingMergeAction onMatch() {
+		return ongoingOnAfterMerge(MergeAction.Type.ON_MATCH);
+	}
+
+	private OngoingMergeAction ongoingOnAfterMerge(MergeAction.Type type) {
+
+		Assertions.notNull(this.currentOngoingUpdate, "MERGE must have been invoked before defining an event.");
+		Assertions.isTrue(this.currentOngoingUpdate.builder instanceof SupportsActionsOnTheUpdatingClause, "MERGE must have been invoked before defining an event.");
+
+		return new OngoingMergeAction() {
+
+			@Override
+			public OngoingMatchAndUpdate set(Expression... expressions) {
+				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder).on(type, expressions);
+				return DefaultStatementBuilder.this;
+			}
+		};
+	}
+
+
+	@Override
 	public OngoingUnwind unwind(Expression expression) {
 
 		if (this.currentOngoingMatch != null) {
@@ -148,7 +175,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		if (this.currentOngoingUpdate != null) {
-			this.currentSinglePartElements.add(this.currentOngoingUpdate.buildUpdatingClause());
+			this.currentSinglePartElements.add(this.currentOngoingUpdate.builder.build());
 		}
 
 		if (pattern.getClass().getComponentType() == PatternElement.class) {
@@ -220,7 +247,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate set(Expression... expressions) {
 		if (this.currentOngoingUpdate != null) {
-			this.currentSinglePartElements.add(this.currentOngoingUpdate.buildUpdatingClause());
+			this.currentSinglePartElements.add(this.currentOngoingUpdate.builder.build());
 			this.currentOngoingUpdate = null;
 		}
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
@@ -294,7 +321,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		if (this.currentOngoingUpdate != null) {
-			visitables.add(this.currentOngoingUpdate.buildUpdatingClause());
+			visitables.add(this.currentOngoingUpdate.builder.build());
 			this.currentOngoingUpdate = null;
 		}
 
@@ -667,68 +694,144 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
 
-	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder
-		implements OngoingMatchAndUpdate {
+	private interface UpdatingClauseBuilder {
 
-		private final List<? extends Visitable> expressions;
-		private final UpdateType updateType;
+		UpdatingClause build();
+	}
+
+	interface SupportsActionsOnTheUpdatingClause {
+
+		SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, Expression... expressions);
+	}
+
+	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(UpdateType updateType, T... patternOrExpressions) {
+
+		boolean mergeOrCreate = MERGE_OR_CREATE.contains(updateType);
+		String message = mergeOrCreate ? "At least one pattern is required." : "At least one modifying expressions is required.";
+		Assertions.notNull(patternOrExpressions, message);
+		Assertions.notEmpty(patternOrExpressions, message);
+
+		if (mergeOrCreate) {
+			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions).map(PatternElement.class::cast).collect(Collectors.toList());
+			if (updateType == UpdateType.CREATE) {
+				return new AbstractUpdatingClauseBuilder.CreateBuilder(patternElements);
+			} else {
+				return new AbstractUpdatingClauseBuilder.MergeBuilder(patternElements);
+			}
+		} else {
+			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast).collect(Collectors.toList());
+			ExpressionList expressionList = new ExpressionList(updateType == UpdateType.SET ? prepareSetExpressions(expressions) : expressions);
+			switch (updateType) {
+				case DETACH_DELETE:
+					return () -> new Delete(expressionList, true);
+				case DELETE:
+					return () -> new Delete(expressionList, false);
+				case SET:
+					return () -> new Set(expressionList);
+				case REMOVE:
+					return () -> new Remove(expressionList);
+				default:
+					throw new IllegalArgumentException("Unsupported update type " + updateType);
+			}
+		}
+	}
+
+	/**
+	 * Utility method to prepare a list of expression to work with the set clause.
+	 * @param possibleSetOperations A mixed list of expressions (property and list operations)
+	 * @return A reified list of expressions that all target properties
+	 */
+	private static List<Expression> prepareSetExpressions(List<Expression> possibleSetOperations) {
+		List<Expression> propertyOperations = new ArrayList<>();
+
+		List<Expression> listOfExpressions = new ArrayList<>();
+		for (Expression possibleSetOperation : possibleSetOperations) {
+			if (possibleSetOperation instanceof Operation) {
+				propertyOperations.add(possibleSetOperation);
+			} else {
+				listOfExpressions.add(possibleSetOperation);
+			}
+
+		}
+
+		if (listOfExpressions.size() % 2 != 0) {
+			throw new IllegalArgumentException("The list of expression to set must be even.");
+		}
+		for (int i = 0; i < listOfExpressions.size(); i += 2) {
+			propertyOperations.add(Operations.set(listOfExpressions.get(i), listOfExpressions.get(i + 1)));
+		}
+
+		return propertyOperations;
+	}
+
+	/**
+	 * Infrastructure for building {@link UpdatingClause updating clauses}
+	 * @param <T> The type of the updating clause
+	 */
+	private abstract static class AbstractUpdatingClauseBuilder<T extends UpdatingClause> implements UpdatingClauseBuilder {
+
+		protected final List<PatternElement> patternElements;
+
+		AbstractUpdatingClauseBuilder(List<PatternElement> patternElements) {
+			this.patternElements = patternElements;
+		}
+
+		abstract Function<Pattern, T> getUpdatingClauseProvider();
+
+		@Override
+		public T build() {
+			return getUpdatingClauseProvider().apply(new Pattern(patternElements));
+		}
+
+		static class CreateBuilder extends AbstractUpdatingClauseBuilder<Create> {
+
+			CreateBuilder(List<PatternElement> patternElements) {
+				super(patternElements);
+			}
+
+			@Override Function<Pattern, Create> getUpdatingClauseProvider() {
+				return Create::new;
+			}
+		}
+
+		static class MergeBuilder extends AbstractUpdatingClauseBuilder<Merge> implements
+			SupportsActionsOnTheUpdatingClause {
+
+			private List<MergeAction> mergeActions = new ArrayList<>();
+
+			MergeBuilder(List<PatternElement> patternElements) {
+				super(patternElements);
+			}
+
+			@Override
+			Function<Pattern, Merge> getUpdatingClauseProvider() {
+				return pattern -> new Merge(pattern, mergeActions);
+			}
+
+			@Override
+			public SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, Expression... expressions) {
+
+				ExpressionList expressionList = new ExpressionList(prepareSetExpressions(Arrays.asList(expressions)));
+				this.mergeActions.add(new MergeAction(type, new Set(expressionList)));
+				return this;
+			}
+		}
+	}
+
+	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder implements OngoingMatchAndUpdate {
+
+		final UpdatingClauseBuilder builder;
 
 		protected DefaultStatementWithUpdateBuilder(UpdateType updateType, PatternElement... pattern) {
 			super(false);
 
-			this.updateType = updateType;
-
-			Assertions.notNull(pattern, "Patterns to create are required.");
-			Assertions.notEmpty(pattern, "At least one pattern to create is required.");
-
-			this.expressions = Arrays.asList(pattern);
+			this.builder = getUpdatingClauseBuilder(updateType, pattern);
 		}
 
 		protected DefaultStatementWithUpdateBuilder(UpdateType updateType, Expression... expressions) {
 			super(false);
 
-			this.updateType = updateType;
-
-			Assertions.notNull(expressions, "Modifying expressions are required.");
-			Assertions.notEmpty(expressions, "At least one expressions is required.");
-
-			switch (this.updateType) {
-				case DETACH_DELETE:
-				case DELETE:
-					this.expressions = Arrays.asList(expressions);
-					break;
-				case SET:
-					this.expressions = prepareSetExpressions(expressions);
-					break;
-				case REMOVE:
-					this.expressions = Arrays.asList(expressions);
-					break;
-				default:
-					throw new IllegalArgumentException("Unsupported update type " + updateType);
-			}
-		}
-
-		List<? extends Visitable> prepareSetExpressions(Expression... possibleSetOperations) {
-			List<Expression> propertyOperations = new ArrayList<>();
-
-			List<Expression> listOfExpressions = new ArrayList<>();
-			for (Expression possibleSetOperation : possibleSetOperations) {
-				if (possibleSetOperation instanceof Operation) {
-					propertyOperations.add(possibleSetOperation);
-				} else {
-					listOfExpressions.add(possibleSetOperation);
-				}
-
-			}
-
-			if (listOfExpressions.size() % 2 != 0) {
-				throw new IllegalArgumentException("The list of expression to set must be even.");
-			}
-			for (int i = 0; i < listOfExpressions.size(); i += 2) {
-				propertyOperations.add(Operations.set(listOfExpressions.get(i), listOfExpressions.get(i + 1)));
-			}
-
-			return propertyOperations;
+			this.builder = getUpdatingClauseBuilder(updateType, expressions);
 		}
 
 		@Override
@@ -762,12 +865,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public <T extends OngoingUpdate & ExposesSet> T merge(PatternElement... pattern) {
-			throw new UnsupportedOperationException("Not supported yet");
+		@SuppressWarnings("unchecked")
+		public OngoingUpdate merge(PatternElement... pattern) {
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return DefaultStatementBuilder.this.merge(pattern);
 		}
 
 		private OngoingUpdate delete(boolean nextDetach, Expression... deletedExpressions) {
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
 		}
 
@@ -775,7 +880,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@SuppressWarnings("unchecked")
 		public OngoingMatchAndUpdate set(Expression... keyValuePairs) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
 		}
 
@@ -783,7 +888,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@SuppressWarnings("unchecked")
 		public OngoingMatchAndUpdate set(Node node, String... label) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
 				UpdateType.SET, Operations.set(node, label));
 		}
@@ -792,7 +897,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@SuppressWarnings("unchecked")
 		public OngoingMatchAndUpdate remove(Node node, String... label) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
 				Operations.set(node, label));
 		}
@@ -801,7 +906,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@SuppressWarnings("unchecked")
 		public OngoingMatchAndUpdate remove(Property... properties) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 		}
 
@@ -815,47 +920,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return this.with(true, returnedExpressions);
 		}
 
+		@Override
+		@SuppressWarnings("unchecked")
+		public OngoingUpdate create(PatternElement... pattern) {
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return DefaultStatementBuilder.this.create(pattern);
+		}
+
 		private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Expression... returnedExpressions) {
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
-			return DefaultStatementBuilder.this
-				.with(distinct, returnedExpressions);
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return DefaultStatementBuilder.this.with(distinct, returnedExpressions);
 		}
 
 		@Override
 		public Statement build() {
 
-			DefaultStatementBuilder.this.addUpdatingClause(buildUpdatingClause());
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return super.build();
-		}
-
-		@SuppressWarnings("incomplete-switch") // Both switch togehter with the IllegalArgumentException contains all values plus default.
-		private UpdatingClause buildUpdatingClause() {
-
-			if (MERGE_OR_CREATE.contains(updateType)) {
-				final Pattern pattern = new Pattern(
-					this.expressions.stream().map(PatternElement.class::cast).collect(Collectors.toList()));
-				switch (updateType) {
-					case CREATE:
-						return new Create(pattern);
-					case MERGE:
-						return new Merge(pattern);
-				}
-			} else {
-				final ExpressionList expressionsList = new ExpressionList(
-					this.expressions.stream().map(Expression.class::cast).collect(Collectors.toList()));
-				switch (updateType) {
-					case DETACH_DELETE:
-						return new Delete(expressionsList, true);
-					case DELETE:
-						return new Delete(expressionsList, false);
-					case SET:
-						return new Set(expressionsList);
-					case REMOVE:
-						return new Remove(expressionsList);
-				}
-			}
-
-			throw new IllegalArgumentException("Unsupported update type " + updateType);
 		}
 	}
 
