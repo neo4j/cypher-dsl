@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Determine revision
-        run: echo "::set-env name=REVISION::$(date +'%Y.0.0')"
+        run: echo "REVISION=$(date +'%Y.0.0')" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -39,7 +39,7 @@ jobs:
       - name: setup native-image
         run: fc-cache -f -v && gu install native-image
       - name: Determine revision
-        run: echo "::set-env name=REVISION::$(date +'%Y.0.0')"
+        run: echo "REVISION=$(date +'%Y.0.0')" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
@@ -58,11 +58,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '14' ]
+        java: [ '11', '15' ]
     needs: build
     steps:
       - name: Determine revision
-        run: echo "::set-env name=REVISION::$(date +'%Y.0.0')"
+        run: echo "REVISION=$(date +'%Y.0.0')" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
