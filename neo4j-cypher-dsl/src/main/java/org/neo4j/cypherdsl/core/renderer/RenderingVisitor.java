@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Arguments;
+import org.neo4j.cypherdsl.core.Asterisk;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.CompoundCondition;
 import org.neo4j.cypherdsl.core.Create;
@@ -152,7 +153,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		return this.resolvedSymbolicNames.computeIfAbsent(symbolicName, k -> {
 			String value = k.getValue();
 			if (Strings.hasText(value)) {
-				return symbolicName.getValue();
+				return escapeIfNecessary(symbolicName.getValue());
 			}
 			return String.format("%s%03d", Strings.randomIdentifier(8), resolvedSymbolicNames.size());
 		});
@@ -273,14 +274,14 @@ class RenderingVisitor extends ReflectiveVisitor {
 	void enter(AliasedExpression aliased) {
 
 		if (this.visitableToAliased.containsValue(aliased)) {
-			builder.append(aliased.getAlias());
+			builder.append(escapeIfNecessary(aliased.getAlias()));
 		}
 	}
 
 	void leave(AliasedExpression aliased) {
 
 		if (!this.visitableToAliased.containsValue(aliased)) {
-			builder.append(" AS ").append(aliased.getAlias());
+			builder.append(" AS ").append(escapeIfNecessary(aliased.getAlias()));
 		}
 	}
 
@@ -311,9 +312,11 @@ class RenderingVisitor extends ReflectiveVisitor {
 	}
 
 	void enter(PropertyLookup propertyLookup) {
+
+		String propertyKeyName = propertyLookup.getPropertyKeyName();
 		builder
 			.append(".")
-			.append(propertyLookup.getPropertyKeyName());
+			.append(Asterisk.INSTANCE.getContent().equals(propertyKeyName) ? propertyKeyName : escapeIfNecessary(propertyKeyName));
 	}
 
 	void enter(FunctionInvocation functionInvocation) {
@@ -467,7 +470,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	void enter(KeyValueMapEntry map) {
 
-		builder.append(map.getKey()).append(": ");
+		builder.append(escapeIfNecessary(map.getKey())).append(": ");
 	}
 
 	void leave(MapExpression map) {
@@ -632,5 +635,15 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(unescapedName);
 		return Optional.of(String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``")));
+	}
+
+	static String escapeIfNecessary(String potentiallyNonIdentifier) {
+
+		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier)) {
+			return potentiallyNonIdentifier;
+		}
+
+		Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(potentiallyNonIdentifier);
+		return String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``"));
 	}
 }
