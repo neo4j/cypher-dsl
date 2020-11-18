@@ -57,6 +57,10 @@ public final class ProcedureCall implements Statement {
 		visitor.leave(this);
 	}
 
+	boolean doesReturnElements() {
+		return this.yieldItems != null;
+	}
+
 	/**
 	 * The union of a buildable statement and call exposing new arguments and yields.
 	 */
@@ -77,7 +81,7 @@ public final class ProcedureCall implements Statement {
 	 */
 	public interface OngoingStandaloneCallWithReturnFields extends
 		StatementBuilder.BuildableStatement,
-		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith {
+		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 
 	/**
@@ -100,7 +104,7 @@ public final class ProcedureCall implements Statement {
 	 * An in-query call exposing where and return clauses.
 	 */
 	public interface OngoingInQueryCallWithReturnFields extends
-		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith {
+		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 
 	protected abstract static class Builder implements ExposesWhere, ExposesReturning,
@@ -194,6 +198,11 @@ public final class ProcedureCall implements Statement {
 		@Override
 		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 			return new DefaultStatementBuilder(this).withDistinct(expressions);
+		}
+
+		@Override
+		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement) {
+			return new DefaultStatementBuilder(this).call(statement);
 		}
 	}
 }

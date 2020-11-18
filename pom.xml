@@ -403,6 +403,11 @@
 							<placement>X</placement>
 							<head>Soundtrack</head>
 						</tag>
+						<tag>
+							<name>neo4jversion</name>
+							<placement>a</placement>
+							<head>Neo4j version required</head>
+						</tag>
 					</tags>
 				</configuration>
 			</plugin>

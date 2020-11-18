@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
+import org.neo4j.cypherdsl.core.support.Neo4jVersion;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -31,7 +32,25 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface StatementBuilder
-	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning {
+	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning, ExposesSubqueryCall {
+
+	/**
+	 * Starts a with clause by passing variables to it.
+	 *
+	 * @param variables The variables to start the query with
+	 * @return An ongoing read, exposing return and further matches.
+	 * @since 2020.1.2
+	 */
+	OrderableOngoingReadingAndWithWithoutWhere with(String... variables);
+
+	/**
+	 * Starts a with clause by passing named expressions to it.
+	 *
+	 * @param expressions The expressions to start the query with
+	 * @return An ongoing read, exposing return and further matches.
+	 * @since 2020.1.2
+	 */
+	OrderableOngoingReadingAndWithWithoutWhere with(Named... expressions);
 
 	/**
 	 * Allows for queries starting with {@code with range(1,10) as x return x} or similar.
@@ -39,7 +58,7 @@ public interface StatementBuilder
 	 * @param expressions The expressions to start the query with
 	 * @return An ongoing read, exposing return and further matches.
 	 */
-	OrderableOngoingReadingAndWith with(AliasedExpression... expressions);
+	OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
 
 	/**
 	 * An ongoing update statement that can be used to chain more update statements or add a with or return clause.
@@ -52,13 +71,31 @@ public interface StatementBuilder
 	}
 
 	/**
+	 * A shared marker interface for things that can be turned into a subquery to be used inside the WHERE clause.
+	 *
+	 * @since 2020.1.2
+	 */
+	interface ExposesExistentialSubqueryCall {
+
+		/**
+		 * This can be used against a 4.x database to turn this ongoing match statement into a condition to be used
+		 * in an existential subquery.
+		 *
+		 * @return An existential subquery.
+		 * @neo4jversion 4.0.0
+		 */
+		@Neo4jVersion(minimum = "4.0.0")
+		Condition asCondition();
+	}
+
+	/**
 	 * A match that exposes {@code returning} and {@code where} methods to add required information.
 	 * While the where clause is optional, an returning clause needs to be specified before the
 	 * statement can be build.
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingReadingWithoutWhere extends OngoingReading, ExposesWhere, ExposesMatch {
+	interface OngoingReadingWithoutWhere extends OngoingReading, ExposesWhere, ExposesMatch, ExposesExistentialSubqueryCall {
 	}
 
 	/**
@@ -67,7 +104,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReadingWithWhere extends OngoingReading, ExposesMatch,
-		ExposesLogicalOperators<OngoingReadingWithWhere> {
+		ExposesLogicalOperators<OngoingReadingWithWhere>, ExposesExistentialSubqueryCall {
 	}
 
 	/**
@@ -78,7 +115,7 @@ public interface StatementBuilder
 	 */
 	interface OngoingReading
 		extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate,
-		ExposesCall<OngoingInQueryCallWithoutArguments> {
+		ExposesCall<OngoingInQueryCallWithoutArguments>, ExposesSubqueryCall {
 	}
 
 	/**

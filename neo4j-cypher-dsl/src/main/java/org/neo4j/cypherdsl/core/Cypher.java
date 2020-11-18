@@ -28,6 +28,7 @@ import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
+import org.neo4j.cypherdsl.core.support.Neo4jVersion;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -222,10 +223,38 @@ public final class Cypher {
 	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
 	 * arguments to have an alias.
 	 *
+	 * @param variables One ore more variables.
+	 * @return An ongoing with clause.
+	 * @since 2020.1.2
+	 */
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
+
+		return Statement.builder().with(variables);
+	}
+
+	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
+	 *
+	 * @param variables One ore more variables.
+	 * @return An ongoing with clause.
+	 * @since 2020.1.2
+	 */
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
+
+		return Statement.builder().with(variables);
+	}
+
+	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
+	 *
 	 * @param expressions One ore more aliased expressions.
 	 * @return An ongoing with clause.
 	 */
-	public static StatementBuilder.OrderableOngoingReadingAndWith with(AliasedExpression... expressions) {
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 
 		return Statement.builder().with(expressions);
 	}
@@ -447,6 +476,18 @@ public final class Cypher {
 	 */
 	public static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 		return Statement.call(namespaceAndProcedure);
+	}
+
+	/**
+	 * Starts building a statement based on one subquery.
+	 *
+	 * @neo4jversion 4.0.0
+	 * @see ExposesSubqueryCall#call(Statement)
+	 * @since 2020.1.2
+	 */
+	@Neo4jVersion(minimum = "4.0.0")
+	public static StatementBuilder.OngoingReadingWithoutWhere call(Statement subquery) {
+		return Statement.builder().call(subquery);
 	}
 
 	/**

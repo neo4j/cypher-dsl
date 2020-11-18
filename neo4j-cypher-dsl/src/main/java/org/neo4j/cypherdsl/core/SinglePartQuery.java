@@ -63,4 +63,8 @@ final class SinglePartQuery implements SingleQuery {
 		precedingClauses.forEach(c -> c.accept(visitor));
 		Visitable.visitIfNotNull(aReturn, visitor);
 	}
+
+	boolean doesReturnElements() {
+		return this.aReturn != null;
+	}
 }

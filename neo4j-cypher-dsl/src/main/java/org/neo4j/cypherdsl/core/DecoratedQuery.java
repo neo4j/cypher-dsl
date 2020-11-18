@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @soundtrack Blind Guardian - Blind Guardian Live
  * @since 2020.1.2
  */
-@API(status = INTERNAL, since = "1.0")
+@API(status = INTERNAL, since = "2020.1.2")
 class DecoratedQuery implements Statement {
 
 	private enum Decoration implements Visitable {

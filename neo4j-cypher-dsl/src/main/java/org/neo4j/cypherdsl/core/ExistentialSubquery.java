@@ -18,42 +18,38 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
-import java.util.ArrayList;
-import java.util.List;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.support.Neo4jVersion;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/MultiPartQuery.html">MultiPartQuery</a>.
- *
  * @author Michael J. Simons
- * @soundtrack Ferris MC - Ferris MC's Audiobiographie
- * @since 1.0
+ * @soundtrack Die Ärzte - Seitenhirsch
+ * @neo4jversion 4.0.0
+ * @since 2020.1.2
  */
-@API(status = INTERNAL, since = "1.0")
-final class MultiPartQuery implements Statement.SingleQuery {
+@API(status = EXPERIMENTAL, since = "2020.1.2")
+@Neo4jVersion(minimum = "4.0.0")
+public final class ExistentialSubquery implements Condition {
 
-	private final List<MultiPartElement> parts;
+	static ExistentialSubquery exists(Match fragment) {
 
-	private final SinglePartQuery remainder;
+		return new ExistentialSubquery(fragment);
+	}
 
-	MultiPartQuery(List<MultiPartElement> parts, SinglePartQuery remainder) {
+	private final Match fragment;
 
-		this.parts = new ArrayList<>(parts);
-		this.remainder = remainder;
+	ExistentialSubquery(Match fragment) {
+		this.fragment = fragment;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
-		parts.forEach(p -> p.accept(visitor));
-		remainder.accept(visitor);
-	}
-
-	boolean doesReturnElements() {
-		return this.remainder.doesReturnElements();
+		visitor.enter(this);
+		fragment.accept(visitor);
+		visitor.leave(this);
 	}
 }

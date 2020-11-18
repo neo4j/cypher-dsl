@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @soundtrack System Of A Down - Protect The Land &amp; Genocidal Humanoidz
  * @since 2020.1.2
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = EXPERIMENTAL, since = "2020.1.2")
 public final class MergeAction implements Visitable {
 
 	/**

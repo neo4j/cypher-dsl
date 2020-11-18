@@ -37,6 +37,7 @@ import org.neo4j.cypherdsl.core.CompoundCondition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.Delete;
 import org.neo4j.cypherdsl.core.Distinct;
+import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Limit;
@@ -70,6 +71,7 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
+import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.Unwind;
@@ -204,6 +206,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 	}
 
 	void leave(Match match) {
+
 		builder.append(" ");
 	}
 
@@ -611,6 +614,27 @@ class RenderingVisitor extends ReflectiveVisitor {
 	void enter(Enum<?> statement) {
 
 		builder.append(statement.name()).append(" ");
+	}
+
+	void enter(Subquery subquery) {
+
+		builder.append("CALL {");
+	}
+
+	void leave(Subquery subquery) {
+
+		builder.append("} ");
+	}
+
+	void enter(ExistentialSubquery subquery) {
+
+		builder.append("EXISTS {");
+	}
+
+	void leave(ExistentialSubquery subquery) {
+
+		// Trimming the inner match without having to do this in the match (looking up if inside subquery).
+		builder.replace(builder.length() - 1, builder.length(), "}");
 	}
 
 	public String getRenderedContent() {

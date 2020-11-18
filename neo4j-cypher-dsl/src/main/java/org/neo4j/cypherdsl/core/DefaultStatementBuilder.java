@@ -94,14 +94,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		Assertions.notNull(pattern, "Patterns to match are required.");
 		Assertions.notEmpty(pattern, "At least one pattern to match is required.");
 
-		if (this.currentOngoingMatch != null) {
-			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
-		}
-
-		if (this.currentOngoingCall != null) {
-			this.currentSinglePartElements.add(this.currentOngoingCall.build());
-			this.currentOngoingCall = null;
-		}
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingCall();
 
 		this.currentOngoingMatch = new MatchBuilder(optional);
 		this.currentOngoingMatch.patternList.addAll(Arrays.asList(pattern));
@@ -151,10 +145,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public OngoingUnwind unwind(Expression expression) {
 
-		if (this.currentOngoingMatch != null) {
-			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
-			this.currentOngoingMatch = null;
-		}
+		closeCurrentOngoingMatch();
 
 		return new DefaultOngoingUnwind(expression);
 	}
@@ -164,19 +155,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 		Assertions.notNull(pattern, "Patterns to create are required.");
 		Assertions.notEmpty(pattern, "At least one pattern to create is required.");
 
-		if (this.currentOngoingMatch != null) {
-			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
-			this.currentOngoingMatch = null;
-		}
-
-		if (this.currentOngoingCall != null) {
-			this.currentSinglePartElements.add(this.currentOngoingCall.build());
-			this.currentOngoingCall = null;
-		}
-
-		if (this.currentOngoingUpdate != null) {
-			this.currentSinglePartElements.add(this.currentOngoingUpdate.builder.build());
-		}
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingCall();
+		this.closeCurrentOngoingUpdate();
 
 		if (pattern.getClass().getComponentType() == PatternElement.class) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (PatternElement[]) pattern);
@@ -206,8 +187,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	public OrderableOngoingReadingAndWith with(AliasedExpression... expressions) {
-		return with(false, expressions);
+	public OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
+		return with(false, Expressions.createSymbolicNames(variables));
+	}
+
+	@Override
+	public OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
+		return with(false, Expressions.createSymbolicNames(variables));
 	}
 
 	@Override
@@ -246,10 +232,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate set(Expression... expressions) {
-		if (this.currentOngoingUpdate != null) {
-			this.currentSinglePartElements.add(this.currentOngoingUpdate.builder.build());
-			this.currentOngoingUpdate = null;
-		}
+
+		this.closeCurrentOngoingUpdate();
+
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
 	}
 
@@ -347,13 +332,59 @@ class DefaultStatementBuilder implements StatementBuilder,
 	protected final DefaultStatementBuilder addUpdatingClause(UpdatingClause updatingClause) {
 
 		// Close current match
-		if (this.currentOngoingMatch != null) {
-			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
-			this.currentOngoingMatch = null;
-		}
+		closeCurrentOngoingMatch();
 
 		this.currentSinglePartElements.add(updatingClause);
 		return this;
+	}
+
+	@Override
+	public OngoingReadingWithoutWhere call(Statement statement) {
+
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingCall();
+		this.closeCurrentOngoingUpdate();
+
+		this.currentSinglePartElements.add(Subquery.call(statement));
+
+		return this;
+	}
+
+	private void closeCurrentOngoingMatch() {
+		if (this.currentOngoingMatch == null) {
+			return;
+		}
+
+		this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
+		this.currentOngoingMatch = null;
+	}
+
+	private void closeCurrentOngoingCall() {
+		if (this.currentOngoingCall == null) {
+			return;
+		}
+
+		this.currentSinglePartElements.add(this.currentOngoingCall.build());
+		this.currentOngoingCall = null;
+	}
+
+	private void closeCurrentOngoingUpdate() {
+		if (this.currentOngoingUpdate == null) {
+			return;
+		}
+
+		this.currentSinglePartElements.add(this.currentOngoingUpdate.builder.build());
+		this.currentOngoingUpdate = null;
+	}
+
+	@Override
+	public Condition asCondition() {
+
+		if (this.currentOngoingMatch == null || !this.currentSinglePartElements.isEmpty()) {
+			throw new IllegalArgumentException("Only simple MATCH statements can be used as existential subqueries.");
+		}
+
+		return ExistentialSubquery.exists(this.currentOngoingMatch.buildMatch());
 	}
 
 	protected class DefaultStatementWithReturnBuilder
@@ -632,6 +663,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.unwind(expression);
+		}
+
+		@Override
+		public OngoingReadingWithoutWhere call(Statement statement) {
+
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.call(statement);
 		}
 
 		@Override
@@ -984,14 +1023,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		Assertions.notEmpty(namespaceAndProcedure, "The procedure namespace and name must not be null or empty.");
 
-		if (this.currentOngoingMatch != null) {
-			this.currentSinglePartElements.add(this.currentOngoingMatch.buildMatch());
-		}
+		closeCurrentOngoingMatch();
 
-		if (this.currentOngoingCall != null) {
-			this.currentSinglePartElements.add(this.currentOngoingCall.build());
-			this.currentOngoingCall = null;
-		}
+		closeCurrentOngoingCall();
 
 		InQueryCallBuilder inQueryCallBuilder = new InQueryCallBuilder(ProcedureName.from(namespaceAndProcedure));
 		this.currentOngoingCall = inQueryCallBuilder;
@@ -1061,6 +1095,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			DefaultStatementBuilder.this.currentOngoingCall = this;
 			return DefaultStatementBuilder.this.withDistinct(expressions);
+		}
+
+		@Override
+		public OngoingReadingWithoutWhere call(Statement statement) {
+
+			DefaultStatementBuilder.this.currentOngoingCall = this;
+			return DefaultStatementBuilder.this.call(statement);
 		}
 	}
 
