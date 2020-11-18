@@ -180,7 +180,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface TerminalOngoingOrderDefinition extends TerminalExposesSkip, TerminalExposesLimit {
+	interface TerminalOngoingOrderDefinition extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement {
 
 		/**
 		 * Specifies descending order and jumps back to defining the match and return statement.
