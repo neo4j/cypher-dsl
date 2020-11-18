@@ -116,6 +116,36 @@ class ProcedureCallsIT {
 			.isEqualTo("CALL db.labels() YIELD label RETURN count(label) AS numLabels");
 	}
 
+	@Test
+	void withThanReturning() {
+
+		SymbolicName label = Cypher.name("label");
+		Statement call = Cypher
+			.call("db.labels")
+			.yield(label)
+			.with(label)
+			.returning(Functions.count(label).as("numLabels"))
+			.build();
+		assertThat(cypherRenderer.render(call))
+			.isEqualTo("CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");
+	}
+
+	@Test
+	void withThanReturningInQuery() {
+
+		SymbolicName label = Cypher.name("label");
+		Statement call = Cypher
+			.match(Cypher.anyNode().named("n"))
+			.with("n")
+			.call("db.labels")
+			.yield(label)
+			.with(label)
+			.returning(Functions.count(label).as("numLabels"))
+			.build();
+		assertThat(cypherRenderer.render(call))
+			.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");
+	}
+
 	@Test // GH-101
 	void shouldBeUsableAsExpression() {
 

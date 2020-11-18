@@ -77,7 +77,7 @@ public final class ProcedureCall implements Statement {
 	 */
 	public interface OngoingStandaloneCallWithReturnFields extends
 		StatementBuilder.BuildableStatement,
-		ExposesWhere, ExposesReturning {
+		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith {
 	}
 
 	/**
@@ -100,7 +100,7 @@ public final class ProcedureCall implements Statement {
 	 * An in-query call exposing where and return clauses.
 	 */
 	public interface OngoingInQueryCallWithReturnFields extends
-		ExposesWhere, ExposesReturning {
+		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith {
 	}
 
 	protected abstract static class Builder implements ExposesWhere, ExposesReturning,
@@ -184,6 +184,16 @@ public final class ProcedureCall implements Statement {
 				return FunctionInvocation.create(() -> procedureName.getQualifiedName());
 			}
 			return FunctionInvocation.create(() -> procedureName.getQualifiedName(), super.arguments);
+		}
+
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
+			return new DefaultStatementBuilder(this).with(expressions);
+		}
+
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
+			return new DefaultStatementBuilder(this).withDistinct(expressions);
 		}
 	}
 }

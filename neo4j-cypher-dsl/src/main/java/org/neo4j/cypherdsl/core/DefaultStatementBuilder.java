@@ -1044,8 +1044,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
+
 			DefaultStatementBuilder.this.currentOngoingCall = this;
 			return DefaultStatementBuilder.this.returningDistinct(expressions);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
+
+			DefaultStatementBuilder.this.currentOngoingCall = this;
+			return DefaultStatementBuilder.this.with(expressions);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
+
+			DefaultStatementBuilder.this.currentOngoingCall = this;
+			return DefaultStatementBuilder.this.withDistinct(expressions);
 		}
 	}
 
