@@ -639,7 +639,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	static String escapeIfNecessary(String potentiallyNonIdentifier) {
 
-		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier)) {
+		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier) || potentiallyNonIdentifier.trim().isEmpty()) {
 			return potentiallyNonIdentifier;
 		}
 
