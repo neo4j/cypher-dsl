@@ -3570,6 +3570,20 @@ class CypherIT {
 	class DoubleRendering {
 
 		@Test
+		void fragmentOfStatementShouldBeReusable() {
+
+			Node personNode = Cypher.node("Person").named("p");
+			Property ageProperty = personNode.property("age");
+
+			StatementBuilder.OngoingReadingAndReturn returning = Cypher.match(personNode).returning("p");
+			Statement s1 = returning.orderBy(ageProperty.ascending()).limit(1).build();
+			Statement s2 = returning.orderBy(ageProperty.descending()).limit(1).build();
+
+			assertThat(cypherRenderer.render(s1)).isEqualTo("MATCH (p:`Person`) RETURN p ORDER BY p.age ASC LIMIT 1");
+			assertThat(cypherRenderer.render(s2)).isEqualTo("MATCH (p:`Person`) RETURN p ORDER BY p.age DESC LIMIT 1");
+		}
+
+		@Test
 		void aliasedFunctionsShouldNotBeRenderedTwiceInProjection() {
 
 			Node o = Cypher.node("Order").named("o");

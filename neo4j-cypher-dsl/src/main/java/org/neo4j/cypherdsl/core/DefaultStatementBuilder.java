@@ -298,11 +298,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public Statement build() {
 
-		return buildImpl(null);
+		return buildImpl(false, null);
 	}
 
-	protected Statement buildImpl(Return returning) {
-		SinglePartQuery singlePartQuery = SinglePartQuery.create(buildListOfVisitables(), returning);
+	protected Statement buildImpl(boolean clearCurrentBuildSteps, Return returning) {
+
+		SinglePartQuery singlePartQuery = SinglePartQuery.create(
+			buildListOfVisitables(clearCurrentBuildSteps), returning);
 
 		if (multiPartElements.isEmpty()) {
 			return singlePartQuery;
@@ -311,32 +313,34 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 	}
 
-	protected final List<Visitable> buildListOfVisitables() {
+	protected final List<Visitable> buildListOfVisitables(boolean clearAfter) {
 
 		List<Visitable> visitables = new ArrayList<>(this.currentSinglePartElements);
 
 		if (this.currentOngoingMatch != null) {
 			visitables.add(this.currentOngoingMatch.buildMatch());
-			this.currentOngoingMatch = null;
 		}
 
 		if (this.currentOngoingUpdate != null) {
 			visitables.add(this.currentOngoingUpdate.builder.build());
-			this.currentOngoingUpdate = null;
 		}
 
 		if (this.currentOngoingCall != null) {
 			visitables.add(this.currentOngoingCall.build());
-			this.currentOngoingCall = null;
 		}
 
-		this.currentSinglePartElements.clear();
+		if (clearAfter) {
+			this.currentOngoingMatch = null;
+			this.currentOngoingUpdate = null;
+			this.currentOngoingCall = null;
+			this.currentSinglePartElements.clear();
+		}
 		return visitables;
 	}
 
 	protected final DefaultStatementBuilder addWith(Optional<With> optionalWith) {
 
-		optionalWith.ifPresent(with -> multiPartElements.add(new MultiPartElement(buildListOfVisitables(), with)));
+		optionalWith.ifPresent(with -> multiPartElements.add(new MultiPartElement(buildListOfVisitables(true), with)));
 		return this;
 	}
 
@@ -420,7 +424,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 					orderBuilder.getLimit());
 			}
 
-			return DefaultStatementBuilder.this.buildImpl(returning);
+			return DefaultStatementBuilder.this.buildImpl(false, returning);
 		}
 
 		protected final void addExpressions(Expression... expressions) {
@@ -1126,7 +1130,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 			if (lastSortItem != null) {
 				sortItemList.add(lastSortItem);
 			}
-			return sortItemList.size() > 0 ? Optional.of(new Order(sortItemList)) : Optional.empty();
+			Optional<Order> result = sortItemList.size() > 0 ? Optional.of(new Order(sortItemList)) : Optional.empty();
+			sortItemList.clear();
+			lastSortItem = null;
+			return result;
 		}
 
 		protected Skip getSkip() {
