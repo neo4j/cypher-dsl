@@ -47,4 +47,25 @@ class RenderingVisitorTest {
 
 		assertThat(RenderingVisitor.escapeName(null)).isEmpty();
 	}
+
+	@ParameterizedTest
+	@CsvSource({
+		"ALabel, ALabel",
+		"A Label, `A Label`",
+		"A `Label, `A ``Label`",
+		"`A `Label, ```A ``Label`",
+		"Spring Data Neo4j⚡️RX, `Spring Data Neo4j⚡️RX`"
+	})
+	void shouldEscapeIfNecessary(String name, String expectedEscapedName) {
+
+		assertThat(RenderingVisitor.escapeIfNecessary(name)).isEqualTo(expectedEscapedName);
+	}
+
+	@Test
+	void shouldNotUnnecessaryEscape() {
+
+		assertThat(RenderingVisitor.escapeIfNecessary(" ")).isEqualTo(" ");
+		assertThat(RenderingVisitor.escapeIfNecessary(null)).isNull();
+		assertThat(RenderingVisitor.escapeIfNecessary("a")).isEqualTo("a");
+	}
 }

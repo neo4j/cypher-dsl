@@ -3391,6 +3391,38 @@ class CypherIT {
 					"CALL apoc.create.relationship(parent, 'ChildEdge', {score: 0.33, weight: 1.7}, child) YIELD rel");
 
 		}
+
+		@Test // GH-106
+		void aliasesShouldBeEscapedIfNecessary() {
+
+			AliasedExpression alias = Cypher.name("n").as("das ist ein Alias");
+			Statement statement = Cypher.match(Cypher.anyNode().named("n"))
+				.with(alias)
+				.returning(alias).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH (n) WITH n AS `das ist ein Alias` RETURN `das ist ein Alias`");
+		}
+
+		@Test // GH-106
+		void projectedPropertiesShouldBeEscapedIfNecessary() {
+
+			Node node = Cypher.anyNode().named("n");
+			Statement statement = Cypher.match(node)
+				.returning(node.project("property 1", "property 2"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH (n) RETURN n{.`property 1`, .`property 2`}");
+		}
+
+		@Test // GH-106
+		void mapKeysShouldBeEscapedIfNecessary() {
+
+			Node node = Cypher.anyNode().named("n");
+			Statement statement = Cypher.returning(Cypher.mapOf("key 1", Cypher.literalTrue(), "key 2", Cypher.literalFalse()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("RETURN {`key 1`: true, `key 2`: false}");
+		}
 	}
 
 	@Nested
