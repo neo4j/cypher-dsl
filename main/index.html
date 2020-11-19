@@ -536,19 +536,20 @@ table.CodeRay td.code>pre{padding:0}
 <div id="toctitle">Table of Contents</div>
 <ul class="sectlevel1">
 <li><a href="#introduction">1. Introduction</a>
-<ul class="sectlevel3">
+<ul class="sectlevel2">
 <li><a href="#purpose">1.1. Purpose</a></li>
 <li><a href="#wheretouseit">1.2. Where to use it</a></li>
+<li><a href="#javaapi">1.3. Java API</a></li>
 </ul>
 </li>
 <li><a href="#getting-started">2. Getting started</a>
-<ul class="sectlevel3">
+<ul class="sectlevel2">
 <li><a href="#preparedependencies">2.1. Prepare dependencies</a></li>
 <li><a href="#howtouseit">2.2. How to use it</a></li>
 </ul>
 </li>
 <li><a href="#functions">3. Functions</a>
-<ul class="sectlevel3">
+<ul class="sectlevel2">
 <li><a href="#lists">3.1. Lists</a></li>
 </ul>
 </li>
@@ -595,8 +596,8 @@ All public classes inside <code>org.neo4j.cypherdsl</code> still subject to brea
 <div class="sect1">
 <h2 id="introduction"><a class="anchor" href="#introduction"></a>1. Introduction</h2>
 <div class="sectionbody">
-<div class="sect3">
-<h4 id="purpose"><a class="anchor" href="#purpose"></a>1.1. Purpose</h4>
+<div class="sect2">
+<h3 id="purpose"><a class="anchor" href="#purpose"></a>1.1. Purpose</h3>
 <div class="paragraph">
 <p>The Cypher-DSL has been developed with the needs of <a href="https://github.com/neo4j/sdn-rx">SDN/RX</a> in mind:
 We wanted to avoid string concatenations in our query generation and decided do go with a builder approach, much like we
@@ -615,8 +616,8 @@ We however have a type safe API for Cypher that allows only generating valid Cyp
 <p>The Cypher-DSL can also be seen in the same area as the <a href="https://docs.spring.io/spring-data/mongodb/docs/current/api/org/springframework/data/mongodb/core/query/Criteria.html">Criteria API</a> of Spring Data Mongo.</p>
 </div>
 </div>
-<div class="sect3">
-<h4 id="wheretouseit"><a class="anchor" href="#wheretouseit"></a>1.2. Where to use it</h4>
+<div class="sect2">
+<h3 id="wheretouseit"><a class="anchor" href="#wheretouseit"></a>1.2. Where to use it</h3>
 <div class="paragraph">
 <p>The Cypher-DSL creates an <a href="https://en.wikipedia.org/wiki/Abstract_syntax_tree">Abstract Syntax Tree (AST)</a> representing your Cypher-Statements.
 An instance of a <code>org.neo4j.cypherdsl.core.Statement</code> representing that AST is provided at the end of query building step.
@@ -627,9 +628,15 @@ Those can be used in any context supporting String-based queries, for example wi
 <p>Parameters in the generated queries will use the <code>$form</code> and as such be compatible with all current versions of Neo4j.</p>
 </div>
 <div class="paragraph">
-<p>Users of SDN/RX respectivly SDN 6 can use the generated <code>org.neo4j.cypherdsl.core.Statement</code> directly with the <code>Neo4jTemplate</code> or the <code>ReactiveNeo4jTemplate</code>.
+<p>Users of SDN/RX respectively SDN 6 can use the generated <code>org.neo4j.cypherdsl.core.Statement</code> directly with the <code>Neo4jTemplate</code> or the <code>ReactiveNeo4jTemplate</code>.
 Both the imperative and the reactive variants allow the retrieval and counting of entities without rendering a String first,
 for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code>.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="javaapi"><a class="anchor" href="#javaapi"></a>1.3. Java API</h3>
+<div class="paragraph">
+<p>Find the Java-API and a generated project info here: <a href="project-info/apidocs/index.html">API</a> and <a href="project-info/index.html">project info</a>.</p>
 </div>
 </div>
 </div>
@@ -637,13 +644,13 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="sect1">
 <h2 id="getting-started"><a class="anchor" href="#getting-started"></a>2. Getting started</h2>
 <div class="sectionbody">
-<div class="sect3">
-<h4 id="preparedependencies"><a class="anchor" href="#preparedependencies"></a>2.1. Prepare dependencies</h4>
+<div class="sect2">
+<h3 id="preparedependencies"><a class="anchor" href="#preparedependencies"></a>2.1. Prepare dependencies</h3>
 <div class="paragraph">
 <p>Please use a dependency management system. We recommend either Maven or Gradle.</p>
 </div>
-<div class="sect4">
-<h5 id="mavenconfiguration"><a class="anchor" href="#mavenconfiguration"></a>Maven configuration</h5>
+<div class="sect3">
+<h4 id="mavenconfiguration"><a class="anchor" href="#mavenconfiguration"></a>2.1.1. Maven configuration</h4>
 <div class="listingblock">
 <div class="title">Listing 1. Inclusion of the Neo4j Cypher-DSL in a Maven project</div>
 <div class="content">
@@ -655,8 +662,8 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 </div>
 </div>
 </div>
-<div class="sect4">
-<h5 id="gradleconfiguration"><a class="anchor" href="#gradleconfiguration"></a>Gradle configuration</h5>
+<div class="sect3">
+<h4 id="gradleconfiguration"><a class="anchor" href="#gradleconfiguration"></a>2.1.2. Gradle configuration</h4>
 <div class="listingblock">
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
@@ -667,8 +674,8 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="howtouseit"><a class="anchor" href="#howtouseit"></a>2.2. How to use it</h4>
+<div class="sect2">
+<h3 id="howtouseit"><a class="anchor" href="#howtouseit"></a>2.2. How to use it</h3>
 <div class="paragraph">
 <p>You use the Cypher-DSL as you would write Cypher:
 It allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.</p>
@@ -699,8 +706,8 @@ This <code>Statement</code> needs to be rendered into a string or passed to meth
 <p>Please get an instance of the default renderer via <code>org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()</code>.
 The renderer provides a single method <code>render</code> for rendering the AST into a string representation.</p>
 </div>
-<div class="sect4">
-<h5 id="examples"><a class="anchor" href="#examples"></a>Examples</h5>
+<div class="sect3">
+<h4 id="examples"><a class="anchor" href="#examples"></a>2.2.1. Examples</h4>
 <div class="paragraph">
 <p>The following examples are 1:1 copies of the queries you will find in the Neo4j browser after running <code>:play movies</code>.</p>
 </div>
@@ -751,8 +758,8 @@ assertThat(cypherRenderer.render(statement))
 </tr>
 </table>
 </div>
-<div class="sect5">
-<h6 id="find"><a class="anchor" href="#find"></a>Find</h6>
+<div class="sect4">
+<h5 id="find"><a class="anchor" href="#find"></a>Find</h5>
 <div class="paragraph">
 <p>Match all nodes with a given set of properties:</p>
 </div>
@@ -805,8 +812,8 @@ assertThat(cypherRenderer.render(statement))
 </div>
 </div>
 </div>
-<div class="sect5">
-<h6 id="query"><a class="anchor" href="#query"></a>Query</h6>
+<div class="sect4">
+<h5 id="query"><a class="anchor" href="#query"></a>Query</h5>
 <div class="paragraph">
 <p>Build relationships</p>
 </div>
@@ -873,8 +880,8 @@ assertThat(cypherRenderer.render(statement))
 </div>
 </div>
 </div>
-<div class="sect5">
-<h6 id="solve"><a class="anchor" href="#solve"></a>Solve</h6>
+<div class="sect4">
+<h5 id="solve"><a class="anchor" href="#solve"></a>Solve</h5>
 <div class="listingblock">
 <div class="title">Listing 12. Movies and actors up to 4 "hops" away from Kevin Bacon</div>
 <div class="content">
@@ -890,8 +897,8 @@ assertThat(cypherRenderer.render(statement))
 </div>
 </div>
 </div>
-<div class="sect5">
-<h6 id="recommend"><a class="anchor" href="#recommend"></a>Recommend</h6>
+<div class="sect4">
+<h5 id="recommend"><a class="anchor" href="#recommend"></a>Recommend</h5>
 <div class="listingblock">
 <div class="title">Listing 13. Extend Tom Hanks co-actors, to find co-co-actors who haven&#8217;t worked with Tom Hanks&#8230;&#8203;</div>
 <div class="content">
@@ -942,10 +949,10 @@ There are many more functions implemented in <code>org.neo4j.cypherdsl.core.Func
 </tr>
 </table>
 </div>
+<div class="sect2">
+<h3 id="lists"><a class="anchor" href="#lists"></a>3.1. Lists</h3>
 <div class="sect3">
-<h4 id="lists"><a class="anchor" href="#lists"></a>3.1. Lists</h4>
-<div class="sect4">
-<h5 id="functions-list-range"><a class="anchor" href="#functions-list-range"></a>range()</h5>
+<h4 id="functions-list-range"><a class="anchor" href="#functions-list-range"></a>3.1.1. range()</h4>
 <div class="paragraph">
 <p>Creates an invocation of <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range"><code>range()</code></a>.</p>
 </div>
@@ -979,8 +986,8 @@ The step size can be specified as well:</p>
 <p>Both variants of <code>range</code> also take a <code>NumberLiteral</code> for the start and end index and the step size.</p>
 </div>
 </div>
-<div class="sect4">
-<h5 id="insertingalistoperator"><a class="anchor" href="#insertingalistoperator"></a>Inserting a list operator</h5>
+<div class="sect3">
+<h4 id="insertingalistoperator"><a class="anchor" href="#insertingalistoperator"></a>3.1.2. Inserting a list operator</h4>
 <div class="paragraph">
 <p>The <em>list operator</em> <code>[]</code> selects a specific value of a list or a range of values from a list.
 A range can either be closed or open.</p>
@@ -1039,7 +1046,7 @@ While the examples use <a href="#functions-list-range">Section 3.1.1</a>, the li
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2020-11-19 13:58:23 UTC
+Last updated 2020-11-19 15:12:13 UTC
 </div>
 </div>
 </body>
