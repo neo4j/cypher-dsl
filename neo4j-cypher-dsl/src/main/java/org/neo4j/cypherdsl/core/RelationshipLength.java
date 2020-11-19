@@ -50,14 +50,26 @@ public final class RelationshipLength implements Visitable {
 		this.unbounded = false;
 	}
 
+	/**
+	 * @return Minimum number of hops to match.
+	 */
+	@API(status = INTERNAL)
 	public Integer getMinimum() {
 		return minimum;
 	}
 
+	/**
+	 * @return Maximum number of hops to match.
+	 */
+	@API(status = INTERNAL)
 	public Integer getMaximum() {
 		return maximum;
 	}
 
+	/**
+	 * @return True if neither minimum nor maximum number of hops are set.
+	 */
+	@API(status = INTERNAL)
 	public boolean isUnbounded() {
 		return unbounded;
 	}

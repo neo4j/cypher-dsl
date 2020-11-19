@@ -183,10 +183,16 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 		return requiredSymbolicName;
 	}
 
+	/**
+	 * @return A new function invocation returning the internal id of this node.
+	 */
 	public FunctionInvocation internalId() {
 		return Functions.id(this);
 	}
 
+	/**
+	 * @return A new function invocation returning the labels of this node.
+	 */
 	public FunctionInvocation labels() {
 		return Functions.labels(this);
 	}
@@ -231,41 +237,79 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	@Override
 	public String toString() {
 		return "Node{" +
-			"symbolicName=" + symbolicName +
-			", labels=" + labels +
-			'}';
+			   "symbolicName=" + symbolicName +
+			   ", labels=" + labels +
+			   '}';
 	}
 
+	/**
+	 * Creates a new condition whether this node is equal to {@literal otherNode}.
+	 *
+	 * @param otherNode The node to compare this node to.
+	 * @return A condition.
+	 */
 	public Condition isEqualTo(Node otherNode) {
 
 		return this.getRequiredSymbolicName().isEqualTo(otherNode.getRequiredSymbolicName());
 	}
 
+	/**
+	 * Creates a new condition whether this node is not equal to {@literal otherNode}.
+	 *
+	 * @param otherNode The node to compare this node to.
+	 * @return A condition.
+	 */
 	public Condition isNotEqualTo(Node otherNode) {
 
 		return this.getRequiredSymbolicName().isNotEqualTo(otherNode.getRequiredSymbolicName());
 	}
 
+	/**
+	 * Creates a new condition based on this node whether it is null.
+	 *
+	 * @return A condition.
+	 */
 	public Condition isNull() {
 
 		return this.getRequiredSymbolicName().isNull();
 	}
 
+	/**
+	 * Creates a new condition based on this node whether it is not null.
+	 *
+	 * @return A condition.
+	 */
 	public Condition isNotNull() {
 
 		return this.getRequiredSymbolicName().isNotNull();
 	}
 
+	/**
+	 * Creates a new sort item of this node in descending order.
+	 *
+	 * @return A sort item.
+	 */
 	public SortItem descending() {
 
 		return this.getRequiredSymbolicName().descending();
 	}
 
+	/**
+	 * Creates a new sort item of this node in ascending order.
+	 *
+	 * @return A sort item.
+	 */
 	public SortItem ascending() {
 
 		return this.getRequiredSymbolicName().ascending();
 	}
 
+	/**
+	 * Creates an alias for this node.
+	 *
+	 * @param alias The alias to use.
+	 * @return The aliased expression.
+	 */
 	public AliasedExpression as(String alias) {
 
 		return this.getRequiredSymbolicName().as(alias);

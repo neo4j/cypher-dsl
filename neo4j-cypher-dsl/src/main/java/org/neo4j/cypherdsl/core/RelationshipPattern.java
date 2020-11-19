@@ -35,5 +35,11 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface RelationshipPattern extends PatternElement, ExposesRelationships<RelationshipChain> {
 
+	/**
+	 * Turns the pattern into a named chain of relationships.
+	 *
+	 * @param name The name to be used.
+	 * @return A named relationship that can be chained with more relationship definitions.
+	 */
 	ExposesRelationships<RelationshipChain> named(String name);
 }

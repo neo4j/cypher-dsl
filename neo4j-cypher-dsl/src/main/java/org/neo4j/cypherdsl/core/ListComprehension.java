@@ -69,6 +69,12 @@ public final class ListComprehension implements Expression {
 	 */
 	public interface OngoingDefinitionWithVariable {
 
+		/**
+		 * Create a list comprehension past on a literal list.
+		 *
+		 * @param list The source list.
+		 * @return An ongoing definition
+		 */
 		OngoingDefinitionWithList in(Expression list);
 	}
 
@@ -77,6 +83,12 @@ public final class ListComprehension implements Expression {
 	 */
 	public interface OngoingDefinitionWithList extends OngoingDefinitionWithoutReturn {
 
+		/**
+		 * Adds a {@code WHERE} clause to this comprehension.
+		 *
+		 * @param condition the condition to start the {@code WHERE} clause with.
+		 * @return An ongoing definition
+		 */
 		OngoingDefinitionWithoutReturn where(Condition condition);
 	}
 
@@ -139,7 +151,8 @@ public final class ListComprehension implements Expression {
 		@Override
 		public ListComprehension returning(Expression... expressions) {
 
-			return new ListComprehension(variable, listExpression, where, ListExpression.listOrSingleExpression(expressions));
+			return new ListComprehension(variable, listExpression, where,
+				ListExpression.listOrSingleExpression(expressions));
 		}
 	}
 

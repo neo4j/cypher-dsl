@@ -49,7 +49,7 @@ public abstract class Case implements Visitable {
 		return new GenericCase(new ArrayList<>());
 	}
 
-	protected Case(List<CaseWhenThen> caseWhenThens) {
+	Case(List<CaseWhenThen> caseWhenThens) {
 		this.caseWhenThens = caseWhenThens;
 	}
 
@@ -63,8 +63,14 @@ public abstract class Case implements Visitable {
 		return caseWhenThens;
 	}
 
-	public OngoingWhenThen when(Expression whenExpression) {
-		return new OngoingWhenThen(whenExpression);
+	/**
+	 * Creates a new case/when expression with an additional {@code WHEN} block.
+	 *
+	 * @param nextExpression The next expression to use.
+	 * @return An ongoing when builder.
+	 */
+	public OngoingWhenThen when(Expression nextExpression) {
+		return new OngoingWhenThen(nextExpression);
 	}
 
 	/**
@@ -72,10 +78,22 @@ public abstract class Case implements Visitable {
 	 */
 	@API(status = EXPERIMENTAL, since = "1.0")
 	public interface CaseEnding extends Condition {
-		OngoingWhenThen when(Expression whenExpression);
 
-		CaseEnding elseDefault(Expression elseExpression);
+		/**
+		 * Adds a new {@code WHEN} block.
+		 *
+		 * @param expression A new when expression.
+		 * @return An ongoing when builder.
+		 */
+		OngoingWhenThen when(Expression expression);
 
+		/**
+		 * Ends this case expression with a default expression to evaluate.
+		 *
+		 * @param defaultExpression The new default expression
+		 * @return An ongoing when builder.
+		 */
+		CaseEnding elseDefault(Expression defaultExpression);
 	}
 
 	/**
@@ -105,8 +123,8 @@ public abstract class Case implements Visitable {
 				super(caseExpression, caseWhenThens);
 			}
 
-			public CaseEnding elseDefault(Expression elseExpression) {
-				this.setCaseElse(new CaseElse(elseExpression));
+			public CaseEnding elseDefault(Expression defaultExpression) {
+				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
 			}
 		}
@@ -135,8 +153,9 @@ public abstract class Case implements Visitable {
 			private EndingGenericCase(List<CaseWhenThen> caseWhenThens) {
 				super(caseWhenThens);
 			}
-			public CaseEnding elseDefault(Expression elseExpression) {
-				this.setCaseElse(new CaseElse(elseExpression));
+
+			public CaseEnding elseDefault(Expression defaultExpression) {
+				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
 			}
 		}
@@ -170,8 +189,15 @@ public abstract class Case implements Visitable {
 			this.whenExpression = whenExpression;
 		}
 
-		public CaseEnding then(Expression thenExpression) {
-			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, thenExpression);
+		/**
+		 * Ends this {@code WHEN} block with an expression.
+		 *
+		 * @param expression The expression for the ongoing {@code WHEN} block.
+		 * @return An ongoing when builder.
+		 */
+		public CaseEnding then(Expression expression) {
+
+			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, expression);
 			getCaseWhenThens().add(caseWhenThen);
 			if (getCaseExpression() != null) {
 				return new SimpleCase.EndingSimpleCase(Case.this.getCaseExpression(), getCaseWhenThens());
@@ -179,7 +205,6 @@ public abstract class Case implements Visitable {
 				return new GenericCase.EndingGenericCase(getCaseWhenThens());
 			}
 		}
-
 	}
 
 	/**
@@ -197,8 +222,14 @@ public abstract class Case implements Visitable {
 			this.thenExpression = thenExpression;
 		}
 
-		public OngoingWhenThen when(Expression nextWhenExpression) {
-			return new OngoingWhenThen(nextWhenExpression);
+		/**
+		 * Creates a new case/when expression with an additional {@code WHEN} block.
+		 *
+		 * @param nextExpression The next expression to use.
+		 * @return An ongoing when builder.
+		 */
+		public OngoingWhenThen when(Expression nextExpression) {
+			return new OngoingWhenThen(nextExpression);
 		}
 
 		@Override

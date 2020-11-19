@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -28,7 +29,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * An action or event that happens after a {@code MERGE} clause. It can either be one of two types:
  * {@link Type#ON_CREATE} or {@link Type#ON_MATCH}.
  *
- *  <p>Both events supports the setting of properties, but not removing or adding labels. Multiple
+ * <p>Both events supports the setting of properties, but not removing or adding labels. Multiple
  * properties should be set in one action, but Cypher and
  * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Merge.html">openCypher</a>
  * allow for multiple {@link MergeAction merge actions}, with the same or different types.
@@ -44,9 +45,13 @@ public final class MergeAction implements Visitable {
 	 * The type of the action.
 	 */
 	public enum Type {
-		/** Triggered when a pattern has been created. */
+		/**
+		 * Triggered when a pattern has been created.
+		 */
 		ON_CREATE,
-		/** Triggered when a pattern has been fully matched. */
+		/**
+		 * Triggered when a pattern has been fully matched.
+		 */
 		ON_MATCH
 	}
 
@@ -58,6 +63,10 @@ public final class MergeAction implements Visitable {
 		this.set = set;
 	}
 
+	/**
+	 * @return Event type of this action.
+	 */
+	@API(status = INTERNAL)
 	public Type getType() {
 		return type;
 	}

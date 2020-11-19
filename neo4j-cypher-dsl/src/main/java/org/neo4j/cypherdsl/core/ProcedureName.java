@@ -75,6 +75,12 @@ public final class ProcedureName implements Visitable {
 		visitor.leave(this);
 	}
 
+	/**
+	 * Use {@link #getQualifiedName()} to retrieve the full name, including the namespace.
+	 *
+	 * @return The actual name of the procedure, without any namespace.
+	 */
+	@API(status = INTERNAL)
 	public String getValue() {
 		return value;
 	}

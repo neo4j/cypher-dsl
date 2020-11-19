@@ -26,9 +26,12 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
+ * Represents a "callable" subquery. A subquery can contain statement that returns something (standard statements, union
+ * statements and calls to stored procedures, yielding their elements). Subqueries can be nested.
+ *
  * @author Michael J. Simons
  * @soundtrack Die Ärzte - Seitenhirsch
- * @neo4jversion 4.0.0
+ * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
 @API(status = EXPERIMENTAL, since = "2020.1.2")

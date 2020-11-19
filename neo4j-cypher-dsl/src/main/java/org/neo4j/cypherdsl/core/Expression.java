@@ -45,26 +45,62 @@ public interface Expression extends Visitable {
 		return new AliasedExpression(this, alias);
 	}
 
+	/**
+	 * Creates a {@code lhs = rhs} condition.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
 	default Condition isEqualTo(Expression rhs) {
 		return Conditions.isEqualTo(this, rhs);
 	}
 
+	/**
+	 * Creates a {@code lhs <> rhs} condition.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
 	default Condition isNotEqualTo(Expression rhs) {
 		return Conditions.isNotEqualTo(this, rhs);
 	}
 
+	/**
+	 * Creates a {@code lhs < rhs} condition.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
 	default Condition lt(Expression rhs) {
 		return Conditions.lt(this, rhs);
 	}
 
+	/**
+	 * Creates a {@code lhs <= rhs} condition.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
 	default Condition lte(Expression rhs) {
 		return Conditions.lte(this, rhs);
 	}
 
+	/**
+	 * Creates a {@code lhs > rhs} condition.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
 	default Condition gt(Expression rhs) {
 		return Conditions.gt(this, rhs);
 	}
 
+	/**
+	 * Creates a {@code lhs >= rhs} condition.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
 	default Condition gte(Expression rhs) {
 		return Conditions.gte(this, rhs);
 	}

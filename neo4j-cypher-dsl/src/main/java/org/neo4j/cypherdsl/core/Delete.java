@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -41,6 +42,10 @@ public final class Delete implements UpdatingClause {
 		this.detach = detach;
 	}
 
+	/**
+	 * @return True, if the {@code DETACH} keyword needs to be included.
+	 */
+	@API(status = INTERNAL)
 	public boolean isDetach() {
 		return detach;
 	}

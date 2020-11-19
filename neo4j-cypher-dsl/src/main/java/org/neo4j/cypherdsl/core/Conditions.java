@@ -123,10 +123,16 @@ public final class Conditions {
 		return condition.not();
 	}
 
-	public static Condition not(PatternElement patternElement) {
+	/**
+	 * Negates the given pattern element: The pattern must not matched to be included in the reuslt.
+	 *
+	 * @param pattern The pattern to negate. Must not be null.
+	 * @return A condition that evaluates to true when the pattern does not match.
+	 */
+	public static Condition not(PatternElement pattern) {
 
-		Assertions.notNull(patternElement, "Pattern to negate must not be null.");
-		return new ExcludedPattern(patternElement);
+		Assertions.notNull(pattern, "Pattern to negate must not be null.");
+		return new ExcludedPattern(pattern);
 	}
 
 	/**

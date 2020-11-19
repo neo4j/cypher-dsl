@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Collections;
 
@@ -107,6 +108,10 @@ public final class FunctionInvocation implements Expression {
 		this.arguments = pattern;
 	}
 
+	/**
+	 * @return The name of this function.
+	 */
+	@API(status = INTERNAL)
 	public String getFunctionName() {
 		return functionName;
 	}

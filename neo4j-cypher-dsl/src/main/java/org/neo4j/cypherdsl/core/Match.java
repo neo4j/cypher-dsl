@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -45,6 +46,10 @@ public final class Match implements ReadingClause {
 		this.optionalWhere = optionalWhere;
 	}
 
+	/**
+	 * @return True if this is an optional match.
+	 */
+	@API(status = INTERNAL)
 	public boolean isOptional() {
 		return optional;
 	}

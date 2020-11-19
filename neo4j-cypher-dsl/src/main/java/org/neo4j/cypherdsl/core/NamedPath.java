@@ -75,6 +75,12 @@ public final class NamedPath implements PatternElement, Named {
 	 */
 	public interface OngoingDefinitionWithName {
 
+		/**
+		 * Create a new named path based on a relationship pattern.
+		 *
+		 * @param pattern The pattern to be used as named path.
+		 * @return A named path.
+		 */
 		NamedPath definedBy(RelationshipPattern pattern);
 	}
 
@@ -83,6 +89,12 @@ public final class NamedPath implements PatternElement, Named {
 	 */
 	public interface OngoingShortestPathDefinitionWithName {
 
+		/**
+		 * Create a new named path based on a single relationship.
+		 *
+		 * @param relationship The relationship to be passed to {@code shortestPath}.
+		 * @return A named path.
+		 */
 		NamedPath definedBy(Relationship relationship);
 	}
 
@@ -136,7 +148,7 @@ public final class NamedPath implements PatternElement, Named {
 
 		visitor.enter(this);
 		this.name.accept(visitor);
-		Operator.EQUALS.accept(visitor);
+		Operator.ASSIGMENT.accept(visitor);
 		this.pattern.accept(visitor);
 		visitor.leave(this);
 	}

@@ -873,6 +873,7 @@ public final class Functions {
 	 * Creates a function invocation for {@code datetime({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
 	 *
+	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
@@ -944,6 +945,7 @@ public final class Functions {
 	 * Creates a function invocation for {@code localdatetime({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
 	 *
+	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
@@ -1015,6 +1017,7 @@ public final class Functions {
 	 * Creates a function invocation for {@code localtime({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
 	 *
+	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
@@ -1086,6 +1089,7 @@ public final class Functions {
 	 * Creates a function invocation for {@code time({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
 	 *
+	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
@@ -1190,6 +1194,13 @@ public final class Functions {
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, temporalAmount);
 	}
 
+	/**
+	 * Creates a function invocation for {@code shortestPath({})}.
+	 *
+	 * @param relationship The relationship to be passed to {@code shortestPath}.
+	 * @return A function call for {@code shortestPath({})}.
+	 * @since 2020.0.0
+	 */
 	public static FunctionInvocation shortestPath(Relationship relationship) {
 
 		return FunctionInvocation.create(Scalars.SHORTEST_PATH, relationship);

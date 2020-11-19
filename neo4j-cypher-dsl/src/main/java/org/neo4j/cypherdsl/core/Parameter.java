@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -49,6 +50,10 @@ public final class Parameter implements Expression {
 		this.name = name;
 	}
 
+	/**
+	 * @return The name of this parameter.
+	 */
+	@API(status = INTERNAL)
 	public String getName() {
 		return name;
 	}

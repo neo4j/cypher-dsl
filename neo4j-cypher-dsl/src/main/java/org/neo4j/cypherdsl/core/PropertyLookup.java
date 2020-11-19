@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 
@@ -37,6 +38,10 @@ public final class PropertyLookup implements Expression {
 		this.propertyKeyName = propertyKeyName;
 	}
 
+	/**
+	 * @return The key for indicating the lookup
+	 */
+	@API(status = INTERNAL)
 	public String getPropertyKeyName() {
 		return propertyKeyName;
 	}

@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Optional;
 
@@ -27,6 +28,8 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
+ * A sort item can be used in an {@code ORDER BY} clause and changes the order of the items being returned from a query.
+ *
  * @author Gerrit Meier
  * @author Michael J. Simons
  * @since 1.0
@@ -47,10 +50,18 @@ public final class SortItem implements Visitable {
 		this.direction = direction;
 	}
 
+	/**
+	 * Creates a new sort item from {@literal this} instance, setting the sort direction to ascending.
+	 * @return A new sort item.
+	 */
 	public SortItem ascending() {
 		return new SortItem(this.expression, Direction.ASC);
 	}
 
+	/**
+	 * Creates a new sort item from {@literal this} instance, setting the sort direction to descending.
+	 * @return A new sort item.
+	 */
 	public SortItem descending() {
 		return new SortItem(this.expression, Direction.DESC);
 	}
@@ -71,8 +82,14 @@ public final class SortItem implements Visitable {
 	 * Sort direction.
 	 * @since 1.0
 	 */
+	@API(status = INTERNAL)
 	public enum Direction implements Visitable {
-		UNDEFINED(""), ASC("ASC"), DESC("DESC");
+		/** Undefined direction. */
+		UNDEFINED(""),
+		/** Ascending order. */
+		ASC("ASC"),
+		/** Descending order. */
+		DESC("DESC");
 
 		private final String symbol;
 
@@ -80,6 +97,9 @@ public final class SortItem implements Visitable {
 			this.symbol = symbol;
 		}
 
+		/**
+		 * @return The database internal symbol for a direction.
+		 */
 		public String getSymbol() {
 			return this.symbol;
 		}

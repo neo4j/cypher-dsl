@@ -31,5 +31,9 @@ import org.neo4j.cypherdsl.core.support.Visitable;
  */
 @API(status = INTERNAL, since = "1.0")
 public enum Distinct implements Visitable {
+
+	/**
+	 * The single instance of the {@code DISTINCT} keyword.
+	 */
 	INSTANCE
 }

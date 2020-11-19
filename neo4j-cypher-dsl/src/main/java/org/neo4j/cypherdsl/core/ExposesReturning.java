@@ -31,10 +31,22 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface ExposesReturning {
 
+	/**
+	 * Creates the {@code RETURN} clause.
+	 *
+	 * @param variables The named things to return
+	 * @return A build step with a defined list of things to return.
+	 */
 	default StatementBuilder.OngoingReadingAndReturn returning(String... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
 
+	/**
+	 * Creates the {@code RETURN} clause.
+	 *
+	 * @param variables The named things to return
+	 * @return A build step with a defined list of things to return.
+	 */
 	default StatementBuilder.OngoingReadingAndReturn returning(Named... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -47,10 +59,22 @@ public interface ExposesReturning {
 	 */
 	StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions);
 
+	/**
+	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword.
+	 *
+	 * @param variables The named things to return
+	 * @return A build step with a defined list of things to return.
+	 */
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(String... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
 
+	/**
+	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword.
+	 *
+	 * @param variables The named things to return
+	 * @return A build step with a defined list of things to return.
+	 */
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Named... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}

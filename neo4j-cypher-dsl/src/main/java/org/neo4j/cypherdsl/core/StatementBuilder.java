@@ -82,7 +82,7 @@ public interface StatementBuilder
 		 * in an existential subquery.
 		 *
 		 * @return An existential subquery.
-		 * @neo4jversion 4.0.0
+		 * @neo4j.version 4.0.0
 		 */
 		@Neo4jVersion(minimum = "4.0.0")
 		Condition asCondition();
@@ -125,6 +125,12 @@ public interface StatementBuilder
 	 */
 	interface OngoingUnwind {
 
+		/**
+		 * Adds an {@code AS} part that allows to define an alias for the iterable being unwound.
+		 *
+		 * @param variable The alias name
+		 * @return A normal, ongoing read.
+		 */
 		OngoingReading as(String variable);
 	}
 
@@ -502,10 +508,26 @@ public interface StatementBuilder
 	 */
 	interface ExposesDelete {
 
+		/**
+		 * Renders a {@code DELETE} clause targeting the given variables. NO checks are done whether they have been matched
+		 * previously.
+		 *
+		 * @param variables Variables indicating the things to delete.
+		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a delete clause that can be build now
+		 */
 		default <T extends OngoingUpdate & BuildableStatement> T delete(String... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
 
+		/**
+		 * Renders a {@code DELETE} clause targeting the given variables. NO checks are done whether they have been matched
+		 * previously.
+		 *
+		 * @param variables Variables indicating the things to delete.
+		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a delete clause that can be build now
+		 */
 		default <T extends OngoingUpdate & BuildableStatement> T delete(Named... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
@@ -519,10 +541,26 @@ public interface StatementBuilder
 		 */
 		<T extends OngoingUpdate & BuildableStatement> T delete(Expression... expressions);
 
+		/**
+		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
+		 * been matched previously.
+		 *
+		 * @param variables Variables indicating the things to delete.
+		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a detach delete clause that can be build now
+		 */
 		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(String... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
 
+		/**
+		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
+		 * been matched previously.
+		 *
+		 * @param variables Variables indicating the things to delete.
+		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a detach delete clause that can be build now
+		 */
 		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(Named... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
@@ -554,6 +592,14 @@ public interface StatementBuilder
 		 */
 		<T extends OngoingMatchAndUpdate & BuildableStatement> T set(Expression... expressions);
 
+		/**
+		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
+		 *
+		 * @param variable   The named thing to modify
+		 * @param expression The modifying expression
+		 * @param <T>        The type of the next step
+		 * @return An ongoing match and update
+		 */
 		default <T extends OngoingMatchAndUpdate & BuildableStatement> T set(Named variable, Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
 		}
@@ -566,10 +612,33 @@ public interface StatementBuilder
 	 */
 	interface ExposesSetAndRemove extends ExposesSet {
 
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T set(Node node, String... label);
+		/**
+		 * Creates {@code SET} clause for setting the given labels to a node.
+		 *
+		 * @param node   The node who's labels are to be changed
+		 * @param labels The labels to be set
+		 * @param <T>    The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a SET clause that can be build now
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement> T set(Node node, String... labels);
 
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T remove(Node node, String... label);
+		/**
+		 * Creates {@code SET} clause for removing the given labels from a node.
+		 *
+		 * @param node   The node who's labels are to be changed
+		 * @param labels The labels to be removed
+		 * @param <T>    The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a REMOVE clause that can be build now
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement> T remove(Node node, String... labels);
 
+		/**
+		 * Creates {@code SET} clause for removing the enumerated properties
+		 *
+		 * @param properties The properties to be removed
+		 * @param <T>        The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a REMOVE clause that can be build now
+		 */
 		<T extends OngoingMatchAndUpdate & BuildableStatement> T remove(Property... properties);
 	}
 
@@ -582,12 +651,24 @@ public interface StatementBuilder
 	}
 
 	/**
+	 * Provides a way to specify an action that happens after a {@code MERGE} clause.
+	 *
 	 * @since 2020.1.2
 	 */
 	interface ExposesMergeAction {
 
+		/**
+		 * This allows to specify the action that should happen when the merge clause lead to the creation of a new pattern.
+		 *
+		 * @return an ongoing definition of a merge action.
+		 */
 		OngoingMergeAction onCreate();
 
+		/**
+		 * This allows to specify the action that should happen when the pattern of the merge clause already existed and matched.
+		 *
+		 * @return an ongoing definition of a merge action.
+		 */
 		OngoingMergeAction onMatch();
 	}
 
@@ -607,7 +688,15 @@ public interface StatementBuilder
 		 */
 		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Expression... expressions);
 
-		default <T extends OngoingMatchAndUpdate & BuildableStatement  & ExposesMergeAction> T set(Named variable, Expression expression) {
+		/**
+		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
+		 *
+		 * @param variable   The named thing to modify
+		 * @param expression The modifying expression
+		 * @param <T>        The type of the next step
+		 * @return An ongoing match and update
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Named variable, Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
 		}
 	}

@@ -107,7 +107,7 @@ public final class ProcedureCall implements Statement {
 		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 
-	protected abstract static class Builder implements ExposesWhere, ExposesReturning,
+	abstract static class Builder implements ExposesWhere, ExposesReturning,
 		StatementBuilder.BuildableStatement {
 
 		protected final ProcedureName procedureName;
@@ -135,7 +135,7 @@ public final class ProcedureCall implements Statement {
 		}
 	}
 
-	protected static final class StandaloneCallBuilder extends Builder implements
+	static final class StandaloneCallBuilder extends Builder implements
 		OngoingStandaloneCallWithoutArguments,
 		OngoingStandaloneCallWithArguments,
 		OngoingStandaloneCallWithReturnFields {

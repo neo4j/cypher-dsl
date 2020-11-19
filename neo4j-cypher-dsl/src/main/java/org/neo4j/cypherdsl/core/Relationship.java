@@ -69,10 +69,18 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 
 		private final String symbolRight;
 
+		/**
+		 * @return The symbol to render on the left side of the relationship types.
+		 */
+		@API(status = INTERNAL)
 		public String getSymbolLeft() {
 			return symbolLeft;
 		}
 
+		/**
+		 * @return The symbol to render on the right side of the relationship types.
+		 */
+		@API(status = INTERNAL)
 		public String getSymbolRight() {
 			return symbolRight;
 		}
@@ -176,6 +184,10 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
 		}
 
+		/**
+		 * @return The direction of the relationship.
+		 */
+		@API(status = INTERNAL)
 		public Direction getDirection() {
 			return direction;
 		}
@@ -199,10 +211,18 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 			return requiredSymbolicName;
 		}
 
+		/**
+		 * @return The relationship types being matched.
+		 */
+		@API(status = INTERNAL)
 		public RelationshipTypes getTypes() {
 			return types;
 		}
 
+		/**
+		 * @return The properties of this relationship.
+		 */
+		@API(status = INTERNAL)
 		public Properties getProperties() {
 			return properties;
 		}
@@ -255,6 +275,12 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 		return right;
 	}
 
+	/**
+	 * The details contains the types, properties and cardinality.
+	 *
+	 * @return A wrapper around the details of this relationship.
+	 */
+	@API(status = INTERNAL)
 	public Details getDetails() {
 		return details;
 	}

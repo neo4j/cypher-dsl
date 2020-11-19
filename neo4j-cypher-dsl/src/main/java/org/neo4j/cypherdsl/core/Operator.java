@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -33,51 +34,144 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 public enum Operator implements Visitable {
 
 	// Mathematical operators
+	/**
+	 * Standard addition operator.
+	 */
 	ADDITION("+"),
+	/**
+	 * Standard subtraction operator.
+	 */
 	SUBTRACTION("-"),
+	/**
+	 * Standard multiplication operator.
+	 */
 	MULTIPLICATION("*"),
+	/**
+	 * Standard division operator.
+	 */
 	DIVISION("/"),
+	/**
+	 * Standard modulo operator.
+	 */
 	MODULO_DIVISION("%"),
+	/**
+	 * Operator for exponentiation.
+	 */
 	EXPONENTIATION("^"),
 
 	// Comparison operators
+	/**
+	 * Comparison for equality.
+	 */
 	EQUALITY("="),
+	/**
+	 * Comparison for inequality.
+	 */
 	INEQUALITY("<>"),
+	/**
+	 * &lt; comparison.
+	 */
 	LESS_THAN("<"),
+	/**
+	 * &gt; comparison.
+	 */
 	GREATER_THAN(">"),
+	/**
+	 * &le; comparison.
+	 */
 	LESS_THAN_OR_EQUAL_TO("<="),
+	/**
+	 * &ge; comparison.
+	 */
 	GREATER_THAN_OR_EQUAL_TO(">="),
+	/**
+	 * {@code IS NULL} comparison.
+	 */
 	IS_NULL("IS NULL", Type.POSTFIX),
+	/**
+	 * {@code IS NOT NULL} comparison.
+	 */
 	IS_NOT_NULL("IS NOT NULL", Type.POSTFIX),
 
+	/**
+	 * String operator for {@code STARTS WITH}.
+	 */
 	STARTS_WITH("STARTS WITH"),
+	/**
+	 * String operator for {@code ENDS WITH}.
+	 */
 	ENDS_WITH("ENDS WITH"),
+	/**
+	 * String operator for {@code CONTAINS}.
+	 */
 	CONTAINS("CONTAINS"),
 
 	// Boolean operators
+	/**
+	 * The AND operator.
+	 */
 	AND("AND"),
+	/**
+	 * The OR operator.
+	 */
 	OR("OR"),
+	/**
+	 * The XOR operator.
+	 */
 	XOR("XOR"),
+	/**
+	 * The NOT operator.
+	 */
 	NOT("NOT", Type.PREFIX),
 
 	// String operators
+	/**
+	 * The string concatenating operator.
+	 */
 	CONCAT("+"),
+	/**
+	 * The string matching operator.
+	 */
 	MATCHES("=~"),
 
 	// List operators
+	/**
+	 * {@code IN} operator.
+	 */
 	IN("IN"),
 
 	// Property operators
+	/**
+	 * Property operator for assigning properties.
+	 */
 	SET("=", Type.PROPERTY),
+	/**
+	 * Property operator for retrieving properties.
+	 */
 	GET(".", Type.PROPERTY),
+	/**
+	 * Property operator for modifying properties.
+	 */
 	MUTATE("+=", Type.PROPERTY),
 
 	// Node operators
+	/**
+	 * The label operator adding labels.
+	 */
 	SET_LABEL("", Type.LABEL),
+	/**
+	 * The label operator removing labels.
+	 */
 	REMOVE_LABEL("", Type.LABEL),
 
 	// Misc
-	EQUALS("="), // Read as in `p := (a)-->(b)`
+	/**
+	 * The assigment operator (Read as in `p := (a)-->(b)`)
+	 */
+	ASSIGMENT("="),
+	/**
+	 * The pipe operator
+	 */
 	PIPE("|");
 
 	private final String representation;
@@ -93,27 +187,54 @@ public enum Operator implements Visitable {
 		this.type = type;
 	}
 
+	/**
+	 * @return The operators textual representation.
+	 */
+	@API(status = INTERNAL)
 	public String getRepresentation() {
 		return representation;
 	}
 
-	public boolean isUnary() {
+	/**
+	 * @return True if this is a unary operator.
+	 */
+	boolean isUnary() {
 		return type != Type.BINARY;
 	}
 
+	/**
+	 * @return The type of this operator.
+	 */
+	@API(status = INTERNAL)
 	public Type getType() {
 		return type;
 	}
 
 	/**
 	 * {@link Operator} type.
+	 *
 	 * @since 1.0
 	 */
 	public enum Type {
+		/**
+		 * Describes a binary operator (An operator with to operands).
+		 */
 		BINARY,
+		/**
+		 * Describes a unary prefix operator (An operator with one operand after the operator).
+		 */
 		PREFIX,
+		/**
+		 * Describes a unary postfix operator (An operator with one operand before the operator).
+		 */
 		POSTFIX,
+		/**
+		 * Describes an operator working with properties of entities.
+		 */
 		PROPERTY,
+		/**
+		 * The binary operator modifying labels of nodes.
+		 */
 		LABEL
 	}
 }

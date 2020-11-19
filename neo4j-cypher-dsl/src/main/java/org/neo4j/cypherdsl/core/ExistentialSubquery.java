@@ -25,9 +25,12 @@ import org.neo4j.cypherdsl.core.support.Neo4jVersion;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
+ * An existential subquery can only be used in a where clause. The subquery must consisted only of a match statement
+ * which may have a {@code WHERE} clause on its own but is not not allowed to return anything.
+ *
  * @author Michael J. Simons
  * @soundtrack Die Ärzte - Seitenhirsch
- * @neo4jversion 4.0.0
+ * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
 @API(status = EXPERIMENTAL, since = "2020.1.2")

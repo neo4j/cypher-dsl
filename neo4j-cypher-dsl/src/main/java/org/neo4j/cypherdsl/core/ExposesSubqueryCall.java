@@ -28,7 +28,7 @@ import org.neo4j.cypherdsl.core.support.Neo4jVersion;
  *
  * @author Michael J. Simons
  * @soundtrack Die Ärzte - Seitenhirsch
- * @neo4jversion 4.0.0
+ * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
 @API(status = EXPERIMENTAL, since = "2020.1.2")

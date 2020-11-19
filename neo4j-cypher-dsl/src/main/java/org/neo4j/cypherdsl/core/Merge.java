@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +64,10 @@ public final class Merge implements UpdatingClause {
 		this.onCreateOrMatchEvents.addAll(mergeActions);
 	}
 
+	/**
+	 * @return True if there are any events defined for the merge statement.
+	 */
+	@API(status = INTERNAL)
 	public boolean hasEvents() {
 		return !this.onCreateOrMatchEvents.isEmpty();
 	}

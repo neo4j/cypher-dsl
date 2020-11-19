@@ -73,6 +73,12 @@ public final class PatternComprehension implements Expression {
 	 */
 	public interface OngoingDefinitionWithPattern extends OngoingDefinitionWithoutReturn {
 
+		/**
+		 * Adds a {@code WHERE} clause to the inner statement of the pattern comprehension
+		 *
+		 * @param condition An initial condition to be used with {@code WHERE}
+		 * @return An ongoing definition of a pattern comprehension for furhter modification
+		 */
 		OngoingDefinitionWithPatternAndWhere where(Condition condition);
 	}
 

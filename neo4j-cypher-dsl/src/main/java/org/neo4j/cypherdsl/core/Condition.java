@@ -103,6 +103,11 @@ public interface Condition extends Expression {
 		return CompoundCondition.create(this, Operator.XOR, new RelationshipPatternCondition(pathPattern));
 	}
 
+	/**
+	 * Negates this condition.
+	 *
+	 * @return A new condition.
+	 */
 	default Condition not() {
 		return Comparison.create(Operator.NOT, this);
 	}

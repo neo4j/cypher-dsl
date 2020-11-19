@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 import java.util.Objects;
 
 import org.apiguardian.api.API;
@@ -58,6 +60,10 @@ public class SymbolicName implements Expression {
 		this.value = value;
 	}
 
+	/**
+	 * @return The value of this symbolic name, does not need to be escaped and is guaranteed to be an identifier.
+	 */
+	@API(status = INTERNAL)
 	public String getValue() {
 		return value;
 	}

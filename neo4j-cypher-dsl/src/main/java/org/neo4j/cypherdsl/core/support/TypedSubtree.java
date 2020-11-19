@@ -27,14 +27,22 @@ import java.util.List;
  * recognized by visitors.
  *
  * @author Michael J. Simons
- * @param <T> The children's type
+ * @param <T>    The children's type
  * @param <SELF> The concrete type of the implementing class.
  * @since 1.0
  */
 public abstract class TypedSubtree<T extends Visitable, SELF extends TypedSubtree<T, SELF>> implements Visitable {
 
+	/**
+	 * The content of this typed subtree.
+	 */
 	protected final List<T> children;
 
+	/**
+	 * Creates a new typed subtree with the given content.
+	 *
+	 * @param children The content of this subtree.
+	 */
 	@SafeVarargs
 	@SuppressWarnings("varargs")
 	protected TypedSubtree(T... children) {
@@ -42,6 +50,11 @@ public abstract class TypedSubtree<T extends Visitable, SELF extends TypedSubtre
 		this.children = Arrays.asList(children);
 	}
 
+	/**
+	 * Creates a new typed subtree with the given content.
+	 *
+	 * @param children The content of this subtree.
+	 */
 	protected TypedSubtree(List<T> children) {
 
 		this.children = new ArrayList<>(children);

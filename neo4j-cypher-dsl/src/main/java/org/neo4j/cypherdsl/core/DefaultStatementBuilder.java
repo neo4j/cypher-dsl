@@ -240,9 +240,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate set(Node named, String... label) {
+	public OngoingMatchAndUpdate set(Node named, String... labels) {
 
-		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, label));
+		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
 	}
 
 	@Override
@@ -254,9 +254,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@Override
 	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate remove(Node named, String... label) {
+	public OngoingMatchAndUpdate remove(Node named, String... labels) {
 
-		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, label));
+		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
 	}
 
 	@Override
@@ -561,20 +561,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate set(Node node, String... label) {
+		public OngoingMatchAndUpdate set(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
-				.set(node, label);
+				.set(node, labels);
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate remove(Node node, String... label) {
+		public OngoingMatchAndUpdate remove(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
-				.remove(node, label);
+				.remove(node, labels);
 		}
 
 		@Override
@@ -929,20 +929,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate set(Node node, String... label) {
+		public OngoingMatchAndUpdate set(Node node, String... labels) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
-				UpdateType.SET, Operations.set(node, label));
+				UpdateType.SET, Operations.set(node, labels));
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate remove(Node node, String... label) {
+		public OngoingMatchAndUpdate remove(Node node, String... labels) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
-				Operations.set(node, label));
+				Operations.set(node, labels));
 		}
 
 		@Override

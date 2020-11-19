@@ -48,6 +48,9 @@ public final class AliasedExpression implements Aliased, Expression {
 		return alias;
 	}
 
+	/**
+	 * @return The thing that has been aliased.
+	 */
 	@API(status = INTERNAL)
 	public Expression getDelegate() {
 		return delegate;

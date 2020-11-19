@@ -55,11 +55,29 @@ public final class Cypher {
 		return Node.create(primaryLabel, additionalLabels);
 	}
 
+	/**
+	 * Create a new Node representation with at least one label, the "primary" label. This is required. All other labels
+	 * are optional.
+	 *
+	 * @param primaryLabel     The primary label this node is identified by.
+	 * @param additionalLabels Additional labels
+	 * @return A new node representation
+	 */
 	public static Node node(String primaryLabel, List<String> additionalLabels) {
 
 		return Node.create(primaryLabel, additionalLabels.toArray(new String[] {}));
 	}
 
+	/**
+	 * Create a new Node representation with at least one label, the "primary" label. This is required. All other labels
+	 * are optional. This method also takes a map of properties. This allows the returned node object to be used in a
+	 * {@code MATCH} or {@code MERGE} statement.
+	 *
+	 * @param primaryLabel     The primary label this node is identified by.
+	 * @param properties       The properties expected to exist on the node.
+	 * @param additionalLabels Additional labels
+	 * @return A new node representation
+	 */
 	public static Node node(String primaryLabel, MapExpression properties, String... additionalLabels) {
 
 		return Node.create(primaryLabel, properties, additionalLabels);
@@ -333,6 +351,7 @@ public final class Cypher {
 	 * Creates a new {@link Literal Literal&lt;?&gt;} from the given {@code object}.
 	 *
 	 * @param object the object to represent.
+	 * @param <T>    The type of the literal returned
 	 * @return a new {@link Literal Literal&lt;?&gt;}.
 	 * @throws IllegalArgumentException when the object cannot be represented as a literal
 	 */
@@ -378,12 +397,24 @@ public final class Cypher {
 		return BooleanLiteral.FALSE;
 	}
 
-	public static Statement union(Statement... statement) {
-		return unionImpl(false, statement);
+	/**
+	 * Creates a {@code UNION} statement from several other statements. No checks are applied for matching return types.
+	 *
+	 * @param statements the statements to union.
+	 * @return A union statement.
+	 */
+	public static Statement union(Statement... statements) {
+		return unionImpl(false, statements);
 	}
 
-	public static Statement unionAll(Statement... statement) {
-		return unionImpl(true, statement);
+	/**
+	 * Creates a {@code UNION ALL} statement from several other statements. No checks are applied for matching return types.
+	 *
+	 * @param statements the statements to union.
+	 * @return A union statement.
+	 */
+	public static Statement unionAll(Statement... statements) {
+		return unionImpl(true, statements);
 	}
 
 	/**
@@ -481,9 +512,11 @@ public final class Cypher {
 	/**
 	 * Starts building a statement based on one subquery.
 	 *
-	 * @neo4jversion 4.0.0
+	 * @param subquery The statement representing the subquery
+	 * @neo4j.version 4.0.0
 	 * @see ExposesSubqueryCall#call(Statement)
 	 * @since 2020.1.2
+	 * @return A new ongoing read without any further conditions or returns.
 	 */
 	@Neo4jVersion(minimum = "4.0.0")
 	public static StatementBuilder.OngoingReadingWithoutWhere call(Statement subquery) {

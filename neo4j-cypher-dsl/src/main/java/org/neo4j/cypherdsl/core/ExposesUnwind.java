@@ -31,13 +31,31 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface ExposesUnwind {
 
+	/**
+	 * Starts building a new {@code UNWIND} clause.
+	 *
+	 * @param expressions The things to unwind.
+	 * @return An ongoing definition of an unwind.
+	 */
 	default StatementBuilder.OngoingUnwind unwind(Expression... expressions) {
 		return unwind(Cypher.listOf(expressions));
 	}
 
+	/**
+	 * Starts building a new {@code UNWIND} clause.
+	 *
+	 * @param variable The thing to unwind.
+	 * @return An ongoing definition of an unwind.
+	 */
 	default StatementBuilder.OngoingUnwind unwind(String variable) {
 		return unwind(Cypher.name(variable));
 	}
 
+	/**
+	 * Starts building a new {@code UNWIND} clause.
+	 *
+	 * @param expression The things to unwind.
+	 * @return An ongoing definition of an unwind.
+	 */
 	StatementBuilder.OngoingUnwind unwind(Expression expression);
 }

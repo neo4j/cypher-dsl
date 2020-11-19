@@ -33,8 +33,15 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface Named {
 
+	/**
+	 * @return An optional symbolic name.
+	 */
 	Optional<SymbolicName> getSymbolicName();
 
+	/**
+	 * @return A symbolic name
+	 * @throws IllegalStateException If this has not been named yet.
+	 */
 	default SymbolicName getRequiredSymbolicName() {
 		return getSymbolicName().orElseThrow(() -> new IllegalStateException("No name present."));
 	}

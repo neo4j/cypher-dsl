@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -42,6 +43,10 @@ public final class KeyValueMapEntry implements Expression {
 		this.value = value;
 	}
 
+	/**
+	 * @return The key of this entry.
+	 */
+	@API(status = INTERNAL)
 	public String getKey() {
 		return key;
 	}

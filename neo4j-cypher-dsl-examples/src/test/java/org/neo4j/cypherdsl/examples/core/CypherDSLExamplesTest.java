@@ -29,6 +29,7 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 // end::cypher-dsl-imports[]
 
@@ -223,4 +224,20 @@ class CypherDSLExamplesTest {
 			.build();
 		assertThat(cypherRenderer.render(call)).isEqualTo("CALL dbms.listConfig('browser') YIELD name");
 	}
+
+	@Test
+	void where() {
+
+		SymbolicName name = Cypher.name("name");
+		Statement call = Cypher
+			.call("dbms.listConfig")
+			.withArgs(Cypher.literalOf("browser"))
+			.yield(name)
+			.where(name.matches("browser\\.allow.*"))
+			.returning(Cypher.asterisk())
+			.build();
+		assertThat(cypherRenderer.render(call))
+			.isEqualTo("CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser\\\\.allow.*' RETURN *");
+	}
+
 }

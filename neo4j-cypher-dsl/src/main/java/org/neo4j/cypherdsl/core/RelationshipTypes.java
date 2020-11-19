@@ -36,10 +36,14 @@ public final class RelationshipTypes implements Visitable {
 
 	private final List<String> values;
 
-	public RelationshipTypes(List<String> values) {
+	RelationshipTypes(List<String> values) {
 		this.values = values;
 	}
 
+	/**
+	 * @return the list of types. The types are not escaped and must be escaped prior to rendering.
+	 */
+	@API(status = INTERNAL)
 	public List<String> getValues() {
 		return values;
 	}

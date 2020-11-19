@@ -31,6 +31,9 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Asterisk extends Literal<String> {
 
+	/**
+	 * The single instance of the {@code *}.
+	 */
 	public static final Asterisk INSTANCE = new Asterisk();
 
 	private Asterisk() {

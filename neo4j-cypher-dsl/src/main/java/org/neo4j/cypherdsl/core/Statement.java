@@ -36,14 +36,22 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface Statement extends Visitable {
 
-	static ProcedureCall.OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
-
-		return new ProcedureCall.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
-	}
-
+	/**
+	 * @return A new statement builder.
+	 */
 	static StatementBuilder builder() {
 
 		return new DefaultStatementBuilder();
+	}
+
+	/**
+	 * @param namespaceAndProcedure The fully qualified name of a stored procedure. Each part can be given as a separate
+	 *                              String, but a fully qualified String is ok as well.
+	 * @return An entry point into a statement that starts with a call to stored procedure.
+	 */
+	static ProcedureCall.OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
+
+		return new ProcedureCall.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
 	}
 
 	/**

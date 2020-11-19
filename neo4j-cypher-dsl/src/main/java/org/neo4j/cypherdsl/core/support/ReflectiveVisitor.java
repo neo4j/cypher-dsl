@@ -73,6 +73,12 @@ public abstract class ReflectiveVisitor implements Visitor {
 	private Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
 	/**
+	 * A map of aliased visitables that already have been seen and for which an alias must be used on each following
+	 * appearance.
+	 */
+	protected final Map<Visitable, AliasedExpression> visitableToAliased = new HashMap<>();
+
+	/**
 	 * This is a hook that is called with the uncasted, raw visitable just before entering a visitable.
 	 * <p>
 	 * The hook is called regardless wither a matching {@code enter} is found or not.
@@ -90,8 +96,6 @@ public abstract class ReflectiveVisitor implements Visitor {
 	 * @param visitable The visitable that is passed on to a matching leave after this call.
 	 */
 	protected abstract void postLeave(Visitable visitable);
-
-	protected final Map<Visitable, AliasedExpression> visitableToAliased = new HashMap<>();
 
 	private Visitable getAliasedIfSeen(Visitable visitable) {
 		return visitableToAliased.containsKey(visitable) ? visitableToAliased.get(visitable) : visitable;

@@ -33,10 +33,18 @@ import org.apiguardian.api.API;
 @API(status = API.Status.INTERNAL, since = "2020.1.0")
 public final class Strings {
 
+	/**
+	 * @param str A string to be checked for text.
+	 * @return True, if the strign is neither null nor empty nor blank.
+	 */
 	public static boolean hasText(String str) {
 		return (str != null && !str.isEmpty() && containsText(str));
 	}
 
+	/**
+	 * @param length The length of the identifier to generate.
+	 * @return A random identifier that is a valid identifier
+	 */
 	public static String randomIdentifier(int length) {
 
 		int leftLimit = 65; // letter 'A'

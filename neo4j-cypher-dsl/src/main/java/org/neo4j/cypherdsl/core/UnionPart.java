@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
@@ -43,6 +44,10 @@ public final class UnionPart implements Visitable {
 		this.query = query;
 	}
 
+	/**
+	 * @return True, if an {@code ALL} keyword should be rendered.
+	 */
+	@API(status = INTERNAL)
 	public boolean isAll() {
 		return all;
 	}
