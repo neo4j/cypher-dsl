@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
@@ -75,7 +76,7 @@ public final class NamedPath implements PatternElement, Named {
 	 */
 	public interface OngoingDefinitionWithName {
 
-		NamedPath definedBy(RelationshipPattern pattern);
+		NamedPath definedBy(RelationshipPattern... pattern);
 	}
 
 	/**
@@ -95,7 +96,7 @@ public final class NamedPath implements PatternElement, Named {
 		}
 
 		@Override
-		public NamedPath definedBy(RelationshipPattern pattern) {
+		public NamedPath definedBy(RelationshipPattern... pattern) {
 			return new NamedPath(name, pattern);
 		}
 	}
@@ -116,9 +117,9 @@ public final class NamedPath implements PatternElement, Named {
 		}
 	}
 
-	private NamedPath(SymbolicName name, RelationshipPattern pattern) {
+	private NamedPath(SymbolicName name, RelationshipPattern... pattern) {
 		this.name = name;
-		this.pattern = pattern;
+		this.pattern = new Pattern(Arrays.asList(pattern));
 	}
 
 	private NamedPath(SymbolicName name, FunctionInvocation algorithm) {

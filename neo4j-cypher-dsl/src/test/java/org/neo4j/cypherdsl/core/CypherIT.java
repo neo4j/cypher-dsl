@@ -3441,7 +3441,7 @@ class CypherIT {
 				.isEqualTo("MATCH p = (michael {name: 'Michael Douglas'})-->() RETURN p");
 		}
 
-		@Test
+		@Test // GH-108
 		void shouldWorkInListComprehensions() {
 
 			NamedPath p = Cypher.path("p").definedBy(
@@ -3450,6 +3450,37 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN [p = (n)-[:`LIKES`|`OWNS`*]->() | p]");
+		}
+
+		@Test // GH-108
+		void pathsWithMultipleSegmentsShouldWorkInReturn() {
+
+			Node n = Cypher.anyNode("n");
+			NamedPath p = Cypher.path("p").definedBy(
+				n.relationshipTo(Cypher.anyNode(), "LIKES").unbounded(),
+				n.relationshipTo(Cypher.anyNode(), "OWNS"),
+				n.relationshipTo(Cypher.anyNode(), "X").relationshipTo(Cypher.node("Target"), "Y")
+			);
+			Statement statement = Cypher.returning(Cypher.listBasedOn(p).returning(p)).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN [p = (n)-[:`LIKES`*]->(), (n)-[:`OWNS`]->(), (n)-[:`X`]->()-[:`Y`]->(:`Target`) | p]");
+		}
+
+		@Test // GH-108
+		void pathsWithMultipleSegmentsShouldWorkInMatch() {
+
+			Node n = Cypher.anyNode("n");
+			NamedPath p = Cypher.path("p").definedBy(
+				n.relationshipTo(Cypher.anyNode(), "LIKES").unbounded(),
+				n.relationshipTo(Cypher.anyNode(), "OWNS"),
+				n.relationshipTo(Cypher.anyNode(), "X").relationshipTo(Cypher.node("Target"), "Y")
+			);
+
+			Statement statement = Cypher.match(p).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH p = (n)-[:`LIKES`*]->(), (n)-[:`OWNS`]->(), (n)-[:`X`]->()-[:`Y`]->(:`Target`) RETURN p");
 		}
 	}
 
