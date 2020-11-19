@@ -94,7 +94,7 @@ public interface ExposesCall<T> {
 				names = Arrays.stream(yieldedItems).map(SymbolicName::of)
 					.toArray(SymbolicName[]::new);
 			}
-			return yield(names);
+			return this.yield(names);
 		}
 
 		/**
