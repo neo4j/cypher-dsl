@@ -31,7 +31,9 @@ jobs:
           java-version: 8
       - name: Run docs generation
         run: >
-          ./mvnw asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName}
+          ./mvnw asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} &&
+          ./mvnw site -pl org.neo4j:neo4j-cypher-dsl &&
+          mv neo4j-cypher-dsl/target/site target/gh-pages/${refName}/project-info
       - name: Create symlink
         if: (github.event_name == 'create' && github.event.ref_type == 'tag')
         working-directory: ./target/gh-pages

@@ -166,7 +166,7 @@ public enum Operator implements Visitable {
 
 	// Misc
 	/**
-	 * The assigment operator (Read as in `p := (a)-->(b)`)
+	 * The assigment operator (Read as in `p := (a)--&gt;(b)`)
 	 */
 	ASSIGMENT("="),
 	/**

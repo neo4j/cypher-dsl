@@ -113,6 +113,7 @@
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
+		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -183,6 +184,23 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
+					<configuration>
+						<detectOfflineLinks>false</detectOfflineLinks>
+						<detectJavaApiLink>false</detectJavaApiLink>
+						<source>${java.version}</source>
+						<tags>
+							<tag>
+								<name>soundtrack</name>
+								<placement>X</placement>
+								<head>Soundtrack</head>
+							</tag>
+							<tag>
+								<name>neo4j.version</name>
+								<placement>a</placement>
+								<head>Neo4j version required</head>
+							</tag>
+						</tags>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -214,6 +232,11 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-surefire-plugin</artifactId>
 					<version>${maven-surefire-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>${maven-site-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>com.github.ekryd.sortpom</groupId>
@@ -393,23 +416,6 @@
 						</goals>
 					</execution>
 				</executions>
-				<configuration>
-					<detectOfflineLinks>false</detectOfflineLinks>
-					<detectJavaApiLink>false</detectJavaApiLink>
-					<source>${java.version}</source>
-					<tags>
-						<tag>
-							<name>soundtrack</name>
-							<placement>X</placement>
-							<head>Soundtrack</head>
-						</tag>
-						<tag>
-							<name>neo4j.version</name>
-							<placement>a</placement>
-							<head>Neo4j version required</head>
-						</tag>
-					</tags>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
@@ -479,4 +485,40 @@
 			</plugin>
 		</plugins>
 	</build>
+
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>${maven-javadoc-plugin.version}</version>
+				<reportSets>
+					<reportSet>
+						<id>default</id>
+						<reports>
+							<report>javadoc</report>
+						</reports>
+					</reportSet>
+					<reportSet>
+						<id>aggregate</id>
+						<reports>
+							<report>aggregate</report>
+						</reports>
+						<configuration></configuration>
+					</reportSet>
+				</reportSets>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>checkstyle</report>
+						</reports>
+					</reportSet>
+				</reportSets>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
