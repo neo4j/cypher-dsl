@@ -1125,7 +1125,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		private boolean hasCondition() {
-			return !(this.condition == null || this.condition == CompoundCondition.EMPTY_CONDITION);
+			return this.condition != null && (!(this.condition instanceof CompoundCondition) || ((CompoundCondition) this.condition).hasConditions());
 		}
 
 		Optional<Condition> buildCondition() {

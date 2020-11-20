@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -933,6 +934,107 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (u.name = 'Test' XOR u.age = 21) RETURN u");
+		}
+
+		@Test // GH-110
+		void multipleEmptyConditionsMustCollapse() {
+
+			Supplier<Condition> no = () -> org.neo4j.cypherdsl.core.Conditions.noCondition(); // Just aliased due to the qualified import
+			String expected = "MATCH (u:`User`) RETURN u";
+
+			Statement statement;
+			statement = Cypher.match(userNode)
+				.where(no.get().or(no.get()))
+				.and(no.get().and(no.get()).or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().and(no.get()).or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+		}
+
+		@Test // GH-110
+		void multipleEmptyConditionsMustCollapse2() {
+
+			Supplier<Condition> no = () -> org.neo4j.cypherdsl.core.Conditions.noCondition(); // Just aliased due to the qualified import
+			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
+			String expected = "MATCH (u:`User`) WHERE u.a = true RETURN u";
+
+			Statement statement;
+			statement = Cypher.match(userNode)
+				.where(no.get().and(t.get()).or(no.get()))
+				.and(no.get().and(no.get()).or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().or(no.get()).or(t.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().and(t.get()).or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().or(no.get()))
+				.and(t.get())
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+		}
+
+		@Test // GH-110
+		void multipleEmptyConditionsMustCollapse3() {
+
+			Supplier<Condition> no = () -> org.neo4j.cypherdsl.core.Conditions.noCondition(); // Just aliased due to the qualified import
+			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
+			Supplier<Condition> f = () -> userNode.property("b").isEqualTo(Cypher.literalFalse());
+			String expected = "MATCH (u:`User`) WHERE (u.a = true AND u.b = false) RETURN u";
+
+			Statement statement;
+			statement = Cypher.match(userNode)
+				.where(no.get().and(t.get()).or(no.get()))
+				.and(no.get().and(f.get()).or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().or(no.get()).or(t.get()).and(f.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher.match(userNode)
+				.where(no.get().and(t.get()).or(no.get())).and(f.get().or(no.get()))
+				.returning(userNode)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
 		}
 
 		@Test

@@ -42,7 +42,7 @@ public final class CompoundCondition implements Condition {
 	/**
 	 * The empty, compound condition.
 	 */
-	static final CompoundCondition EMPTY_CONDITION = new CompoundCondition(null);
+	private static final CompoundCondition EMPTY_CONDITION = new CompoundCondition(null);
 	static final EnumSet<Operator> VALID_OPERATORS = EnumSet.of(Operator.AND, Operator.OR, Operator.XOR);
 
 	static CompoundCondition create(Condition left, Operator operator, Condition right) {
@@ -95,7 +95,7 @@ public final class CompoundCondition implements Condition {
 			return new CompoundCondition(chainingOperator).add(chainingOperator, condition);
 		}
 
-		if (condition == EMPTY_CONDITION) {
+		if (condition instanceof CompoundCondition && !((CompoundCondition) condition).hasConditions()) {
 			return this;
 		}
 
@@ -122,6 +122,10 @@ public final class CompoundCondition implements Condition {
 		}
 
 		return CompoundCondition.create(this, chainingOperator, condition);
+	}
+
+	boolean hasConditions() {
+		return !(this == EMPTY_CONDITION || this.conditions.isEmpty());
 	}
 
 	/**
