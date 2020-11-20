@@ -78,18 +78,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	public OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
-
-		return this.match(true, pattern);
-	}
-
-	@Override
-	public OngoingReadingWithoutWhere match(PatternElement... pattern) {
-
-		return this.match(false, pattern);
-	}
-
-	private OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
+	public OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
 		Assertions.notNull(pattern, "Patterns to match are required.");
 		Assertions.notEmpty(pattern, "At least one pattern to match is required.");
@@ -624,19 +613,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public OngoingReadingWithoutWhere match(PatternElement... pattern) {
+		public OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
-				.match(pattern);
-		}
-
-		@Override
-		public OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.optionalMatch(pattern);
+				.match(optional, pattern);
 		}
 
 		@Override

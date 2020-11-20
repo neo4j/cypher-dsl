@@ -32,18 +32,32 @@ import org.apiguardian.api.API;
 public interface ExposesMatch {
 
 	/**
-	 * Adds (another) match clause.
+	 * Adds (another) {@code MATCH} clause.
 	 *
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
-	StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern);
+	default StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern) {
+		return this.match(false, pattern);
+	}
 
 	/**
-	 * Adds (another) optional match clause.
+	 * Adds (another) optional {@code MATCH} clause.
 	 *
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
-	StatementBuilder.OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern);
+	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
+		return this.match(true, pattern);
+	}
+
+	/**
+	 * Adds (another) {@code MATCH} clause.
+	 *
+	 * @param optional A flag whether the {@code MATCH} clause includes the {@code OPTIONAL} keyword.
+	 * @param pattern  The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2020.1.3
+	 */
+	StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern);
 }
