@@ -80,6 +80,21 @@ public final class PatternComprehension implements Expression {
 		 * @return An ongoing definition of a pattern comprehension for furhter modification
 		 */
 		OngoingDefinitionWithPatternAndWhere where(Condition condition);
+
+		/**
+		 * Adds a where clause based on a path pattern to the ongoing definition
+		 *
+		 * @param pathPattern The path pattern to add to the where clause.
+		 *                    This path pattern must not be {@literal null} and must
+		 *                    not introduce new variables not available in the match.
+		 * @return A match or a call restricted by a where clause with no return items yet.
+		 * @since 2020.1.4
+		 */
+		default OngoingDefinitionWithPatternAndWhere where(RelationshipPattern pathPattern) {
+
+			Assertions.notNull(pathPattern, "The path pattern must not be null.");
+			return this.where(new RelationshipPatternCondition(pathPattern));
+		}
 	}
 
 	/**

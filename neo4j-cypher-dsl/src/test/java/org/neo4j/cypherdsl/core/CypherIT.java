@@ -1392,6 +1392,22 @@ class CypherIT {
 			}
 
 			@Test
+			void gh113() {
+
+				Node foo = Cypher.node("Foo").named("foo");
+				Node bar = Cypher.node("Bar").named("bar");
+				Relationship fooBar = foo.relationshipTo(bar, "FOOBAR").named("rel");
+				PatternComprehension pc = Cypher.listBasedOn(fooBar)
+					.where(bar.relationshipTo(Cypher.node("ZZZ"), "HAS"))
+					.returning(fooBar, bar);
+				Statement statement = Cypher.match(foo).returning(foo.getRequiredSymbolicName(),  pc).build();
+
+				assertThat(cypherRenderer.render(statement)).isEqualTo(
+					"MATCH (foo:`Foo`) RETURN foo, [(foo)-[rel:`FOOBAR`]->(bar:`Bar`) WHERE (bar)-[:`HAS`]->(:`ZZZ`) | [rel, bar]]"
+				);
+			}
+
+			@Test
 			void doc3654() {
 
 				Node person = Cypher.node("Person").named("n");
