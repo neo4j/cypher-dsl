@@ -105,7 +105,7 @@ class RelationshipTest {
 			Property property = relationship.property("p");
 
 			java.util.Set<Object> expected = new HashSet<>();
-			expected.add(property.getName());
+			expected.addAll(property.getNames());
 			expected.add(relationship.getRequiredSymbolicName());
 			expected.add(property);
 

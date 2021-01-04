@@ -21,6 +21,11 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -34,7 +39,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Property implements Expression {
 
-	static Property create(Named parentContainer, String name) {
+	static Property create(Named parentContainer, String... names) {
 
 		SymbolicName requiredSymbolicName;
 		try {
@@ -43,18 +48,27 @@ public final class Property implements Expression {
 			throw new IllegalArgumentException(
 				"A property derived from a node or a relationship needs a parent with a symbolic name.");
 		}
-		Assertions.hasText(name, "The properties name is required.");
 
-		return new Property(requiredSymbolicName, new PropertyLookup((name)));
+		return new Property(requiredSymbolicName, createListOfChainedNames(names));
 	}
 
-	static Property create(Expression container, String name) {
+	static Property create(Expression container, String... names) {
 
 		Assertions.notNull(container, "The property container is required.");
-		Assertions.hasText(name, "The properties name is required.");
 
-		return new Property(container, new PropertyLookup(name));
+		return new Property(container, createListOfChainedNames(names));
+	}
 
+	private static List<PropertyLookup> createListOfChainedNames(String... names) {
+
+		Assertions.notEmpty(names, "The properties name is required.");
+
+		if (names.length == 1) {
+			return Collections.singletonList(new PropertyLookup(names[0]));
+		} else {
+			return Arrays.stream(names).map(PropertyLookup::new)
+				.collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+		}
 	}
 
 	/**
@@ -65,20 +79,20 @@ public final class Property implements Expression {
 	/**
 	 * The name of this property.
 	 */
-	private final PropertyLookup name;
+	private final List<PropertyLookup> names;
 
-	Property(Expression container, PropertyLookup name) {
+	Property(Expression container, List<PropertyLookup> names) {
 
 		this.container = container;
-		this.name = name;
+		this.names = names;
 	}
 
 	/**
-	 * @return The actual property being looked up.
+	 * @return The actual property being looked up. The order matters, so this will return a list, not a collection.
 	 */
 	@API(status = INTERNAL)
-	public PropertyLookup getName() {
-		return name;
+	public List<PropertyLookup> getNames() {
+		return names;
 	}
 
 	/**
@@ -96,7 +110,7 @@ public final class Property implements Expression {
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
 		this.container.accept(visitor);
-		this.name.accept(visitor);
+		this.names.forEach(name -> name.accept(visitor));
 		visitor.leave(this);
 	}
 }

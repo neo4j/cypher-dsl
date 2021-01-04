@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A dedicated map expression.<p>
- * Most of the comparision methods on this expression will not result in a sensible query fragment.
+ * Most of the comparison methods on this expression will not result in a sensible query fragment.
  * A {@link MapExpression} is be useful as a concrete parameter to functions or as properties on {@link Node nodes}
  * or {@link Relationship relationships}.
  *

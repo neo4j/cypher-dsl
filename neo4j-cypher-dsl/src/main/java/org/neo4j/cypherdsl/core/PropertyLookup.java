@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/PropertyLookup.html">PropertyLookup</a>
@@ -35,6 +36,8 @@ public final class PropertyLookup implements Expression {
 	private final String propertyKeyName;
 
 	PropertyLookup(String propertyKeyName) {
+
+		Assertions.hasText(propertyKeyName, "The properties name is required.");
 		this.propertyKeyName = propertyKeyName;
 	}
 

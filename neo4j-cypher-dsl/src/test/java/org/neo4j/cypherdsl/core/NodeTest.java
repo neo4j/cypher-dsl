@@ -119,7 +119,7 @@ class NodeTest {
 			Property property = node.property("p");
 
 			java.util.Set<Object> expected = new HashSet<>();
-			expected.add(property.getName());
+			expected.addAll(property.getNames());
 			expected.add(node.getRequiredSymbolicName());
 			expected.add(property);
 

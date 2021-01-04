@@ -112,23 +112,25 @@ public final class MapProjection implements Expression {
 				lastExpression = ((Expression) current);
 				i += 1;
 			}
-
 			if (lastExpression instanceof Asterisk) {
 				lastExpression = new PropertyLookup("*");
 			}
 
-			final Expression entry;
 			if (lastKey != null) {
 				Assertions.isTrue(!knownKeys.contains(lastKey), "Duplicate key '" + lastKey + "'");
-				entry = new KeyValueMapEntry(lastKey, lastExpression);
+				newContent.add(new KeyValueMapEntry(lastKey, lastExpression));
 				knownKeys.add(lastKey);
 			} else if (lastExpression instanceof SymbolicName || lastExpression instanceof PropertyLookup) {
-				entry = lastExpression;
+				newContent.add(lastExpression);
 			} else if (lastExpression instanceof Property) {
-				entry = ((Property) lastExpression).getName();
+				List<PropertyLookup> names = ((Property) lastExpression).getNames();
+				if (names.size() > 1) {
+					throw new IllegalArgumentException("Cannot project nested properties!");
+				}
+				newContent.addAll(names);
 			} else if (lastExpression instanceof AliasedExpression) {
 				AliasedExpression aliasedExpression = (AliasedExpression) lastExpression;
-				entry = new KeyValueMapEntry(aliasedExpression.getAlias(), aliasedExpression.getDelegate());
+				newContent.add(new KeyValueMapEntry(aliasedExpression.getAlias(), aliasedExpression.getDelegate()));
 			} else if (lastExpression == null) {
 				throw new IllegalArgumentException("Could not determine an expression from the given content!");
 			} else {
@@ -136,7 +138,6 @@ public final class MapProjection implements Expression {
 					+ " cannot be used with an implicit name as map entry.");
 			}
 
-			newContent.add(entry);
 			lastKey = null;
 			lastExpression = null;
 		}

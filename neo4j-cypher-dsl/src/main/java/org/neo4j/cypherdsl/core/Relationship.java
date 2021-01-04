@@ -375,9 +375,9 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	}
 
 	@Override
-	public Property property(String name) {
+	public Property property(String... names) {
 
-		return Property.create(this, name);
+		return Property.create(this, names);
 	}
 
 	@Override

@@ -43,5 +43,9 @@ public interface PropertyContainer extends Named {
 	 * @param name property name, must not be {@literal null} or empty.
 	 * @return a new {@link Property} associated with this {@link Relationship}.
 	 */
-	Property property(String name);
+	default Property property(String name) {
+		return property(new String[] {name});
+	}
+
+	Property property(String... names);
 }

@@ -56,7 +56,7 @@ class CypherTest {
 		Property property = Cypher.property("a", "b");
 		property.accept(segment -> {
 			if (segment instanceof Property) {
-				assertThat(segment).extracting(s -> ((Property) s).getName().getPropertyKeyName()).isEqualTo("b");
+				assertThat(segment).extracting(s -> ((Property) s).getNames().get(0).getPropertyKeyName()).isEqualTo("b");
 			} else if (segment instanceof PropertyLookup) {
 				assertThat(segment).extracting(s -> ((PropertyLookup) s).getPropertyKeyName()).isEqualTo("b");
 			} else if (segment instanceof SymbolicName) {

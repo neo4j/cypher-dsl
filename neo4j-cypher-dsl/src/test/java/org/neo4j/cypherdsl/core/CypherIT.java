@@ -2407,6 +2407,61 @@ class CypherIT {
 
 	@Nested
 	class PropertyRendering {
+
+		@Test // GH-114
+		void manuallyNested() {
+			Node node = Cypher.node("Person").named("p");
+
+			Property locationProperty = node.property("location");
+			Statement statement = Cypher.match(node)
+				.where(Cypher.property(locationProperty, "x").gt(Cypher.literalOf(6)))
+				.returning(node).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (p:`Person`) WHERE p.location.x > 6 RETURN p");
+		}
+
+		@Test // GH-114
+		void chained() {
+			Node node = Cypher.node("Person").named("p");
+
+			Statement statement = Cypher.match(node)
+				.where(node.property("location", "x").gt(Cypher.literalOf(6)))
+				.returning(node).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (p:`Person`) WHERE p.location.x > 6 RETURN p");
+		}
+
+		@Test // GH-114
+		void chainedAndFancy() {
+			Node node = Cypher.node("Person").named("p");
+
+			Statement statement = Cypher.create(node.withProperties(Cypher.mapOf("home.location", Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(50.751), "longitude", Cypher.literalOf(6.179))))))
+				.returning(node).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("CREATE (p:`Person` {`home.location`: point({latitude: 50.751, longitude: 6.179})}) RETURN p");
+
+			statement = Cypher.match(node)
+				.where(node.property("home.location", "y").gt(Cypher.literalOf(50)))
+				.returning(node).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (p:`Person`) WHERE p.`home.location`.y > 50 RETURN p");
+		}
+
+		@Test
+		void chainedInProjection() {
+
+			Node node = Cypher.node("Person").named("p");
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(node)
+				.returning(node.project("__internalNeo4jId__", Functions.id(node), "name")
+					.and(node.property("home.location", "y"))
+				)
+				.build()).withMessage("Cannot project nested properties!");
+		}
+
 		@Test
 		void shouldRenderNodeProperties() {
 
