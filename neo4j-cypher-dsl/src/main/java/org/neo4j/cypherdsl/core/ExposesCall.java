@@ -102,7 +102,7 @@ public interface ExposesCall<T> {
 		 *
 		 * @param yieldedItems The list of named items to be yielded.
 		 * @return The ongoing standalone call to be configured.
-		 * @since 2021.1.4
+		 * @since 2020.1.4
 		 */
 		default T yield(Named... yieldedItems) {
 

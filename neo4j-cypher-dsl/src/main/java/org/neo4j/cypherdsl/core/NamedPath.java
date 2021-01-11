@@ -93,7 +93,7 @@ public final class NamedPath implements PatternElement, Named {
 		 * actually points to a path.
 		 *
 		 * @return A named path.
-		 * @since 2021.1.4
+		 * @since 2020.1.4
 		 */
 		NamedPath get();
 	}
