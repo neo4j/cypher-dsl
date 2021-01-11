@@ -29,7 +29,12 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * Represents a named named path as in {@code p := (a)-->(b)}.
+ * Represents a named path. A named path can be either a {@link RelationshipPattern} that has been assigned to a variable
+ * as in {@code p := (a)-->(b)}, a call to functions known to return paths or an existing, symbolic name that might come
+ * from an arbitrary procedure returning path elements.
+ * <br>
+ * <b>Note</b>: We cannot check a value that has been yielded from a procedure upfront to verify that it is a named
+ * path. This is up to the caller.
  *
  * @author Michael J. Simons
  * @soundtrack Freddie Mercury - Never Boring
@@ -46,7 +51,7 @@ public final class NamedPath implements PatternElement, Named {
 	/**
 	 * The pattern defining this path.
 	 */
-	private final Visitable pattern;
+	private final Visitable optionalPattern;
 
 	static OngoingDefinitionWithName named(String name) {
 
@@ -82,6 +87,15 @@ public final class NamedPath implements PatternElement, Named {
 		 * @return A named path.
 		 */
 		NamedPath definedBy(RelationshipPattern pattern);
+
+		/**
+		 * Create a new named path that references a given, symbolic name. No checks are done if the referenced name
+		 * actually points to a path.
+		 *
+		 * @return A named path.
+		 * @since 2021.1.4
+		 */
+		NamedPath get();
 	}
 
 	/**
@@ -110,6 +124,11 @@ public final class NamedPath implements PatternElement, Named {
 		public NamedPath definedBy(RelationshipPattern pattern) {
 			return new NamedPath(name, pattern);
 		}
+
+		@Override
+		public NamedPath get() {
+			return new NamedPath(name);
+		}
 	}
 
 	private static class ShortestPathBuilder implements OngoingShortestPathDefinitionWithName {
@@ -128,14 +147,19 @@ public final class NamedPath implements PatternElement, Named {
 		}
 	}
 
-	private NamedPath(SymbolicName name, RelationshipPattern pattern) {
+	private NamedPath(SymbolicName name) {
 		this.name = name;
-		this.pattern = pattern;
+		this.optionalPattern = null;
+	}
+
+	private NamedPath(SymbolicName name, RelationshipPattern optionalPattern) {
+		this.name = name;
+		this.optionalPattern = optionalPattern;
 	}
 
 	private NamedPath(SymbolicName name, FunctionInvocation algorithm) {
 		this.name = name;
-		this.pattern = algorithm;
+		this.optionalPattern = algorithm;
 	}
 
 	@Override
@@ -148,8 +172,10 @@ public final class NamedPath implements PatternElement, Named {
 
 		visitor.enter(this);
 		this.name.accept(visitor);
-		Operator.ASSIGMENT.accept(visitor);
-		this.pattern.accept(visitor);
+		if (optionalPattern != null) {
+			Operator.ASSIGMENT.accept(visitor);
+			this.optionalPattern.accept(visitor);
+		}
 		visitor.leave(this);
 	}
 }

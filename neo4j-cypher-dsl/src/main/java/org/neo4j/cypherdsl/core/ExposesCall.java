@@ -98,6 +98,23 @@ public interface ExposesCall<T> {
 		}
 
 		/**
+		 * Adds the given items to the {@literal YIELD} clause of the generated call.
+		 *
+		 * @param yieldedItems The list of named items to be yielded.
+		 * @return The ongoing standalone call to be configured.
+		 * @since 2021.1.4
+		 */
+		default T yield(Named... yieldedItems) {
+
+			SymbolicName[] names = new SymbolicName[0];
+			if (yieldedItems != null) {
+				names = Arrays.stream(yieldedItems).map(Named::getRequiredSymbolicName)
+					.toArray(SymbolicName[]::new);
+			}
+			return this.yield(names);
+		}
+
+		/**
 	     * Adds the given items to the {@literal YIELD} clause of the generated call.
 		 *
 		 * @param resultFields The list of result fields to be returned.

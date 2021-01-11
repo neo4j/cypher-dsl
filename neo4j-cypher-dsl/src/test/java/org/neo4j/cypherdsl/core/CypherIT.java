@@ -3280,6 +3280,30 @@ class CypherIT {
 	class Issues {
 
 		@Test
+		void gh115() {
+			Node nodes = Cypher.node("Node").named("node").withProperties("id", Cypher.literalOf("node_42"));
+			StatementBuilder.OngoingReadingWithoutWhere matchNodes = Cypher.match(nodes);
+
+			NamedPath p = Cypher.path(Cypher.name("path")).get();
+			Statement statement = matchNodes
+				.call("apoc.path.spanningTree")
+				.withArgs(
+					nodes.getRequiredSymbolicName(),
+					Cypher.mapOf(
+						"relationshipFilter",
+						Cypher.literalOf("<rel_filter>"),
+						"labelFilter",
+						Cypher.literalOf("<label_filter>")))
+				.yield(p)
+				.returningDistinct(nodes.getRequiredSymbolicName(), Functions.collect(Functions.relationships(p)).as("rels"), Functions.collect(Functions.nodes(p)).as("nodes")).build();
+
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo("MATCH (node:`Node` {id: 'node_42'}) "
+							   + "CALL apoc.path.spanningTree(node, {relationshipFilter: '<rel_filter>', labelFilter: '<label_filter>'}) YIELD path "
+							   + "RETURN DISTINCT node, collect(relationships(path)) AS rels, collect(nodes(path)) AS nodes");
+		}
+
+		@Test
 		void gh70() {
 			Node strawberry = Cypher.node("Fruit", Cypher.mapOf("kind", Cypher.literalOf("strawberry")));
 			Statement statement = Cypher
