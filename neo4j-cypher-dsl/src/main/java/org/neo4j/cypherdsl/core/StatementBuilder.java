@@ -614,7 +614,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Expression target, MapExpression properties);
+		<T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Expression target, Expression properties);
 
 		/**
 		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
@@ -625,32 +625,8 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, MapExpression properties) {
+		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
-		}
-
-		/**
-		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
-		 * of properties and the right hand side must be a map of new or updated properties
-		 *
-		 * @param target    The target container that should be modified
-		 * @param parameter The new properties
-		 * @return An ongoing match and update
-		 * @since 2020.1.5
-		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Expression target, Parameter parameter);
-
-		/**
-		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
-		 * of properties and the right hand side must be a map of new or updated properties
-		 *
-		 * @param variable  The named thing to modify
-		 * @param parameter The new properties
-		 * @return An ongoing match and update
-		 * @since 2020.1.5
-		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, Parameter parameter) {
-			return mutate(variable.getRequiredSymbolicName(), parameter);
 		}
 	}
 
@@ -760,7 +736,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Expression target, MapExpression properties);
+		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Expression target, Expression properties);
 
 		/**
 		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
@@ -771,32 +747,8 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, MapExpression properties) {
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
-		}
-
-		/**
-		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
-		 * of properties and the right hand side must be a map of new or updated properties
-		 *
-		 * @param target    The target container that should be modified
-		 * @param parameter The new properties
-		 * @return An ongoing match and update
-		 * @since 2020.1.5
-		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Expression target, Parameter parameter);
-
-		/**
-		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
-		 * of properties and the right hand side must be a map of new or updated properties
-		 *
-		 * @param variable  The named thing to modify
-		 * @param parameter The new properties
-		 * @return An ongoing match and update
-		 * @since 2020.1.5
-		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, Parameter parameter) {
-			return mutate(variable.getRequiredSymbolicName(), parameter);
 		}
 	}
 }

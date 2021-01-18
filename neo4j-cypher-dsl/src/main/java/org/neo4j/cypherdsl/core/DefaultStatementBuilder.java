@@ -123,16 +123,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new OngoingMergeAction() {
 
 			@Override
-			public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+			public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.MUTATE, target, properties);
-				return DefaultStatementBuilder.this;
-			}
-
-			@Override
-			public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
-				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
-					.on(type, UpdateType.MUTATE, target, parameter);
 				return DefaultStatementBuilder.this;
 			}
 
@@ -238,7 +231,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 	public OngoingMatchAndUpdate set(Expression... expressions) {
 
 		this.closeCurrentOngoingUpdate();
-
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
 	}
 
@@ -253,17 +245,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	@SuppressWarnings("unchecked")
 	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+	public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
 
+		this.closeCurrentOngoingUpdate();
 		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
-
-		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, parameter));
 	}
 
 	@Override
@@ -593,20 +578,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+		public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.mutate(target, properties);
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.mutate(target, parameter);
 		}
 
 		@Override
@@ -1016,20 +992,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+		public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
 				UpdateType.MUTATE, Operations.mutate(target, properties));
-		}
-
-		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
-
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
-				UpdateType.MUTATE, Operations.mutate(target, parameter));
 		}
 
 		@Override

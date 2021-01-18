@@ -57,7 +57,7 @@ public interface PropertyContainer extends Named {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	default Operation to(Parameter parameter) {
+	default Operation mutate(Parameter parameter) {
 		return Operations.mutate(this.getSymbolicName()
 				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
 			parameter);
@@ -71,7 +71,7 @@ public interface PropertyContainer extends Named {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	default Operation to(MapExpression properties) {
+	default Operation mutate(MapExpression properties) {
 		return Operations.mutate(this.getSymbolicName()
 				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
 			properties);

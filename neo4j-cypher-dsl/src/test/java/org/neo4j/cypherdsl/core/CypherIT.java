@@ -1651,9 +1651,9 @@ class CypherIT {
 			Relationship ownsRelationship = userNode.relationshipTo(bikeNode, "OWNS").named("r");
 			Statement statement = Cypher.match(ownsRelationship)
 				.set(
-					userNode.to(Cypher.mapOf("a", Cypher.literalOf("B"))),
-					bikeNode.to(Cypher.mapOf("c", Cypher.literalOf("D"))),
-					ownsRelationship.to(Cypher.mapOf("e", Cypher.literalOf("F")))
+					userNode.mutate(Cypher.mapOf("a", Cypher.literalOf("B"))),
+					bikeNode.mutate(Cypher.mapOf("c", Cypher.literalOf("D"))),
+					ownsRelationship.mutate(Cypher.mapOf("e", Cypher.literalOf("F")))
 				)
 				.returning(userNode)
 				.build();
@@ -1668,9 +1668,9 @@ class CypherIT {
 			Statement statement = Cypher.merge(ownsRelationship)
 				.onMatch()
 					.set(
-						userNode.to(Cypher.mapOf("a", Cypher.literalOf("B"))),
-						bikeNode.to(Cypher.mapOf("c", Cypher.literalOf("D"))),
-						ownsRelationship.to(Cypher.mapOf("e", Cypher.literalOf("F")))
+						userNode.mutate(Cypher.mapOf("a", Cypher.literalOf("B"))),
+						bikeNode.mutate(Cypher.mapOf("c", Cypher.literalOf("D"))),
+						ownsRelationship.mutate(Cypher.mapOf("e", Cypher.literalOf("F")))
 					)
 				.onCreate()
 					.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
@@ -1679,6 +1679,28 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MERGE (u:`User`)-[r:`OWNS`]->(b:`Bike`) ON MATCH SET u += {a: 'B'}, b += {c: 'D'}, r += {e: 'F'} ON CREATE SET u += {a: 'B'} RETURN u");
+		}
+
+		@Test
+		void mergeMutate() {
+			Statement statement = Cypher.merge(userNode)
+				.mutate(userNode, Cypher.mapOf("e", Cypher.literalOf("F")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`) SET u += {e: 'F'} RETURN u");
+		}
+
+		@Test
+		void createMutate() {
+			Statement statement = Cypher.create(userNode)
+				.mutate(userNode, Cypher.mapOf("e", Cypher.literalOf("F")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("CREATE (u:`User`) SET u += {e: 'F'} RETURN u");
 		}
 	}
 
