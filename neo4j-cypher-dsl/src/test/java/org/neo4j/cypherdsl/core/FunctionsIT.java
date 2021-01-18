@@ -65,6 +65,7 @@ class FunctionsIT {
 			.literalOf(2)));
 		FunctionInvocation p2 = Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(3), "longitude", Cypher
 			.literalOf(4)));
+		NamedPath namedPath = Cypher.path("patternPath").definedBy(r);
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
 		return Stream.of(
@@ -110,6 +111,14 @@ class FunctionsIT {
 			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
 			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
 			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
+			Arguments.
+					of(Functions.reduce(
+							Cypher.name("x"),
+							Cypher.listOf(),
+							Cypher.name("n"),
+							Functions.relationships(namedPath),
+							Cypher.name("x").add(Cypher.name("n"))),
+							"RETURN reduce(x = [], n IN relationships(patternPath) | (x + n))"),
 			Arguments.of(Functions.properties(n), "RETURN properties(n)"),
 			Arguments.of(Functions.properties(r), "RETURN properties(r)"),
 			Arguments.of(Functions.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})"),

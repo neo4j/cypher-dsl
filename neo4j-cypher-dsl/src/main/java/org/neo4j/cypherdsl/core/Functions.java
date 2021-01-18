@@ -1205,4 +1205,24 @@ public final class Functions {
 
 		return FunctionInvocation.create(Scalars.SHORTEST_PATH, relationship);
 	}
+
+	/**
+	 * Creates a function invocation for {@code reduce({})}.
+	 *
+	 * @param accumulator A variable that will hold the result and the partial results as the list is iterated.
+	 * @param initialValue An expression that runs once to give a starting value to the accumulator.
+	 * @param variable The closure will have a variable introduced in its context. We decide here which variable to use.
+	 * @param list An expression that returns a list.
+	 * @param expression This expression will run once per value in the list, and produce the result value.
+	 * @return A function call for {@code reduce({})}.
+	 * @since 2020.1.5
+	 */
+	public static FunctionInvocation reduce(Expression accumulator, Expression initialValue, SymbolicName variable,
+			Expression list, Expression expression) {
+
+		return FunctionInvocation.create(
+				Lists.REDUCE,
+				accumulator.isEqualTo(initialValue),
+				ListComprehensionWithoutBrackets.with(variable).in(list).returning(expression));
+	}
 }
