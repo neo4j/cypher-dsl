@@ -79,6 +79,34 @@ final class Operations {
 		return Operation.create(target, Operator.SET, value);
 	}
 
+	/**
+	 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+	 * of properties and the right hand side must be a map of new or updated properties
+	 *
+	 * @param target The target container that should be modified
+	 * @param value  The new properties
+	 * @return A new operation.
+	 * @since 2020.1.5
+	 */
+	static Operation mutate(Expression target, MapExpression value) {
+
+		return Operation.create(target, Operator.MUTATE, value);
+	}
+
+	/**
+	 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+	 * of properties and the right hand side must be a map of new or updated properties
+	 *
+	 * @param target The target container that should be modified
+	 * @param value  The new properties
+	 * @return A new operation.
+	 * @since 2020.1.5
+	 */
+	static Operation mutate(Expression target, Parameter value) {
+
+		return Operation.create(target, Operator.MUTATE, value);
+	}
+
 	static Operation set(Node target, String... label) {
 
 		return Operation.create(target, Operator.SET_LABEL, label);
@@ -88,7 +116,6 @@ final class Operations {
 
 		return Operation.create(target, Operator.REMOVE_LABEL, label);
 	}
-
 
 	/**
 	 * Not to be instantiated.

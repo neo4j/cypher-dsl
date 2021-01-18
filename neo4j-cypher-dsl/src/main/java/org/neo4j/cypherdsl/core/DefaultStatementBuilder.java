@@ -118,18 +118,32 @@ class DefaultStatementBuilder implements StatementBuilder,
 	private OngoingMergeAction ongoingOnAfterMerge(MergeAction.Type type) {
 
 		Assertions.notNull(this.currentOngoingUpdate, "MERGE must have been invoked before defining an event.");
-		Assertions.isTrue(this.currentOngoingUpdate.builder instanceof SupportsActionsOnTheUpdatingClause, "MERGE must have been invoked before defining an event.");
-
+		Assertions.isTrue(this.currentOngoingUpdate.builder instanceof SupportsActionsOnTheUpdatingClause,
+			"MERGE must have been invoked before defining an event.");
 		return new OngoingMergeAction() {
 
 			@Override
+			public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
+					.on(type, UpdateType.MUTATE, target, properties);
+				return DefaultStatementBuilder.this;
+			}
+
+			@Override
+			public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
+				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
+					.on(type, UpdateType.MUTATE, target, parameter);
+				return DefaultStatementBuilder.this;
+			}
+
+			@Override
 			public OngoingMatchAndUpdate set(Expression... expressions) {
-				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder).on(type, expressions);
+				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
+					.on(type, UpdateType.SET, expressions);
 				return DefaultStatementBuilder.this;
 			}
 		};
 	}
-
 
 	@Override
 	public OngoingUnwind unwind(Expression expression) {
@@ -219,7 +233,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
+	@SuppressWarnings("unchecked")
+	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate set(Expression... expressions) {
 
 		this.closeCurrentOngoingUpdate();
@@ -228,21 +243,40 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
+	@SuppressWarnings("unchecked")
+	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate set(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
+	@SuppressWarnings("unchecked")
+	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
+	public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+
+		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
+	public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
+
+		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, parameter));
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate remove(Property... properties) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
+	@SuppressWarnings("unchecked")
+	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
 	public OngoingMatchAndUpdate remove(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
@@ -559,6 +593,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
+		public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.mutate(target, properties);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
+
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.mutate(target, parameter);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
 		public OngoingMatchAndUpdate remove(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
@@ -712,11 +764,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 	 * A private enum for distinguishing updating clauses.
 	 */
 	enum UpdateType {
-		DELETE, DETACH_DELETE, SET, REMOVE,
+		DELETE, DETACH_DELETE, SET, MUTATE, REMOVE,
 		CREATE, MERGE;
 	}
 
 	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
+	private static final EnumSet<UpdateType> SET = EnumSet.of(UpdateType.SET, UpdateType.MUTATE);
 
 	private interface UpdatingClauseBuilder {
 
@@ -725,32 +778,39 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	interface SupportsActionsOnTheUpdatingClause {
 
-		SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, Expression... expressions);
+		SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, UpdateType updateType, Expression... expressions);
 	}
 
-	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(UpdateType updateType, T... patternOrExpressions) {
+	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(UpdateType updateType,
+		T... patternOrExpressions) {
 
 		boolean mergeOrCreate = MERGE_OR_CREATE.contains(updateType);
-		String message = mergeOrCreate ? "At least one pattern is required." : "At least one modifying expressions is required.";
+		String message = mergeOrCreate ?
+			"At least one pattern is required." :
+			"At least one modifying expressions is required.";
 		Assertions.notNull(patternOrExpressions, message);
 		Assertions.notEmpty(patternOrExpressions, message);
 
 		if (mergeOrCreate) {
-			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions).map(PatternElement.class::cast).collect(Collectors.toList());
+			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions)
+				.map(PatternElement.class::cast).collect(Collectors.toList());
 			if (updateType == UpdateType.CREATE) {
 				return new AbstractUpdatingClauseBuilder.CreateBuilder(patternElements);
 			} else {
 				return new AbstractUpdatingClauseBuilder.MergeBuilder(patternElements);
 			}
 		} else {
-			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast).collect(Collectors.toList());
-			ExpressionList expressionList = new ExpressionList(updateType == UpdateType.SET ? prepareSetExpressions(expressions) : expressions);
+			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast)
+				.collect(Collectors.toList());
+			ExpressionList expressionList = new ExpressionList(
+				SET.contains(updateType) ? prepareSetExpressions(updateType, expressions) : expressions);
 			switch (updateType) {
 				case DETACH_DELETE:
 					return () -> new Delete(expressionList, true);
 				case DELETE:
 					return () -> new Delete(expressionList, false);
 				case SET:
+				case MUTATE:
 					return () -> new Set(expressionList);
 				case REMOVE:
 					return () -> new Remove(expressionList);
@@ -762,37 +822,70 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	/**
 	 * Utility method to prepare a list of expression to work with the set clause.
+	 *
 	 * @param possibleSetOperations A mixed list of expressions (property and list operations)
 	 * @return A reified list of expressions that all target properties
 	 */
-	private static List<Expression> prepareSetExpressions(List<Expression> possibleSetOperations) {
-		List<Expression> propertyOperations = new ArrayList<>();
+	private static List<Expression> prepareSetExpressions(UpdateType updateType, List<Expression> possibleSetOperations) {
 
+		List<Expression> propertyOperations = new ArrayList<>();
 		List<Expression> listOfExpressions = new ArrayList<>();
+
 		for (Expression possibleSetOperation : possibleSetOperations) {
 			if (possibleSetOperation instanceof Operation) {
 				propertyOperations.add(possibleSetOperation);
 			} else {
 				listOfExpressions.add(possibleSetOperation);
 			}
-
 		}
 
 		if (listOfExpressions.size() % 2 != 0) {
 			throw new IllegalArgumentException("The list of expression to set must be even.");
 		}
-		for (int i = 0; i < listOfExpressions.size(); i += 2) {
-			propertyOperations.add(Operations.set(listOfExpressions.get(i), listOfExpressions.get(i + 1)));
-		}
 
+		if (updateType == UpdateType.SET) {
+
+			for (int i = 0; i < listOfExpressions.size(); i += 2) {
+				propertyOperations.add(Operations.set(listOfExpressions.get(i), listOfExpressions.get(i + 1)));
+			}
+		} else if (updateType == UpdateType.MUTATE) {
+
+			if (!(listOfExpressions.isEmpty() || propertyOperations.isEmpty())) {
+				throw new IllegalArgumentException(
+					"A mutating SET must be build through a single operation or through a pair of expression, not both.");
+			}
+
+			if (listOfExpressions.isEmpty()) {
+				for (Expression operation : propertyOperations) {
+					if (((Operation) operation).getOperator() != Operator.MUTATE) {
+						throw new IllegalArgumentException("Only property operations based on the " + Operator.MUTATE
+														   + " are supported inside a mutating SET.");
+					}
+				}
+			} else if (propertyOperations.isEmpty()) {
+				for (int i = 0; i < listOfExpressions.size(); i += 2) {
+					Expression rhs = listOfExpressions.get(i + 1);
+					if (rhs instanceof Parameter) {
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), (Parameter) rhs));
+					} else if (rhs instanceof MapExpression) {
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), (MapExpression) rhs));
+					} else {
+						throw new IllegalArgumentException(
+							"A mutating SET operation can only be used with a named parameter or a map expression.");
+					}
+				}
+			}
+		}
 		return propertyOperations;
 	}
 
 	/**
 	 * Infrastructure for building {@link UpdatingClause updating clauses}
+	 *
 	 * @param <T> The type of the updating clause
 	 */
-	private abstract static class AbstractUpdatingClauseBuilder<T extends UpdatingClause> implements UpdatingClauseBuilder {
+	private abstract static class AbstractUpdatingClauseBuilder<T extends UpdatingClause>
+		implements UpdatingClauseBuilder {
 
 		protected final List<PatternElement> patternElements;
 
@@ -833,16 +926,19 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 
 			@Override
-			public SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, Expression... expressions) {
+			public SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, UpdateType updateType,
+				Expression... expressions) {
 
-				ExpressionList expressionList = new ExpressionList(prepareSetExpressions(Arrays.asList(expressions)));
+				ExpressionList expressionList = new ExpressionList(
+					prepareSetExpressions(updateType, Arrays.asList(expressions)));
 				this.mergeActions.add(new MergeAction(type, new Set(expressionList)));
 				return this;
 			}
 		}
 	}
 
-	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder implements OngoingMatchAndUpdate {
+	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder
+		implements OngoingMatchAndUpdate {
 
 		final UpdatingClauseBuilder builder;
 
@@ -897,7 +993,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		private OngoingUpdate delete(boolean nextDetach, Expression... deletedExpressions) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
+			return DefaultStatementBuilder.this
+				.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
 		}
 
 		@Override
@@ -915,6 +1012,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
 				UpdateType.SET, Operations.set(node, labels));
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public OngoingMatchAndUpdate mutate(Expression target, MapExpression properties) {
+
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+				UpdateType.MUTATE, Operations.mutate(target, properties));
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public OngoingMatchAndUpdate mutate(Expression target, Parameter parameter) {
+
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+				UpdateType.MUTATE, Operations.mutate(target, parameter));
 		}
 
 		@Override
@@ -1106,7 +1221,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		private boolean hasCondition() {
-			return this.condition != null && (!(this.condition instanceof CompoundCondition) || ((CompoundCondition) this.condition).hasConditions());
+			return this.condition != null && (!(this.condition instanceof CompoundCondition)
+											  || ((CompoundCondition) this.condition).hasConditions());
 		}
 
 		Optional<Condition> buildCondition() {

@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -103,5 +104,10 @@ public final class Operation implements Expression {
 	 */
 	public boolean needsGrouping() {
 		return NEEDS_GROUPING_BY_TYPE.contains(this.operator.getType()) && !DONT_GROUP.contains(this.operator);
+	}
+
+	@API(status = INTERNAL)
+	Operator getOperator() {
+		return operator;
 	}
 }

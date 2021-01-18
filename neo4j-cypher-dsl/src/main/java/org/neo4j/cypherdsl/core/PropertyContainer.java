@@ -44,8 +44,36 @@ public interface PropertyContainer extends Named {
 	 * @return a new {@link Property} associated with this {@link Relationship}.
 	 */
 	default Property property(String name) {
-		return property(new String[] {name});
+		return property(new String[] { name });
 	}
 
 	Property property(String... names);
+
+	/**
+	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not
+	 * track the operations created with this method.
+	 *
+	 * @param parameter the new properties
+	 * @return A new operation.
+	 * @since 2020.1.5
+	 */
+	default Operation to(Parameter parameter) {
+		return Operations.mutate(this.getSymbolicName()
+				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
+			parameter);
+	}
+
+	/**
+	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not
+	 * track the operations created with this method.
+	 *
+	 * @param properties the new properties
+	 * @return A new operation.
+	 * @since 2020.1.5
+	 */
+	default Operation to(MapExpression properties) {
+		return Operations.mutate(this.getSymbolicName()
+				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
+			properties);
+	}
 }

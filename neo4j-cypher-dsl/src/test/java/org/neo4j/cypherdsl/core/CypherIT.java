@@ -1570,6 +1570,119 @@ class CypherIT {
 	}
 
 	@Nested
+	class MutatingSetClause {
+
+		@Test
+		void simpleWithParam() {
+			Statement statement = Cypher.match(userNode)
+				.mutate(userNode, Cypher.parameter("newMapsOfHell"))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`) SET u += $newMapsOfHell RETURN u");
+		}
+
+
+		@Test
+		void afterMerge() {
+			Statement statement = Cypher.merge(userNode)
+				.onMatch()
+					.mutate(userNode, Cypher.parameter("newMapsOfHell"))
+				.onCreate()
+					.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`) ON MATCH SET u += $newMapsOfHell ON CREATE SET u += {a: 'B'} RETURN u");
+		}
+
+		@Test
+		void simpleWithMap() {
+			Statement statement = Cypher.match(userNode)
+				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`) SET u += {a: 'B'} RETURN u");
+		}
+
+		@Test
+		void chainedWithParam() {
+			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
+				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.mutate(bikeNode, Cypher.parameter("newMapsOfHell"))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`)-[r:`OWNS`]->(b:`Bike`) SET u += {a: 'B'} SET b += $newMapsOfHell RETURN u");
+		}
+
+		@Test
+		void chainedWithMap() {
+			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
+				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.mutate(bikeNode, Cypher.mapOf("c", Cypher.literalOf("D")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`)-[r:`OWNS`]->(b:`Bike`) SET u += {a: 'B'} SET b += {c: 'D'} RETURN u");
+		}
+
+		@Test
+		void multileLevelsOfChaining() {
+			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
+				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.mutate(bikeNode, Cypher.mapOf("c", Cypher.literalOf("D")))
+				.mutate(Cypher.name("r"), Cypher.mapOf("e", Cypher.literalOf("F")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`)-[r:`OWNS`]->(b:`Bike`) SET u += {a: 'B'} SET b += {c: 'D'} SET r += {e: 'F'} RETURN u");
+		}
+
+		@Test
+		void foldingMultipleMutatesIntoOne() {
+			Relationship ownsRelationship = userNode.relationshipTo(bikeNode, "OWNS").named("r");
+			Statement statement = Cypher.match(ownsRelationship)
+				.set(
+					userNode.to(Cypher.mapOf("a", Cypher.literalOf("B"))),
+					bikeNode.to(Cypher.mapOf("c", Cypher.literalOf("D"))),
+					ownsRelationship.to(Cypher.mapOf("e", Cypher.literalOf("F")))
+				)
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`)-[r:`OWNS`]->(b:`Bike`) SET u += {a: 'B'}, b += {c: 'D'}, r += {e: 'F'} RETURN u");
+		}
+
+		@Test
+		void afterMergeFolding() {
+			Relationship ownsRelationship = userNode.relationshipTo(bikeNode, "OWNS").named("r");
+			Statement statement = Cypher.merge(ownsRelationship)
+				.onMatch()
+					.set(
+						userNode.to(Cypher.mapOf("a", Cypher.literalOf("B"))),
+						bikeNode.to(Cypher.mapOf("c", Cypher.literalOf("D"))),
+						ownsRelationship.to(Cypher.mapOf("e", Cypher.literalOf("F")))
+					)
+				.onCreate()
+					.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (u:`User`)-[r:`OWNS`]->(b:`Bike`) ON MATCH SET u += {a: 'B'}, b += {c: 'D'}, r += {e: 'F'} ON CREATE SET u += {a: 'B'} RETURN u");
+		}
+	}
+
+	@Nested
 	class SetClause {
 
 		@Test

@@ -95,7 +95,8 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingReadingWithoutWhere extends OngoingReading, ExposesWhere, ExposesMatch, ExposesExistentialSubqueryCall {
+	interface OngoingReadingWithoutWhere
+		extends OngoingReading, ExposesWhere, ExposesMatch, ExposesExistentialSubqueryCall {
 	}
 
 	/**
@@ -513,7 +514,7 @@ public interface StatementBuilder
 		 * previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a delete clause that can be build now
 		 */
 		default <T extends OngoingUpdate & BuildableStatement> T delete(String... variables) {
@@ -525,7 +526,7 @@ public interface StatementBuilder
 		 * previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a delete clause that can be build now
 		 */
 		default <T extends OngoingUpdate & BuildableStatement> T delete(Named... variables) {
@@ -546,7 +547,7 @@ public interface StatementBuilder
 		 * been matched previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a detach delete clause that can be build now
 		 */
 		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(String... variables) {
@@ -558,7 +559,7 @@ public interface StatementBuilder
 		 * been matched previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T> The type of the next step, can be used to build the statement or add further instructions.
+		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a detach delete clause that can be build now
 		 */
 		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(Named... variables) {
@@ -602,6 +603,54 @@ public interface StatementBuilder
 		 */
 		default <T extends OngoingMatchAndUpdate & BuildableStatement> T set(Named variable, Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
+		}
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param target The target container that should be modified
+		 * @param properties  The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Expression target, MapExpression properties);
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param variable  The named thing to modify
+		 * @param properties  The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, MapExpression properties) {
+			return mutate(variable.getRequiredSymbolicName(), properties);
+		}
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param target    The target container that should be modified
+		 * @param parameter The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Expression target, Parameter parameter);
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param variable  The named thing to modify
+		 * @param parameter The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, Parameter parameter) {
+			return mutate(variable.getRequiredSymbolicName(), parameter);
 		}
 	}
 
@@ -674,6 +723,7 @@ public interface StatementBuilder
 
 	/**
 	 * A variant of {@link ExposesSet} that allows for further chaining of actions.
+	 *
 	 * @since 2020.1.2
 	 */
 	interface OngoingMergeAction {
@@ -696,8 +746,57 @@ public interface StatementBuilder
 		 * @param <T>        The type of the next step
 		 * @return An ongoing match and update
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Named variable, Expression expression) {
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Named variable,
+			Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
+		}
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param target The target container that should be modified
+		 * @param properties  The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Expression target, MapExpression properties);
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param variable  The named thing to modify
+		 * @param properties  The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, MapExpression properties) {
+			return mutate(variable.getRequiredSymbolicName(), properties);
+		}
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param target    The target container that should be modified
+		 * @param parameter The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Expression target, Parameter parameter);
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param variable  The named thing to modify
+		 * @param parameter The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, Parameter parameter) {
+			return mutate(variable.getRequiredSymbolicName(), parameter);
 		}
 	}
 }
