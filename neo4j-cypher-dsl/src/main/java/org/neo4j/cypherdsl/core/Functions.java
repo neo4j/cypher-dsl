@@ -649,6 +649,20 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for {@code nodes{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-nodes">nodes</a>.
+	 *
+	 * @param symbolicName The symbolic name of a path for which the number of nodes should be retrieved
+	 * @return A function call for {@code nodes{}} on a path represented by a symbolic name.
+	 * @since 2020.1.5
+	 */
+	public static FunctionInvocation nodes(SymbolicName symbolicName) {
+
+		Assertions.notNull(symbolicName, "The symbolic name of the path for nodes is required.");
+		return FunctionInvocation.create(Lists.NODES, symbolicName);
+	}
+
+	/**
 	 * Creates a function invocation for {@code relationships{}}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
 	 *
@@ -661,6 +675,20 @@ public final class Functions {
 		Assertions.notNull(path, "The path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+	}
+
+	/**
+	 * Creates a function invocation for {@code relationships{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
+	 *
+	 * @param symbolicName The symbolic name of a path for which the relationships should be retrieved
+	 * @return A function call for {@code relationships()} on a path represented by a symbolic name.
+	 * @since 2020.1.5
+	 */
+	public static FunctionInvocation relationships(SymbolicName symbolicName) {
+
+		Assertions.notNull(symbolicName, "The symbolic name of the path for relationships is required.");
+		return FunctionInvocation.create(Lists.RELATIONSHIPS, symbolicName);
 	}
 
 	/**
