@@ -92,6 +92,13 @@ public final class FunctionInvocation implements Expression {
 			new Pattern(Collections.singletonList(pattern)));
 	}
 
+	static FunctionInvocation create(FunctionDefinition definition, TypedSubtree<?, ?> arguments) {
+
+		Assertions.notNull(arguments, definition.getImplementationName() + "() requires at least one argument.");
+
+		return new FunctionInvocation(definition.getImplementationName(), arguments);
+	}
+
 	private final String functionName;
 
 	private final TypedSubtree<?, ?> arguments;
@@ -102,7 +109,7 @@ public final class FunctionInvocation implements Expression {
 		this.arguments = new ExpressionList(arguments);
 	}
 
-	private FunctionInvocation(String functionName, Pattern pattern) {
+	private <T extends TypedSubtree<?, ?>> FunctionInvocation(String functionName, T pattern) {
 
 		this.functionName = functionName;
 		this.arguments = pattern;
