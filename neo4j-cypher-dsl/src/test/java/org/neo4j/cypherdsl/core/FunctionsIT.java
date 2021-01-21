@@ -22,6 +22,7 @@ import java.util.TimeZone;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,6 +31,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * @author Michael J. Simons
+ * @author Gerrit Meier
  */
 class FunctionsIT {
 
@@ -47,6 +49,80 @@ class FunctionsIT {
 		);
 		Assertions.assertThat(query).isEqualTo(
 			"MATCH (src:`Movie` {title: 'The Matrix'}) CREATE (copy:`MovieCopy`) SET copy = properties(src) RETURN copy");
+	}
+
+	@Nested
+	class Reduction {
+
+		@Test
+		void reductionOfPaths() {
+
+			Relationship r = Cypher.node("Node").named("n").relationshipTo(Cypher.node("Node2").named("m")).named("r");
+			NamedPath namedPath = Cypher.path("patternPath").definedBy(r);
+
+			SymbolicName x = Cypher.name("x");
+			ListExpression emptyList = Cypher.listOf();
+			FunctionInvocation listToReduce = Functions.relationships(namedPath);
+			SymbolicName n = Cypher.name("n");
+			Statement statement = Cypher.returning(
+				Functions.reduce(n)
+					.in(listToReduce)
+					.map(x.add(n))
+					.accumulateOn(x)
+					.withInitialValueOf(emptyList)
+			).build();
+
+			Assertions.assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN reduce(x = [], n IN relationships(patternPath) | (x + n))");
+		}
+
+		@Test
+		void manual() {
+
+			Node a = Cypher.anyNode().named("a");
+			Node b = Cypher.anyNode().named("b");
+			Node c = Cypher.anyNode().named("c");
+			NamedPath p = Cypher.path("p").definedBy(a.relationshipTo(b).relationshipTo(c));
+			SymbolicName n = Cypher.name("n");
+			SymbolicName totalAge = Cypher.name("totalAge");
+			Statement statement = Cypher.match(p)
+				.where(a.property("name").isEqualTo(Cypher.literalOf("Alice")))
+				.and(b.property("name").isEqualTo(Cypher.literalOf("Bob")))
+				.and(c.property("name").isEqualTo(Cypher.literalOf("Daniel")))
+				.returning(
+					Functions.reduce(n)
+						.in(Functions.nodes(p))
+						.map(totalAge.add(Property.create(n, "age")))
+						.accumulateOn(totalAge)
+						.withInitialValueOf(Cypher.literalOf(0)).as("reduction")
+				).build();
+			Assertions.assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH p = (a)-->(b)-->(c) "
+						   + "WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') "
+						   + "RETURN reduce(totalAge = 0, n IN nodes(p) | (totalAge + n.age)) AS reduction");
+		}
+
+		@Test
+		void ofListComprehension() {
+
+			SymbolicName n = Cypher.name("n");
+			SymbolicName totalAge = Cypher.name("totalAge");
+			SymbolicName x = Cypher.name("x");
+			Statement statement = Cypher.returning(
+				Functions.reduce(n)
+					.in(Cypher.listWith(x)
+						.in(Functions.range(0, 10))
+						.where(x.remainder(Cypher.literalOf(2)).isEqualTo(Cypher.literalOf(0)))
+						.returning(x.pow(Cypher.literalOf(3)))
+					)
+					.map(totalAge.add(n))
+					.accumulateOn(totalAge)
+					.withInitialValueOf(Cypher.literalOf(0.0)).as("result"))
+				.build();
+
+			Assertions.assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN reduce(totalAge = 0.0, n IN [x IN range(0, 10) WHERE (x % 2) = 0 | x^3] | (totalAge + n)) AS result");
+		}
 	}
 
 	@ParameterizedTest(name = "{0}")

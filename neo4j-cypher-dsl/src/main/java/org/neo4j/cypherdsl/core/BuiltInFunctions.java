@@ -146,6 +146,7 @@ final class BuiltInFunctions {
 		LABELS("labels"),
 		NODES("nodes"),
 		RANGE("range"),
+		REDUCE("reduce"),
 		RELATIONSHIPS("relationships");
 
 		private final String implementationName;

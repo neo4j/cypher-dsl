@@ -1233,4 +1233,16 @@ public final class Functions {
 
 		return FunctionInvocation.create(Scalars.SHORTEST_PATH, relationship);
 	}
+
+	/**
+	 * Starts building a function invocation for {@code reduce({})}.
+	 *
+	 * @param variable The closure will have a variable introduced in its context. We decide here which variable to use.
+	 * @return An ongoing definition for a function call to {@code reduce({})}.
+	 * @since 2020.1.5
+	 */
+	public static Reduction.OngoingDefinitionWithVariable reduce(SymbolicName variable) {
+
+		return Reduction.of(variable);
+	}
 }
