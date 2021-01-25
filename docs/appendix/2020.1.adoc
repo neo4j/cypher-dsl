@@ -1,5 +1,10 @@
 == 2020.1
 
+=== 2020.1.6
+
+No new features. 
+Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.
+
 === 2020.1.5
 
 ==== 🚀 Features
