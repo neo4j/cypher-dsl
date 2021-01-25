@@ -1,0 +1,92 @@
+== 2020.1
+
+=== 2020.1.5
+
+==== 🚀 Features
+
+* GH-116 - Add support for creating calls to Neo4j reduce().
+* GH-119 - Add support for passing symbolic names to nodes and relationships functions.
+* GH-117 - Introduce mutating operator.
+
+=== 2020.1.4
+
+==== 🚀 Features
+
+* GH-114 - Support chained properties.
+* GH-115 - Support named items in YIELD and symbolic names as NamedPath reference.
+
+=== 2020.1.3
+
+==== 🚀 Features
+
+* GH-111 - Provide a programmatic way of creating an optional match.
+
+==== 🐛 Bug Fixes
+
+* GH-110 - Fix collapsing of empty conditions.
+
+=== 2020.1.2
+
+==== 🚀 Features
+
+* GH-88 - Add support for Neo4j 4.0 subqueries.
+* GH-104 - Add support for merge actions.
+* GH-101 - Introduce asFunction on an ongoing call definition.
+
+==== 🐛 Bug Fixes
+
+* GH-106 - Escape symbolic names, property lookups, aliases and map keys.
+
+==== 🧹 Housekeeping
+
+* GH-105 - Remove ::set-env from GH-Actions ci.
+
+==== Further improvements:
+
+* Add support for EXPLAIN and PROFILE keywords.
+* Qualify a yield call (only relevant for JDK15+)
+* Fix wrong offsets in the documentation.
+* Improve JavaDoc and document internal API.
+* Allow `WITH` clause after `YIELD`.
+* Improve reusability of fragments.
+* Make ORDER clause buildable.
+* Remove parts of an experimental API.
+
+We do publish the Project info now: http://neo4j-contrib.github.io/cypher-dsl/current/project-info/project-info.html[Project info], 
+including the http://neo4j-contrib.github.io/cypher-dsl/current/project-info/apidocs/index.html[Java API].
+
+=== 2020.1.1
+
+==== 🚀 Features
+
+* List comprehensions can now be build based on named paths.
+
+=== 2020.1.0
+
+==== 🚀 Features
+
+* GH-74 - Automatically generate symbolic name if required: `Node` and `Relationship` objects generate a symbolic name if required and not set
+* Added several new functions
+** GH-77 `properties()`
+** GH-81 `relationships()`
+** GH-83 `startNode()`, `endNode()`,
+** GH-89 All temporal functions
+* GH-76 - Added the list operator (`[]` for accessing sub lists and indexes).
+
+==== 🐛 Bug Fixes
+
+* GH-82 - Expose all necessary interfaces for `call`
+* GH-84 - Fix rendering of nested sub trees.
+* GH-95 - NPE during the creation of map projections
+* GH-96 - Make sure aliased expressions are not rendered multiple times.
+
+==== 🧹 Housekeeping
+
+* GH-67 - Improvements in regards of Java generics.
+* GH-68 - Clean up the Functions api.
+* GH-69 - Avoid star and static imports.
+* GH-72 - Some release cleanup
+* GH-75 - Move Assert to internal utils package.
+* GH-89 - `RelationshipDetails` is now internal API.
+* GH-93 - Ensure compatibility with GraalVM native.
+* GH-94 - Bring back SymbolicName#concat.

@@ -1,0 +1,29 @@
+== 2020.0
+
+=== 2020.0.1
+
+This is the first patch release for the rebooted Cypher-DSL project.
+
+==== 🚀 Features
+
+* GH-64 - Add function invocation for builtin point function.
+* GH-65 - Add support for defining calls to stored procedures. 
+* `Cypher.literalOf` accepts now `boolean` values as well
+
+==== 🧹 Housekeeping
+
+* Improvements to the manual and Java Docs.
+
+Thanks to @Andy2003 for contributing to this release.
+
+=== 2020.0.0
+
+This is the first version of the rebooted Neo4j Cypher-DSL project. This version has been extracted from https://github.com/neo4j/sdn-rx[SDN-RX].
+
+It's a completely revamped API and we use it in all places in SDN/RX for generating Cypher-Queries.
+
+We use https://calver.org[CalVer] in the same way Spring does
+since early 2020 (see https://spring.io/blog/2020/04/30/updates-to-spring-versions[Updates to Spring Versions]) from this release onwards.
+
+You'll find the manual of the latest release version under http://neo4j-contrib.github.io/cypher-dsl/current/ and the current development version - or _main_ - under http://neo4j-contrib.github.io/cypher-dsl/main/.
+

@@ -1,0 +1,6 @@
+== Change log
+
+:leveloffset: +1
+include::2020.1.adoc[]
+include::2020.0.adoc[]
+:leveloffset: -1
