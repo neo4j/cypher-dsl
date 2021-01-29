@@ -47,6 +47,7 @@ import org.neo4j.cypherdsl.core.ListExpression;
 import org.neo4j.cypherdsl.core.ListOperator;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
+import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
@@ -123,6 +124,13 @@ class RenderingVisitor extends ReflectiveVisitor {
 	private final Deque<AliasedExpression> currentAliasedElements = new LinkedList<>();
 
 	/**
+	 * A flag if we can skip aliasing. This is currently the case in exactly one scenario: A aliased expression passed
+	 * to a map project. In that case, the alias is already defined by the key to use in the projected map and we
+	 * cannot define him in `AS xxx` fragment.
+	 */
+	private boolean skipAliasing = false;
+
+	/**
 	 * Keeps track of unresolved symbolic names.
 	 */
 	private final Map<SymbolicName, String> resolvedSymbolicNames = new ConcurrentHashMap<>();
@@ -165,12 +173,16 @@ class RenderingVisitor extends ReflectiveVisitor {
 	protected boolean preEnter(Visitable visitable) {
 
 		Visitable lastAliased = currentAliasedElements.peek();
-		if (skipNodeContent || visitableToAliased.containsValue(lastAliased)) {
+		if (skipNodeContent || visitableToAliased.contains(lastAliased)) {
 			return false;
 		}
 
 		if (visitable instanceof AliasedExpression) {
 			currentAliasedElements.push((AliasedExpression) visitable);
+		}
+
+		if (visitable instanceof MapProjection) {
+			this.skipAliasing = true;
 		}
 
 		int nextLevel = ++currentLevel + 1;
@@ -194,6 +206,10 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		if (currentAliasedElements.peek() == visitable) {
 			currentAliasedElements.pop();
+		}
+
+		if (visitable instanceof MapProjection) {
+			this.skipAliasing = false;
 		}
 
 		--currentLevel;
@@ -276,14 +292,14 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	void enter(AliasedExpression aliased) {
 
-		if (this.visitableToAliased.containsValue(aliased)) {
+		if (this.visitableToAliased.contains(aliased)) {
 			builder.append(escapeIfNecessary(aliased.getAlias()));
 		}
 	}
 
 	void leave(AliasedExpression aliased) {
 
-		if (!this.visitableToAliased.containsValue(aliased)) {
+		if (!(this.visitableToAliased.contains(aliased) || skipAliasing)) {
 			builder.append(" AS ").append(escapeIfNecessary(aliased.getAlias()));
 		}
 	}

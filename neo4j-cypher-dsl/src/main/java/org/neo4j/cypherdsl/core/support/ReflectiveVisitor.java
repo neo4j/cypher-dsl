@@ -21,12 +21,13 @@ package org.neo4j.cypherdsl.core.support;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
@@ -73,10 +74,10 @@ public abstract class ReflectiveVisitor implements Visitor {
 	private Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
 	/**
-	 * A map of aliased visitables that already have been seen and for which an alias must be used on each following
+	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
 	 * appearance.
 	 */
-	protected final Map<Visitable, AliasedExpression> visitableToAliased = new HashMap<>();
+	protected final Set<AliasedExpression> visitableToAliased = new HashSet<>();
 
 	/**
 	 * This is a hook that is called with the uncasted, raw visitable just before entering a visitable.
@@ -97,33 +98,26 @@ public abstract class ReflectiveVisitor implements Visitor {
 	 */
 	protected abstract void postLeave(Visitable visitable);
 
-	private Visitable getAliasedIfSeen(Visitable visitable) {
-		return visitableToAliased.containsKey(visitable) ? visitableToAliased.get(visitable) : visitable;
-	}
-
 	@Override
 	public final void enter(Visitable visitable) {
 
-		Visitable used = getAliasedIfSeen(visitable);
-		if (preEnter(used)) {
-			currentVisitedElements.push(used);
-			executeConcreteMethodIn(new TargetAndPhase(this, used.getClass(), Phase.ENTER), used);
+		if (preEnter(visitable)) {
+			currentVisitedElements.push(visitable);
+			executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.ENTER), visitable);
 		}
 	}
 
 	@Override
 	public final void leave(Visitable visitable) {
 
-		Visitable used = getAliasedIfSeen(visitable);
-		if (currentVisitedElements.peek() == used) {
-			executeConcreteMethodIn(new TargetAndPhase(this, used.getClass(), Phase.LEAVE), used);
-			postLeave(used);
+		if (currentVisitedElements.peek() == visitable) {
+			executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.LEAVE), visitable);
+			postLeave(visitable);
 			currentVisitedElements.pop();
 		}
-
 		if (visitable instanceof AliasedExpression) {
 			AliasedExpression aliasedExpression = (AliasedExpression) visitable;
-			visitableToAliased.put((aliasedExpression).getDelegate(), aliasedExpression);
+			visitableToAliased.add(aliasedExpression);
 		}
 	}
 

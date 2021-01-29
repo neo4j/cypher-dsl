@@ -130,7 +130,7 @@ public final class MapProjection implements Expression {
 				newContent.addAll(names);
 			} else if (lastExpression instanceof AliasedExpression) {
 				AliasedExpression aliasedExpression = (AliasedExpression) lastExpression;
-				newContent.add(new KeyValueMapEntry(aliasedExpression.getAlias(), aliasedExpression.getDelegate()));
+				newContent.add(new KeyValueMapEntry(aliasedExpression.getAlias(), aliasedExpression));
 			} else if (lastExpression == null) {
 				throw new IllegalArgumentException("Could not determine an expression from the given content!");
 			} else {
