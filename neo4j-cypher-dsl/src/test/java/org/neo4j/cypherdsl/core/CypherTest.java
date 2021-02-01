@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
 
@@ -54,15 +55,24 @@ class CypherTest {
 	@Test
 	void shouldCreatePropertyPointingToSymbolicName() {
 		Property property = Cypher.property("a", "b");
+		AtomicInteger counter = new AtomicInteger(0);
 		property.accept(segment -> {
-			if (segment instanceof Property) {
-				assertThat(segment).extracting(s -> ((Property) s).getNames().get(0).getPropertyKeyName()).isEqualTo("b");
-			} else if (segment instanceof PropertyLookup) {
-				assertThat(segment).extracting(s -> ((PropertyLookup) s).getPropertyKeyName()).isEqualTo("b");
-			} else if (segment instanceof SymbolicName) {
-				assertThat(segment).extracting("value").isEqualTo("a");
-			} else {
-				fail("Unexpected segment: " + segment.getClass());
+			int cnt = counter.incrementAndGet();
+			switch (cnt) {
+				case 1:
+					assertThat(segment).isInstanceOf(Property.class);
+					break;
+				case 2:
+					assertThat(segment).isInstanceOf(SymbolicName.class).extracting("value").isEqualTo("a");
+					break;
+				case 3:
+					assertThat(segment).isInstanceOf(PropertyLookup.class);
+					break;
+				case 4:
+					assertThat(segment).isInstanceOf(SymbolicName.class).extracting("value").isEqualTo("b");
+					break;
+				default:
+					fail("Unexpected segment: " + segment.getClass());
 			}
 		});
 	}

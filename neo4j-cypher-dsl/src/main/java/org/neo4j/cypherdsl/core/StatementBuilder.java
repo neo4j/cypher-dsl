@@ -96,7 +96,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReadingWithoutWhere
-		extends OngoingReading, ExposesWhere, ExposesMatch, ExposesExistentialSubqueryCall {
+		extends OngoingReading, ExposesHints, ExposesWhere, ExposesMatch, ExposesExistentialSubqueryCall {
 	}
 
 	/**

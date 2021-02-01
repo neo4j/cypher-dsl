@@ -104,7 +104,7 @@ public final class MapProjection implements Expression {
 					i += 2;
 				} else {
 					lastKey = null;
-					lastExpression = new PropertyLookup((String) current);
+					lastExpression = PropertyLookup.forName((String) current);
 					i += 1;
 				}
 			} else if (current instanceof Expression) {
@@ -113,7 +113,7 @@ public final class MapProjection implements Expression {
 				i += 1;
 			}
 			if (lastExpression instanceof Asterisk) {
-				lastExpression = new PropertyLookup("*");
+				lastExpression = PropertyLookup.wildcard();
 			}
 
 			if (lastKey != null) {

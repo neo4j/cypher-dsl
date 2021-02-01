@@ -24,6 +24,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
@@ -49,14 +50,14 @@ public final class Property implements Expression {
 				"A property derived from a node or a relationship needs a parent with a symbolic name.");
 		}
 
-		return new Property(requiredSymbolicName, createListOfChainedNames(names));
+		return new Property(Optional.of(parentContainer), requiredSymbolicName, createListOfChainedNames(names));
 	}
 
-	static Property create(Expression container, String... names) {
+	static Property create(Expression containerReference, String... names) {
 
-		Assertions.notNull(container, "The property container is required.");
+		Assertions.notNull(containerReference, "The property container is required.");
 
-		return new Property(container, createListOfChainedNames(names));
+		return new Property(Optional.empty(), containerReference, createListOfChainedNames(names));
 	}
 
 	private static List<PropertyLookup> createListOfChainedNames(String... names) {
@@ -64,26 +65,32 @@ public final class Property implements Expression {
 		Assertions.notEmpty(names, "The properties name is required.");
 
 		if (names.length == 1) {
-			return Collections.singletonList(new PropertyLookup(names[0]));
+			return Collections.singletonList(PropertyLookup.forName(names[0]));
 		} else {
-			return Arrays.stream(names).map(PropertyLookup::new)
+			return Arrays.stream(names).map(PropertyLookup::forName)
 				.collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
 		}
 	}
 
 	/**
-	 * The expression describing the container.
+	 * The reference to the container itself is optional.
 	 */
-	private final Expression container;
+	private final Named container;
+
+	/**
+	 * The expression pointing to the {@link #container} above is not.
+	 */
+	private final Expression containerReference;
 
 	/**
 	 * The name of this property.
 	 */
 	private final List<PropertyLookup> names;
 
-	Property(Expression container, List<PropertyLookup> names) {
+	Property(Optional<Named> container, Expression containerReference, List<PropertyLookup> names) {
 
-		this.container = container;
+		this.container = container.orElse(null);
+		this.containerReference = containerReference;
 		this.names = names;
 	}
 
@@ -93,6 +100,11 @@ public final class Property implements Expression {
 	@API(status = INTERNAL)
 	public List<PropertyLookup> getNames() {
 		return names;
+	}
+
+	@API(status = INTERNAL)
+	Named getContainer() {
+		return container;
 	}
 
 	/**
@@ -109,7 +121,7 @@ public final class Property implements Expression {
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		this.container.accept(visitor);
+		this.containerReference.accept(visitor);
 		this.names.forEach(name -> name.accept(visitor));
 		visitor.leave(this);
 	}

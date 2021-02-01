@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -33,19 +34,37 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class PropertyLookup implements Expression {
 
-	private final String propertyKeyName;
+	private static final PropertyLookup WILDCARD = new PropertyLookup(Asterisk.INSTANCE);
 
-	PropertyLookup(String propertyKeyName) {
+	private final Expression propertyKeyName;
 
-		Assertions.hasText(propertyKeyName, "The properties name is required.");
+	static PropertyLookup forName(String name) {
+
+		Assertions.hasText(name, "The property's name is required.");
+		return new PropertyLookup(SymbolicName.unsafe(name));
+	}
+
+	static PropertyLookup wildcard() {
+
+		return WILDCARD;
+	}
+
+	private PropertyLookup(Expression propertyKeyName) {
 		this.propertyKeyName = propertyKeyName;
 	}
 
-	/**
-	 * @return The key for indicating the lookup
-	 */
 	@API(status = INTERNAL)
-	public String getPropertyKeyName() {
-		return propertyKeyName;
+	SymbolicName getPropertyKeyName() {
+
+		Assertions.isTrue(this != WILDCARD, "The wildcard property lookup does not reference a specific property!");
+		return (SymbolicName) propertyKeyName;
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+
+		visitor.enter(this);
+		propertyKeyName.accept(visitor);
+		visitor.leave(this);
 	}
 }

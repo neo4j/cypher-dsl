@@ -21,6 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -38,12 +42,18 @@ public final class Match implements ReadingClause {
 
 	private final Pattern pattern;
 
+	/**
+	 * A Neo4j extension to the match clause that allows to specify hints via the {@code USING} clause.
+	 */
+	private final List<Hint> hints;
+
 	private final Where optionalWhere;
 
-	Match(boolean optional, Pattern pattern, Where optionalWhere) {
+	Match(boolean optional, Pattern pattern, Where optionalWhere, List<Hint> optionalHints) {
 		this.optional = optional;
 		this.pattern = pattern;
 		this.optionalWhere = optionalWhere;
+		this.hints = optionalHints == null ? Collections.emptyList() : new ArrayList<>(optionalHints);
 	}
 
 	/**
@@ -59,6 +69,7 @@ public final class Match implements ReadingClause {
 
 		visitor.enter(this);
 		this.pattern.accept(visitor);
+		this.hints.forEach(value -> value.accept(visitor));
 		Visitable.visitIfNotNull(optionalWhere, visitor);
 		visitor.leave(this);
 	}

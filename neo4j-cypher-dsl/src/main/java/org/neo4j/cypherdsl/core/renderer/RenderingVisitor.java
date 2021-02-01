@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Arguments;
-import org.neo4j.cypherdsl.core.Asterisk;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.CompoundCondition;
 import org.neo4j.cypherdsl.core.Create;
@@ -40,6 +39,7 @@ import org.neo4j.cypherdsl.core.Delete;
 import org.neo4j.cypherdsl.core.Distinct;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
+import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
@@ -332,10 +332,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	void enter(PropertyLookup propertyLookup) {
 
-		String propertyKeyName = propertyLookup.getPropertyKeyName();
-		builder
-			.append(".")
-			.append(Asterisk.INSTANCE.getContent().equals(propertyKeyName) ? propertyKeyName : escapeIfNecessary(propertyKeyName));
+		builder.append(".");
 	}
 
 	void enter(FunctionInvocation functionInvocation) {
@@ -632,7 +629,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	void enter(Enum<?> statement) {
 
-		builder.append(statement.name()).append(" ");
+		builder.append(statement.name().replaceAll("_", " ")).append(" ");
 	}
 
 	void enter(Subquery subquery) {
@@ -654,6 +651,21 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		// Trimming the inner match without having to do this in the match (looking up if inside subquery).
 		builder.replace(builder.length() - 1, builder.length(), "}");
+	}
+
+	void enter(Hint hint) {
+
+		builder.append(" USING ");
+	}
+
+	void enter(Hint.IndexProperties indexProperties) {
+
+		builder.append("(");
+	}
+
+	void leave(Hint.IndexProperties indexProperties) {
+
+		builder.append(")");
 	}
 
 	public String getRenderedContent() {

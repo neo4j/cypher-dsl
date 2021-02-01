@@ -395,6 +395,34 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ExistentialSubquery.exists(this.currentOngoingMatch.buildMatch());
 	}
 
+	@Override
+	public OngoingReadingWithoutWhere usingIndex(Property... properties) {
+
+		this.currentOngoingMatch.hints.add(Hint.useIndexFor(false, properties));
+		return this;
+	}
+
+	@Override
+	public OngoingReadingWithoutWhere usingIndexSeek(Property... properties) {
+
+		this.currentOngoingMatch.hints.add(Hint.useIndexFor(true, properties));
+		return this;
+	}
+
+	@Override
+	public OngoingReadingWithoutWhere usingScan(Node node) {
+
+		this.currentOngoingMatch.hints.add(Hint.useScanFor(node));
+		return this;
+	}
+
+	@Override
+	public OngoingReadingWithoutWhere usingJoinOn(SymbolicName... names) {
+
+		this.currentOngoingMatch.hints.add(Hint.useJoinOn(names));
+		return this;
+	}
+
 	protected class DefaultStatementWithReturnBuilder
 		implements OngoingReadingAndReturn, TerminalOngoingOrderDefinition, OngoingMatchAndReturnWithOrder {
 
@@ -1052,6 +1080,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		private final List<PatternElement> patternList = new ArrayList<>();
 
+		private final List<Hint> hints = new ArrayList<>();
+
 		private final ConditionBuilder conditionBuilder = new ConditionBuilder();
 
 		private final boolean optional;
@@ -1062,7 +1092,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		Match buildMatch() {
 			Pattern pattern = new Pattern(this.patternList);
-			return new Match(optional, pattern, conditionBuilder.buildCondition().map(Where::new).orElse(null));
+			return new Match(optional, pattern, conditionBuilder.buildCondition().map(Where::new).orElse(null), hints);
 		}
 	}
 

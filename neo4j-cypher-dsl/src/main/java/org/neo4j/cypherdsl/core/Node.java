@@ -19,9 +19,11 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -88,6 +90,11 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 
 		this.labels = new ArrayList<>(labels);
 		this.properties = properties;
+	}
+
+	@API(status = INTERNAL)
+	List<NodeLabel> getLabels() {
+		return Collections.unmodifiableList(labels);
 	}
 
 	/**

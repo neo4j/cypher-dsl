@@ -49,6 +49,12 @@ public class SymbolicName implements Expression {
 		return new SymbolicName(name);
 	}
 
+	static SymbolicName unsafe(String name) {
+
+		Assertions.hasText(name, "Name must not be empty.");
+		return new SymbolicName(name);
+	}
+
 	static SymbolicName unresolved() {
 
 		return new SymbolicName(null);
