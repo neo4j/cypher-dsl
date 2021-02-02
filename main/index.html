@@ -551,6 +551,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#functions">3. Functions</a>
 <ul class="sectlevel2">
 <li><a href="#lists">3.1. Lists</a></li>
+<li><a href="#callingarbitraryproceduresandfunctions">3.2. Calling arbitrary procedures and functions</a></li>
 </ul>
 </li>
 <li><a href="#appendix">4. Appendix</a>
@@ -1046,6 +1047,241 @@ While the examples use <a href="#functions-list-range">Section 3.1.1</a>, the li
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="callingarbitraryproceduresandfunctions"><a class="anchor" href="#callingarbitraryproceduresandfunctions"></a>3.2. Calling arbitrary procedures and functions</h3>
+<div class="paragraph">
+<p>Neo4j has plethora of builtin procedures and functions.
+The Cypher-DSL does cover a lot of them already, and they can be called in a typesafe way on many <code>Expression</code>-instances
+taking in various expressions such as the results of other calls, literals or parameters.</p>
+</div>
+<div class="paragraph">
+<p>However, there will probably always be a gap between what the Cypher-DSL includes and what the Neo4j database brings.
+More so, there are fantastic libraries out there like <a href="https://neo4j.com/labs/apoc/">APOC</a>.
+APOC has so many procedures and functions in so many categories that it is rather futile to add shims
+for all of them consistently.</p>
+</div>
+<div class="paragraph">
+<p>Probably the most important aspect of all: Many Neo4j users bring their knowledge to the database themselves,
+in the form of their stored procedures. Those should be callable as well.</p>
+</div>
+<div class="paragraph">
+<p>The Cypher-DSL is flexible enough to call all those procedures and functions.</p>
+</div>
+<div class="sect3">
+<h4 id="callingcustomprocedures"><a class="anchor" href="#callingcustomprocedures"></a>3.2.1. Calling custom procedures</h4>
+<div class="paragraph">
+<p>Procedures are called via the Cypher <a href="https://neo4j.com/docs/cypher-manual/current/clauses/call/">CALL-Clause</a>.
+The CALL-Clause can appear as a <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/StandaloneCall.html">StandAlone call</a>
+and as an <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/InQueryCall.html">InQuery call</a>.
+Both are supported by the Cypher-DSL.</p>
+</div>
+<div class="sect4">
+<h5 id="standaloneprocedurecalls"><a class="anchor" href="#standaloneprocedurecalls"></a>Standalone procedure calls</h5>
+<div class="paragraph">
+<p>Standalone calls are particular useful for <code>VOID</code> procedures.
+A VOID procedure is a procedure that does not declare any result fields and returns no result records and that has explicitly been declared as <code>VOID</code>.
+Let&#8217;s take the first example <a href="https://neo4j.com/docs/cypher-manual/current/clauses/call/#call-call-a-procedure-using-call">from here</a></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">labels</span><span class="delimiter">&quot;</span></span>).build(); <i class="conum" data-value="1"></i><b>(1)</b>
+assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL db.labels()</span><span class="delimiter">&quot;</span></span>);
+
+call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db.labels</span><span class="delimiter">&quot;</span></span>).build();  <i class="conum" data-value="2"></i><b>(2)</b>
+assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL db.labels()</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>Cypher.call</code> returns a buildable statement that can be rendered.
+<code>Cypher.call</code> can be used with separate namespace and procedure name as shown here or</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>with a single argument equal to the name of the procedure.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Of course, arguments can be specified as expressions.
+Expressions can be literals as in <a href="#standalone-call-with-args">[standalone-call-with-args]</a>, Cypher parameters (via <code>Cypher.parameter</code>) that bind your input or nested calls:</p>
+</div>
+<div id="standalone-call-with-args" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var call = Cypher
+        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.security.createUser</span><span class="delimiter">&quot;</span></span>)
+        .withArgs(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">johnsmith</span><span class="delimiter">&quot;</span></span>), Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">h6u4%kr</span><span class="delimiter">&quot;</span></span>), Cypher.literalFalse())
+        .build();
+assertThat(cypherRenderer.render(call))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL dbms.security.createUser('johnsmith', 'h6u4%kr', false)</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Last but not least, the Cypher-DSL can of course <code>YIELD</code> the results from a standalone call:</p>
+</div>
+<div id="standalone-call-yielding" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.procedures</span><span class="delimiter">&quot;</span></span>).yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">signature</span><span class="delimiter">&quot;</span></span>).build(); <i class="conum" data-value="1"></i><b>(1)</b>
+assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL dbms.procedures() YIELD name, signature</span><span class="delimiter">&quot;</span></span>);
+
+call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.procedures</span><span class="delimiter">&quot;</span></span>).yield(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>), Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">signature</span><span class="delimiter">&quot;</span></span>)).build(); <i class="conum" data-value="2"></i><b>(2)</b>
+assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL dbms.procedures() YIELD name, signature</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Yielded items can be specified via string…</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>…or with symbolic names created earlier</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>A standalone call can spot a <code>WHERE</code> clause as well:</p>
+</div>
+<div id="standalone-call-where" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var name = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
+var call = Cypher
+        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.listConfig</span><span class="delimiter">&quot;</span></span>)
+        .withArgs(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">browser</span><span class="delimiter">&quot;</span></span>))
+        .yield(name)
+        .where(name.matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">browser</span><span class="char">\\</span><span class="content">.allow.*</span><span class="delimiter">&quot;</span></span>))
+        .returning(Cypher.asterisk())
+        .build();
+assertThat(cypherRenderer.render(call)).isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser</span><span class="char">\\</span><span class="char">\\</span><span class="content">.allow.*' RETURN *</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="in-queryprocedurecalls"><a class="anchor" href="#in-queryprocedurecalls"></a>In-query procedure calls</h5>
+<div class="paragraph">
+<p>In-query calls are only possible with non-void procedures. An In-query call happens inside the flow of a normal query.
+The mechanics to construct those calls via the Cypher-DSL are identical to standalone calls:</p>
+</div>
+<div id="in-query-calls" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var label = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">label</span><span class="delimiter">&quot;</span></span>);
+var statement = Cypher
+        .match(Cypher.anyNode().named(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>)).with(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>)
+        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db.labels</span><span class="delimiter">&quot;</span></span>).yield(label).with(label)
+        .returning(Functions.count(label).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">numLabels</span><span class="delimiter">&quot;</span></span>))
+        .build();
+assertThat(cypherRenderer.render(statement)).isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>A <code>CALL</code> can be used after a <code>MATCH</code>, a <code>WITH</code> and also a <code>WHERE</code> clause.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="usestored-procedure-callsasexpressionscallingcustomfunctions"><a class="anchor" href="#usestored-procedure-callsasexpressionscallingcustomfunctions"></a>3.2.2. Use stored-procedure-calls as expressions (Calling custom functions)</h4>
+<div class="paragraph">
+<p>All the mechanics described and shown above - how to define a custom call statement, supply it with arguments etc. - doesn&#8217;t
+distinguish between procedures and functions.
+Every stored procedure can be treated as a function - as long as the stored procedure returns a single value.
+It doesn&#8217;t matter if the single value returns a scalar or a list of objects.
+A list of objects is still a single value, in contrast to a stream of objects returned by a non-void procedure.</p>
+</div>
+<div class="paragraph">
+<p>So the question is not how to call a stored custom function, but how to turn a call statement into an expression that can be used in any place in a query where an expression is valid.
+This is where <code>asFunction</code> comes in.</p>
+</div>
+<div id="as-function" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var p = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+var createUuid = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.create.uuid</span><span class="delimiter">&quot;</span></span>).asFunction(); <i class="conum" data-value="1"></i><b>(1)</b>
+var statement = Cypher.merge(p.withProperties(Cypher.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, createUuid))) <i class="conum" data-value="2"></i><b>(2)</b>
+        .set(
+                p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Michael</span><span class="delimiter">&quot;</span></span>)),
+                p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">surname</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hunger</span><span class="delimiter">&quot;</span></span>))
+        )
+        .returning(p)
+        .build();
+assertThat(cypherRenderer.render(statement)).isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (p:`Person` {id: apoc.create.uuid()}) </span><span class="delimiter">&quot;</span></span>
+        + <span class="string"><span class="delimiter">&quot;</span><span class="content">SET p.firstName = 'Michael', p.surname = 'Hunger' </span><span class="delimiter">&quot;</span></span>
+        + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN p</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>First we define a call as seen earlier and turn it into an expression</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>This expression is than used as any other expression</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Of course, arguments to those functions can be express as well. Either as literals or expressions.</p>
+</div>
+<div id="as-function-with-args" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var p = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+var createUuid = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.create.uuid</span><span class="delimiter">&quot;</span></span>).asFunction(); <i class="conum" data-value="1"></i><b>(1)</b>
+var toCamelCase = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.text.camelCase</span><span class="delimiter">&quot;</span></span>)
+        .withArgs(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">first name</span><span class="delimiter">&quot;</span></span>)) <i class="conum" data-value="2"></i><b>(2)</b>
+        .asFunction();
+var statement = Cypher.merge(p.withProperties(Cypher.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>,
+        createUuid)))
+        .set(p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">surname</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Simons</span><span class="delimiter">&quot;</span></span>)))
+        .with(p)
+        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.create.setProperty</span><span class="delimiter">&quot;</span></span>).withArgs(
+                p.getRequiredSymbolicName(),
+                toCamelCase,
+                Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">nameParam</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+        ).yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>)
+        .returning(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>)
+        .build();
+assertThat(cypherRenderer.render(statement)).isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.surname = 'Simons' </span><span class="delimiter">&quot;</span></span>
+        + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH p CALL apoc.create.setProperty(p, apoc.text.camelCase('first name'), $nameParam) </span><span class="delimiter">&quot;</span></span>
+        + <span class="string"><span class="delimiter">&quot;</span><span class="content">YIELD node RETURN node</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Same as before</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A call to APOC&#8217;s <code>camelCase</code> function, taking in the literal of <code>first name</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>A call to another APOC function to which a parameter is passed. You find that corresponding placeholder as <code>$nameParam</code> in the following assert</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="summary"><a class="anchor" href="#summary"></a>3.2.3. Summary</h4>
+<div class="paragraph">
+<p>Through <code>Cypher.call</code> any procedure or function can be called iin case one of your favorite procedures is missing in <code>org.neo4j.cypherdsl.core.Functions</code>.
+All clauses, including <code>YIELD</code> and <code>WHERE</code> on procedures are supported.
+All procedures can be turned into functions.
+The Cypher-DSL however does not check if the procedure that is used as a function is actually eligible to do so.</p>
+</div>
+<div class="paragraph">
+<p>If the Cypher-DSL misses an important builtin Neo4j function, please raise a <a href="https://github.com/neo4j-contrib/cypher-dsl/issues/new">ticket</a>.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1351,7 +1587,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-01 17:07:38 UTC
+Last updated 2021-02-02 15:44:30 UTC
 </div>
 </div>
 </body>
