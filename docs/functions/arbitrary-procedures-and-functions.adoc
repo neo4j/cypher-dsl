@@ -1,0 +1,115 @@
+== Calling arbitrary procedures and functions
+
+Neo4j has plethora of builtin procedures and functions.
+The Cypher-DSL does cover a lot of them already, and they can be called in a typesafe way on many `Expression`-instances
+taking in various expressions such as the results of other calls, literals or parameters.
+
+However, there will probably always be a gap between what the Cypher-DSL includes and what the Neo4j database brings.
+More so, there are fantastic libraries out there like https://neo4j.com/labs/apoc/[APOC].
+APOC has so many procedures and functions in so many categories that it is rather futile to add shims
+for all of them consistently.
+
+Probably the most important aspect of all: Many Neo4j users bring their knowledge to the database themselves,
+in the form of their stored procedures. Those should be callable as well.
+
+The Cypher-DSL is flexible enough to call all those procedures and functions.
+
+=== Calling custom procedures
+
+Procedures are called via the Cypher https://neo4j.com/docs/cypher-manual/current/clauses/call/[CALL-Clause].
+The CALL-Clause can appear as a https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/StandaloneCall.html[StandAlone call]
+and as an https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/InQueryCall.html[InQuery call].
+Both are supported by the Cypher-DSL.
+
+==== Standalone procedure calls
+
+Standalone calls are particular useful for `VOID` procedures.
+A VOID procedure is a procedure that does not declare any result fields and returns no result records and that has explicitly been declared as `VOID`.
+Let's take the first example https://neo4j.com/docs/cypher-manual/current/clauses/call/#call-call-a-procedure-using-call[from here]
+
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call]
+----
+<.> `Cypher.call` returns a buildable statement that can be rendered.
+    `Cypher.call` can be used with separate namespace and procedure name as shown here or
+<.> with a single argument equal to the name of the procedure.
+
+Of course, arguments can be specified as expressions.
+Expressions can be literals as in <<standalone-call-with-args>>, Cypher parameters (via `Cypher.parameter`) that bind your input or nested calls:
+
+[[standalone-call-with-args]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-with-args]
+----
+
+Last but not least, the Cypher-DSL can of course `YIELD` the results from a standalone call:
+
+[[standalone-call-yielding]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-yielding]
+----
+<.> Yielded items can be specified via string…
+<.> …or with symbolic names created earlier
+
+A standalone call can spot a `WHERE` clause as well:
+
+[[standalone-call-where]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-where]
+----
+
+==== In-query procedure calls
+
+In-query calls are only possible with non-void procedures. An In-query call happens inside the flow of a normal query.
+The mechanics to construct those calls via the Cypher-DSL are identical to standalone calls:
+
+[[in-query-calls]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=in-query-calls]
+----
+
+A `CALL` can be used after a `MATCH`, a `WITH` and also a `WHERE` clause.
+
+=== Use stored-procedure-calls as expressions (Calling custom functions)
+
+All the mechanics described and shown above - how to define a custom call statement, supply it with arguments etc. - doesn't
+distinguish between procedures and functions.
+Every stored procedure can be treated as a function - as long as the stored procedure returns a single value.
+It doesn't matter if the single value returns a scalar or a list of objects.
+A list of objects is still a single value, in contrast to a stream of objects returned by a non-void procedure.
+
+So the question is not how to call a stored custom function, but how to turn a call statement into an expression that can be used in any place in a query where an expression is valid.
+This is where `asFunction` comes in.
+
+[[as-function]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=as-function]
+----
+<.> First we define a call as seen earlier and turn it into an expression
+<.> This expression is than used as any other expression
+
+Of course, arguments to those functions can be express as well. Either as literals or expressions.
+
+[[as-function-with-args]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=as-function-with-args]
+----
+<.> Same as before
+<.> A call to APOC's `camelCase` function, taking in the literal of `first name`.
+<.> A call to another APOC function to which a parameter is passed. You find that corresponding placeholder as `$nameParam` in the following assert
+
+=== Summary
+
+Through `Cypher.call` any procedure or function can be called iin case one of your favorite procedures is missing in `org.neo4j.cypherdsl.core.Functions`.
+All clauses, including `YIELD` and `WHERE` on procedures are supported.
+All procedures can be turned into functions.
+The Cypher-DSL however does not check if the procedure that is used as a function is actually eligible to do so.
+
+If the Cypher-DSL misses an important builtin Neo4j function, please raise a https://github.com/neo4j-contrib/cypher-dsl/issues/new[ticket].
