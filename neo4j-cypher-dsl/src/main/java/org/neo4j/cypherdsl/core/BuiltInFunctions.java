@@ -183,6 +183,63 @@ final class BuiltInFunctions {
 		}
 	}
 
+	enum MathematicalFunctions implements FunctionDefinition {
+
+		ABS("abs"),
+		CEIL("ceil"),
+		FLOOR("floor"),
+		RAND("rand", 0, 0),
+		ROUND("round", 1, 3),
+		SIGN("sign"),
+		E("e", 0, 0),
+		EXP("exp"),
+		LOG("log"),
+		LOG10("log10"),
+		SQRT("sqrt"),
+		ACOS("acos"),
+		ASIN("asin"),
+		ATAN("atan"),
+		ATAN2("atan2", 2, 2),
+		COS("cos"),
+		COT("cot"),
+		DEGREES("degrees"),
+		HAVERSIN("haversin"),
+		PI("pi", 0, 0),
+		RADIANS("radians"),
+		SIN("sin"),
+		TAN("tan");
+
+		private final String implementationName;
+
+		private final int minArgs;
+
+		private final int maxArgs;
+
+		MathematicalFunctions(String implementationName) {
+			this(implementationName, 1, 1);
+		}
+
+		MathematicalFunctions(String implementationName, int minArgs, int maxArgs) {
+			this.implementationName = implementationName;
+			this.minArgs = minArgs;
+			this.maxArgs = maxArgs;
+		}
+
+		public int getMinArgs() {
+			return minArgs;
+		}
+
+		public int getMaxArgs() {
+			return maxArgs;
+		}
+
+		@Override
+		public String getImplementationName() {
+			return implementationName;
+		}
+
+	}
+
 	private BuiltInFunctions() {
 	}
 }

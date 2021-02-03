@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
@@ -26,6 +29,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -121,7 +125,57 @@ class FunctionsIT {
 				.build();
 
 			Assertions.assertThat(cypherRenderer.render(statement))
-				.isEqualTo("RETURN reduce(totalAge = 0.0, n IN [x IN range(0, 10) WHERE (x % 2) = 0 | x^3] | (totalAge + n)) AS result");
+				.isEqualTo(
+					"RETURN reduce(totalAge = 0.0, n IN [x IN range(0, 10) WHERE (x % 2) = 0 | x^3] | (totalAge + n)) AS result");
+		}
+	}
+
+	@ParameterizedTest
+	@EnumSource(BuiltInFunctions.MathematicalFunctions.class)
+	void mathFunctionsShouldBeRenderedAsExpected(BuiltInFunctions.MathematicalFunctions function)
+		throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+		if (function.getMinArgs() != function.getMaxArgs()) {
+			Class[] argTypes = new Class[2];
+			argTypes[0] = Expression.class;
+			argTypes[1] = Expression[].class;
+			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+
+			Expression arg1 = Cypher.literalOf(1);
+			for (int n = 0; n <= function.getMaxArgs() - function.getMinArgs(); ++n) {
+				Expression[] vargs = new Expression[n];
+				StringBuilder expected = new StringBuilder("RETURN " + function.getImplementationName() + "(1");
+				for (int i = 0; i < n; ++i) {
+					vargs[i] = Cypher.literalOf(i);
+					expected.append(", ");
+					expected.append(i);
+				}
+				FunctionInvocation f = (FunctionInvocation) m.invoke(null, arg1, vargs);
+				expected.append(");");
+				Assertions.assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
+					.isEqualTo(expected.toString());
+			}
+		} else {
+			StringBuilder expected = new StringBuilder("RETURN " + function.getImplementationName() + "(");
+
+			int n = function.getMinArgs();
+			Class[] argTypes = new Class[n];
+			Expression[] args = new Expression[n];
+
+			for (int i = 0; i < n; ++i) {
+				argTypes[i] = Expression.class;
+				args[i] = Cypher.literalOf(i);
+				if (i > 0) {
+					expected.append(", ");
+				}
+				expected.append(i);
+			}
+			expected.append(");");
+
+			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			FunctionInvocation f = (FunctionInvocation) m.invoke(null, args);
+			Assertions.assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
+				.isEqualTo(expected.toString());
 		}
 	}
 

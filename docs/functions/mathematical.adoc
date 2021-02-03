@@ -1,0 +1,8 @@
+== Mathematical functions
+
+The Cypher-DSL supports all mathematical functions as of Neo4j 4.2. Please find
+their description in the Neo4j cypher manual:
+
+* https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/[Numeric]
+* https://neo4j.com/docs/cypher-manual/current/functions/mathematical-logarithmic/[Logarithmic]
+* https://neo4j.com/docs/cypher-manual/current/functions/mathematical-trigonometric/[Trigonometric]

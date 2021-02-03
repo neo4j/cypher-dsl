@@ -5,4 +5,6 @@ NOTE: There are many more functions implemented in `org.neo4j.cypherdsl.core.Fun
 
 include::lists.adoc[]
 
+include::mathematical.adoc[]
+
 include::arbitrary-procedures-and-functions.adoc[]

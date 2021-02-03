@@ -1245,4 +1245,329 @@ public final class Functions {
 
 		return Reduction.of(variable);
 	}
+
+	/**
+	 * Creates a function invocation for {@code abs({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-abs">abs</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code abs({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation abs(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ABS, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code ceil({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-ceil">ceil</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code ceil({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation ceil(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.CEIL, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code floor({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-floor">floor</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code floor({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation floor(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.FLOOR, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code rand({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-rand">rand</a>.
+	 *
+	 * @return A function call for {@code rand({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation rand() {
+
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.RAND);
+	}
+
+	/**
+	 * Creates a function invocation for {@code round({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-round">round</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code round({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation round(Expression value, Expression... expression) {
+
+		if (expression == null || expression.length == 0) {
+			return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ROUND, value);
+		} else if (expression.length == 1) {
+			return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ROUND, value, expression[0]);
+		} else if (expression.length == 2) {
+			return FunctionInvocation
+				.create(BuiltInFunctions.MathematicalFunctions.ROUND, value, expression[0], expression[1]);
+		} else {
+			throw new IllegalArgumentException(
+				"round() must be called with 1, 2 or 3 arguments (value, value + precision or value + precision + rounding mode.");
+		}
+	}
+
+	/**
+	 * Creates a function invocation for {@code sign({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sign">sign</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code sign({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation sign(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIGN, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code e({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-e">e</a>.
+	 *
+	 * @return A function call for {@code e({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation e() {
+
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.E);
+	}
+
+	/**
+	 * Creates a function invocation for {@code exp({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-exp">exp</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code exp({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation exp(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.EXP, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code log({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-log">log</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code log({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation log(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code log10({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-log10">log10</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code log10({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation log10(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG10, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code sqrt({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sqrt">sqrt</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code sqrt({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation sqrt(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SQRT, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code acos({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-acos">acos</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code acos({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation acos(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ACOS, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code asin({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-asin">asin</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code asin({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation asin(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ASIN, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code atan({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan">atan</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code atan({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation atan(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ATAN, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code atan2({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan2">atan2</a>.
+	 *
+	 * @return A function call for {@code atan2({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation atan2(Expression y, Expression x) {
+
+		Assertions.notNull(y, "y is required.");
+		Assertions.notNull(x, "x is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ATAN2, y, x);
+	}
+
+	/**
+	 * Creates a function invocation for {@code cos({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-cos">cos</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code cos({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation cos(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COS, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code cot({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-cot">cot</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code cot({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation cot(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COT, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code degrees({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-degrees">degrees</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code degrees({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation degrees(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.DEGREES, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code haversin({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-haversin">haversin</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code haversin({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation haversin(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.HAVERSIN, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code pi({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-pi">pi</a>.
+	 *
+	 * @return A function call for {@code pi({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation pi() {
+
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.PI);
+	}
+
+	/**
+	 * Creates a function invocation for {@code radians({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-radians">radians</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code radians({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation radians(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.RADIANS, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code sin({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sin">sin</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code sin({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation sin(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIN, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code tan({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-tan">tan</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code tan({})}.
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation tan(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.TAN, expression);
+	}
 }
