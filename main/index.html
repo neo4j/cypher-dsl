@@ -548,14 +548,15 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#howtouseit">2.2. How to use it</a></li>
 </ul>
 </li>
-<li><a href="#functions">3. Functions</a>
+<li><a href="#properties">3. Properties</a></li>
+<li><a href="#functions">4. Functions</a>
 <ul class="sectlevel2">
-<li><a href="#lists">3.1. Lists</a></li>
-<li><a href="#mathematicalfunctions">3.2. Mathematical functions</a></li>
-<li><a href="#callingarbitraryproceduresandfunctions">3.3. Calling arbitrary procedures and functions</a></li>
+<li><a href="#lists">4.1. Lists</a></li>
+<li><a href="#mathematicalfunctions">4.2. Mathematical functions</a></li>
+<li><a href="#callingarbitraryproceduresandfunctions">4.3. Calling arbitrary procedures and functions</a></li>
 </ul>
 </li>
-<li><a href="#appendix">4. Appendix</a>
+<li><a href="#appendix">5. Appendix</a>
 <ul class="sectlevel2">
 <li><a href="#changelog">Change log</a></li>
 </ul>
@@ -942,7 +943,98 @@ assertThat(cypherRenderer.render(statement))
 </div>
 </div>
 <div class="sect1">
-<h2 id="functions"><a class="anchor" href="#functions"></a>3. Functions</h2>
+<h2 id="properties"><a class="anchor" href="#properties"></a>3. Properties</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Nodes and Relationships expose properties.
+This reflects directly in the Cypher-DSL:</p>
+</div>
+<div id="properties-on-nodes-and-rel" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var personNode = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+var movieNode = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>);
+var ratedRel = personNode.relationshipTo(movieNode, <span class="string"><span class="delimiter">&quot;</span><span class="content">RATED</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>);
+var statement = Cypher.match(ratedRel)
+        .returning(
+                personNode.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>), <i class="conum" data-value="1"></i><b>(1)</b>
+                ratedRel.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">rating</span><span class="delimiter">&quot;</span></span>)) <i class="conum" data-value="2"></i><b>(2)</b>
+        .build();
+
+assertThat(cypherRenderer.render(statement))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (p:`Person`)-[r:`RATED`]-&gt;(:`Movie`) RETURN p.name, r.rating</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a property expression from a <code>Node</code></td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create a property expression from a <code>Relationship</code></td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Both Node and Relationship should be named as in the example.
+The Cypher-DSL generates names if they are not named, to refer to them in the statements.
+Without the explicit names, the generated statement would look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (geIcWNUD000:`Person`)-[TqfqBNcc001:`RATED`]-&gt;(:`Movie`) RETURN geIcWNUD000.name, TqfqBNcc001.rating</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The name is of course random.</p>
+</div>
+<div class="paragraph">
+<p>The <code>Cypher</code> class exposes the <code>property</code> method, too. This methods takes in one name (as symbolic name or as string literal) OR one expression
+and  at least one further string, referring to the name of the property.</p>
+</div>
+<div class="paragraph">
+<p>Passing in a symbolic name would lead to a similar result like in <a href="#properties-on-nodes-and-rel">[properties-on-nodes-and-rel]</a>, an expression can refer
+to the results of functions etc.:</p>
+</div>
+<div id="properties-on-expressions" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var epochSeconds = Cypher.property(Functions.datetime(), <span class="string"><span class="delimiter">&quot;</span><span class="content">epochSeconds</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="1"></i><b>(1)</b>
+var statement = Cypher.returning(epochSeconds).build();
+Assertions.assertThat(cypherRenderer.render(statement))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN datetime().epochSeconds</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Here an expression, the <code>datetime()</code> function is passed in and the <code>epocheSeconds</code> property is dereferenced.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Nested properties are of course possible as well, either directly on nodes and relationships or via the static builder:</p>
+</div>
+<div id="nested-properties" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var node = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+
+var locationPropV1 = Cypher.property(node.getRequiredSymbolicName(), <span class="string"><span class="delimiter">&quot;</span><span class="content">home.location</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">y</span><span class="delimiter">&quot;</span></span>);
+var locationPropV2 = Cypher.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">home.location</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">y</span><span class="delimiter">&quot;</span></span>);
+
+var statement = Cypher.match(node)
+        .where(locationPropV1.gt(Cypher.literalOf(<span class="integer">50</span>)))
+        .returning(locationPropV2).build();
+
+assertThat(cypherRenderer.render(statement))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (p:`Person`) WHERE p.`home.location`.y &gt; 50 RETURN p.`home.location`.y</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="functions"><a class="anchor" href="#functions"></a>4. Functions</h2>
 <div class="sectionbody">
 <div class="admonitionblock note">
 <table>
@@ -957,9 +1049,9 @@ There are many more functions implemented in <code>org.neo4j.cypherdsl.core.Func
 </table>
 </div>
 <div class="sect2">
-<h3 id="lists"><a class="anchor" href="#lists"></a>3.1. Lists</h3>
+<h3 id="lists"><a class="anchor" href="#lists"></a>4.1. Lists</h3>
 <div class="sect3">
-<h4 id="functions-list-range"><a class="anchor" href="#functions-list-range"></a>3.1.1. range()</h4>
+<h4 id="functions-list-range"><a class="anchor" href="#functions-list-range"></a>4.1.1. range()</h4>
 <div class="paragraph">
 <p>Creates an invocation of <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range"><code>range()</code></a>.</p>
 </div>
@@ -994,14 +1086,14 @@ The step size can be specified as well:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="insertingalistoperator"><a class="anchor" href="#insertingalistoperator"></a>3.1.2. Inserting a list operator</h4>
+<h4 id="insertingalistoperator"><a class="anchor" href="#insertingalistoperator"></a>4.1.2. Inserting a list operator</h4>
 <div class="paragraph">
 <p>The <em>list operator</em> <code>[]</code> selects a specific value of a list or a range of values from a list.
 A range can either be closed or open.</p>
 </div>
 <div class="paragraph">
 <p>Find examples to select a value at a given index, a sublist based on a closed range and sublist based on open ranges below.
-While the examples use <a href="#functions-list-range">Section 3.1.1</a>, the list operator doesn&#8217;t put any restrictions on the expression at the moment.</p>
+While the examples use <a href="#functions-list-range">Section 4.1.1</a>, the list operator doesn&#8217;t put any restrictions on the expression at the moment.</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1049,7 +1141,7 @@ While the examples use <a href="#functions-list-range">Section 3.1.1</a>, the li
 </div>
 </div>
 <div class="sect2">
-<h3 id="mathematicalfunctions"><a class="anchor" href="#mathematicalfunctions"></a>3.2. Mathematical functions</h3>
+<h3 id="mathematicalfunctions"><a class="anchor" href="#mathematicalfunctions"></a>4.2. Mathematical functions</h3>
 <div class="paragraph">
 <p>The Cypher-DSL supports all mathematical functions as of Neo4j 4.2. Please find
 their description in the Neo4j cypher manual:</p>
@@ -1069,7 +1161,7 @@ their description in the Neo4j cypher manual:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="callingarbitraryproceduresandfunctions"><a class="anchor" href="#callingarbitraryproceduresandfunctions"></a>3.3. Calling arbitrary procedures and functions</h3>
+<h3 id="callingarbitraryproceduresandfunctions"><a class="anchor" href="#callingarbitraryproceduresandfunctions"></a>4.3. Calling arbitrary procedures and functions</h3>
 <div class="paragraph">
 <p>Neo4j has plethora of builtin procedures and functions.
 The Cypher-DSL does cover a lot of them already, and they can be called in a typesafe way on many <code>Expression</code>-instances
@@ -1089,7 +1181,7 @@ in the form of their stored procedures. Those should be callable as well.</p>
 <p>The Cypher-DSL is flexible enough to call all those procedures and functions.</p>
 </div>
 <div class="sect3">
-<h4 id="callingcustomprocedures"><a class="anchor" href="#callingcustomprocedures"></a>3.3.1. Calling custom procedures</h4>
+<h4 id="callingcustomprocedures"><a class="anchor" href="#callingcustomprocedures"></a>4.3.1. Calling custom procedures</h4>
 <div class="paragraph">
 <p>Procedures are called via the Cypher <a href="https://neo4j.com/docs/cypher-manual/current/clauses/call/">CALL-Clause</a>.
 The CALL-Clause can appear as a <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/StandaloneCall.html">StandAlone call</a>
@@ -1205,7 +1297,7 @@ assertThat(cypherRenderer.render(statement)).isEqualTo(
 </div>
 </div>
 <div class="sect3">
-<h4 id="usestored-procedure-callsasexpressionscallingcustomfunctions"><a class="anchor" href="#usestored-procedure-callsasexpressionscallingcustomfunctions"></a>3.3.2. Use stored-procedure-calls as expressions (Calling custom functions)</h4>
+<h4 id="usestored-procedure-callsasexpressionscallingcustomfunctions"><a class="anchor" href="#usestored-procedure-callsasexpressionscallingcustomfunctions"></a>4.3.2. Use stored-procedure-calls as expressions (Calling custom functions)</h4>
 <div class="paragraph">
 <p>All the mechanics described and shown above - how to define a custom call statement, supply it with arguments etc. - doesn&#8217;t
 distinguish between procedures and functions.
@@ -1291,7 +1383,7 @@ assertThat(cypherRenderer.render(statement)).isEqualTo(
 </div>
 </div>
 <div class="sect3">
-<h4 id="summary"><a class="anchor" href="#summary"></a>3.3.3. Summary</h4>
+<h4 id="summary"><a class="anchor" href="#summary"></a>4.3.3. Summary</h4>
 <div class="paragraph">
 <p>Through <code>Cypher.call</code> any procedure or function can be called iin case one of your favorite procedures is missing in <code>org.neo4j.cypherdsl.core.Functions</code>.
 All clauses, including <code>YIELD</code> and <code>WHERE</code> on procedures are supported.
@@ -1306,7 +1398,7 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 </div>
 </div>
 <div class="sect1">
-<h2 id="appendix"><a class="anchor" href="#appendix"></a>4. Appendix</h2>
+<h2 id="appendix"><a class="anchor" href="#appendix"></a>5. Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="changelog"><a class="anchor" href="#changelog"></a>Change log</h3>
@@ -1543,13 +1635,15 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <p>GH-93 - Ensure compatibility with GraalVM native.</p>
 </li>
 <li>
-<p>GH-94 - Bring back SymbolicName#concat.
-== 2020.0</p>
+<p>GH-94 - Bring back SymbolicName#concat.</p>
 </li>
 </ul>
 </div>
 </div>
 </div>
+</div>
+<div class="sect3">
+<h4 id="2020.0"><a class="anchor" href="#2020.0"></a>2020.0</h4>
 <div class="sect4">
 <h5 id="2020.0.1"><a class="anchor" href="#2020.0.1"></a>2020.0.1</h5>
 <div class="paragraph">
@@ -1608,7 +1702,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-03 15:34:22 UTC
+Last updated 2021-02-05 14:27:28 UTC
 </div>
 </div>
 </body>
