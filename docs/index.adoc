@@ -46,6 +46,8 @@ include::introduction-and-preface/index.adoc[leveloffset=+1]
 
 include::getting-started/index.adoc[leveloffset=+1]
 
+include::properties/index.adoc[leveloffset=+1]
+
 include::functions/index.adoc[leveloffset=+1]
 
 include::appendix/index.adoc[leveloffset=+1]

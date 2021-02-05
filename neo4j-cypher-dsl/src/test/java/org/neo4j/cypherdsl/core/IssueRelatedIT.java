@@ -395,4 +395,23 @@ class IssueRelatedIT {
 			.isEqualTo(
 				"MATCH (u:`User`), (rn:`SomeLabel`), (nn:`SomeLabel`) WITH DISTINCT u, rn, rn AS nn RETURN u, rn, nn");
 	}
+
+	@Test // GH-123
+	void propertiesOfFunctions() {
+
+		Statement statement = Cypher.returning(Cypher.property(Functions.datetime(), "epochSeconds")).build();
+		Assertions.assertThat(cypherRenderer.render(statement))
+			.isEqualTo("RETURN datetime().epochSeconds");
+	}
+
+	@Test // GH-123
+	void propertiesOfFunctionsInsideQuery() {
+
+		Expression collectedThings = Functions.collect(Cypher.name("n")).as("collectedThings");
+		Statement statement = Cypher.match(Cypher.anyNode().named("n"))
+			.with(collectedThings)
+			.returning(Cypher.property(Functions.last(collectedThings), "name")).build();
+		Assertions.assertThat(cypherRenderer.render(statement))
+			.isEqualTo("MATCH (n) WITH collect(n) AS collectedThings RETURN last(collectedThings).name");
+	}
 }

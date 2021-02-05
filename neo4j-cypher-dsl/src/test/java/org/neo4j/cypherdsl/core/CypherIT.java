@@ -2586,6 +2586,21 @@ class CypherIT {
 				.isEqualTo("MATCH (p:`Person`) WHERE p.`home.location`.y > 50 RETURN p");
 		}
 
+		@Test // GH-123
+		void explicitlyDefined() {
+			Node node = Cypher.node("Person").named("p");
+
+			Property ly1 = Cypher.property(node.getRequiredSymbolicName(), "home.location", "y");
+			Property ly2 = Cypher.property("p", "home.location", "y");
+
+			Statement statement = Cypher.match(node)
+				.where(ly1.gt(Cypher.literalOf(50)))
+				.returning(ly2).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (p:`Person`) WHERE p.`home.location`.y > 50 RETURN p.`home.location`.y");
+		}
+
 		@Test
 		void chainedInProjection() {
 

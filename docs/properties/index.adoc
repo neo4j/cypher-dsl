@@ -1,0 +1,46 @@
+[[properties]]
+= Properties
+
+Nodes and Relationships expose properties.
+This reflects directly in the Cypher-DSL:
+
+[[properties-on-nodes-and-rel]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=properties-on-nodes-and-rel]
+----
+<.> Create a property expression from a `Node`
+<.> Create a property expression from a `Relationship`
+
+Both Node and Relationship should be named as in the example.
+The Cypher-DSL generates names if they are not named, to refer to them in the statements.
+Without the explicit names, the generated statement would look like this:
+
+[source,cypher]
+----
+MATCH (geIcWNUD000:`Person`)-[TqfqBNcc001:`RATED`]->(:`Movie`) RETURN geIcWNUD000.name, TqfqBNcc001.rating
+----
+
+The name is of course random.
+
+The `Cypher` class exposes the `property` method, too. This methods takes in one name (as symbolic name or as string literal) OR one expression
+and  at least one further string, referring to the name of the property.
+
+Passing in a symbolic name would lead to a similar result like in <<properties-on-nodes-and-rel>>, an expression can refer
+to the results of functions etc.:
+
+[[properties-on-expressions]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=properties-on-expressions]
+----
+<.> Here an expression, the `datetime()` function is passed in and the `epocheSeconds` property is dereferenced.
+
+Nested properties are of course possible as well, either directly on nodes and relationships or via the static builder:
+
+[[nested-properties]]
+[source,java,indent=0]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=nested-properties]
+----
+
