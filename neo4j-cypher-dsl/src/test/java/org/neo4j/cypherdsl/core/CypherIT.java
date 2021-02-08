@@ -2954,6 +2954,25 @@ class CypherIT {
 			}
 
 			@Test
+			void generatedSymbolicNameMustPrevendNodeContentDoubleRenderingAswWell() {
+
+				Node person = Cypher.node("Person");
+				person.getRequiredSymbolicName();
+				Node movie = Cypher.node("Movie");
+				movie.getRequiredSymbolicName();
+				Relationship directed = person.relationshipTo(movie, "DIRECTED");
+				Relationship actedIn = person.relationshipTo(movie, "ACTED_IN");
+				Statement statement = Cypher.match(directed)
+					.match(actedIn)
+					.returning(directed, actedIn)
+					.build();
+
+				assertThat(cypherRenderer.render(statement))
+					.matches(
+						"MATCH \\(\\w+:`Person`\\)-\\[\\w+:`DIRECTED`\\]->\\(\\w+:`Movie`\\) MATCH \\(\\w+\\)-\\[\\w+:`ACTED_IN`\\]->\\(\\w+\\) RETURN \\w+, \\w+");
+			}
+
+			@Test
 			void addedProjections() {
 
 				Statement statement;

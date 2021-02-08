@@ -393,14 +393,14 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		// This is only relevant for nodes in relationships.
 		// Otherwise all the labels would be rendered again.
-		node.getSymbolicName().map(SymbolicName::getValue).ifPresent(symbolicName -> {
-			skipNodeContent = visitedNamed.contains(node);
-			visitedNamed.add(node);
+		skipNodeContent = visitedNamed.contains(node);
+		visitedNamed.add(node);
 
-			if (skipNodeContent) {
-				builder.append(symbolicName);
-			}
-		});
+		if (skipNodeContent) {
+			String symbolicName = node.getSymbolicName()
+				.map(SymbolicName::getValue).orElseGet(() -> resolve(node.getRequiredSymbolicName()));
+			builder.append(symbolicName);
+		}
 	}
 
 	void leave(Node node) {
