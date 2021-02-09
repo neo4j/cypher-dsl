@@ -33,23 +33,23 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Skip implements Visitable {
 
-	static Skip create(Number value) {
+	static Skip create(Expression expression) {
 
-		Assertions.notNull(value, "Cannot skip a value of null.");
+		Assertions.notNull(expression, "Cannot skip a value of null.");
 
-		return new Skip(new NumberLiteral(value));
+		return new Skip(expression);
 	}
 
-	private final NumberLiteral skipAmount;
+	private final Expression expression;
 
-	private Skip(NumberLiteral skipAmount) {
-		this.skipAmount = skipAmount;
+	private Skip(Expression expression) {
+		this.expression = expression;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		skipAmount.accept(visitor);
+		expression.accept(visitor);
 		visitor.leave(this);
 	}
 }

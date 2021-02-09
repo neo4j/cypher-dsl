@@ -28,6 +28,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 /**
  * @author Michael J. Simons
  * @author Gerrit Meier
+ * @author Andreas Berger
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
@@ -417,6 +418,15 @@ public interface StatementBuilder
 		 */
 		<T extends TerminalExposesLimit & BuildableStatement> T skip(Number number);
 
+		/**
+		 * Adds a skip clause.
+		 *
+		 * @param expression The expression to skip by
+		 * @param <T>    The type of the next step
+		 * @return A step that only allows the limit of records to be specified.
+		 * @since 2021.1.0
+		 */
+		<T extends TerminalExposesLimit & BuildableStatement> T skip(Expression expression);
 	}
 
 	/**
@@ -433,6 +443,15 @@ public interface StatementBuilder
 		 * @return A buildable match statement.
 		 */
 		BuildableStatement limit(Number number);
+
+		/**
+		 * Limits the number of returned records.
+		 *
+		 * @param expression How many records to return. If this is null, all the records are returned.
+		 * @return A buildable match statement.
+		 * @since 2021.1.0
+		 */
+		BuildableStatement limit(Expression expression);
 	}
 
 	/**
@@ -476,6 +495,15 @@ public interface StatementBuilder
 		 */
 		<T extends ExposesLimit & OngoingReadingAndWith> T skip(Number number);
 
+		/**
+		 * Adds a skip clause.
+		 *
+		 * @param expression How many records to skip. If this is null, then no records are skipped.
+		 * @param <T>    The type of the next step
+		 * @return A step that only allows the limit of records to be specified.
+		 * @since 2021.1.0
+		 */
+		<T extends ExposesLimit & OngoingReadingAndWith> T  skip(Expression expression);
 	}
 
 	/**
@@ -492,6 +520,15 @@ public interface StatementBuilder
 		 * @return A buildable match statement.
 		 */
 		OngoingReadingAndWith limit(Number number);
+
+		/**
+		 * Limits the number of returned records.
+		 *
+		 * @param expression How many records to return. If this is null, all the records are returned.
+		 * @return A buildable match statement.
+		 * @since 2021.1.0
+		 */
+		OngoingReadingAndWith limit(Expression expression);
 	}
 
 	/**

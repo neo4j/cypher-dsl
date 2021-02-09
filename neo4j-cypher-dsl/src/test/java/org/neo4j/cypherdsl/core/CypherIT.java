@@ -31,6 +31,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 /**
  * @author Michael J. Simons
  * @author Gerrit Meier
+ * @author Andreas Berger
  */
 class CypherIT {
 
@@ -362,11 +363,11 @@ class CypherIT {
 
 			@Test
 			void nullSkip() {
-				Statement statement = Cypher.match(userNode).returning(userNode).skip(null).build();
+				Statement statement = Cypher.match(userNode).returning(userNode).skip((Number) null).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u");
+						.isEqualTo(
+								"MATCH (u:`User`) RETURN u");
 			}
 
 			@Test
@@ -374,17 +375,25 @@ class CypherIT {
 				Statement statement = Cypher.match(userNode).returning(userNode).limit(1).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u LIMIT 1");
+						.isEqualTo(
+								"MATCH (u:`User`) RETURN u LIMIT 1");
+			}
+
+			@Test // GH-129
+			void limitWithParams() {
+				Statement statement = Cypher.match(userNode).returning(userNode).limit(Cypher.parameter("param")).build();
+
+				assertThat(cypherRenderer.render(statement))
+						.isEqualTo("MATCH (u:`User`) RETURN u LIMIT $param");
 			}
 
 			@Test
 			void nullLimit() {
-				Statement statement = Cypher.match(userNode).returning(userNode).limit(null).build();
+				Statement statement = Cypher.match(userNode).returning(userNode).limit((Number) null).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u");
+						.isEqualTo(
+								"MATCH (u:`User`) RETURN u");
 			}
 
 			@Test
@@ -392,17 +401,30 @@ class CypherIT {
 				Statement statement = Cypher.match(userNode).returning(userNode).skip(1).limit(1).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u SKIP 1 LIMIT 1");
+						.isEqualTo(
+								"MATCH (u:`User`) RETURN u SKIP 1 LIMIT 1");
+			}
+
+			@Test // GH-129
+			void skipAndLimitWithParams() {
+				Statement statement = Cypher.match(userNode)
+						.returning(userNode)
+						.skip(Cypher.parameter("skip"))
+						.limit(Cypher.parameter("limit"))
+						.build();
+
+				assertThat(cypherRenderer.render(statement))
+						.isEqualTo(
+								"MATCH (u:`User`) RETURN u SKIP $skip LIMIT $limit");
 			}
 
 			@Test
 			void nullSkipAndLimit() {
-				Statement statement = Cypher.match(userNode).returning(userNode).skip(null).limit(null).build();
+				Statement statement = Cypher.match(userNode).returning(userNode).skip((Number) null).limit((Number) null).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u");
+						.isEqualTo(
+								"MATCH (u:`User`) RETURN u");
 			}
 
 			@Test
@@ -476,6 +498,87 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("WITH $listOfPropertyMaps AS p UNWIND p AS item RETURN item");
+		}
+
+		@Test // GH-129
+		void withWithSkip() {
+			Node m = Cypher.node("Movie").named("m");
+			Statement statement = Cypher
+				.match(m).with(m).skip(1)
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) WITH m SKIP 1 RETURN count(m)");
+
+			statement = Cypher
+				.match(m).with(m).skip(Cypher.parameter("skip"))
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) WITH m SKIP $skip RETURN count(m)");
+		}
+
+		@Test // GH-129
+		void withWithLimit() {
+			Node m = Cypher.node("Movie").named("m");
+			Statement statement = Cypher
+				.match(m).with(m).limit(23)
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) WITH m LIMIT 23 RETURN count(m)");
+
+			statement = Cypher
+				.match(m).with(m).limit(Cypher.parameter("limit"))
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) WITH m LIMIT $limit RETURN count(m)");
+		}
+
+		@Test // GH-129
+		void withWithSkipAndLimit() {
+			Node m = Cypher.node("Movie").named("m");
+			Statement statement = Cypher
+				.match(m).with(m).skip(1).limit(23)
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) WITH m SKIP 1 LIMIT 23 RETURN count(m)");
+
+			statement = Cypher
+				.match(m).with(m).skip(Cypher.parameter("skip")).limit(Cypher.parameter("limit"))
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) WITH m SKIP $skip LIMIT $limit RETURN count(m)");
+		}
+
+		@Test // GH-129
+		void withWithAndNullsForSkipAndLimit() {
+			Node m = Cypher.node("Movie").named("m");
+			Statement statement = Cypher
+				.match(m).with(m).skip((Number) null).limit((Number) null)
+				.returning(Functions.count(m))
+				.build();
+
+			String expected = "MATCH (m:`Movie`) WITH m RETURN count(m)";
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
+
+			statement = Cypher
+				.match(m).with(m).skip((Expression) null).limit((Expression) null)
+				.returning(Functions.count(m))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(expected);
 		}
 
 		@Test
@@ -3577,14 +3680,37 @@ class CypherIT {
 		}
 
 		@Test
+		void subListUntilExpressionShouldWork() {
+
+			Statement statement = Cypher.returning(Cypher.subListUntil(Functions.range(0, 10), Cypher.parameter("end"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[..$end]");
+		}
+
+		@Test
+		void subListFromExpressionShouldWork() {
+			Statement statement = Cypher.returning(Cypher.subListFrom(Functions.range(0, 10), Cypher.parameter("start"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[$start..]");
+		}
+
+		@Test
+		void subListExpressionShouldWork() {
+
+			Statement statement = Cypher.returning(Cypher.subList(Functions.range(0, 10), Cypher.parameter("start"), Cypher.parameter("end"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("RETURN range(0, 10)[$start..$end]");
+		}
+
+		@Test
 		void shouldWorkWithMapProjections() {
 
 			Node person = Cypher.node("Person").named("person");
 			Node location = Cypher.node("Location").named("personLivesIn");
 
 			Statement statement = Cypher.match(person)
-				.returning(
-					person.project(
+					.returning(
+							person.project(
 						"livesIn",
 						Cypher.valueAt(Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN"))
 							.returning(location.project("name")), 0)
