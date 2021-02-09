@@ -60,6 +60,16 @@ public interface ExposesReturning {
 	StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions);
 
 	/**
+	 * Creates the {@code RETURN} clause.
+	 *
+	 * @param variables The symbolic named things to return
+	 * @return A build step with a defined list of things to return.
+	 */
+	default StatementBuilder.OngoingReadingAndReturn returning(SymbolicName... variables) {
+		return returning((Expression[]) variables);
+	}
+
+	/**
 	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword.
 	 *
 	 * @param variables The named things to return
@@ -86,4 +96,14 @@ public interface ExposesReturning {
 	 * @return A match that can be build now
 	 */
 	StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions);
+
+	/**
+	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword.
+	 *
+	 * @param variables The symbolic named things to return
+	 * @return A build step with a defined list of things to return.
+	 */
+	default StatementBuilder.OngoingReadingAndReturn returningDistinct(SymbolicName... variables) {
+		return returningDistinct((Expression[]) variables);
+	}
 }

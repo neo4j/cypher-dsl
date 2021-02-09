@@ -448,4 +448,34 @@ class IssueRelatedIT {
 					   + "}");
 
 	}
+
+	@Test // GH-131
+	void projectSymbolicNames() {
+		Node user = Cypher.node("User").named("user");
+		Node userKnows = Cypher.node("User").named("userKnows");
+		SymbolicName sortedElement = Cypher.name("sortedElement");
+
+		PatternComprehension innerPatternComprehension = Cypher.listBasedOn(user.relationshipTo(userKnows, "KNOWS"))
+				.returning(userKnows.project(
+						"born",
+						userKnows.property("born")
+				));
+		StatementBuilder.BuildableStatement statement = Cypher
+				.match(user)
+				.returning(
+						user.project(
+								"knows",
+								Cypher.listWith(sortedElement)
+										.in(innerPatternComprehension)
+										.returning(sortedElement.project(
+												"born",
+												Cypher.mapOf(
+														"formatted",
+														Cypher.call("toString").withArgs(sortedElement.property("born")).asFunction()
+												)
+										))
+						));
+		assertThat(cypherRenderer.render(statement.build()))
+				.isEqualTo("MATCH (user:`User`) RETURN user{knows: [sortedElement IN [(user)-[:`KNOWS`]->(userKnows:`User`) | userKnows{born: userKnows.born}] | sortedElement{born: {formatted: toString(sortedElement.born)}}]}");
+	}
 }

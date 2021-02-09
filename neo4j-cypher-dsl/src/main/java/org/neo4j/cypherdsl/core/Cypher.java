@@ -310,6 +310,19 @@ public final class Cypher {
 	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
 	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
 	 * arguments to have an alias.
+	 *
+	 * @param variables One ore more variables.
+	 * @return An ongoing with clause.
+	 */
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
+
+		return Statement.builder().with(variables);
+	}
+
+	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
 	 * <p>
 	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
 	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.

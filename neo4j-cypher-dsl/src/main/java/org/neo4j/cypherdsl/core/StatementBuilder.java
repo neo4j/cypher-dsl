@@ -62,6 +62,16 @@ public interface StatementBuilder
 	OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
 
 	/**
+	 * Starts a with clause by passing symbolic name to it.
+	 *
+	 * @param expressions The expressions to start the query with
+	 * @return An ongoing read, exposing return and further matches.
+	 */
+	default OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... expressions) {
+		return with((Expression[]) expressions);
+	}
+
+	/**
 	 * An ongoing update statement that can be used to chain more update statements or add a with or return clause.
 	 *
 	 * @since 1.0
@@ -352,6 +362,15 @@ public interface StatementBuilder
 		/**
 		 * @param variables The variables to pass on to the next part
 		 * @return A match that can be build now
+		 * @see #with(Expression...)
+		 */
+		default OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
+			return with((Expression[]) variables);
+		}
+
+		/**
+		 * @param variables The variables to pass on to the next part
+		 * @return A match that can be build now
 		 * @see #withDistinct(Expression...)
 		 */
 		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(String... variables) {
@@ -374,6 +393,15 @@ public interface StatementBuilder
 		 * @return A match that can be build now
 		 */
 		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions);
+
+		/**
+		 * @param variables The variables to pass on to the next part
+		 * @return A match that can be build now
+		 * @see #withDistinct(Expression...)
+		 */
+		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(SymbolicName... variables) {
+			return withDistinct((Expression[]) variables);
+		}
 	}
 
 	/**
@@ -580,6 +608,18 @@ public interface StatementBuilder
 		<T extends OngoingUpdate & BuildableStatement> T delete(Expression... expressions);
 
 		/**
+		 * Renders a {@code DELETE} clause targeting the given variables. NO checks are done whether they have been matched
+		 * previously.
+		 *
+		 * @param variables Variables indicating the things to delete.
+		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a delete clause that can be build now
+		 */
+		default <T extends OngoingUpdate & BuildableStatement> T delete(SymbolicName... variables) {
+			return delete((Expression[]) variables);
+		}
+
+		/**
 		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
 		 * been matched previously.
 		 *
@@ -611,6 +651,18 @@ public interface StatementBuilder
 		 * @return A match with a delete clause that can be build now
 		 */
 		<T extends OngoingUpdate & BuildableStatement> T detachDelete(Expression... expressions);
+
+		/**
+		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
+		 * been matched previously.
+		 *
+		 * @param variables Variables indicating the things to delete.
+		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
+		 * @return A match with a detach delete clause that can be build now
+		 */
+		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(SymbolicName... variables) {
+			return detachDelete((Expression[]) variables);
+		}
 	}
 
 	/**
@@ -643,6 +695,18 @@ public interface StatementBuilder
 		}
 
 		/**
+		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
+		 *
+		 * @param variable   The named thing to modify
+		 * @param expression The modifying expression
+		 * @param <T>        The type of the next step
+		 * @return An ongoing match and update
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement> T set(SymbolicName variable, Expression expression) {
+			return set((Expression) variable, expression);
+		}
+
+		/**
 		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
 		 * of properties and the right hand side must be a map of new or updated properties
 		 *
@@ -664,6 +728,19 @@ public interface StatementBuilder
 		 */
 		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
+		}
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param variable  The named thing to modify
+		 * @param properties  The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(SymbolicName variable, Expression properties) {
+			return mutate((Expression) variable, properties);
 		}
 	}
 
@@ -765,6 +842,19 @@ public interface StatementBuilder
 		}
 
 		/**
+		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
+		 *
+		 * @param variable   The named thing to modify
+		 * @param expression The modifying expression
+		 * @param <T>        The type of the next step
+		 * @return An ongoing match and update
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(SymbolicName variable,
+				Expression expression) {
+			return set((Expression) variable, expression);
+		}
+
+		/**
 		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
 		 * of properties and the right hand side must be a map of new or updated properties
 		 *
@@ -786,6 +876,19 @@ public interface StatementBuilder
 		 */
 		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
+		}
+
+		/**
+		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
+		 * of properties and the right hand side must be a map of new or updated properties
+		 *
+		 * @param variable  The named thing to modify
+		 * @param properties  The new properties
+		 * @return An ongoing match and update
+		 * @since 2020.1.5
+		 */
+		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(SymbolicName variable, Expression properties) {
+			return mutate((Expression) variable, properties);
 		}
 	}
 }

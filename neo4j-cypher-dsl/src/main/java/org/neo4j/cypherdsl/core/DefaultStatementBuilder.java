@@ -155,9 +155,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.closeCurrentOngoingCall();
 		this.closeCurrentOngoingUpdate();
 
-		if (pattern.getClass().getComponentType() == PatternElement.class) {
+		if (PatternElement.class.isAssignableFrom(pattern.getClass().getComponentType())) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (PatternElement[]) pattern);
-		} else if (pattern.getClass().getComponentType() == Expression.class) {
+		} else if (Expression.class.isAssignableFrom(pattern.getClass().getComponentType())) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (Expression[]) pattern);
 		}
 
@@ -196,6 +196,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 	public OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 
 		return with(false, expressions);
+	}
+
+	@Override
+	public OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... expressions) {
+		return with((Expression[]) expressions);
 	}
 
 	@Override

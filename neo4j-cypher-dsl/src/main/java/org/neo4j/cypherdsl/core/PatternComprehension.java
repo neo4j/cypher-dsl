@@ -66,6 +66,15 @@ public final class PatternComprehension implements Expression {
 		 * @return The final definition of the pattern comprehension
 		 */
 		PatternComprehension returning(Expression... listDefinition);
+
+		/**
+		 * @param variables the elements to be returned from the pattern
+		 * @return The final definition of the pattern comprehension
+		 * @see #returning(Expression...)
+		 */
+		default PatternComprehension returning(SymbolicName... variables) {
+			return returning((Expression[]) variables);
+		}
 	}
 
 	/**

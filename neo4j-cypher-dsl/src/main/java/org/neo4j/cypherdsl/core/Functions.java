@@ -322,7 +322,21 @@ public final class Functions {
 
 		Assertions.notNull(variable, "The variable parameter is required.");
 
-		return FunctionInvocation.create(Aggregates.COLLECT, variable.getRequiredSymbolicName());
+		return collect(variable.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a function invocation for the {@code collect()} function.
+	 *
+	 * @param variable The named thing to collect
+	 * @return A function call for {@code collect()}
+	 * @see #collect(Expression)
+	 */
+	public static FunctionInvocation collect(SymbolicName variable) {
+
+		Assertions.notNull(variable, "The variable parameter is required.");
+
+		return FunctionInvocation.create(Aggregates.COLLECT, variable);
 	}
 
 	/**

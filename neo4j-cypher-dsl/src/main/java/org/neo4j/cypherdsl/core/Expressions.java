@@ -40,7 +40,9 @@ final class Expressions {
 	 */
 	static <T extends Expression> Expression nameOrExpression(T expression) {
 
-		if (expression instanceof Named) {
+		if (expression instanceof SymbolicName) {
+			return expression;
+		} else if (expression instanceof Named) {
 			return ((Named) expression).getSymbolicName().map(Expression.class::cast).orElse(expression);
 		} else {
 			return expression;

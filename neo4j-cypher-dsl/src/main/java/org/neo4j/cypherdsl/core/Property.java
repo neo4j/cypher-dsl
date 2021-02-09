@@ -52,6 +52,10 @@ public final class Property implements Expression {
 		return new Property(Optional.empty(), containerReference, createListOfChainedNames(names));
 	}
 
+	static Property create(SymbolicName containerReference, String... names) {
+		return create((Expression) containerReference, names);
+	}
+
 	static Property create(Named parentContainer, Expression lookup) {
 
 		SymbolicName requiredSymbolicName = extractRequiredSymbolicName(parentContainer);
@@ -63,6 +67,12 @@ public final class Property implements Expression {
 
 		return new Property(Optional.empty(), containerReference,
 			Collections.singletonList(PropertyLookup.forExpression(lookup)));
+	}
+
+	static Property create(SymbolicName containerReference, Expression lookup) {
+
+		return new Property(Optional.empty(), containerReference,
+				Collections.singletonList(PropertyLookup.forExpression(lookup)));
 	}
 
 	private static List<PropertyLookup> createListOfChainedNames(String... names) {

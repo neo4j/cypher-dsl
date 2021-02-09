@@ -113,6 +113,15 @@ public final class ListComprehension implements Expression {
 		ListComprehension returning(Expression... listDefinition);
 
 		/**
+		 * @param variables the elements to be returned from the list
+		 * @return The final definition of the list comprehension
+		 * @see #returning(Expression...)
+		 */
+		default ListComprehension returning(SymbolicName... variables) {
+			return returning((Expression[]) variables);
+		}
+
+		/**
 		 * @return Returns the list comprehension as is, without a {@literal WHERE} and returning each element of the
 		 * original list
 		 */

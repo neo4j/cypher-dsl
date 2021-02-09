@@ -20,7 +20,9 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
@@ -40,7 +42,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @since 1.0
  */
 @API(status = Status.EXPERIMENTAL, since = "1.0")
-public class SymbolicName implements Expression {
+public class SymbolicName implements Expression, PropertyContainer {
 
 	static SymbolicName of(String name) {
 
@@ -72,6 +74,45 @@ public class SymbolicName implements Expression {
 	@API(status = INTERNAL)
 	public String getValue() {
 		return value;
+	}
+
+	/**
+	 * A list will never be a valid entry for a map projection, so this convenient method prevents trying to create one
+	 * from a list of objects. It will delegate to {@link #project(Object...)} with the content of the list.
+	 *
+	 * @param entries A list of entries for the projection
+	 * @return A map projection.
+	 */
+	public MapProjection project(List<Object> entries) {
+		return project(entries.toArray());
+	}
+
+	/**
+	 * Creates a map projection based on this name
+	 * <p>
+	 * Entries of type {@code String} in {@code entries} followed by an {@link Expression} will be treated as map keys
+	 * pointing to the expression in the projection, {@code String} entries alone will be treated as property lookups on the node.
+	 *
+	 * @param entries A list of entries for the projection
+	 * @return A map projection.
+	 */
+	public MapProjection project(Object... entries) {
+		return MapProjection.create(this, entries);
+	}
+
+	@Override
+	public Property property(String... names) {
+		return Property.create(this, names);
+	}
+
+	@Override
+	public Optional<SymbolicName> getSymbolicName() {
+		return Optional.of(this);
+	}
+
+	@Override
+	public SymbolicName getRequiredSymbolicName() {
+		return this;
 	}
 
 	/**
