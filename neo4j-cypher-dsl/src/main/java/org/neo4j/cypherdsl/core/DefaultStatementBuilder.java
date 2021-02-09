@@ -764,7 +764,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		@SuppressWarnings("unchecked")
 		public OrderableOngoingReadingAndWithWithWhere skip(Number number) {
-			return skip(new NumberLiteral(number));
+			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
 		@Override
@@ -776,7 +776,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		public OngoingReadingAndWith limit(Number number) {
-			return limit(new NumberLiteral(number));
+			return limit(number == null ? null : new NumberLiteral(number));
 		}
 
 		@Override
