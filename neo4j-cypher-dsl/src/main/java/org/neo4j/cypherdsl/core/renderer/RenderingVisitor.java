@@ -332,7 +332,18 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 	void enter(PropertyLookup propertyLookup) {
 
-		builder.append(".");
+		if (propertyLookup.isDynamicLookup()) {
+			builder.append("[");
+		} else {
+			builder.append(".");
+		}
+	}
+
+	void leave(PropertyLookup propertyLookup) {
+
+		if (propertyLookup.isDynamicLookup()) {
+			builder.append("]");
+		}
 	}
 
 	void enter(FunctionInvocation functionInvocation) {

@@ -2770,8 +2770,61 @@ class CypherIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo(
-					"MATCH (b:`Bike` {a: 'b'}), (b)<-[:`OWNS`]-(u:`User`) RETURN b");
+				.isEqualTo("MATCH (b:`Bike` {a: 'b'}), (b)<-[:`OWNS`]-(u:`User`) RETURN b");
+		}
+
+		@Test // GH-127
+		void dynamicPropertyLookupsOnNodes() {
+
+			Node m = Cypher.node("Movie").named("m");
+			Statement statement;
+
+			statement = Cypher.match(m).returning(m.property(Cypher.literalOf("title"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) RETURN m['title']");
+
+			statement = Cypher.match(m).returning(m.property(Cypher.parameter("prop"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) RETURN m[$prop]");
+		}
+
+		@Test // GH-127
+		void dynamicPropertyLookupsOnRelationships() {
+
+			Node m = Cypher.node("Movie").named("m");
+			Relationship r = m.relationshipFrom(Cypher.anyNode(), "ACTED_IN").named("r");
+			Statement statement;
+
+			statement = Cypher.match(r).returning(r.property(Cypher.literalOf("roles"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`)<-[r:`ACTED_IN`]-() RETURN r['roles']");
+
+			statement = Cypher.match(r).returning(r.property(Cypher.parameter("prop"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`)<-[r:`ACTED_IN`]-() RETURN r[$prop]");
+		}
+
+		@Test // GH-127
+		void arbitraryDynamicLookups() {
+
+			Node m = Cypher.node("Movie").named("m");
+			Statement statement;
+
+			statement = Cypher.match(m).returning(Cypher.property("m", Cypher.literalOf("title"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) RETURN m['title']");
+
+			statement = Cypher.match(m).returning(Cypher.property(SymbolicName.of("m"), Cypher.literalOf("title"))).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Movie`) RETURN m['title']");
+
+			statement = Cypher.with(Cypher.mapOf("a", Cypher.literalOf("X"), "b", Cypher.literalOf("Y")).as("m"))
+				.returning(
+					Cypher.property("m", Cypher.literalOf("a")),
+					Cypher.property("m", "a")
+				).build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("WITH {a: 'X', b: 'Y'} AS m RETURN m['a'], m.a");
 		}
 	}
 

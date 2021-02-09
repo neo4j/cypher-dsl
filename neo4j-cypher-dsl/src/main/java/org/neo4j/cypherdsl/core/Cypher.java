@@ -117,7 +117,8 @@ public final class Cypher {
 	 * Dereferences a property for a symbolic name, most likely pointing to a property container like a node or a relationship.
 	 *
 	 * @param containerName The symbolic name of a property container
-	 * @param names         The names of the properties to dereference. More than one name does create a nested property like {@code containerName.name1.name2}.
+	 * @param names         The names of the properties to dereference. More than one name does create a nested property
+	 *                      like {@code containerName.name1.name2}.
 	 * @return A new property
 	 */
 	public static Property property(String containerName, String... names) {
@@ -128,11 +129,38 @@ public final class Cypher {
 	 * Dereferences a property on a arbitrary expression.
 	 *
 	 * @param expression The expression that describes some sort of accessible map
-	 * @param names      The names of the properties to dereference. More than one name does create a nested property like {@code expression.name1.name2}.
+	 * @param names      The names of the properties to dereference. More than one name does create a nested property
+	 *                   like {@code expression.name1.name2}.
 	 * @return A new property.
 	 */
 	public static Property property(Expression expression, String... names) {
 		return Property.create(expression, names);
+	}
+
+	/**
+	 * Creates a dynamic lookup of a property for a symbolic name, most likely pointing to a property container like a
+	 * node or a relationship. A dynamic property will be rendered as {@code p[expression]}.
+	 *
+	 * @param containerName The symbolic name of a property container
+	 * @param lookup        An expression to use as a dynamic lookup for properties of the container with the given name
+	 * @return A new property
+	 * @since 2021.0.0
+	 */
+	public static Property property(String containerName, Expression lookup) {
+		return property(name(containerName), lookup);
+	}
+
+	/**
+	 * Creates a dynamic lookup of a property on a arbitrary expression. A dynamic property will be rendered as
+	 * {@code p[expression]}.
+	 *
+	 * @param expression The expression that describes some sort of accessible map
+	 * @param lookup     An expression to use as a dynamic lookup for properties of the container the expression resolved to
+	 * @return A new property.
+	 * @since 2021.0.0
+	 */
+	public static Property property(Expression expression, Expression lookup) {
+		return Property.create(expression, lookup);
 	}
 
 	/**
@@ -530,10 +558,10 @@ public final class Cypher {
 	 * Starts building a statement based on one subquery.
 	 *
 	 * @param subquery The statement representing the subquery
+	 * @return A new ongoing read without any further conditions or returns.
 	 * @neo4j.version 4.0.0
 	 * @see ExposesSubqueryCall#call(Statement)
 	 * @since 2020.1.2
-	 * @return A new ongoing read without any further conditions or returns.
 	 */
 	@Neo4jVersion(minimum = "4.0.0")
 	public static StatementBuilder.OngoingReadingWithoutWhere call(Statement subquery) {

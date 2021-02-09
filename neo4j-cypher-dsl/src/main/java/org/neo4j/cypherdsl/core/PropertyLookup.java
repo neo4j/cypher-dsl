@@ -34,14 +34,22 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class PropertyLookup implements Expression {
 
-	private static final PropertyLookup WILDCARD = new PropertyLookup(Asterisk.INSTANCE);
+	private static final PropertyLookup WILDCARD = new PropertyLookup(Asterisk.INSTANCE, false);
 
 	private final Expression propertyKeyName;
+	/** This flag is set to true for dynamic lookups via `p['x']` notation. */
+	private final boolean dynamicLookup;
 
 	static PropertyLookup forName(String name) {
 
 		Assertions.hasText(name, "The property's name is required.");
-		return new PropertyLookup(SymbolicName.unsafe(name));
+		return new PropertyLookup(SymbolicName.unsafe(name), false);
+	}
+
+	static PropertyLookup forExpression(Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required");
+		return new PropertyLookup(expression, true);
 	}
 
 	static PropertyLookup wildcard() {
@@ -49,8 +57,10 @@ public final class PropertyLookup implements Expression {
 		return WILDCARD;
 	}
 
-	private PropertyLookup(Expression propertyKeyName) {
+	private PropertyLookup(Expression propertyKeyName, boolean dynamicLookup) {
+
 		this.propertyKeyName = propertyKeyName;
+		this.dynamicLookup = dynamicLookup;
 	}
 
 	@API(status = INTERNAL)
@@ -58,6 +68,11 @@ public final class PropertyLookup implements Expression {
 
 		Assertions.isTrue(this != WILDCARD, "The wildcard property lookup does not reference a specific property!");
 		return (SymbolicName) propertyKeyName;
+	}
+
+	@API(status = INTERNAL)
+	public boolean isDynamicLookup() {
+		return dynamicLookup;
 	}
 
 	@Override

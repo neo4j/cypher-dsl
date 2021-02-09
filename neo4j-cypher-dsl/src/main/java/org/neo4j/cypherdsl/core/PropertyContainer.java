@@ -41,13 +41,34 @@ public interface PropertyContainer extends Named {
 	 * properties that have been created for this property container.
 	 *
 	 * @param name property name, must not be {@literal null} or empty.
-	 * @return a new {@link Property} associated with this {@link Relationship}.
+	 * @return a new {@link Property} associated with this named container
 	 */
 	default Property property(String name) {
 		return property(new String[] { name });
 	}
 
-	Property property(String... names);
+	default Property property(String... names) {
+		return Property.create(this, names);
+	}
+
+	/**
+	 * Creates a new {@link Property} associated with this property container. This property can be used as a lookup in
+	 * other expressions. It does not add a value to the property.
+	 * <p>
+	 * The new {@link Property} object is a dynamic lookup, based on the {@code expression} passed to this method. The
+	 * expression can be example another property, a function result or a Cypher parameter. A property defined in such a way will
+	 * render as {@code p[expression]}.
+	 * <p>
+	 * Note: The property container does not track property creation and there is no possibility to enumerate all
+	 * properties that have been created for this property container.
+	 *
+	 * @param lookup the expression that is evaluated to lookup this property.
+	 * @return a new {@link Property} associated with this named container
+	 * @since 2021.0.0
+	 */
+	default Property property(Expression lookup) {
+		return Property.create(this, lookup);
+	}
 
 	/**
 	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not

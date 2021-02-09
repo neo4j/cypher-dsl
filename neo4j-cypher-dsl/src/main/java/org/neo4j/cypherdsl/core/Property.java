@@ -42,22 +42,27 @@ public final class Property implements Expression {
 
 	static Property create(Named parentContainer, String... names) {
 
-		SymbolicName requiredSymbolicName;
-		try {
-			requiredSymbolicName = parentContainer.getRequiredSymbolicName();
-		} catch (IllegalStateException e) {
-			throw new IllegalArgumentException(
-				"A property derived from a node or a relationship needs a parent with a symbolic name.");
-		}
-
+		SymbolicName requiredSymbolicName = extractRequiredSymbolicName(parentContainer);
 		return new Property(Optional.of(parentContainer), requiredSymbolicName, createListOfChainedNames(names));
 	}
 
 	static Property create(Expression containerReference, String... names) {
 
 		Assertions.notNull(containerReference, "The property container is required.");
-
 		return new Property(Optional.empty(), containerReference, createListOfChainedNames(names));
+	}
+
+	static Property create(Named parentContainer, Expression lookup) {
+
+		SymbolicName requiredSymbolicName = extractRequiredSymbolicName(parentContainer);
+		return new Property(Optional.of(parentContainer), requiredSymbolicName,
+			Collections.singletonList(PropertyLookup.forExpression(lookup)));
+	}
+
+	static Property create(Expression containerReference, Expression lookup) {
+
+		return new Property(Optional.empty(), containerReference,
+			Collections.singletonList(PropertyLookup.forExpression(lookup)));
 	}
 
 	private static List<PropertyLookup> createListOfChainedNames(String... names) {
@@ -124,5 +129,14 @@ public final class Property implements Expression {
 		this.containerReference.accept(visitor);
 		this.names.forEach(name -> name.accept(visitor));
 		visitor.leave(this);
+	}
+
+	private static SymbolicName extractRequiredSymbolicName(Named parentContainer) {
+		try {
+			return parentContainer.getRequiredSymbolicName();
+		} catch (IllegalStateException e) {
+			throw new IllegalArgumentException(
+				"A property derived from a node or a relationship needs a parent with a symbolic name.");
+		}
 	}
 }

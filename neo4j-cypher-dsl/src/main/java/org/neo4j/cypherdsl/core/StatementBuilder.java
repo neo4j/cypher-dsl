@@ -424,7 +424,7 @@ public interface StatementBuilder
 		 * @param expression The expression to skip by
 		 * @param <T>    The type of the next step
 		 * @return A step that only allows the limit of records to be specified.
-		 * @since 2021.1.0
+		 * @since 2021.0.0
 		 */
 		<T extends TerminalExposesLimit & BuildableStatement> T skip(Expression expression);
 	}
@@ -449,7 +449,7 @@ public interface StatementBuilder
 		 *
 		 * @param expression How many records to return. If this is null, all the records are returned.
 		 * @return A buildable match statement.
-		 * @since 2021.1.0
+		 * @since 2021.0.0
 		 */
 		BuildableStatement limit(Expression expression);
 	}
@@ -501,7 +501,7 @@ public interface StatementBuilder
 		 * @param expression How many records to skip. If this is null, then no records are skipped.
 		 * @param <T>    The type of the next step
 		 * @return A step that only allows the limit of records to be specified.
-		 * @since 2021.1.0
+		 * @since 2021.0.0
 		 */
 		<T extends ExposesLimit & OngoingReadingAndWith> T  skip(Expression expression);
 	}
@@ -526,7 +526,7 @@ public interface StatementBuilder
 		 *
 		 * @param expression How many records to return. If this is null, all the records are returned.
 		 * @return A buildable match statement.
-		 * @since 2021.1.0
+		 * @since 2021.0.0
 		 */
 		OngoingReadingAndWith limit(Expression expression);
 	}

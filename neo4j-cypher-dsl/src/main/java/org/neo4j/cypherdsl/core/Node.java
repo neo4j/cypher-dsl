@@ -137,11 +137,7 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 		return withProperties(newProperties);
 	}
 
-	@Override
-	public Property property(String... names) {
 
-		return Property.create(this, names);
-	}
 
 	/**
 	 * A list will never be a valid entry for a map projection, so this convenient method prevents trying to create one
