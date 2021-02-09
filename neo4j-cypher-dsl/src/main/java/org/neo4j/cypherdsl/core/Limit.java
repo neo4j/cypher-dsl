@@ -33,23 +33,23 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Limit implements Visitable {
 
-	static Limit create(Number value) {
+	static Limit create(Expression value) {
 
 		Assertions.notNull(value, "A limit cannot have a null value.");
 
-		return new Limit(new NumberLiteral(value));
+		return new Limit(value);
 	}
 
-	private final NumberLiteral limitAmount;
+	private final Expression limitExpression;
 
-	private Limit(NumberLiteral limitAmount) {
-		this.limitAmount = limitAmount;
+	private Limit(Expression limitExpression) {
+		this.limitExpression = limitExpression;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		limitAmount.accept(visitor);
+		limitExpression.accept(visitor);
 		visitor.leave(this);
 	}
 }

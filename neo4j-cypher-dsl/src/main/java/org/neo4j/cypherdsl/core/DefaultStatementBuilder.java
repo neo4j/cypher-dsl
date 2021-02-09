@@ -469,13 +469,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		@SuppressWarnings("unchecked")
 		public final OngoingReadingAndReturn skip(Number number) {
-			orderBuilder.skip(number);
+			return skip(number == null ? null : new NumberLiteral(number));
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public final OngoingReadingAndReturn skip(Expression expression) {
+			orderBuilder.skip(expression);
 			return this;
 		}
 
 		@Override
 		public final OngoingReadingAndReturn limit(Number number) {
-			orderBuilder.limit(number);
+			return limit(number == null ? null : new NumberLiteral(number));
+		}
+
+		@Override
+		public final OngoingReadingAndReturn limit(Expression expression) {
+			orderBuilder.limit(expression);
 			return this;
 		}
 
@@ -753,13 +764,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		@SuppressWarnings("unchecked")
 		public OrderableOngoingReadingAndWithWithWhere skip(Number number) {
-			orderBuilder.skip(number);
+			return skip(new NumberLiteral(number));
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public OrderableOngoingReadingAndWithWithWhere skip(Expression expression) {
+			orderBuilder.skip(expression);
 			return this;
 		}
 
 		@Override
 		public OngoingReadingAndWith limit(Number number) {
-			orderBuilder.limit(number);
+			return limit(new NumberLiteral(number));
+		}
+
+		@Override
+		public OngoingReadingAndWith limit(Expression expression) {
+			orderBuilder.limit(expression);
 			return this;
 		}
 	}
@@ -1262,17 +1284,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.lastSortItem = null;
 		}
 
-		protected void skip(Number number) {
-
-			if (number != null) {
-				skip = Skip.create(number);
+		protected void skip(Expression expression) {
+			if (expression != null) {
+				skip = Skip.create(expression);
 			}
 		}
 
-		protected void limit(Number number) {
-
-			if (number != null) {
-				limit = Limit.create(number);
+		protected void limit(Expression expression) {
+			if (expression != null) {
+				limit = Limit.create(expression);
 			}
 		}
 
