@@ -90,6 +90,15 @@ public class SymbolicName implements Expression {
 		return SymbolicName.of(this.value + otherValue);
 	}
 
+	/**
+	 * Transform this symbolic name so it can be used directly as condition.
+	 *
+	 * @return this name as a condition
+	 */
+	public ExpressionCondition asCondition() {
+		return new ExpressionCondition(this);
+	}
+
 	@Override
 	public String toString() {
 		return value == null ? "SymbolicName{" +

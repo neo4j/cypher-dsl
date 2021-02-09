@@ -18,23 +18,29 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.support.Visitor;
+
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
-import org.apiguardian.api.API;
-
 /**
- * A constant condition that is either always {@literal true} or {@literal false}.
+ * A condition that uses its bound expression
  *
- * @author Michael J. Simons
- * @since 1.0
+ * @author Andreas Berger
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class ConstantCondition extends ExpressionCondition {
+public class ExpressionCondition implements Condition {
 
-	static final ConstantCondition TRUE = new ConstantCondition(BooleanLiteral.TRUE);
-	static final ConstantCondition FALSE = new ConstantCondition(BooleanLiteral.FALSE);
+	private final Expression value;
 
-	private ConstantCondition(BooleanLiteral value) {
-		super(value);
+	ExpressionCondition(Expression value) {
+		this.value = value;
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		value.accept(visitor);
+		visitor.leave(this);
 	}
 }
