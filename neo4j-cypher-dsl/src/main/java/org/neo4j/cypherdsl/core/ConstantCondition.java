@@ -26,6 +26,7 @@ import org.apiguardian.api.API;
  * A constant condition that is either always {@literal true} or {@literal false}.
  *
  * @author Michael J. Simons
+ * @author Andreas Berger
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")

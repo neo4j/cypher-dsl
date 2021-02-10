@@ -21,15 +21,15 @@ package org.neo4j.cypherdsl.core;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * A condition that uses its bound expression
  *
  * @author Andreas Berger
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public class ExpressionCondition implements Condition {
+@API(status = INTERNAL, since = "2021.0.0")
+class ExpressionCondition implements Condition {
 
 	private final Expression value;
 
@@ -39,6 +39,7 @@ public class ExpressionCondition implements Condition {
 
 	@Override
 	public void accept(Visitor visitor) {
+
 		visitor.enter(this);
 		value.accept(visitor);
 		visitor.leave(this);

@@ -37,6 +37,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * with some characters, this DSL uses the same identifier Java itself uses for simplicity and until otherwise needed.
  *
  * @author Michael J. Simons
+ * @author Andreas Berger
  * @since 1.0
  */
 @API(status = Status.EXPERIMENTAL, since = "1.0")
@@ -94,6 +95,7 @@ public class SymbolicName implements Expression {
 	 * Transform this symbolic name so it can be used directly as condition.
 	 *
 	 * @return this name as a condition
+	 * @since 2021.0.0
 	 */
 	public ExpressionCondition asCondition() {
 		return new ExpressionCondition(this);
