@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
-
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * A condition that uses its bound expression
  *
  * @author Andreas Berger
+ * @since 2021.0.0
  */
 @API(status = INTERNAL, since = "2021.0.0")
 class ExpressionCondition implements Condition {
