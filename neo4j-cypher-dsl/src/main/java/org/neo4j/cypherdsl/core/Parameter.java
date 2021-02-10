@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Represents a named parameter inside a Cypher statement.
@@ -33,9 +33,16 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Parameter implements Expression {
 
+	private static final Object NO_VALUE = new Object();
+
 	private final String name;
+	private final Object boundValue;
 
 	static Parameter create(String name) {
+		return create(name, NO_VALUE);
+	}
+
+	static Parameter create(String name, Object value) {
 
 		Assertions.hasText(name, "The name of the parameter is required!");
 
@@ -43,11 +50,12 @@ public final class Parameter implements Expression {
 			return create(name.substring(1));
 		}
 
-		return new Parameter(name);
+		return new Parameter(name, value);
 	}
 
-	private Parameter(String name) {
+	private Parameter(String name, Object value) {
 		this.name = name;
+		this.boundValue = value;
 	}
 
 	/**
@@ -56,5 +64,29 @@ public final class Parameter implements Expression {
 	@API(status = INTERNAL)
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return A new Parameter with a bound value
+	 */
+	@API(status = INTERNAL)
+	public Parameter withValue(Object value) {
+		return create(name, value);
+	}
+
+	/**
+	 * @return the value bound to this parameter
+	 */
+	@API(status = INTERNAL)
+	public Object getBoundValue() {
+		return boundValue;
+	}
+
+	/**
+	 * @return true if the Parameter has a bound value
+	 */
+	@API(status = INTERNAL)
+	public boolean hasBoundValue() {
+		return boundValue != NO_VALUE;
 	}
 }
