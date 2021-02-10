@@ -112,7 +112,7 @@ class IssueRelatedIT {
 
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo(
-				"MATCH (r:`Resume`)-[:`FOR`]->(o:`Offer`) WHERE (NOT (r:`LastResume`) AND (coalesce(o.valid_only, false) = false AND NOT (r:`InvalidStatus`) OR (o.valid_only = true AND r:`InvalidStatus`))) RETURN DISTINCT r, o");
+				"MATCH (r:`Resume`)-[:`FOR`]->(o:`Offer`) WHERE (NOT (r:`LastResume`) AND ((coalesce(o.valid_only, false) = false AND NOT (r:`InvalidStatus`)) OR (o.valid_only = true AND r:`InvalidStatus`))) RETURN DISTINCT r, o");
 	}
 
 	@Test
@@ -141,8 +141,8 @@ class IssueRelatedIT {
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (r:`Resume`)<-[:`HAS`]-(u:`UserSearchable`) "
 					   + "WHERE (NOT (r:`LastResume`) "
-					   + "AND (coalesce(o.valid_only, false) = false "
-					   + "AND NOT (r:`InvalidStatus`) "
+					   + "AND ((coalesce(o.valid_only, false) = false "
+					   + "AND NOT (r:`InvalidStatus`)) "
 					   + "OR (o.valid_only = true "
 					   + "AND r:`ValidStatus`)) "
 					   + "AND NOT ("

@@ -101,19 +101,23 @@ public final class CompoundCondition implements Condition {
 
 		if (condition instanceof CompoundCondition) {
 			CompoundCondition compoundCondition = (CompoundCondition) condition;
+			CompoundCondition target;
 			if (this.operator == chainingOperator && chainingOperator == compoundCondition.operator) {
-				if (compoundCondition.canBeFlattenedWith(chainingOperator)) {
-					this.conditions.addAll(compoundCondition.conditions);
-				} else {
-					this.conditions.add(compoundCondition);
-				}
+				target = this;
 			} else {
 				CompoundCondition inner = new CompoundCondition(chainingOperator);
-				inner.conditions.add(compoundCondition);
-				this.conditions.add(inner);
+				if (this.hasConditions()) {
+					inner.conditions.add(this);
+				}
+				target = inner;
+			}
+			if (compoundCondition.canBeFlattenedWith(chainingOperator)) {
+				target.conditions.addAll(compoundCondition.conditions);
+			} else {
+				target.conditions.add(compoundCondition);
 			}
 
-			return this;
+			return target;
 		}
 
 		if (this.operator == chainingOperator) {
@@ -134,6 +138,9 @@ public final class CompoundCondition implements Condition {
 	 */
 	private boolean canBeFlattenedWith(Operator operatorBefore) {
 
+		if (this.operator != operatorBefore) {
+			return false;
+		}
 		for (Condition c : this.conditions) {
 			if (c instanceof CompoundCondition && ((CompoundCondition) c).operator != operatorBefore) {
 				return false;
@@ -162,12 +169,7 @@ public final class CompoundCondition implements Condition {
 		// All others do
 		if (hasManyConditions) {
 			for (Condition condition : conditions.subList(1, conditions.size())) {
-				// This takes care of a potential inner compound condition that got added with a different operator
-				// and thus forms a tree.
-				Operator actualOperator = condition instanceof CompoundCondition ?
-					((CompoundCondition) condition).operator :
-					operator;
-				acceptVisitorWithOperatorForChildCondition(visitor, actualOperator, condition);
+				acceptVisitorWithOperatorForChildCondition(visitor, operator, condition);
 			}
 			visitor.leave(this);
 		}

@@ -945,10 +945,12 @@ class CypherIT {
 		void nestedConditions() {
 			Statement statement;
 
+			Condition isTrue = org.neo4j.cypherdsl.core.Conditions.isTrue();
+			Condition isFalse = org.neo4j.cypherdsl.core.Conditions.isFalse();
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()))
+					isTrue.or(isFalse).and(isTrue)
+				)
 				.returning(userNode)
 				.build();
 
@@ -957,9 +959,9 @@ class CypherIT {
 
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()))
-				.or(org.neo4j.cypherdsl.core.Conditions.isFalse())
+					isTrue.or(isFalse).and(isTrue)
+				)
+				.or(isFalse)
 				.returning(userNode)
 				.build();
 
@@ -969,10 +971,10 @@ class CypherIT {
 
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()))
-				.or(org.neo4j.cypherdsl.core.Conditions.isFalse())
-				.and(org.neo4j.cypherdsl.core.Conditions.isFalse())
+					isTrue.or(isFalse).and(isTrue)
+				)
+				.or(isFalse)
+				.and(isFalse)
 				.returning(userNode)
 				.build();
 
@@ -981,48 +983,58 @@ class CypherIT {
 
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()))
-				.or(org.neo4j.cypherdsl.core.Conditions.isFalse().and(org.neo4j.cypherdsl.core.Conditions.isTrue()))
+					isTrue.or(isFalse).and(isTrue))
+				.or(isFalse.and(isTrue))
 				.returning(userNode)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (u:`User`) WHERE ((true OR false) AND true OR (false AND true)) RETURN u");
+				.isEqualTo("MATCH (u:`User`) WHERE (((true OR false) AND true) OR (false AND true)) RETURN u");
 
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()))
-				.or(org.neo4j.cypherdsl.core.Conditions.isFalse().and(org.neo4j.cypherdsl.core.Conditions.isTrue()))
-				.and(org.neo4j.cypherdsl.core.Conditions.isTrue())
+					isTrue.or(isFalse).and(isTrue))
+				.or(isFalse.and(isTrue))
+				.and(isTrue)
 				.returning(userNode)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (u:`User`) WHERE ((true OR false) AND true OR (false AND true) AND true) RETURN u");
+				.isEqualTo("MATCH (u:`User`) WHERE ((((true OR false) AND true) OR (false AND true)) AND true) RETURN u");
 
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()))
-				.or(org.neo4j.cypherdsl.core.Conditions.isFalse().or(org.neo4j.cypherdsl.core.Conditions.isTrue()))
+					isTrue.or(isFalse).and(isTrue)
+				)
+				.or(isFalse.or(isTrue))
 				.returning(userNode)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (u:`User`) WHERE ((true OR false) AND true OR (false OR true)) RETURN u");
+				.isEqualTo("MATCH (u:`User`) WHERE (((true OR false) AND true) OR false OR true) RETURN u");
 
 			statement = Cypher.match(userNode)
 				.where(
-					org.neo4j.cypherdsl.core.Conditions.isTrue().or(org.neo4j.cypherdsl.core.Conditions.isFalse()).and(
-						org.neo4j.cypherdsl.core.Conditions.isTrue()).or(
-						org.neo4j.cypherdsl.core.Conditions.isFalse().or(org.neo4j.cypherdsl.core.Conditions.isTrue())))
+					isTrue.or(isFalse).and(isTrue)
+						.or(
+							isFalse.or(isTrue))
+				)
 				.returning(userNode)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (u:`User`) WHERE ((true OR false) AND true OR (false OR true)) RETURN u");
+				.isEqualTo("MATCH (u:`User`) WHERE (((true OR false) AND true) OR false OR true) RETURN u");
+
+			statement = Cypher.match(userNode)
+				.where(
+					isTrue.or(isTrue).or(isTrue)
+				).or(isFalse.or(isFalse).or(isFalse))
+				.or(isTrue).or(isTrue).or(isTrue)
+				.returning(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (u:`User`) WHERE (true OR true OR true OR false OR false OR false OR true OR true OR true) RETURN u");
 		}
 
 		@Test
@@ -1384,6 +1396,39 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE u.name = 'test' RETURN u");
+		}
+
+		@Test // GH-137
+		void groupingBug() {
+
+			Node node = Cypher.node("Person").named("person");
+
+			Statement statement;
+			statement = Cypher
+				.match(node)
+				.where(
+					Cypher.literalOf("A").isTrue().or(Cypher.literalOf("B").isTrue())
+				).and(
+					Cypher.literalOf("C").isTrue()
+				)
+				.returning(node).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (person:`Person`) WHERE (('A' = true OR 'B' = true) AND 'C' = true) RETURN person");
+
+			statement = Cypher
+				.match(node)
+				.where(
+					Cypher.literalOf("A").isTrue().or(Cypher.literalOf("B").isTrue())
+				).and(
+					Cypher.literalOf("C").isTrue().or(Cypher.literalOf("D").isTrue())
+				)
+				.returning(node).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (person:`Person`) WHERE (('A' = true OR 'B' = true) AND ('C' = true OR 'D' = true)) RETURN person");
 		}
 
 		@Nested // GH-206, 3.6.5. Using path patterns in WHERE
