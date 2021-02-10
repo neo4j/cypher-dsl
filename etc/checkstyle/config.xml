@@ -112,6 +112,12 @@
         <module name="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAfterCheck" />
         <module name="com.puppycrawl.tools.checkstyle.checks.whitespace.WhitespaceAroundCheck" />
 
+        <module name="RegexpSinglelineJava">
+            <property name="format" value="^\t* "/>
+            <property name="message" value="Indent must use tab characters"/>
+            <property name="ignoreComments" value="true"/>
+        </module>
+
         <!-- We have some empty blocks and statements.  -->
         <module name="SuppressionCommentFilter"/>
 

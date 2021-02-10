@@ -101,9 +101,9 @@ class FunctionsIT {
 						.withInitialValueOf(Cypher.literalOf(0)).as("reduction")
 				).build();
 			Assertions.assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH p = (a)-->(b)-->(c) "
-						   + "WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') "
-						   + "RETURN reduce(totalAge = 0, n IN nodes(p) | (totalAge + n.age)) AS reduction");
+					.isEqualTo("MATCH p = (a)-->(b)-->(c) "
+							+ "WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') "
+							+ "RETURN reduce(totalAge = 0, n IN nodes(p) | (totalAge + n.age)) AS reduction");
 		}
 
 		@Test

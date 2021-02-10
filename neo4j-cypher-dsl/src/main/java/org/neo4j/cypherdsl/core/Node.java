@@ -214,9 +214,9 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 	@Override
 	public String toString() {
 		return "Node{" +
-			   "symbolicName=" + symbolicName +
-			   ", labels=" + labels +
-			   '}';
+				"symbolicName=" + symbolicName +
+				", labels=" + labels +
+				'}';
 	}
 
 	/**

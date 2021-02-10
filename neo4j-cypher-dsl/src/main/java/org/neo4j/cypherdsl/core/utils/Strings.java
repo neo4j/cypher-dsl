@@ -75,9 +75,7 @@ public final class Strings {
 		if (!Character.isJavaIdentifierStart(cp)) {
 			return false;
 		}
-		for (int i = Character.charCount(cp);
-			 i < id.length();
-			 i += Character.charCount(cp)) {
+		for (int i = Character.charCount(cp);  i < id.length(); i += Character.charCount(cp)) {
 			cp = id.codePointAt(i);
 			if (!Character.isJavaIdentifierPart(cp)) {
 				return false;

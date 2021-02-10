@@ -62,7 +62,7 @@ public final class Hint implements Visitable {
 
 		boolean pointsToSameContainer(SymbolicName otherSymbolicName, NodeLabel otherLabel) {
 			return this.symbolicName.equals(otherSymbolicName) &&
-				   (this.optionalLabel == null && otherLabel == null || this.optionalLabel.equals(otherLabel));
+					(this.optionalLabel == null && otherLabel == null || this.optionalLabel.equals(otherLabel));
 		}
 
 		@Override

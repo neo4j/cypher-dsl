@@ -51,9 +51,9 @@ class IssueRelatedIT {
 				Functions.collect(Functions.nodes(p)).as("nodes")).build();
 
 		assertThat(cypherRenderer.render(statement))
-			.isEqualTo("MATCH (node:`Node` {id: 'node_42'}) "
-					   + "CALL apoc.path.spanningTree(node, {relationshipFilter: '<rel_filter>', labelFilter: '<label_filter>'}) YIELD path "
-					   + "RETURN DISTINCT node, collect(relationships(path)) AS rels, collect(nodes(path)) AS nodes");
+				.isEqualTo("MATCH (node:`Node` {id: 'node_42'}) "
+						+ "CALL apoc.path.spanningTree(node, {relationshipFilter: '<rel_filter>', labelFilter: '<label_filter>'}) YIELD path "
+						+ "RETURN DISTINCT node, collect(relationships(path)) AS rels, collect(nodes(path)) AS nodes");
 	}
 
 	@Test
@@ -139,19 +139,19 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (r:`Resume`)<-[:`HAS`]-(u:`UserSearchable`) "
-					   + "WHERE (NOT (r:`LastResume`) "
-					   + "AND ((coalesce(o.valid_only, false) = false "
-					   + "AND NOT (r:`InvalidStatus`)) "
-					   + "OR (o.valid_only = true "
-					   + "AND r:`ValidStatus`)) "
-					   + "AND NOT ("
-					   + "(r.is_internship = true AND size(size((r)-[:`PART_OF`]->())) = 0)"
-					   + ") "
-					   + "AND NOT ("
-					   + "(r.is_sandwich_training = true AND size(size((r)-[:`PART_OF`]->())) = 0)"
-					   + ")"
-					   + ") RETURN DISTINCT r, o");
+				.isEqualTo("MATCH (r:`Resume`)<-[:`HAS`]-(u:`UserSearchable`) "
+						+ "WHERE (NOT (r:`LastResume`) "
+						+ "AND ((coalesce(o.valid_only, false) = false "
+						+ "AND NOT (r:`InvalidStatus`)) "
+						+ "OR (o.valid_only = true "
+						+ "AND r:`ValidStatus`)) "
+						+ "AND NOT ("
+						+ "(r.is_internship = true AND size(size((r)-[:`PART_OF`]->())) = 0)"
+						+ ") "
+						+ "AND NOT ("
+						+ "(r.is_sandwich_training = true AND size(size((r)-[:`PART_OF`]->())) = 0)"
+						+ ")"
+						+ ") RETURN DISTINCT r, o");
 	}
 
 	@Test
@@ -441,11 +441,11 @@ class IssueRelatedIT {
 			)).build();
 
 		assertThat(cypherRenderer.render(statement))
-			.isEqualTo("MATCH (person:`Person`) "
-					   + "RETURN person{"
-					   + "json: apoc.map.fromPairs([key IN keys(person) WHERE key STARTS WITH 'properties.' | [substring(key, 11), "
-					   + "person[key]]])"
-					   + "}");
+				.isEqualTo("MATCH (person:`Person`) "
+						+ "RETURN person{"
+						+ "json: apoc.map.fromPairs([key IN keys(person) WHERE key STARTS WITH 'properties.' | [substring(key, 11), "
+						+ "person[key]]])"
+						+ "}");
 
 	}
 
@@ -517,16 +517,16 @@ class IssueRelatedIT {
 			.returning(node).build();
 
 		String expected = (""
-						   + "MATCH (person:`Person`) WHERE ("
-						   + "  ("
-						   + "      (person)-[:`A`]->() OR (person)-[:`B`]->()"
-						   + "  ) AND ("
-						   + "      ("
-						   + "          (person)-[:`C`]->() OR ("
-						   + "              (person)-[:`D`]->() AND (person)-[:`E`]->()"
-						   + "          )"
-						   + "      ) OR (person)-[:`F`]->())"
-						   + ") RETURN person"
+				+ "MATCH (person:`Person`) WHERE ("
+				+ "  ("
+				+ "      (person)-[:`A`]->() OR (person)-[:`B`]->()"
+				+ "  ) AND ("
+				+ "      ("
+				+ "          (person)-[:`C`]->() OR ("
+				+ "              (person)-[:`D`]->() AND (person)-[:`E`]->()"
+				+ "          )"
+				+ "      ) OR (person)-[:`F`]->())"
+				+ ") RETURN person"
 		).replaceAll("\\s{2,}", "");
 
 		assertThat(cypherRenderer.render(statement)).isEqualTo(expected);

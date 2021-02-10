@@ -885,7 +885,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				for (Expression operation : propertyOperations) {
 					if (((Operation) operation).getOperator() != Operator.MUTATE) {
 						throw new IllegalArgumentException("Only property operations based on the " + Operator.MUTATE
-														   + " are supported inside a mutating SET.");
+								+ " are supported inside a mutating SET.");
 					}
 				}
 			} else if (propertyOperations.isEmpty()) {
@@ -1241,7 +1241,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		private boolean hasCondition() {
 			return this.condition != null && (!(this.condition instanceof CompoundCondition)
-											  || ((CompoundCondition) this.condition).hasConditions());
+					|| ((CompoundCondition) this.condition).hasConditions());
 		}
 
 		Optional<Condition> buildCondition() {
