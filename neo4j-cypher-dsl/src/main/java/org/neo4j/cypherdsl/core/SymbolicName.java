@@ -98,7 +98,7 @@ public class SymbolicName implements Expression {
 	 * @return this name as a condition
 	 * @since 2021.0.0
 	 */
-	public ExpressionCondition asCondition() {
+	public Condition asCondition() {
 		return new ExpressionCondition(this);
 	}
 
