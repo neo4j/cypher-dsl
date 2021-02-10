@@ -42,4 +42,15 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @return A named relationship that can be chained with more relationship definitions.
 	 */
 	ExposesRelationships<RelationshipChain> named(String name);
+
+	/**
+	 * Transform this pattern into a condition. All names of the patterns must be known upfront in the final statement,
+	 * as PatternExpressions are not allowed to introduce new variables.
+	 *
+	 * @return A condition based on this pattern.
+	 * @since 2021.0.0
+	 */
+	default Condition asCondition() {
+		return new RelationshipPatternCondition(this);
+	}
 }

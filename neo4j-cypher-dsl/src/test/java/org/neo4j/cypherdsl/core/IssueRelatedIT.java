@@ -478,7 +478,7 @@ class IssueRelatedIT {
 				"born",
 				userKnows.property("born")
 			));
-		StatementBuilder.BuildableStatement statement = Cypher
+		Statement statement = Cypher
 			.match(user)
 			.returning(
 				user.project(
@@ -492,8 +492,43 @@ class IssueRelatedIT {
 								Cypher.call("toString").withArgs(Cypher.property(sortedElement, "born")).asFunction()
 							)
 						))
-				));
-		assertThat(cypherRenderer.render(statement.build()))
-			.isEqualTo("MATCH (user:`User`) RETURN user{knows: [sortedElement IN [(user)-[:`KNOWS`]->(userKnows:`User`) | userKnows{born: userKnows.born}] | sortedElement{born: {formatted: toString(sortedElement.born)}}]}");
+				)).build();
+		assertThat(cypherRenderer.render(statement))
+			.isEqualTo(
+				"MATCH (user:`User`) RETURN user{knows: [sortedElement IN [(user)-[:`KNOWS`]->(userKnows:`User`) | userKnows{born: userKnows.born}] | sortedElement{born: {formatted: toString(sortedElement.born)}}]}");
+	}
+
+	@Test // GH-128
+	void relationshipPatternsAsCondition() {
+
+		Node node = Cypher.node("Person").named("person");
+		Statement statement = Cypher.match(node)
+			.where(
+				node.relationshipTo(Cypher.anyNode(), "A").asCondition().or(node.relationshipTo(Cypher.anyNode(), "B"))
+			)
+			.and(
+				node.relationshipTo(Cypher.anyNode(), "C").asCondition()
+					.or(
+						node.relationshipTo(Cypher.anyNode(), "D").asCondition()
+							.and(node.relationshipTo(Cypher.anyNode(), "E"))
+					)
+					.or(node.relationshipTo(Cypher.anyNode(), "F"))
+			)
+			.returning(node).build();
+
+		String expected = (""
+						   + "MATCH (person:`Person`) WHERE ("
+						   + "  ("
+						   + "      (person)-[:`A`]->() OR (person)-[:`B`]->()"
+						   + "  ) AND ("
+						   + "      ("
+						   + "          (person)-[:`C`]->() OR ("
+						   + "              (person)-[:`D`]->() AND (person)-[:`E`]->()"
+						   + "          )"
+						   + "      ) OR (person)-[:`F`]->())"
+						   + ") RETURN person"
+		).replaceAll("\\s{2,}", "");
+
+		assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 	}
 }
