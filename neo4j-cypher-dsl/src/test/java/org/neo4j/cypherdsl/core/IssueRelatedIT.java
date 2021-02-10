@@ -448,4 +448,22 @@ class IssueRelatedIT {
 					   + "}");
 
 	}
+
+	@Test // GH-133
+	void allowSymbolicNamesAsCondition() {
+		Node company = Cypher.node("Company").named("company");
+		SymbolicName cond = Cypher.name("cond");
+		Node person = Cypher.anyNode().named("person");
+		StatementBuilder.OngoingReadingAndReturn cypher = Cypher
+				.match(company)
+				.where(Predicates.any(cond).in(Cypher
+						.listBasedOn(company.relationshipTo(person, "WORKS_AT"))
+						.returning(person.property("name").isEqualTo(Cypher.parameter("name"))))
+						.where(cond.asCondition())
+				)
+				.returning(company);
+
+		assertThat(cypherRenderer.render(cypher.build()))
+				.isEqualTo("MATCH (company:`Company`) WHERE any(cond IN [(company)-[:`WORKS_AT`]->(person) | person.name = $name] WHERE cond) RETURN company");
+	}
 }
