@@ -26,16 +26,17 @@ import java.util.stream.Collectors;
 /**
  * @author Andreas Berger
  */
-public class ConflictingParametersException extends RuntimeException {
-	private final Map<String, Set<Object>> errors;
+public final class ConflictingParametersException extends RuntimeException {
 
-	public ConflictingParametersException(Map<String, Set<Object>> errors) {
-		super(createMessage(errors));
-		this.errors = errors;
+	private final Map<String, Set<Object>> erroneousParameters;
+
+	public ConflictingParametersException(Map<String, Set<Object>> erroneousParameters) {
+		super(createMessage(erroneousParameters));
+		this.erroneousParameters = erroneousParameters;
 	}
 
-	public Map<String, Set<Object>> getErrors() {
-		return errors;
+	public Map<String, Set<Object>> getErroneousParameters() {
+		return erroneousParameters;
 	}
 
 	private static String createMessage(Map<String, Set<Object>> errors) {
@@ -47,9 +48,9 @@ public class ConflictingParametersException extends RuntimeException {
 		} else {
 			prefix = "";
 		}
-		errors.forEach((key, values) -> {
+		errors.forEach((param, values) -> {
 			sb.append(prefix);
-			sb.append("Parameter '").append(key).append("' is defined multiple times with different bound values: ");
+			sb.append("Parameter '").append(param).append("' is defined multiple times with different bound values: ");
 			sb.append(values.stream().map(Objects::toString).collect(Collectors.joining(" != ")));
 		});
 		return sb.toString();

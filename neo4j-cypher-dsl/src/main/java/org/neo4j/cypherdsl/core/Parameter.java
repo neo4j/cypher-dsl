@@ -28,6 +28,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  * Represents a named parameter inside a Cypher statement.
  *
  * @author Michael J. Simons
+ * @author Andreas Berger
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
@@ -36,7 +37,7 @@ public final class Parameter implements Expression {
 	private static final Object NO_VALUE = new Object();
 
 	private final String name;
-	private final Object boundValue;
+	private final Object value;
 
 	static Parameter create(String name) {
 		return create(name, NO_VALUE);
@@ -54,8 +55,9 @@ public final class Parameter implements Expression {
 	}
 
 	private Parameter(String name, Object value) {
+
 		this.name = name;
-		this.boundValue = value;
+		this.value = value;
 	}
 
 	/**
@@ -67,26 +69,27 @@ public final class Parameter implements Expression {
 	}
 
 	/**
-	 * @return A new Parameter with a bound value
+	 * @return A new parameter with a bound value
+	 * @since 2021.0.0
 	 */
-	@API(status = INTERNAL)
-	public Parameter withValue(Object value) {
-		return create(name, value);
+	@API(status = EXPERIMENTAL, since = "2021.0.0")
+	public Parameter withValue(Object newValue) {
+		return create(name, newValue);
 	}
 
 	/**
 	 * @return the value bound to this parameter
 	 */
 	@API(status = INTERNAL)
-	public Object getBoundValue() {
-		return boundValue;
+	public Object getValue() {
+		return value;
 	}
 
 	/**
 	 * @return true if the Parameter has a bound value
 	 */
 	@API(status = INTERNAL)
-	public boolean hasBoundValue() {
-		return boundValue != NO_VALUE;
+	public boolean hasValue() {
+		return value != NO_VALUE;
 	}
 }

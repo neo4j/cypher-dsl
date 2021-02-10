@@ -20,43 +20,82 @@ package org.neo4j.cypherdsl.core;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.parameter.ConflictingParametersException;
-import org.neo4j.cypherdsl.core.parameter.ParameterValueCollector;
+import org.neo4j.cypherdsl.core.parameter.ParameterCollector;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import java.util.Map;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.assertj.core.api.Assertions.entry;
-
 
 /**
  * @author Andreas Berger
+ * @author Michael J. Simons
  */
 class ParameterIT {
 
-    private final Node userNode = Cypher.node("User").named("u");
+	private final Node userNode = Cypher.node("User").named("u");
 
-    @Test
-    void shouldCollectParameters() {
-        Statement statement = Cypher
-                .match(userNode)
-                .returning(userNode)
-                .limit(Cypher.parameter("param").withValue(5)).build();
+	@Test
+	void shouldCollectParameters() {
+		Statement statement = Cypher
+				.match(userNode)
+				.returning(userNode)
+				.limit(Cypher.parameter("param").withValue(5)).build();
 
-        Map<String, Object> usedParams = ParameterValueCollector.collectBoundParameters(statement);
-        assertThat(usedParams).containsExactly(entry("param", 5));
-    }
+		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
+		assertThat(usedParams).containsEntry("param", 5);
+	}
 
-    @Test
-    void shouldFailOnDifferentBoundValues() {
-        Statement statement = Cypher
-                .match(userNode)
-                .returning(userNode)
-                .skip(Cypher.parameter("param").withValue(1))
-                .limit(Cypher.parameter("param").withValue(5)).build();
+	@Test
+	void shouldDealWithNullValues() {
+		Statement statement = Cypher
+				.match(userNode)
+				.set(userNode.property("name").to(Cypher.parameter("param").withValue(null)))
+				.returning(userNode)
+				.build();
 
-        assertThatExceptionOfType(ConflictingParametersException.class)
-                .isThrownBy(() -> ParameterValueCollector.collectBoundParameters(statement));
-    }
+		assertThat(Renderer.getDefaultRenderer().render(statement))
+				.isEqualTo("MATCH (u:`User`) SET u.name = $param RETURN u");
+		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
+		assertThat(usedParams).containsEntry("param", null);
+	}
 
+	@Test
+	void shouldFailOnDifferentBoundValues() {
+		Statement statement = Cypher
+				.match(userNode)
+				.returning(userNode)
+				.skip(Cypher.parameter("param").withValue(1))
+				.limit(Cypher.parameter("param").withValue(5)).build();
+
+		assertThatExceptionOfType(ConflictingParametersException.class)
+				.isThrownBy(() -> ParameterCollector.collectBoundParameters(statement))
+				.satisfies(e -> {
+					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
+					assertThat(erroneousParameters).containsKey("param");
+					Set<Object> values = erroneousParameters.get("param");
+					assertThat(values).containsExactlyInAnyOrder(1, 5);
+				});
+	}
+
+	@Test
+	void shouldFailOnDifferentBoundValuesWhenSameValueIsUsedTwice() {
+		Statement statement = Cypher
+				.match(userNode)
+				.where(userNode.internalId().isEqualTo(Cypher.parameter("param").withValue(5)))
+				.returning(userNode)
+				.skip(Cypher.parameter("param").withValue(1))
+				.limit(Cypher.parameter("param").withValue(1)).build();
+
+		assertThatExceptionOfType(ConflictingParametersException.class)
+				.isThrownBy(() -> ParameterCollector.collectBoundParameters(statement))
+				.satisfies(e -> {
+					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
+					assertThat(erroneousParameters).containsKey("param");
+					Set<Object> values = erroneousParameters.get("param");
+					assertThat(values).containsExactlyInAnyOrder(1, 5);
+				});
+	}
 }

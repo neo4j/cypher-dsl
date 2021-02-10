@@ -27,7 +27,7 @@ import org.neo4j.cypherdsl.core.Statement;
  *
  * @author Andreas Berger
  */
-public final class ParameterValueCollector {
+public final class ParameterCollector {
 
 	/**
 	 * Collects all bound parameters from the statement.
@@ -37,8 +37,8 @@ public final class ParameterValueCollector {
 	 * @see org.neo4j.cypherdsl.core.Parameter#withValue(Object)
 	 */
 	public static Map<String, Object> collectBoundParameters(Statement statement) {
-		ParameterValueCollectorVisitor parameterValueCollectorVisitor = new ParameterValueCollectorVisitor();
-		statement.accept(parameterValueCollectorVisitor);
-		return parameterValueCollectorVisitor.getParameterValues();
+		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor();
+		statement.accept(parameterCollectingVisitor);
+		return parameterCollectingVisitor.getParameters();
 	}
 }
