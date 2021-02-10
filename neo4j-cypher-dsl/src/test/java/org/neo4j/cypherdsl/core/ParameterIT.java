@@ -23,6 +23,7 @@ import org.neo4j.cypherdsl.core.parameter.ConflictingParametersException;
 import org.neo4j.cypherdsl.core.parameter.ParameterCollector;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -97,5 +98,42 @@ class ParameterIT {
 					Set<Object> values = erroneousParameters.get("param");
 					assertThat(values).containsExactlyInAnyOrder(1, 5);
 				});
+	}
+
+	@Test
+	void shouldWorkWithUnions() {
+
+		final Node bikeNode = Cypher.node("Bike").named("b");
+
+		Statement statement1 = Cypher.match(bikeNode)
+				.where(bikeNode.property("a").isEqualTo(Cypher.parameter("p1").withValue("A")))
+				.returning(bikeNode)
+				.build();
+		assertThat(ParameterCollector.collectBoundParameters(statement1)).containsEntry("p1", "A");
+
+		Statement statement2 = Cypher.match(bikeNode)
+				.where(bikeNode.property("b").isEqualTo(Cypher.parameter("p2").withValue("B")))
+				.returning(bikeNode)
+				.build();
+		assertThat(ParameterCollector.collectBoundParameters(statement2)).containsEntry("p2", "B");
+
+		Statement statement3 = Cypher.match(bikeNode)
+				.where(bikeNode.property("c").isEqualTo(Cypher.parameter("p3").withValue("C")))
+				.returning(bikeNode)
+				.build();
+		assertThat(ParameterCollector.collectBoundParameters(statement3)).containsEntry("p3", "C");
+
+		Statement statement = Cypher.union(statement1, statement2, statement3);
+
+		assertThat(Renderer.getDefaultRenderer().render(statement))
+				.isEqualTo(
+						"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b) WHERE b.b = $p2 RETURN b UNION MATCH (b) WHERE b.c = $p3 RETURN b");
+
+		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
+		Map<String, Object> expectedParams = new HashMap<>();
+		expectedParams.put("p1", "A");
+		expectedParams.put("p2", "B");
+		expectedParams.put("p3", "C");
+		assertThat(usedParams).containsAllEntriesOf(expectedParams);
 	}
 }
