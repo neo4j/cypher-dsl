@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.apiguardian.api.API;
@@ -99,6 +100,32 @@ public class SymbolicName implements Expression {
 	 */
 	public ExpressionCondition asCondition() {
 		return new ExpressionCondition(this);
+	}
+
+	/**
+	 * A list will never be a valid entry for a map projection, so this convenient method prevents trying to create one
+	 * from a list of objects. It will delegate to {@link #project(Object...)} with the content of the list.
+	 *
+	 * @param entries A list of entries for the projection
+	 * @return A map projection.
+	 * @since 2021.0.0
+	 */
+	public MapProjection project(List<Object> entries) {
+		return project(entries.toArray());
+	}
+
+	/**
+	 * Creates a map projection based on this node. The node needs a symbolic name for this to work.
+	 * <p>
+	 * Entries of type {@code String} in {@code entries} followed by an {@link Expression} will be treated as map keys
+	 * pointing to the expression in the projection, {@code String} entries alone will be treated as property lookups on the node.
+	 *
+	 * @param entries A list of entries for the projection
+	 * @return A map projection.
+	 * @since 2021.0.0
+	 */
+	public MapProjection project(Object... entries) {
+		return MapProjection.create(this, entries);
 	}
 
 	@Override

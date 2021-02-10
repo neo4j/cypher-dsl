@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.List;
+
 import org.apiguardian.api.API;
 
 /**
@@ -96,5 +98,27 @@ public interface PropertyContainer extends Named {
 		return Operations.mutate(this.getSymbolicName()
 				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
 			properties);
+	}
+
+	/**
+	 * Unwraps the list of entries into an array before creating a projection out of it.
+	 *
+	 * @param entries A list of entries for the projection
+	 * @return A map projection.
+	 * @see SymbolicName#project(List)
+	 */
+	default MapProjection project(List<Object> entries) {
+		return project(entries.toArray());
+	}
+
+	/**
+	 * Creates a map projection based on this container. The container needs a symbolic name for this to work.
+	 *
+	 * @param entries A list of entries for the projection
+	 * @return A map projection.
+	 * @see SymbolicName#project(Object...)
+	 */
+	default MapProjection project(Object... entries) {
+		return getRequiredSymbolicName().project(entries);
 	}
 }

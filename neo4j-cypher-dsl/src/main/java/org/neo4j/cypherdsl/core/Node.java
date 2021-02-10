@@ -137,32 +137,6 @@ public final class Node implements PatternElement, PropertyContainer, ExposesRel
 		return withProperties(newProperties);
 	}
 
-
-
-	/**
-	 * A list will never be a valid entry for a map projection, so this convenient method prevents trying to create one
-	 * from a list of objects. It will delegate to {@link #project(Object...)} with the content of the list.
-	 *
-	 * @param entries A list of entries for the projection
-	 * @return A map projection.
-	 */
-	public MapProjection project(List<Object> entries) {
-		return project(entries.toArray());
-	}
-
-	/**
-	 * Creates a map projection based on this node. The node needs a symbolic name for this to work.
-	 * <p>
-	 * Entries of type {@code String} in {@code entries} followed by an {@link Expression} will be treated as map keys
-	 * pointing to the expression in the projection, {@code String} entries alone will be treated as property lookups on the node.
-	 *
-	 * @param entries A list of entries for the projection
-	 * @return A map projection.
-	 */
-	public MapProjection project(Object... entries) {
-		return MapProjection.create(this.getRequiredSymbolicName(), entries);
-	}
-
 	/**
 	 * @return The optional symbolic name of this node.
 	 */
