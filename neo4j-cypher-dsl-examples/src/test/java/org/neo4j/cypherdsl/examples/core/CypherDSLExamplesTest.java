@@ -19,14 +19,15 @@
 package org.neo4j.cypherdsl.examples.core;
 
 // tag::cypher-dsl-imports[]
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-// end::cypher-dsl-imports[]
+import java.util.Collection;
+import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-// tag::cypher-dsl-imports[]
-import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Conditions;
+import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -240,4 +241,32 @@ class CypherDSLExamplesTest {
 			.isEqualTo("CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser\\\\.allow.*' RETURN *");
 	}
 
+	@Test
+	void collectingParameters() {
+
+		// tag::collecting-params[]
+		var person = Cypher.node("Person").named("p");
+		var statement =
+			Cypher
+				.match(person)
+				.where(person.property("nickname").isEqualTo(Cypher.parameter("nickname")))
+				.set(
+					person.property("firstName").to(Cypher.parameter("firstName").withValue("Thomas")),
+					person.property("name").to(Cypher.parameter("name", "Anderson"))
+				)
+				.returning(person)
+				.build();
+
+		assertThat(cypherRenderer.render(statement))
+			.isEqualTo("MATCH (p:`Person`) WHERE p.nickname = $nickname SET p.firstName = $firstName, p.name = $name RETURN p");
+
+		Collection<String> parameterNames = statement.getParameterNames();
+		assertThat(parameterNames).containsExactlyInAnyOrder("nickname", "firstName", "name"); // <.>
+
+		Map<String, Object> parameters = statement.getParameters();
+		assertThat(parameters).hasSize(2); // <.>
+		assertThat(parameters).containsEntry("firstName", "Thomas");
+		assertThat(parameters).containsEntry("name", "Anderson");
+		// end::collecting-params[]
+	}
 }

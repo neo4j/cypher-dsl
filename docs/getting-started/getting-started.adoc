@@ -42,6 +42,9 @@ This `Statement` needs to be rendered into a string or passed to methods support
 Please get an instance of the default renderer via `org.neo4j.cypherdsl.renderer.Renderer#getDefaultRenderer()`.
 The renderer provides a single method `render` for rendering the AST into a string representation.
 
+Furthermore, the `Statement` will collect parameter names and if provided, parameter values.
+Parameter names and values are available after the statement has been build and can for example be used directly with
+Neo4j-Java-Driver.
 
 === Examples
 
@@ -58,7 +61,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 To match and return all the movie, build your statement like this:
 
 .Simple match
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e1]
 ----
@@ -71,7 +74,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Match all nodes with a given set of properties:
 
 .Find the actor named "Tom Hanks"...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e2]
 ----
@@ -79,7 +82,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Limit the number of returned things and return only one attribute
 
 .Find 10 people...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e4]
 ----
@@ -87,7 +90,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Create complex conditions
 
 .Find movies released in the 1990s...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e5]
 ----
@@ -97,25 +100,25 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Build relationships
 
 .List all Tom Hanks movies...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e6]
 ----
 
 .Who directed "Cloud Atlas"?
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e7]
 ----
 
 .Tom Hanks' co-actors...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e8]
 ----
 
 .How people are related to "Cloud Atlas"...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e9]
 ----
@@ -123,7 +126,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 ==== Solve
 
 .Movies and actors up to 4 "hops" away from Kevin Bacon
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-bacon]
 ----
@@ -131,7 +134,27 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 ==== Recommend
 
 .Extend Tom Hanks co-actors, to find co-co-actors who haven't worked with Tom Hanks...
-[source, java,indent=0]
+[source, java,indent=0,,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
 ----
+
+==== Retrieving parameters being defined
+
+A placeholder for a parameter can be defined via `Cypher.parameter("param")`.
+This placeholder will be rendered as `$param` and must be filled with the appropriate means of the environment you're working with.
+
+In addition, an arbitrary value can be bound to the name via ´Cypher.parameter("param", "a value")` or `Cypher.parameter("param").withValue("a value")`.
+`NULL` is a valid value.
+The Cypher-DSL will not use those values, but collect them for you.
+
+The following example shows how to access them and how to use it:
+
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=collecting-params]
+----
+<.> The names contain all placeholders, also those without a value
+<.> The parameter map contains only parameters with defined values
+
+If you define a parameter with conflicting values, a `ConflictingParametersException` will be thrown the moment you try to retrieve the collected parameters.
