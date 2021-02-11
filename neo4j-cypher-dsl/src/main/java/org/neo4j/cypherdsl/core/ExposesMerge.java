@@ -33,9 +33,8 @@ public interface ExposesMerge {
 
 	/**
 	 * @param pattern patterns to merge
-	 * @param <T>     The type of the next step
 	 * @return An ongoing merge
 	 * @see Cypher#merge(PatternElement...)
 	 */
-	<T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T merge(PatternElement... pattern);
+	StatementBuilder.OngoingMerge merge(PatternElement... pattern);
 }

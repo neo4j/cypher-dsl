@@ -33,9 +33,8 @@ public interface ExposesCreate {
 
 	/**
 	 * @param pattern patterns to create
-	 * @param <T>     The type of the next step
 	 * @return An ongoing merge
 	 * @see Cypher#create(PatternElement...)
 	 */
-	<T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T create(PatternElement... pattern);
+	StatementBuilder.OngoingUpdate create(PatternElement... pattern);
 }

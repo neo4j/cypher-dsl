@@ -29,7 +29,10 @@ import java.util.stream.Collectors;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithArguments;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithReturnFields;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
+import org.neo4j.cypherdsl.core.StatementBuilder.BuildableMatchAndUpdate;
+import org.neo4j.cypherdsl.core.StatementBuilder.BuildableOngoingMergeAction;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMatchAndUpdate;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMerge;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingUpdate;
@@ -43,7 +46,9 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 class DefaultStatementBuilder implements StatementBuilder,
-	OngoingUpdate, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate {
+	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
+	BuildableMatchAndUpdate,
+	BuildableOngoingMergeAction {
 
 	/**
 	 * Current list of reading or update clauses to be generated.
@@ -99,8 +104,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
-	public OngoingUpdate merge(PatternElement... pattern) {
+	public OngoingMerge merge(PatternElement... pattern) {
 
 		return update(UpdateType.MERGE, pattern);
 	}
@@ -123,14 +127,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new OngoingMergeAction() {
 
 			@Override
-			public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
+			public BuildableOngoingMergeAction mutate(Expression target, Expression properties) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.MUTATE, target, properties);
 				return DefaultStatementBuilder.this;
 			}
 
 			@Override
-			public OngoingMatchAndUpdate set(Expression... expressions) {
+			public BuildableOngoingMergeAction set(Expression... expressions) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.SET, expressions);
 				return DefaultStatementBuilder.this;
@@ -226,43 +230,33 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate set(Expression... expressions) {
+	public BuildableMatchAndUpdate set(Expression... expressions) {
 
 		this.closeCurrentOngoingUpdate();
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate set(Node named, String... labels) {
+	public BuildableMatchAndUpdate set(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
+	public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 		this.closeCurrentOngoingUpdate();
 		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate remove(Property... properties) {
+	public BuildableMatchAndUpdate remove(Property... properties) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	// This method returns a `DefaultStatementWithUpdateBuilder`, implementing the necessary interfaces
-	public OngoingMatchAndUpdate remove(Node named, String... labels) {
+	public BuildableMatchAndUpdate remove(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
 	}
@@ -515,18 +509,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	/**
-	 * Adds support for With to a return builder.
+	 * Helper class aggregating a couple of interface, collecting conditions and returned objects.
 	 */
-	protected abstract class WithBuilderSupport {
-
-	}
-
-	/**
-	 * Ongoing with extends from {@link WithBuilderSupport} and therefore from {@link DefaultStatementWithReturnBuilder}.
-	 */
-	protected final class DefaultStatementWithWithBuilder extends WithBuilderSupport
+	protected final class DefaultStatementWithWithBuilder
 		implements OngoingOrderDefinition, OrderableOngoingReadingAndWithWithoutWhere,
-		OrderableOngoingReadingAndWithWithWhere, OngoingReadingAndWithWithWhereAndOrder {
+		OrderableOngoingReadingAndWithWithWhere, OngoingReadingAndWithWithWhereAndOrder, OngoingReadingAndWithWithSkip {
 
 		protected final ConditionBuilder conditionBuilder = new ConditionBuilder();
 		protected final List<Expression> returnList = new ArrayList<>();
@@ -599,7 +586,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate set(Expression... expressions) {
+		public BuildableMatchAndUpdate set(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -608,7 +595,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate set(Node node, String... labels) {
+		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -616,8 +603,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
+		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -625,8 +611,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate remove(Node node, String... labels) {
+		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -634,8 +619,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate remove(Property... properties) {
+		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -697,8 +681,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingUpdate merge(PatternElement... pattern) {
+		public OngoingMerge merge(PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -748,28 +731,26 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OrderableOngoingReadingAndWithWithWhere descending() {
+		public OngoingReadingAndWithWithWhereAndOrder descending() {
 			orderBuilder.descending();
 			return this;
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OrderableOngoingReadingAndWithWithWhere ascending() {
+		public OngoingReadingAndWithWithWhereAndOrder ascending() {
 			orderBuilder.ascending();
 			return this;
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OrderableOngoingReadingAndWithWithWhere skip(Number number) {
+		public OngoingReadingAndWithWithSkip skip(Number number) {
 			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
 		@Override
 		@SuppressWarnings("unchecked")
-		public OrderableOngoingReadingAndWithWithWhere skip(Expression expression) {
+		public OngoingReadingAndWithWithSkip skip(Expression expression) {
 			orderBuilder.skip(expression);
 			return this;
 		}
@@ -807,8 +788,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 		SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, UpdateType updateType, Expression... expressions);
 	}
 
-	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(UpdateType updateType,
-		T... patternOrExpressions) {
+	/**
+	 * Creates a builder for an UPDATE clause. The vargs is list of pattern or expressions.
+	 * In case {@code updateType} is of {@link UpdateType#MERGE} or {@link UpdateType#CREATE} they will
+	 * be treated as pattern, otherwise as expression.
+	 *
+	 * @param updateType The update type to create
+	 * @param patternOrExpressions A list of pattern or expression
+	 * @param <T> The type of {@code patternOrExpressions}
+	 * @return Ongoing builder
+	 */
+	@SafeVarargs
+	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(
+		UpdateType updateType, T... patternOrExpressions
+	) {
 
 		boolean mergeOrCreate = MERGE_OR_CREATE.contains(updateType);
 		String message = mergeOrCreate ?
@@ -964,7 +957,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder
-		implements OngoingMatchAndUpdate {
+		implements BuildableMatchAndUpdate {
 
 		final UpdatingClauseBuilder builder;
 
@@ -1011,8 +1004,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingUpdate merge(PatternElement... pattern) {
+		public OngoingMerge merge(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.merge(pattern);
 		}
@@ -1024,16 +1016,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate set(Expression... keyValuePairs) {
+		public BuildableMatchAndUpdate set(Expression... keyValuePairs) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate set(Node node, String... labels) {
+		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
@@ -1041,8 +1031,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate mutate(Expression target, Expression properties) {
+		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
@@ -1050,8 +1039,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate remove(Node node, String... labels) {
+		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
@@ -1059,8 +1047,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingMatchAndUpdate remove(Property... properties) {
+		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);

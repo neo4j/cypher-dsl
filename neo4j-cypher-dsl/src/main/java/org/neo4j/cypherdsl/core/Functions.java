@@ -1304,7 +1304,9 @@ public final class Functions {
 	 * Creates a function invocation for {@code round({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-round">round</a>.
 	 *
-	 * @param expression The value to pass to the function.
+	 * @param value The value to round
+	 * @param expression Additional parameters, length must be 0, 1 or 2:
+	 *                   First entry is the precision, second is the rounding mode
 	 * @return A function call for {@code round({})}.
 	 * @since 2021.0.0
 	 */
@@ -1451,6 +1453,8 @@ public final class Functions {
 	 * Creates a function invocation for {@code atan2({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan2">atan2</a>.
 	 *
+	 * @param y the y value of a point
+	 * @param x the x value of a point
 	 * @return A function call for {@code atan2({})}.
 	 * @since 2021.0.0
 	 */
