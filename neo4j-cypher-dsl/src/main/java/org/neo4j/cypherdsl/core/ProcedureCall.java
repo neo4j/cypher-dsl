@@ -28,7 +28,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
-public final class ProcedureCall implements Statement {
+public final class ProcedureCall extends AbstractStatement implements Statement {
 
 	private final ProcedureName name;
 

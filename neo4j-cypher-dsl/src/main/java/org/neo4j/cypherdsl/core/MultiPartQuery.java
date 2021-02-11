@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-final class MultiPartQuery implements Statement.SingleQuery {
+final class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery {
 
 	private final List<MultiPartElement> parts;
 

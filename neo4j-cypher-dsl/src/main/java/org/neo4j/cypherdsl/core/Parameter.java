@@ -27,27 +27,39 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 /**
  * Represents a named parameter inside a Cypher statement.
  *
+ * @param <T> The type of the parameter. Defaults to {@link Object} for a parameter without a value from which to derive
+ *            the actual type.
  * @author Michael J. Simons
+ * @author Andreas Berger
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Parameter implements Expression {
+public final class Parameter<T> implements Expression {
+
+	static final Object NO_VALUE = new Object();
 
 	private final String name;
+	private final T value;
 
-	static Parameter create(String name) {
+	static Parameter<Object> create(String name) {
+		return create(name, NO_VALUE);
+	}
+
+	static <T> Parameter<T> create(String name, Object value) {
 
 		Assertions.hasText(name, "The name of the parameter is required!");
 
 		if (name.startsWith("$")) {
-			return create(name.substring(1));
+			return create(name.substring(1), value);
 		}
 
-		return new Parameter(name);
+		return new Parameter(name, value);
 	}
 
-	private Parameter(String name) {
+	private Parameter(String name, T value) {
+
 		this.name = name;
+		this.value = value;
 	}
 
 	/**
@@ -56,5 +68,28 @@ public final class Parameter implements Expression {
 	@API(status = INTERNAL)
 	public String getName() {
 		return name;
+	}
+
+	/**
+	 * @return A new parameter with a bound value
+	 * @since 2021.0.0
+	 */
+	@API(status = EXPERIMENTAL, since = "2021.0.0")
+	public Parameter withValue(Object newValue) {
+		return create(name, newValue);
+	}
+
+	/**
+	 * @return the value bound to this parameter
+	 */
+	T getValue() {
+		return value;
+	}
+
+	/**
+	 * @return true if the Parameter has a bound value
+	 */
+	boolean hasValue() {
+		return value != NO_VALUE;
 	}
 }

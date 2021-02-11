@@ -20,6 +20,9 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.Collection;
+import java.util.Map;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 
@@ -53,6 +56,27 @@ public interface Statement extends Visitable {
 
 		return new ProcedureCall.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
 	}
+
+	/**
+	 * After a statement has been build, all parameters that have been added to the statement can be retrieved through
+	 * this method. The result will only contain parameters with a defined value. If you are interested in all parameter
+	 * names, use {@link #getParameterNames()}.
+	 * <p>
+	 * The map can be used for example as an argument with various methods on the Neo4j Java Driver that allow the
+	 * execution of parameterized queries.
+	 *
+	 * @return A map of all parameters with a bound value.
+	 * @since 2021.0.0
+	 */
+	Map<String, Object> getParameters();
+
+	/**
+	 * After the statement has been build, this method returns a list of all parameter names used, regardless whether
+	 * a value was bound to the parameter o not.
+	 * @return A set of parameter names being used.
+	 * @since 2021.0.0
+	 */
+	Collection<String> getParameterNames();
 
 	/**
 	 * Represents {@code RegularQuery}.
