@@ -18,43 +18,45 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.utils.Assertions;
-
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
+
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a named parameter inside a Cypher statement.
  *
+ * @param <T> The type of the parameter. Defaults to {@link Object} for a parameter without a value from which to derive
+ *            the actual type.
  * @author Michael J. Simons
  * @author Andreas Berger
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Parameter implements Expression {
+public final class Parameter<T> implements Expression {
 
 	private static final Object NO_VALUE = new Object();
 
 	private final String name;
-	private final Object value;
+	private final T value;
 
-	static Parameter create(String name) {
+	static Parameter<Object> create(String name) {
 		return create(name, NO_VALUE);
 	}
 
-	static Parameter create(String name, Object value) {
+	static <T> Parameter<T> create(String name, Object value) {
 
 		Assertions.hasText(name, "The name of the parameter is required!");
 
 		if (name.startsWith("$")) {
-			return create(name.substring(1));
+			return create(name.substring(1), value);
 		}
 
 		return new Parameter(name, value);
 	}
 
-	private Parameter(String name, Object value) {
+	private Parameter(String name, T value) {
 
 		this.name = name;
 		this.value = value;
@@ -81,7 +83,7 @@ public final class Parameter implements Expression {
 	 * @return the value bound to this parameter
 	 */
 	@API(status = INTERNAL)
-	public Object getValue() {
+	public T getValue() {
 		return value;
 	}
 

@@ -42,11 +42,14 @@ class ParameterIT {
 	void shouldCollectParameters() {
 		Statement statement = Cypher
 				.match(userNode)
+				.where(userNode.property("name").isEqualTo(Cypher.parameter("name", "Neo")))
 				.returning(userNode)
 				.limit(Cypher.parameter("param").withValue(5)).build();
 
 		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
-		assertThat(usedParams).containsEntry("param", 5);
+		assertThat(usedParams)
+			.containsEntry("param", 5)
+			.containsEntry("name", "Neo");
 	}
 
 	@Test

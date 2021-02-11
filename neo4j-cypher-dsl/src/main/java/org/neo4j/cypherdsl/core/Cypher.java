@@ -37,6 +37,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *
  * @author Michael J. Simons
  * @author Gerrit Meier
+ * @author Andreas Berger
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
@@ -224,8 +225,21 @@ public final class Cypher {
 	 * @param name The name of the parameter, must not be null
 	 * @return The new parameter
 	 */
-	public static Parameter parameter(String name) {
+	public static Parameter<Object> parameter(String name) {
 		return Parameter.create(name);
+	}
+
+	/**
+	 * Creates a new parameter with the given {@code name} and a value bound to it.
+	 * The value can be retrieved from the final statement build.
+	 *
+	 * @param name The name of the parameter, must not be null
+	 * @param value The value of the parameter.
+	 * @return The new parameter
+	 * @since 2021.0.0
+	 */
+	public static <T>  Parameter<T> parameter(String name, T value) {
+		return Parameter.create(name, value);
 	}
 
 	/**
