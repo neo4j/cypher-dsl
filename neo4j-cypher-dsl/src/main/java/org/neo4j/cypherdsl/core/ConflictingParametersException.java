@@ -16,16 +16,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.parameter;
+package org.neo4j.cypherdsl.core;
+
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apiguardian.api.API;
+
 /**
+ * Exception thrown when extracting parameters from a statement leads to one parameter with a given name appearing
+ * with different values.
+ *
  * @author Andreas Berger
+ * @since 2021.0.0
  */
+@API(status = EXPERIMENTAL, since = "2021.0.0")
 public final class ConflictingParametersException extends RuntimeException {
 
 	private final Map<String, Set<Object>> erroneousParameters;
@@ -51,7 +60,9 @@ public final class ConflictingParametersException extends RuntimeException {
 		errors.forEach((param, values) -> {
 			sb.append(prefix);
 			sb.append("Parameter '").append(param).append("' is defined multiple times with different bound values: ");
-			sb.append(values.stream().map(Objects::toString).collect(Collectors.joining(" != ")));
+			sb.append(values.stream()
+				.map(o -> o == Parameter.NO_VALUE ? "(UNDEFINED VALUE)" : Objects.toString(o))
+				.collect(Collectors.joining(" != ")));
 		});
 		return sb.toString();
 	}

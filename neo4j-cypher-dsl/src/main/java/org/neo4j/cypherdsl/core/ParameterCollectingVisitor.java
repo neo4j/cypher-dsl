@@ -16,17 +16,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.parameter;
+package org.neo4j.cypherdsl.core;
 
-import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
-import org.neo4j.cypherdsl.core.support.Visitable;
-
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
+
+import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
+import org.neo4j.cypherdsl.core.support.Visitable;
 
 /**
  * This is an implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -39,9 +40,21 @@ import java.util.TreeMap;
  * @author Michael J. Simons
  * @since 2021.0.0
  */
-class ParameterCollectingVisitor extends ReflectiveVisitor {
+final class ParameterCollectingVisitor extends ReflectiveVisitor {
 
-	private final Map<String, Object> parameters = new TreeMap<>();
+	static class ParameterInformation {
+
+		final Set<String> names;
+		final Map<String, Object> values;
+
+		ParameterInformation(Set<String> names, Map<String, Object> values) {
+			this.names = Collections.unmodifiableSet(names);
+			this.values = Collections.unmodifiableMap(values);
+		}
+	}
+
+	private final Set<String> names = new TreeSet<>();
+	private final Map<String, Object> values = new TreeMap<>();
 	private final Map<String, Set<Object>> erroneousParameters = new TreeMap<>();
 
 	@Override
@@ -56,16 +69,17 @@ class ParameterCollectingVisitor extends ReflectiveVisitor {
 	@SuppressWarnings("unused")
 	void enter(Parameter parameter) {
 
-		if (!parameter.hasValue()) {
-			return;
-		}
+		boolean knownParameterName = !this.names.add(parameter.getName());
 
-		boolean knownParameterName = this.parameters.containsKey(parameter.getName());
 		Object newValue = parameter.getValue();
-		Object oldValue = this.parameters.put(parameter.getName(), newValue);
-
+		Object oldValue = knownParameterName && this.values.containsKey(parameter.getName()) ?
+			this.values.get(parameter.getName()) :
+			Parameter.NO_VALUE;
+		if (parameter.hasValue()) {
+			this.values.put(parameter.getName(), newValue);
+		}
 		if (knownParameterName && !Objects.equals(oldValue, newValue)) {
-			Set<Object> conflictingObjects = erroneousParameters.computeIfAbsent(parameter.getName(), s -> {
+			Set<Object> conflictingObjects = this.erroneousParameters.computeIfAbsent(parameter.getName(), s -> {
 				HashSet<Object> list = new HashSet<>();
 				list.add(oldValue);
 				return list;
@@ -74,11 +88,12 @@ class ParameterCollectingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	Map<String, Object> getParameters() {
+	public ParameterInformation getResult() {
 
 		if (!erroneousParameters.isEmpty()) {
 			throw new ConflictingParametersException(erroneousParameters);
 		}
-		return parameters;
+
+		return new ParameterInformation(this.names, this.values);
 	}
 }

@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Parameter<T> implements Expression {
 
-	private static final Object NO_VALUE = new Object();
+	static final Object NO_VALUE = new Object();
 
 	private final String name;
 	private final T value;
@@ -82,16 +82,14 @@ public final class Parameter<T> implements Expression {
 	/**
 	 * @return the value bound to this parameter
 	 */
-	@API(status = INTERNAL)
-	public T getValue() {
+	T getValue() {
 		return value;
 	}
 
 	/**
 	 * @return true if the Parameter has a bound value
 	 */
-	@API(status = INTERNAL)
-	public boolean hasValue() {
+	boolean hasValue() {
 		return value != NO_VALUE;
 	}
 }

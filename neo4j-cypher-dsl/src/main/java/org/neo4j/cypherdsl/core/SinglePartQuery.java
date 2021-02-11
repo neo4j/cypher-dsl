@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-final class SinglePartQuery implements SingleQuery {
+final class SinglePartQuery extends AbstractStatement implements SingleQuery {
 
 	private final List<Visitable> precedingClauses;
 

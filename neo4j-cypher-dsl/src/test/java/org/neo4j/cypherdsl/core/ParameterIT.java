@@ -19,13 +19,15 @@
 package org.neo4j.cypherdsl.core;
 
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypherdsl.core.parameter.ConflictingParametersException;
-import org.neo4j.cypherdsl.core.parameter.ParameterCollector;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -36,7 +38,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  */
 class ParameterIT {
 
-	private final Node userNode = Cypher.node("User").named("u");
+	private static final Node userNode = Cypher.node("User").named("u");
 
 	@Test
 	void shouldCollectParameters() {
@@ -46,10 +48,12 @@ class ParameterIT {
 				.returning(userNode)
 				.limit(Cypher.parameter("param").withValue(5)).build();
 
-		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
-		assertThat(usedParams)
+		assertThat(statement.getParameters())
 			.containsEntry("param", 5)
 			.containsEntry("name", "Neo");
+
+		assertThat(statement.getParameterNames())
+			.containsExactlyInAnyOrder("param", "name");
 	}
 
 	@Test
@@ -62,8 +66,71 @@ class ParameterIT {
 
 		assertThat(Renderer.getDefaultRenderer().render(statement))
 				.isEqualTo("MATCH (u:`User`) SET u.name = $param RETURN u");
-		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
-		assertThat(usedParams).containsEntry("param", null);
+		assertThat(statement.getParameters()).containsEntry("param", null);
+	}
+
+	private static Stream<Arguments> conflictingParameters() {
+		return Stream.of("x", null)
+			.flatMap(v -> Stream.of(
+				Arguments.of(
+					Cypher.match(userNode)
+						.set(
+							userNode.property("name").to(Cypher.parameter("param").withValue(v)),
+							userNode.property("firstName").to(Cypher.parameter("param"))
+						).returning(userNode).build()
+				),
+				Arguments.of(
+					Cypher.match(userNode)
+						.set(
+							userNode.property("firstName").to(Cypher.parameter("param")),
+							userNode.property("name").to(Cypher.parameter("param").withValue(v))
+						).returning(userNode).build()
+				)
+			));
+	}
+
+
+	@ParameterizedTest
+	@MethodSource("conflictingParameters")
+	void shouldFailWithNoValueVsNull(Statement statement) {
+
+		assertThatExceptionOfType(ConflictingParametersException.class)
+			.isThrownBy(() -> statement.getParameters());
+	}
+
+	@Test
+	void shouldNotFailWithSameNameAndMultipleNulLValues() {
+
+		Statement statement = Cypher
+			.match(userNode)
+			.set(
+				userNode.property("name").to(Cypher.parameter("param").withValue(null)),
+				userNode.property("firstName").to(Cypher.parameter("param").withValue(null))
+			)
+			.returning(userNode)
+			.build();
+
+		assertThat(Renderer.getDefaultRenderer().render(statement))
+			.isEqualTo("MATCH (u:`User`) SET u.name = $param, u.firstName = $param RETURN u");
+		assertThat(statement.getParameters()).containsEntry("param", null);
+	}
+
+	@Test
+	void shouldNotFailWithSameNameAndNoValue() {
+
+		Statement statement = Cypher
+			.match(userNode)
+			.set(
+				userNode.property("name").to(Cypher.parameter("param")),
+				userNode.property("firstName").to(Cypher.parameter("param"))
+			)
+			.returning(userNode)
+			.build();
+
+		assertThat(Renderer.getDefaultRenderer().render(statement))
+			.isEqualTo("MATCH (u:`User`) SET u.name = $param, u.firstName = $param RETURN u");
+		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getParameterNames()).containsExactlyInAnyOrder("param");
 	}
 
 	@Test
@@ -75,7 +142,7 @@ class ParameterIT {
 				.limit(Cypher.parameter("param").withValue(5)).build();
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(() -> ParameterCollector.collectBoundParameters(statement))
+				.isThrownBy(() -> statement.getParameters())
 				.satisfies(e -> {
 					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
 					assertThat(erroneousParameters).containsKey("param");
@@ -94,7 +161,7 @@ class ParameterIT {
 				.limit(Cypher.parameter("param").withValue(1)).build();
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(() -> ParameterCollector.collectBoundParameters(statement))
+				.isThrownBy(() -> statement.getParameters())
 				.satisfies(e -> {
 					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
 					assertThat(erroneousParameters).containsKey("param");
@@ -112,19 +179,19 @@ class ParameterIT {
 				.where(bikeNode.property("a").isEqualTo(Cypher.parameter("p1").withValue("A")))
 				.returning(bikeNode)
 				.build();
-		assertThat(ParameterCollector.collectBoundParameters(statement1)).containsEntry("p1", "A");
+		assertThat(statement1.getParameters()).containsEntry("p1", "A");
 
 		Statement statement2 = Cypher.match(bikeNode)
 				.where(bikeNode.property("b").isEqualTo(Cypher.parameter("p2").withValue("B")))
 				.returning(bikeNode)
 				.build();
-		assertThat(ParameterCollector.collectBoundParameters(statement2)).containsEntry("p2", "B");
+		assertThat(statement2.getParameters()).containsEntry("p2", "B");
 
 		Statement statement3 = Cypher.match(bikeNode)
 				.where(bikeNode.property("c").isEqualTo(Cypher.parameter("p3").withValue("C")))
 				.returning(bikeNode)
 				.build();
-		assertThat(ParameterCollector.collectBoundParameters(statement3)).containsEntry("p3", "C");
+		assertThat(statement3.getParameters()).containsEntry("p3", "C");
 
 		Statement statement = Cypher.union(statement1, statement2, statement3);
 
@@ -132,11 +199,10 @@ class ParameterIT {
 				.isEqualTo(
 						"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b) WHERE b.b = $p2 RETURN b UNION MATCH (b) WHERE b.c = $p3 RETURN b");
 
-		Map<String, Object> usedParams = ParameterCollector.collectBoundParameters(statement);
 		Map<String, Object> expectedParams = new HashMap<>();
 		expectedParams.put("p1", "A");
 		expectedParams.put("p2", "B");
 		expectedParams.put("p3", "C");
-		assertThat(usedParams).containsAllEntriesOf(expectedParams);
+		assertThat(statement.getParameters()).containsAllEntriesOf(expectedParams);
 	}
 }

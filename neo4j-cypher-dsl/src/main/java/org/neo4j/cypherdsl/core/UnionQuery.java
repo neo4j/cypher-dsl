@@ -33,7 +33,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-final class UnionQuery implements Statement.RegularQuery {
+final class UnionQuery extends AbstractStatement implements Statement.RegularQuery {
 
 	static UnionQuery create(boolean unionAll, List<SingleQuery> queries) {
 
