@@ -66,9 +66,18 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingUpdate
-		extends BuildableStatement, ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith,
-		ExposesMergeAction {
+	interface OngoingUpdate extends BuildableStatement,
+		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith {
+	}
+
+	/**
+	 * An ongoing update statement that can be used to chain more updating statements, define actions on a merge
+	 * or add a with or return clause.
+	 *
+	 * @since 2021.0.0
+	 */
+	interface OngoingMerge extends BuildableStatement,
+		ExposesMergeAction, ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet  {
 	}
 
 	/**

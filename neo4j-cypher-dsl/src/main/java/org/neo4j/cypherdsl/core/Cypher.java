@@ -326,10 +326,9 @@ public final class Cypher {
 	 * Starts building a statement based on a {@code MERGE} clause.
 	 *
 	 * @param pattern The patterns to merge
-	 * @param <T>     The type of the next step
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
-	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet & StatementBuilder.ExposesMergeAction> T merge(
+	public static StatementBuilder.OngoingMerge merge(
 		PatternElement... pattern) {
 
 		return Statement.builder().merge(pattern);
@@ -400,6 +399,7 @@ public final class Cypher {
 	 * @return a new {@link Literal Literal&lt;?&gt;}.
 	 * @throws IllegalArgumentException when the object cannot be represented as a literal
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T> Literal<T> literalOf(Object object) {
 
 		if (object == null) {
@@ -418,7 +418,6 @@ public final class Cypher {
 				}
 			}
 
-			@SuppressWarnings("unchecked") // See above
 			ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
 			return (Literal<T>) listLiteral;
 		}

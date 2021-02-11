@@ -30,6 +30,7 @@ import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithArguments;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithReturnFields;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMatchAndUpdate;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMerge;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingUpdate;
@@ -43,7 +44,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 class DefaultStatementBuilder implements StatementBuilder,
-	OngoingUpdate, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate {
+	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate {
 
 	/**
 	 * Current list of reading or update clauses to be generated.
@@ -99,8 +100,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
-	public OngoingUpdate merge(PatternElement... pattern) {
+	public OngoingMerge merge(PatternElement... pattern) {
 
 		return update(UpdateType.MERGE, pattern);
 	}
@@ -697,8 +697,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingUpdate merge(PatternElement... pattern) {
+		public OngoingMerge merge(PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -1011,8 +1010,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		@SuppressWarnings("unchecked")
-		public OngoingUpdate merge(PatternElement... pattern) {
+		public OngoingMerge merge(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.merge(pattern);
 		}
