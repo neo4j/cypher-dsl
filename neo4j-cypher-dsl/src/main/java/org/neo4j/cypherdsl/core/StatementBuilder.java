@@ -67,7 +67,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingUpdate extends BuildableStatement,
-		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith {
+		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet {
 	}
 
 	/**
@@ -76,8 +76,7 @@ public interface StatementBuilder
 	 *
 	 * @since 2021.0.0
 	 */
-	interface OngoingMerge extends BuildableStatement,
-		ExposesMergeAction, ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet  {
+	interface OngoingMerge extends OngoingUpdate, ExposesMergeAction {
 	}
 
 	/**
@@ -239,18 +238,16 @@ public interface StatementBuilder
 		/**
 		 * Specifies descending order and jumps back to defining the match and return statement.
 		 *
-		 * @param <T> The type of the next step
 		 * @return The ongoing definition of a match
 		 */
-		<T extends TerminalExposesSkip & TerminalExposesLimit & OngoingMatchAndReturnWithOrder> T descending();
+		OngoingMatchAndReturnWithOrder descending();
 
 		/**
 		 * Specifies ascending order and jumps back to defining the match and return statement.
 		 *
-		 * @param <T> The type of the next step
 		 * @return The ongoing definition of a match
 		 */
-		<T extends TerminalExposesSkip & TerminalExposesLimit & OngoingMatchAndReturnWithOrder> T ascending();
+		OngoingMatchAndReturnWithOrder ascending();
 	}
 
 	/**
@@ -280,18 +277,16 @@ public interface StatementBuilder
 		/**
 		 * Specifies descending order and jumps back to defining the match and return statement.
 		 *
-		 * @param <T> The type of the next step
 		 * @return The ongoing definition of a match
 		 */
-		<T extends ExposesSkip & ExposesLimit & OngoingReadingAndWithWithWhereAndOrder> T descending();
+		OngoingReadingAndWithWithWhereAndOrder descending();
 
 		/**
 		 * Specifies ascending order and jumps back to defining the match and return statement.
 		 *
-		 * @param <T> The type of the next step
 		 * @return The ongoing definition of a match
 		 */
-		<T extends ExposesSkip & ExposesLimit & OngoingReadingAndWithWithWhereAndOrder> T ascending();
+		OngoingReadingAndWithWithWhereAndOrder ascending();
 	}
 
 	/**
@@ -422,20 +417,18 @@ public interface StatementBuilder
 		 * Adds a skip clause, skipping the given number of records.
 		 *
 		 * @param number How many records to skip. If this is null, then no records are skipped.
-		 * @param <T>    The type of the next step
 		 * @return A step that only allows the limit of records to be specified.
 		 */
-		<T extends TerminalExposesLimit & BuildableStatement> T skip(Number number);
+		TerminalExposesLimit skip(Number number);
 
 		/**
 		 * Adds a skip clause.
 		 *
 		 * @param expression The expression to skip by
-		 * @param <T>    The type of the next step
 		 * @return A step that only allows the limit of records to be specified.
 		 * @since 2021.0.0
 		 */
-		<T extends TerminalExposesLimit & BuildableStatement> T skip(Expression expression);
+		TerminalExposesLimit skip(Expression expression);
 	}
 
 	/**
@@ -443,7 +436,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface TerminalExposesLimit {
+	interface TerminalExposesLimit extends BuildableStatement {
 
 		/**
 		 * Limits the number of returned records.
@@ -489,6 +482,13 @@ public interface StatementBuilder
 	}
 
 	/**
+	 * The union type of an ongoing reading with a WITH and a SKIP clause.
+	 * @since 2021.0.0
+	 */
+	interface OngoingReadingAndWithWithSkip extends OngoingReadingAndWith, ExposesLimit {
+	}
+
+	/**
 	 * A step that exposes the {@link #skip(Number)} method.
 	 *
 	 * @since 1.0
@@ -499,20 +499,18 @@ public interface StatementBuilder
 		 * Adds a skip clause, skipping the given number of records.
 		 *
 		 * @param number How many records to skip. If this is null, then no records are skipped.
-		 * @param <T>    The type of the next step
 		 * @return A step that only allows the limit of records to be specified.
 		 */
-		<T extends ExposesLimit & OngoingReadingAndWith> T skip(Number number);
+		OngoingReadingAndWithWithSkip skip(Number number);
 
 		/**
 		 * Adds a skip clause.
 		 *
 		 * @param expression How many records to skip. If this is null, then no records are skipped.
-		 * @param <T>    The type of the next step
 		 * @return A step that only allows the limit of records to be specified.
 		 * @since 2021.0.0
 		 */
-		<T extends ExposesLimit & OngoingReadingAndWith> T  skip(Expression expression);
+		OngoingReadingAndWithWithSkip skip(Expression expression);
 	}
 
 	/**
@@ -560,10 +558,9 @@ public interface StatementBuilder
 		 * previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a delete clause that can be build now
 		 */
-		default <T extends OngoingUpdate & BuildableStatement> T delete(String... variables) {
+		default OngoingUpdate delete(String... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
 
@@ -572,10 +569,9 @@ public interface StatementBuilder
 		 * previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a delete clause that can be build now
 		 */
-		default <T extends OngoingUpdate & BuildableStatement> T delete(Named... variables) {
+		default OngoingUpdate delete(Named... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
 
@@ -583,20 +579,18 @@ public interface StatementBuilder
 		 * Creates a delete step with one or more expressions to be deleted.
 		 *
 		 * @param expressions The expressions to be deleted.
-		 * @param <T>         The type of the next step
 		 * @return A match with a delete clause that can be build now
 		 */
-		<T extends OngoingUpdate & BuildableStatement> T delete(Expression... expressions);
+		OngoingUpdate delete(Expression... expressions);
 
 		/**
 		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
 		 * been matched previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a detach delete clause that can be build now
 		 */
-		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(String... variables) {
+		default OngoingUpdate detachDelete(String... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
 
@@ -605,10 +599,9 @@ public interface StatementBuilder
 		 * been matched previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @param <T>       The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a detach delete clause that can be build now
 		 */
-		default <T extends OngoingUpdate & BuildableStatement> T detachDelete(Named... variables) {
+		default OngoingUpdate detachDelete(Named... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
 
@@ -616,10 +609,9 @@ public interface StatementBuilder
 		 * Starts building a delete step that will use {@code DETACH} to remove relationships.
 		 *
 		 * @param expressions The expressions to be deleted.
-		 * @param <T>         The type of the next step
 		 * @return A match with a delete clause that can be build now
 		 */
-		<T extends OngoingUpdate & BuildableStatement> T detachDelete(Expression... expressions);
+		OngoingUpdate detachDelete(Expression... expressions);
 	}
 
 	/**
@@ -634,20 +626,18 @@ public interface StatementBuilder
 		 * SET operation.
 		 *
 		 * @param expressions The list of expressions to use in a set clause.
-		 * @param <T>         The type of the next step
 		 * @return An ongoing match and update
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T set(Expression... expressions);
+		BuildableMatchAndUpdate set(Expression... expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
 		 *
 		 * @param variable   The named thing to modify
 		 * @param expression The modifying expression
-		 * @param <T>        The type of the next step
 		 * @return An ongoing match and update
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement> T set(Named variable, Expression expression) {
+		default BuildableMatchAndUpdate set(Named variable, Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
 		}
 
@@ -660,7 +650,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Expression target, Expression properties);
+		BuildableMatchAndUpdate mutate(Expression target, Expression properties);
 
 		/**
 		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
@@ -671,7 +661,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement> T mutate(Named variable, Expression properties) {
+		default BuildableMatchAndUpdate mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
 		}
 	}
@@ -688,37 +678,43 @@ public interface StatementBuilder
 		 *
 		 * @param node   The node who's labels are to be changed
 		 * @param labels The labels to be set
-		 * @param <T>    The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a SET clause that can be build now
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T set(Node node, String... labels);
+		BuildableMatchAndUpdate set(Node node, String... labels);
 
 		/**
 		 * Creates {@code SET} clause for removing the given labels from a node.
 		 *
 		 * @param node   The node who's labels are to be changed
 		 * @param labels The labels to be removed
-		 * @param <T>    The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a REMOVE clause that can be build now
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T remove(Node node, String... labels);
+		BuildableMatchAndUpdate remove(Node node, String... labels);
 
 		/**
 		 * Creates {@code SET} clause for removing the enumerated properties
 		 *
 		 * @param properties The properties to be removed
-		 * @param <T>        The type of the next step, can be used to build the statement or add further instructions.
 		 * @return A match with a REMOVE clause that can be build now
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement> T remove(Property... properties);
+		BuildableMatchAndUpdate remove(Property... properties);
 	}
 
 	/**
-	 * A buildable step that will create a MATCH ... DELETE statement.
+	 * After a MATCH..UPDATE chain has been established, a RETURN can be added, a pipeline with WITH can be started
+	 * or more mutating steps can be added.
 	 *
 	 * @since 1.0
 	 */
 	interface OngoingMatchAndUpdate extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesCreate {
+	}
+
+	/**
+	 * A buildable ongoing MATCH and UPDATE.
+	 *
+	 * @since 2021.0.0
+	 */
+	interface BuildableMatchAndUpdate extends OngoingMatchAndUpdate, BuildableStatement {
 	}
 
 	/**
@@ -744,6 +740,13 @@ public interface StatementBuilder
 	}
 
 	/**
+	 * An interface combining a buildable MATCH and UPDATE with the possibility to add actions after a MERGE clause.
+	 * @since 2021.0.0
+	 */
+	interface BuildableOngoingMergeAction extends BuildableMatchAndUpdate, ExposesMergeAction {
+	}
+
+	/**
 	 * A variant of {@link ExposesSet} that allows for further chaining of actions.
 	 *
 	 * @since 2020.1.2
@@ -755,20 +758,18 @@ public interface StatementBuilder
 		 * SET operation.
 		 *
 		 * @param expressions The list of expressions to use in a set clause.
-		 * @param <T>         The type of the next step
 		 * @return An ongoing match and update
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Expression... expressions);
+		BuildableOngoingMergeAction set(Expression... expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
 		 *
 		 * @param variable   The named thing to modify
 		 * @param expression The modifying expression
-		 * @param <T>        The type of the next step
 		 * @return An ongoing match and update
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T set(Named variable,
+		default BuildableOngoingMergeAction set(Named variable,
 			Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
 		}
@@ -782,7 +783,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		<T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Expression target, Expression properties);
+		BuildableOngoingMergeAction mutate(Expression target, Expression properties);
 
 		/**
 		 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
@@ -793,7 +794,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		default <T extends OngoingMatchAndUpdate & BuildableStatement & ExposesMergeAction> T mutate(Named variable, Expression properties) {
+		default BuildableOngoingMergeAction mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
 		}
 	}

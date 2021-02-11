@@ -269,10 +269,9 @@ public final class Cypher {
 	 * Starts building a statement based on a {@code CREATE} clause.
 	 *
 	 * @param pattern The patterns to create
-	 * @param <T>     The type of the next step
 	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
-	public static <T extends StatementBuilder.OngoingUpdate & StatementBuilder.ExposesSet> T create(
+	public static StatementBuilder.OngoingUpdate create(
 		PatternElement... pattern) {
 
 		return Statement.builder().create(pattern);
