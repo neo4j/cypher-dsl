@@ -88,7 +88,7 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	public ParameterInformation getResult() {
+	ParameterInformation getResult() {
 
 		if (!erroneousParameters.isEmpty()) {
 			throw new ConflictingParametersException(erroneousParameters);
