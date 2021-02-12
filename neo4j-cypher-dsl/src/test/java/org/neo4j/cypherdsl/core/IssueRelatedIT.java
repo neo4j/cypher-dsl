@@ -29,6 +29,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 class IssueRelatedIT {
 
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+	private final Node person = Cypher.node("Person").named("person");
 
 	@Test
 	void gh115() {
@@ -198,14 +199,13 @@ class IssueRelatedIT {
 
 	@Test
 	void gh197() {
-		final Node n = Cypher.node("Person").named("n");
 
 		// avg
-		Statement s = Cypher.match(n)
-			.returning(Functions.avg(n.property("age")))
+		Statement s = Cypher.match(person)
+			.returning(Functions.avg(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (n:`Person`) RETURN avg(n.age)");
+			.isEqualTo("MATCH (person:`Person`) RETURN avg(person.age)");
 
 		// max/min
 		final ListExpression list = Cypher.listOf(
@@ -226,43 +226,43 @@ class IssueRelatedIT {
 			.isEqualTo("UNWIND [1, 'a', NULL, 0.2, 'b', '1', '99'] AS val RETURN min(val)");
 
 		// percentileCont/percentileDisc
-		s = Cypher.match(n)
-			.returning(Functions.percentileCont(n.property("age"), 0.4))
+		s = Cypher.match(person)
+			.returning(Functions.percentileCont(person.property("age"), 0.4))
 			.build();
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (n:`Person`) RETURN percentileCont(n.age, 0.4)");
-		s = Cypher.match(n)
-			.returning(Functions.percentileDisc(n.property("age"), 0.5))
+			.isEqualTo("MATCH (person:`Person`) RETURN percentileCont(person.age, 0.4)");
+		s = Cypher.match(person)
+			.returning(Functions.percentileDisc(person.property("age"), 0.5))
 			.build();
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (n:`Person`) RETURN percentileDisc(n.age, 0.5)");
+			.isEqualTo("MATCH (person:`Person`) RETURN percentileDisc(person.age, 0.5)");
 
 		// stDev/stDevP
-		s = Cypher.match(n)
-			.where(n.property("name").in(
+		s = Cypher.match(person)
+			.where(person.property("name").in(
 				Cypher.listOf(Cypher.literalOf("A"), Cypher.literalOf("B"), Cypher.literalOf("C"))))
-			.returning(Functions.stDev(n.property("age")))
+			.returning(Functions.stDev(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (n:`Person`) WHERE n.name IN ['A', 'B', 'C'] RETURN stDev(n.age)");
-		s = Cypher.match(n)
-			.where(n.property("name").in(
+			.isEqualTo("MATCH (person:`Person`) WHERE person.name IN ['A', 'B', 'C'] RETURN stDev(person.age)");
+		s = Cypher.match(person)
+			.where(person.property("name").in(
 				Cypher.listOf(Cypher.literalOf("A"), Cypher.literalOf("B"), Cypher.literalOf("C"))))
-			.returning(Functions.stDevP(n.property("age")))
+			.returning(Functions.stDevP(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (n:`Person`) WHERE n.name IN ['A', 'B', 'C'] RETURN stDevP(n.age)");
+			.isEqualTo("MATCH (person:`Person`) WHERE person.name IN ['A', 'B', 'C'] RETURN stDevP(person.age)");
 
 		// sum
-		s = Cypher.match(n)
+		s = Cypher.match(person)
 			.with(Cypher.listOf(Cypher.mapOf(
-				"type", n.getRequiredSymbolicName(),
-				"nb", Functions.sum(n.getRequiredSymbolicName())))
+				"type", person.getRequiredSymbolicName(),
+				"nb", Functions.sum(person.getRequiredSymbolicName())))
 				.as("counts"))
-			.returning(Functions.sum(n.property("age")))
+			.returning(Functions.sum(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
-			.isEqualTo("MATCH (n:`Person`) WITH [{type: n, nb: sum(n)}] AS counts RETURN sum(n.age)");
+			.isEqualTo("MATCH (person:`Person`) WITH [{type: person, nb: sum(person)}] AS counts RETURN sum(person.age)");
 	}
 
 	@Test
@@ -294,17 +294,16 @@ class IssueRelatedIT {
 
 	@Test
 	void gh245() {
-		String expected = "MATCH (p:`Person`) RETURN p{alias: p.name}";
+		String expected = "MATCH (person:`Person`) RETURN person{alias: person.name}";
 
-		Node n = Cypher.node("Person").named("p");
 		Statement statement;
-		statement = Cypher.match(n)
-			.returning(n.project("alias", n.property("name")))
+		statement = Cypher.match(person)
+			.returning(person.project("alias", person.property("name")))
 			.build();
 		assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 
-		statement = Cypher.match(n)
-			.returning(n.project(n.property("name").as("alias")))
+		statement = Cypher.match(person)
+			.returning(person.project(person.property("name").as("alias")))
 			.build();
 		assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 	}
@@ -369,7 +368,6 @@ class IssueRelatedIT {
 	@Test // GH-106
 	void mapKeysShouldBeEscapedIfNecessary() {
 
-		Node node = Cypher.anyNode().named("n");
 		Statement statement = Cypher
 			.returning(Cypher.mapOf("key 1", Cypher.literalTrue(), "key 2", Cypher.literalFalse()))
 			.build();
@@ -419,22 +417,21 @@ class IssueRelatedIT {
 	@Test
 	void gh127() {
 
-		Node node = Cypher.node("Person").named("person");
 		SymbolicName key = Cypher.name("key");
 		String dynamicPrefix = "properties.";
 		Statement statement = Cypher
-			.match(node)
-			.returning(node.project(
+			.match(person)
+			.returning(person.project(
 				"json",
 				Cypher.call("apoc.map.fromPairs")
 					.withArgs(
 						Cypher.listWith(key)
-							.in(Cypher.call("keys").withArgs(node.getRequiredSymbolicName()).asFunction())
+							.in(Cypher.call("keys").withArgs(person.getRequiredSymbolicName()).asFunction())
 							.where(key.startsWith(Cypher.literalOf(dynamicPrefix)))
 							.returning(
 								Cypher.call("substring")
 									.withArgs(key, Cypher.literalOf(dynamicPrefix.length())).asFunction(),
-								node.property(key)
+								person.property(key)
 							)
 					)
 					.asFunction()
@@ -451,9 +448,9 @@ class IssueRelatedIT {
 
 	@Test // GH-133
 	void allowSymbolicNamesAsCondition() {
+
 		Node company = Cypher.node("Company").named("company");
 		SymbolicName cond = Cypher.name("cond");
-		Node person = Cypher.anyNode().named("person");
 		StatementBuilder.OngoingReadingAndReturn cypher = Cypher
 				.match(company)
 				.where(Predicates.any(cond).in(Cypher
@@ -464,11 +461,12 @@ class IssueRelatedIT {
 				.returning(company);
 
 		assertThat(cypherRenderer.render(cypher.build()))
-				.isEqualTo("MATCH (company:`Company`) WHERE any(cond IN [(company)-[:`WORKS_AT`]->(person) | person.name = $name] WHERE cond) RETURN company");
+				.isEqualTo("MATCH (company:`Company`) WHERE any(cond IN [(company)-[:`WORKS_AT`]->(person:`Person`) | person.name = $name] WHERE cond) RETURN company");
 	}
 
 	@Test // GH-131
 	void projectSymbolicNames() {
+
 		Node user = Cypher.node("User").named("user");
 		Node userKnows = Cypher.node("User").named("userKnows");
 		SymbolicName sortedElement = Cypher.name("sortedElement");
@@ -501,20 +499,19 @@ class IssueRelatedIT {
 	@Test // GH-128
 	void relationshipPatternsAsCondition() {
 
-		Node node = Cypher.node("Person").named("person");
-		Statement statement = Cypher.match(node)
+		Statement statement = Cypher.match(person)
 			.where(
-				node.relationshipTo(Cypher.anyNode(), "A").asCondition().or(node.relationshipTo(Cypher.anyNode(), "B"))
+				person.relationshipTo(Cypher.anyNode(), "A").asCondition().or(person.relationshipTo(Cypher.anyNode(), "B"))
 			)
 			.and(
-				node.relationshipTo(Cypher.anyNode(), "C").asCondition()
+				person.relationshipTo(Cypher.anyNode(), "C").asCondition()
 					.or(
-						node.relationshipTo(Cypher.anyNode(), "D").asCondition()
-							.and(node.relationshipTo(Cypher.anyNode(), "E"))
+						person.relationshipTo(Cypher.anyNode(), "D").asCondition()
+							.and(person.relationshipTo(Cypher.anyNode(), "E"))
 					)
-					.or(node.relationshipTo(Cypher.anyNode(), "F"))
+					.or(person.relationshipTo(Cypher.anyNode(), "F"))
 			)
-			.returning(node).build();
+			.returning(person).build();
 
 		String expected = (""
 				+ "MATCH (person:`Person`) WHERE ("
@@ -535,12 +532,27 @@ class IssueRelatedIT {
 	@Test // GH-142
 	void pointShouldAcceptExpressionToo() {
 
-		Node person = Cypher.node("Person").named("person");
-
 		Parameter location = Cypher.parameter("location");
 		Property distance = Cypher.property(location, "distance");
 
 		Expression point = Functions.point(Cypher.property(location, "point"));
+
+		Statement statement = Cypher
+			.match(person)
+			.where(Functions.distance(person.property("location"), point).isEqualTo(distance))
+			.returning(person).build();
+
+		assertThat(cypherRenderer.render(statement))
+			.isEqualTo("MATCH (person:`Person`) WHERE distance(person.location, point($location.point)) = $location.distance RETURN person");
+	}
+
+	@Test // GH-141
+	void propertiesShouldBeExtractableFromExpressions() {
+
+		Parameter location = Cypher.parameter("location");
+
+		Expression point = Cypher.call("point").withArgs(location.property("point")).asFunction();
+		Property distance = Cypher.property(location, "distance");
 
 		Statement statement = Cypher
 			.match(person)

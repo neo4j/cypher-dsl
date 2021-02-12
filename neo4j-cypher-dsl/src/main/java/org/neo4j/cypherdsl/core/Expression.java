@@ -307,4 +307,19 @@ public interface Expression extends Visitable {
 
 		return SortItem.create(this, SortItem.Direction.ASC);
 	}
+
+	/**
+	 * Assumes that this expressions refers to a container of some type allowing to reference properties from it.
+	 * Note: The expression does not track property creation and there is no possibility to enumerate all properties
+	 * that have been created for it.
+	 *
+	 * @param names At least one non empty name. If multiple names are specified, the expression creates a nested property like {@code this.name1.name2}.
+	 *
+	 * @return a new {@link Property} associated with this expression
+	 * @since 2021.0.0
+	 */
+	default Property property(String... names) {
+
+		return Property.create(this, names);
+	}
 }
