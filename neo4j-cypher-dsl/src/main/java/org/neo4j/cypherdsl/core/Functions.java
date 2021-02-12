@@ -272,7 +272,22 @@ public final class Functions {
 	 */
 	public static FunctionInvocation point(MapExpression parameterMap) {
 
-		return FunctionInvocation.create(Spatials.POINT, parameterMap);
+		return point((Expression) parameterMap);
+	}
+
+	/**
+	 * Creates a function invocation for the {@code point()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
+	 * <p>
+	 * This generic expression variant is useful for referencing a point inside a parameter or another map.
+	 *
+	 * @param expression An expression resolving to a valid map of parameters for {@code point()}
+	 * @return A function call for {@code point()}
+	 * @since 2021.0.0
+	 */
+	public static FunctionInvocation point(Expression expression) {
+
+		return FunctionInvocation.create(Spatials.POINT, expression);
 	}
 
 	/**

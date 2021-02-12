@@ -531,4 +531,23 @@ class IssueRelatedIT {
 
 		assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 	}
+
+	@Test // GH-142
+	void pointShouldAcceptExpressionToo() {
+
+		Node person = Cypher.node("Person").named("person");
+
+		Parameter location = Cypher.parameter("location");
+		Property distance = Cypher.property(location, "distance");
+
+		Expression point = Functions.point(Cypher.property(location, "point"));
+
+		Statement statement = Cypher
+			.match(person)
+			.where(Functions.distance(person.property("location"), point).isEqualTo(distance))
+			.returning(person).build();
+
+		assertThat(cypherRenderer.render(statement))
+			.isEqualTo("MATCH (person:`Person`) WHERE distance(person.location, point($location.point)) = $location.distance RETURN person");
+	}
 }
