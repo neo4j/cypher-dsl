@@ -1,0 +1,92 @@
+== 2021.0
+
+=== 2021.0.0
+
+2021.0.0 comes with a lot of new features.
+Thanks to https://github.com/Andy2003[Andy] for his contributions!
+
+Andy is one of our first users outside https://github.com/spring-projects/spring-data-neo4j[Spring Data Neo4j 6].
+He started to use the Cypher-DSL in https://github.com/neo4j-graphql/neo4j-graphql-java[Neo4j GraphQL Java].
+Neo4j GraphQL Java is a library to translate GraphQL based schemas and queries to Cypher and execute those statements with the Neo4j database.
+It can be used from a wide variety of frameworks.
+
+We are happy and proud to be part of this and even more so about the input and contribution we got back from Andy.
+
+Of course thanks for your input in form of tickets and discussions go out to @utnaf, @aaramg, @K-Lovelace and @maximelovino as well!
+
+==== Noteworthy
+
+Two things should be mentioned:
+
+The https://github.com/neo4j-contrib/cypher-dsl/commit/2d0c98af853c72d4cd61099c9d8f3209b7e4c7c6[bugfix for GH-121] might
+change behavior for some users:
+The changes prevents the forced rendering of an alias for objects when the original object - the one that has been aliased
+- is passed down to the DSL after an alias has been created.
+
+The original intention for that behaviour was related to Map projection, in which the alias is actually rendered before the object.
+
+So now the use of an aliased expression the first time triggers `a AS b` respectively `b: a` in a map projection.
+All further calls will just render `b`. If the *original* object is used again, `a` will be rendered. If that is not desired
+in your query and you rely on the alias, make sure you use the aliased expression returned from `.as("someAlias")`.
+
+The other thing are the combined features GH-135 and GH-146.
+The `Statement` class has become a fully fledged accessor to the Cypher String and the parameters used and if provided,
+the values for those. The following shows a small example:
+
+[source,java]
+----
+var person = Cypher.node("Person").named("p");
+var statement = Cypher
+    .match(person)
+    .where(person.property("nickname").isEqualTo(Cypher.parameter("nickname")))
+    .set(
+        person.property("firstName").to(Cypher.parameter("firstName").withValue("Thomas")),
+        person.property("name").to(Cypher.parameter("name", "Anderson"))
+    )
+    .returning(person)
+    .build();
+
+assertThat(statement.getCypher())
+    .isEqualTo("MATCH (p:`Person`) WHERE p.nickname = $nickname SET p.firstName = $firstName, p.name = $name RETURN p");
+
+Collection<String> parameterNames = statement.getParameterNames();
+assertThat(parameterNames).containsExactlyInAnyOrder("nickname", "firstName", "name");
+
+Map<String, Object> parameters = statement.getParameters();
+assertThat(parameters).hasSize(2);
+assertThat(parameters).containsEntry("firstName", "Thomas");
+assertThat(parameters).containsEntry("name", "Anderson");
+----
+
+==== 🚀 Features
+
+* GH-122 - Add support for index hints.
+* GH-123 - Expose nested building of nested properties as public API.
+* GH-124 - Add support for Neo4j's mathematical functions.
+* GH-127 - Allow dynamic property lookup.
+* GH-128 - Provide asConditions for RelationshipPatterns.
+* GH-129 - Allow Expressions as Parameter for Skip and Limit.
+* GH-131 - Add support for projections on symbolic names.
+* GH-133 - Allow symbolic names to be used as condition.
+* GH-135 - Collect parameters defined on a statement.
+* GH-141 - Provide a property function on all expressions.
+* GH-142 - Provide a point function accepting generic expressions as parameter.
+* GH-146 - Allow a statement to render itself.
+
+==== 📖 Documentation
+
+* GH-126 - Document how to call arbitrary functions and procedures.
+
+==== 🐛 Bug Fixes
+
+* Prevent double rendering of Node content when using generated names.
+* GH-121 - Don't force rendering of aliases when the original object is used.
+* GH-137 - Fix grouping of nested conditions.
+
+==== 🧹 Housekeeping
+
+* Switch to GraalVM 20.3.0.
+* GH-125 - Use GraalVM image from ghcr.io.
+* GH-139 - Ensure indention via tabs.
+* GH-140 - Provide editorconfig.
+* GH-143 - Remove union types.

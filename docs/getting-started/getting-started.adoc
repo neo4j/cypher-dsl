@@ -139,6 +139,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
 ----
 
+[[retrieving-parameters]]
 ==== Retrieving parameters being defined
 
 A placeholder for a parameter can be defined via `Cypher.parameter("param")`.
@@ -158,3 +159,16 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 <.> The parameter map contains only parameters with defined values
 
 If you define a parameter with conflicting values, a `ConflictingParametersException` will be thrown the moment you try to retrieve the collected parameters.
+
+==== Using the default renderer
+
+A statement can render itself as well:
+
+[source, java]
+----
+var statement = Cypher.returning(literalTrue().as("t")).build();
+var cypher = statement.getCypher();
+assertThat(cypher).isEqualTo("RETURN true AS t");
+----
+
+This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and it's parameters.
