@@ -573,7 +573,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2020.1.7-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.0.0.</p>
 </div>
 </blockquote>
 </div>
@@ -665,7 +665,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2020.1.7-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.0.0<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -676,7 +676,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2020.1.7-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.0.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -948,7 +948,7 @@ assertThat(cypherRenderer.render(statement))
 </div>
 </div>
 <div class="sect4">
-<h5 id="retrievingparametersbeingdefined"><a class="anchor" href="#retrievingparametersbeingdefined"></a>Retrieving parameters being defined</h5>
+<h5 id="retrieving-parameters"><a class="anchor" href="#retrieving-parameters"></a>Retrieving parameters being defined</h5>
 <div class="paragraph">
 <p>A placeholder for a parameter can be defined via <code>Cypher.parameter("param")</code>.
 This placeholder will be rendered as <code>$param</code> and must be filled with the appropriate means of the environment you&#8217;re working with.</p>
@@ -1001,6 +1001,22 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 <div class="paragraph">
 <p>If you define a parameter with conflicting values, a <code>ConflictingParametersException</code> will be thrown the moment you try to retrieve the collected parameters.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="usingthedefaultrenderer"><a class="anchor" href="#usingthedefaultrenderer"></a>Using the default renderer</h5>
+<div class="paragraph">
+<p>A statement can render itself as well:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var statement = Cypher.returning(literalTrue().as(<span class="string"><span class="delimiter">&quot;</span><span class="content">t</span><span class="delimiter">&quot;</span></span>)).build();
+var cypher = statement.getCypher();
+assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN true AS t</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This, together with <a href="#retrieving-parameters">the above</a>, makes the statement a complete accessor for a Cypher-statement and it&#8217;s parameters.</p>
 </div>
 </div>
 </div>
@@ -1468,6 +1484,169 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 <div class="sect2">
 <h3 id="changelog"><a class="anchor" href="#changelog"></a>Change log</h3>
 <div class="sect3">
+<h4 id="2021.0"><a class="anchor" href="#2021.0"></a>2021.0</h4>
+<div class="sect4">
+<h5 id="2021.0.0"><a class="anchor" href="#2021.0.0"></a>2021.0.0</h5>
+<div class="paragraph">
+<p>2021.0.0 comes with a lot of new features.
+Thanks to <a href="https://github.com/Andy2003">Andy</a> for his contributions!</p>
+</div>
+<div class="paragraph">
+<p>Andy is one of our first users outside <a href="https://github.com/spring-projects/spring-data-neo4j">Spring Data Neo4j 6</a>.
+He started to use the Cypher-DSL in <a href="https://github.com/neo4j-graphql/neo4j-graphql-java">Neo4j GraphQL Java</a>.
+Neo4j GraphQL Java is a library to translate GraphQL based schemas and queries to Cypher and execute those statements with the Neo4j database.
+It can be used from a wide variety of frameworks.</p>
+</div>
+<div class="paragraph">
+<p>We are happy and proud to be part of this and even more so about the input and contribution we got back from Andy.</p>
+</div>
+<div class="paragraph">
+<p>Of course thanks for your input in form of tickets and discussions go out to @utnaf, @aaramg, @K-Lovelace and @maximelovino as well!</p>
+</div>
+<div class="sect5">
+<h6 id="noteworthy"><a class="anchor" href="#noteworthy"></a>Noteworthy</h6>
+<div class="paragraph">
+<p>Two things should be mentioned:</p>
+</div>
+<div class="paragraph">
+<p>The <a href="https://github.com/neo4j-contrib/cypher-dsl/commit/2d0c98af853c72d4cd61099c9d8f3209b7e4c7c6">bugfix for GH-121</a> might
+change behavior for some users:
+The changes prevents the forced rendering of an alias for objects when the original object - the one that has been aliased
+- is passed down to the DSL after an alias has been created.</p>
+</div>
+<div class="paragraph">
+<p>The original intention for that behaviour was related to Map projection, in which the alias is actually rendered before the object.</p>
+</div>
+<div class="paragraph">
+<p>So now the use of an aliased expression the first time triggers <code>a AS b</code> respectively <code>b: a</code> in a map projection.
+All further calls will just render <code>b</code>. If the <strong>original</strong> object is used again, <code>a</code> will be rendered. If that is not desired
+in your query and you rely on the alias, make sure you use the aliased expression returned from <code>.as("someAlias")</code>.</p>
+</div>
+<div class="paragraph">
+<p>The other thing are the combined features GH-135 and GH-146.
+The <code>Statement</code> class has become a fully fledged accessor to the Cypher String and the parameters used and if provided,
+the values for those. The following shows a small example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var person = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+var statement = Cypher
+    .match(person)
+    .where(person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>).isEqualTo(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>)))
+    .set(
+        person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).to(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).withValue(<span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>)),
+        person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>))
+    )
+    .returning(person)
+    .build();
+
+assertThat(statement.getCypher())
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (p:`Person`) WHERE p.nickname = $nickname SET p.firstName = $firstName, p.name = $name RETURN p</span><span class="delimiter">&quot;</span></span>);
+
+<span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt; parameterNames = statement.getParameterNames();
+assertThat(parameterNames).containsExactlyInAnyOrder(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
+
+<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; parameters = statement.getParameters();
+assertThat(parameters).hasSize(<span class="integer">2</span>);
+assertThat(parameters).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>);
+assertThat(parameters).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-122 - Add support for index hints.</p>
+</li>
+<li>
+<p>GH-123 - Expose nested building of nested properties as public API.</p>
+</li>
+<li>
+<p>GH-124 - Add support for Neo4j&#8217;s mathematical functions.</p>
+</li>
+<li>
+<p>GH-127 - Allow dynamic property lookup.</p>
+</li>
+<li>
+<p>GH-128 - Provide asConditions for RelationshipPatterns.</p>
+</li>
+<li>
+<p>GH-129 - Allow Expressions as Parameter for Skip and Limit.</p>
+</li>
+<li>
+<p>GH-131 - Add support for projections on symbolic names.</p>
+</li>
+<li>
+<p>GH-133 - Allow symbolic names to be used as condition.</p>
+</li>
+<li>
+<p>GH-135 - Collect parameters defined on a statement.</p>
+</li>
+<li>
+<p>GH-141 - Provide a property function on all expressions.</p>
+</li>
+<li>
+<p>GH-142 - Provide a point function accepting generic expressions as parameter.</p>
+</li>
+<li>
+<p>GH-146 - Allow a statement to render itself.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="documentation"><a class="anchor" href="#documentation"></a>📖 Documentation</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-126 - Document how to call arbitrary functions and procedures.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="bugfixes"><a class="anchor" href="#bugfixes"></a>🐛 Bug Fixes</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Prevent double rendering of Node content when using generated names.</p>
+</li>
+<li>
+<p>GH-121 - Don&#8217;t force rendering of aliases when the original object is used.</p>
+</li>
+<li>
+<p>GH-137 - Fix grouping of nested conditions.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Switch to GraalVM 20.3.0.</p>
+</li>
+<li>
+<p>GH-125 - Use GraalVM image from ghcr.io.</p>
+</li>
+<li>
+<p>GH-139 - Ensure indention via tabs.</p>
+</li>
+<li>
+<p>GH-140 - Provide editorconfig.</p>
+</li>
+<li>
+<p>GH-143 - Remove union types.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="2020.1"><a class="anchor" href="#2020.1"></a>2020.1</h4>
 <div class="sect4">
 <h5 id="2020.1.6"><a class="anchor" href="#2020.1.6"></a>2020.1.6</h5>
@@ -1479,7 +1658,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.5"><a class="anchor" href="#2020.1.5"></a>2020.1.5</h5>
 <div class="sect5">
-<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1498,7 +1677,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.4"><a class="anchor" href="#2020.1.4"></a>2020.1.4</h5>
 <div class="sect5">
-<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
+<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1514,7 +1693,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.3"><a class="anchor" href="#2020.1.3"></a>2020.1.3</h5>
 <div class="sect5">
-<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
+<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1524,7 +1703,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes"><a class="anchor" href="#bugfixes"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes2"><a class="anchor" href="#bugfixes2"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1537,7 +1716,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.2"><a class="anchor" href="#2020.1.2"></a>2020.1.2</h5>
 <div class="sect5">
-<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
+<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1553,7 +1732,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes2"><a class="anchor" href="#bugfixes2"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes3"><a class="anchor" href="#bugfixes3"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1563,7 +1742,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1611,7 +1790,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.1"><a class="anchor" href="#2020.1.1"></a>2020.1.1</h5>
 <div class="sect5">
-<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
+<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1624,7 +1803,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.0"><a class="anchor" href="#2020.1.0"></a>2020.1.0</h5>
 <div class="sect5">
-<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
+<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1656,7 +1835,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes3"><a class="anchor" href="#bugfixes3"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes4"><a class="anchor" href="#bugfixes4"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1675,7 +1854,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1715,7 +1894,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <p>This is the first patch release for the rebooted Cypher-DSL project.</p>
 </div>
 <div class="sect5">
-<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
+<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1731,7 +1910,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1767,7 +1946,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-15 09:11:54 UTC
+Last updated 2021-02-15 10:06:26 UTC
 </div>
 </div>
 </body>
