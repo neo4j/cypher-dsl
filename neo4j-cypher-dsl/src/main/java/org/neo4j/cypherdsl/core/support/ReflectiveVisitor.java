@@ -71,7 +71,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 	/**
 	 * Keeps track of the ASTs current level.
 	 */
-	private Deque<Visitable> currentVisitedElements = new LinkedList<>();
+	protected Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
@@ -123,7 +123,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 
 	private void executeConcreteMethodIn(TargetAndPhase targetAndPhase, Visitable onVisitable) {
 		Optional<Method> optionalMethod = VISITING_METHODS_CACHE
-			.computeIfAbsent(targetAndPhase, ReflectiveVisitor::findHandleFor);
+				.computeIfAbsent(targetAndPhase, ReflectiveVisitor::findHandleFor);
 		optionalMethod.ifPresent(handle -> {
 			try {
 				handle.invoke(this, onVisitable);
@@ -136,14 +136,18 @@ public abstract class ReflectiveVisitor implements Visitor {
 	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
 
 		for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
-			try {
-				Method method = targetAndPhase.visitorClass
-					.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
-				method.setAccessible(true);
-				return Optional.of(method);
-			} catch (NoSuchMethodException e) {
-				// We don't do anything if the method doesn't exists
-				// Try the next parameter type in the hierarchy
+			Class<?> c = targetAndPhase.visitorClass;
+			while (c != null) {
+				try {
+					// Using MethodHandles.lookup().findVirtual() doesn't allow to make a protected method accessible.
+					Method method = c.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
+					method.setAccessible(true);
+					return Optional.of(method);
+				} catch (NoSuchMethodException e) {
+					// We don't do anything if the method doesn't exists
+					// Try the next parameter type in the hierarchy
+				}
+				c = c.getSuperclass();
 			}
 		}
 		return Optional.empty();
@@ -169,7 +173,8 @@ public abstract class ReflectiveVisitor implements Visitor {
 			} while (classOfVisitable != null);
 		}
 
-		@Override public boolean equals(Object o) {
+		@Override
+		public boolean equals(Object o) {
 			if (this == o) {
 				return true;
 			}
@@ -178,8 +183,8 @@ public abstract class ReflectiveVisitor implements Visitor {
 			}
 			TargetAndPhase that = (TargetAndPhase) o;
 			return visitorClass.equals(that.visitorClass) &&
-				classHierarchyOfVisitable.equals(that.classHierarchyOfVisitable) &&
-				phase == that.phase;
+					classHierarchyOfVisitable.equals(that.classHierarchyOfVisitable) &&
+					phase == that.phase;
 		}
 
 		@Override

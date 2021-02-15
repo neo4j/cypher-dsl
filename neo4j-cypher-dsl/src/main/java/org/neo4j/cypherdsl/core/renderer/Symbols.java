@@ -24,7 +24,7 @@ package org.neo4j.cypherdsl.core.renderer;
  * @author Michael J. Simons
  * @since 1.0
  */
-final class Symbols {
+public final class Symbols {
 
 	public static final String NODE_LABEL_START = ":";
 	public static final String REL_TYPE_START = ":";

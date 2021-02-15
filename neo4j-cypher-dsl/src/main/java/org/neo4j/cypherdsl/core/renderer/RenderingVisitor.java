@@ -99,14 +99,15 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @author Gerrit Meier
  * @since 1.0
  */
-class RenderingVisitor extends ReflectiveVisitor {
+@SuppressWarnings("ALL")
+public class RenderingVisitor extends ReflectiveVisitor {
 
 	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("`");
 
 	/**
 	 * Target of all rendering.
 	 */
-	private final StringBuilder builder = new StringBuilder();
+	protected final StringBuilder builder = new StringBuilder();
 
 	/**
 	 * This keeps track on which level of the tree a separator is needed.
@@ -215,41 +216,41 @@ class RenderingVisitor extends ReflectiveVisitor {
 		--currentLevel;
 	}
 
-	void enter(Match match) {
+	protected void enter(Match match) {
 		if (match.isOptional()) {
 			builder.append("OPTIONAL ");
 		}
 		builder.append("MATCH ");
 	}
 
-	void leave(Match match) {
+	protected void leave(Match match) {
 
 		builder.append(" ");
 	}
 
-	void enter(Where where) {
+	protected void enter(Where where) {
 		builder.append(" WHERE ");
 	}
 
-	void enter(Create create) {
+	protected void enter(Create create) {
 		builder.append("CREATE ");
 	}
 
-	void leave(Create create) {
+	protected void leave(Create create) {
 		builder.append(" ");
 	}
 
-	void enter(Merge merge) {
+	protected void enter(Merge merge) {
 		builder.append("MERGE ");
 	}
 
-	void leave(Merge merge) {
+	protected void leave(Merge merge) {
 		if (!merge.hasEvents()) { // The last SET will include this
 			builder.append(" ");
 		}
 	}
 
-	void enter(MergeAction onCreateOrMatchEvent) {
+	protected void enter(MergeAction onCreateOrMatchEvent) {
 		switch (onCreateOrMatchEvent.getType()) {
 			case ON_CREATE:
 				builder.append("ON CREATE");
@@ -261,23 +262,23 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(" ");
 	}
 
-	void enter(Distinct distinct) {
+	protected void enter(Distinct distinct) {
 		builder.append("DISTINCT ");
 	}
 
-	void enter(Return returning) {
+	protected void enter(Return returning) {
 		builder.append("RETURN ");
 	}
 
-	void enter(With with) {
+	protected void enter(With with) {
 		builder.append("WITH ");
 	}
 
-	void leave(With with) {
+	protected void leave(With with) {
 		builder.append(" ");
 	}
 
-	void enter(Delete delete) {
+	protected void enter(Delete delete) {
 
 		if (delete.isDetach()) {
 			builder.append("DETACH ");
@@ -286,51 +287,51 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append("DELETE ");
 	}
 
-	void leave(Delete match) {
+	protected void leave(Delete match) {
 		builder.append(" ");
 	}
 
-	void enter(AliasedExpression aliased) {
+	protected void enter(AliasedExpression aliased) {
 
 		if (this.visitableToAliased.contains(aliased)) {
 			builder.append(escapeIfNecessary(aliased.getAlias()));
 		}
 	}
 
-	void leave(AliasedExpression aliased) {
+	protected void leave(AliasedExpression aliased) {
 
 		if (!(this.visitableToAliased.contains(aliased) || skipAliasing)) {
 			builder.append(" AS ").append(escapeIfNecessary(aliased.getAlias()));
 		}
 	}
 
-	void enter(NestedExpression nested) {
+	protected void enter(NestedExpression nested) {
 		builder.append("(");
 	}
 
-	void leave(NestedExpression nested) {
+	protected void leave(NestedExpression nested) {
 		builder.append(")");
 	}
 
-	void enter(Order order) {
+	protected void enter(Order order) {
 		builder.append(" ORDER BY ");
 	}
 
-	void enter(Skip skip) {
+	protected void enter(Skip skip) {
 		builder.append(" SKIP ");
 	}
 
-	void enter(Limit limit) {
+	protected void enter(Limit limit) {
 		builder.append(" LIMIT ");
 	}
 
-	void enter(SortItem.Direction direction) {
+	protected void enter(SortItem.Direction direction) {
 		builder
 			.append(" ")
 			.append(direction.getSymbol());
 	}
 
-	void enter(PropertyLookup propertyLookup) {
+	protected void enter(PropertyLookup propertyLookup) {
 
 		if (propertyLookup.isDynamicLookup()) {
 			builder.append("[");
@@ -339,32 +340,32 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void leave(PropertyLookup propertyLookup) {
+	protected void leave(PropertyLookup propertyLookup) {
 
 		if (propertyLookup.isDynamicLookup()) {
 			builder.append("]");
 		}
 	}
 
-	void enter(FunctionInvocation functionInvocation) {
+	protected void enter(FunctionInvocation functionInvocation) {
 		builder
 			.append(functionInvocation.getFunctionName())
 			.append("(");
 	}
 
-	void leave(FunctionInvocation functionInvocation) {
+	protected void leave(FunctionInvocation functionInvocation) {
 		builder
 			.append(")");
 	}
 
-	void enter(Operation operation) {
+	protected void enter(Operation operation) {
 
 		if (operation.needsGrouping()) {
 			builder.append("(");
 		}
 	}
 
-	void enter(Operator operator) {
+	protected void enter(Operator operator) {
 
 		Operator.Type type = operator.getType();
 		if (type == Operator.Type.LABEL) {
@@ -379,26 +380,26 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void leave(Operation operation) {
+	protected void leave(Operation operation) {
 
 		if (operation.needsGrouping()) {
 			builder.append(")");
 		}
 	}
 
-	void enter(CompoundCondition compoundCondition) {
+	protected void enter(CompoundCondition compoundCondition) {
 		builder.append("(");
 	}
 
-	void leave(CompoundCondition compoundCondition) {
+	protected void leave(CompoundCondition compoundCondition) {
 		builder.append(")");
 	}
 
-	void enter(Literal<?> expression) {
+	protected void enter(Literal<?> expression) {
 		builder.append(expression.asString());
 	}
 
-	void enter(Node node) {
+	protected void enter(Node node) {
 
 		builder.append("(");
 
@@ -414,28 +415,28 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void leave(Node node) {
+	protected void leave(Node node) {
 
 		builder.append(")");
 
 		skipNodeContent = false;
 	}
 
-	void enter(NodeLabel nodeLabel) {
+	protected void enter(NodeLabel nodeLabel) {
 
 		escapeName(nodeLabel.getValue()).ifPresent(label -> builder.append(Symbols.NODE_LABEL_START).append(label));
 	}
 
-	void enter(Properties properties) {
+	protected void enter(Properties properties) {
 
 		builder.append(" ");
 	}
 
-	void enter(SymbolicName symbolicName) {
+	protected void enter(SymbolicName symbolicName) {
 		builder.append(resolve(symbolicName));
 	}
 
-	void enter(Relationship.Details details) {
+	protected void enter(Relationship.Details details) {
 
 		Relationship.Direction direction = details.getDirection();
 		builder.append(direction.getSymbolLeft());
@@ -444,15 +445,15 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void enter(RelationshipTypes types) {
+	protected void enter(RelationshipTypes types) {
 
 		builder
 			.append(types.getValues().stream()
-				.map(RenderingVisitor::escapeName)
+				.map(this::escapeName)
 				.map(Optional::get).collect(Collectors.joining(Symbols.REL_TYP_SEPARATOR, Symbols.REL_TYPE_START, "")));
 	}
 
-	void enter(RelationshipLength length) {
+	protected void enter(RelationshipLength length) {
 
 		Integer minimum = length.getMinimum();
 		Integer maximum = length.getMaximum();
@@ -476,7 +477,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void leave(Relationship.Details details) {
+	protected void leave(Relationship.Details details) {
 
 		Relationship.Direction direction = details.getDirection();
 		if (details.hasContent()) {
@@ -485,49 +486,49 @@ class RenderingVisitor extends ReflectiveVisitor {
 		builder.append(direction.getSymbolRight());
 	}
 
-	void enter(Parameter parameter) {
+	protected void enter(Parameter parameter) {
 
 		builder.append("$").append(parameter.getName());
 	}
 
-	void enter(MapExpression map) {
+	protected void enter(MapExpression map) {
 
 		builder.append("{");
 	}
 
-	void enter(KeyValueMapEntry map) {
+	protected void enter(KeyValueMapEntry map) {
 
 		builder.append(escapeIfNecessary(map.getKey())).append(": ");
 	}
 
-	void leave(MapExpression map) {
+	protected void leave(MapExpression map) {
 
 		builder.append("}");
 	}
 
-	void enter(ListExpression list) {
+	protected void enter(ListExpression list) {
 
 		builder.append("[");
 	}
 
-	void leave(ListExpression list) {
+	protected void leave(ListExpression list) {
 
 		builder.append("]");
 	}
 
-	void enter(Unwind unwind) {
+	protected void enter(Unwind unwind) {
 
 		builder.append("UNWIND ");
 	}
 
-	void leave(Unwind unwind) {
+	protected void leave(Unwind unwind) {
 
 		builder.append(" AS ")
 			.append(unwind.getVariable())
 			.append(" ");
 	}
 
-	void enter(UnionPart unionPart) {
+	protected void enter(UnionPart unionPart) {
 
 		builder.append(" UNION ");
 		if (unionPart.isAll()) {
@@ -535,146 +536,146 @@ class RenderingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void enter(Set set) {
+	protected void enter(Set set) {
 
 		builder.append("SET ");
 	}
 
-	void leave(Set set) {
+	protected void leave(Set set) {
 		builder.append(" ");
 	}
 
-	void enter(Remove remove) {
+	protected void enter(Remove remove) {
 
 		builder.append("REMOVE ");
 	}
 
-	void leave(Remove remove) {
+	protected void leave(Remove remove) {
 		builder.append(" ");
 	}
 
-	void enter(PatternComprehension patternComprehension) {
+	protected void enter(PatternComprehension patternComprehension) {
 		builder.append("[");
 	}
 
-	void leave(PatternComprehension patternComprehension) {
+	protected void leave(PatternComprehension patternComprehension) {
 		builder.append("]");
 	}
 
-	void enter(ListComprehension listComprehension) {
+	protected void enter(ListComprehension listComprehension) {
 		builder.append("[");
 	}
 
-	void leave(ListComprehension listComprehension) {
+	protected void leave(ListComprehension listComprehension) {
 		builder.append("]");
 	}
 
-	void enter(Case genericCase) {
+	protected void enter(Case genericCase) {
 		builder.append("CASE");
 	}
 
-	void enter(Case.SimpleCase simpleCase) {
+	protected void enter(Case.SimpleCase simpleCase) {
 		builder.append("CASE ");
 	}
 
-	void enter(Case.CaseWhenThen caseWhenExpression) {
+	protected void enter(Case.CaseWhenThen caseWhenExpression) {
 		builder.append(" WHEN ");
 	}
 
-	void leave(Case.CaseWhenThen caseWhenExpression) {
+	protected void leave(Case.CaseWhenThen caseWhenExpression) {
 		builder.append(" THEN ");
 	}
 
-	void enter(Case.CaseElse caseElseExpression) {
+	protected void enter(Case.CaseElse caseElseExpression) {
 		builder.append(" ELSE ");
 	}
 
-	void leave(Case caseExpression) {
+	protected void leave(Case caseExpression) {
 		builder.append(" END");
 	}
 
-	void enter(ProcedureCall procedureCall) {
+	protected void enter(ProcedureCall procedureCall) {
 
 		builder.append("CALL ");
 	}
 
-	void leave(Namespace namespace) {
+	protected void leave(Namespace namespace) {
 
 		builder.append(".");
 	}
 
-	void leave(ProcedureName procedureName) {
+	protected void leave(ProcedureName procedureName) {
 
 		builder.append(procedureName.getValue());
 	}
 
-	void enter(Arguments arguments) {
+	protected void enter(Arguments arguments) {
 
 		builder.append("(");
 	}
 
-	void leave(Arguments arguments) {
+	protected void leave(Arguments arguments) {
 
 		builder.append(")");
 	}
 
-	void enter(YieldItems yieldItems) {
+	protected void enter(YieldItems yieldItems) {
 
 		builder.append(" YIELD ");
 	}
 
-	void leave(ProcedureCall procedureCall) {
+	protected void leave(ProcedureCall procedureCall) {
 
 		builder.append(" ");
 	}
 
-	void enter(ListOperator.Details details) {
+	protected void enter(ListOperator.Details details) {
 
 		builder.append("[");
 	}
 
-	void leave(ListOperator.Details details) {
+	protected void leave(ListOperator.Details details) {
 
 		builder.append("]");
 	}
 
-	void enter(Enum<?> statement) {
+	protected void enter(Enum<?> statement) {
 
 		builder.append(statement.name().replaceAll("_", " ")).append(" ");
 	}
 
-	void enter(Subquery subquery) {
+	protected void enter(Subquery subquery) {
 
 		builder.append("CALL {");
 	}
 
-	void leave(Subquery subquery) {
+	protected void leave(Subquery subquery) {
 
 		builder.append("} ");
 	}
 
-	void enter(ExistentialSubquery subquery) {
+	protected void enter(ExistentialSubquery subquery) {
 
 		builder.append("EXISTS {");
 	}
 
-	void leave(ExistentialSubquery subquery) {
+	protected void leave(ExistentialSubquery subquery) {
 
 		// Trimming the inner match without having to do this in the match (looking up if inside subquery).
 		builder.replace(builder.length() - 1, builder.length(), "}");
 	}
 
-	void enter(Hint hint) {
+	protected void enter(Hint hint) {
 
 		builder.append(" USING ");
 	}
 
-	void enter(Hint.IndexProperties indexProperties) {
+	protected void enter(Hint.IndexProperties indexProperties) {
 
 		builder.append("(");
 	}
 
-	void leave(Hint.IndexProperties indexProperties) {
+	protected void leave(Hint.IndexProperties indexProperties) {
 
 		builder.append(")");
 	}
@@ -690,7 +691,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 	 * @param unescapedName The name to escape.
 	 * @return An empty optional when the unescaped name is {@literal null}, otherwise the correctly escaped name, safe to be used in statements.
 	 */
-	static Optional<String> escapeName(CharSequence unescapedName) {
+	protected Optional<String> escapeName(CharSequence unescapedName) {
 
 		if (unescapedName == null) {
 			return Optional.empty();
@@ -700,7 +701,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		return Optional.of(String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``")));
 	}
 
-	static String escapeIfNecessary(String potentiallyNonIdentifier) {
+	protected String escapeIfNecessary(String potentiallyNonIdentifier) {
 
 		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier) || potentiallyNonIdentifier.trim().isEmpty()) {
 			return potentiallyNonIdentifier;
