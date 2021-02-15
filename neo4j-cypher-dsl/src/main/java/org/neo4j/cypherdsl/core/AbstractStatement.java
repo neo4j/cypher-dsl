@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * The abstract statement provides possible state shared across various statement implementations. Use cases are collecting
@@ -37,7 +38,15 @@ import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 @API(status = INTERNAL, since = "2021.0.0")
 abstract class AbstractStatement implements Statement {
 
+	/**
+	 * The collected parameter information (names only and names + values).
+	 */
 	private volatile ParameterInformation parameterInformation;
+
+	/**
+	 * The rendered Cypher statement.
+	 */
+	private volatile String cypher;
 
 	@Override
 	public Map<String, Object> getParameters() {
@@ -47,6 +56,22 @@ abstract class AbstractStatement implements Statement {
 	@Override
 	public Set<String> getParameterNames() {
 		return getParameterInformation().names;
+	}
+
+	@Override
+	public String getCypher() {
+
+		String result = this.cypher;
+		if (result == null) {
+			synchronized (this) {
+				result = this.cypher;
+				if (result == null) {
+					this.cypher = Renderer.getDefaultRenderer().render(this);
+					result = this.cypher;
+				}
+			}
+		}
+		return result;
 	}
 
 	ParameterInformation getParameterInformation() {
