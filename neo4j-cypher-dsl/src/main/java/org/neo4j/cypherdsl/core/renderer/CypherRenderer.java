@@ -24,6 +24,7 @@ import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.Supplier;
 
 import org.neo4j.cypherdsl.core.Statement;
 
@@ -34,7 +35,8 @@ import org.neo4j.cypherdsl.core.Statement;
  */
 enum CypherRenderer implements Renderer {
 
-	INSTANCE;
+	INSTANCE(RenderingVisitor::new),
+	PRETTY_PRINT_INSTANCE(PrettyRenderingVisitor::new);
 
 	private final int STATEMENT_CACHE_SIZE = 128;
 	private final LinkedHashMap<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
@@ -42,6 +44,11 @@ enum CypherRenderer implements Renderer {
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final Lock read = lock.readLock();
 	private final Lock write = lock.writeLock();
+	private final Supplier<RenderingVisitor> visitorFactory;
+
+	CypherRenderer(Supplier<RenderingVisitor> visitorFactory) {
+		this.visitorFactory = visitorFactory;
+	}
 
 	@Override
 	public String render(Statement statement) {
@@ -60,7 +67,7 @@ enum CypherRenderer implements Renderer {
 			try {
 				write.lock();
 
-				RenderingVisitor renderingVisitor = new RenderingVisitor();
+				RenderingVisitor renderingVisitor = visitorFactory.get();
 				statement.accept(renderingVisitor);
 				renderedContent = renderingVisitor.getRenderedContent().trim();
 
@@ -77,7 +84,7 @@ enum CypherRenderer implements Renderer {
 
 		private static final long serialVersionUID = -6819899594092598277L;
 
-		private int cacheSize;
+		private final int cacheSize;
 
 		LRUCache(int cacheSize) {
 			super(cacheSize / 4, 0.75f, true);

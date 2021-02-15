@@ -99,6 +99,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @author Gerrit Meier
  * @since 1.0
  */
+@SuppressWarnings("unused")
 class RenderingVisitor extends ReflectiveVisitor {
 
 	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("`");
@@ -106,7 +107,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 	/**
 	 * Target of all rendering.
 	 */
-	private final StringBuilder builder = new StringBuilder();
+	protected final StringBuilder builder = new StringBuilder();
 
 	/**
 	 * This keeps track on which level of the tree a separator is needed.
@@ -448,7 +449,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 
 		builder
 			.append(types.getValues().stream()
-				.map(RenderingVisitor::escapeName)
+				.map(this::escapeName)
 				.map(Optional::get).collect(Collectors.joining(Symbols.REL_TYP_SEPARATOR, Symbols.REL_TYPE_START, "")));
 	}
 
@@ -690,7 +691,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 	 * @param unescapedName The name to escape.
 	 * @return An empty optional when the unescaped name is {@literal null}, otherwise the correctly escaped name, safe to be used in statements.
 	 */
-	static Optional<String> escapeName(CharSequence unescapedName) {
+	protected Optional<String> escapeName(CharSequence unescapedName) {
 
 		if (unescapedName == null) {
 			return Optional.empty();
@@ -700,7 +701,7 @@ class RenderingVisitor extends ReflectiveVisitor {
 		return Optional.of(String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``")));
 	}
 
-	static String escapeIfNecessary(String potentiallyNonIdentifier) {
+	protected String escapeIfNecessary(String potentiallyNonIdentifier) {
 
 		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier) || potentiallyNonIdentifier.trim().isEmpty()) {
 			return potentiallyNonIdentifier;

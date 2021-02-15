@@ -71,7 +71,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 	/**
 	 * Keeps track of the ASTs current level.
 	 */
-	private Deque<Visitable> currentVisitedElements = new LinkedList<>();
+	protected Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
@@ -136,14 +136,18 @@ public abstract class ReflectiveVisitor implements Visitor {
 	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
 
 		for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
+			Class<?> c = targetAndPhase.visitorClass;
+			while (c != null) {
 			try {
-				Method method = targetAndPhase.visitorClass
-					.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
+					// Using MethodHandles.lookup().findVirtual() doesn't allow to make a protected method accessible.
+					Method method = c.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
 				method.setAccessible(true);
 				return Optional.of(method);
 			} catch (NoSuchMethodException e) {
 				// We don't do anything if the method doesn't exists
 				// Try the next parameter type in the hierarchy
+			}
+				c = c.getSuperclass();
 			}
 		}
 		return Optional.empty();
