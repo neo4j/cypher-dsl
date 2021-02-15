@@ -64,6 +64,8 @@ public interface Statement extends Visitable {
 	 * <p>
 	 * The map can be used for example as an argument with various methods on the Neo4j Java Driver that allow the
 	 * execution of parameterized queries.
+	 * <p>
+	 * This method is threadsafe
 	 *
 	 * @return A map of all parameters with a bound value.
 	 * @since 2021.0.0
@@ -73,10 +75,26 @@ public interface Statement extends Visitable {
 	/**
 	 * After the statement has been build, this method returns a list of all parameter names used, regardless whether
 	 * a value was bound to the parameter o not.
+	 * <p>
+	 * This method is threadsafe
+	 *
 	 * @return A set of parameter names being used.
 	 * @since 2021.0.0
 	 */
 	Collection<String> getParameterNames();
+
+	/**
+	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher
+	 * will use escaped literals and correct placeholders like {@code $param} for parameters. The placeholders for
+	 * parameters can be retrieved via {@link #getParameterNames}. Bounded values for paramters can be retrieved via
+	 * {@link #getParameters()}.
+	 * <p>
+	 * This method is threadsafe
+	 *
+	 * @return A valid Cypher statement
+	 * @since 2021.0.0
+	 */
+	String getCypher();
 
 	/**
 	 * Represents {@code RegularQuery}.

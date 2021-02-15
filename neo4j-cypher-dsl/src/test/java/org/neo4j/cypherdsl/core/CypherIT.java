@@ -39,6 +39,15 @@ class CypherIT {
 	private final Node bikeNode = Cypher.node("Bike").named("b");
 	private final Node userNode = Cypher.node("User").named("u");
 
+	@Test
+	void statementShouldBeRenderable() {
+
+		Statement statement = Cypher.returning(Cypher.literalTrue().as("t")).build();
+		String cypher = statement.getCypher();
+		assertThat(cypher).isEqualTo("RETURN true AS t");
+		assertThat(statement.getCypher()).isSameAs(cypher);
+	}
+
 	@Nested
 	class SingleQuerySinglePart {
 
