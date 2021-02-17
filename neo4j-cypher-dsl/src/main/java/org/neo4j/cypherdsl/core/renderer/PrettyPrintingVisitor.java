@@ -48,7 +48,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	 * In contrast to the current level in the {@link DefaultVisitor} that contains the level of elements in the tree.
 	 */
 	private int indentationLevel;
-	private int topCount;
+	private int readingOrUpdatingClausesCount;
 
 	PrettyPrintingVisitor(IndentStyle indentStyle, int indentSize) {
 
@@ -102,7 +102,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Match match) {
-		if (topCount > 0) {
+		if (readingOrUpdatingClausesCount > 0) {
 			trimNewline();
 		}
 		super.enter(match);
@@ -110,13 +110,13 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void leave(Match match) {
-		topCount++;
+		readingOrUpdatingClausesCount++;
 		super.leave(match);
 	}
 
 	@Override
 	void enter(Create create) {
-		if (topCount > 0) {
+		if (readingOrUpdatingClausesCount > 0) {
 			trimNewline();
 		}
 		super.enter(create);
@@ -124,7 +124,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void leave(Create create) {
-		topCount++;
+		readingOrUpdatingClausesCount++;
 		super.leave(create);
 	}
 
@@ -190,7 +190,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Merge merge) {
-		if (topCount > 0) {
+		if (readingOrUpdatingClausesCount > 0) {
 			trimNewline();
 		}
 		super.enter(merge);
@@ -198,7 +198,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void leave(Merge merge) {
-		topCount++;
+		readingOrUpdatingClausesCount++;
 		super.leave(merge);
 	}
 

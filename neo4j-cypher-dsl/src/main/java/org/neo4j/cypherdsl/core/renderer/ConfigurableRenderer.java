@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core.renderer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -28,13 +29,23 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.neo4j.cypherdsl.core.Statement;
 
 /**
- * A minimal, shared based class for renderer. It's main responsibility is keeping some rendered content around.
- *
  * @author Michael J. Simons
- * @soundtrack Slayer - Undisputed Attitude
- * @since 2020.0.1
+ * @author Gerrit Meier
+ * @since 1.0
  */
-abstract class AbstractRenderer implements Renderer {
+class ConfigurableRenderer implements Renderer {
+
+	private final static Map<Configuration, ConfigurableRenderer> CONFIGURATIONS = new ConcurrentHashMap<>(8);
+
+	/**
+	 * Creates a new instance of the configurable renderer or uses an existing one matching the  given configuration
+	 *
+	 * @param configuration The configuration for the render
+	 * @return A new renderer
+	 */
+	static ConfigurableRenderer create(Configuration configuration) {
+		return CONFIGURATIONS.computeIfAbsent(configuration, ConfigurableRenderer::new);
+	}
 
 	private final int STATEMENT_CACHE_SIZE = 128;
 	private final LinkedHashMap<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
@@ -45,7 +56,7 @@ abstract class AbstractRenderer implements Renderer {
 
 	private final Configuration configuration;
 
-	AbstractRenderer(Configuration configuration) {
+	ConfigurableRenderer(Configuration configuration) {
 		this.configuration = configuration;
 	}
 
@@ -66,9 +77,9 @@ abstract class AbstractRenderer implements Renderer {
 			try {
 				write.lock();
 
-				DefaultVisitor renderingVisitor = new DefaultVisitor();
+				RenderingVisitor renderingVisitor = createVisitor();
 				statement.accept(renderingVisitor);
-				renderedContent = doRender(statement);
+				renderedContent = renderingVisitor.getRenderedContent().trim();
 
 				renderedStatementCache.put(key, renderedContent);
 			} finally {
@@ -79,7 +90,14 @@ abstract class AbstractRenderer implements Renderer {
 		return renderedContent;
 	}
 
-	protected abstract String doRender(Statement statement);
+	private RenderingVisitor createVisitor() {
+
+		if (!this.configuration.isPrettyPrint()) {
+			return new DefaultVisitor();
+		} else {
+			return new PrettyPrintingVisitor(this.configuration.getIndentStyle(), this.configuration.getIndentSize());
+		}
+	}
 
 	private static class LRUCache<K, V> extends LinkedHashMap<K, V> {
 

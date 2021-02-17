@@ -162,4 +162,13 @@ public final class Configuration {
 	public int hashCode() {
 		return Objects.hash(prettyPrint, indentStyle, indentSize);
 	}
+
+	@Override
+	public String toString() {
+		return "Configuration{" +
+			   "prettyPrint=" + prettyPrint +
+			   ", indentStyle=" + indentStyle +
+			   ", indentSize=" + indentSize +
+			   '}';
+	}
 }

@@ -56,6 +56,6 @@ public interface Renderer {
 	 * @return A new renderer (might be a shared instance).
 	 */
 	static Renderer getRenderer(Configuration configuration) {
-		return CypherRenderer.create(configuration);
+		return ConfigurableRenderer.create(configuration);
 	}
 }
