@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -3940,27 +3939,28 @@ class CypherIT {
 		void prettyPrintingWithDefaultSettingShouldWork() {
 
 			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
-				.isEqualTo("MATCH (u:User)\n" +
-						   "WHERE (u.name = 'Max' \n" +
-						   "  AND u.lastName = 'Mustermann') \n" +
-						   "SET u.lastName = $newName \n" +
-						   "WITH u \n" +
-						   "MATCH (b:Bike) \n" +
-						   "CREATE (u)-[:LIKES]->(b) \n" +
-						   "RETURN u {\n" +
-						   "  name: u.name, \n" +
-						   "  nesting1:  {\n" +
-						   "    name: u.name, \n" +
-						   "    nesting2:  {\n" +
-						   "      name: b.name, \n" +
-						   "      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
-						   "        .x, \n" +
-						   "        .y\n" +
-						   "      }]\n" +
-						   "    }\n" +
-						   "  }\n" +
-						   "}");
-
+				.isEqualTo(
+					"MATCH (u:User)\n" +
+					"WHERE (u.name = 'Max' \n" +
+					"  AND u.lastName = 'Mustermann') \n" +
+					"SET u.lastName = $newName \n" +
+					"WITH u \n" +
+					"MATCH (b:Bike) \n" +
+					"CREATE (u)-[:LIKES]->(b) \n" +
+					"RETURN u {\n" +
+					"  name: u.name, \n" +
+					"  nesting1:  {\n" +
+					"    name: u.name, \n" +
+					"    nesting2:  {\n" +
+					"      name: b.name, \n" +
+					"      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+					"        .x, \n" +
+					"        .y\n" +
+					"      }]\n" +
+					"    }\n" +
+					"  }\n" +
+					"}"
+				);
 		}
 
 		@Test
@@ -3968,26 +3968,28 @@ class CypherIT {
 
 			assertThat(Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentStyle(
 				Configuration.IndentStyle.TAB).build()).render(statement))
-				.isEqualTo("MATCH (u:User)\n" +
-						   "WHERE (u.name = 'Max' \n" +
-						   "\tAND u.lastName = 'Mustermann') \n" +
-						   "SET u.lastName = $newName \n" +
-						   "WITH u \n" +
-						   "MATCH (b:Bike) \n" +
-						   "CREATE (u)-[:LIKES]->(b) \n" +
-						   "RETURN u {\n" +
-						   "\tname: u.name, \n" +
-						   "\tnesting1:  {\n" +
-						   "\t\tname: u.name, \n" +
-						   "\t\tnesting2:  {\n" +
-						   "\t\t\tname: b.name, \n" +
-						   "\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
-						   "\t\t\t\t.x, \n" +
-						   "\t\t\t\t.y\n" +
-						   "\t\t\t}]\n" +
-						   "\t\t}\n" +
-						   "\t}\n" +
-						   "}");
+				.isEqualTo(
+					"MATCH (u:User)\n" +
+					"WHERE (u.name = 'Max' \n" +
+					"\tAND u.lastName = 'Mustermann') \n" +
+					"SET u.lastName = $newName \n" +
+					"WITH u \n" +
+					"MATCH (b:Bike) \n" +
+					"CREATE (u)-[:LIKES]->(b) \n" +
+					"RETURN u {\n" +
+					"\tname: u.name, \n" +
+					"\tnesting1:  {\n" +
+					"\t\tname: u.name, \n" +
+					"\t\tnesting2:  {\n" +
+					"\t\t\tname: b.name, \n" +
+					"\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+					"\t\t\t\t.x, \n" +
+					"\t\t\t\t.y\n" +
+					"\t\t\t}]\n" +
+					"\t\t}\n" +
+					"\t}\n" +
+					"}"
+				);
 		}
 
 		/**
@@ -3999,20 +4001,22 @@ class CypherIT {
 			Node a = Cypher.anyNode("a");
 			Node b = Cypher.anyNode("b");
 
-			Statement statement = Cypher.merge(n)
+			Statement mergeStatement = Cypher.merge(n)
 				.onCreate().set(n.property("prop").to(Cypher.literalOf(0)))
 				.merge(a.relationshipTo(b, "T"))
 				.onCreate().set(a.property("name").to(Cypher.literalOf("me")))
 				.onMatch().set(b.property("name").to(Cypher.literalOf("you")))
 				.returning(a.property("prop")).build();
 
-			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
-				.isEqualTo("MERGE (n)\n"
-						   + "  ON CREATE SET n.prop = 0\n"
-						   + "MERGE (a:A)-[:T]-(b:B)\n"
-						   + "  ON CREATE SET a.name = 'me'\n"
-						   + "  ON MATCH SET b.name = 'you'\n"
-						   + "RETURN a.prop");
+			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(mergeStatement))
+				.isEqualTo(
+					"MERGE (n)\n" +
+					"  ON CREATE SET n.prop = 0\n" +
+					"MERGE (a:A)-[:T]-(b:B)\n" +
+					"  ON CREATE SET a.name = 'me'\n" +
+					"  ON MATCH SET b.name = 'you'\n" +
+					"RETURN a.prop"
+				);
 		}
 	}
 }

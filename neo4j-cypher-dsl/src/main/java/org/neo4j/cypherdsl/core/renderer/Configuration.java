@@ -39,8 +39,14 @@ public final class Configuration {
 	private static final Configuration DEFAULT_CONFIG = newConfig().build();
 	private static final Configuration PRETTY_PRINTING = newConfig().withPrettyPrint(true).build();
 
+	/**
+	 * Enum for the available indent styles.
+	 */
 	public enum IndentStyle {
-		TAB, SPACE
+		/** Use tabs for indentation. */
+		TAB,
+		/** Use a configurable number of spaces for indentation. */
+		SPACE
 	}
 
 	/**
@@ -80,6 +86,10 @@ public final class Configuration {
 		return Builder.newConfig();
 	}
 
+	/**
+	 * Use this builder to create new {@link Configuration} instances.
+	 */
+	@SuppressWarnings("HiddenField")
 	public static final class Builder {
 
 		private boolean prettyPrint = false;

@@ -18,7 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.support;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
