@@ -166,9 +166,9 @@ public final class Configuration {
 	@Override
 	public String toString() {
 		return "Configuration{" +
-			   "prettyPrint=" + prettyPrint +
-			   ", indentStyle=" + indentStyle +
-			   ", indentSize=" + indentSize +
-			   '}';
+			"prettyPrint=" + prettyPrint +
+			", indentStyle=" + indentStyle +
+			", indentSize=" + indentSize +
+			'}';
 	}
 }
