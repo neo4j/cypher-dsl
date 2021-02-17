@@ -1,6 +1,10 @@
 [
   {
-    "name" : "org.neo4j.cypherdsl.core.renderer.RenderingVisitor",
+    "name" : "org.neo4j.cypherdsl.core.renderer.DefaultVisitor",
+    "allDeclaredMethods" : true
+  },
+  {
+    "name" : "org.neo4j.cypherdsl.core.renderer.PrettyPrintingVisitor",
     "allDeclaredMethods" : true
   }
 ]
