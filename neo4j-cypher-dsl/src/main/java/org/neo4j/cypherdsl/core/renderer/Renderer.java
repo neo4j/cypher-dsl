@@ -47,7 +47,7 @@ public interface Renderer {
 	 * @return The default renderer.
 	 */
 	static Renderer getDefaultRenderer() {
-		return CypherRenderer.create(Configuration.defaultConfig());
+		return getRenderer(Configuration.defaultConfig());
 	}
 
 	/**
