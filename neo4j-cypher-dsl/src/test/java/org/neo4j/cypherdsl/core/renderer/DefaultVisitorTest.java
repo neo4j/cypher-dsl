@@ -27,7 +27,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 /**
  * @author Michael J. Simons
  */
-class RenderingVisitorTest {
+class DefaultVisitorTest {
+
+	private final DefaultVisitor visitor = new DefaultVisitor();
 
 	@ParameterizedTest
 	@CsvSource({
@@ -39,13 +41,13 @@ class RenderingVisitorTest {
 	})
 	void shouldCorrectlyEscapeNames(String name, String expectedEscapedName) {
 
-		assertThat(RenderingVisitor.escapeName(name)).hasValue(expectedEscapedName);
+		assertThat(visitor.escapeName(name)).hasValue(expectedEscapedName);
 	}
 
 	@Test
 	void shouldNotTryToEscapeNullNames() {
 
-		assertThat(RenderingVisitor.escapeName(null)).isEmpty();
+		assertThat(visitor.escapeName(null)).isEmpty();
 	}
 
 	@ParameterizedTest
@@ -58,14 +60,14 @@ class RenderingVisitorTest {
 	})
 	void shouldEscapeIfNecessary(String name, String expectedEscapedName) {
 
-		assertThat(RenderingVisitor.escapeIfNecessary(name)).isEqualTo(expectedEscapedName);
+		assertThat(visitor.escapeIfNecessary(name)).isEqualTo(expectedEscapedName);
 	}
 
 	@Test
 	void shouldNotUnnecessaryEscape() {
 
-		assertThat(RenderingVisitor.escapeIfNecessary(" ")).isEqualTo(" ");
-		assertThat(RenderingVisitor.escapeIfNecessary(null)).isNull();
-		assertThat(RenderingVisitor.escapeIfNecessary("a")).isEqualTo("a");
+		assertThat(visitor.escapeIfNecessary(" ")).isEqualTo(" ");
+		assertThat(visitor.escapeIfNecessary(null)).isNull();
+		assertThat(visitor.escapeIfNecessary("a")).isEqualTo("a");
 	}
 }

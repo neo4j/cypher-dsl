@@ -76,6 +76,15 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>Andy2003</id>
+			<name>Andreas Berger</name>
+			<email>andreas at berger-ecommerce.com</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
 	</developers>
 
 	<modules>

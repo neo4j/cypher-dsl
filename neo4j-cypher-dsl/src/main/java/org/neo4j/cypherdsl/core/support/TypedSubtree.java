@@ -18,9 +18,13 @@
  */
 package org.neo4j.cypherdsl.core.support;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.apiguardian.api.API;
 
 /**
  * This class helps to group items of the same type on the same level of the tree into a list structure that can be
@@ -31,6 +35,7 @@ import java.util.List;
  * @param <SELF> The concrete type of the implementing class.
  * @since 1.0
  */
+@API(status = INTERNAL, since = "1.0")
 public abstract class TypedSubtree<T extends Visitable, SELF extends TypedSubtree<T, SELF>> implements Visitable {
 
 	/**

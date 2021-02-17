@@ -26,6 +26,7 @@ import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -3908,6 +3909,123 @@ class CypherIT {
 				.returning(netAmount, totalAmount).build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
 				"MATCH (o:`Order`)-[h]->(li:`LineItem`) WHERE o.id = $id WITH o, sum((li.price * li.quantity)) AS netAmount, (netAmount * (1 + $taxRate)) AS totalAmount RETURN netAmount, totalAmount");
+		}
+	}
+
+	@Nested
+	class PrettyPrinting {
+
+		private final Statement statement;
+
+		PrettyPrinting() {
+			Node otherNode = Cypher.anyNode("other");
+			this.statement = Cypher.match(userNode)
+				.where(userNode.property("name").isEqualTo(Cypher.literalOf("Max")))
+				.and(userNode.property("lastName").isEqualTo(Cypher.literalOf("Mustermann")))
+				.set(userNode.property("lastName").to(Cypher.parameter("newName")))
+				.with(userNode)
+				.match(bikeNode)
+				.create(userNode.relationshipTo(bikeNode, "LIKES"))
+				.returning(userNode.project(
+					"name",
+					userNode.property("name"),
+					"nesting1",
+					Cypher.mapOf(
+						"name",
+						userNode.property("name"),
+						"nesting2",
+						Cypher.mapOf(
+							"name", bikeNode.property("name"),
+							"pattern", Cypher
+								.listBasedOn(userNode.relationshipTo(otherNode, "LIKES"))
+								.where(otherNode.property("foo").isEqualTo(Cypher.parameter("foo")))
+								.returning(otherNode.project("x", "y"))
+						)
+					))).build();
+		}
+
+		@Test
+		void prettyPrintingWithDefaultSettingShouldWork() {
+
+			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
+				.isEqualTo(
+					"MATCH (u:User)\n" +
+					"WHERE (u.name = 'Max'\n" +
+					"  AND u.lastName = 'Mustermann')\n" +
+					"SET u.lastName = $newName\n" +
+					"WITH u\n" +
+					"MATCH (b:Bike)\n" +
+					"CREATE (u)-[:LIKES]->(b)\n" +
+					"RETURN u {\n" +
+					"  name: u.name,\n" +
+					"  nesting1:  {\n" +
+					"    name: u.name,\n" +
+					"    nesting2:  {\n" +
+					"      name: b.name,\n" +
+					"      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+					"        .x,\n" +
+					"        .y\n" +
+					"      }]\n" +
+					"    }\n" +
+					"  }\n" +
+					"}"
+				);
+		}
+
+		@Test
+		void prettyPrintingWithTabsShouldWork() {
+
+			assertThat(Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentStyle(
+				Configuration.IndentStyle.TAB).build()).render(statement))
+				.isEqualTo(
+					"MATCH (u:User)\n" +
+					"WHERE (u.name = 'Max'\n" +
+					"\tAND u.lastName = 'Mustermann')\n" +
+					"SET u.lastName = $newName\n" +
+					"WITH u\n" +
+					"MATCH (b:Bike)\n" +
+					"CREATE (u)-[:LIKES]->(b)\n" +
+					"RETURN u {\n" +
+					"\tname: u.name,\n" +
+					"\tnesting1:  {\n" +
+					"\t\tname: u.name,\n" +
+					"\t\tnesting2:  {\n" +
+					"\t\t\tname: b.name,\n" +
+					"\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+					"\t\t\t\t.x,\n" +
+					"\t\t\t\t.y\n" +
+					"\t\t\t}]\n" +
+					"\t\t}\n" +
+					"\t}\n" +
+					"}"
+				);
+		}
+
+		/**
+		 * See https://neo4j.com/docs/cypher-manual/current/styleguide/#cypher-styleguide-indentation-and-line-breaks
+		 */
+		@Test
+		void onClauses() {
+			Node n = Cypher.anyNode("n");
+			Node a = Cypher.node("A").named("a");
+			Node b = Cypher.node("B").named("b");
+
+			Statement mergeStatement = Cypher.merge(n)
+				.onCreate().set(n.property("prop").to(Cypher.literalOf(0)))
+				.merge(a.relationshipBetween(b, "T"))
+				.onCreate().set(a.property("name").to(Cypher.literalOf("me")))
+				.onMatch().set(b.property("name").to(Cypher.literalOf("you")))
+				.returning(a.property("prop")).build();
+
+			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(mergeStatement))
+				.isEqualTo(
+					"MERGE (n)\n" +
+					"  ON CREATE SET n.prop = 0\n" +
+					"MERGE (a:A)-[:T]-(b:B)\n" +
+					"  ON CREATE SET a.name = 'me'\n" +
+					"  ON MATCH SET b.name = 'you'\n" +
+					"RETURN a.prop"
+				);
 		}
 	}
 }
