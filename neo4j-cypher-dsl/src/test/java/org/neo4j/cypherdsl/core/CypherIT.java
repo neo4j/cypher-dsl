@@ -3998,8 +3998,8 @@ class CypherIT {
 		@Test
 		void onClauses() {
 			Node n = Cypher.anyNode("n");
-			Node a = Cypher.node("A").named( "a");
-			Node b = Cypher.node("B").named( "b");
+			Node a = Cypher.node("A").named("a");
+			Node b = Cypher.node("B").named("b");
 
 			Statement mergeStatement = Cypher.merge(n)
 				.onCreate().set(n.property("prop").to(Cypher.literalOf(0)))
