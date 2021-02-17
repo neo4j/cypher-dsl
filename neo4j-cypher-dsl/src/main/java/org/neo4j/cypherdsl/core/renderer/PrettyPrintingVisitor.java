@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.util.Optional;
+import java.util.function.BiConsumer;
+
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.MapExpression;
@@ -28,25 +31,49 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
-
-import java.util.Optional;
+import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 
 /**
- * This is a implementation of a visitor to the Cypher AST created by the Cypher builder
- * based on the {@link RenderingVisitor reflective visitor}.
- * <p>
- * It takes care of separating elements of sub trees containing the element type with a separator and provides pairs of
- * {@code enter} / {@code leave} for the structuring elements of the Cypher AST as needed.
- * <p>
- * This rendering visitor is not meant to be used outside framework code and we don't give any guarantees on the format
- *
  * @author Andreas Berger
+ * @author Michael J. Simons
  */
 @SuppressWarnings("unused")
-class PrettyRenderingVisitor extends RenderingVisitor {
+class PrettyPrintingVisitor extends DefaultVisitor {
 
-	private int level;
+	private final IndentStyle indentStyle;
+
+	private final int indentSize;
+
+	private final BiConsumer<StringBuilder, Integer> indentionProvider;
+
+	/**
+	 * In contrast to the current level in the {@link DefaultVisitor} that contains the level of elements in the tree.
+	 */
+	private int indentationLevel;
 	private int topCount;
+
+	PrettyPrintingVisitor(IndentStyle indentStyle, int indentSize) {
+		this.indentStyle = indentStyle;
+		this.indentSize = indentSize;
+
+		if (indentStyle == IndentStyle.TAB) {
+			indentionProvider = (builder, width) -> {
+				for (int i = 0; i < width; i++) {
+					builder.append("\t");
+				}
+			};
+		} else {
+			indentionProvider = (builder, width) -> {
+				for (int i = 0; i < width * indentSize; i++) {
+					builder.append(" ");
+				}
+			};
+		}
+	}
+
+	private void indent(int width) {
+		indentionProvider.accept(builder, width);
+	}
 
 	@Override
 	void enter(Where where) {
@@ -105,18 +132,19 @@ class PrettyRenderingVisitor extends RenderingVisitor {
 
 	@Override
 	void enter(PropertyLookup propertyLookup) {
-		if (currentVisitedElements.stream().skip(1).limit(1).anyMatch(visitable -> visitable instanceof MapExpression)) {
+		if (currentVisitedElements.stream().skip(1).limit(1)
+			.anyMatch(visitable -> visitable instanceof MapExpression)) {
 			builder.append("\n");
-			indent(level);
+			indent(indentationLevel);
 		}
 		super.enter(propertyLookup);
 	}
 
 	@Override
 	void enter(KeyValueMapEntry map) {
-		if (level > 0) {
+		if (indentationLevel > 0) {
 			builder.append("\n");
-			indent(level);
+			indent(indentationLevel);
 		}
 		super.enter(map);
 	}
@@ -131,7 +159,8 @@ class PrettyRenderingVisitor extends RenderingVisitor {
 			builder.append(" ");
 		}
 		if (operator == Operator.OR || operator == Operator.AND || operator == Operator.XOR) {
-			builder.append("\n\t");
+			builder.append("\n");
+			indent(1);
 		}
 		builder.append(operator.getRepresentation());
 		if (type != Operator.Type.POSTFIX && operator != Operator.EXPONENTIATION) {
@@ -141,16 +170,16 @@ class PrettyRenderingVisitor extends RenderingVisitor {
 
 	@Override
 	void enter(MapExpression map) {
-		level++;
+		indentationLevel++;
 		builder.append(" ");
 		super.enter(map);
 	}
 
 	@Override
 	void leave(MapExpression map) {
-		level--;
+		indentationLevel--;
 		builder.append("\n");
-		indent(level);
+		indent(indentationLevel);
 		super.leave(map);
 	}
 
@@ -160,11 +189,5 @@ class PrettyRenderingVisitor extends RenderingVisitor {
 			return Optional.empty();
 		}
 		return Optional.of(super.escapeIfNecessary(unescapedName.toString()));
-	}
-
-	private void indent(int indentionSize) {
-		for (int i = 0; i < indentionSize; i++) {
-			builder.append("\t");
-		}
 	}
 }

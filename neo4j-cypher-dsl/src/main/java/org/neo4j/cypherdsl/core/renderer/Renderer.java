@@ -35,6 +35,7 @@ public interface Renderer {
 
 	/**
 	 * Renders a statement.
+	 *
 	 * @param statement the statement to render
 	 * @return The rendered Cypher statement.
 	 */
@@ -46,15 +47,15 @@ public interface Renderer {
 	 * @return The default renderer.
 	 */
 	static Renderer getDefaultRenderer() {
-		return CypherRenderer.INSTANCE;
+		return CypherRenderer.create(Configuration.defaultConfig());
 	}
 
 	/**
-	 * Provides the default renderer. This method may or may not provide shared instances of the renderer.
+	 * Creates a new renderer for the given configuration.
 	 *
-	 * @return The default renderer.
+	 * @return A new renderer (might be a shared instance).
 	 */
-	static Renderer getPrettyRenderer() {
-		return CypherRenderer.PRETTY_PRINT_INSTANCE;
+	static Renderer getRenderer(Configuration configuration) {
+		return CypherRenderer.create(configuration);
 	}
 }

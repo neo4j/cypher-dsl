@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core.support;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -30,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 
 /**
@@ -46,6 +49,7 @@ import org.neo4j.cypherdsl.core.AliasedExpression;
  * @author Gerrit Meier
  * @since 1.0
  */
+@API(status = INTERNAL, since = "1.0")
 public abstract class ReflectiveVisitor implements Visitor {
 
 	/**

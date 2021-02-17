@@ -27,9 +27,9 @@ import org.junit.jupiter.params.provider.CsvSource;
 /**
  * @author Michael J. Simons
  */
-class RenderingVisitorTest {
+class DefaultVisitorTest {
 
-	private final RenderingVisitor visitor = new RenderingVisitor();
+	private final DefaultVisitor visitor = new DefaultVisitor();
 
 	@ParameterizedTest
 	@CsvSource({
