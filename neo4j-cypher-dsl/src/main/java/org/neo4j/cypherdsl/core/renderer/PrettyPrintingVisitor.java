@@ -25,6 +25,8 @@ import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
+import org.neo4j.cypherdsl.core.Merge;
+import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Return;
@@ -40,10 +42,6 @@ import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 @SuppressWarnings("unused")
 class PrettyPrintingVisitor extends DefaultVisitor {
 
-	private final IndentStyle indentStyle;
-
-	private final int indentSize;
-
 	private final BiConsumer<StringBuilder, Integer> indentionProvider;
 
 	/**
@@ -53,8 +51,6 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private int topCount;
 
 	PrettyPrintingVisitor(IndentStyle indentStyle, int indentSize) {
-		this.indentStyle = indentStyle;
-		this.indentSize = indentSize;
 
 		if (indentStyle == IndentStyle.TAB) {
 			indentionProvider = (builder, width) -> {
@@ -86,26 +82,28 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Return returning) {
-		builder.append("\n");
+		trimNewline();
 		super.enter(returning);
 	}
 
 	@Override
 	void enter(With with) {
-		builder.append("\n");
+		trimNewline();
 		super.enter(with);
 	}
 
 	@Override
 	void enter(Set set) {
-		builder.append("\n");
+		if (currentVisitedElements.stream().noneMatch(visitable -> visitable instanceof MergeAction)) {
+			trimNewline();
+		}
 		super.enter(set);
 	}
 
 	@Override
 	void enter(Match match) {
 		if (topCount > 0) {
-			builder.append("\n");
+			trimNewline();
 		}
 		super.enter(match);
 	}
@@ -119,7 +117,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(Create create) {
 		if (topCount > 0) {
-			builder.append("\n");
+			trimNewline();
 		}
 		super.enter(create);
 	}
@@ -133,8 +131,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(PropertyLookup propertyLookup) {
 		if (currentVisitedElements.stream().skip(1).limit(1)
-			.anyMatch(visitable -> visitable instanceof MapExpression)) {
-			builder.append("\n");
+				.anyMatch(visitable -> visitable instanceof MapExpression)) {
+			trimNewline();
 			indent(indentationLevel);
 		}
 		super.enter(propertyLookup);
@@ -143,7 +141,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(KeyValueMapEntry map) {
 		if (indentationLevel > 0) {
-			builder.append("\n");
+			trimNewline();
 			indent(indentationLevel);
 		}
 		super.enter(map);
@@ -159,7 +157,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 			builder.append(" ");
 		}
 		if (operator == Operator.OR || operator == Operator.AND || operator == Operator.XOR) {
-			builder.append("\n");
+			trimNewline();
 			indent(1);
 		}
 		builder.append(operator.getRepresentation());
@@ -178,9 +176,41 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void leave(MapExpression map) {
 		indentationLevel--;
-		builder.append("\n");
+		trimNewline();
 		indent(indentationLevel);
 		super.leave(map);
+	}
+
+	@Override
+	void enter(MergeAction onCreateOrMatchEvent) {
+		trimNewline();
+		indent(1);
+		super.enter(onCreateOrMatchEvent);
+	}
+
+	@Override
+	void enter(Merge merge) {
+		if (topCount > 0) {
+			trimNewline();
+		}
+		super.enter(merge);
+	}
+
+	@Override
+	void leave(Merge merge) {
+		topCount++;
+		super.leave(merge);
+	}
+
+	private void trimNewline() {
+		for (int i = builder.length() - 1; i >= 0; i--) {
+			if (builder.charAt(i) == ' ') {
+				builder.deleteCharAt(i);
+			} else {
+				break;
+			}
+		}
+		builder.append("\n");
 	}
 
 	@Override

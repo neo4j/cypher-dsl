@@ -3941,20 +3941,20 @@ class CypherIT {
 			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
 				.isEqualTo(
 					"MATCH (u:User)\n" +
-					"WHERE (u.name = 'Max' \n" +
-					"  AND u.lastName = 'Mustermann') \n" +
-					"SET u.lastName = $newName \n" +
-					"WITH u \n" +
-					"MATCH (b:Bike) \n" +
-					"CREATE (u)-[:LIKES]->(b) \n" +
+					"WHERE (u.name = 'Max'\n" +
+					"  AND u.lastName = 'Mustermann')\n" +
+					"SET u.lastName = $newName\n" +
+					"WITH u\n" +
+					"MATCH (b:Bike)\n" +
+					"CREATE (u)-[:LIKES]->(b)\n" +
 					"RETURN u {\n" +
-					"  name: u.name, \n" +
+					"  name: u.name,\n" +
 					"  nesting1:  {\n" +
-					"    name: u.name, \n" +
+					"    name: u.name,\n" +
 					"    nesting2:  {\n" +
-					"      name: b.name, \n" +
+					"      name: b.name,\n" +
 					"      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
-					"        .x, \n" +
+					"        .x,\n" +
 					"        .y\n" +
 					"      }]\n" +
 					"    }\n" +
@@ -3970,20 +3970,20 @@ class CypherIT {
 				Configuration.IndentStyle.TAB).build()).render(statement))
 				.isEqualTo(
 					"MATCH (u:User)\n" +
-					"WHERE (u.name = 'Max' \n" +
-					"\tAND u.lastName = 'Mustermann') \n" +
-					"SET u.lastName = $newName \n" +
-					"WITH u \n" +
-					"MATCH (b:Bike) \n" +
-					"CREATE (u)-[:LIKES]->(b) \n" +
+					"WHERE (u.name = 'Max'\n" +
+					"\tAND u.lastName = 'Mustermann')\n" +
+					"SET u.lastName = $newName\n" +
+					"WITH u\n" +
+					"MATCH (b:Bike)\n" +
+					"CREATE (u)-[:LIKES]->(b)\n" +
 					"RETURN u {\n" +
-					"\tname: u.name, \n" +
+					"\tname: u.name,\n" +
 					"\tnesting1:  {\n" +
-					"\t\tname: u.name, \n" +
+					"\t\tname: u.name,\n" +
 					"\t\tnesting2:  {\n" +
-					"\t\t\tname: b.name, \n" +
+					"\t\t\tname: b.name,\n" +
 					"\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
-					"\t\t\t\t.x, \n" +
+					"\t\t\t\t.x,\n" +
 					"\t\t\t\t.y\n" +
 					"\t\t\t}]\n" +
 					"\t\t}\n" +
@@ -3998,12 +3998,12 @@ class CypherIT {
 		@Test
 		void onClauses() {
 			Node n = Cypher.anyNode("n");
-			Node a = Cypher.anyNode("a");
-			Node b = Cypher.anyNode("b");
+			Node a = Cypher.node("A").named( "a");
+			Node b = Cypher.node("B").named( "b");
 
 			Statement mergeStatement = Cypher.merge(n)
 				.onCreate().set(n.property("prop").to(Cypher.literalOf(0)))
-				.merge(a.relationshipTo(b, "T"))
+				.merge(a.relationshipBetween(b, "T"))
 				.onCreate().set(a.property("name").to(Cypher.literalOf("me")))
 				.onMatch().set(b.property("name").to(Cypher.literalOf("you")))
 				.returning(a.property("prop")).build();
