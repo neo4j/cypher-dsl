@@ -21,11 +21,11 @@ package org.neo4j.cypherdsl.core.support;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -139,45 +139,55 @@ public abstract class ReflectiveVisitor implements Visitor {
 
 	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
 
-		for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
-			Class<?> c = targetAndPhase.visitorClass;
-			while (c != null) {
-			try {
-					// Using MethodHandles.lookup().findVirtual() doesn't allow to make a protected method accessible.
-					Method method = c.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
-				method.setAccessible(true);
-				return Optional.of(method);
-			} catch (NoSuchMethodException e) {
-				// We don't do anything if the method doesn't exists
-				// Try the next parameter type in the hierarchy
+		Class<?> visitorClass = targetAndPhase.visitorClass;
+		do { // Loop over the hierarchy of visitors so that we catch overloaded and inherited methods.
+			// the loop goes from concrete to abstract, so that the most concrete visitor wins
+			for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
+				try {
+					Method method = visitorClass.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
+					method.setAccessible(true);
+					return Optional.of(method);
+				} catch (NoSuchMethodException e) {
+					// We don't do anything if the method doesn't exists
+					// Try the next parameter type in the hierarchy or the next visitor
+				}
 			}
-				c = c.getSuperclass();
-			}
-		}
+			visitorClass = visitorClass.getSuperclass();
+		} while (visitorClass != null && visitorClass != ReflectiveVisitor.class);
+
 		return Optional.empty();
 	}
 
 	private static class TargetAndPhase {
+
+		/**
+		 * The most concrete visitor class. It may be that the handle that is eventually found will not be called
+		 * with that class, but with a parent. The attribute here is just a starting point and later on, a cache key.
+		 */
 		private final Class<? extends ReflectiveVisitor> visitorClass;
 
-		private final List<Class<?>> classHierarchyOfVisitable;
+		private final Set<Class<?>> classHierarchyOfVisitable;
 
 		private final Phase phase;
 
-		<T extends ReflectiveVisitor> TargetAndPhase(T visitor, Class<? extends Visitable> concreteVisitableClass,
-			Phase phase) {
+		<T extends ReflectiveVisitor> TargetAndPhase(T visitor, Class<? extends Visitable> concreteVisitableClass, Phase phase) {
 			this.visitorClass = visitor.getClass();
 			this.phase = phase;
-			this.classHierarchyOfVisitable = new ArrayList<>();
+			this.classHierarchyOfVisitable = new LinkedHashSet<>();
 
 			Class<?> classOfVisitable = concreteVisitableClass;
 			do {
 				this.classHierarchyOfVisitable.add(classOfVisitable);
+				// Add all interfaces apart visitable too.
+				Arrays.stream(classOfVisitable.getInterfaces())
+					.filter(c -> c != Visitable.class)
+					.forEach(this.classHierarchyOfVisitable::add);
 				classOfVisitable = classOfVisitable.getSuperclass();
-			} while (classOfVisitable != null);
+			} while (classOfVisitable != null && classOfVisitable != Object.class);
 		}
 
-		@Override public boolean equals(Object o) {
+		@Override
+		public boolean equals(Object o) {
 			if (this == o) {
 				return true;
 			}
