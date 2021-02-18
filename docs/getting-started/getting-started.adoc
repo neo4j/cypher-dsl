@@ -139,6 +139,8 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
 ----
 
+=== More features
+
 [[retrieving-parameters]]
 ==== Retrieving parameters being defined
 
@@ -172,3 +174,18 @@ assertThat(cypher).isEqualTo("RETURN true AS t");
 ----
 
 This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and it's parameters.
+
+==== Generating formatted cypher
+
+The Cypher-DSL can also format the generated Cypher to some extend.
+The `Renderer` offers the overload `Renderer getRenderer(Configuration configuration)`, taking in an instance of `org.neo4j.cypherdsl.core.renderer.Configuration`.
+
+Instances of `Configuration` are threadsafe and reusable.
+The class offers a couple of static convenience methods for retrieving some variants.
+
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=pretty-printing-examle]
+----
+<.> Get a "pretty printing" instance of the renderer configuration and retrieve a renderer based on it
+<.> Enjoy formatted Cypher.

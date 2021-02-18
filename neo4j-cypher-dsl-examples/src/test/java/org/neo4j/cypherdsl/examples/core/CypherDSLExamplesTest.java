@@ -29,8 +29,10 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Functions;
+import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 // end::cypher-dsl-imports[]
 
@@ -268,5 +270,33 @@ class CypherDSLExamplesTest {
 		assertThat(parameters).containsEntry("firstName", "Thomas");
 		assertThat(parameters).containsEntry("name", "Anderson");
 		// end::collecting-params[]
+	}
+
+	@Test
+	void prettyPrintExample() {
+
+		// tag::pretty-printing-examle[]
+		var n = Cypher.anyNode("n");
+		var a = Cypher.node("A").named("a");
+		var b = Cypher.node("B").named("b");
+
+		var mergeStatement = Cypher.merge(n)
+			.onCreate().set(n.property("prop").to(Cypher.literalOf(0)))
+			.merge(a.relationshipBetween(b, "T"))
+			.onCreate().set(a.property("name").to(Cypher.literalOf("me")))
+			.onMatch().set(b.property("name").to(Cypher.literalOf("you")))
+			.returning(a.property("prop")).build();
+
+		var renderer = Renderer.getRenderer(Configuration.prettyPrinting()); // <.>
+		assertThat(renderer.render(mergeStatement))
+			.isEqualTo(
+				"MERGE (n)\n" +
+				"  ON CREATE SET n.prop = 0\n" +
+				"MERGE (a:A)-[:T]-(b:B)\n" +
+				"  ON CREATE SET a.name = 'me'\n" +
+				"  ON MATCH SET b.name = 'you'\n" +
+				"RETURN a.prop"
+			); // <.>
+		// end::pretty-printing-examle[]
 	}
 }
