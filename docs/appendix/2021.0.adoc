@@ -1,5 +1,42 @@
 == 2021.0
 
+=== 2021.0.1
+
+==== 🚀 Features
+
+* GH-147 - Configuration infrastructure for renderer.
+           First use case being a simple, pretty printing renderer.
+
+The feature looks like this:
+
+[source,java]
+----
+var c = node("Configuration").named("c");
+var d = node("Cypher-DSL").named("d");
+
+var mergeStatement = merge(c.relationshipTo(d, "CONFIGURES"))
+    .onCreate()
+        .set(
+            d.property("version").to(literalOf("2021.0.1")),
+            c.property("prettyPrint").to(literalTrue())
+        )
+    .onMatch().set(c.property("indentStyle").to(literalOf("TAB")))
+    .returning(d).build();
+
+var renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+System.out.println(renderer.render(mergeStatement));
+----
+
+and gives you:
+
+[source,cypher]
+----
+MERGE (c:Configuration)-[:CONFIGURES]->(d:`Cypher-DSL`)
+  ON CREATE SET d.version = '2021.0.1', c.prettyPrint = true
+  ON MATCH SET c.indentStyle = 'TAB'
+RETURN d
+----
+
 === 2021.0.0
 
 2021.0.0 comes with a lot of new features.
