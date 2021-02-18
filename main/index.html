@@ -573,7 +573,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2021.0.1-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.0.1.</p>
 </div>
 </blockquote>
 </div>
@@ -665,7 +665,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2021.0.1-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.0.1<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -676,7 +676,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.0.1-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.0.1</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -739,8 +739,10 @@ Neo4j-Java-Driver.</p>
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Conditions</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Cypher</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Functions</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Node</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Statement</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Configuration</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Renderer</span>;</code></pre>
 </div>
 </div>
@@ -947,6 +949,9 @@ assertThat(cypherRenderer.render(statement))
 </div>
 </div>
 </div>
+</div>
+<div class="sect3">
+<h4 id="morefeatures"><a class="anchor" href="#morefeatures"></a>2.2.2. More features</h4>
 <div class="sect4">
 <h5 id="retrieving-parameters"><a class="anchor" href="#retrieving-parameters"></a>Retrieving parameters being defined</h5>
 <div class="paragraph">
@@ -1017,6 +1022,54 @@ assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;
 </div>
 <div class="paragraph">
 <p>This, together with <a href="#retrieving-parameters">the above</a>, makes the statement a complete accessor for a Cypher-statement and it&#8217;s parameters.</p>
+</div>
+</div>
+<div class="sect4">
+<h5 id="generatingformattedcypher"><a class="anchor" href="#generatingformattedcypher"></a>Generating formatted cypher</h5>
+<div class="paragraph">
+<p>The Cypher-DSL can also format the generated Cypher to some extend.
+The <code>Renderer</code> offers the overload <code>Renderer getRenderer(Configuration configuration)</code>, taking in an instance of <code>org.neo4j.cypherdsl.core.renderer.Configuration</code>.</p>
+</div>
+<div class="paragraph">
+<p>Instances of <code>Configuration</code> are threadsafe and reusable.
+The class offers a couple of static convenience methods for retrieving some variants.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var n = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
+var a = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">A</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
+var b = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">B</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>);
+
+var mergeStatement = Cypher.merge(n)
+    .onCreate().set(n.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prop</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="integer">0</span>)))
+    .merge(a.relationshipBetween(b, <span class="string"><span class="delimiter">&quot;</span><span class="content">T</span><span class="delimiter">&quot;</span></span>))
+    .onCreate().set(a.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">me</span><span class="delimiter">&quot;</span></span>)))
+    .onMatch().set(b.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">you</span><span class="delimiter">&quot;</span></span>)))
+    .returning(a.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prop</span><span class="delimiter">&quot;</span></span>)).build();
+
+var renderer = <span class="predefined-type">Renderer</span>.getRenderer(<span class="predefined-type">Configuration</span>.prettyPrinting()); <i class="conum" data-value="1"></i><b>(1)</b>
+assertThat(renderer.render(mergeStatement))
+    .isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (n)</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON CREATE SET n.prop = 0</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (a:A)-[:T]-(b:B)</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON CREATE SET a.name = 'me'</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON MATCH SET b.name = 'you'</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN a.prop</span><span class="delimiter">&quot;</span></span>
+    ); <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get a "pretty printing" instance of the renderer configuration and retrieve a renderer based on it</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Enjoy formatted Cypher.</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -1486,6 +1539,52 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 <div class="sect3">
 <h4 id="2021.0"><a class="anchor" href="#2021.0"></a>2021.0</h4>
 <div class="sect4">
+<h5 id="2021.0.1"><a class="anchor" href="#2021.0.1"></a>2021.0.1</h5>
+<div class="sect5">
+<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-147 - Configuration infrastructure for renderer.
+First use case being a simple, pretty printing renderer.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The feature looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var c = node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Configuration</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">c</span><span class="delimiter">&quot;</span></span>);
+var d = node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Cypher-DSL</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">d</span><span class="delimiter">&quot;</span></span>);
+
+var mergeStatement = merge(c.relationshipTo(d, <span class="string"><span class="delimiter">&quot;</span><span class="content">CONFIGURES</span><span class="delimiter">&quot;</span></span>))
+    .onCreate()
+        .set(
+            d.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">version</span><span class="delimiter">&quot;</span></span>).to(literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">2021.0.1</span><span class="delimiter">&quot;</span></span>)),
+            c.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prettyPrint</span><span class="delimiter">&quot;</span></span>).to(literalTrue())
+        )
+    .onMatch().set(c.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">indentStyle</span><span class="delimiter">&quot;</span></span>).to(literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">TAB</span><span class="delimiter">&quot;</span></span>)))
+    .returning(d).build();
+
+var renderer = <span class="predefined-type">Renderer</span>.getRenderer(<span class="predefined-type">Configuration</span>.prettyPrinting());
+<span class="predefined-type">System</span>.out.println(renderer.render(mergeStatement));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and gives you:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="cypher">MERGE (c:Configuration)-[:CONFIGURES]-&gt;(d:`Cypher-DSL`)
+  ON CREATE SET d.version = '2021.0.1', c.prettyPrint = true
+  ON MATCH SET c.indentStyle = 'TAB'
+RETURN d</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect4">
 <h5 id="2021.0.0"><a class="anchor" href="#2021.0.0"></a>2021.0.0</h5>
 <div class="paragraph">
 <p>2021.0.0 comes with a lot of new features.
@@ -1554,7 +1653,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1658,7 +1757,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.5"><a class="anchor" href="#2020.1.5"></a>2020.1.5</h5>
 <div class="sect5">
-<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
+<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1677,7 +1776,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.4"><a class="anchor" href="#2020.1.4"></a>2020.1.4</h5>
 <div class="sect5">
-<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
+<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1693,7 +1792,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.3"><a class="anchor" href="#2020.1.3"></a>2020.1.3</h5>
 <div class="sect5">
-<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
+<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1716,7 +1815,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.2"><a class="anchor" href="#2020.1.2"></a>2020.1.2</h5>
 <div class="sect5">
-<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
+<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1790,7 +1889,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.1"><a class="anchor" href="#2020.1.1"></a>2020.1.1</h5>
 <div class="sect5">
-<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
+<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1803,7 +1902,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.0"><a class="anchor" href="#2020.1.0"></a>2020.1.0</h5>
 <div class="sect5">
-<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
+<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1894,7 +1993,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <p>This is the first patch release for the rebooted Cypher-DSL project.</p>
 </div>
 <div class="sect5">
-<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
+<h6 id="features9"><a class="anchor" href="#features9"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -1946,7 +2045,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-17 15:30:23 UTC
+Last updated 2021-02-18 12:21:27 UTC
 </div>
 </div>
 </body>
