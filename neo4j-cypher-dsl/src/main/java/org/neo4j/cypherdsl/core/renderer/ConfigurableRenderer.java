@@ -27,6 +27,7 @@ import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.support.LRUCache;
 
 /**
  * @author Michael J. Simons
@@ -99,20 +100,4 @@ class ConfigurableRenderer implements Renderer {
 		}
 	}
 
-	private static class LRUCache<K, V> extends LinkedHashMap<K, V> {
-
-		private static final long serialVersionUID = -6819899594092598277L;
-
-		private final int cacheSize;
-
-		LRUCache(int cacheSize) {
-			super(cacheSize / 4, 0.75f, true);
-			this.cacheSize = cacheSize;
-		}
-
-		@Override
-		protected boolean removeEldestEntry(Map.Entry<K, V> eldest) {
-			return size() >= cacheSize;
-		}
-	}
 }
