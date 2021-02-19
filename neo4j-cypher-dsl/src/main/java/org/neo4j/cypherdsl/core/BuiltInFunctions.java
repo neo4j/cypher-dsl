@@ -143,6 +143,7 @@ final class BuiltInFunctions {
 	}
 
 	enum Lists implements FunctionDefinition {
+		KEYS("keys"),
 		LABELS("labels"),
 		NODES("nodes"),
 		RANGE("range"),

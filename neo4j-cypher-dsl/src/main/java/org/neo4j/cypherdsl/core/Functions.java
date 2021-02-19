@@ -71,6 +71,51 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for {@code keys{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
+	 *
+	 * @param node The node which keys should be returned.
+	 * @return A function call for {@code keys()} on an expression.
+	 * @since 2021.0.2
+	 */
+	public static FunctionInvocation keys(Node node) {
+
+		Assertions.notNull(node, "The node parameter is required.");
+		return keys(node.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a function invocation for {@code keys{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
+	 *
+	 * @param relationship The relationship which keys should be returned.
+	 * @return A function call for {@code keys()} on an expression.
+	 * @since 2021.0.2
+	 */
+	public static FunctionInvocation keys(Relationship relationship) {
+
+		Assertions.notNull(relationship, "The relationship parameter is required.");
+		return keys(relationship.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a function invocation for {@code keys{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
+	 *
+	 * @param expression The expressions which keys should be returned. Must resolve to a node, relationship or map.
+	 * @return A function call for {@code keys()} on an expression.
+	 * @since 2021.0.2
+	 */
+	public static FunctionInvocation keys(Expression expression) {
+
+		Assertions.notNull(expression, "The expression parameter is required.");
+
+		Expression param = expression instanceof Named ? ((Named) expression).getRequiredSymbolicName() : expression;
+		return FunctionInvocation.create(Lists.KEYS, param);
+	}
+
+
+	/**
 	 * Creates a function invocation for {@code labels{}}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-labels">labels</a>.
 	 *
