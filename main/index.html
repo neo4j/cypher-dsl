@@ -1026,7 +1026,7 @@ assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;
 </div>
 </div>
 <div class="sect4">
-<h5 id="generatingformattedcypher"><a class="anchor" href="#generatingformattedcypher"></a>Generating formatted cypher</h5>
+<h5 id="generatingformattedcypher"><a class="anchor" href="#generatingformattedcypher"></a>Generating formatted Cypher</h5>
 <div class="paragraph">
 <p>The Cypher-DSL can also format the generated Cypher to some extend.
 The <code>Renderer</code> offers the overload <code>Renderer getRenderer(Configuration configuration)</code>, taking in an instance of <code>org.neo4j.cypherdsl.core.renderer.Configuration</code>.</p>
@@ -1069,6 +1069,38 @@ assertThat(renderer.render(mergeStatement))
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Enjoy formatted Cypher.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="insertingrawcypher"><a class="anchor" href="#insertingrawcypher"></a>Inserting raw Cypher</h5>
+<div class="paragraph">
+<p><code>Cypher.raw</code> allows for creating arbitrary expressions from raw String literals.
+Users discretion is advised:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var key = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">key</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.meta.schema</span><span class="delimiter">&quot;</span></span>)
+    .yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>).with(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>)
+    .unwind(Functions.keys(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>))).as(key)
+    .returning(
+        key,
+        Cypher.raw(<span class="string"><span class="delimiter">&quot;</span><span class="content">value[$E]</span><span class="delimiter">&quot;</span></span>, key).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    )
+    .build().getCypher();
+
+assertThat(cypher).isEqualTo(
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL apoc.meta.schema() YIELD value WITH value UNWIND keys(value) AS key RETURN key, value[key] AS value</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The Cypher-DSL doesn&#8217;t support a dynamic lookup of properties on expression at the moment.
+We use a raw Cypher string with the placeholder <code>$E</code> which resolves to the symbolic name also passed to the <code>raw</code> function.</td>
 </tr>
 </table>
 </div>
@@ -2348,7 +2380,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-22 14:02:46 UTC
+Last updated 2021-02-22 17:27:41 UTC
 </div>
 </div>
 </body>
