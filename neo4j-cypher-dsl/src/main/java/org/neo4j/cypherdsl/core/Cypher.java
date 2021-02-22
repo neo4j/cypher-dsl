@@ -686,6 +686,24 @@ public final class Cypher {
 		return ListOperator.valueAt(targetExpression, index);
 	}
 
+	/**
+	 * Creates an expression from a raw string fragment. No validation is performed on it. If it is used as expression,
+	 * you must make sure to define something that works as expression.
+	 * <p>
+	 * This method expects exactly one placeholder in the form of {@literal $E} for any argument passed with {@code mixedArgs}.
+	 * <p>
+	 * To use exactly the term {@literal $E} escape it like this: {@literal \$E}
+	 *
+	 * @param format A raw Cypher string
+	 * @param mixedArgs Args to the Cypher string
+	 * @return An expression to reuse with the builder.
+	 * @since 2021.0.2
+	 */
+	public static Expression raw(String format, Object... mixedArgs) {
+
+		return RawLiteral.create(format, mixedArgs);
+	}
+
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {
 
 		Assertions.isTrue(statements != null && statements.length >= 2, "At least two statements are required!");

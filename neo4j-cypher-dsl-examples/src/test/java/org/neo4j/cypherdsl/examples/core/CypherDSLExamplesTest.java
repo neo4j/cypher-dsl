@@ -298,4 +298,23 @@ class CypherDSLExamplesTest {
 			); // <.>
 		// end::pretty-printing-examle[]
 	}
+
+	@Test
+	void rawCypher() {
+
+		// tag::raw-cypher[]
+		var key = Cypher.name("key");
+		var cypher = Cypher.call("apoc.meta.schema")
+			.yield("value").with("value")
+			.unwind(Functions.keys(Cypher.name("value"))).as(key)
+			.returning(
+				key,
+				Cypher.raw("value[$E]", key).as("value") // <.>
+			)
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo(
+			"CALL apoc.meta.schema() YIELD value WITH value UNWIND keys(value) AS key RETURN key, value[key] AS value");
+		// end::raw-cypher[]
+	}
 }

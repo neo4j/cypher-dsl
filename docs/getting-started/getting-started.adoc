@@ -175,7 +175,7 @@ assertThat(cypher).isEqualTo("RETURN true AS t");
 
 This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and it's parameters.
 
-==== Generating formatted cypher
+==== Generating formatted Cypher
 
 The Cypher-DSL can also format the generated Cypher to some extend.
 The `Renderer` offers the overload `Renderer getRenderer(Configuration configuration)`, taking in an instance of `org.neo4j.cypherdsl.core.renderer.Configuration`.
@@ -189,3 +189,15 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 ----
 <.> Get a "pretty printing" instance of the renderer configuration and retrieve a renderer based on it
 <.> Enjoy formatted Cypher.
+
+==== Inserting raw Cypher
+
+`Cypher.raw` allows for creating arbitrary expressions from raw String literals.
+Users discretion is advised:
+
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=raw-cypher]
+----
+<.> The Cypher-DSL doesn't support a dynamic lookup of properties on expression at the moment.
+    We use a raw Cypher string with the placeholder `$E` which resolves to the symbolic name also passed to the `raw` function.
