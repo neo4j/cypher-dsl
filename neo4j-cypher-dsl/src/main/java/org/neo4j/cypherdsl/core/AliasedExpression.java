@@ -44,6 +44,7 @@ public final class AliasedExpression implements Aliased, Expression {
 		this.alias = alias;
 	}
 
+	@API(status = INTERNAL)
 	public String getAlias() {
 		return alias;
 	}

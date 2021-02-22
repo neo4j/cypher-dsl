@@ -74,7 +74,7 @@ public class SymbolicName implements Expression {
 	}
 
 	/**
-	 * @return The value of this symbolic name, does not need to be escaped and is guaranteed to be an identifier.
+	 * @return The value of this symbolic name.
 	 */
 	@API(status = INTERNAL)
 	public String getValue() {

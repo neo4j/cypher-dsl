@@ -142,6 +142,17 @@ public interface StatementBuilder
 		 * @return A normal, ongoing read.
 		 */
 		OngoingReading as(String variable);
+
+		/**
+		 * Reuse an existing symbolic name.
+		 *
+		 * @param variable A symbolic name
+		 * @return A normal, ongoing read.
+		 * @since 2021.0.2
+		 */
+		default OngoingReading as(SymbolicName variable) {
+			return as(variable.getValue());
+		}
 	}
 
 	/**

@@ -46,6 +46,19 @@ public interface Expression extends Visitable {
 	}
 
 	/**
+	 * Reuse an existing symbolic name to alias this expression
+	 *
+	 * @param alias A symbolic name
+	 * @return An aliased expression.
+	 * @since 2021.0.2
+	 */
+	default AliasedExpression as(SymbolicName alias) {
+
+		Assertions.notNull(alias, "The alias may not be null.");
+		return as(alias.getValue());
+	}
+
+	/**
 	 * Creates a {@code lhs = rhs} condition.
 	 *
 	 * @param rhs The right hand side of the condition
