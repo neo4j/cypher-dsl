@@ -125,6 +125,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 		});
 	}
 
+	@SuppressWarnings("PMD.EmptyCatchBlock")
 	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
 
 		Class<?> visitorClass = targetAndPhase.visitorClass;

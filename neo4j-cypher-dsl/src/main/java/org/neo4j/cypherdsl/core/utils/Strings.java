@@ -38,7 +38,7 @@ public final class Strings {
 	 * @return True, if the strign is neither null nor empty nor blank.
 	 */
 	public static boolean hasText(String str) {
-		return (str != null && !str.isEmpty() && containsText(str));
+		return str != null && !str.isEmpty() && containsText(str);
 	}
 
 	/**

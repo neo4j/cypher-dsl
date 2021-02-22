@@ -125,6 +125,7 @@
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
+		<maven-pmd-plugin.version>3.11.0</maven-pmd-plugin.version>
 		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
 		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
@@ -374,6 +375,19 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>sort</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-pmd-plugin</artifactId>
+				<version>${maven-pmd-plugin.version}</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>pmd</goal>
 						</goals>
 					</execution>
 				</executions>

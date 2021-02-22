@@ -106,7 +106,7 @@ public final class Assertions {
 	}
 
 	private static boolean isEmpty(Object[] array) {
-		return (array == null || array.length == 0);
+		return array == null || array.length == 0;
 	}
 
 	private Assertions() {

@@ -425,7 +425,7 @@ public final class Cypher {
 			return (Literal<T>) new NumberLiteral((Number) object);
 		}
 		if (object instanceof Iterable) {
-			for (Object element : ((Iterable<?>) object)) {
+			for (Object element : (Iterable<?>) object) {
 				if (!(element instanceof Literal)) {
 					throw new IllegalArgumentException("Unsupported literal type in iterable: " + element.getClass());
 				}

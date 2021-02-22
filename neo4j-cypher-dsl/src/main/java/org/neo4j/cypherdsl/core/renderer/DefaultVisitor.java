@@ -112,7 +112,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	/**
 	 * This keeps track on which level of the tree a separator is needed.
 	 */
-	private final java.util.Map<Integer, AtomicReference<String>> separatorOnLevel = new ConcurrentHashMap<>();
+	private final Map<Integer, AtomicReference<String>> separatorOnLevel = new ConcurrentHashMap<>();
 
 	/**
 	 * Keeps track of named objects that have been already visited.

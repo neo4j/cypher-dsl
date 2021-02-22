@@ -109,7 +109,7 @@ public final class MapProjection implements Expression {
 				}
 			} else if (current instanceof Expression) {
 				lastKey = null;
-				lastExpression = ((Expression) current);
+				lastExpression = (Expression) current;
 				i += 1;
 			}
 			if (lastExpression instanceof Asterisk) {

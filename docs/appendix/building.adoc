@@ -79,7 +79,7 @@ $ mvnw.cmd clean verify
 On a plain JDK 11 or higher, run the following to skip the native tests:
 
 [source,console,subs="verbatim,attributes"]
-[[build-default-bash]]
+[[build-skip-native-bash]]
 .Skipping native tests
 ----
 $ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests
@@ -90,7 +90,7 @@ $ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests
 The core module can be build on plain JDK 8 with:
 
 [source,console,subs="verbatim,attributes"]
-[[build-default-bash]]
+[[build-only-core-bash]]
 .Skipping native tests
 ----
 $ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl
