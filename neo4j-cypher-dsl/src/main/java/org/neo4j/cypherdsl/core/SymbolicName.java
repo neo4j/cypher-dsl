@@ -34,8 +34,8 @@ import org.neo4j.cypherdsl.core.utils.Strings;
 /**
  * A symbolic name to identify nodes, relationships and aliased items.
  * <p>
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/SchemaName.html">SchemaName</a>
- * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/SymbolicName.html">SymbolicName</a>
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SchemaName.html">SchemaName</a>
+ * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SymbolicName.html">SymbolicName</a>
  * <p>
  * While OpenCypher extends the <a href="https://unicode.org/reports/tr31/">UNICODE IDENTIFIER AND PATTERN SYNTAX</a>
  * with some characters, this DSL uses the same identifier Java itself uses for simplicity and until otherwise needed.

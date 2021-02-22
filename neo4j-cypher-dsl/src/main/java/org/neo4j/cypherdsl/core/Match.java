@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Match.html">Match</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Match.html">Match</a>.
  *
  * @author Michael J. Simons
  * @since 1.0

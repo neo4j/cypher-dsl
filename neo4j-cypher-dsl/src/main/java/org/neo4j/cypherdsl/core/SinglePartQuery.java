@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/SinglePartQuery.html">SinglePartQuery</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SinglePartQuery.html">SinglePartQuery</a>.
  *
  * @author Michael J. Simons
  * @since 1.0

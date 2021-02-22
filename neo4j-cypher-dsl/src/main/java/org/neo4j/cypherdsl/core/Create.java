@@ -24,7 +24,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Create.html">Create</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Create.html">Create</a>.
  *
  * @author Michael J. Simons
  * @soundtrack Die Ärzte - Seitenhirsch

@@ -25,7 +25,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Unwind.html">Unwind</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Unwind.html">Unwind</a>.
  *
  * @author Michael J. Simons
  * @soundtrack Queen - Jazz

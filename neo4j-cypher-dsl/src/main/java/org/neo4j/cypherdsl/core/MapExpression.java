@@ -41,7 +41,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public final class MapExpression extends TypedSubtree<Expression, MapExpression> implements Expression {
+public final class MapExpression extends TypedSubtree<Expression> implements Expression {
 
 	static MapExpression create(Object... input) {
 

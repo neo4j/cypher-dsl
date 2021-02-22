@@ -75,7 +75,7 @@ public final class Hint implements Visitable {
 		}
 	}
 
-	private final static class IndexReferences extends TypedSubtree<IndexReference, IndexReferences> {
+	private final static class IndexReferences extends TypedSubtree<IndexReference> {
 		IndexReferences(List<IndexReference> indexReferences) {
 			super(indexReferences);
 		}
@@ -85,7 +85,7 @@ public final class Hint implements Visitable {
 	 * Internal helper class to wrap up the properties used inside an index.
 	 */
 	@API(status = INTERNAL)
-	public final static class IndexProperties extends TypedSubtree<SymbolicName, IndexProperties> {
+	public final static class IndexProperties extends TypedSubtree<SymbolicName> {
 		IndexProperties(List<SymbolicName> properties) {
 			super(properties);
 		}

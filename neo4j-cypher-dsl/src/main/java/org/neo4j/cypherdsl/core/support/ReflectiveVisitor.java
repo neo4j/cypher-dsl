@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -33,7 +32,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.AliasedExpression;
 
 /**
  * This is a convenience class implementing a {@link Visitor} and it takes care of choosing the right methods
@@ -78,12 +76,6 @@ public abstract class ReflectiveVisitor implements Visitor {
 	protected Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
 	/**
-	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
-	 * appearance.
-	 */
-	protected final Set<AliasedExpression> visitableToAliased = new HashSet<>();
-
-	/**
 	 * This is a hook that is called with the uncasted, raw visitable just before entering a visitable.
 	 * <p>
 	 * The hook is called regardless wither a matching {@code enter} is found or not.
@@ -118,10 +110,6 @@ public abstract class ReflectiveVisitor implements Visitor {
 			executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.LEAVE), visitable);
 			postLeave(visitable);
 			currentVisitedElements.pop();
-		}
-		if (visitable instanceof AliasedExpression) {
-			AliasedExpression aliasedExpression = (AliasedExpression) visitable;
-			visitableToAliased.add(aliasedExpression);
 		}
 	}
 

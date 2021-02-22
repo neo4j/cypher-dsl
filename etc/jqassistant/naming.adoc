@@ -1,0 +1,18 @@
+[[arch-rules.naming]]
+[role=group,includesConstraints="arch-rules.naming:*"]
+
+==== Consistent naming
+
+The following naming conventions are used throughout the project:
+
+[[arch-rules.naming:TypeNameMustBeginWithGroupId]]
+[source,cypher,role=constraint]
+.All Java types must be located in packages that start with `org.neo4j.cypherdsl`.
+----
+MATCH
+  (project:Maven:Project)-[:CREATES]->(:Artifact)-[:CONTAINS]->(type:Type)
+WHERE
+  NOT type.fqn starts with 'org.neo4j.cypherdsl'
+RETURN
+  project as Project, collect(type) as TypeWithWrongName
+----

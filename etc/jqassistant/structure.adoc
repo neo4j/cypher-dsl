@@ -1,0 +1,44 @@
+[[arch-rules.structure]]
+[role=group,includesConstraints="arch-rules.structure:*"]
+
+==== Neo4j-Cypher-DSL Core
+
+The core of the Cypher-DSL is consist of a set of classese that loosely reassemble the https://www.opencypher.org[openCypher spec],
+especially in the https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Cypher.html[railroad diagrams].
+
+The main package of the core module is `org.neo4j.cypherdsl.core` which also reflects in the JDK module name: `org.neo4j.cypherdsl.core`.
+Part of the Cypher-DSL core is also the `renderer` package as the main goal of the core is to render Cypher.
+The `renderer` package is a sub-package of `core` as it is an essential part of it and in addition, the above mentioned
+JDK module name should reflect exactly one package.
+
+So while all other subpackages in `core` can be used freely from the `core` classes themselves, we don't want to access the
+`renderer` package apart from one exception: The `AbstractStatement` class can be used to invoke the rendering process without
+explicitly specifying a renderer:
+
+[[arch-rules.structure:core-must-not-depend-on-renderer]]
+[source,cypher,role=constraint,requiresConcepts="dependency:Package"]
+.The Cypher-DSL core package must not depend on the rendering infrastructure
+----
+MATCH (a:Main:Artifact)
+MATCH (a)-[:CONTAINS]->(p1:Package)
+WHERE p1.fqn in ['org.neo4j.cypherdsl.core']
+WITH p1, a
+MATCH (p1)-[:CONTAINS]->(t:Type)
+MATCH (t)-[:DEPENDS_ON]->(t2:Type)<-[:CONTAINS]-(p2:Package)<-[:CONTAINS]-(a)
+WHERE p2.fqn = 'org.neo4j.cypherdsl.core.renderer'
+  AND t.fqn <> 'org.neo4j.cypherdsl.core.AbstractStatement'
+RETURN t, t2
+----
+
+The `renderer` package is not only free to use the whole `core`, it must do so to fulfill its purpose.
+The `support` and `utils` packages however should not have dependencies outside their own:
+
+[[arch-rules.structure:supporting-packages-are-dependency-free]]
+[source,cypher,role=constraint,requiresConcepts="dependency:Package"]
+.Supporting packages must not depend on anything from the outside
+----
+MATCH (a:Main:Artifact)
+MATCH (a)-[:CONTAINS]->(p1:Package)-[:DEPENDS_ON]->(p2:Package)<-[:CONTAINS]-(a)
+WHERE p1.fqn IN ['org.neo4j.cypherdsl.core.support', 'org.neo4j.cypherdsl.core.utils']
+RETURN p1,p2;
+----

@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.support.TypedSubtree;
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
-public final class YieldItems extends TypedSubtree<Expression, YieldItems> {
+public final class YieldItems extends TypedSubtree<Expression> {
 
 	static YieldItems yieldAllOf(Expression... c) {
 

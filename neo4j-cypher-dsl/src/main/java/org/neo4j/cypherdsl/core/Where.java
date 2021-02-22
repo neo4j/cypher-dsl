@@ -25,7 +25,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * Roughly corresponding to <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Match.html#Where">Where</a>.
+ * Roughly corresponding to <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Match.html#Where">Where</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
