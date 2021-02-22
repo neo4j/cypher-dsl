@@ -1670,7 +1670,7 @@ native-image             21.0.0              Native Image                  Early
 <div class="paragraph">
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
-<div id="build-default-bash" class="listingblock">
+<div id="build-skip-native-bash" class="listingblock">
 <div class="title">Listing 19. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
@@ -1682,7 +1682,7 @@ native-image             21.0.0              Native Image                  Early
 <div class="paragraph">
 <p>The core module can be build on plain JDK 8 with:</p>
 </div>
-<div id="build-default-bash" class="listingblock">
+<div id="build-only-core-bash" class="listingblock">
 <div class="title">Listing 20. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
@@ -2380,7 +2380,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-02-22 17:57:17 UTC
+Last updated 2021-02-22 18:23:17 UTC
 </div>
 </div>
 </body>
