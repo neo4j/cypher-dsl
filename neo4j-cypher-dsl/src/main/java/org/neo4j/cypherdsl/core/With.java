@@ -25,7 +25,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/With.html">With</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/With.html">With</a>.
  *
  * @author Michael J. Simons
  * @soundtrack Ferris MC - Ferris MC's Audiobiographie

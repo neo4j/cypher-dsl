@@ -29,7 +29,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/CaseExpression.html">CaseExpression</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
  *
  * @author Gerrit Meier
  * @author Michael J. Simons

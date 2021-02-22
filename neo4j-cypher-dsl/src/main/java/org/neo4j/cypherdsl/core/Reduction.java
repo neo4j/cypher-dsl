@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 2020.1.5
  */
 @API(status = EXPERIMENTAL, since = "2020.1.5")
-public final class Reduction extends TypedSubtree<Visitable, Reduction> {
+public final class Reduction extends TypedSubtree<Visitable> {
 
 	/**
 	 * Step 1: Define the variable of the reduction

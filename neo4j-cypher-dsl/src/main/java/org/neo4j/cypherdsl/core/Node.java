@@ -35,7 +35,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/NodePattern.html">NodePattern</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/NodePattern.html">NodePattern</a>.
  *
  * @author Michael J. Simons
  * @since 1.0

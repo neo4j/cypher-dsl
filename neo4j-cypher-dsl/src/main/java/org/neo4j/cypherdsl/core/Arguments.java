@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
-public final class Arguments extends TypedSubtree<Expression, Arguments> {
+public final class Arguments extends TypedSubtree<Expression> {
 
 	Arguments(Expression... children) {
 		super(children);

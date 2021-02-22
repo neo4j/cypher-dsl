@@ -35,82 +35,60 @@ https://neo4j-contrib.github.io/cypher-dsl[Manual].
 
 == Getting Started
 
-Here is a quick example to get you started.
-First, include the dependency to the Neo4j Cypher-DSL under the following coordinates: `{groupId}:{artifactId}`.
-Then build your query starting with the static methods provided through `org.neo4j.cypherdsl.core.Cypher` like this:
+=== Adding the necessary dependencies
+
+First, include the dependency to the Neo4j Cypher-DSL under the following coordinates: `{groupId}:{artifactId}`:
+
+==== Maven configuration
+
+[source,xml,subs="verbatim,attributes"]
+.Inclusion of the Neo4j Cypher-DSL in a Maven project
+----
+<dependency>
+	<groupId>{groupId}</groupId>
+	<artifactId>{artifactId}</artifactId>
+	<version>{neo4j-cypher-dsl-version}</version>
+</dependency>
+----
+
+==== Gradle configuration
+
+[source,groovy,subs="verbatim,attributes"]
+.Inclusion of the Neo4j Cypher-DSL in a Gradle project
+----
+dependencies {
+    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version}'
+}
+----
+
+=== A simple example
+
+With the Cypher-DSL, you can build your queries starting with the static methods provided through `org.neo4j.cypherdsl.core.Cypher`.
+Static imports for those packages should be allowed:
 
 [source,java,tabsize=4]
 ----
-import static org.assertj.core.api.Assertions.*;
-import static org.neo4j.cypherdsl.core.Conditions.*;
 import static org.neo4j.cypherdsl.core.Cypher.*;
-import static org.neo4j.cypherdsl.core.Functions.*;
 
-import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.renderer.Renderer;
 
-class CypherDSLExamplesTest {
+class SimpleExample {
 
-	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
-
-	@Test
-	void findAllMovies() {
+	public static void main(String... a) {
 
 		var m = node("Movie").named("m");
 		var statement = Cypher.match(m)
 			.returning(m)
 			.build();
 
-		assertThat(cypherRenderer.render(statement))
-			.isEqualTo("MATCH (m:`Movie`) RETURN m");
+		System.out.println(statement.getCypher());
+		// Prints MATCH (m:`Movie`) RETURN m
 	}
 }
 ----
 
-== Building the Neo4j Cypher-DSL
+=== Required JDK Version
 
-=== Requirements
-
-* JDK 11+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
-* Maven 3.6.3 (We provide the Maven wrapper, see `mvnw` respectively `mvnw.cmd` in the project root; the wrapper downloads the appropriate Maven version automatically)
-
-The build requires a local copy of the project:
-
-[source,console,subs="verbatim,attributes"]
-[[clone-cypher-dsl]]
-.Clone the Neo4j Cypher-DSL
-----
-$ git clone git@github.com:neo4j-contrib/cypher-dsl.git
-----
-
-Before you proceed, verify your locally installed JDK version.
-The output should be similar:
-
-[source,console,subs="verbatim,attributes"]
-[[verify-jdk]]
-.Verify your JDK
-----
-$ java -version
-java 11.0.7 2020-04-14 LTS
-Java(TM) SE Runtime Environment 18.9 (build 11.0.7+8-LTS)
-Java HotSpot(TM) 64-Bit Server VM 18.9 (build 11.0.7+8-LTS, mixed mode)
-----
-
-On a Unix-like operating system, use `./mvnw`:
-
-[source,console,subs="verbatim,attributes"]
-[[build-default-bash]]
-.Build with default settings on Linux / macOS
-----
-$ ./mvnw clean verify
-----
-
-On a Windows machine, use
-
-[source,console,subs="verbatim,attributes"]
-[[build-default-windows]]
-.Build with default settings on Windows
-----
-$ mvnw.cmd clean verify
-----
+The minimal required version to use the Cypher-DSL core module is *JDK 8*.
+The reason for staying on JDK 8 is the fact that the Cypher-DSL is widely used in https://github.com/spring-projects/spring-data-neo4j[Spring Data Neo4j 6+].
+Spring Data Neo4j shares JDK 8 as baseline with the Spring Framework until Spring Framework 6 is released.

@@ -1,0 +1,45 @@
+[[arch-rules]]
+[role=group,includesGroups="arch-rules.naming,arch-rules.api,arch-rules.structure"]
+== Architecture
+
+The Neo4j-Cypher-DSL consists of one main module: `org.neo4j.cypherdsl.core`.
+The coordinates of that module `{groupId}:{artifactId}`, the JDK module name is `org.neo4j.cypherdsl.core`.
+The rendering feature is part of the core module.
+
+All other modules depend on the core. As the core reflects the Cypher language, it is not meant to be extendable.
+Therefore, there is little to know API to do so with the AST visitor being the exception.
+
+We document our rules structure with https://jqassistant.org[jQAssistant],
+a Neo4j based tool for software analysis. jQAssistant is integrated in our build.
+
+To run the analysis standalone, you have to compile and build the project first. As you can skip both examples and
+native tests, JDK 8 is sufficient todo so:
+
+[source,bash]
+----
+java --version # <.>
+./mvnw clean verify \
+  -pl \!org.neo4j:neo4j-cypher-dsl-examples,\!org.neo4j:neo4j-cypher-dsl-native-tests # <.>
+./mvnw jqassistant:server # <.>
+----
+<.> Must be at least Java 8
+<.> Build and verify all modules except the examples and the native tests, which includes all scannes
+<.> Start a local Neo4j server, reachable at http://localhost:7474/browser/. The instance contains a dedicated jQAssistant
+    dashboard as well: http://localhost:7474/jqassistant/dashboard/
+
+If you want to change the default Neo4j HTTP- and Bolt-ports, start the server like this:
+
+[source,bash]
+----
+./mvnw jqassistant:server -Djqassistant.embedded.httpPort=4711 -Djqassistant.embedded.boltPort=9999
+----
+
+=== Coding rules
+
+include::naming.adoc[]
+
+include::api.adoc[]
+
+=== Structure
+
+include::structure.adoc[]

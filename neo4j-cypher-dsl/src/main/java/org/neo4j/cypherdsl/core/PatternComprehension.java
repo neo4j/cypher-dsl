@@ -26,7 +26,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/PatternComprehension.html">PatternComprehension</a>
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/PatternComprehension.html">PatternComprehension</a>
  * and <a href="https://neo4j.com/docs/cypher-manual/current/syntax/lists/#cypher-pattern-comprehension">the corresponding cypher manual entry</a>.
  *
  * @author Michael J. Simons

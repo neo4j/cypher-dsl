@@ -109,9 +109,13 @@
 		<checkstyle.version>8.29</checkstyle.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<flatten-maven-plugin.version>1.2.1</flatten-maven-plugin.version>
-		<jacoco-maven-plugin.version>0.8.5</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
 		<java-module-name></java-module-name>
 		<java.version>1.8</java.version>
+		<jqassistant-dashboard-plugin.version>${jqassistant.version}</jqassistant-dashboard-plugin.version>
+		<jqassistant.plugin.git.version>1.8.0</jqassistant.plugin.git.version>
+		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
+		<jqassistant.version>1.9.0</jqassistant.version>
 		<junit-jupiter.version>5.6.1</junit-jupiter.version>
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
@@ -174,6 +178,23 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.jacoco</groupId>
+					<artifactId>jacoco-maven-plugin</artifactId>
+					<version>${jacoco-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-pmd-plugin</artifactId>
+					<version>3.14.0</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
@@ -263,6 +284,26 @@
 						<createBackupFile>false</createBackupFile>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>com.buschmais.jqassistant</groupId>
+					<artifactId>jqassistant-maven-plugin</artifactId>
+					<version>${jqassistant.version}</version>
+					<dependencies>
+						<dependency>
+							<groupId>de.kontext-e.jqassistant.plugin</groupId>
+							<artifactId>jqassistant.plugin.git</artifactId>
+							<version>${jqassistant.plugin.git.version}</version>
+						</dependency>
+						<dependency>
+							<groupId>org.jqassistant.contrib.plugin</groupId>
+							<artifactId>jqassistant-dashboard-plugin</artifactId>
+							<version>${jqassistant-dashboard-plugin.version}</version>
+						</dependency>
+					</dependencies>
+					<configuration>
+						<rulesDirectory>etc/jqassistant</rulesDirectory>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -333,6 +374,37 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>sort</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+						<configuration>
+							<append>true</append>
+						</configuration>
+					</execution>
+					<execution>
+						<id>prepare-agent-integration</id>
+						<goals>
+							<goal>prepare-agent-integration</goal>
+						</goals>
+						<configuration>
+							<append>true</append>
+							<destFile>${project.build.directory}/jacoco.exec</destFile>
+						</configuration>
+					</execution>
+					<execution>
+						<id>report</id>
+						<goals>
+							<goal>report</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -494,6 +566,45 @@
 					</requires>
 					<outputDirectory>${project.build.docs}</outputDirectory>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.buschmais.jqassistant</groupId>
+				<artifactId>jqassistant-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>jqassistant-scan</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>scan</goal>
+						</goals>
+						<configuration>
+							<scanProperties>
+								<jqassistant.plugin.jacoco.filename>jacoco.xml</jqassistant.plugin.jacoco.filename>
+							</scanProperties>
+							<scanIncludes>
+								<scanInclude>
+									<path>${project.basedir}/.git</path>
+								</scanInclude>
+								<scanInclude>
+									<path>${project.reporting.outputDirectory}/jacoco</path>
+								</scanInclude>
+							</scanIncludes>
+						</configuration>
+					</execution>
+					<execution>
+						<id>jqassistant-analyze</id>
+						<goals>
+							<goal>analyze</goal>
+						</goals>
+						<configuration>
+							<failOnSeverity>MINOR</failOnSeverity>
+							<groups>
+								<group>arch-rules</group>
+								<group>jqassistant-dashboard:Default</group>
+							</groups>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * See
- * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/FunctionInvocation.html">FunctionInvocation</a>
+ * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/FunctionInvocation.html">FunctionInvocation</a>
  *
  * @author Gerrit Meier
  * @author Michael J. Simons
@@ -92,7 +92,7 @@ public final class FunctionInvocation implements Expression {
 			new Pattern(Collections.singletonList(pattern)));
 	}
 
-	static FunctionInvocation create(FunctionDefinition definition, TypedSubtree<?, ?> arguments) {
+	static FunctionInvocation create(FunctionDefinition definition, TypedSubtree<?> arguments) {
 
 		Assertions.notNull(arguments, definition.getImplementationName() + "() requires at least one argument.");
 
@@ -101,7 +101,7 @@ public final class FunctionInvocation implements Expression {
 
 	private final String functionName;
 
-	private final TypedSubtree<?, ?> arguments;
+	private final TypedSubtree<?> arguments;
 
 	private FunctionInvocation(String functionName, Expression... arguments) {
 
@@ -109,7 +109,7 @@ public final class FunctionInvocation implements Expression {
 		this.arguments = new ExpressionList(arguments);
 	}
 
-	private <T extends TypedSubtree<?, ?>> FunctionInvocation(String functionName, T pattern) {
+	private <T extends TypedSubtree<?>> FunctionInvocation(String functionName, T pattern) {
 
 		this.functionName = functionName;
 		this.arguments = pattern;

@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  *
  * <p>Both events supports the setting of properties, but not removing or adding labels. Multiple
  * properties should be set in one action, but Cypher and
- * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/Merge.html">openCypher</a>
+ * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Merge.html">openCypher</a>
  * allow for multiple {@link MergeAction merge actions}, with the same or different types.
  *
  * @author Michael J. Simons

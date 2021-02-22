@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
  * @author Michael J. Simons
  * @since 1.0
  */
-class ExpressionList extends TypedSubtree<Expression, ExpressionList> {
+class ExpressionList extends TypedSubtree<Expression> {
 
 	ExpressionList(List<Expression> returnItems) {
 		super(returnItems);

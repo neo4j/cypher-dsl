@@ -120,6 +120,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private final java.util.Set<Named> visitedNamed = new HashSet<>();
 
 	/**
+	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
+	 * appearance.
+	 */
+	protected final java.util.Set<AliasedExpression> visitableToAliased = new HashSet<>();
+
+	/**
 	 * Keeps track if currently in an aliased expression so that the content can be skipped when already visited.
 	 */
 	private final Deque<AliasedExpression> currentAliasedElements = new LinkedList<>();
@@ -211,6 +217,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		if (visitable instanceof MapProjection) {
 			this.skipAliasing = false;
+		}
+
+		if (visitable instanceof AliasedExpression) {
+			AliasedExpression aliasedExpression = (AliasedExpression) visitable;
+			visitableToAliased.add(aliasedExpression);
 		}
 
 		--currentLevel;

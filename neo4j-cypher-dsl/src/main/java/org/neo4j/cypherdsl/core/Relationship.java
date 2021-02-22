@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/RelationshipPattern.html">RelationshipPattern</a>.
+ * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipPattern.html">RelationshipPattern</a>.
  *
  * @author Michael J. Simons
  * @author Philipp Tölle
@@ -87,7 +87,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	}
 
 	/**
-	 * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/railroad/RelationshipDetail.html">RelationshipDetail</a>.
+	 * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html">RelationshipDetail</a>.
 	 * This is not a public API and just used internally for structuring the tree.
 	 */
 	@API(status = INTERNAL, since = "1.0")

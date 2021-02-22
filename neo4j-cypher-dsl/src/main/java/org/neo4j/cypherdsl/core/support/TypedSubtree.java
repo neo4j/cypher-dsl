@@ -32,11 +32,10 @@ import org.apiguardian.api.API;
  *
  * @author Michael J. Simons
  * @param <T>    The children's type
- * @param <SELF> The concrete type of the implementing class.
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public abstract class TypedSubtree<T extends Visitable, SELF extends TypedSubtree<T, SELF>> implements Visitable {
+public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 
 	/**
 	 * The content of this typed subtree.

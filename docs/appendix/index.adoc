@@ -2,4 +2,9 @@
 = Appendix
 
 :numbered!:
+
+include::building.adoc[]
+
+include::../../etc/jqassistant/index.adoc[]
+
 include::changes.adoc[]
