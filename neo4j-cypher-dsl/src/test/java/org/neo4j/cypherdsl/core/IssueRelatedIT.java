@@ -20,7 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -561,5 +566,63 @@ class IssueRelatedIT {
 
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("MATCH (person:`Person`) WHERE distance(person.location, point($location.point)) = $location.distance RETURN person");
+	}
+
+	static Stream<Arguments> relpatternChainingArgs() {
+		Stream.Builder<Arguments> arguments = Stream.builder();
+		arguments.add(Arguments.of(true, 1, false,
+			"MATCH (s)-[:`PART_OF`*0..1]->(:`Resume`)-[:`IS_PARALLEL`*0..1]->(:`Resume`)-[l:`LEADS_TO`]->(e) RETURN s, l, e"));
+		arguments.add(Arguments.of(true, 2, false,
+			"MATCH (s)-[:`PART_OF`*0..1]->(:`Resume`)-[:`IS_PARALLEL`*0..1]->(:`Resume`)-[l:`LEADS_TO`*2..2]->(e) RETURN s, l, e"));
+		arguments.add(Arguments.of(true, 1, true,
+			"MATCH (s)-[:`PART_OF`*0..1]->(:`Resume`)-[:`IS_PARALLEL`*0..1]->(:`Resume`)<-[l:`LEADS_TO`]-(e) RETURN s, l, e"));
+		arguments.add(Arguments.of(true, 2, true,
+			"MATCH (s)-[:`PART_OF`*0..1]->(:`Resume`)-[:`IS_PARALLEL`*0..1]->(:`Resume`)<-[l:`LEADS_TO`*2..2]-(e) RETURN s, l, e"));
+
+		arguments.add(Arguments.of(false, 1, false, "MATCH (s)-[l:`LEADS_TO`]->(e) RETURN s, l, e"));
+		arguments.add(Arguments.of(false, 2, false, "MATCH (s)-[l:`LEADS_TO`*2..2]->(e) RETURN s, l, e"));
+		arguments.add(Arguments.of(false, 1, true, "MATCH (s)<-[l:`LEADS_TO`]-(e) RETURN s, l, e"));
+		arguments.add(Arguments.of(false, 2, true, "MATCH (s)<-[l:`LEADS_TO`*2..2]-(e) RETURN s, l, e"));
+
+		return arguments.build();
+	}
+
+	@ParameterizedTest // GH-152
+	@MethodSource("relpatternChainingArgs")
+	void relpatternChaining(boolean multihops, int length, boolean backward, String expected) {
+
+		Node start = Cypher.anyNode("s");
+		Node end = Cypher.anyNode("e");
+
+		PatternElement result;
+		if (multihops) {
+			RelationshipChain leadsTo;
+			leadsTo = start.relationshipTo(Cypher.node("Resume"), "PART_OF").length(0, 1)
+				.relationshipTo(Cypher.node("Resume"), "IS_PARALLEL").length(0, 1);
+
+			if (backward) {
+				leadsTo = leadsTo.relationshipFrom(end, "LEADS_TO").named("l");
+			} else {
+				leadsTo = leadsTo.relationshipTo(end, "LEADS_TO").named("l");
+			}
+			if (length > 1) {
+				leadsTo = leadsTo.length(length, length);
+			}
+			result = leadsTo;
+		} else {
+			Relationship leadsTo;
+
+			if (backward) {
+				leadsTo = start.relationshipFrom(end, "LEADS_TO").named("l");
+			} else {
+				leadsTo = start.relationshipTo(end, "LEADS_TO").named("l");
+			}
+			if (length > 1) {
+				leadsTo = leadsTo.length(length, length);
+			}
+			result = leadsTo;
+		}
+		String cypher = Cypher.match(result).returning("s", "l", "e").build().getCypher();
+		assertThat(cypher).isEqualTo(expected);
 	}
 }
