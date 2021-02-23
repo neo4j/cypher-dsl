@@ -60,7 +60,7 @@ public final class Configuration {
 	private final IndentStyle indentStyle;
 
 	/**
-	 * The indentation sizes. Only applicable when using {@link IndentStyle#SPACE}. Defaults to {@literal 4}.
+	 * The indentation sizes. Only applicable when using {@link IndentStyle#SPACE}. Defaults to {@literal 2}.
 	 */
 	private final int indentSize;
 
@@ -93,7 +93,7 @@ public final class Configuration {
 	public static final class Builder {
 
 		private boolean prettyPrint = false;
-		private IndentStyle indentStyle = IndentStyle.SPACE;
+		private IndentStyle indentStyle;
 		private int indentSize = 2;
 
 		private Builder() {
@@ -130,7 +130,7 @@ public final class Configuration {
 
 	private Configuration(boolean prettyPrint, IndentStyle indentStyle, int indentSize) {
 		this.prettyPrint = prettyPrint;
-		this.indentStyle = indentStyle == null ? IndentStyle.TAB : indentStyle;
+		this.indentStyle = indentStyle == null ? IndentStyle.SPACE : indentStyle;
 		this.indentSize = indentSize;
 	}
 
