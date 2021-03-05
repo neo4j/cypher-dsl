@@ -399,6 +399,7 @@ public final class Cypher {
 	 *
 	 * @param map A map to be turned into a MapExpression
 	 * @return A new map expression.
+	 * @since 2021.1.0
 	 */
 	public static MapExpression asExpression(Map<String, Object> map) {
 
