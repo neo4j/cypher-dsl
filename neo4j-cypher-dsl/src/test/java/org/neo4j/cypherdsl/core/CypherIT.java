@@ -3924,8 +3924,8 @@ class CypherIT {
 				.and(userNode.property("lastName").isEqualTo(Cypher.literalOf("Mustermann")))
 					.and(Cypher
 							.match(userNode.relationshipTo(bikeNode, "LIKES"))
-							.where(bikeNode.relationshipTo(Cypher.anyNode("other"), "LINK"))
-							.or(Cypher.match(bikeNode.relationshipTo(Cypher.anyNode("other"), "LINK")).asCondition())
+							.where(bikeNode.relationshipTo(Cypher.anyNode(), "LINK"))
+							.or(Cypher.match(bikeNode.relationshipTo(Cypher.anyNode(), "LINK")).asCondition())
 							.asCondition())
 				.set(userNode.property("lastName").to(Cypher.parameter("newName")))
 				.with(userNode)
@@ -3959,14 +3959,14 @@ class CypherIT {
 					"  AND u.lastName = 'Mustermann'\n" +
 					"  AND EXISTS {\n" +
 					"    MATCH (u)-[:LIKES]->(b:Bike)\n" +
-					"    WHERE ((b)-[:LINK]->(other)\n" +
+					"    WHERE ((b)-[:LINK]->()\n" +
 					"      OR EXISTS {\n" +
-					"        MATCH (b)-[:LINK]->(other)\n" +
+					"        MATCH (b)-[:LINK]->()\n" +
 					"      })\n" +
 					"  })\n" +
 					"SET u.lastName = $newName\n" +
 					"WITH u\n" +
-					"MATCH (b)\n" +
+					"MATCH (b:Bike)\n" +
 					"CREATE (u)-[:LIKES]->(b)\n" +
 					"RETURN u {\n" +
 					"  name: u.name,\n" +
@@ -3995,14 +3995,14 @@ class CypherIT {
 					"\tAND u.lastName = 'Mustermann'\n" +
 					"\tAND EXISTS {\n" +
 					"\t\tMATCH (u)-[:LIKES]->(b:Bike)\n" +
-					"\t\tWHERE ((b)-[:LINK]->(other)\n" +
+					"\t\tWHERE ((b)-[:LINK]->()\n" +
 					"\t\t\tOR EXISTS {\n" +
-					"\t\t\t\tMATCH (b)-[:LINK]->(other)\n" +
+					"\t\t\t\tMATCH (b)-[:LINK]->()\n" +
 					"\t\t\t})\n" +
 					"\t})\n" +
 					"SET u.lastName = $newName\n" +
 					"WITH u\n" +
-					"MATCH (b)\n" +
+					"MATCH (b:Bike)\n" +
 					"CREATE (u)-[:LIKES]->(b)\n" +
 					"RETURN u {\n" +
 					"\tname: u.name,\n" +
