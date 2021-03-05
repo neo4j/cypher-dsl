@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.examples.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.assertj.core.api.Assertions;
@@ -101,5 +102,17 @@ class PropertiesTest {
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("MATCH (p:`Person`) WHERE p.`home.location`.y > 50 RETURN p.`home.location`.y");
 		// end::nested-properties[]
+	}
+
+	@Test
+	void usingExistingJavaMaps() {
+
+		var node = Cypher
+			.node("ANode")
+			.named("n")
+			.withProperties(Map.of("aProperty", 23));
+
+		assertThat(Cypher.match(node).returning(node).build().getCypher())
+			.isEqualTo("MATCH (n:`ANode` {aProperty: 23}) RETURN n");
 	}
 }

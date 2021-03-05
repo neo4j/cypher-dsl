@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -2700,6 +2702,23 @@ class CypherIT {
 
 	@Nested
 	class PropertyRendering {
+
+		@Test // GH-157
+		void usingExistingJavaMaps() {
+
+			Map<String, Object> newProperties = new LinkedHashMap<>();
+			newProperties.put("prop1", 23);
+			newProperties.put("theTruth", 42);
+			newProperties.put("somethingElse", "foobar");
+			newProperties.put("aParam", Cypher.parameter("x").withValue("y"));
+			Node node = Cypher
+				.node("ANode")
+				.named("n")
+				.withProperties(newProperties);
+
+			assertThat(Cypher.match(node).returning(node).build().getCypher())
+				.isEqualTo("MATCH (n:`ANode` {prop1: 23, theTruth: 42, somethingElse: 'foobar', aParam: $x}) RETURN n");
+		}
 
 		@Test // GH-114
 		void manuallyNested() {

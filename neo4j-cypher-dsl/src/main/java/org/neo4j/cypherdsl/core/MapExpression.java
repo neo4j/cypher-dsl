@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apiguardian.api.API;
@@ -42,6 +43,18 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = INTERNAL, since = "1.0")
 public final class MapExpression extends TypedSubtree<Expression> implements Expression {
+
+	static MapExpression create(Map<String, Object> map) {
+
+		Object[] args = new Object[map.size() * 2];
+		int i = 0;
+		for (Map.Entry<String, Object> entry : map.entrySet()) {
+			Object value = entry.getValue();
+			args[i++] = entry.getKey();
+			args[i++] = value instanceof Expression ? value : Cypher.literalOf(value);
+		}
+		return create(args);
+	}
 
 	static MapExpression create(Object... input) {
 

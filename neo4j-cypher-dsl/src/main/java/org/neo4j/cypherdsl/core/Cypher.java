@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
@@ -391,6 +392,17 @@ public final class Cypher {
 	public static MapExpression mapOf(Object... keysAndValues) {
 
 		return MapExpression.create(keysAndValues);
+	}
+
+	/**
+	 * Creates a map of expression from a Java Map.
+	 *
+	 * @param map A map to be turned into a MapExpression
+	 * @return A new map expression.
+	 */
+	public static MapExpression asExpression(Map<String, Object> map) {
+
+		return MapExpression.create(map);
 	}
 
 	/**
