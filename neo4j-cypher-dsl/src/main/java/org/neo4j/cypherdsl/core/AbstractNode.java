@@ -27,9 +27,9 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  * in inheritors.
  *
  * @author Michael J. Simons
- * @since TBA
+ * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "TBA")
+@API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
 	@Override

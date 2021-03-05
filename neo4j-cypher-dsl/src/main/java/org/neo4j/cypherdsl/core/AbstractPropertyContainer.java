@@ -28,9 +28,9 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  * Abstract base class for all property containers to avoid default interface methods to be overridable in inheritors.
  *
  * @author Michael J. Simons
- * @since TBA
+ * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "TBA")
+@API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractPropertyContainer implements PropertyContainer {
 
 	@Override

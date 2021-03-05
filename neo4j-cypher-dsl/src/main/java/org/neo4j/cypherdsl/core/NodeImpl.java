@@ -40,9 +40,9 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @param <T> The type of this node
  * @author Michael J. Simons
  * @soundtrack Queen - The Miracle
- * @since TBA
+ * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "TBA")
+@API(status = EXPERIMENTAL, since = "2021.1.0")
 public class NodeImpl<T extends Node> extends AbstractNode implements Node {
 
 	private volatile SymbolicName symbolicName;

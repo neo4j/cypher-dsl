@@ -38,9 +38,9 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @param <E> The type at the pointy end of the relationship
  * @param <T> The type of the persistent relationship itself
  * @author Michael J. Simons
- * @since TBA
+ * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "TBA")
+@API(status = EXPERIMENTAL, since = "2021.1.0")
 public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T extends RelationshipImpl<S, E, T>>
 		extends AbstractPropertyContainer implements Relationship {
 
