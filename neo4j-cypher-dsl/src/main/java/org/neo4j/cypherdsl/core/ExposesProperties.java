@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import java.util.Map;
+
 /**
  * A container that exposes methods to add properties with values to nodes or relationships.
  *
@@ -45,4 +47,15 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	 * @return The new property container.
 	 */
 	T withProperties(Object... keysAndValues);
+
+	/**
+	 * Creates a a copy of this property container with additional properties.
+	 *
+	 * @param newProperties A map with the new properties
+	 * @return The new property container.
+	 */
+	default T withProperties(Map<String, Object> newProperties) {
+
+		return withProperties(MapExpression.create(newProperties));
+	}
 }
