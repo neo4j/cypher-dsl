@@ -83,6 +83,7 @@ import org.neo4j.cypherdsl.core.YieldItems;
 import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.support.TypedSubtree;
 import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
@@ -287,6 +288,22 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(With with) {
 		builder.append(" ");
+		clearPreviouslyVisitedNamed(with);
+	}
+
+	private void clearPreviouslyVisitedNamed(With with) {
+		// We need to clear the named cache after defining a with.
+		// Everything not taken into the next step has to go.
+		// TODO This must be probably nested for subqueries, too
+		java.util.Set<Named> retain = new HashSet<>();
+		with.accept(segment -> {
+			if(segment instanceof SymbolicName) {
+				visitedNamed.stream()
+					.filter(named -> named.getRequiredSymbolicName().equals(segment))
+					.forEach(retain::add);
+			}
+		});
+		this.visitedNamed.retainAll(retain);
 	}
 
 	void enter(Delete delete) {
