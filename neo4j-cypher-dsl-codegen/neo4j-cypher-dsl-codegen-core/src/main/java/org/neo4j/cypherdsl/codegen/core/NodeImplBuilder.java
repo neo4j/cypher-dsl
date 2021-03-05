@@ -1,0 +1,220 @@
+/*
+ * Copyright (c) 2019-2021 "Neo4j,"
+ * Neo4j Sweden AB [https://neo4j.com]
+ *
+ * This file is part of Neo4j.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.neo4j.cypherdsl.codegen.core;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import javax.lang.model.element.Modifier;
+
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeLabel;
+import org.neo4j.cypherdsl.core.Properties;
+import org.neo4j.cypherdsl.core.Property;
+
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeSpec;
+
+/**
+ * This is a builder. It builds classes extending {@link NodeImpl}. The workflow is as follows: Create an instance via
+ * {@link #create(Configuration, String, String)}, defining the target package (fully qualified name) as well as the type.
+ * Unless {@link #writeTo(Path)} or {@link #writeToString()} is called, additional labels and properties can be added
+ * with {@link #addLabels(Collection)} and {@link #addProperty(String)}.
+ * A call to any of the {@code writeToXXX} methods will trigger the generation of source code and after that, this instance
+ * becomes effectively immutable.
+ *
+ * @author Michael J. Simons
+ * @since 2021.1.0
+ */
+@API(status = INTERNAL, since = "2021.1.0")
+final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> implements NodeModelBuilder {
+
+	private static final ClassName TYPE_NAME_NODE_LABEL = ClassName.get(NodeLabel.class);
+
+	private final Set<String> labels = new LinkedHashSet<>();
+
+	private final Set<RelationshipPropertyDefinition> relationshipDefinitions = new LinkedHashSet<>();
+
+	static NodeModelBuilder create(Configuration configuration, String packageName, String suggestedTypeName) {
+
+		String className = configuration.getNodeNameGenerator().generate(suggestedTypeName);
+		String usedPackageName = packageName == null ? configuration.getDefaultPackage() : packageName;
+		NodeImplBuilder builder = new NodeImplBuilder(
+			configuration,
+			ClassName.get(usedPackageName, configuration.getTypeNameDecorator().apply(className)),
+			className
+		);
+		return builder.apply(configuration);
+	}
+
+	private NodeImplBuilder(Configuration configuration, ClassName className, String fieldName) {
+		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(), configuration.getIndent());
+	}
+
+	@Override
+	public NodeModelBuilder addLabel(String newLabel) {
+
+		return addLabels(newLabel == null ? Collections.emptyList() : Collections.singleton(newLabel));
+	}
+
+	@Override
+	public NodeModelBuilder addLabels(Collection<String> newLabels) {
+
+		return callOnlyWithoutJavaFilePresent(() -> {
+			if (newLabels != null) {
+				this.labels.addAll(newLabels);
+			}
+			return this;
+		});
+	}
+
+	@Override
+	public NodeModelBuilder addRelationshipDefinition(RelationshipPropertyDefinition definition) {
+
+		return callOnlyWithoutJavaFilePresent(() -> {
+			if (definition != null) {
+				this.relationshipDefinitions.add(definition);
+			}
+			return this;
+		});
+	}
+
+	private MethodSpec buildDefaultConstructor() {
+
+		CodeBlock.Builder superCallBuilder = CodeBlock.builder().add("super(");
+		superCallBuilder.add(
+			CodeBlock.join(this.labels.stream().map(l -> CodeBlock.of("$S", l)).collect(Collectors.toList()), ", "));
+		superCallBuilder.add(")");
+
+		return MethodSpec.constructorBuilder()
+			.addModifiers(Modifier.PUBLIC)
+			.addStatement(superCallBuilder.build())
+			.build();
+	}
+
+	private MethodSpec buildCopyConstructor() {
+
+		ParameterSpec symbolicName = ParameterSpec.builder(TYPE_NAME_SYMBOLIC_NAME, "symbolicName").build();
+		ParameterSpec labelsParameter = ParameterSpec
+			.builder(ParameterizedTypeName.get(TYPE_NAME_LIST, TYPE_NAME_NODE_LABEL), "labels").build();
+		ParameterSpec properties = ParameterSpec.builder(ClassName.get(Properties.class), "properties").build();
+		return MethodSpec.constructorBuilder()
+			.addModifiers(Modifier.PRIVATE)
+			.addParameter(symbolicName)
+			.addParameter(labelsParameter)
+			.addParameter(properties)
+			.addStatement("super($N, $N, $N)", symbolicName, labelsParameter, properties)
+			.build();
+
+	}
+
+	private MethodSpec buildNamedMethod() {
+
+		ParameterSpec newSymbolicName = ParameterSpec.builder(TYPE_NAME_SYMBOLIC_NAME, "newSymbolicName").build();
+		return MethodSpec.methodBuilder("named")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(className)
+			.addParameter(newSymbolicName)
+			.addStatement("return new $T($N, getLabels(), getProperties())", className, newSymbolicName)
+			.build();
+	}
+
+	private MethodSpec buildWithPropertiesMethod() {
+
+		ParameterSpec newProperties = ParameterSpec.builder(TYPE_NAME_MAP_EXPRESSION, "newProperties")
+			.build();
+		return MethodSpec.methodBuilder("withProperties")
+			.addAnnotation(Override.class)
+			.addModifiers(Modifier.PUBLIC)
+			.returns(className)
+			.addParameter(newProperties)
+			.addStatement("return new $T(getSymbolicName().orElse(null), getLabels(), Properties.create($N))",
+				className, newProperties)
+			.build();
+	}
+
+	private List<FieldSpec> buildFields() {
+
+		FieldSpec defaultInstance = FieldSpec
+			.builder(className, getFieldName(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+			.initializer("new $T()", className)
+			.build();
+
+		Stream<FieldSpec> properties = this.properties.stream().map(p -> {
+				String fieldName = p.getNameInDomain() == null ? p.getNameInGraph() : p.getNameInDomain();
+				return FieldSpec
+					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC,
+						Modifier.FINAL)
+					.initializer("this.property($S)", p.getNameInGraph())
+					.build();
+			}
+		);
+
+		Stream<FieldSpec> relationships = relationshipDefinitions.stream().map(p -> {
+
+			String fieldName = p.getNameInDomain() == null ? p.getType() : p.getNameInDomain();
+			ClassName relationshipClassName = extractClassName(p.getRelationshipBuilder());
+			FieldSpec.Builder builder = FieldSpec.builder(relationshipClassName, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC, Modifier.FINAL);
+			if (this == p.getStart()) {
+				builder.initializer("new $T(this, $T.$N)", relationshipClassName, extractClassName(p.getEnd()), p.getEnd().getFieldName());
+			} else {
+				builder.initializer("new $T($T.$N, this)", relationshipClassName, extractClassName(p.getStart()), p.getStart().getFieldName());
+			}
+			return builder.build();
+		});
+
+		return Stream.concat(Stream.of(defaultInstance), Stream.concat(properties, relationships))
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	protected JavaFile buildJavaFile() {
+
+		if (this.labels.isEmpty()) {
+			throw new IllegalStateException("Cannot build NodeImpl without labels!");
+		}
+
+		TypeSpec newType = addGenerated(TypeSpec.classBuilder(className))
+			.superclass(ParameterizedTypeName.get(TYPE_NAME_NODE_IMPL, className))
+			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+			.addFields(buildFields())
+			.addMethod(buildDefaultConstructor())
+			.addMethod(buildCopyConstructor())
+			.addMethod(buildNamedMethod())
+			.addMethod(buildWithPropertiesMethod())
+			.build();
+
+		return prepareFileBuilder(newType).build();
+	}
+}
