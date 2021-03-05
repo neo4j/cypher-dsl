@@ -32,6 +32,7 @@
 
 	<modules>
 		<module>neo4j-cypher-dsl-codegen-core</module>
+		<module>neo4j-cypher-dsl-codegen-sdn6</module>
 	</modules>
 
 	<properties>
