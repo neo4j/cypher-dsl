@@ -47,7 +47,7 @@ jobs:
           name: artifacts
           path: binaries
       - name: Recreate test classes
-        run: ./mvnw test-compile -pl org.neo4j:neo4j-cypher-dsl
+        run: ./mvnw --no-transfer-progress test-compile -pl org.neo4j:neo4j-cypher-dsl
       - name: Run tests
         run: >
           docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action --java 8 bin/runtests.java
