@@ -45,7 +45,7 @@ jobs:
       - name: Run tests
         run: >
           docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action --java 8 bin/runtests.java
-          -cp $GITHUB_WORKSPACE/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
+          -cp repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
           -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
 
   test_native:
