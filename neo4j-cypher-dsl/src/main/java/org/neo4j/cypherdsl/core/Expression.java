@@ -69,6 +69,16 @@ public interface Expression extends Visitable {
 	}
 
 	/**
+	 * An alias for {@link #isEqualTo(Expression)}.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
+	default Condition eq(Expression rhs) {
+		return isEqualTo(rhs);
+	}
+
+	/**
 	 * Creates a {@code lhs <> rhs} condition.
 	 *
 	 * @param rhs The right hand side of the condition
@@ -76,6 +86,16 @@ public interface Expression extends Visitable {
 	 */
 	default Condition isNotEqualTo(Expression rhs) {
 		return Conditions.isNotEqualTo(this, rhs);
+	}
+
+	/**
+	 * An alias for {@link #isNotEqualTo(Expression)}.
+	 *
+	 * @param rhs The right hand side of the condition
+	 * @return A new condition
+	 */
+	default Condition ne(Expression rhs) {
+		return isNotEqualTo(rhs);
 	}
 
 	/**

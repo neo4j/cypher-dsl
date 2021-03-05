@@ -54,7 +54,7 @@ public final class Cypher {
 	 */
 	public static Node node(String primaryLabel, String... additionalLabels) {
 
-		return Node.create(primaryLabel, additionalLabels);
+		return new NodeImpl(primaryLabel, additionalLabels);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public final class Cypher {
 	 */
 	public static Node node(String primaryLabel, List<String> additionalLabels) {
 
-		return Node.create(primaryLabel, additionalLabels.toArray(new String[] {}));
+		return new NodeImpl(primaryLabel, additionalLabels.toArray(new String[] {}));
 	}
 
 	/**
@@ -82,14 +82,14 @@ public final class Cypher {
 	 */
 	public static Node node(String primaryLabel, MapExpression properties, String... additionalLabels) {
 
-		return Node.create(primaryLabel, properties, additionalLabels);
+		return new NodeImpl(null, primaryLabel, properties, additionalLabels);
 	}
 
 	/**
 	 * @return A node matching any node.
 	 */
 	public static Node anyNode() {
-		return Node.create();
+		return new NodeImpl();
 	}
 
 	/**
@@ -104,7 +104,7 @@ public final class Cypher {
 	 * @return A node matching any node with the symbolic the given {@code symbolicName}.
 	 */
 	public static Node anyNode(String symbolicName) {
-		return Node.create().named(symbolicName);
+		return new NodeImpl().named(symbolicName);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public final class Cypher {
 	 * @return A node matching any node with the symbolic the given {@code symbolicName}.
 	 */
 	public static Node anyNode(SymbolicName symbolicName) {
-		return Node.create().named(symbolicName);
+		return new NodeImpl().named(symbolicName);
 	}
 
 	/**

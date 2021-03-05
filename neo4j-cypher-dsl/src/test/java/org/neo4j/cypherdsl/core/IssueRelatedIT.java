@@ -587,6 +587,18 @@ class IssueRelatedIT {
 		return arguments.build();
 	}
 
+	@Test
+	void removeAllPropertiesShouldWork() {
+
+		Node n = Cypher.node("DeleteMe").named("n");
+		String cypher = Cypher.match(n)
+			.set(n, Cypher.mapOf())
+			.set(n.property("newProperty").to(Cypher.literalOf("aValue")))
+			.returning(n)
+			.build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (n:`DeleteMe`) SET n = {} SET n.newProperty = 'aValue' RETURN n");
+	}
+
 	@ParameterizedTest // GH-152
 	@MethodSource("relpatternChainingArgs")
 	void relpatternChaining(boolean multihops, int length, boolean backward, String expected) {

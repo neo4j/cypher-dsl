@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * to it. To use a {@literal $E} escape it as {$literal \$E}.
  *
  * @author Michael J. Simons
- * @soundtrack Foo Fighters - Echoes, Silence, Patience & Grace
+ * @soundtrack Foo Fighters - Echoes, Silence, Patience &amp; Grace
  * @since 2021.0.2
  */
 @API(status = Status.INTERNAL)

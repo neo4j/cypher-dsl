@@ -93,13 +93,13 @@ public final class Configuration {
 	public static final class Builder {
 
 		private boolean prettyPrint = false;
-		private IndentStyle indentStyle;
+		private IndentStyle indentStyle = IndentStyle.SPACE;
 		private int indentSize = 2;
 
 		private Builder() {
 		}
 
-		private static Builder newConfig() {
+		static Builder newConfig() {
 			return new Builder();
 		}
 
@@ -109,6 +109,10 @@ public final class Configuration {
 		}
 
 		public Builder withIndentStyle(IndentStyle indentStyle) {
+
+			if (indentStyle == null) {
+				throw new IllegalArgumentException("Indent style is required.");
+			}
 			this.indentStyle = indentStyle;
 			return this;
 		}
@@ -118,11 +122,6 @@ public final class Configuration {
 			return this;
 		}
 
-		public Builder but() {
-			return newConfig().withPrettyPrint(prettyPrint).withIndentStyle(indentStyle)
-				.withIndentSize(indentSize);
-		}
-
 		public Configuration build() {
 			return new Configuration(prettyPrint, indentStyle, indentSize);
 		}
@@ -130,7 +129,7 @@ public final class Configuration {
 
 	private Configuration(boolean prettyPrint, IndentStyle indentStyle, int indentSize) {
 		this.prettyPrint = prettyPrint;
-		this.indentStyle = indentStyle == null ? IndentStyle.SPACE : indentStyle;
+		this.indentStyle = indentStyle;
 		this.indentSize = indentSize;
 	}
 

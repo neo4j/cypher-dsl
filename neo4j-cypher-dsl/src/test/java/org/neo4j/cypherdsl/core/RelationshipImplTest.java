@@ -38,16 +38,16 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 /**
  * @author Michael J. Simons
  */
-class RelationshipTest {
+class RelationshipImplTest {
 
 	@Test
 	void preconditionsShouldBeAsserted() {
 
 		assertThatIllegalArgumentException()
-			.isThrownBy(() -> Relationship.create(null, null, Node.create("a"), new String[0]))
+			.isThrownBy(() -> new RelationshipImpl(null, null, null, null, Cypher.node("a"), new String[0]))
 			.withMessage("Left node is required.");
 		assertThatIllegalArgumentException()
-			.isThrownBy(() -> Relationship.create(Node.create("a"), null, null, new String[0]))
+			.isThrownBy(() -> new RelationshipImpl(null, Cypher.node("a"), null, null, null, new String[0]))
 			.withMessage("Right node is required.");
 	}
 
@@ -57,9 +57,9 @@ class RelationshipTest {
 
 		private Stream<Arguments> createNodesWithProperties() {
 			return Stream.of(
-				Arguments.of(Node.create("N").named("n").relationshipTo(Cypher.anyNode())
+				Arguments.of(Cypher.node("N").named("n").relationshipTo(Cypher.anyNode())
 					.withProperties("p", Cypher.literalTrue())),
-				Arguments.of(Node.create("N").named("n").relationshipTo(Cypher.anyNode())
+				Arguments.of(Cypher.node("N").named("n").relationshipTo(Cypher.anyNode())
 					.withProperties(MapExpression.create("p", Cypher.literalTrue())))
 			);
 		}
@@ -101,7 +101,7 @@ class RelationshipTest {
 		@Test
 		void shouldCreateProperty() {
 
-			Relationship relationship = Node.create("N").named("n").relationshipTo(Cypher.anyNode()).named("r");
+			Relationship relationship = Cypher.node("N").named("n").relationshipTo(Cypher.anyNode()).named("r");
 			Property property = relationship.property("p");
 
 			java.util.Set<Object> expected = new HashSet<>();

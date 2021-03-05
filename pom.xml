@@ -111,7 +111,7 @@
 		<flatten-maven-plugin.version>1.2.1</flatten-maven-plugin.version>
 		<jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
 		<java-module-name></java-module-name>
-		<java.version>1.8</java.version>
+		<java.version>8</java.version>
 		<jqassistant-dashboard-plugin.version>${jqassistant.version}</jqassistant-dashboard-plugin.version>
 		<jqassistant.plugin.git.version>1.8.0</jqassistant.plugin.git.version>
 		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
@@ -130,8 +130,6 @@
 		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
 		<maven.version>3.6.3</maven.version>
 		<mockito.version>3.6.0</mockito.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
@@ -211,6 +209,7 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
+						<release>${java.version}</release>
 						<compilerArgument>-Xlint:unchecked</compilerArgument>
 					</configuration>
 				</plugin>

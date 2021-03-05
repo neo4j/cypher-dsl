@@ -133,7 +133,7 @@ public final class Hint implements Visitable {
 		Assertions.isTrue(labels.size() == 1, "Exactly one label is required for a SCAN hint.");
 
 		return new Hint(Type.SCAN,
-			Collections.singletonList(new IndexReference(node.getRequiredSymbolicName(), node.getLabels().get(0))),
+			Collections.singletonList(new IndexReference(node.getRequiredSymbolicName(), labels.get(0))),
 			null);
 	}
 

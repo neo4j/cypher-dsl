@@ -153,6 +153,11 @@ public final class RelationshipChain implements RelationshipPattern {
 	}
 
 	@Override
+	public Condition asCondition() {
+		return new RelationshipPatternCondition(this);
+	}
+
+	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);

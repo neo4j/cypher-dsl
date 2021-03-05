@@ -32,7 +32,11 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * A property that belongs to a property container (either Node or Relationship).
+ * A property. A property might belong to a container such as a {@link Node} or {@link Relationship}, but it's not uncommon
+ * to extract single properties from maps or from various datatypes such as a duration returned from stored procedures.
+ * The container can be retrieved via {@link #getContainer()} in case the property belongs to a node or relationship.
+ * <p>
+ * A property has always a reference to the name of the object it was extracted from (see {@link #containerReference}.
  *
  * @author Michael J. Simons
  * @since 1.0

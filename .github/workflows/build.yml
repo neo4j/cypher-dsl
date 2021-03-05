@@ -17,7 +17,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 8
+          java-version: 11
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean deploy -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
@@ -28,6 +28,27 @@ jobs:
         with:
           name: artifacts
           path: target/repository
+
+  test_on_jdk8:
+    name: Verify tests on JDK 8
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Determine revision
+        run: echo "REVISION=$(date +'%Y.0.0')" >> $GITHUB_ENV
+      - uses: actions/checkout@v1
+      - name: Download artifacts
+        uses: actions/download-artifact@v1
+        with:
+          name: artifacts
+          path: repository
+      - name: Install dependencies
+        run: "mkdir -p $HOME/.m2 && mv $GITHUB_WORKSPACE/repository $HOME/.m2/"
+      - name: Run tests
+        run: >
+          docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action --java 8 bin/runtests.java
+          -cp $GITHUB_WORKSPACE/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
+          -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
 
   test_native:
     name: Verify compilation on GraalVM native

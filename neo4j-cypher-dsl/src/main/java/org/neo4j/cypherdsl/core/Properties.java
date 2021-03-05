@@ -25,7 +25,8 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
- * Represents the properties of a {@link Node node} or a {@link Relationship relationship}.
+ * Represents the properties of a {@link Node node} or a {@link Relationship relationship} when used as part of the
+ * whole pattern (inside a {@code MATCH}, {@code CREATE} or {@code MERGE} clause as {@code {p1: v1, p2: v2, pn: vn}}.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -35,7 +36,18 @@ public final class Properties implements Visitable {
 
 	private final MapExpression properties;
 
-	Properties(MapExpression properties) {
+	/**
+	 * Wraps an expression into a {@link Properties} node.
+	 *
+	 * @param expression Nullable expression
+	 * @return A properties expression
+	 */
+	public static Properties create(MapExpression expression) {
+
+		return expression == null ? null : new Properties(expression);
+	}
+
+	private Properties(MapExpression properties) {
 		this.properties = properties;
 	}
 
