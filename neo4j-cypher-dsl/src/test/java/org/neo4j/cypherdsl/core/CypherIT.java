@@ -3877,6 +3877,11 @@ class CypherIT {
 		@Test
 		void fragmentOfStatementShouldBeReusable() {
 
+			try {
+				Map.class.getMethod("of");
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			}
 			Node personNode = Cypher.node("Person").named("p");
 			Property ageProperty = personNode.property("age");
 

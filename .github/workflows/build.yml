@@ -53,6 +53,7 @@ jobs:
           docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action --java 8 bin/runtests.java
           -cp binaries/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
           -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
+          --include-classname=\.\*Test --include-classname=\.\*IT
 
   test_native:
     name: Verify compilation on GraalVM native
