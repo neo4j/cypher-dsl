@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.core.renderer;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
+import org.neo4j.cypherdsl.core.CompoundCondition;
 import org.neo4j.cypherdsl.core.Create;
+import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
@@ -48,7 +50,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	 * In contrast to the current level in the {@link DefaultVisitor} that contains the level of elements in the tree.
 	 */
 	private int indentationLevel;
-	private int readingOrUpdatingClausesCount;
+	private boolean passedFirstReadingOrUpdatingClause;
 
 	PrettyPrintingVisitor(IndentStyle indentStyle, int indentSize) {
 
@@ -74,7 +76,9 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(Where where) {
 		if (currentVisitedElements.stream().noneMatch(visitable -> visitable instanceof Return)) {
-			builder.append("\nWHERE ");
+			builder.append("\n");
+			indent(indentationLevel);
+			builder.append("WHERE ");
 		} else {
 			super.enter(where);
 		}
@@ -88,7 +92,11 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(With with) {
-		trimNewline();
+		if (passedFirstReadingOrUpdatingClause) {
+			trimNewline();
+			indent(indentationLevel);
+		}
+		passedFirstReadingOrUpdatingClause = true;
 		super.enter(with);
 	}
 
@@ -96,36 +104,28 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	void enter(Set set) {
 		if (currentVisitedElements.stream().noneMatch(visitable -> visitable instanceof MergeAction)) {
 			trimNewline();
+			indent(indentationLevel);
 		}
 		super.enter(set);
 	}
 
 	@Override
 	void enter(Match match) {
-		if (readingOrUpdatingClausesCount > 0) {
+		if (passedFirstReadingOrUpdatingClause) {
 			trimNewline();
+			indent(indentationLevel);
 		}
+		passedFirstReadingOrUpdatingClause = true;
 		super.enter(match);
 	}
 
 	@Override
-	void leave(Match match) {
-		readingOrUpdatingClausesCount++;
-		super.leave(match);
-	}
-
-	@Override
 	void enter(Create create) {
-		if (readingOrUpdatingClausesCount > 0) {
+		if (passedFirstReadingOrUpdatingClause) {
 			trimNewline();
 		}
+		passedFirstReadingOrUpdatingClause = true;
 		super.enter(create);
-	}
-
-	@Override
-	void leave(Create create) {
-		readingOrUpdatingClausesCount++;
-		super.leave(create);
 	}
 
 	@Override
@@ -147,6 +147,16 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		super.enter(map);
 	}
 
+	void enter(CompoundCondition operator) {
+		indentationLevel++;
+		super.enter(operator);
+	}
+
+	void leave(CompoundCondition operator) {
+		indentationLevel--;
+		super.leave(operator);
+	}
+
 	@Override
 	void enter(Operator operator) {
 		Operator.Type type = operator.getType();
@@ -158,7 +168,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		}
 		if (operator == Operator.OR || operator == Operator.AND || operator == Operator.XOR) {
 			trimNewline();
-			indent(1);
+			indent(indentationLevel);
 		}
 		builder.append(operator.getRepresentation());
 		if (type != Operator.Type.POSTFIX && operator != Operator.EXPONENTIATION) {
@@ -190,16 +200,26 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Merge merge) {
-		if (readingOrUpdatingClausesCount > 0) {
+		if (passedFirstReadingOrUpdatingClause) {
 			trimNewline();
+			indent(indentationLevel);
 		}
+		passedFirstReadingOrUpdatingClause = true;
 		super.enter(merge);
 	}
 
 	@Override
-	void leave(Merge merge) {
-		readingOrUpdatingClausesCount++;
-		super.leave(merge);
+	void enter(ExistentialSubquery subquery) {
+		super.enter(subquery);
+		indentationLevel++;
+	}
+
+	@Override
+	void leave(ExistentialSubquery subquery) {
+		indentationLevel--;
+		trimNewline();
+		indent(indentationLevel);
+		builder.append("}");
 	}
 
 	private void trimNewline() {

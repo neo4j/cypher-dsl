@@ -3922,6 +3922,11 @@ class CypherIT {
 			this.statement = Cypher.match(userNode)
 				.where(userNode.property("name").isEqualTo(Cypher.literalOf("Max")))
 				.and(userNode.property("lastName").isEqualTo(Cypher.literalOf("Mustermann")))
+					.and(Cypher
+							.match(userNode.relationshipTo(bikeNode, "LIKES"))
+							.where(bikeNode.relationshipTo(Cypher.anyNode(), "LINK"))
+							.or(Cypher.match(bikeNode.relationshipTo(Cypher.anyNode(), "LINK")).asCondition())
+							.asCondition())
 				.set(userNode.property("lastName").to(Cypher.parameter("newName")))
 				.with(userNode)
 				.match(bikeNode)
@@ -3951,7 +3956,14 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (u:User)\n" +
 					"WHERE (u.name = 'Max'\n" +
-					"  AND u.lastName = 'Mustermann')\n" +
+					"  AND u.lastName = 'Mustermann'\n" +
+					"  AND EXISTS {\n" +
+					"    MATCH (u)-[:LIKES]->(b:Bike)\n" +
+					"    WHERE ((b)-[:LINK]->()\n" +
+					"      OR EXISTS {\n" +
+					"        MATCH (b)-[:LINK]->()\n" +
+					"      })\n" +
+					"  })\n" +
 					"SET u.lastName = $newName\n" +
 					"WITH u\n" +
 					"MATCH (b:Bike)\n" +
@@ -3980,7 +3992,14 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (u:User)\n" +
 					"WHERE (u.name = 'Max'\n" +
-					"\tAND u.lastName = 'Mustermann')\n" +
+					"\tAND u.lastName = 'Mustermann'\n" +
+					"\tAND EXISTS {\n" +
+					"\t\tMATCH (u)-[:LIKES]->(b:Bike)\n" +
+					"\t\tWHERE ((b)-[:LINK]->()\n" +
+					"\t\t\tOR EXISTS {\n" +
+					"\t\t\t\tMATCH (b)-[:LINK]->()\n" +
+					"\t\t\t})\n" +
+					"\t})\n" +
 					"SET u.lastName = $newName\n" +
 					"WITH u\n" +
 					"MATCH (b:Bike)\n" +
@@ -4025,6 +4044,25 @@ class CypherIT {
 					"  ON CREATE SET a.name = 'me'\n" +
 					"  ON MATCH SET b.name = 'you'\n" +
 					"RETURN a.prop"
+				);
+		}
+
+		@Test
+		void singleExistsSubquery() {
+			Node a = Cypher.node("A").named("a");
+			Node b = Cypher.node("B").named("b");
+
+			Statement mergeStatement = Cypher.match(a)
+				.where(Cypher.match(a.relationshipTo(b)).asCondition())
+				.returning(a).build();
+
+			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(mergeStatement))
+				.isEqualTo(
+					"MATCH (a:A)\n" +
+					"WHERE EXISTS {\n" +
+					"  MATCH (a)-->(b:B)\n" +
+					"}\n" +
+					"RETURN a"
 				);
 		}
 	}
