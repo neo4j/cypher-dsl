@@ -37,15 +37,21 @@ jobs:
       - name: Determine revision
         run: echo "REVISION=$(date +'%Y.0.0')" >> $GITHUB_ENV
       - uses: actions/checkout@v1
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
           name: artifacts
-          path: repository
+          path: binaries
+      - name: Recreate test classes
+        run: ./mvnw test-compile -pl org.neo4j:neo4j-cypher-dsl
       - name: Run tests
         run: >
           docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action --java 8 bin/runtests.java
-          -cp repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
+          -cp binaries/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
           -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
 
   test_native:
