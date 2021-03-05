@@ -54,8 +54,5 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	 * @param newProperties A map with the new properties
 	 * @return The new property container.
 	 */
-	default T withProperties(Map<String, Object> newProperties) {
-
-		return withProperties(MapExpression.create(newProperties));
-	}
+	T withProperties(Map<String, Object> newProperties);
 }

@@ -63,11 +63,23 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 		Set<String> knownKeys = new HashSet<>();
 
 		for (int i = 0; i < input.length; i += 2) {
-			Assertions.isInstanceOf(String.class, input[i], "Key needs to be of type String.");
+			Object keyCandidate = input[i];
+			String key;
+			if (keyCandidate instanceof String) {
+				key = (String) keyCandidate;
+			} else if (keyCandidate instanceof Property) {
+				List<PropertyLookup> names = ((Property) keyCandidate).getNames();
+				if (names.size() != 1) {
+					throw new IllegalArgumentException("Nested properties are not supported in a map expression");
+				}
+				key = names.get(0).getPropertyKeyName().getValue();
+			} else {
+				throw new IllegalStateException("Key needs to be of type String or Property.");
+			}
 			Assertions.isInstanceOf(Expression.class, input[i + 1], "Value needs to be of type Expression.");
 			Assertions.isTrue(!knownKeys.contains(input[i]), "Duplicate key '" + input[i] + "'");
 
-			final KeyValueMapEntry entry = new KeyValueMapEntry((String) input[i], (Expression) input[i + 1]);
+			final KeyValueMapEntry entry = new KeyValueMapEntry(key, (Expression) input[i + 1]);
 			newContent.add(entry);
 			knownKeys.add(entry.getKey());
 		}

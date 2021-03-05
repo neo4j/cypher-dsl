@@ -45,7 +45,7 @@ public final class Parameter<T> implements Expression {
 		return create(name, NO_VALUE);
 	}
 
-	static <T> Parameter<T> create(String name, Object value) {
+	static <T> Parameter<T> create(String name, T value) {
 
 		Assertions.hasText(name, "The name of the parameter is required!");
 
@@ -53,7 +53,7 @@ public final class Parameter<T> implements Expression {
 			return create(name.substring(1), value);
 		}
 
-		return new Parameter(name, value);
+		return new Parameter<>(name, value);
 	}
 
 	private Parameter(String name, T value) {

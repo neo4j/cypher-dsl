@@ -173,7 +173,7 @@ class FunctionsIT {
 			expected.append(");");
 
 			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
-			FunctionInvocation f = (FunctionInvocation) m.invoke(null, args);
+			FunctionInvocation f = (FunctionInvocation) m.invoke(null, (Object[]) args);
 			Assertions.assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
 				.isEqualTo(expected.toString());
 		}

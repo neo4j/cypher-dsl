@@ -45,13 +45,9 @@ public interface PropertyContainer extends Named {
 	 * @param name property name, must not be {@literal null} or empty.
 	 * @return a new {@link Property} associated with this named container
 	 */
-	default Property property(String name) {
-		return property(new String[] { name });
-	}
+	Property property(String name);
 
-	default Property property(String... names) {
-		return Property.create(this, names);
-	}
+	Property property(String... names);
 
 	/**
 	 * Creates a new {@link Property} associated with this property container. This property can be used as a lookup in
@@ -68,9 +64,7 @@ public interface PropertyContainer extends Named {
 	 * @return a new {@link Property} associated with this named container
 	 * @since 2021.0.0
 	 */
-	default Property property(Expression lookup) {
-		return Property.create(this, lookup);
-	}
+	Property property(Expression lookup);
 
 	/**
 	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not
@@ -80,11 +74,7 @@ public interface PropertyContainer extends Named {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	default Operation mutate(Parameter parameter) {
-		return Operations.mutate(this.getSymbolicName()
-				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
-			parameter);
-	}
+	Operation mutate(Parameter parameter);
 
 	/**
 	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not
@@ -94,11 +84,7 @@ public interface PropertyContainer extends Named {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	default Operation mutate(MapExpression properties) {
-		return Operations.mutate(this.getSymbolicName()
-				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
-			properties);
-	}
+	Operation mutate(MapExpression properties);
 
 	/**
 	 * Unwraps the list of entries into an array before creating a projection out of it.
@@ -107,9 +93,7 @@ public interface PropertyContainer extends Named {
 	 * @return A map projection.
 	 * @see SymbolicName#project(List)
 	 */
-	default MapProjection project(List<Object> entries) {
-		return project(entries.toArray());
-	}
+	MapProjection project(List<Object> entries);
 
 	/**
 	 * Creates a map projection based on this container. The container needs a symbolic name for this to work.
@@ -118,7 +102,5 @@ public interface PropertyContainer extends Named {
 	 * @return A map projection.
 	 * @see SymbolicName#project(Object...)
 	 */
-	default MapProjection project(Object... entries) {
-		return getRequiredSymbolicName().project(entries);
-	}
+	MapProjection project(Object... entries);
 }

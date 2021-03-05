@@ -39,14 +39,15 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Relationship implements RelationshipPattern, PropertyContainer, ExposesProperties<Relationship> {
+public interface Relationship extends RelationshipPattern, PropertyContainer, ExposesProperties<Relationship> {
 
 	/**
 	 * While the direction in the schema package is centered around the node, the direction here is the direction between two nodes.
 	 *
 	 * @since 1.0
 	 */
-	public enum Direction {
+	@API(status = INTERNAL, since = "1.0")
+	enum Direction {
 		/**
 		 * Left to right
 		 */
@@ -91,7 +92,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * This is not a public API and just used internally for structuring the tree.
 	 */
 	@API(status = INTERNAL, since = "1.0")
-	public static final class Details implements Visitable {
+	final class Details implements Visitable {
 
 		/**
 		 * The direction between the nodes of the relationship.
@@ -106,8 +107,16 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 
 		private final Properties properties;
 
-		static Details create(Direction direction, SymbolicName symbolicName,
-			RelationshipTypes types) {
+		static Details create(Direction direction, SymbolicName symbolicName, String... types) {
+
+			List<String> listOfTypes = Arrays.stream(types)
+				.filter(type -> !(type == null || type.isEmpty()))
+				.collect(Collectors.toList());
+
+			return create(direction, symbolicName, 	listOfTypes.isEmpty()  ? null : new RelationshipTypes(listOfTypes));
+		}
+
+		static Details create(Direction direction, SymbolicName symbolicName, RelationshipTypes types) {
 
 			return new Details(direction, symbolicName, types, null, null);
 		}
@@ -119,7 +128,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 			Properties properties
 		) {
 
-			this.direction = direction;
+			this.direction = Optional.ofNullable(direction).orElse(Direction.UNI);
 			this.symbolicName = symbolicName;
 			this.types = types;
 			this.length = length;
@@ -133,12 +142,6 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 		 */
 		public boolean hasContent() {
 			return this.symbolicName != null || this.types != null || this.length != null || this.properties != null;
-		}
-
-		Details named(String newSymbolicName) {
-
-			Assertions.hasText(newSymbolicName, "Symbolic name is required.");
-			return named(SymbolicName.of(newSymbolicName));
 		}
 
 		Details named(SymbolicName newSymbolicName) {
@@ -239,51 +242,16 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 		}
 	}
 
-	static Relationship create(Node left, Direction direction, Node right, String... types) {
-
-		Assertions.notNull(left, "Left node is required.");
-		Assertions.notNull(right, "Right node is required.");
-
-		List<String> listOfTypes = Arrays.stream(types)
-			.filter(type -> !(type == null || type.isEmpty()))
-			.collect(Collectors.toList());
-
-		Details details = Details.create(
-			Optional.ofNullable(direction).orElse(Direction.UNI),
-			null,
-			listOfTypes.isEmpty() ? null : new RelationshipTypes(listOfTypes));
-		return new Relationship(left, details, right);
-	}
-
-	private final Node left;
-
-	private final Node right;
-
-	private final Details details;
-
-	Relationship(Node left, Details details, Node right) {
-		this.left = left;
-		this.right = right;
-		this.details = details;
-	}
-
-	Node getLeft() {
-		return left;
-	}
-
-	Node getRight() {
-		return right;
-	}
+	Node getLeft();
 
 	/**
 	 * The details contains the types, properties and cardinality.
 	 *
 	 * @return A wrapper around the details of this relationship.
 	 */
-	@API(status = INTERNAL)
-	public Details getDetails() {
-		return details;
-	}
+	Details getDetails();
+
+	Node getRight();
 
 	/**
 	 * Creates a copy of this relationship with a new symbolic name.
@@ -291,11 +259,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new relationship.
 	 */
-	public Relationship named(String newSymbolicName) {
-
-		// Sanity check of newSymbolicName delegated to the details.
-		return new Relationship(this.left, this.details.named(newSymbolicName), this.right);
-	}
+	Relationship named(String newSymbolicName);
 
 	/**
 	 * Creates a copy of this relationship with a new symbolic name.
@@ -303,11 +267,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new relationship.
 	 */
-	public Relationship named(SymbolicName newSymbolicName) {
-
-		// Sanity check of newSymbolicName delegated to the details.
-		return new Relationship(this.left, this.details.named(newSymbolicName), this.right);
-	}
+	Relationship named(SymbolicName newSymbolicName);
 
 	/**
 	 * Creates a new relationship with an unbound length minimum length
@@ -315,10 +275,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * @return the new relationship
 	 * @since 1.1.1
 	 */
-	public Relationship unbounded() {
-
-		return new Relationship(this.left, this.details.unbounded(), this.right);
-	}
+	Relationship unbounded();
 
 	/**
 	 * Creates a new relationship with a new minimum length
@@ -326,10 +283,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * @param minimum the new minimum
 	 * @return the new relationship
 	 */
-	public Relationship min(Integer minimum) {
-
-		return new Relationship(this.left, this.details.min(minimum), this.right);
-	}
+	Relationship min(Integer minimum);
 
 	/**
 	 * Creates a new relationship with a new maximum length
@@ -337,10 +291,7 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
-	public Relationship max(Integer maximum) {
-
-		return new Relationship(this.left, this.details.max(maximum), this.right);
-	}
+	Relationship max(Integer maximum);
 
 	/**
 	 * Creates a new relationship with a new length
@@ -349,71 +300,5 @@ public final class Relationship implements RelationshipPattern, PropertyContaine
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
-	public Relationship length(Integer minimum, Integer maximum) {
-
-		return new Relationship(this.left, this.details.min(minimum).max(maximum), this.right);
-	}
-
-	@Override
-	public Relationship withProperties(MapExpression newProperties) {
-
-		if (newProperties == null && this.details.getProperties() == null) {
-			return this;
-		}
-		return new Relationship(this.left,
-			this.details.with(newProperties == null ? null : new Properties(newProperties)), this.right);
-	}
-
-	@Override
-	public Relationship withProperties(Object... keysAndValues) {
-
-		MapExpression newProperties = null;
-		if (keysAndValues != null && keysAndValues.length != 0) {
-			newProperties = MapExpression.create(keysAndValues);
-		}
-		return withProperties(newProperties);
-	}
-
-	@Override
-	public Optional<SymbolicName> getSymbolicName() {
-		return details.getSymbolicName();
-	}
-
-	@Override
-	public SymbolicName getRequiredSymbolicName() {
-		return details.getRequiredSymbolicName();
-	}
-
-	@Override
-	public RelationshipChain relationshipTo(Node other, String... types) {
-		return RelationshipChain
-			.create(this)
-			.add(this.right.relationshipTo(other, types));
-	}
-
-	@Override
-	public RelationshipChain relationshipFrom(Node other, String... types) {
-		return RelationshipChain
-			.create(this)
-			.add(this.right.relationshipFrom(other, types));
-	}
-
-	@Override
-	public RelationshipChain relationshipBetween(Node other, String... types) {
-		return RelationshipChain
-			.create(this)
-			.add(this.right.relationshipBetween(other, types));
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-
-		left.accept(visitor);
-		details.accept(visitor);
-		right.accept(visitor);
-
-		visitor.leave(this);
-	}
+	Relationship length(Integer minimum, Integer maximum);
 }

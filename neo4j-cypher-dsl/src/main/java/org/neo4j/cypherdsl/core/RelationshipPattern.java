@@ -50,7 +50,5 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @return A condition based on this pattern.
 	 * @since 2021.0.0
 	 */
-	default Condition asCondition() {
-		return new RelationshipPatternCondition(this);
-	}
+	Condition asCondition();
 }

@@ -29,6 +29,7 @@
 	<artifactId>neo4j-cypher-dsl</artifactId>
 
 	<name>Neo4j Cypher DSL (Core)</name>
+	<description>The core module of the Cypher DSL, including all supported elements and the default renderer.</description>
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.core</java-module-name>

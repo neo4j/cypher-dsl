@@ -38,29 +38,35 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
+ * This tests focus on the internal node implementation.
+ *
  * @author Michael J. Simons
  */
-class NodeTest {
+class NodeImplTest {
 
 	@Test
 	void preconditionsShouldBeAsserted() {
 		String expectedMessage = "A primary label is required.";
 
-		assertThatIllegalArgumentException().isThrownBy(() -> Node.create("")).withMessage(expectedMessage);
-		assertThatIllegalArgumentException().isThrownBy(() -> Node.create(" \t")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> new NodeImpl("")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> new NodeImpl(" \t")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node("")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node(" \t")).withMessage(expectedMessage);
 	}
 
 	@Test
 	void shouldNotAddEmptyAdditionalLabels() {
 
-		assertThatIllegalArgumentException().isThrownBy(() -> Node.create("primary", " ", "\t "))
+		assertThatIllegalArgumentException().isThrownBy(() -> new NodeImpl("primary", " ", "\t "))
+			.withMessage("An empty label is not allowed.");
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node("primary", " ", "\t "))
 			.withMessage("An empty label is not allowed.");
 	}
 
 	@Test
 	void shouldCreateNodes() {
 
-		Node node = Node.create("primary", "secondary");
+		Node node = new NodeImpl("primary", "secondary");
 		List<String> labels = new ArrayList<>();
 		node.accept(new Visitor() {
 			@Override
@@ -81,8 +87,8 @@ class NodeTest {
 
 		private Stream<Arguments> createNodesWithProperties() {
 			return Stream.of(
-				Arguments.of(Node.create("N").named("n").withProperties("p", Cypher.literalTrue())),
-				Arguments.of(Node.create("N").named("n").withProperties(MapExpression.create("p", Cypher.literalTrue())))
+				Arguments.of(new NodeImpl("N").named("n").withProperties("p", Cypher.literalTrue())),
+				Arguments.of(new NodeImpl("N").named("n").withProperties(MapExpression.create("p", Cypher.literalTrue())))
 			);
 		}
 
@@ -115,7 +121,7 @@ class NodeTest {
 		@Test
 		void shouldCreateProperty() {
 
-			Node node = Node.create("N").named("n");
+			Node node = new NodeImpl("N").named("n");
 			Property property = node.property("p");
 
 			java.util.Set<Object> expected = new HashSet<>();
