@@ -23,7 +23,7 @@ import org.apiguardian.api.API;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
- * Abstract base class for the {@link NodeImpl node implementation} to avoid default interface methods to be overridable
+ * Abstract base class for the {@link NodeBase node implementation} to avoid default interface methods to be overridable
  * in inheritors.
  *
  * @author Michael J. Simons
@@ -93,16 +93,16 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
 	@Override
 	public final Relationship relationshipTo(Node other, String... types) {
-		return new RelationshipImpl(null, this, Relationship.Direction.LTR, other, types);
+		return new InternalRelationshipImpl(null, this, Relationship.Direction.LTR, other, types);
 	}
 
 	@Override
 	public final Relationship relationshipFrom(Node other, String... types) {
-		return new RelationshipImpl(null, this, Relationship.Direction.RTL, other, types);
+		return new InternalRelationshipImpl(null, this, Relationship.Direction.RTL, other, types);
 	}
 
 	@Override
 	public final Relationship relationshipBetween(Node other, String... types) {
-		return new RelationshipImpl(null, this, Relationship.Direction.UNI, other, types);
+		return new InternalRelationshipImpl(null, this, Relationship.Direction.UNI, other, types);
 	}
 }

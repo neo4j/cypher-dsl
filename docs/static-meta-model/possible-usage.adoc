@@ -1,0 +1,118 @@
+== Possible Usage
+
+Please assume we did model the "Movie graph" (`:play movies` in Neo4j-Browser) with the following scheme
+
+image::movie-graph.png[]
+
+and these classes, which have been generated with the
+<<static-meta-model.building-blocks, building blocks described earlier>> (the required functions have been omitted for brevity):
+
+[source,java,indent=0,tabsize=4]
+----
+final class Movie extends NodeBase<Movie> {
+
+	public static final Movie MOVIE = new Movie();
+
+	public final Property TAGLINE = this.property("tagline");
+
+	public final Property TITLE = this.property("title");
+
+	public final Property RELEASED = this.property("released");
+
+	public Movie() {
+		super("Movie");
+	}
+}
+
+final class Person extends NodeBase<Person> {
+
+	public static final Person PERSON = new Person();
+
+    public final Property NAME = this.property("name");
+
+	public final Property FIRST_NAME = this.property("firstName");
+
+	public final Directed<Movie> DIRECTED = new Directed<>(this, Movie.MOVIE);
+
+	public final ActedIn ACTED_IN = new ActedIn(this, Movie.MOVIE);
+
+	public final Property BORN = this.property("born");
+
+	public Person() {
+		super("Person");
+	}
+}
+
+final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> {
+
+	public final Property ROLE = this.property("role");
+
+	protected ActedIn(Person start, Movie end) {
+		super(start, "ACTED_IN", end);
+	}
+}
+
+final class Directed<E extends NodeBase<?>> extends RelationshipBase<Person, E, Directed<E>> {
+
+	protected Directed(Person start, E end) {
+		super(start, "DIRECTED", end);
+	}
+}
+----
+
+=== Work with properties
+
+Properties can be used like normal objects:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=work-with-properties]
+----
+
+Of course, new properties can be derived:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=deriving-new-properties]
+----
+
+=== Query nodes or relationships by properties
+
+Use `withProperties` (and `named` you like) to model your queries as needed.
+Applicable to properties of nodes such as the title:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-node-by-properties]
+----
+
+and relationships
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-rel-by-properties]
+----
+
+Note that the query will look like this, as we didn't rename the objects and they used generated names:
+
+[source,cypher]
+----
+`MATCH (dZVpwHhe000:`Person`)-[JcVKsSrn001:`ACTED_IN` {role: 'Neo'}]->(cDWeUJSI002:`Movie`) RETURN cDWeUJSI002`` as we didn't specify aliases)
+----
+
+=== Work with relationships
+
+Relationships can be worked with like with properties:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=multiple-relationships]
+----
+
+They are quite flexible together with the `inverse` method. The following example also shows how to include non-static parts:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=chaining-relationships]
+----
+<.> Using a non-static fragment

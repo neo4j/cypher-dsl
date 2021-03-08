@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.model;
+package org.neo4j.cypherdsl.examples.model;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,45 +30,64 @@ class StaticModelIT {
 	@Test
 	void simpleMatchShouldWork() {
 
-		String cypher = Cypher.match(Movie.MOVIE)
+		// tag::simple-model[]
+		var cypher = Cypher.match(Movie.MOVIE)
 			.returning(Movie.MOVIE)
 			.build().getCypher();
+		// end::simple-model[]
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Movie`\\) RETURN \\w+");
 	}
 
 	@Test
+	void simpleMatchRenamedShouldWork() {
+
+		// tag::simple-model-renamed[]
+		var movie = Movie.MOVIE.named("m");
+		var cypher = Cypher.match(movie)
+			.returning(movie)
+			.build().getCypher();
+		// end::simple-model-renamed[]
+
+		Assertions.assertThat(cypher).isEqualTo("MATCH (m:`Movie`) RETURN m");
+	}
+
+	@Test
 	void renamingShouldWork() {
 
-		Movie m1 = Movie.MOVIE.named("m1");
-		String cypher = Cypher.match(m1)
-			.where(m1.TITLE.isEqualTo(Cypher.literalOf("The Matrix")))
-			.returning(m1)
+		// tag::add-properties[]
+		var movie = Movie.MOVIE.named("m");
+		var cypher = Cypher.match(movie)
+			.where(movie.TITLE.isEqualTo(Cypher.literalOf("The Matrix"))) // <.>
+			.returning(movie)
 			.build().getCypher();
 
 		Assertions.assertThat(cypher)
-			.isEqualTo("MATCH (m1:`Movie`) WHERE m1.title = 'The Matrix' RETURN m1");
+			.isEqualTo("MATCH (m:`Movie`) WHERE m.title = 'The Matrix' RETURN m");
+		// end::add-properties[]
 	}
 
 	@Test
 	void propertiesShouldWorkInMatchWithType() {
 
-		Movie m1 = Movie.MOVIE.withProperties(Movie.MOVIE.TITLE, Cypher.literalOf("The Matrix")).named("m1");
-		String cypher = Cypher.match(m1)
-			.returning(m1)
+		// tag::query-node-by-properties[]
+		var movie = Movie.MOVIE.withProperties(Movie.MOVIE.TITLE, Cypher.literalOf("The Matrix")).named("m1");
+		var cypher = Cypher.match(movie)
+			.returning(movie)
 			.build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.isEqualTo("MATCH (m1:`Movie` {title: 'The Matrix'}) RETURN m1");
+		// end::query-node-by-properties[]
 	}
 
 	@Test
 	void relRropertiesShouldWorkInMatchWithType() {
 
-		ActedIn actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf("Neo"))
+		var actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf("Neo"))
 			.named("n");
-		String cypher = Cypher.match(actedIn)
+		var cypher = Cypher.match(actedIn)
 			.returning(Movie.MOVIE)
 			.build().getCypher();
 
@@ -77,10 +96,24 @@ class StaticModelIT {
 	}
 
 	@Test
+	void relRropertiesShouldWorkInMatchWithTypeCustomName() {
+
+		// tag::query-rel-by-properties[]
+		var actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf("Neo"));
+		var cypher = Cypher.match(actedIn)
+			.returning(Movie.MOVIE)
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches("MATCH \\(\\w+:`Person`\\)-\\[\\w+:`ACTED_IN` \\{role: 'Neo'}]->\\(\\w+:`Movie`\\) RETURN \\w+");
+		// end::query-rel-by-properties[]
+	}
+
+	@Test
 	void renamingRelationshipsShouldWork() {
 
-		Directed<Movie> directed = Person.PERSON.DIRECTED.named("d");
-		String cypher = Cypher.match(directed)
+		var directed = Person.PERSON.DIRECTED.named("d");
+		var cypher = Cypher.match(directed)
 			.returning(Movie.MOVIE)
 			.build().getCypher();
 
@@ -91,7 +124,7 @@ class StaticModelIT {
 	@Test
 	void matchOnRelationshipsShouldWork() {
 
-		String cypher = Cypher.match(Person.PERSON.DIRECTED)
+		var cypher = Cypher.match(Person.PERSON.DIRECTED)
 			.returning(Movie.MOVIE)
 			.build().getCypher();
 
@@ -100,12 +133,25 @@ class StaticModelIT {
 	}
 
 	@Test
+	void matchOnRelationshipsShouldWorkInverse() {
+
+		var cypher = Cypher.match(Person.PERSON.DIRECTED.inverse())
+			.returning(Person.PERSON)
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches("MATCH \\(\\w+:`Movie`\\)<-\\[:`DIRECTED`]-\\(\\w+:`Person`\\) RETURN \\w+");
+	}
+
+	@Test
 	void multipleRelationships() {
 
-		String cypher = Cypher.match(Person.PERSON.DIRECTED)
+		// tag::multiple-relationships[]
+		var cypher = Cypher.match(Person.PERSON.DIRECTED)
 			.match(Person.PERSON.ACTED_IN)
 			.returning(Person.PERSON.DIRECTED, Person.PERSON.ACTED_IN)
 			.build().getCypher();
+		// end::multiple-relationships[]
 
 		Assertions.assertThat(cypher)
 			.matches(
@@ -113,22 +159,43 @@ class StaticModelIT {
 	}
 
 	@Test
+	void chaining() {
+
+		// tag::chaining-relationships[]
+		var otherPerson = Person.PERSON.named("o");
+		var cypher = Cypher.match(
+				Person.PERSON.DIRECTED.inverse()
+					.relationshipTo(otherPerson, "FOLLOWS") // <.>
+			)
+			.where(otherPerson.NAME.isEqualTo(Cypher.literalOf("Someone")))
+			.returning(Person.PERSON)
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches(
+				"MATCH \\(\\w+:`Movie`\\)<-\\[:`DIRECTED`]-\\(\\w+:`Person`\\)-\\[:`FOLLOWS`]->\\(o:`Person`\\) WHERE o\\.name = 'Someone' RETURN \\w+");
+		// end::chaining-relationships[]
+	}
+
+	@Test
 	void workWithPropertiesShouldBePossible() {
 
-		String cypher = Cypher.match(Person.PERSON)
+		// tag::work-with-properties[]
+		var cypher = Cypher.match(Person.PERSON)
 			.returning(Person.PERSON.NAME, Person.PERSON.BORN)
 			.build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Person`\\) RETURN \\w+\\.name, \\w+\\.born");
+		// end::work-with-properties[]
 	}
 
 	@Test
 	void queryingNonStaticInformationAndPathsShouldWork() {
 
-		Person otherPerson = Person.PERSON.named("o");
-		String cypher = Cypher.match(Person.PERSON.withProperties(Person.PERSON.NAME, Cypher.literalOf("Tom Hanks"))
-			.relationshipTo(otherPerson, "WORKED_WITH"))
+		var otherPerson = Person.PERSON.named("o");
+		var cypher = Cypher.match(Person.PERSON.withProperties(Person.PERSON.NAME, Cypher.literalOf("Tom Hanks"))
+			.relationshipTo(otherPerson, "WORKED_WITH")) // <.>
 			.returning(otherPerson.NAME)
 			.build().getCypher();
 
@@ -140,18 +207,20 @@ class StaticModelIT {
 	@Test
 	void workingOnTheDelegateShouldMakeSens() {
 
-		String cypher = Cypher.match(Person.PERSON)
+		// tag::deriving-new-properties[]
+		var cypher = Cypher.match(Person.PERSON)
 			.returning(Person.PERSON.NAME.concat(Cypher.literalOf(" whatever")))
 			.build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Person`\\) RETURN \\(\\w+\\.name \\+ ' whatever'\\)");
+		// end::deriving-new-properties[]
 	}
 
 	@Test
 	void oldQueryDSLExampleRevisited() {
 
-		Person person = new Person().named("person");
+		var person = new Person().named("person");
 		Assertions.assertThat(
 			Cypher.match(person)
 				.where(person.FIRST_NAME.eq(Cypher.literalOf("P")).

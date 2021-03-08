@@ -35,9 +35,10 @@ import java.util.concurrent.Callable;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.codegen.core.Configuration.JavaVersion;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -47,8 +48,8 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
 /**
- * Base class with some shared state and information for builders of {@link org.neo4j.cypherdsl.core.NodeImpl} and
- * {@link org.neo4j.cypherdsl.core.RelationshipImpl}.
+ * Base class with some shared state and information for builders of {@link NodeBase} and
+ * {@link RelationshipBase}.
  *
  * @param <T> Concrete type of this builder
  * @author Michael J. Simons
@@ -59,7 +60,7 @@ import com.squareup.javapoet.TypeSpec;
 abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuilder<T> {
 
 	protected static final ClassName TYPE_NAME_NODE = ClassName.get(Node.class);
-	protected static final ClassName TYPE_NAME_NODE_IMPL = ClassName.get(NodeImpl.class);
+	protected static final ClassName TYPE_NAME_NODE_BASE = ClassName.get(NodeBase.class);
 	protected static final ClassName TYPE_NAME_SYMBOLIC_NAME = ClassName.get(SymbolicName.class);
 	protected static final ClassName TYPE_NAME_LIST = ClassName.get(List.class);
 	protected static final ClassName TYPE_NAME_STRING = ClassName.get(String.class);

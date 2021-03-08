@@ -16,12 +16,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.model;
+package org.neo4j.cypherdsl.examples.model;
 
 import java.util.List;
 
 import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
 import org.neo4j.cypherdsl.core.Property;
@@ -31,19 +31,21 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  * @author Michael J. Simons
  * @soundtrack Höhner - Die ersten 30 Jahre
  */
-public final class Person extends NodeImpl<Person> {
+// tag::simple-model[]
+public final class Person extends NodeBase<Person> {
 
 	public static final Person PERSON = new Person();
 
 	public final Directed<Movie> DIRECTED = new Directed<>(this, Movie.MOVIE);
 
-	public final ActedIn ACTED_IN = new ActedIn(this, Movie.MOVIE);
+	public final ActedIn ACTED_IN = new ActedIn(this, Movie.MOVIE); // <.>
 
 	public final Property NAME = this.property("name");
 
 	public final Property FIRST_NAME = this.property("firstName");
 
 	public final Property BORN = this.property("born");
+	// end::simple-model[]
 
 	public Person() {
 		super("Person");
@@ -64,4 +66,6 @@ public final class Person extends NodeImpl<Person> {
 
 		return new Person(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
 	}
+	// tag::simple-model[]
 }
+// end::simple-model[]

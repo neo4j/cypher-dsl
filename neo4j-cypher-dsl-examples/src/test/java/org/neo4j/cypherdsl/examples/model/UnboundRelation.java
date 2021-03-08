@@ -16,13 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.model;
+package org.neo4j.cypherdsl.examples.model;
 
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.RelationshipImpl;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
@@ -32,28 +32,27 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  * @param <S> Start node
  * @param <E> End node
  */
-public final class FreeridingRelation<S extends NodeImpl<?>, E extends NodeImpl<?>>
-	extends RelationshipImpl<S, E, FreeridingRelation<S, E>> {
+public final class UnboundRelation<S extends NodeBase<?>, E extends NodeBase<?>>
+	extends RelationshipBase<S, E, UnboundRelation<S, E>> {
 
-	protected FreeridingRelation(S start, E end) {
+	protected UnboundRelation(S start, E end) {
 		super(start, "FREERIDING", end);
 	}
 
-	private FreeridingRelation(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
+	private UnboundRelation(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
 		super(symbolicName, start, type, properties, end);
 	}
 
 	@Override
-	public FreeridingRelation<S, E> named(SymbolicName newSymbolicName) {
+	public UnboundRelation<S, E> named(SymbolicName newSymbolicName) {
 
-		return new FreeridingRelation<>(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(),
-			getRight());
+		return new UnboundRelation<>(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
 	}
 
 	@Override
-	public FreeridingRelation<S, E> withProperties(MapExpression newProperties) {
+	public UnboundRelation<S, E> withProperties(MapExpression newProperties) {
 
-		return new FreeridingRelation<>(getSymbolicName().orElse(null), getLeft(), getRequiredType(),
+		return new UnboundRelation<>(getSymbolicName().orElse(null), getLeft(), getRequiredType(),
 			Properties.create(newProperties), getRight());
 	}
 }

@@ -36,19 +36,19 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *
  * @param <S> The type at the start of the relationship
  * @param <E> The type at the pointy end of the relationship
- * @param <T> The type of the persistent relationship itself
+ * @param <SELF> The type of the persistent relationship itself
  * @author Michael J. Simons
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")
-public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T extends RelationshipImpl<S, E, T>>
+public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase<?>, SELF extends RelationshipBase<S, E, SELF>>
 		extends AbstractPropertyContainer implements Relationship {
 
-	private final Node left;
+	final Node left;
 
-	private final Node right;
+	final Node right;
 
-	private final Details details;
+	final Details details;
 
 	// ------------------------------------------------------------------------
 	// Public API to be used by the static meta model.
@@ -62,7 +62,7 @@ public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T ex
 	 * @param end   end node
 	 * @param type  type of the relationship
 	 */
-	protected RelationshipImpl(S start, String type, E end) {
+	protected RelationshipBase(S start, String type, E end) {
 
 		this(null, start, Direction.LTR, end, type);
 	}
@@ -72,31 +72,32 @@ public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T ex
 	 *
 	 * @param symbolicName an optional symbolic name
 	 * @param start        start node
+	 * @param properties   The properties for the relationship
 	 * @param end          end node
 	 * @param type         type of the relationship
 	 */
-	protected RelationshipImpl(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
+	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
 
 		this(symbolicName, start, Direction.LTR, properties, end, type);
 	}
 
 	@Override
-	public final T named(String newSymbolicName) {
+	public final SELF named(String newSymbolicName) {
 
 		Assertions.hasText(newSymbolicName, "Symbolic name is required.");
 		return named(SymbolicName.of(newSymbolicName));
 	}
 
+	/**
+	 * This method needs to be implemented to provide new, type safe instances of this relationship.
+	 * @param newSymbolicName the new symbolic name.
+	 * @return A new relationship
+	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public T named(SymbolicName newSymbolicName) {
-
-		// Sanity check of newSymbolicName delegated to the details.
-		return (T) new RelationshipImpl(this.left, this.details.named(newSymbolicName), this.right);
-	}
+	abstract public SELF named(SymbolicName newSymbolicName);
 
 	@Override
-	public final T withProperties(Object... keysAndValues) {
+	public final SELF withProperties(Object... keysAndValues) {
 
 		MapExpression newProperties = null;
 		if (keysAndValues != null && keysAndValues.length != 0) {
@@ -106,17 +107,18 @@ public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T ex
 	}
 
 	@Override
-	public final T withProperties(Map<String, Object> newProperties) {
+	public final SELF withProperties(Map<String, Object> newProperties) {
 
 		return withProperties(MapExpression.create(newProperties));
 	}
 
+	/**
+	 * This method needs to be implemented to provide new, type safe instances of this relationship.
+	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
+	 * @return A new relationship
+	 */
 	@Override
-	@SuppressWarnings("unchecked")
-	public T withProperties(MapExpression newProperties) {
-
-		return (T) new RelationshipImpl(this.left, this.details.with(Properties.create(newProperties)), this.right);
-	}
+	abstract public SELF withProperties(MapExpression newProperties);
 
 	@Override
 	public final Node getLeft() {
@@ -145,25 +147,31 @@ public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T ex
 	@Override
 	public final Relationship unbounded() {
 
-		return new RelationshipImpl(this.left, this.details.unbounded(), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.unbounded(), this.right);
 	}
 
 	@Override
 	public final Relationship min(Integer minimum) {
 
-		return new RelationshipImpl(this.left, this.details.min(minimum), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.min(minimum), this.right);
 	}
 
 	@Override
 	public final Relationship max(Integer maximum) {
 
-		return new RelationshipImpl(this.left, this.details.max(maximum), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.max(maximum), this.right);
 	}
 
 	@Override
 	public final Relationship length(Integer minimum, Integer maximum) {
 
-		return new RelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.right);
+	}
+
+	@Override
+	public final Relationship inverse() {
+
+		return new InternalRelationshipImpl(this.right, this.details.inverse(), this.left);
 	}
 
 	@Override
@@ -206,17 +214,17 @@ public class RelationshipImpl<S extends NodeImpl<?>, E extends NodeImpl<?>, T ex
 	// Internal API.
 	// ------------------------------------------------------------------------
 
-	RelationshipImpl(SymbolicName symbolicName, Node left, Direction direction, Node right, String... types) {
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Node right, String... types) {
 
 		this(symbolicName, left, direction, null, right, types);
 	}
 
-	RelationshipImpl(SymbolicName symbolicName, Node left, Direction direction, Properties properties, Node right, String... types) {
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties, Node right, String... types) {
 
 		this(left, Details.create(direction, symbolicName, types).with(properties), right);
 	}
 
-	RelationshipImpl(Node left, Details details, Node right) {
+	RelationshipBase(Node left, Details details, Node right) {
 
 		Assertions.notNull(left, "Left node is required.");
 		Assertions.notNull(details, "Details are required.");

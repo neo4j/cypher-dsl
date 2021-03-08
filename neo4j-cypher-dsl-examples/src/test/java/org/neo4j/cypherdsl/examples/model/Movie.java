@@ -16,47 +16,65 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.model;
+package org.neo4j.cypherdsl.examples.model;
 
+// tag::simple-model[]
 import java.util.List;
 
 import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
+// end::simple-model[]
+// tag::add-properties[]
 import org.neo4j.cypherdsl.core.Property;
+
+// end::add-properties[]
+// tag::simple-model[]
 import org.neo4j.cypherdsl.core.SymbolicName;
+
+// end::simple-model[]
 
 /**
  * @author Michael J. Simons
  */
-public final class Movie extends NodeImpl<Movie> {
+// tag::simple-model[]
+// tag::add-properties[]
+public final class Movie extends NodeBase<Movie> { // <.>
 
-	public static final Movie MOVIE = new Movie();
+	// end::add-properties[]
+	public static final Movie MOVIE = new Movie(); // <.>
 
+	// end::simple-model[]
 	public final Property TAGLINE = this.property("tagline");
 
-	public final Property TITLE = this.property("title");
+	// tag::add-properties[]
+	public final Property TITLE = this.property("title"); // <.>
+	// end::add-properties[]
 
 	public final Property RELEASED = this.property("released");
 
+	// tag::simple-model[]
 	public Movie() {
-		super("Movie");
+		super("Movie"); // <.>
 	}
 
-	private Movie(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
+	private Movie(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) { // <.>
 		super(symbolicName, labels, properties);
 	}
 
 	@Override
-	public Movie named(SymbolicName newSymbolicName) {
+	public Movie named(SymbolicName newSymbolicName) { // <.>
 
 		return new Movie(newSymbolicName, getLabels(), getProperties());
 	}
 
 	@Override
-	public Movie withProperties(MapExpression newProperties) {
+	public Movie withProperties(MapExpression newProperties) { // <.>
 
 		return new Movie(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
 	}
+	// tag::add-properties[]
 }
+// end::simple-model[]
+// end::add-properties[]

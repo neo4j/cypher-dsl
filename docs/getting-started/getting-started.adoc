@@ -24,6 +24,7 @@ dependencies {
 }
 ----
 
+[[how-to-use-it]]
 == How to use it
 
 You use the Cypher-DSL as you would write Cypher:
@@ -46,6 +47,7 @@ Furthermore, the `Statement` will collect parameter names and if provided, param
 Parameter names and values are available after the statement has been build and can for example be used directly with
 Neo4j-Java-Driver.
 
+[[how-to-use-it.examples]]
 === Examples
 
 The following examples are 1:1 copies of the queries you will find in the Neo4j browser after running `:play movies`.
@@ -61,7 +63,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 To match and return all the movie, build your statement like this:
 
 .Simple match
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e1]
 ----
@@ -74,7 +76,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Match all nodes with a given set of properties:
 
 .Find the actor named "Tom Hanks"...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e2]
 ----
@@ -82,7 +84,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Limit the number of returned things and return only one attribute
 
 .Find 10 people...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e4]
 ----
@@ -90,7 +92,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Create complex conditions
 
 .Find movies released in the 1990s...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e5]
 ----
@@ -100,25 +102,25 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 Build relationships
 
 .List all Tom Hanks movies...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e6]
 ----
 
 .Who directed "Cloud Atlas"?
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e7]
 ----
 
 .Tom Hanks' co-actors...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e8]
 ----
 
 .How people are related to "Cloud Atlas"...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e9]
 ----
@@ -126,7 +128,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 ==== Solve
 
 .Movies and actors up to 4 "hops" away from Kevin Bacon
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-bacon]
 ----
@@ -134,7 +136,7 @@ include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examp
 ==== Recommend
 
 .Extend Tom Hanks co-actors, to find co-co-actors who haven't worked with Tom Hanks...
-[source, java,indent=0,,tabsize=4]
+[source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
 ----

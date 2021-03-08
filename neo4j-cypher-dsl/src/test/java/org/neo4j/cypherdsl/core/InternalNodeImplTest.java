@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
@@ -36,19 +38,47 @@ import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
+ * This tests focus on the internal node implementation.
+ *
  * @author Michael J. Simons
  */
-class RelationshipImplTest {
+class InternalNodeImplTest {
 
 	@Test
 	void preconditionsShouldBeAsserted() {
+		String expectedMessage = "A primary label is required.";
 
-		assertThatIllegalArgumentException()
-			.isThrownBy(() -> new RelationshipImpl(null, null, null, null, Cypher.node("a"), new String[0]))
-			.withMessage("Left node is required.");
-		assertThatIllegalArgumentException()
-			.isThrownBy(() -> new RelationshipImpl(null, Cypher.node("a"), null, null, null, new String[0]))
-			.withMessage("Right node is required.");
+		assertThatIllegalArgumentException().isThrownBy(() -> new InternalNodeImpl("")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> new InternalNodeImpl(" \t")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node("")).withMessage(expectedMessage);
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node(" \t")).withMessage(expectedMessage);
+	}
+
+	@Test
+	void shouldNotAddEmptyAdditionalLabels() {
+
+		assertThatIllegalArgumentException().isThrownBy(() -> new InternalNodeImpl("primary", " ", "\t "))
+			.withMessage("An empty label is not allowed.");
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node("primary", " ", "\t "))
+			.withMessage("An empty label is not allowed.");
+	}
+
+	@Test
+	void shouldCreateNodes() {
+
+		Node node = new InternalNodeImpl("primary", "secondary");
+		List<String> labels = new ArrayList<>();
+		node.accept(new Visitor() {
+			@Override
+			public void enter(Visitable segment) {
+
+				if (segment instanceof NodeLabel) {
+					labels.add(((NodeLabel) segment).getValue());
+				}
+
+			}
+		});
+		assertThat(labels).contains("primary", "secondary");
 	}
 
 	@Nested
@@ -57,19 +87,17 @@ class RelationshipImplTest {
 
 		private Stream<Arguments> createNodesWithProperties() {
 			return Stream.of(
-				Arguments.of(Cypher.node("N").named("n").relationshipTo(Cypher.anyNode())
-					.withProperties("p", Cypher.literalTrue())),
-				Arguments.of(Cypher.node("N").named("n").relationshipTo(Cypher.anyNode())
-					.withProperties(MapExpression.create("p", Cypher.literalTrue())))
+				Arguments.of(new InternalNodeImpl("N").named("n").withProperties("p", Cypher.literalTrue())),
+				Arguments.of(new InternalNodeImpl("N").named("n").withProperties(MapExpression.create("p", Cypher.literalTrue())))
 			);
 		}
 
 		@ParameterizedTest
 		@MethodSource("createNodesWithProperties")
-		void shouldAddProperties(Relationship relationship) {
+		void shouldAddProperties(Node node) {
 
 			AtomicBoolean failTest = new AtomicBoolean(true);
-			relationship.accept(new Visitor() {
+			node.accept(new Visitor() {
 				Class<?> expectedTypeOfNextSegment = null;
 
 				@Override
@@ -86,14 +114,6 @@ class RelationshipImplTest {
 						failTest.getAndSet(false);
 					}
 				}
-
-				@Override
-				public void leave(Visitable segment) {
-					if (expectedTypeOfNextSegment == BooleanLiteral.class) {
-						failTest.getAndSet(true);
-						expectedTypeOfNextSegment = Node.class;
-					}
-				}
 			});
 			assertThat(failTest).isFalse();
 		}
@@ -101,12 +121,12 @@ class RelationshipImplTest {
 		@Test
 		void shouldCreateProperty() {
 
-			Relationship relationship = Cypher.node("N").named("n").relationshipTo(Cypher.anyNode()).named("r");
-			Property property = relationship.property("p");
+			Node node = new InternalNodeImpl("N").named("n");
+			Property property = node.property("p");
 
 			java.util.Set<Object> expected = new HashSet<>();
 			expected.addAll(property.getNames());
-			expected.add(relationship.getRequiredSymbolicName());
+			expected.add(node.getRequiredSymbolicName());
 			expected.add(property);
 
 			property.accept(expected::remove);

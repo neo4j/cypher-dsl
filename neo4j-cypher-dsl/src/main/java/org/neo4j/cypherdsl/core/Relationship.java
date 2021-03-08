@@ -157,8 +157,15 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 
 		Details unbounded() {
 
-			return new Details(this.direction, this.symbolicName, this.types, new RelationshipLength(),
-				properties);
+			return new Details(this.direction, this.symbolicName, this.types, new RelationshipLength(), this.properties);
+		}
+
+		Details inverse() {
+
+			if (this.direction == Direction.UNI) {
+				return this;
+			}
+			return new Details(this.direction == Direction.LTR ? Direction.RTL : Direction.LTR, null, this.types, this.length, this.properties);
 		}
 
 		Details min(Integer minimum) {
@@ -301,4 +308,14 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @return the new relationship
 	 */
 	Relationship length(Integer minimum, Integer maximum);
+
+	/**
+	 * Creates a new relationship, inverting the direction but keeping the semantics intact
+	 * ({@code (a) --> (b)} becomes {@code (b) <-- (a)}).
+	 * A symbolic name will be removed from this relationship if any, as the it wouldn't be the same pattern to match
+	 * against.
+	 *
+	 * @return the new relationship
+	 */
+	Relationship inverse();
 }

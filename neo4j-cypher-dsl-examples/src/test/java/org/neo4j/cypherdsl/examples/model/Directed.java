@@ -16,13 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.model;
+package org.neo4j.cypherdsl.examples.model;
 
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.RelationshipImpl;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
@@ -33,7 +33,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  * @soundtrack Höhner - Die ersten 30 Jahre
  * @param <E> End node
  */
-public final class Directed<E extends NodeImpl<?>> extends RelationshipImpl<Person, E, Directed<E>> {
+public final class Directed<E extends NodeBase<?>> extends RelationshipBase<Person, E, Directed<E>> {
 
 	protected Directed(Person start, E end) {
 		super(start, "DIRECTED", end);

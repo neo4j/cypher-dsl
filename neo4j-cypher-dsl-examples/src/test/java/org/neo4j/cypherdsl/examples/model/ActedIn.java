@@ -16,40 +16,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.model;
+package org.neo4j.cypherdsl.examples.model;
 
+// tag::simple-model[]
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Properties;
 import org.neo4j.cypherdsl.core.Property;
-import org.neo4j.cypherdsl.core.RelationshipImpl;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
+// end::simple-model[]
 /**
  * @author Michael J. Simons
  * @soundtrack Höhner - Die ersten 30 Jahre
  */
-public final class ActedIn extends RelationshipImpl<Person, Movie, ActedIn> {
+// tag::simple-model[]
+public final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> { // <.>
 
-	public final Property ROLE = this.property("role");
+	public final Property ROLE = this.property("role"); // <.>
 
 	protected ActedIn(Person start, Movie end) {
-		super(start, "ACTED_IN", end);
+		super(start, "ACTED_IN", end); // <.>
 	}
 
-	private ActedIn(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
+	private ActedIn(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) { // <.>
 		super(symbolicName, start, type, properties, end);
 	}
 
 	@Override
-	public ActedIn named(SymbolicName newSymbolicName) {
+	public ActedIn named(SymbolicName newSymbolicName) { // <.>
 
 		return new ActedIn(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
 	}
 
 	@Override
-	public ActedIn withProperties(MapExpression newProperties) {
+	public ActedIn withProperties(MapExpression newProperties) { // <.>
 
 		return new ActedIn(getSymbolicName().orElse(null), getLeft(), getRequiredType(), Properties.create(newProperties), getRight());
 	}
 }
+// end::simple-model[]

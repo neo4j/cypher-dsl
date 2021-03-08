@@ -54,7 +54,7 @@ public final class Cypher {
 	 */
 	public static Node node(String primaryLabel, String... additionalLabels) {
 
-		return new NodeImpl(primaryLabel, additionalLabels);
+		return new InternalNodeImpl(primaryLabel, additionalLabels);
 	}
 
 	/**
@@ -67,7 +67,7 @@ public final class Cypher {
 	 */
 	public static Node node(String primaryLabel, List<String> additionalLabels) {
 
-		return new NodeImpl(primaryLabel, additionalLabels.toArray(new String[] {}));
+		return new InternalNodeImpl(primaryLabel, additionalLabels.toArray(new String[] {}));
 	}
 
 	/**
@@ -82,14 +82,14 @@ public final class Cypher {
 	 */
 	public static Node node(String primaryLabel, MapExpression properties, String... additionalLabels) {
 
-		return new NodeImpl(null, primaryLabel, properties, additionalLabels);
+		return new InternalNodeImpl(null, primaryLabel, properties, additionalLabels);
 	}
 
 	/**
 	 * @return A node matching any node.
 	 */
 	public static Node anyNode() {
-		return new NodeImpl();
+		return new InternalNodeImpl();
 	}
 
 	/**
@@ -104,7 +104,7 @@ public final class Cypher {
 	 * @return A node matching any node with the symbolic the given {@code symbolicName}.
 	 */
 	public static Node anyNode(String symbolicName) {
-		return new NodeImpl().named(symbolicName);
+		return new InternalNodeImpl().named(symbolicName);
 	}
 
 	/**
@@ -112,7 +112,7 @@ public final class Cypher {
 	 * @return A node matching any node with the symbolic the given {@code symbolicName}.
 	 */
 	public static Node anyNode(SymbolicName symbolicName) {
-		return new NodeImpl().named(symbolicName);
+		return new InternalNodeImpl().named(symbolicName);
 	}
 
 	/**
@@ -236,6 +236,7 @@ public final class Cypher {
 	 *
 	 * @param name The name of the parameter, must not be null
 	 * @param value The value of the parameter.
+	 * @param <T> Type of the new parameter
 	 * @return The new parameter
 	 * @since 2021.0.0
 	 */
