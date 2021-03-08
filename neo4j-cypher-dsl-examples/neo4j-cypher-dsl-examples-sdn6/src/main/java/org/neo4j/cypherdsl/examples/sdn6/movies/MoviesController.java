@@ -31,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Michael J. Simons
  */
+// tag::as-property[]
 @RestController
 @RequestMapping("/api/movies")
 public final class MoviesController {
@@ -39,16 +40,17 @@ public final class MoviesController {
 
 	private final PeopleRepository peopleRepository;
 
-	MoviesController(MovieRepository movieRepository,
-		PeopleRepository peopleRepository) {
+	MoviesController(MovieRepository movieRepository, PeopleRepository peopleRepository) {
 		this.movieRepository = movieRepository;
 		this.peopleRepository = peopleRepository;
 	}
 
 	@GetMapping({ "", "/" })
 	public List<Movie> get() {
-		return movieRepository.findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending());
+		return movieRepository
+			.findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); // <.>
 	}
+	// end::as-property[]
 
 	@GetMapping({ "/relatedTo/{name}" })
 	public List<Movie> relatedTo(@PathVariable String name) {
@@ -58,4 +60,7 @@ public final class MoviesController {
 			.flatMap(p -> movieRepository.findAllMoviesRelatedTo(p).stream())
 			.collect(Collectors.toList());
 	}
+
+	// tag::as-property[]
 }
+// end::as-property[]

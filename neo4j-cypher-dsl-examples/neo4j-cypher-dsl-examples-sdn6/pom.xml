@@ -17,15 +17,15 @@
 | See the License for the specific language governing permissions and
 | limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.4.3</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath></relativePath>
+		<!-- lookup parent from repository -->
 	</parent>
 
 	<groupId>org.neo4j</groupId>
@@ -36,26 +36,15 @@
 	<description>Example how to use the SDN 6 code generator.</description>
 
 	<properties>
+		<checkstyle.version>8.29</checkstyle.version>
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>11</java.version>
-		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
-		<checkstyle.version>8.29</checkstyle.version>
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
+		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
+		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 	</properties>
 
 	<dependencies>
-
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-neo4j</artifactId>
-			<!-- Right now the versions don't match. This is gonna change soon -->
-			<exclusions>
-				<exclusion>
-					<groupId>org.neo4j</groupId>
-					<artifactId>neo4j-cypher-dsl</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 
 		<dependency>
 			<groupId>org.neo4j</groupId>
@@ -65,7 +54,14 @@
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
+			<artifactId>spring-boot-starter-data-neo4j</artifactId>
+			<!-- Right now the versions don't match. This is gonna change soon -->
+			<exclusions>
+				<exclusion>
+					<artifactId>neo4j-cypher-dsl</artifactId>
+					<groupId>org.neo4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<dependency>
@@ -73,14 +69,22 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 	</dependencies>
 
+	<!-- tag::sdn-processor[] -->
 	<build>
 		<plugins>
+			<!-- end::sdn-processor[] -->
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+			<!-- tag::sdn-processor[] -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -95,6 +99,7 @@
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+			<!-- end::sdn-processor[] -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -117,9 +122,23 @@
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>com.github.ekryd.sortpom</groupId>
+				<artifactId>sortpom-maven-plugin</artifactId>
+				<version>${sortpom-maven-plugin.version}</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<keepBlankLines>true</keepBlankLines>
+					<nrOfIndentSpace>-1</nrOfIndentSpace>
+					<sortProperties>true</sortProperties>
+					<sortDependencies>groupId,artifactId</sortDependencies>
+					<createBackupFile>false</createBackupFile>
+				</configuration>
+			</plugin>
+			<!-- tag::sdn-processor[] -->
 		</plugins>
 	</build>
+	<!-- end::sdn-processor[] -->
 
 	<!-- This not relevant to the example, only for our project structure and build chain. -->
 	<profiles>

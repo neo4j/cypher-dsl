@@ -36,6 +36,7 @@ interface MovieRepositoryExt {
 	List<Movie> findAllMoviesRelatedTo(Person person);
 }
 
+// tag::complex-queries[]
 class MovieRepositoryExtImpl implements MovieRepositoryExt {
 
 	private final Neo4jTemplate neo4jTemplate;
@@ -57,8 +58,12 @@ class MovieRepositoryExtImpl implements MovieRepositoryExt {
 			.with(person)
 			.optionalMatch(new ActedIn_(person, actedIn))
 			.optionalMatch(new Directed_(person, directed))
-			.returningDistinct(Functions.collect(actedIn).add(Functions.collect(directed))).build();
+			.returningDistinct(
+				Functions.collect(actedIn).add(Functions.collect(directed))
+			).build();
 
-		return this.neo4jTemplate.findAll(statement, Map.of("name", personOfInterest.getName()), Movie.class);
+		return this.neo4jTemplate.findAll(
+			statement, Map.of("name", personOfInterest.getName()), Movie.class);
 	}
 }
+// end::complex-queries[]
