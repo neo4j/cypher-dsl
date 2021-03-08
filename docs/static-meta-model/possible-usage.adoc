@@ -66,14 +66,14 @@ Properties can be used like normal objects:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=work-with-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=work-with-properties]
 ----
 
 Of course, new properties can be derived:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=deriving-new-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=deriving-new-properties]
 ----
 
 === Query nodes or relationships by properties
@@ -83,14 +83,14 @@ Applicable to properties of nodes such as the title:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-node-by-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-node-by-properties]
 ----
 
 and relationships
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-rel-by-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-rel-by-properties]
 ----
 
 Note that the query will look like this, as we didn't rename the objects and they used generated names:
@@ -106,13 +106,13 @@ Relationships can be worked with like with properties:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=multiple-relationships]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=multiple-relationships]
 ----
 
 They are quite flexible together with the `inverse` method. The following example also shows how to include non-static parts:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=chaining-relationships]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=chaining-relationships]
 ----
 <.> Using a non-static fragment

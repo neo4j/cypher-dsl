@@ -9,12 +9,12 @@ Given the following imports
 
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range-imports]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range-imports]
 ----
 
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range]
 ----
 
 Gives you `range(0,10)`.
@@ -22,7 +22,7 @@ The step size can be specified as well:
 
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range-step]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-range-step]
 ----
 
 This gives you `range(0,10,1)`.
@@ -39,5 +39,5 @@ While the examples use <<functions-list-range>>, the list operator doesn't put a
 
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-operator]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/FunctionsListTest.java[tag=functions-list-operator]
 ----

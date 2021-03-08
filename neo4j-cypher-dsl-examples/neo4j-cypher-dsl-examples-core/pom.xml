@@ -22,20 +22,17 @@
 
 	<parent>
 		<groupId>org.neo4j</groupId>
-		<artifactId>neo4j-cypher-dsl-parent</artifactId>
+		<artifactId>neo4j-cypher-dsl-examples</artifactId>
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 
-	<artifactId>neo4j-cypher-dsl-native-tests</artifactId>
+	<artifactId>neo4j-cypher-dsl-examples-core</artifactId>
 
-	<name>Neo4j Cypher DSL (Native Tests)</name>
-	<description>Ensures Cypher DSL can be compiled and used natively.</description>
+	<name>Examples (Core)</name>
+	<description>Examples for the core Cypher-DSL used in the documentation.</description>
 
 	<properties>
-		<java-module-name>org.neo4j.cypherdsl.graalvm</java-module-name>
-		<java.version>11</java.version>
-		<native-image-maven-plugin.version>20.3.0</native-image-maven-plugin.version>
-		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
+		<java-module-name>org.neo4j.cypherdsl.examples.core</java-module-name>
 	</properties>
 
 	<dependencies>
@@ -52,31 +49,12 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${neo4j-cypher-dsl.version}</version>
+			<version>${revision}${sha1}${changelist}</version>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.graalvm.nativeimage</groupId>
-				<artifactId>native-image-maven-plugin</artifactId>
-				<version>${native-image-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>native-image</goal>
-						</goals>
-						<configuration>
-							<mainClass>org.neo4j.cypherdsl.graalvm.Application</mainClass>
-							<imageName>application</imageName>
-							<buildArgs>--no-fallback -H:+ReportExceptionStackTraces</buildArgs>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>

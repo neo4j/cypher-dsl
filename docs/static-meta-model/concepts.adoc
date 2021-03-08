@@ -52,7 +52,7 @@ Start by extending `NodeBase` like this:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/Movie.java[tag=simple-model]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/Movie.java[tag=simple-model]
 ----
 <.> Extend from `NodeBase` and specify your class as a "self" type-argument
 <.> Optional: Create one static instance of your model
@@ -67,7 +67,7 @@ With that in place, you can already use it like this:
 [source,java,indent=0,tabsize=4]
 [[static-movie]]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=simple-model]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=simple-model]
 ----
 
 and it would generate a Cypher string like this: `"MATCH (jwKyXzwS000:`Movie`) RETURN jwKyXzwS000"`, with generated variable names.
@@ -76,14 +76,14 @@ If you don't like them, you can just rename one instance of the movie-model like
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=simple-model-renamed]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=simple-model-renamed]
 ----
 
 Of course, properties belong into a model as well. You add them like this:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/Movie.java[tag=add-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/Movie.java[tag=add-properties]
 ----
 <.> Same class before, extending from `NodeBase`.
 <.> Use `this` and the `property` method to create a new `Property` instance, stored on the given instance
@@ -92,7 +92,7 @@ A possible usage scenario looks like this:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=add-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=add-properties]
 ----
 <.> Make sure to use the renamed instance everywhere. Here: For accessing the property. Alternatively, don't rename.
 
@@ -124,7 +124,7 @@ It exists between people and movies (going from person to movie) and has an attr
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/ActedIn.java[tag=simple-model]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/ActedIn.java[tag=simple-model]
 ----
 <.> The base class, with 3 concrete types. A `Person`, the `Movie` from <<static-movie>> and the type itself.
 <.> Same idea with as with nodes: Store all properties as final attributes.
@@ -138,7 +138,7 @@ This is stored at the owner. In this case, the `Person`:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/model/Person.java[tag=simple-model]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/Person.java[tag=simple-model]
 ----
 <.> We create the relationship properties with `this` concrete instance pointing to another, concrete instance.
 
