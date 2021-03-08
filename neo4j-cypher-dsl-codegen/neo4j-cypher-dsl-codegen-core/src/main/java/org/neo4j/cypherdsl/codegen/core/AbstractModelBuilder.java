@@ -32,18 +32,23 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import javax.lang.model.element.Modifier;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.codegen.core.Configuration.JavaVersion;
-import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeBase;
+import org.neo4j.cypherdsl.core.Property;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
@@ -238,6 +243,32 @@ abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuil
 			builder.addAnnotation(spec);
 		}
 		return builder;
+	}
+
+	/**
+	 * Turns the property definitions into field spec
+	 *
+	 * @return a stream of field specs
+	 */
+	final Stream<FieldSpec> generateFieldSpecsFromProperties() {
+		return properties.stream().map(p -> {
+
+				String fieldName;
+				CodeBlock initializer;
+				if (p.getNameInDomain() == null) {
+					fieldName = p.getNameInGraph();
+					initializer = CodeBlock.of("this.property($S)", p.getNameInGraph());
+				} else {
+					fieldName = p.getNameInDomain();
+					initializer = CodeBlock.of("this.property($S).referencedAs($S)", p.getNameInGraph(), p.getNameInDomain());
+				}
+
+				return FieldSpec
+					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC, Modifier.FINAL)
+					.initializer(initializer)
+					.build();
+			}
+		);
 	}
 
 	/**

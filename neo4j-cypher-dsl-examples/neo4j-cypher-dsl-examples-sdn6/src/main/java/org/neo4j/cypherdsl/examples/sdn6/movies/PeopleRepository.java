@@ -1,3 +1,21 @@
+/*
+ * Copyright (c) 2019-2021 "Neo4j,"
+ * Neo4j Sweden AB [https://neo4j.com]
+ *
+ * This file is part of Neo4j.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 import java.util.Optional;
@@ -8,15 +26,17 @@ import org.springframework.data.neo4j.repository.query.Query;
 /**
  * @author Michael J. Simons
  */
-interface PeopleRepository extends Neo4jRepository<Person, Long> {
+public interface PeopleRepository extends Neo4jRepository<Person, Long> {
 
+	// TODO replace by query executor when ready
 	@Query("MATCH (person:Person {name: $name})\n"
-		   + "\t\tOPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)\n"
-		   + "\t\tOPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)\n"
-		   + "\t\tOPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)\t\t\n"
-		   + "\t\tRETURN DISTINCT person,\n"
-		   + "\t\tcollect(DISTINCT d) AS directed,\n"
-		   + "\t\tcollect(DISTINCT a) AS actedIn,\n"
-		   + "\t\tcollect(DISTINCT relatedPerson) AS related")
+		+ "OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)\n"
+		+ "OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)\n"
+		+ "OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)\n"
+		+ "RETURN DISTINCT person,\n"
+		+ "collect(DISTINCT d) AS directed,\n"
+		+ "collect(DISTINCT a) AS actedIn,\n"
+		+ "collect(DISTINCT relatedPerson) AS related"
+	)
 	Optional<PersonDetails> getDetailsByName(String name);
 }

@@ -19,7 +19,7 @@ public final class Movie_ extends NodeBase<Movie_> {
 
 	public final Property TITLE = this.property("title");
 
-	public final Property DESCRIPTION = this.property("tagline");
+	public final Property DESCRIPTION = this.property("tagline").referencedAs("description");
 
 	public final Directed_ DIRECTORS = new Directed_(Person_.PERSON, this);
 

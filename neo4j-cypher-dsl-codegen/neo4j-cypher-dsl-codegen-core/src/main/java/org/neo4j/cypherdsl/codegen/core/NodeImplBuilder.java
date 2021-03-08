@@ -34,7 +34,6 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.Property;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -171,15 +170,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			.initializer("new $T()", className)
 			.build();
 
-		Stream<FieldSpec> properties = this.properties.stream().map(p -> {
-				String fieldName = p.getNameInDomain() == null ? p.getNameInGraph() : p.getNameInDomain();
-				return FieldSpec
-					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC,
-						Modifier.FINAL)
-					.initializer("this.property($S)", p.getNameInGraph())
-					.build();
-			}
-		);
+		Stream<FieldSpec> properties = generateFieldSpecsFromProperties();
 
 		Stream<FieldSpec> relationships = relationshipDefinitions.stream().map(p -> {
 

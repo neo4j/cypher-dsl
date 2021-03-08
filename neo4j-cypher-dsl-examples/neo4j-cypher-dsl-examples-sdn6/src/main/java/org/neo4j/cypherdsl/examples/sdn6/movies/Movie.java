@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 2002-2020 "Neo4j,"
- * Neo4j Sweden AB [http://neo4j.com]
+ * Copyright (c) 2019-2021 "Neo4j,"
+ * Neo4j Sweden AB [https://neo4j.com]
  *
  * This file is part of Neo4j.
  *
@@ -8,7 +8,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -89,13 +89,13 @@ public final class Movie {
 		this.released = released;
 	}
 
-	public Movie addActors(Collection<Actor> actors) {
-		this.actors.addAll(actors);
+	public Movie addActors(Collection<Actor> newActors) {
+		this.actors.addAll(newActors);
 		return this;
 	}
 
-	public Movie addDirectors(Collection<Person> directors) {
-		this.directors.addAll(directors);
+	public Movie addDirectors(Collection<Person> newDirectors) {
+		this.directors.addAll(newDirectors);
 		return this;
 	}
 }

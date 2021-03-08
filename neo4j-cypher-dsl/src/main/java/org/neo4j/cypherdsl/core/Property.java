@@ -47,26 +47,26 @@ public final class Property implements Expression {
 	static Property create(Named parentContainer, String... names) {
 
 		SymbolicName requiredSymbolicName = extractRequiredSymbolicName(parentContainer);
-		return new Property(Optional.of(parentContainer), requiredSymbolicName, createListOfChainedNames(names));
+		return new Property(Optional.of(parentContainer), requiredSymbolicName, createListOfChainedNames(names), null);
 	}
 
 	static Property create(Expression containerReference, String... names) {
 
 		Assertions.notNull(containerReference, "The property container is required.");
-		return new Property(Optional.empty(), containerReference, createListOfChainedNames(names));
+		return new Property(Optional.empty(), containerReference, createListOfChainedNames(names), null);
 	}
 
 	static Property create(Named parentContainer, Expression lookup) {
 
 		SymbolicName requiredSymbolicName = extractRequiredSymbolicName(parentContainer);
 		return new Property(Optional.of(parentContainer), requiredSymbolicName,
-			Collections.singletonList(PropertyLookup.forExpression(lookup)));
+			Collections.singletonList(PropertyLookup.forExpression(lookup)), null);
 	}
 
 	static Property create(Expression containerReference, Expression lookup) {
 
 		return new Property(Optional.empty(), containerReference,
-			Collections.singletonList(PropertyLookup.forExpression(lookup)));
+			Collections.singletonList(PropertyLookup.forExpression(lookup)), null);
 	}
 
 	private static List<PropertyLookup> createListOfChainedNames(String... names) {
@@ -96,24 +96,53 @@ public final class Property implements Expression {
 	 */
 	private final List<PropertyLookup> names;
 
-	Property(Optional<Named> container, Expression containerReference, List<PropertyLookup> names) {
+	/**
+	 * An optional, external (as in external to the graph) reference.
+	 */
+	private final String externalReference;
+
+	Property(Optional<Named> container, Expression containerReference, List<PropertyLookup> names, String externalReference) {
 
 		this.container = container.orElse(null);
 		this.containerReference = containerReference;
 		this.names = names;
+		this.externalReference = externalReference;
 	}
 
 	/**
 	 * @return The actual property being looked up. The order matters, so this will return a list, not a collection.
 	 */
 	@API(status = INTERNAL)
-	public List<PropertyLookup> getNames() {
+	List<PropertyLookup> getNames() {
 		return names;
 	}
 
 	@API(status = INTERNAL)
 	Named getContainer() {
 		return container;
+	}
+
+	/**
+	 * Returns the concatenated names of the property or the {@link #externalReference} (See {@link #referencedAs(String)}) if set.
+	 *
+	 * @return A name to reference the property under in an external application
+	 */
+	@API(status = EXPERIMENTAL, since = "2021.1.0")
+	public String getName() {
+		return externalReference != null ? this.externalReference : this.names.stream().map(PropertyLookup::getPropertyKeyName)
+			.map(SymbolicName::getValue)
+			.collect(Collectors.joining("."));
+	}
+
+	/**
+	 * Creates a new property with an external reference.
+	 * @param newReference An arbitrary, external reference
+	 * @return A new property
+	 */
+	@API(status = EXPERIMENTAL, since = "2021.1.0")
+	public Property referencedAs(String newReference) {
+
+		return new Property(Optional.ofNullable(this.container), containerReference, this.names, newReference);
 	}
 
 	/**

@@ -28,7 +28,6 @@ import javax.lang.model.element.Modifier;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.RelationshipBase;
 
 import com.squareup.javapoet.ClassName;
@@ -173,15 +172,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 	private List<FieldSpec> buildFields() {
 
-		return properties.stream().map(p -> {
-				String fieldName = p.getNameInDomain() == null ? p.getNameInGraph() : p.getNameInDomain();
-				return FieldSpec
-					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC,
-						Modifier.FINAL)
-					.initializer("this.property($S)", p.getNameInGraph())
-					.build();
-			}
-		).collect(Collectors.toList());
+		return generateFieldSpecsFromProperties().collect(Collectors.toList());
 	}
 
 	@Override
