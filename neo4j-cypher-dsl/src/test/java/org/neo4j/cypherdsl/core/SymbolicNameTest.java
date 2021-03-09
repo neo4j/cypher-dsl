@@ -75,6 +75,13 @@ public class SymbolicNameTest {
 			SymbolicName name2 = SymbolicName.of("b");
 			assertThat(name1.hashCode()).isNotEqualTo(name2.hashCode());
 		}
+
+		@Test
+		void toStringShouldWork() {
+
+			SymbolicName name1 = SymbolicName.of("a");
+			assertThat(name1.toString()).isEqualTo("SymbolicName{name='a'}");
+		}
 	}
 
 	@Nested
@@ -106,6 +113,13 @@ public class SymbolicNameTest {
 			SymbolicName name1 = SymbolicName.unresolved();
 			SymbolicName name2 = SymbolicName.unresolved();
 			assertThat(name1.hashCode()).isNotEqualTo(name2.hashCode());
+		}
+
+		@Test
+		void toStringShouldWork() {
+
+			SymbolicName name1 = SymbolicName.unresolved();
+			assertThat(name1.toString()).isEqualTo("Unresolved SymbolicName");
 		}
 	}
 }

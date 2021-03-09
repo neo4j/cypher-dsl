@@ -135,7 +135,7 @@ public class SymbolicName implements Expression {
 
 	@Override
 	public String toString() {
-		return value == null ? "SymbolicName{" +
+		return value != null ? "SymbolicName{" +
 			"name='" + value + '\'' +
 			'}' : "Unresolved SymbolicName";
 	}
