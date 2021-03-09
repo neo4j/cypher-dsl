@@ -35,7 +35,6 @@
 		<java-module-name>org.neo4j.cypherdsl.graalvm</java-module-name>
 		<java.version>11</java.version>
 		<native-image-maven-plugin.version>20.3.0</native-image-maven-plugin.version>
-		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
 	</properties>
 
 	<dependencies>
@@ -52,7 +51,7 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${neo4j-cypher-dsl.version}</version>
+			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
