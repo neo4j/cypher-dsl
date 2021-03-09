@@ -16,6 +16,10 @@ The processor generates a static meta model for each annotated class found in th
 The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version `2021.1.0` or later on it's classpath.
 We recommend using it explicitly on the separate annotation processor classpath (via `--processor-path` to `javac`).
 
+=== Configure your build
+
+==== Maven
+
 As a Maven user, please configure the build as follows:
 
 [source,xml,subs="verbatim,attributes",indent=0,tabsize=4]
@@ -39,6 +43,8 @@ As a Maven user, please configure the build as follows:
 </build>
 ----
 
+==== Gradle
+
 In a Gradle project, please add the following:
 
 [source,groovy,subs="verbatim,attributes"]
@@ -48,10 +54,36 @@ dependencies {
 }
 ----
 
+==== As dependency on the classpath
+
 NOTE: We recommend the annotation processor path for two reasons: The processor needs SDN as dependency. While SDN is already on the classpath,
 it might not fit the one we build the annotation processor against exactly.
 While the processor is lenient in that regard, your dependency setup might not.
 Furthermore: Why should you have the annotation processor as a dependency in your final artifact? This would be unnecessary.
+
+If you insist on having the SDN 6 annotation processor on the standard class path, please include with your Spring Data Neo4j 6
+application like as follows to avoid dependency conflicts:
+
+[source,xml,subs="verbatim,attributes",indent=0,tabsize=4]
+----
+<dependency>
+    <groupId>{groupId}</groupId>
+    <artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
+    <version>{neo4j-cypher-dsl.version}</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+----
+
+=== Usage
 
 The processor supports the following arguments:
 
