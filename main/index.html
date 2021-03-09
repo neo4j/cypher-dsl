@@ -545,7 +545,7 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#getting-started">2. Getting started</a>
 <ul class="sectlevel2">
 <li><a href="#preparedependencies">2.1. Prepare dependencies</a></li>
-<li><a href="#howtouseit">2.2. How to use it</a></li>
+<li><a href="#how-to-use-it">2.2. How to use it</a></li>
 </ul>
 </li>
 <li><a href="#properties">3. Properties</a></li>
@@ -556,7 +556,14 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#callingarbitraryproceduresandfunctions">4.3. Calling arbitrary procedures and functions</a></li>
 </ul>
 </li>
-<li><a href="#appendix">5. Appendix</a>
+<li><a href="#static-meta-model">5. Building a static meta model</a>
+<ul class="sectlevel2">
+<li><a href="#concepts">5.1. Concepts</a></li>
+<li><a href="#possibleusage">5.2. Possible Usage</a></li>
+<li><a href="#thespringdataneo4j6annotationprocessor">5.3. The Spring Data Neo4j 6 annotation processor</a></li>
+</ul>
+</li>
+<li><a href="#appendix">6. Appendix</a>
 <ul class="sectlevel2">
 <li><a href="#buildingtheneo4jcypher-dsl">Building the Neo4j Cypher-DSL</a></li>
 <li><a href="#arch-rules">Architecture</a></li>
@@ -685,7 +692,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 </div>
 </div>
 <div class="sect2">
-<h3 id="howtouseit"><a class="anchor" href="#howtouseit"></a>2.2. How to use it</h3>
+<h3 id="how-to-use-it"><a class="anchor" href="#how-to-use-it"></a>2.2. How to use it</h3>
 <div class="paragraph">
 <p>You use the Cypher-DSL as you would write Cypher:
 It allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.</p>
@@ -722,7 +729,7 @@ Parameter names and values are available after the statement has been build and 
 Neo4j-Java-Driver.</p>
 </div>
 <div class="sect3">
-<h4 id="examples"><a class="anchor" href="#examples"></a>2.2.1. Examples</h4>
+<h4 id="how-to-use-it.examples"><a class="anchor" href="#how-to-use-it.examples"></a>2.2.1. Examples</h4>
 <div class="paragraph">
 <p>The following examples are 1:1 copies of the queries you will find in the Neo4j browser after running <code>:play movies</code>.</p>
 </div>
@@ -1565,7 +1572,776 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 </div>
 </div>
 <div class="sect1">
-<h2 id="appendix"><a class="anchor" href="#appendix"></a>5. Appendix</h2>
+<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>5. Building a static meta model</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="concepts"><a class="anchor" href="#concepts"></a>5.1. Concepts</h3>
+<div class="sect3">
+<h4 id="astaticmetamodelisoptional"><a class="anchor" href="#astaticmetamodelisoptional"></a>5.1.1. A static meta model is optional</h4>
+<div class="paragraph">
+<p>First let&#8217;s stress this: A static meta model is optional for the Cypher-DSL. It is completly ok to use the Cypher-DSL
+as shown in the <a href="#how-to-use-it.examples">examples in the "How to use it" part</a>:
+All labels, types and properties can be named as you go.
+The Cypher-DSL will still give you type-safety in regard to the Cypher&#8217;s syntax.</p>
+</div>
+<div class="paragraph">
+<p>This fit&#8217;s nicely with Neo4j&#8217;s capabilities: Neo4j is a schema less database. Nodes, their relationships between each other,
+their labels and properties can be changed as you go but all of this information can still be queried.</p>
+</div>
+<div class="paragraph">
+<p>In a schemaless database or a database with dynamic scheme the scheme is often defined by the application.
+This definition takes many forms: It can be through an object mapper like <a href="https://github.com/neo4j/neo4j-ogm">Neo4j-OGM</a> or
+<a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j 6</a>, or maybe in form of
+Graph-QL schemes.</p>
+</div>
+<div class="paragraph">
+<p>Another source maybe the information we can retrieve from the database itself via <a href="https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_nodetypeproperties"><code>db.schema.nodeTypeProperties</code></a> and
+<a href="https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_reltypeproperties"><code>db.schema.relTypeProperties</code></a>.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="static-meta-model.building-blocks"><a class="anchor" href="#static-meta-model.building-blocks"></a>5.1.2. Building blocks</h4>
+<div class="paragraph">
+<p>The Cypher DSL offers the following building blocks as part of the public API:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Two pattern elements:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Nodes via <code>Node</code> (and it&#8217;s default implementation <code>NodeBase</code>)</p>
+</li>
+<li>
+<p>Relationships via <code>Relationship</code> (and it&#8217;s default implementation <code>RelationshipBase</code>)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p><code>Property</code>, which is a a holder for properties</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When you use Cypher-DSL like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+var statement = Cypher.match(m).returning(m).build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>m</code> will be a <code>Node</code> instance having the label <code>Movie</code> and an alias of <code>m</code>. <code>m</code> can be used everywhere where a pattern element
+can be used according to the openCypher spec.
+You don&#8217;t have to care about it&#8217;s type. That&#8217;s why we vouched for the JDK11+ local type inference here and omitted the
+declaration of the type <code>Node</code>: It just reads better.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="averysimplestaticmodel"><a class="anchor" href="#averysimplestaticmodel"></a>5.1.3. A very simple, static model</h4>
+<div class="paragraph">
+<p>Both <code>NodeBase</code> and  <code>RelationshipBase</code> are meant to be extended to put your static model into something that is usable
+with the Cypher-DSL.</p>
+</div>
+<div class="sect4">
+<h5 id="nodes"><a class="anchor" href="#nodes"></a>Nodes</h5>
+<div class="paragraph">
+<p>Start by extending <code>NodeBase</code> like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.MapExpression</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.NodeBase</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.NodeLabel</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Properties</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
+
+<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> Movie MOVIE = <span class="keyword">new</span> Movie(); <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="directive">public</span> Movie() {
+        <span class="local-variable">super</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    <span class="directive">private</span> Movie(SymbolicName symbolicName, <span class="predefined-type">List</span>&lt;NodeLabel&gt; labels, <span class="predefined-type">Properties</span> properties) { <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="local-variable">super</span>(symbolicName, labels, properties);
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> Movie named(SymbolicName newSymbolicName) { <i class="conum" data-value="5"></i><b>(5)</b>
+
+        <span class="keyword">return</span> <span class="keyword">new</span> Movie(newSymbolicName, getLabels(), getProperties());
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> Movie withProperties(MapExpression newProperties) { <i class="conum" data-value="6"></i><b>(6)</b>
+
+        <span class="keyword">return</span> <span class="keyword">new</span> Movie(getSymbolicName().orElse(<span class="predefined-constant">null</span>), getLabels(), <span class="predefined-type">Properties</span>.create(newProperties));
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Extend from <code>NodeBase</code> and specify your class as a "self" type-argument</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Optional: Create one static instance of your model</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>This is where you specify one or more label</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>This constructor is optional, it is used in the next two steps</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><code>named</code> must be overridden and must return new copies of the node, with the changed symbolic name.
+It must be overridden to guarantee type integrity.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Same as obove</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>With that in place, you can already use it like this:</p>
+</div>
+<div id="static-movie" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var cypher = Cypher.match(Movie.MOVIE)
+    .returning(Movie.MOVIE)
+    .build().getCypher();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and it would generate a Cypher string like this: <code>"MATCH (jwKyXzwS000:`Movie</code>) RETURN jwKyXzwS000"`, with generated variable names.</p>
+</div>
+<div class="paragraph">
+<p>If you don&#8217;t like them, you can just rename one instance of the movie-model like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var movie = Movie.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher.match(movie)
+    .returning(movie)
+    .build().getCypher();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, properties belong into a model as well. You add them like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Property</span>;
+
+<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="directive">public</span> <span class="directive">final</span> Property TITLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Same class before, extending from <code>NodeBase</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Use <code>this</code> and the <code>property</code> method to create a new <code>Property</code> instance, stored on the given instance</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>A possible usage scenario looks like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var movie = Movie.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher.match(movie)
+    .where(movie.TITLE.isEqualTo(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Matrix</span><span class="delimiter">&quot;</span></span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+    .returning(movie)
+    .build().getCypher();
+
+Assertions.assertThat(cypher)
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m:`Movie`) WHERE m.title = 'The Matrix' RETURN m</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Make sure to use the renamed instance everywhere. Here: For accessing the property. Alternatively, don&#8217;t rename.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="relationships"><a class="anchor" href="#relationships"></a>Relationships</h5>
+<div class="paragraph">
+<p>Relationships are a bit more complicated. Relationships of the same type can be used between nodes with different labels.
+We have these scenarios:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>(s:LabelA) - (r:SomeType) &#8594; (e:LabelB)</code>:</p>
+</li>
+<li>
+<p><code>(s:LabelA) - (r:SomeType) &#8594; (e)</code></p>
+</li>
+<li>
+<p><code>(s) - (r:SomeType) &#8594; (e)</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We either have a type that is used only between the same set of labels, or a type is used always with one fixed label or
+a type is used between arbitrary labels.</p>
+</div>
+<div class="paragraph">
+<p>To accomadate for that, the default relationship implementation, <code>RelationshipBase</code> spots three type parameters:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="type">class</span> <span class="class">RelationshipBase</span>&lt;S <span class="directive">extends</span> NodeBase&lt;?&gt;, E <span class="directive">extends</span> NodeBase&lt;?&gt;, SELF <span class="directive">extends</span> RelationshipBase&lt;S, E, SELF&gt;&gt; {
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>S</code> is the type of a start node, <code>E</code> of an end node and <code>SELF</code> is the concrete implementation itself.
+The public API of <code>RelationshipBase</code> enforces a direction from start to end (<code>LTR</code>, left to right).</p>
+</div>
+<div class="paragraph">
+<p>We just have a look at the first case to make the concepts clear. We model the <code>ACTED_IN</code> relationship of the movie graph.
+It exists between people and movies (going from person to movie) and has an attribute roles:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.MapExpression</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Node</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Properties</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Property</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.RelationshipBase</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
+
+<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">ActedIn</span> <span class="directive">extends</span> RelationshipBase&lt;Person, Movie, ActedIn&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="directive">public</span> <span class="directive">final</span> Property ROLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">role</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b>
+
+    <span class="directive">protected</span> ActedIn(Person start, Movie end) {
+        <span class="local-variable">super</span>(start, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>, end); <i class="conum" data-value="3"></i><b>(3)</b>
+    }
+
+    <span class="directive">private</span> ActedIn(SymbolicName symbolicName, Node start, <span class="predefined-type">String</span> type, <span class="predefined-type">Properties</span> properties, Node end) { <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="local-variable">super</span>(symbolicName, start, type, properties, end);
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> ActedIn named(SymbolicName newSymbolicName) { <i class="conum" data-value="5"></i><b>(5)</b>
+
+        <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> ActedIn withProperties(MapExpression newProperties) { <i class="conum" data-value="6"></i><b>(6)</b>
+
+        <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(getSymbolicName().orElse(<span class="predefined-constant">null</span>), getLeft(), getRequiredType(), <span class="predefined-type">Properties</span>.create(newProperties), getRight());
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The base class, with 3 concrete types. A <code>Person</code>, the <code>Movie</code> from <a href="#static-movie">[static-movie]</a> and the type itself.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Same idea with as with nodes: Store all properties as final attributes.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>There is no default constructor for a relationship: Start and end node must be specified. The type is fixed.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Copy constructor for the following two methods</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Required to rename this relationship</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>Required for querying properties</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>In contrast to the movie, we don&#8217;t see a static attribute allowing access to the relationship.
+This is stored at the owner. In this case, the <code>Person</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Person</span> <span class="directive">extends</span> NodeBase&lt;Person&gt; {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> Person PERSON = <span class="keyword">new</span> Person();
+
+    <span class="directive">public</span> <span class="directive">final</span> Directed&lt;Movie&gt; DIRECTED = <span class="keyword">new</span> Directed&lt;&gt;(<span class="local-variable">this</span>, Movie.MOVIE);
+
+    <span class="directive">public</span> <span class="directive">final</span> ActedIn ACTED_IN = <span class="keyword">new</span> ActedIn(<span class="local-variable">this</span>, Movie.MOVIE); <i class="conum" data-value="1"></i><b>(1)</b>
+
+    <span class="directive">public</span> <span class="directive">final</span> Property NAME = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> <span class="directive">final</span> Property FIRST_NAME = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> <span class="directive">final</span> Property BORN = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>We create the relationship properties with <code>this</code> concrete instance pointing to another, concrete instance.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="summary2"><a class="anchor" href="#summary2"></a>5.1.4. Summary</h4>
+<div class="paragraph">
+<p>While there are possible other ways to define a static meta model with the Cypher-DSL, this is the way we create them with
+the <code>neo4j-cypher-dsl-codegen</code> models.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="possibleusage"><a class="anchor" href="#possibleusage"></a>5.2. Possible Usage</h3>
+<div class="paragraph">
+<p>Please assume we did model the "Movie graph" (<code>:play movies</code> in Neo4j-Browser) with the following scheme</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/movie-graph.png" alt="movie graph">
+</div>
+</div>
+<div class="paragraph">
+<p>and these classes, which have been generated with the
+<a href="#static-meta-model.building-blocks">building blocks described earlier</a> (the required functions have been omitted for brevity):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> Movie MOVIE = <span class="keyword">new</span> Movie();
+
+    <span class="directive">public</span> <span class="directive">final</span> Property TAGLINE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">tagline</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> <span class="directive">final</span> Property TITLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> <span class="directive">final</span> Property RELEASED = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">released</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> Movie() {
+        <span class="local-variable">super</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>);
+    }
+}
+
+<span class="directive">final</span> <span class="type">class</span> <span class="class">Person</span> <span class="directive">extends</span> NodeBase&lt;Person&gt; {
+
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> Person PERSON = <span class="keyword">new</span> Person();
+
+    <span class="directive">public</span> <span class="directive">final</span> Property NAME = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> <span class="directive">final</span> Property FIRST_NAME = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> <span class="directive">final</span> Directed&lt;Movie&gt; DIRECTED = <span class="keyword">new</span> Directed&lt;&gt;(<span class="local-variable">this</span>, Movie.MOVIE);
+
+    <span class="directive">public</span> <span class="directive">final</span> ActedIn ACTED_IN = <span class="keyword">new</span> ActedIn(<span class="local-variable">this</span>, Movie.MOVIE);
+
+    <span class="directive">public</span> <span class="directive">final</span> Property BORN = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">public</span> Person() {
+        <span class="local-variable">super</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>);
+    }
+}
+
+<span class="directive">final</span> <span class="type">class</span> <span class="class">ActedIn</span> <span class="directive">extends</span> RelationshipBase&lt;Person, Movie, ActedIn&gt; {
+
+    <span class="directive">public</span> <span class="directive">final</span> Property ROLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">role</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">protected</span> ActedIn(Person start, Movie end) {
+        <span class="local-variable">super</span>(start, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>, end);
+    }
+}
+
+<span class="directive">final</span> <span class="type">class</span> <span class="class">Directed</span>&lt;E <span class="directive">extends</span> NodeBase&lt;?&gt;&gt; <span class="directive">extends</span> RelationshipBase&lt;Person, E, Directed&lt;E&gt;&gt; {
+
+    <span class="directive">protected</span> Directed(Person start, E end) {
+        <span class="local-variable">super</span>(start, <span class="string"><span class="delimiter">&quot;</span><span class="content">DIRECTED</span><span class="delimiter">&quot;</span></span>, end);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="workwithproperties"><a class="anchor" href="#workwithproperties"></a>5.2.1. Work with properties</h4>
+<div class="paragraph">
+<p>Properties can be used like normal objects:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var cypher = Cypher.match(Person.PERSON)
+    .returning(Person.PERSON.NAME, Person.PERSON.BORN)
+    .build().getCypher();
+
+Assertions.assertThat(cypher)
+    .matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.name, </span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.born</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, new properties can be derived:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var cypher = Cypher.match(Person.PERSON)
+    .returning(Person.PERSON.NAME.concat(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content"> whatever</span><span class="delimiter">&quot;</span></span>)))
+    .build().getCypher();
+
+Assertions.assertThat(cypher)
+    .matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.name </span><span class="char">\\</span><span class="content">+ ' whatever'</span><span class="char">\\</span><span class="content">)</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="querynodesorrelationshipsbyproperties"><a class="anchor" href="#querynodesorrelationshipsbyproperties"></a>5.2.2. Query nodes or relationships by properties</h4>
+<div class="paragraph">
+<p>Use <code>withProperties</code> (and <code>named</code> you like) to model your queries as needed.
+Applicable to properties of nodes such as the title:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var movie = Movie.MOVIE.withProperties(Movie.MOVIE.TITLE, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Matrix</span><span class="delimiter">&quot;</span></span>)).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m1</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher.match(movie)
+    .returning(movie)
+    .build().getCypher();
+
+Assertions.assertThat(cypher)
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m1:`Movie` {title: 'The Matrix'}) RETURN m1</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and relationships</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Neo</span><span class="delimiter">&quot;</span></span>));
+var cypher = Cypher.match(actedIn)
+    .returning(Movie.MOVIE)
+    .build().getCypher();
+
+Assertions.assertThat(cypher)
+    .matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">)-</span><span class="char">\\</span><span class="content">[</span><span class="char">\\</span><span class="content">w+:`ACTED_IN` </span><span class="char">\\</span><span class="content">{role: 'Neo'}]-&gt;</span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Movie`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Note that the query will look like this, as we didn&#8217;t rename the objects and they used generated names:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="cypher">`MATCH (dZVpwHhe000:`Person`)-[JcVKsSrn001:`ACTED_IN` {role: 'Neo'}]-&gt;(cDWeUJSI002:`Movie`) RETURN cDWeUJSI002`` as we didn't specify aliases)</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="workwithrelationships"><a class="anchor" href="#workwithrelationships"></a>5.2.3. Work with relationships</h4>
+<div class="paragraph">
+<p>Relationships can be worked with like with properties:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var cypher = Cypher.match(Person.PERSON.DIRECTED)
+    .match(Person.PERSON.ACTED_IN)
+    .returning(Person.PERSON.DIRECTED, Person.PERSON.ACTED_IN)
+    .build().getCypher();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>They are quite flexible together with the <code>inverse</code> method. The following example also shows how to include non-static parts:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var otherPerson = Person.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher.match(
+        Person.PERSON.DIRECTED.inverse()
+            .relationshipTo(otherPerson, <span class="string"><span class="delimiter">&quot;</span><span class="content">FOLLOWS</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    )
+    .where(otherPerson.NAME.isEqualTo(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Someone</span><span class="delimiter">&quot;</span></span>)))
+    .returning(Person.PERSON)
+    .build().getCypher();
+
+Assertions.assertThat(cypher)
+    .matches(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Movie`</span><span class="char">\\</span><span class="content">)&lt;-</span><span class="char">\\</span><span class="content">[:`DIRECTED`]-</span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">)-</span><span class="char">\\</span><span class="content">[:`FOLLOWS`]-&gt;</span><span class="char">\\</span><span class="content">(o:`Person`</span><span class="char">\\</span><span class="content">) WHERE o</span><span class="char">\\</span><span class="content">.name = 'Someone' RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Using a non-static fragment</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="thespringdataneo4j6annotationprocessor"><a class="anchor" href="#thespringdataneo4j6annotationprocessor"></a>5.3. The Spring Data Neo4j 6 annotation processor</h3>
+<div class="paragraph">
+<p>We provide a Java annotation processor for <a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j</a> under the following coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 14. Coordinates of the SDN 6 annotation processor</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.0-SNAPSHOT</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The annotation processor understands classes annotated with <code>@Node</code> and <code>@RelationshipProperties</code>.
+Inside those classes <code>@Relationship</code> and <code>@Property</code> are read.</p>
+</div>
+<div class="paragraph">
+<p>The processor generates a static meta model for each annotated class found in the same package with an underscore (<code>_</code>) added to the name.</p>
+</div>
+<div class="paragraph">
+<p>The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version <code>2021.1.0</code> or later on it&#8217;s classpath.
+We recommend using it explicitly on the separate annotation processor classpath (via <code>--processor-path</code> to <code>javac</code>).</p>
+</div>
+<div class="sect3">
+<h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>5.3.1. Configure your build</h4>
+<div class="sect4">
+<h5 id="maven"><a class="anchor" href="#maven"></a>Maven</h5>
+<div class="paragraph">
+<p>As a Maven user, please configure the build as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;build&gt;</span>
+    <span class="tag">&lt;plugins&gt;</span>
+        <span class="tag">&lt;plugin&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;configuration&gt;</span>
+                <span class="tag">&lt;annotationProcessorPaths&gt;</span>
+                    <span class="tag">&lt;annotationProcessorPath&gt;</span>
+                        <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
+                        <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-codegen-sdn6<span class="tag">&lt;/artifactId&gt;</span>
+                        <span class="tag">&lt;version&gt;</span>{neo4j-cypher-dsl.version}<span class="tag">&lt;/version&gt;</span>
+                    <span class="tag">&lt;/annotationProcessorPath&gt;</span>
+                <span class="tag">&lt;/annotationProcessorPaths&gt;</span>
+            <span class="tag">&lt;/configuration&gt;</span>
+        <span class="tag">&lt;/plugin&gt;</span>
+    <span class="tag">&lt;/plugins&gt;</span>
+<span class="tag">&lt;/build&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="gradle"><a class="anchor" href="#gradle"></a>Gradle</h5>
+<div class="paragraph">
+<p>In a Gradle project, please add the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="asdependencyontheclasspath"><a class="anchor" href="#asdependencyontheclasspath"></a>As dependency on the classpath</h5>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+We recommend the annotation processor path for two reasons: The processor needs SDN as dependency. While SDN is already on the classpath,
+it might not fit the one we build the annotation processor against exactly.
+While the processor is lenient in that regard, your dependency setup might not.
+Furthermore: Why should you have the annotation processor as a dependency in your final artifact? This would be unnecessary.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you insist on having the SDN 6 annotation processor on the standard class path, please include with your Spring Data Neo4j 6
+application like as follows to avoid dependency conflicts:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-codegen-sdn6<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>{neo4j-cypher-dsl.version}<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;exclusions&gt;</span>
+        <span class="tag">&lt;exclusion&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.slf4j<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>slf4j-simple<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/exclusion&gt;</span>
+        <span class="tag">&lt;exclusion&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.springframework.data<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>spring-data-neo4j<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/exclusion&gt;</span>
+    <span class="tag">&lt;/exclusions&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="usage"><a class="anchor" href="#usage"></a>5.3.2. Usage</h4>
+<div class="paragraph">
+<p>The processor supports the following arguments:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Name</th>
+<th class="tableblock halign-left valign-top">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.prefix,</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An optional prefix for the generated classes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.suffix</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An optional suffix for the generated classes</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.indent_style</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The indent style (Use <code>TAB</code> for tabs, <code>SPACE</code> for spaces)</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.indent_size</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The number of whitespaces for the indent style <code>SPACE</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.timestamp</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An optional timestampe in ISO_OFFSET_DATE_TIME format for the generated classes. Defaults to the time of generation.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.add_at_generated</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A flag whether <code>@Generated</code> should be added</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The generated classes can be used in variety of places:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@RestController</span>
+<span class="annotation">@RequestMapping</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/api/movies</span><span class="delimiter">&quot;</span></span>)
+<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">MoviesController</span> {
+
+    <span class="directive">private</span> <span class="directive">final</span> MovieRepository movieRepository;
+
+    <span class="directive">private</span> <span class="directive">final</span> PeopleRepository peopleRepository;
+
+    MoviesController(MovieRepository movieRepository, PeopleRepository peopleRepository) {
+        <span class="local-variable">this</span>.movieRepository = movieRepository;
+        <span class="local-variable">this</span>.peopleRepository = peopleRepository;
+    }
+
+    <span class="annotation">@GetMapping</span>({ <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span> })
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Movie&gt; get() {
+        <span class="keyword">return</span> movieRepository
+            .findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); <i class="conum" data-value="1"></i><b>(1)</b>
+    }
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Pass the name of the property <code>TITLE</code> to Spring Data&#8217;s sort facility</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Or build complex queries with it:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">class</span> <span class="class">MovieRepositoryExtImpl</span> <span class="directive">implements</span> MovieRepositoryExt {
+
+    <span class="directive">private</span> <span class="directive">final</span> Neo4jTemplate neo4jTemplate;
+
+    MovieRepositoryExtImpl(Neo4jTemplate neo4jTemplate) {
+
+        <span class="local-variable">this</span>.neo4jTemplate = neo4jTemplate;
+    }
+
+    <span class="annotation">@Override</span>
+    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Movie&gt; findAllMoviesRelatedTo(Person personOfInterest) {
+
+        var person = Person_.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+        var actedIn = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
+        var directed = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">d</span><span class="delimiter">&quot;</span></span>);
+        var m = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+
+        var statement = Cypher.match(person)
+            .where(person.NAME.isEqualTo(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>)))
+            .with(person)
+            .optionalMatch(<span class="keyword">new</span> ActedIn_(person, actedIn))
+            .optionalMatch(<span class="keyword">new</span> Directed_(person, directed))
+            .with(Functions.collect(actedIn).add(Functions.collect(directed))
+                .as(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>))
+            .unwind(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>).as(m)
+            .returningDistinct(m)
+            .orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
+            .build();
+
+        <span class="keyword">return</span> <span class="local-variable">this</span>.neo4jTemplate.findAll(
+            statement, <span class="predefined-type">Map</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, personOfInterest.getName()), Movie.class);
+    }
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The full example is in <code>neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6</code>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="appendix"><a class="anchor" href="#appendix"></a>6. Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="buildingtheneo4jcypher-dsl"><a class="anchor" href="#buildingtheneo4jcypher-dsl"></a>Building the Neo4j Cypher-DSL</h3>
@@ -1598,7 +2374,7 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 <p>The build requires a local copy of the project:</p>
 </div>
 <div id="clone-cypher-dsl" class="listingblock">
-<div class="title">Listing 14. Clone the Neo4j Cypher-DSL</div>
+<div class="title">Listing 15. Clone the Neo4j Cypher-DSL</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ git clone git@github.com:neo4j-contrib/cypher-dsl.git</code></pre>
 </div>
@@ -1611,7 +2387,7 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 15. Verify your JDK</div>
+<div class="title">Listing 16. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;11.0.10&quot; 2021-01-19
@@ -1623,7 +2399,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixe
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 16. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 17. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability           Origin
@@ -1640,7 +2416,7 @@ native-image             21.0.0              Native Image                  Early
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 17. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 18. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -1649,7 +2425,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 18. Build with default settings on Windows</div>
+<div class="title">Listing 19. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -1661,7 +2437,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 19. Skipping native tests</div>
+<div class="title">Listing 20. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -1673,7 +2449,7 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 20. Skipping native tests</div>
+<div class="title">Listing 21. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -1740,7 +2516,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 21. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 22. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -1761,7 +2537,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 22. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 23. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -1773,7 +2549,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 23. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 24. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -1798,7 +2574,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 24. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 25. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -1830,7 +2606,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 25. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 26. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -1848,7 +2624,7 @@ RETURN t, t2</code></pre>
 The <code>support</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 26. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 27. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -2452,7 +3228,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-09 12:00:27 UTC
+Last updated 2021-03-09 13:51:19 UTC
 </div>
 </div>
 </body>
