@@ -19,11 +19,11 @@
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * @author Michael J. Simons
@@ -38,9 +38,9 @@ public class PeopleController {
 		this.peopleRepository = peopleRepository;
 	}
 
-	@PostMapping
-	@ResponseStatus(value = HttpStatus.CREATED)
-	Person createNewPerson(@RequestBody Person person) {
-		return peopleRepository.save(person);
+	@GetMapping("/details/{name}")
+	PersonDetails getDetails(@PathVariable String name) {
+		return peopleRepository.getDetailsByName(name)
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 }

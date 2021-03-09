@@ -52,15 +52,19 @@ class MovieRepositoryExtImpl implements MovieRepositoryExt {
 		var person = Person_.PERSON.named("p");
 		var actedIn = Movie_.MOVIE.named("a");
 		var directed = Movie_.MOVIE.named("d");
+		var m = Cypher.name("m");
 
 		var statement = Cypher.match(person)
 			.where(person.NAME.isEqualTo(Cypher.parameter("name")))
 			.with(person)
 			.optionalMatch(new ActedIn_(person, actedIn))
 			.optionalMatch(new Directed_(person, directed))
-			.returningDistinct(
-				Functions.collect(actedIn).add(Functions.collect(directed))
-			).build();
+			.with(Functions.collect(actedIn).add(Functions.collect(directed))
+				.as("movies"))
+			.unwind("movies").as(m)
+			.returningDistinct(m)
+			.orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
+			.build();
 
 		return this.neo4jTemplate.findAll(
 			statement, Map.of("name", personOfInterest.getName()), Movie.class);

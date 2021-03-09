@@ -41,6 +41,7 @@
 		<java.version>11</java.version>
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
 		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
+		<neo4j.version>4.2.3</neo4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 	</properties>
 
@@ -53,9 +54,26 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.neo4j.test</groupId>
+			<artifactId>neo4j-harness</artifactId>
+			<version>${neo4j.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>junit-vintage-engine</artifactId>
+					<groupId>org.junit.vintage</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-nop</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-neo4j</artifactId>
-			<!-- Right now the versions don't match. This is gonna change soon -->
+			<!-- Right now the versions don't match. This is gonna change soon. Also, 6.0.5 won't be ABI compatible with Cypher-DSL 2021.1.0, so tests will be disabled. -->
 			<exclusions>
 				<exclusion>
 					<artifactId>neo4j-cypher-dsl</artifactId>
@@ -136,6 +154,10 @@
 				</configuration>
 			</plugin>
 			<!-- tag::sdn-processor[] -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
 		</plugins>
 	</build>
 	<!-- end::sdn-processor[] -->
