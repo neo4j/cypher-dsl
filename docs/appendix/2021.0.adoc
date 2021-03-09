@@ -1,5 +1,37 @@
 == 2021.0
 
+=== 2021.0.2
+
+WARNING: This will already be the last release of the 2021.0 line.
+      2021.1 will be API compatible but not ABI compatible, as some classes have
+      been changed into interfaces.
+      That means it is not a drop in replacement, but your application needs to be recompiled.
+
+==== 🚀 Features
+
+* GH-157 - Provide a method to turn a Java map into an expression.
+* GH-158 - Improve pretty printing of subqueries.
+* Allow the use of raw cypher as expressions.
+* Allow symbolic names to be used as aliases.
+* Cache some symbolic names.
+* Add support for the keys() function.
+
+==== 📖 Documentation
+
+* GH-152 - Document usage of PatterElement in tests.
+
+==== 🐛 Bug Fixes
+
+* GH-149 - Avoid possible stackoverflow exception during visitor traversal.
+* GH-159 - Fix missing labels for nodes after `WITH`.
+
+==== 🧹 Housekeeping
+
+* GH-148 - Add jQAssistant rules and improve building documentation.
+* Add Maven PMD plugin.
+
+Thanks https://github.com/Andy2003[Andy] for the improvements of the pretty printer.
+
 === 2021.0.1
 
 ==== 🚀 Features
