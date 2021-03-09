@@ -1,0 +1,8 @@
+[[static-meta-model]]
+= Building a static meta model
+
+include::concepts.adoc[]
+
+include::possible-usage.adoc[]
+
+include::sdn6-annotation-processor.adoc[]

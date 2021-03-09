@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-| Copyright (c) 2019-2021 "Neo4j,"
-| Neo4j Sweden AB [https://neo4j.com]
-|
-| This file is part of Neo4j.
-|
-| Licensed under the Apache License, Version 2.0 (the "License");
-| you may not use this file except in compliance with the License.
-| You may obtain a copy of the License at
-|
-|     https://www.apache.org/licenses/LICENSE-2.0
-|
-| Unless required by applicable law or agreed to in writing, software
-| distributed under the License is distributed on an "AS IS" BASIS,
-| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-| See the License for the specific language governing permissions and
-| limitations under the License.
+ | Copyright (c) 2019-2021 "Neo4j,"
+ | Neo4j Sweden AB [https://neo4j.com]
+ |
+ | This file is part of Neo4j.
+ |
+ | Licensed under the Apache License, Version 2.0 (the "License");
+ | you may not use this file except in compliance with the License.
+ | You may obtain a copy of the License at
+ |
+ |     https://www.apache.org/licenses/LICENSE-2.0
+ |
+ | Unless required by applicable law or agreed to in writing, software
+ | distributed under the License is distributed on an "AS IS" BASIS,
+ | WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ | See the License for the specific language governing permissions and
+ | limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -27,107 +27,16 @@
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl-examples</artifactId>
-	<version>999-SNAPSHOT</version>
-
+	<packaging>pom</packaging>
 	<name>Neo4j Cypher DSL (Examples)</name>
-	<description>Examples used in the documentation.</description>
+
+	<modules>
+		<module>neo4j-cypher-dsl-examples-core</module>
+		<module>neo4j-cypher-dsl-examples-sdn6</module>
+	</modules>
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.examples</java-module-name>
 		<java.version>11</java.version>
-		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
 	</properties>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.assertj</groupId>
-			<artifactId>assertj-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.junit.jupiter</groupId>
-			<artifactId>junit-jupiter</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${neo4j-cypher-dsl.version}</version>
-		</dependency>
-	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<skipIfEmpty>true</skipIfEmpty>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-install-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-deploy-plugin</artifactId>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-failsafe-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>integration-test</goal>
-							<goal>verify</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-		</plugins>
-	</build>
-
-	<profiles>
-		<profile>
-			<id>revisionMissing</id>
-			<activation>
-				<property>
-					<name>!revision</name>
-				</property>
-			</activation>
-			<properties>
-				<revision>9999</revision>
-			</properties>
-		</profile>
-		<profile>
-			<id>sha1Missing</id>
-			<activation>
-				<property>
-					<name>!sha</name>
-				</property>
-			</activation>
-			<properties>
-				<sha1></sha1>
-			</properties>
-		</profile>
-		<profile>
-			<id>changelistMissing</id>
-			<activation>
-				<property>
-					<name>!changelist</name>
-				</property>
-			</activation>
-			<properties>
-				<changelist>-SNAPSHOT</changelist>
-			</properties>
-		</profile>
-	</profiles>
-
 </project>

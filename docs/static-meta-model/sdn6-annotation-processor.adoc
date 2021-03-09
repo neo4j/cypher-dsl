@@ -1,0 +1,127 @@
+== The Spring Data Neo4j 6 annotation processor
+
+We provide a Java annotation processor for https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference[Spring Data Neo4j] under the following coordinates:
+
+[source,subs="verbatim,attributes",indent=0,tabsize=4]
+.Coordinates of the SDN 6 annotation processor
+----
+{groupId}:neo4j-cypher-dsl-codegen-sdn6:{neo4j-cypher-dsl-version}
+----
+
+The annotation processor understands classes annotated with `@Node` and `@RelationshipProperties`.
+Inside those classes `@Relationship` and `@Property` are read.
+
+The processor generates a static meta model for each annotated class found in the same package with an underscore (`_`) added to the name.
+
+The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version `2021.1.0` or later on it's classpath.
+We recommend using it explicitly on the separate annotation processor classpath (via `--processor-path` to `javac`).
+
+=== Configure your build
+
+==== Maven
+
+As a Maven user, please configure the build as follows:
+
+[source,xml,subs="verbatim,attributes",indent=0,tabsize=4]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <annotationProcessorPaths>
+                    <annotationProcessorPath>
+                        <groupId>{groupId}</groupId>
+                        <artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
+                        <version>{neo4j-cypher-dsl.version}</version>
+                    </annotationProcessorPath>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
+
+==== Gradle
+
+In a Gradle project, please add the following:
+
+[source,groovy,subs="verbatim,attributes"]
+----
+dependencies {
+    annotationProcessor '{groupId}:neo4j-cypher-dsl-codegen-sdn6:{neo4j-cypher-dsl-version}'
+}
+----
+
+==== As dependency on the classpath
+
+NOTE: We recommend the annotation processor path for two reasons: The processor needs SDN as dependency. While SDN is already on the classpath,
+it might not fit the one we build the annotation processor against exactly.
+While the processor is lenient in that regard, your dependency setup might not.
+Furthermore: Why should you have the annotation processor as a dependency in your final artifact? This would be unnecessary.
+
+If you insist on having the SDN 6 annotation processor on the standard class path, please include with your Spring Data Neo4j 6
+application like as follows to avoid dependency conflicts:
+
+[source,xml,subs="verbatim,attributes",indent=0,tabsize=4]
+----
+<dependency>
+    <groupId>{groupId}</groupId>
+    <artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
+    <version>{neo4j-cypher-dsl.version}</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+        </exclusion>
+        <exclusion>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+----
+
+=== Usage
+
+The processor supports the following arguments:
+
+|===
+|Name | Meaning
+
+| org.neo4j.cypherdsl.codegen.prefix,
+| An optional prefix for the generated classes
+
+| org.neo4j.cypherdsl.codegen.suffix
+| An optional suffix for the generated classes
+
+| org.neo4j.cypherdsl.codegen.indent_style
+| The indent style (Use `TAB` for tabs, `SPACE` for spaces)
+
+| org.neo4j.cypherdsl.codegen.indent_size
+| The number of whitespaces for the indent style `SPACE`
+
+| org.neo4j.cypherdsl.codegen.timestamp
+| An optional timestampe in ISO_OFFSET_DATE_TIME format for the generated classes. Defaults to the time of generation.
+
+| org.neo4j.cypherdsl.codegen.add_at_generated
+| A flag whether `@Generated` should be added
+|===
+
+The generated classes can be used in variety of places:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/MoviesController.java[tag=as-property]
+----
+<.> Pass the name of the property `TITLE` to Spring Data's sort facility
+
+Or build complex queries with it:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/MovieRepository.java[tag=complex-queries]
+----
+
+The full example is in `neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6`.

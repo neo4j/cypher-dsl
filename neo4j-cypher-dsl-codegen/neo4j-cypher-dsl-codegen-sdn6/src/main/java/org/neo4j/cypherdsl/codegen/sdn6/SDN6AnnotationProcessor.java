@@ -107,6 +107,24 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		P, R;
 	}
 
+
+	static {
+		disableSpringConverterDebugLog();
+	}
+
+	@SuppressWarnings("PMD")
+	private static void disableSpringConverterDebugLog() {
+		try {
+			Class<?> logback = Class.forName("ch.qos.logback.classic.Logger");
+			// Don't replace the qualified names, Checkstyle will yell at you.
+			logback.getMethod("setLevel").invoke(
+				org.slf4j.LoggerFactory.getLogger("org.springframework.data.convert.CustomConversions"),
+				org.slf4j.event.Level.DEBUG
+			);
+		} catch (Exception e) {
+		}
+	}
+
 	private final Neo4jConversions conversions = new Neo4jConversions();
 
 	private Types typeUtils;
@@ -728,8 +746,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 					DeclaredType declaredType = (DeclaredType) field.asType();
 					Class<?> fieldType = Class.forName(declaredType.asElement().toString());
 
-					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions
-						.hasCustomWriteTarget(fieldType);
+					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions.hasCustomWriteTarget(fieldType);
 				} catch (ClassNotFoundException e) {
 					return false;
 				}

@@ -21,10 +21,12 @@ package org.neo4j.cypherdsl.codegen.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.NodeBase;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 
 /**
- * Strategy interface for generating class names for {@link org.neo4j.cypherdsl.core.NodeImpl} or
- * {@link org.neo4j.cypherdsl.core.RelationshipImpl}.
+ * Strategy interface for generating class names for {@link NodeBase} or
+ * {@link RelationshipBase}.
  *
  * @author Michael J. Simons
  * @soundtrack Daft Punk - TRON Legacy

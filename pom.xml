@@ -17,7 +17,8 @@
  | See the License for the specific language governing permissions and
  | limitations under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>org.neo4j</groupId>
@@ -89,9 +90,9 @@
 
 	<modules>
 		<module>neo4j-cypher-dsl</module>
-		<module>neo4j-cypher-dsl-examples</module>
-		<module>neo4j-cypher-dsl-native-tests</module>
 		<module>neo4j-cypher-dsl-codegen</module>
+		<module>neo4j-cypher-dsl-native-tests</module>
+		<module>neo4j-cypher-dsl-examples</module>
 	</modules>
 
 	<scm>
@@ -223,11 +224,22 @@
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-neo4j</artifactId>
 				<version>${spring-data-neo4j.version}</version>
-				<scope>provided</scope>
 				<exclusions>
 					<exclusion>
 						<artifactId>neo4j-cypher-dsl</artifactId>
 						<groupId>org.neo4j</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>spring-tx</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>spring-aop</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>spring-expression</artifactId>
+						<groupId>org.springframework</groupId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -383,7 +395,8 @@
 							<arguments>
 								<argument>-i</argument>
 								<argument>.bak</argument>
-								<argument>s/\(:neo4j-cypher-dsl-version:\) \(.*\)/\1 ${revision}${sha1}${changelist}/g</argument>
+								<argument>s/\(:neo4j-cypher-dsl-version:\) \(.*\)/\1 ${revision}${sha1}${changelist}/g
+								</argument>
 								<argument>README.adoc</argument>
 							</arguments>
 						</configuration>

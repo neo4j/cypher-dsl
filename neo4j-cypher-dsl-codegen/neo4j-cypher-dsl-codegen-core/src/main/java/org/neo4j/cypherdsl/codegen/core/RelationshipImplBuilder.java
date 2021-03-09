@@ -28,8 +28,7 @@ import javax.lang.model.element.Modifier;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.Property;
-import org.neo4j.cypherdsl.core.RelationshipImpl;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -52,9 +51,9 @@ import com.squareup.javapoet.WildcardTypeName;
 @API(status = INTERNAL, since = "2021.1.0")
 final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipModelBuilder> implements RelationshipModelBuilder {
 
-	private static final ClassName TYPE_NAME_RELATIONSHIP_IMPL = ClassName.get(RelationshipImpl.class);
-	private static final TypeVariableName S = TypeVariableName.get("S", ParameterizedTypeName.get(TYPE_NAME_NODE_IMPL, WildcardTypeName.subtypeOf(Object.class)));
-	private static final TypeVariableName E = TypeVariableName.get("E", ParameterizedTypeName.get(TYPE_NAME_NODE_IMPL, WildcardTypeName.subtypeOf(Object.class)));
+	private static final ClassName TYPE_NAME_RELATIONSHIP_BASE = ClassName.get(RelationshipBase.class);
+	private static final TypeVariableName S = TypeVariableName.get("S", ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+	private static final TypeVariableName E = TypeVariableName.get("E", ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
 
 	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType, String alternateClassNameSuggestion) {
 
@@ -173,15 +172,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 	private List<FieldSpec> buildFields() {
 
-		return properties.stream().map(p -> {
-				String fieldName = p.getNameInDomain() == null ? p.getNameInGraph() : p.getNameInDomain();
-				return FieldSpec
-					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC,
-						Modifier.FINAL)
-					.initializer("this.property($S)", p.getNameInGraph())
-					.build();
-			}
-		).collect(Collectors.toList());
+		return generateFieldSpecsFromProperties().collect(Collectors.toList());
 	}
 
 	@Override
@@ -206,7 +197,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 		}
 
 		TypeSpec newType = addGenerated(builder)
-			.superclass(ParameterizedTypeName.get(TYPE_NAME_RELATIONSHIP_IMPL, startNode, endNode,
+			.superclass(ParameterizedTypeName.get(TYPE_NAME_RELATIONSHIP_BASE, startNode, endNode,
 				parameterizedTypeName))
 			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 			.addFields(buildFields())

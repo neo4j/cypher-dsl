@@ -21,10 +21,11 @@ package org.neo4j.cypherdsl.codegen.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 
 /**
  * A variant of a {@link ModelBuilder} responsible for creating classes extending from
- * {@link org.neo4j.cypherdsl.core.RelationshipImpl} that will in the end represent a static model of relationships
+ * {@link RelationshipBase} that will in the end represent a static model of relationships
  * and their properties.
  *
  * @author Michael J. Simons

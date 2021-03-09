@@ -71,6 +71,7 @@ public final class Parameter<T> implements Expression {
 	}
 
 	/**
+	 * @param newValue The new value that should be bound by this parameter
 	 * @return A new parameter with a bound value
 	 * @since 2021.0.0
 	 */

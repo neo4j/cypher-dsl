@@ -32,23 +32,29 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.stream.Stream;
+
+import javax.lang.model.element.Modifier;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.codegen.core.Configuration.JavaVersion;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
+import org.neo4j.cypherdsl.core.Property;
+import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.TypeSpec;
 
 /**
- * Base class with some shared state and information for builders of {@link org.neo4j.cypherdsl.core.NodeImpl} and
- * {@link org.neo4j.cypherdsl.core.RelationshipImpl}.
+ * Base class with some shared state and information for builders of {@link NodeBase} and
+ * {@link RelationshipBase}.
  *
  * @param <T> Concrete type of this builder
  * @author Michael J. Simons
@@ -59,7 +65,7 @@ import com.squareup.javapoet.TypeSpec;
 abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuilder<T> {
 
 	protected static final ClassName TYPE_NAME_NODE = ClassName.get(Node.class);
-	protected static final ClassName TYPE_NAME_NODE_IMPL = ClassName.get(NodeImpl.class);
+	protected static final ClassName TYPE_NAME_NODE_BASE = ClassName.get(NodeBase.class);
 	protected static final ClassName TYPE_NAME_SYMBOLIC_NAME = ClassName.get(SymbolicName.class);
 	protected static final ClassName TYPE_NAME_LIST = ClassName.get(List.class);
 	protected static final ClassName TYPE_NAME_STRING = ClassName.get(String.class);
@@ -237,6 +243,32 @@ abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuil
 			builder.addAnnotation(spec);
 		}
 		return builder;
+	}
+
+	/**
+	 * Turns the property definitions into field spec
+	 *
+	 * @return a stream of field specs
+	 */
+	final Stream<FieldSpec> generateFieldSpecsFromProperties() {
+		return properties.stream().map(p -> {
+
+				String fieldName;
+				CodeBlock initializer;
+				if (p.getNameInDomain() == null) {
+					fieldName = p.getNameInGraph();
+					initializer = CodeBlock.of("this.property($S)", p.getNameInGraph());
+				} else {
+					fieldName = p.getNameInDomain();
+					initializer = CodeBlock.of("this.property($S).referencedAs($S)", p.getNameInGraph(), p.getNameInDomain());
+				}
+
+				return FieldSpec
+					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC, Modifier.FINAL)
+					.initializer(initializer)
+					.build();
+			}
+		);
 	}
 
 	/**

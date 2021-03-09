@@ -29,7 +29,7 @@ Let's take the first example https://neo4j.com/docs/cypher-manual/current/clause
 
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call]
 ----
 <.> `Cypher.call` returns a buildable statement that can be rendered.
     `Cypher.call` can be used with separate namespace and procedure name as shown here or
@@ -41,7 +41,7 @@ Expressions can be literals as in <<standalone-call-with-args>>, Cypher paramete
 [[standalone-call-with-args]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-with-args]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-with-args]
 ----
 
 Last but not least, the Cypher-DSL can of course `YIELD` the results from a standalone call:
@@ -49,7 +49,7 @@ Last but not least, the Cypher-DSL can of course `YIELD` the results from a stan
 [[standalone-call-yielding]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-yielding]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-yielding]
 ----
 <.> Yielded items can be specified via string…
 <.> …or with symbolic names created earlier
@@ -59,7 +59,7 @@ A standalone call can spot a `WHERE` clause as well:
 [[standalone-call-where]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-where]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=standalone-call-where]
 ----
 
 ==== In-query procedure calls
@@ -70,7 +70,7 @@ The mechanics to construct those calls via the Cypher-DSL are identical to stand
 [[in-query-calls]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=in-query-calls]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=in-query-calls]
 ----
 
 A `CALL` can be used after a `MATCH`, a `WITH` and also a `WHERE` clause.
@@ -89,7 +89,7 @@ This is where `asFunction` comes in.
 [[as-function]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=as-function]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=as-function]
 ----
 <.> First we define a call as seen earlier and turn it into an expression
 <.> This expression is than used as any other expression
@@ -99,7 +99,7 @@ Of course, arguments to those functions can be express as well. Either as litera
 [[as-function-with-args]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=as-function-with-args]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/ArbitraryProceduresAndFunctionsTest.java[tag=as-function-with-args]
 ----
 <.> Same as before
 <.> A call to APOC's `camelCase` function, taking in the literal of `first name`.

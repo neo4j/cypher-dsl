@@ -1,0 +1,148 @@
+== Concepts
+
+=== A static meta model is optional
+
+First let's stress this: A static meta model is optional for the Cypher-DSL. It is completly ok to use the Cypher-DSL
+as shown in the <<how-to-use-it.examples,examples in the "How to use it" part>>:
+All labels, types and properties can be named as you go.
+The Cypher-DSL will still give you type-safety in regard to the Cypher's syntax.
+
+This fit's nicely with Neo4j's capabilities: Neo4j is a schema less database. Nodes, their relationships between each other,
+their labels and properties can be changed as you go but all of this information can still be queried.
+
+In a schemaless database or a database with dynamic scheme the scheme is often defined by the application.
+This definition takes many forms: It can be through an object mapper like https://github.com/neo4j/neo4j-ogm[Neo4j-OGM] or
+https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference[Spring Data Neo4j 6], or maybe in form of
+Graph-QL schemes.
+
+Another source maybe the information we can retrieve from the database itself via https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_nodetypeproperties[`db.schema.nodeTypeProperties`] and
+https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_reltypeproperties[`db.schema.relTypeProperties`].
+
+[[static-meta-model.building-blocks]]
+=== Building blocks
+
+The Cypher DSL offers the following building blocks as part of the public API:
+
+* Two pattern elements:
+** Nodes via `Node` (and it's default implementation `NodeBase`)
+** Relationships via `Relationship` (and it's default implementation `RelationshipBase`)
+* `Property`, which is a a holder for properties
+
+When you use Cypher-DSL like this:
+
+[source,java]
+----
+var m = Cypher.node("Movie").named("m");
+var statement = Cypher.match(m).returning(m).build();
+----
+
+`m` will be a `Node` instance having the label `Movie` and an alias of `m`. `m` can be used everywhere where a pattern element
+can be used according to the openCypher spec.
+You don't have to care about it's type. That's why we vouched for the JDK11+ local type inference here and omitted the
+declaration of the type `Node`: It just reads better.
+
+=== A very simple, static model
+
+Both `NodeBase` and  `RelationshipBase` are meant to be extended to put your static model into something that is usable
+with the Cypher-DSL.
+
+==== Nodes
+
+Start by extending `NodeBase` like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/Movie.java[tag=simple-model]
+----
+<.> Extend from `NodeBase` and specify your class as a "self" type-argument
+<.> Optional: Create one static instance of your model
+<.> This is where you specify one or more label
+<.> This constructor is optional, it is used in the next two steps
+<.> `named` must be overridden and must return new copies of the node, with the changed symbolic name.
+    It must be overridden to guarantee type integrity.
+<.> Same as obove
+
+With that in place, you can already use it like this:
+
+[source,java,indent=0,tabsize=4]
+[[static-movie]]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=simple-model]
+----
+
+and it would generate a Cypher string like this: `"MATCH (jwKyXzwS000:`Movie`) RETURN jwKyXzwS000"`, with generated variable names.
+
+If you don't like them, you can just rename one instance of the movie-model like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=simple-model-renamed]
+----
+
+Of course, properties belong into a model as well. You add them like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/Movie.java[tag=add-properties]
+----
+<.> Same class before, extending from `NodeBase`.
+<.> Use `this` and the `property` method to create a new `Property` instance, stored on the given instance
+
+A possible usage scenario looks like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=add-properties]
+----
+<.> Make sure to use the renamed instance everywhere. Here: For accessing the property. Alternatively, don't rename.
+
+==== Relationships
+
+Relationships are a bit more complicated. Relationships of the same type can be used between nodes with different labels.
+We have these scenarios:
+
+* `(s:LabelA) - (r:SomeType) -> (e:LabelB)`:
+* `(s:LabelA) - (r:SomeType) -> (e)`
+* `(s) - (r:SomeType) -> (e)`
+
+We either have a type that is used only between the same set of labels, or a type is used always with one fixed label or
+a type is used between arbitrary labels.
+
+To accomadate for that, the default relationship implementation, `RelationshipBase` spots three type parameters:
+
+[source,java]
+----
+public class RelationshipBase<S extends NodeBase<?>, E extends NodeBase<?>, SELF extends RelationshipBase<S, E, SELF>> {
+}
+----
+
+`S` is the type of a start node, `E` of an end node and `SELF` is the concrete implementation itself.
+The public API of `RelationshipBase` enforces a direction from start to end (`LTR`, left to right).
+
+We just have a look at the first case to make the concepts clear. We model the `ACTED_IN` relationship of the movie graph.
+It exists between people and movies (going from person to movie) and has an attribute roles:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/ActedIn.java[tag=simple-model]
+----
+<.> The base class, with 3 concrete types. A `Person`, the `Movie` from <<static-movie>> and the type itself.
+<.> Same idea with as with nodes: Store all properties as final attributes.
+<.> There is no default constructor for a relationship: Start and end node must be specified. The type is fixed.
+<.> Copy constructor for the following two methods
+<.> Required to rename this relationship
+<.> Required for querying properties
+
+In contrast to the movie, we don't see a static attribute allowing access to the relationship.
+This is stored at the owner. In this case, the `Person`:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/Person.java[tag=simple-model]
+----
+<.> We create the relationship properties with `this` concrete instance pointing to another, concrete instance.
+
+=== Summary
+
+While there are possible other ways to define a static meta model with the Cypher-DSL, this is the way we create them with
+the `neo4j-cypher-dsl-codegen` models.

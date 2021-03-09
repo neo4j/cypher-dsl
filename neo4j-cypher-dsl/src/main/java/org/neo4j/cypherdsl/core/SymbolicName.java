@@ -156,6 +156,10 @@ public class SymbolicName implements Expression {
 		return value.equals(that.value);
 	}
 
+	boolean isResolved() {
+		return this.value != null;
+	}
+
 	@Override
 	public int hashCode() {
 		return value == null ? super.hashCode() : Objects.hash(value);

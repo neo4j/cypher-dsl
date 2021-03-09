@@ -7,7 +7,7 @@ This reflects directly in the Cypher-DSL:
 [[properties-on-nodes-and-rel]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=properties-on-nodes-and-rel]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=properties-on-nodes-and-rel]
 ----
 <.> Create a property expression from a `Node`
 <.> Create a property expression from a `Relationship`
@@ -32,7 +32,7 @@ to the results of functions etc.:
 [[properties-on-expressions]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=properties-on-expressions]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=properties-on-expressions]
 ----
 <.> Here an expression, the `datetime()` function is passed in and the `epocheSeconds` property is dereferenced.
 
@@ -41,6 +41,6 @@ Nested properties are of course possible as well, either directly on nodes and r
 [[nested-properties]]
 [source,java,indent=0]
 ----
-include::../../neo4j-cypher-dsl-examples/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=nested-properties]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/PropertiesTest.java[tag=nested-properties]
 ----
 

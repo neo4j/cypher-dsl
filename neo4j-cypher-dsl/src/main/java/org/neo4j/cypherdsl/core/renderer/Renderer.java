@@ -53,6 +53,7 @@ public interface Renderer {
 	/**
 	 * Creates a new renderer for the given configuration.
 	 *
+	 * @param configuration The configuration for this renderer
 	 * @return A new renderer (might be a shared instance).
 	 */
 	static Renderer getRenderer(Configuration configuration) {

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+| Copyright (c) 2019-2021 "Neo4j,"
+| Neo4j Sweden AB [https://neo4j.com]
+|
+| This file is part of Neo4j.
+|
+| Licensed under the Apache License, Version 2.0 (the "License");
+| you may not use this file except in compliance with the License.
+| You may obtain a copy of the License at
+|
+|     https://www.apache.org/licenses/LICENSE-2.0
+|
+| Unless required by applicable law or agreed to in writing, software
+| distributed under the License is distributed on an "AS IS" BASIS,
+| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+| See the License for the specific language governing permissions and
+| limitations under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.4.3</version>
+		<relativePath></relativePath>
+		<!-- lookup parent from repository -->
+	</parent>
+
+	<groupId>org.neo4j</groupId>
+	<artifactId>neo4j-cypher-dsl-examples-sdn6</artifactId>
+	<version>${revision}${sha1}${changelist}</version>
+
+	<name>Examples (SDN 6 Code generator)</name>
+	<description>Example how to use the SDN 6 code generator.</description>
+
+	<properties>
+		<checkstyle.version>8.29</checkstyle.version>
+		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
+		<java.version>11</java.version>
+		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
+		<neo4j-cypher-dsl.version>${revision}${sha1}${changelist}</neo4j-cypher-dsl.version>
+		<neo4j.version>4.2.3</neo4j.version>
+		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
+	</properties>
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-dsl</artifactId>
+			<version>${neo4j-cypher-dsl.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j.test</groupId>
+			<artifactId>neo4j-harness</artifactId>
+			<version>${neo4j.version}</version>
+			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>junit-vintage-engine</artifactId>
+					<groupId>org.junit.vintage</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>slf4j-nop</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-neo4j</artifactId>
+			<!-- Right now the versions don't match. This is gonna change soon. Also, 6.0.5 won't be ABI compatible with Cypher-DSL 2021.1.0, so tests will be disabled. -->
+			<exclusions>
+				<exclusion>
+					<artifactId>neo4j-cypher-dsl</artifactId>
+					<groupId>org.neo4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
+	</dependencies>
+
+	<!-- tag::sdn-processor[] -->
+	<build>
+		<plugins>
+			<!-- end::sdn-processor[] -->
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+			<!-- tag::sdn-processor[] -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>${maven-compiler-plugin.version}</version>
+				<configuration combine.self="append">
+					<annotationProcessorPaths>
+						<annotationProcessorPath>
+							<groupId>org.neo4j</groupId>
+							<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
+							<version>${neo4j-cypher-dsl.version}</version>
+						</annotationProcessorPath>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<!-- end::sdn-processor[] -->
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<version>${maven-checkstyle-plugin.version}</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>${checkstyle.version}</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<configLocation>../../etc/checkstyle/config.xml</configLocation>
+					<suppressionsLocation>../../etc/checkstyle/suppressions.xml</suppressionsLocation>
+					<headerLocation>../../etc/checkstyle/java-header.txt</headerLocation>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<consoleOutput>true</consoleOutput>
+					<failsOnError>true</failsOnError>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.ekryd.sortpom</groupId>
+				<artifactId>sortpom-maven-plugin</artifactId>
+				<version>${sortpom-maven-plugin.version}</version>
+				<configuration>
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<keepBlankLines>true</keepBlankLines>
+					<nrOfIndentSpace>-1</nrOfIndentSpace>
+					<sortProperties>true</sortProperties>
+					<sortDependencies>groupId,artifactId</sortDependencies>
+					<createBackupFile>false</createBackupFile>
+				</configuration>
+			</plugin>
+			<!-- tag::sdn-processor[] -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+			</plugin>
+		</plugins>
+	</build>
+	<!-- end::sdn-processor[] -->
+
+	<!-- This not relevant to the example, only for our project structure and build chain. -->
+	<profiles>
+		<profile>
+			<id>revisionMissing</id>
+			<activation>
+				<property>
+					<name>!revision</name>
+				</property>
+			</activation>
+			<properties>
+				<revision>9999</revision>
+			</properties>
+		</profile>
+		<profile>
+			<id>sha1Missing</id>
+			<activation>
+				<property>
+					<name>!sha</name>
+				</property>
+			</activation>
+			<properties>
+				<sha1></sha1>
+			</properties>
+		</profile>
+		<profile>
+			<id>changelistMissing</id>
+			<activation>
+				<property>
+					<name>!changelist</name>
+				</property>
+			</activation>
+			<properties>
+				<changelist>-SNAPSHOT</changelist>
+			</properties>
+		</profile>
+	</profiles>
+
+</project>

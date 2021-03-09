@@ -27,7 +27,6 @@
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl-native-tests</artifactId>
-	<version>999-SNAPSHOT</version>
 
 	<name>Neo4j Cypher DSL (Native Tests)</name>
 	<description>Ensures Cypher DSL can be compiled and used natively.</description>
@@ -113,41 +112,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>revisionMissing</id>
-			<activation>
-				<property>
-					<name>!revision</name>
-				</property>
-			</activation>
-			<properties>
-				<revision>9999</revision>
-			</properties>
-		</profile>
-		<profile>
-			<id>sha1Missing</id>
-			<activation>
-				<property>
-					<name>!sha</name>
-				</property>
-			</activation>
-			<properties>
-				<sha1></sha1>
-			</properties>
-		</profile>
-		<profile>
-			<id>changelistMissing</id>
-			<activation>
-				<property>
-					<name>!changelist</name>
-				</property>
-			</activation>
-			<properties>
-				<changelist>-SNAPSHOT</changelist>
-			</properties>
-		</profile>
-	</profiles>
-
 </project>

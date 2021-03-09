@@ -31,10 +31,9 @@ import java.util.stream.Stream;
 import javax.lang.model.element.Modifier;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.NodeImpl;
+import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.Property;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -46,9 +45,9 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeSpec;
 
 /**
- * This is a builder. It builds classes extending {@link NodeImpl}. The workflow is as follows: Create an instance via
+ * This is a builder. It builds classes extending {@link NodeBase}. The workflow is as follows: Create an instance via
  * {@link #create(Configuration, String, String)}, defining the target package (fully qualified name) as well as the type.
- * Unless {@link #writeTo(Path)} or {@link #writeToString()} is called, additional labels and properties can be added
+ * Unless {@link #writeTo(java.nio.file.Path)} or {@link #writeToString()} is called, additional labels and properties can be added
  * with {@link #addLabels(Collection)} and {@link #addProperty(String)}.
  * A call to any of the {@code writeToXXX} methods will trigger the generation of source code and after that, this instance
  * becomes effectively immutable.
@@ -171,15 +170,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			.initializer("new $T()", className)
 			.build();
 
-		Stream<FieldSpec> properties = this.properties.stream().map(p -> {
-				String fieldName = p.getNameInDomain() == null ? p.getNameInGraph() : p.getNameInDomain();
-				return FieldSpec
-					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC,
-						Modifier.FINAL)
-					.initializer("this.property($S)", p.getNameInGraph())
-					.build();
-			}
-		);
+		Stream<FieldSpec> properties = generateFieldSpecsFromProperties();
 
 		Stream<FieldSpec> relationships = relationshipDefinitions.stream().map(p -> {
 
@@ -206,7 +197,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 		}
 
 		TypeSpec newType = addGenerated(TypeSpec.classBuilder(className))
-			.superclass(ParameterizedTypeName.get(TYPE_NAME_NODE_IMPL, className))
+			.superclass(ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, className))
 			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 			.addFields(buildFields())
 			.addMethod(buildDefaultConstructor())
