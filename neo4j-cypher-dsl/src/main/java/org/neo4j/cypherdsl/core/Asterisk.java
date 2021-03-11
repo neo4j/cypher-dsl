@@ -29,7 +29,7 @@ import org.apiguardian.api.API;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Asterisk extends Literal<String> {
+public final class Asterisk extends LiteralBase<String> {
 
 	/**
 	 * The single instance of the {@code *}.

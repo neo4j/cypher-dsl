@@ -2203,7 +2203,7 @@ class CypherIT {
 		@Test // GH-104
 		void singleCreateAction() {
 
-			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
+			Literal<String> halloWeltString = Cypher.<String>literalOf("Hallo, Welt");
 			for (Statement statement : new Statement[] {
 				Cypher.merge(userNode)
 					.onCreate().set(userNode.property("p").to(halloWeltString))

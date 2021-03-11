@@ -30,7 +30,7 @@ import org.apiguardian.api.API;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class BooleanLiteral extends Literal<Boolean> {
+public final class BooleanLiteral extends LiteralBase<Boolean> {
 
 	static final BooleanLiteral TRUE = new BooleanLiteral(true);
 	static final BooleanLiteral FALSE = new BooleanLiteral(false);

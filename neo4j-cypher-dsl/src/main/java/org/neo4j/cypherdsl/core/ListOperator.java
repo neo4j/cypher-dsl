@@ -38,7 +38,7 @@ public final class ListOperator implements Expression {
 	/**
 	 * A literal for the dots.
 	 */
-	private static final Literal<String> DOTS = new Literal<String>("..") {
+	private static final Literal<String> DOTS = new LiteralBase<String>("..") {
 		@Override public String asString() {
 			return super.getContent();
 		}

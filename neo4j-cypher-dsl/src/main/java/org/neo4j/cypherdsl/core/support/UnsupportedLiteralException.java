@@ -16,31 +16,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.support;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 
 /**
- * Represents the literal value {@literal null}.
+ * Thrown when a given object cannot be used as a Cypher-DSL-Literal.
  *
- * @author Gerrit Meier
  * @author Michael J. Simons
- * @since 1.0
+ * @soundtrack Helge Schneider - Heart Attack No. 1
+ * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class NullLiteral extends LiteralBase<Void> {
+@API(status = EXPERIMENTAL, since = "2021.1.0")
+public final class UnsupportedLiteralException extends IllegalArgumentException {
 
-	static final NullLiteral INSTANCE = new NullLiteral();
+	private final Class<?> unsupportedType;
 
-	private NullLiteral() {
-
-		super(null);
+	public UnsupportedLiteralException(String message, Object unsupportedObject) {
+		super(message);
+		this.unsupportedType = unsupportedObject.getClass();
 	}
 
-	@Override
-	public String asString() {
-		return "NULL";
+	public UnsupportedLiteralException(Object unsupportedObject) {
+		super("Unsupported literal type: " + unsupportedObject.getClass());
+		this.unsupportedType = unsupportedObject.getClass();
+	}
+
+	public Class<?> getUnsupportedType() {
+		return unsupportedType;
 	}
 }

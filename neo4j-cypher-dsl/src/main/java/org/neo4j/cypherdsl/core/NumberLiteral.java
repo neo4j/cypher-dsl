@@ -28,7 +28,7 @@ import org.apiguardian.api.API;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class NumberLiteral extends Literal<Number> {
+public final class NumberLiteral extends LiteralBase<Number> {
 
 	NumberLiteral(Number content) {
 		super(content);

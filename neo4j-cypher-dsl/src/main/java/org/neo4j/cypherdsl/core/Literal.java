@@ -25,28 +25,12 @@ import org.apiguardian.api.API;
 /**
  * Represents a literal with an optional content.
  *
- * @author Michael J. Simons
  * @param <T> type of content
+ * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public abstract class Literal<T> implements Expression {
-
-	/**
-	 * The content of this literal.
-	 */
-	private T content;
-
-	Literal(T content) {
-		this.content = content;
-	}
-
-	/**
-	 * @return The content of this literal, may be {@literal null}
-	 */
-	public T getContent() {
-		return content;
-	}
+public interface Literal<T> extends Expression {
 
 	/**
 	 * The string representation should be designed in such a way the a renderer can use it correctly in
@@ -55,6 +39,6 @@ public abstract class Literal<T> implements Expression {
 	 *
 	 * @return A string representation to be used literally in a cypher statement.
 	 */
-	public abstract String asString();
+	String asString();
 }
 
