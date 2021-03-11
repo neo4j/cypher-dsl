@@ -20,9 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.lang.reflect.Array;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
@@ -30,6 +33,7 @@ import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPatter
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
 import org.neo4j.cypherdsl.core.support.Neo4jVersion;
+import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -432,26 +436,49 @@ public final class Cypher {
 		if (object == null) {
 			return (Literal<T>) NullLiteral.INSTANCE;
 		}
+		if (object instanceof Literal<?>) {
+			return (Literal<T>) object;
+		}
 		if (object instanceof CharSequence) {
 			return (Literal<T>) new StringLiteral((CharSequence) object);
+		}
+		if (object instanceof Character) {
+			return (Literal<T>) new StringLiteral(String.valueOf(object));
 		}
 		if (object instanceof Number) {
 			return (Literal<T>) new NumberLiteral((Number) object);
 		}
-		if (object instanceof Iterable) {
-			for (Object element : (Iterable<?>) object) {
-				if (!(element instanceof Literal)) {
-					throw new IllegalArgumentException("Unsupported literal type in iterable: " + element.getClass());
+		if (object instanceof TemporalAccessor) {
+			return (Literal<T>) new TemporalLiteral((TemporalAccessor) object);
+		}
+		if (object instanceof Iterable || object.getClass().isArray()) {
+			List<Literal<?>> elements = new ArrayList<>();
+			Consumer<Object> handleElement = element -> {
+				if (element instanceof Literal) {
+					elements.add((Literal<?>) element);
+				} else {
+					try {
+						elements.add(Cypher.literalOf(element));
+					} catch (UnsupportedLiteralException e) {
+						throw new UnsupportedLiteralException("Unsupported literal type in iterable.", element);
+					}
 				}
+			};
+			if (object.getClass().isArray()) {
+				for (int i = 0; i < Array.getLength(object); i++) {
+					handleElement.accept(Array.get(object, i));
+				}
+			} else {
+				((Iterable<?>) object).forEach(handleElement);
 			}
 
-			ListLiteral listLiteral = new ListLiteral((Iterable<Literal<?>>) object);
+			ListLiteral listLiteral = new ListLiteral(elements);
 			return (Literal<T>) listLiteral;
 		}
 		if (object instanceof Boolean) {
 			return (Literal<T>) BooleanLiteral.of((Boolean) object);
 		}
-		throw new IllegalArgumentException("Unsupported literal type: " + object.getClass());
+		throw new UnsupportedLiteralException(object);
 	}
 
 	/**

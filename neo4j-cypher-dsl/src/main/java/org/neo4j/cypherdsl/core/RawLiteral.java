@@ -42,7 +42,7 @@ final class RawLiteral implements Expression {
 
 	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("(?<!\\\\)\\$E");
 
-	static class RawElement extends Literal<String> {
+	static class RawElement extends LiteralBase<String> {
 
 		RawElement(String content) {
 			super(RawLiteral.unescapeEscapedPlaceholders(content));

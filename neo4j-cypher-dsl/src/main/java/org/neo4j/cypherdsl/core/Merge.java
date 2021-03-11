@@ -42,7 +42,7 @@ public final class Merge implements UpdatingClause {
 	/**
 	 * A literal for the blank.
 	 */
-	private static final Literal<String> BLANK = new Literal<String>(" ") {
+	private static final Literal<String> BLANK = new LiteralBase<String>(" ") {
 		@Override public String asString() {
 			return super.getContent();
 		}

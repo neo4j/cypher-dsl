@@ -33,7 +33,7 @@ import org.apiguardian.api.API;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class ListLiteral extends Literal<Iterable<Literal<?>>> {
+public final class ListLiteral extends LiteralBase<Iterable<Literal<?>>> {
 
 	ListLiteral(Iterable<Literal<?>> content) {
 		super(content);

@@ -35,7 +35,7 @@ import org.apiguardian.api.API;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class StringLiteral extends Literal<CharSequence> {
+public final class StringLiteral extends LiteralBase<CharSequence> {
 
 	private static final Pattern RESERVED_CHARS = Pattern.compile("([" + Pattern.quote("\\'\"") + "])");
 	private static final String QUOTED_LITERAL_FORMAT = "'%s'";
