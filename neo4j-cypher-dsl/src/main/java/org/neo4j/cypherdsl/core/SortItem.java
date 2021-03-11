@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Optional;
 
@@ -82,7 +81,7 @@ public final class SortItem implements Visitable {
 	 * Sort direction.
 	 * @since 1.0
 	 */
-	@API(status = INTERNAL)
+	@API(status = EXPERIMENTAL)
 	public enum Direction implements Visitable {
 		/** Undefined direction. */
 		UNDEFINED(""),

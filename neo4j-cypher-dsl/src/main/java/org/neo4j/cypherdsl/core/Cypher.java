@@ -389,6 +389,19 @@ public final class Cypher {
 	}
 
 	/**
+	 * Creates a new {@link SortItem} to be used as part of an {@link Order}.
+	 *
+	 * @param expression The expression by which things should be sorted
+	 * @param direction The direction to sort by. Defaults to {@link SortItem.Direction#UNDEFINED}.
+	 * @return A sort item
+	 * @since 2021.1.0
+	 */
+	public static SortItem sort(Expression expression, SortItem.Direction direction) {
+
+		return SortItem.create(expression, direction);
+	}
+
+	/**
 	 * Creates a map of expression from a list of key/value pairs.
 	 *
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}
