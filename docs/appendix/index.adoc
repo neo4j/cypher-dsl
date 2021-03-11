@@ -3,6 +3,8 @@
 
 :numbered!:
 
+include::query-dsl-support.adoc[]
+
 include::building.adoc[]
 
 include::../../etc/jqassistant/index.adoc[]
