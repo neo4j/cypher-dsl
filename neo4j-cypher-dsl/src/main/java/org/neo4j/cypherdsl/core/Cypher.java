@@ -745,6 +745,33 @@ public final class Cypher {
 		return RawLiteral.create(format, mixedArgs);
 	}
 
+	/**
+	 * The Query-DSL adapter. Can only be used when `com.querydsl:querydsl-core` is on the class path.
+	 */
+	private static volatile QueryDSLAdapter queryDSLAdapter;
+
+	/**
+	 * Provides access to the Query-DSL adapter. Please make sure you have `com.querydsl:querydsl-core` on the class path,
+	 * otherwise you will see some kind of {@link ClassNotFoundException} along various classes related to
+	 * {@code com.querydsl.core.*}.
+	 * @return The single QueryDSL adapter instance.
+	 * @since 2021.1.0
+	 */
+	public static QueryDSLAdapter adapt() {
+
+		QueryDSLAdapter adapter = queryDSLAdapter;
+		if (adapter == null) {
+			synchronized (Cypher.class) {
+				adapter = queryDSLAdapter;
+				if (adapter == null) {
+					queryDSLAdapter = new QueryDSLAdapter();
+					adapter = queryDSLAdapter;
+				}
+			}
+		}
+		return adapter;
+	}
+
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {
 
 		Assertions.isTrue(statements != null && statements.length >= 2, "At least two statements are required!");
