@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Collection;
 import java.util.Map;
@@ -95,6 +96,9 @@ public interface Statement extends Visitable {
 	 * @since 2021.0.0
 	 */
 	String getCypher();
+
+	@API(status = INTERNAL, since = "2021.0.0")
+	StatementContext getContext();
 
 	/**
 	 * Represents {@code RegularQuery}.

@@ -36,6 +36,7 @@ import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
+import org.neo4j.cypherdsl.core.StatementContext;
 
 /**
  * @author Andreas Berger
@@ -52,7 +53,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private int indentationLevel;
 	private boolean passedFirstReadingOrUpdatingClause;
 
-	PrettyPrintingVisitor(IndentStyle indentStyle, int indentSize) {
+	PrettyPrintingVisitor(StatementContext meta, IndentStyle indentStyle, int indentSize) {
+		super(meta);
 
 		if (indentStyle == IndentStyle.TAB) {
 			indentionProvider = (builder, width) -> {

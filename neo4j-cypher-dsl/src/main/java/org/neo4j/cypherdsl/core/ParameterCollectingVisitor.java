@@ -53,9 +53,14 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 		}
 	}
 
+	private final StatementContext statementContext;
 	private final Set<String> names = new TreeSet<>();
 	private final Map<String, Object> values = new TreeMap<>();
 	private final Map<String, Set<Object>> erroneousParameters = new TreeMap<>();
+
+	ParameterCollectingVisitor(StatementContext statementContext) {
+		this.statementContext = statementContext;
+	}
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
@@ -69,17 +74,18 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 	@SuppressWarnings("unused")
 	void enter(Parameter parameter) {
 
-		boolean knownParameterName = !this.names.add(parameter.getName());
+		String parameterName = statementContext.getParameterName(parameter);
+		boolean knownParameterName = !this.names.add(parameterName);
 
 		Object newValue = parameter.getValue();
-		Object oldValue = knownParameterName && this.values.containsKey(parameter.getName()) ?
-			this.values.get(parameter.getName()) :
+		Object oldValue = knownParameterName && this.values.containsKey(parameterName) ?
+			this.values.get(parameterName) :
 			Parameter.NO_VALUE;
 		if (parameter.hasValue()) {
-			this.values.put(parameter.getName(), newValue);
+			this.values.put(parameterName, newValue);
 		}
 		if (knownParameterName && !Objects.equals(oldValue, newValue)) {
-			Set<Object> conflictingObjects = this.erroneousParameters.computeIfAbsent(parameter.getName(), s -> {
+			Set<Object> conflictingObjects = this.erroneousParameters.computeIfAbsent(parameterName, s -> {
 				HashSet<Object> list = new HashSet<>();
 				list.add(oldValue);
 				return list;

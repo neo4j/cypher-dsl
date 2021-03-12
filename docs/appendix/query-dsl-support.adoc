@@ -27,6 +27,13 @@ include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/querydsl/
     won't return the expected results
 <.> Create some Query-DSL predicate based on the properties and adapt it as condition
 <.> Return some Query-DSL properties and adapt it as expression
+<.> Access the statements parameters for generated parameter names
+<.> Notice that most constants will be transported as named parameters. We are doing this for several reasons:
+    Parameters don't bust the query cache when the constant value changes, they are not subject to Cypher-Injection and
+    last but not least, we cannot translate each constant into something that is valid Cypher, so we delegate this task
+    to libraries like the Neo4j Java Driver further down the road.
+
+
 
 The Neo4j Cypher-DSL will collect all parameters defined via Query-DSL for you:
 

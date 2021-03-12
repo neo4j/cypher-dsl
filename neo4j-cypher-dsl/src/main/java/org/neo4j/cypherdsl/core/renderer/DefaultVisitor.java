@@ -73,6 +73,7 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
@@ -142,6 +143,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private final Map<SymbolicName, String> resolvedSymbolicNames = new ConcurrentHashMap<>();
 
+	protected final StatementContext statementContext;
+
 	/**
 	 * The current level in the tree of cypher elements.
 	 */
@@ -151,6 +154,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 * Will be set to true when entering an already visited node.
 	 */
 	private boolean skipNodeContent = false;
+
+	DefaultVisitor(StatementContext statementContext) {
+		this.statementContext = statementContext;
+	}
 
 	private void enableSeparator(int level, boolean on) {
 		if (on) {
@@ -515,7 +522,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Parameter parameter) {
 
-		builder.append("$").append(parameter.getName());
+		if (statementContext == null) {
+			throw new IllegalStateException("Parameter outside a statement context are not supported.");
+		}
+		builder.append("$").append(statementContext.getParameterName(parameter));
 	}
 
 	void enter(MapExpression map) {

@@ -21,10 +21,14 @@ package org.neo4j.cypherdsl.core.querydsl;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Parameter;
 
 import com.querydsl.core.types.Operator;
 import com.querydsl.core.types.Template;
@@ -42,6 +46,8 @@ public final class CypherContext {
 
 	private final List<Expression> expressions = new ArrayList<>();
 	private final String TO_STRING_VALUE_OF_UNSUPPORTED = "'" + CypherTemplates.UNSUPPORTED_MARKER + "'";
+
+	private final Map<Object, Parameter<?>> parameters = new IdentityHashMap<>();
 
 	public void add(Expression expression) {
 		this.expressions.add(expression);
@@ -64,5 +70,10 @@ public final class CypherContext {
 
 	int getPrecedence(Operator op) {
 		return templates.getPrecedence(op);
+	}
+
+	Parameter<?> getOrCreateParameterFor(Object object) {
+
+		return parameters.computeIfAbsent(object, o -> Cypher.anonParameter(o));
 	}
 }

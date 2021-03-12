@@ -244,8 +244,21 @@ public final class Cypher {
 	 * @return The new parameter
 	 * @since 2021.0.0
 	 */
-	public static <T>  Parameter<T> parameter(String name, T value) {
+	public static <T> Parameter<T> parameter(String name, T value) {
 		return Parameter.create(name, value);
+	}
+
+	/**
+	 * Creates a new anonymous parameter with a value bound to it. The value can be retrieved from the final statement build.
+	 * The name will be available as soon as the statement has been rendered.
+	 *
+	 * @param value The value of the parameter.
+	 * @param <T> Type of the new parameter
+	 * @return The new parameter
+	 * @since 2021.1.0
+	 */
+	public static <T> Parameter<T> anonParameter(T value) {
+		return Parameter.anon(value);
 	}
 
 	/**

@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class DefaultVisitorTest {
 
-	private final DefaultVisitor visitor = new DefaultVisitor();
+	private final DefaultVisitor visitor = new DefaultVisitor(null);
 
 	@ParameterizedTest
 	@CsvSource({

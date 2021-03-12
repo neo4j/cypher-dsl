@@ -28,6 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.support.LRUCache;
+import org.neo4j.cypherdsl.core.StatementContext;
 
 /**
  * @author Michael J. Simons
@@ -78,7 +79,7 @@ class ConfigurableRenderer implements Renderer {
 			try {
 				write.lock();
 
-				RenderingVisitor renderingVisitor = createVisitor();
+				RenderingVisitor renderingVisitor = createVisitor(statement.getContext());
 				statement.accept(renderingVisitor);
 				renderedContent = renderingVisitor.getRenderedContent().trim();
 
@@ -91,12 +92,12 @@ class ConfigurableRenderer implements Renderer {
 		return renderedContent;
 	}
 
-	private RenderingVisitor createVisitor() {
+	private RenderingVisitor createVisitor(StatementContext meta) {
 
 		if (!this.configuration.isPrettyPrint()) {
-			return new DefaultVisitor();
+			return new DefaultVisitor(meta);
 		} else {
-			return new PrettyPrintingVisitor(this.configuration.getIndentStyle(), this.configuration.getIndentSize());
+			return new PrettyPrintingVisitor(meta, this.configuration.getIndentStyle(), this.configuration.getIndentSize());
 		}
 	}
 

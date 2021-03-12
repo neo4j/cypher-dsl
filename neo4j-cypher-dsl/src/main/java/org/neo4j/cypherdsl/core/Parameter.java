@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -56,6 +55,16 @@ public final class Parameter<T> implements Expression {
 		return new Parameter<>(name, value);
 	}
 
+	static Parameter<Object> anon() {
+
+		return anon(NO_VALUE);
+	}
+
+	static <T> Parameter<T> anon(T value) {
+
+		return new Parameter<>(null, value);
+	}
+
 	private Parameter(String name, T value) {
 
 		this.name = name;
@@ -63,10 +72,20 @@ public final class Parameter<T> implements Expression {
 	}
 
 	/**
+	 * Query method to check if this is an anonymous parameter.
+	 *
+	 * @return True if this is an anonymous parameter
+	 * @since 2021.1.0
+	 */
+	@API(status = EXPERIMENTAL, since = "2021.0.0")
+	public boolean isAnon() {
+		return this.name == null || this.name.trim().isEmpty();
+	}
+
+	/**
 	 * @return The name of this parameter.
 	 */
-	@API(status = INTERNAL)
-	public String getName() {
+	String getName() {
 		return name;
 	}
 

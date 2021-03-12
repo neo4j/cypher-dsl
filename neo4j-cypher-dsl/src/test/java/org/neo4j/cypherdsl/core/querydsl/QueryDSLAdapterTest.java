@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core.querydsl;
 
 //CHECKSTYLE:OFF
+
 import static com.querydsl.core.alias.Alias.$;
 import static com.querydsl.core.alias.Alias.alias;
 import static com.querydsl.core.types.dsl.Expressions.asNumber;
@@ -30,10 +31,8 @@ import static com.querydsl.core.types.dsl.Expressions.numberOperation;
 import static com.querydsl.core.types.dsl.Expressions.predicate;
 import static com.querydsl.core.types.dsl.Expressions.stringOperation;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
-//CHECKSTYLE:ON
 
 import java.time.LocalDate;
 import java.time.OffsetTime;
@@ -41,7 +40,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -53,7 +52,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Statement;
-import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Ops;
@@ -77,118 +75,131 @@ import com.querydsl.core.types.dsl.Param;
  */
 class QueryDSLAdapterTest {
 
+	static Map<String, Object> expected(Object... args) {
+		Map<String, Object> result = new HashMap<>();
+		for (int i = 0; i < args.length; i++) {
+			result.put(String.format("pcdsl%02d", i + 1), args[i]);
+		}
+		return result;
+	}
+
+
 	static Stream<Arguments> supportedOpsArgs() {
 
 		Stream.Builder<Arguments> r = Stream.builder();
 
 		//@formatter:off
-		r.add(arguments("true = true AND false = true", Expressions.TRUE.isTrue().and(Expressions.FALSE.isTrue())));
-		r.add(arguments("NOT true", Expressions.TRUE.not()));
-		r.add(arguments("true = true OR false = true", Expressions.TRUE.isTrue().or(Expressions.FALSE.isTrue())));
-		r.add(arguments("NOT (true XOR false)", booleanOperation(Ops.XNOR,  Expressions.TRUE,  Expressions.FALSE)));
-		r.add(arguments("true XOR false", booleanOperation(Ops.XOR,  Expressions.TRUE,  Expressions.FALSE)));
+		r.add(arguments("true = true AND false = true", Expressions.TRUE.isTrue().and(Expressions.FALSE.isTrue()), Collections.emptyMap()));
+		r.add(arguments("NOT true", Expressions.TRUE.not(), Collections.emptyMap()));
+		r.add(arguments("true = true OR false = true", Expressions.TRUE.isTrue().or(Expressions.FALSE.isTrue()), Collections.emptyMap()));
+		r.add(arguments("NOT (true XOR false)", booleanOperation(Ops.XNOR,  Expressions.TRUE,  Expressions.FALSE), Collections.emptyMap()));
+		r.add(arguments("true XOR false", booleanOperation(Ops.XOR,  Expressions.TRUE,  Expressions.FALSE), Collections.emptyMap()));
 
-		r.add(arguments("size(['x']) = 0", booleanOperation(Ops.COL_IS_EMPTY, constant(Arrays.asList("x")))));
-		r.add(arguments("size(['x']) > 1", numberOperation(Integer.class, Ops.COL_SIZE, constant(Arrays.asList("x"))).gt(1)));
-
-		r.add(arguments("size(['x']) > 1", numberOperation(Integer.class, Ops.COL_SIZE, constant(new String[]{"x"})).gt(1)));
+		r.add(arguments("size(['x']) = 0", booleanOperation(Ops.COL_IS_EMPTY, constant(Arrays.asList("x"))), Collections.emptyMap()));
+		r.add(arguments("size(['x']) > $pcdsl01", numberOperation(Integer.class, Ops.COL_SIZE, constant(Arrays.asList("x"))).gt(1), expected(1)));
+		r.add(arguments("size(['x']) > $pcdsl01", numberOperation(Integer.class, Ops.COL_SIZE, constant(new String[]{"x"})).gt(1), expected(1)));
 
 		Map<String, String> aMap = new HashMap<>();
 		aMap.put("1", "a");
 		aMap.put("2", "b");
-		r.add(arguments("size(keys({`1`: 'a', `2`: 'b'})) > 1", numberOperation(Integer.class, Ops.MAP_SIZE, constant(aMap)).gt(1)));
-		r.add(arguments("size(keys({`1`: 'a', `2`: 'b'})) = 0", booleanOperation(Ops.MAP_IS_EMPTY, constant(aMap))));
-		r.add(arguments("any(v in keys({`1`: 'a', `2`: 'b'}) where v = '1')", booleanOperation(Ops.CONTAINS_KEY, constant(aMap), asString("1"))));
-		r.add(arguments("any(v in [k IN KEYS({`1`: 'a', `2`: 'b'}) | {`1`: 'a', `2`: 'b'}[k]] where v = 'b')", booleanOperation(Ops.CONTAINS_VALUE, constant(aMap), asString("b"))));
+		r.add(arguments("size(keys($pcdsl01)) > $pcdsl02", numberOperation(Integer.class, Ops.MAP_SIZE, constant(aMap)).gt(1), expected(aMap, 1)));
+		r.add(arguments("size(keys($pcdsl01)) = 0", booleanOperation(Ops.MAP_IS_EMPTY, constant(aMap)), expected(aMap)));
+		r.add(arguments("any(v in keys($pcdsl01) where v = $pcdsl02)", booleanOperation(Ops.CONTAINS_KEY, constant(aMap), asString("1")), expected(aMap, "1")));
+		r.add(arguments("any(v in [k IN KEYS($pcdsl01) | $pcdsl01[k]] where v = $pcdsl02)", booleanOperation(Ops.CONTAINS_VALUE, constant(aMap), asString("b")), expected(aMap, "b")));
 
-		r.add(arguments("size('a' + 'b') = 2", stringOperation(Ops.CONCAT, asString("a"), asString("b")).length().eq(2)));
-		r.add(arguments("toLower('A') = 'a'", stringOperation(Ops.LOWER, asString("A")).eq(asString("a"))));
-		r.add(arguments("substring('1234', 1) = '234'", stringOperation(Ops.SUBSTR_1ARG, asString("1234"), Expressions.ONE).eq(asString("234"))));
-		r.add(arguments("substring('1234', 1, 2) = '23'", stringOperation(Ops.SUBSTR_2ARGS, asString("1234"), Expressions.ONE, Expressions.TWO).eq(asString("23"))));
-		r.add(arguments("trim(' A ') = 'A'", stringOperation(Ops.TRIM, asString(" A ")).eq(asString("A"))));
-		r.add(arguments("toUpper('a') = 'A'", stringOperation(Ops.UPPER, asString("a")).eq(asString("A"))));
-		r.add(arguments("'a' =~ 'A'", booleanOperation(Ops.MATCHES, asString("a"), asString("A"))));
-		r.add(arguments("'a' =~ ('(?i)' + 'A')", booleanOperation(Ops.MATCHES_IC, asString("a"), asString("A"))));
-		r.add(arguments("'a' =~ ('(?i)' + 'A')", booleanOperation(Ops.MATCHES_IC, asString("a"), asString("A"))));
-		r.add(arguments("'ABC' STARTS WITH 'a'", booleanOperation(Ops.STARTS_WITH, asString("ABC"), asString("a"))));
-		r.add(arguments("toLower('ABC') STARTS WITH toLower('a')", booleanOperation(Ops.STARTS_WITH_IC, asString("ABC"), asString("a"))));
-		r.add(arguments("'ABC' ENDS WITH 'c'", booleanOperation(Ops.ENDS_WITH, asString("ABC"), asString("c"))));
-		r.add(arguments("toLower('ABC') ENDS WITH toLower('c')", booleanOperation(Ops.ENDS_WITH_IC, asString("ABC"), asString("c"))));
-		r.add(arguments("'ABC' CONTAINS 'c'", booleanOperation(Ops.STRING_CONTAINS, asString("ABC"), asString("c"))));
-		r.add(arguments("toLower('ABC') CONTAINS toLower('c')", booleanOperation(Ops.STRING_CONTAINS_IC, asString("ABC"), asString("c"))));
-		r.add(arguments("substring('1234', 2, 1) = '3'", Expressions.operation(Character.class, Ops.CHAR_AT, asString("1234"),  Expressions.TWO).eq('3')));
-		r.add(arguments("size('ABC') = 3", asString("ABC").length().eq(3)));
-		r.add(arguments("'ABC' =~ '.*' + 'a' + '.*'", booleanOperation(Ops.LIKE, asString("ABC"), asString("a"))));
-		r.add(arguments("'ABC' =~ '(?i).*' + 'a' + '.*'", booleanOperation(Ops.LIKE_IC, asString("ABC"), asString("a"))));
-		r.add(arguments("size(left('ABCD', 3)) = 3", stringOperation(Ops.StringOps.LEFT, asString("ABCD"), asNumber(3)).length().eq(3)));
-		r.add(arguments("size(right('ABCD', 3)) = 3", stringOperation(Ops.StringOps.RIGHT, asString("ABCD"), asNumber(3)).length().eq(3)));
-		r.add(arguments("size(ltrim(' ABCD')) = 4", stringOperation(Ops.StringOps.LTRIM, asString(" ABCD"), asNumber(3)).length().eq(4)));
-		r.add(arguments("size(rtrim('ABCD ')) = 4", stringOperation(Ops.StringOps.RTRIM, asString("ABCD "), asNumber(3)).length().eq(4)));
+		r.add(arguments("size($pcdsl01 + $pcdsl02) = $pcdsl03", stringOperation(Ops.CONCAT, asString("a"), asString("b")).length().eq(2), expected("a", "b", 2)));
+		r.add(arguments("toLower($pcdsl01) = $pcdsl02", stringOperation(Ops.LOWER, asString("A")).eq(asString("a")), expected("A", "a")));
+		r.add(arguments("substring($pcdsl01, 1) = $pcdsl02", stringOperation(Ops.SUBSTR_1ARG, asString("1234"), Expressions.ONE).eq(asString("234")), expected("1234", "234")));
+		r.add(arguments("substring($pcdsl01, 1, 2) = $pcdsl02", stringOperation(Ops.SUBSTR_2ARGS, asString("1234"), Expressions.ONE, Expressions.TWO).eq(asString("23")), expected("1234", "23")));
+		r.add(arguments("trim($pcdsl01) = $pcdsl02", stringOperation(Ops.TRIM, asString(" A ")).eq(asString("A")), expected(" A ", "A")));
+		r.add(arguments("toUpper($pcdsl01) = $pcdsl02", stringOperation(Ops.UPPER, asString("a")).eq(asString("A")), expected("a", "A")));
+		r.add(arguments("$pcdsl01 =~ $pcdsl02", booleanOperation(Ops.MATCHES, asString("a"), asString("A")), expected("a", "A")));
+		r.add(arguments("$pcdsl01 =~ ('(?i)' + $pcdsl02)", booleanOperation(Ops.MATCHES_IC, asString("a"), asString("A")), expected("a", "A")));
+		r.add(arguments("$pcdsl01 =~ ('(?i)' + $pcdsl02)", booleanOperation(Ops.MATCHES_IC, asString("a"), asString("A")), expected("a", "A")));
+		r.add(arguments("$pcdsl01 STARTS WITH $pcdsl02", booleanOperation(Ops.STARTS_WITH, asString("ABC"), asString("a")), expected("ABC", "a")));
+		r.add(arguments("toLower($pcdsl01) STARTS WITH toLower($pcdsl02)", booleanOperation(Ops.STARTS_WITH_IC, asString("ABC"), asString("a")), expected("ABC", "a")));
+		r.add(arguments("$pcdsl01 ENDS WITH $pcdsl02", booleanOperation(Ops.ENDS_WITH, asString("ABC"), asString("c")), expected("ABC", "c")));
+		r.add(arguments("toLower($pcdsl01) ENDS WITH toLower($pcdsl02)", booleanOperation(Ops.ENDS_WITH_IC, asString("ABC"), asString("c")), expected("ABC", "c")));
+		r.add(arguments("$pcdsl01 CONTAINS $pcdsl02", booleanOperation(Ops.STRING_CONTAINS, asString("ABC"), asString("c")), expected("ABC", "c")));
+		r.add(arguments("toLower($pcdsl01) CONTAINS toLower($pcdsl02)", booleanOperation(Ops.STRING_CONTAINS_IC, asString("ABC"), asString("c")), expected("ABC", "c")));
+		r.add(arguments("substring($pcdsl01, 2, 1) = $pcdsl02", Expressions.operation(Character.class, Ops.CHAR_AT, asString("1234"), Expressions.TWO).eq('3'), expected("1234", '3')));
+		r.add(arguments("size($pcdsl01) = $pcdsl02", asString("ABC").length().eq(3), expected("ABC", 3)));
+		r.add(arguments("$pcdsl01 =~ '.*' + $pcdsl02 + '.*'", booleanOperation(Ops.LIKE, asString("ABC"), asString("a")), expected("ABC", "a")));
+		r.add(arguments("$pcdsl01 =~ '(?i).*' + $pcdsl02 + '.*'", booleanOperation(Ops.LIKE_IC, asString("ABC"), asString("a")), expected("ABC", "a")));
+		r.add(arguments("size(left($pcdsl01, $pcdsl02)) = $pcdsl02", stringOperation(Ops.StringOps.LEFT, asString("ABCD"), asNumber(3)).length().eq(3), expected("ABCD", 3)));
+		r.add(arguments("size(right($pcdsl01, $pcdsl02)) = $pcdsl02", stringOperation(Ops.StringOps.RIGHT, asString("ABCD"), asNumber(3)).length().eq(3), expected("ABCD", 3)));
+		r.add(arguments("size(ltrim($pcdsl01)) = $pcdsl02", stringOperation(Ops.StringOps.LTRIM, asString(" ABCD")).length().eq(4), expected(" ABCD", 4)));
+		r.add(arguments("size(rtrim($pcdsl01)) = $pcdsl02", stringOperation(Ops.StringOps.RTRIM, asString("ABCD ")).length().eq(4), expected("ABCD ", 4)));
 
-		r.add(arguments("datetime() >= datetime('2021-03-10T15:50:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE).goe(ZonedDateTime.of(2021, 3, 10, 15, 50, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("date() >= date('2021-03-10')", dateOperation(LocalDate.class, Ops.DateTimeOps.CURRENT_DATE).goe(LocalDate.of(2021, 3, 10))));
-		r.add(arguments("time() >= time('15:53:00Z')", dateOperation(OffsetTime.class, Ops.DateTimeOps.CURRENT_TIME).goe(OffsetTime.of(15, 53, 0, 0, ZoneOffset.UTC))));
-		r.add(arguments("datetime().epochmillis >= 23", dateOperation(Long.class, Ops.DateTimeOps.CURRENT_TIMESTAMP).goe(23L)));
-		r.add(arguments("date('2021-03-10') >= date('2021-03-10')", dateOperation(LocalDate.class, Ops.DateTimeOps.DATE, Expressions.asString("2021-03-10")).goe(LocalDate.of(2021, 3, 10))));
+		ZonedDateTime t = ZonedDateTime.of(2021, 3, 10, 15, 50, 0, 0, ZoneId.of("Europe/Berlin"));
+		r.add(arguments("datetime() >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE).goe(t), expected(t)));
+		LocalDate l = LocalDate.of(2021, 3, 10);
+		r.add(arguments("date() >= $pcdsl01", dateOperation(LocalDate.class, Ops.DateTimeOps.CURRENT_DATE).goe(l), expected(l)));
+		OffsetTime ot = OffsetTime.of(15, 53, 0, 0, ZoneOffset.UTC);
+		r.add(arguments("time() >= $pcdsl01", dateOperation(OffsetTime.class, Ops.DateTimeOps.CURRENT_TIME).goe(ot), expected(ot)));
+		r.add(arguments("datetime().epochmillis >= $pcdsl01", dateOperation(Long.class, Ops.DateTimeOps.CURRENT_TIMESTAMP).goe(23L), expected(23L)));
+		r.add(arguments("date($pcdsl01) >= $pcdsl02", dateOperation(LocalDate.class, Ops.DateTimeOps.DATE, Expressions.asString("2021-03-10")).goe(l), expected("2021-03-10", l)));
 
-		r.add(arguments("datetime().millisecond >= 23", dateOperation(Integer.class, Ops.DateTimeOps.MILLISECOND, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().second >= 23", dateOperation(Integer.class, Ops.DateTimeOps.SECOND, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().minute >= 23", dateOperation(Integer.class, Ops.DateTimeOps.MINUTE, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().hour >= 23", dateOperation(Integer.class, Ops.DateTimeOps.HOUR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().week >= 23", dateOperation(Integer.class, Ops.DateTimeOps.WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().month >= 23", dateOperation(Integer.class, Ops.DateTimeOps.MONTH, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().year >= 23", dateOperation(Integer.class, Ops.DateTimeOps.YEAR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().weekYear >= 23", dateOperation(Integer.class, Ops.DateTimeOps.YEAR_WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
-		r.add(arguments("datetime().dayOfWeek >= 23", dateOperation(Integer.class, Ops.DateTimeOps.DAY_OF_WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23)));
+		r.add(arguments("datetime().millisecond >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.MILLISECOND, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().second >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.SECOND, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().minute >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.MINUTE, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().hour >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.HOUR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().week >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().month >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.MONTH, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().year >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.YEAR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().weekYear >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.YEAR_WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
+		r.add(arguments("datetime().dayOfWeek >= $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DAY_OF_WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(23), expected(23)));
 
-		r.add(arguments("datetime() + duration({years: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_YEARS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime() + duration({months: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_MONTHS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime() + duration({weeks: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_WEEKS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime() + duration({days: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_DAYS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime() + duration({hours: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_HOURS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime() + duration({minutes: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_MINUTES, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime() + duration({seconds: 23}) >= datetime('2021-03-10T16:48:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_SECONDS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin")))));
+		t = ZonedDateTime.of(2021, 3, 10, 16, 48, 0, 0, ZoneId.of("Europe/Berlin"));
+		r.add(arguments("datetime() + duration({years: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_YEARS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
+		r.add(arguments("datetime() + duration({months: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_MONTHS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
+		r.add(arguments("datetime() + duration({weeks: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_WEEKS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
+		r.add(arguments("datetime() + duration({days: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_DAYS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
+		r.add(arguments("datetime() + duration({hours: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_HOURS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
+		r.add(arguments("datetime() + duration({minutes: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_MINUTES, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
+		r.add(arguments("datetime() + duration({seconds: $pcdsl01}) >= $pcdsl02", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.ADD_SECONDS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), asNumber(23)).goe(t), expected(23, t)));
 
-		r.add(arguments("duration.between(datetime(), datetime()).years = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_YEARS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
-		r.add(arguments("duration.between(datetime(), datetime()).months = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_MONTHS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
-		r.add(arguments("duration.between(datetime(), datetime()).weeks = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_WEEKS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
-		r.add(arguments("duration.between(datetime(), datetime()).days = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_DAYS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
-		r.add(arguments("duration.between(datetime(), datetime()).hours = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_HOURS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
-		r.add(arguments("duration.between(datetime(), datetime()).minutes = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_MINUTES, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
-		r.add(arguments("duration.between(datetime(), datetime()).seconds = 0", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_SECONDS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).years = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_YEARS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).months = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_MONTHS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).weeks = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_WEEKS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).days = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_DAYS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).hours = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_HOURS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).minutes = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_MINUTES, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
+		r.add(arguments("duration.between(datetime(), datetime()).seconds = $pcdsl01", dateOperation(Integer.class, Ops.DateTimeOps.DIFF_SECONDS, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE), dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).eq(0), expected(0)));
 
-		r.add(arguments("date.truncate('year', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_YEAR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("date.truncate('month', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_MONTH, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("date.truncate('week', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("date.truncate('day', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_DAY, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime.truncate('hour', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_HOUR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime.truncate('minute', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_MINUTE, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
-		r.add(arguments("datetime.truncate('second', datetime()) >= datetime('2021-03-10T17:02:00+01:00[Europe/Berlin]')", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_SECOND, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin")))));
+		t = ZonedDateTime.of(2021, 3, 10, 17, 02, 0, 0, ZoneId.of("Europe/Berlin"));
+		r.add(arguments("date.truncate('year', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_YEAR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
+		r.add(arguments("date.truncate('month', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_MONTH, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
+		r.add(arguments("date.truncate('week', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_WEEK, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
+		r.add(arguments("date.truncate('day', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_DAY, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
+		r.add(arguments("datetime.truncate('hour', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_HOUR, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
+		r.add(arguments("datetime.truncate('minute', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_MINUTE, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
+		r.add(arguments("datetime.truncate('second', datetime()) >= $pcdsl01", dateOperation(ZonedDateTime.class, Ops.DateTimeOps.TRUNC_SECOND, dateOperation(ZonedDateTime.class, Ops.DateTimeOps.SYSDATE)).goe(t), expected(t)));
 
-		r.add(arguments("abs(1) > 1.0", numberOperation(Double.class, Ops.MathOps.ABS, asNumber(1)).gt(1)));
-		r.add(arguments("acos(1) > 1.0", numberOperation(Double.class, Ops.MathOps.ACOS, asNumber(1)).gt(1)));
-		r.add(arguments("asin(1) > 1.0", numberOperation(Double.class, Ops.MathOps.ASIN, asNumber(1)).gt(1)));
-		r.add(arguments("atan(1) > 1.0", numberOperation(Double.class, Ops.MathOps.ATAN, asNumber(1)).gt(1)));
-		r.add(arguments("ceil(1) > 1.0", numberOperation(Double.class, Ops.MathOps.CEIL, asNumber(1)).gt(1)));
-		r.add(arguments("cos(1) > 1.0", numberOperation(Double.class, Ops.MathOps.COS, asNumber(1)).gt(1)));
-		r.add(arguments("cot(1) > 1.0", numberOperation(Double.class, Ops.MathOps.COT, asNumber(1)).gt(1)));
-		r.add(arguments("degrees(1) > 1.0", numberOperation(Double.class, Ops.MathOps.DEG, asNumber(1)).gt(1)));
-		r.add(arguments("tan(1) > 1.0", numberOperation(Double.class, Ops.MathOps.TAN, asNumber(1)).gt(1)));
-		r.add(arguments("sqrt(4) > 1.0", numberOperation(Double.class, Ops.MathOps.SQRT, asNumber(4)).gt(1)));
-		r.add(arguments("sign(1) > 1.0", numberOperation(Double.class, Ops.MathOps.SIGN, asNumber(1)).gt(1)));
-		r.add(arguments("sin(1) > 1.0", numberOperation(Double.class, Ops.MathOps.SIN, asNumber(1)).gt(1)));
-		r.add(arguments("round(1) > 1.0", numberOperation(Double.class, Ops.MathOps.ROUND, asNumber(1)).gt(1)));
-		r.add(arguments("round(1, 1) > 1.0", numberOperation(Double.class, Ops.MathOps.ROUND2, asNumber(1), asNumber(1)).gt(1)));
-		r.add(arguments("radians(1) > 1.0", numberOperation(Double.class, Ops.MathOps.RAD, asNumber(1)).gt(1)));
-		r.add(arguments("CASE WHEN 1 < 2 THEN 1 ELSE 2 END > 1.0", numberOperation(Double.class, Ops.MathOps.MIN, asNumber(1), asNumber(2)).gt(1)));
-		r.add(arguments("CASE WHEN 1 > 2 THEN 1 ELSE 2 END > 1.0", numberOperation(Double.class, Ops.MathOps.MAX, asNumber(1), asNumber(2)).gt(1)));
-		r.add(arguments("floor(1.1) > 1.0", numberOperation(Double.class, Ops.MathOps.FLOOR, asNumber(1.1)).gt(1)));
-		r.add(arguments("exp(1) > 1.0", numberOperation(Double.class, Ops.MathOps.EXP, asNumber(1)).gt(1)));
+		r.add(arguments("abs($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ABS, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("acos($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ACOS, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("asin($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ASIN, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("atan($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ATAN, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("ceil($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.CEIL, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("cos($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.COS, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("cot($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.COT, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("degrees($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.DEG, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("tan($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.TAN, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("sqrt($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SQRT, asNumber(4)).gt(1), expected(4, 1.0)));
+		r.add(arguments("sign($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SIGN, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("sin($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SIN, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("round($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ROUND, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("round($pcdsl01, $pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ROUND2, asNumber(1), asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("radians($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.RAD, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("CASE WHEN $pcdsl01 < $pcdsl02 THEN $pcdsl01 ELSE $pcdsl02 END > $pcdsl03", numberOperation(Double.class, Ops.MathOps.MIN, asNumber(1), asNumber(2)).gt(1), expected(1, 2, 1.0)));
+		r.add(arguments("CASE WHEN $pcdsl01 > $pcdsl02 THEN $pcdsl01 ELSE $pcdsl02 END > $pcdsl03", numberOperation(Double.class, Ops.MathOps.MAX, asNumber(1), asNumber(2)).gt(1), expected(1, 2, 1.0)));
+		r.add(arguments("floor($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.FLOOR, asNumber(1.1)).gt(1), expected(1.1, 1.0)));
+		r.add(arguments("exp($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.EXP, asNumber(1)).gt(1), expected(1)));
 
 		Predicate p = Expressions.cases().when(Expressions.TRUE).then(Expressions.asNumber(1))
 			.when(Expressions.FALSE).then(Expressions.asNumber(2))
 			.otherwise(Expressions.asNumber(3)).gt(3);
-		r.add(arguments("(CASE WHEN true THEN 1 WHEN false THEN 2 ELSE 3 END) > 3", p));
+		r.add(arguments("(CASE WHEN true THEN $pcdsl01 WHEN false THEN $pcdsl02 ELSE $pcdsl03 END) > $pcdsl03", p, expected(1, 2, 3)));
 		//@formatter:on
 
 		return r.build();
@@ -196,13 +207,14 @@ class QueryDSLAdapterTest {
 
 	@MethodSource("supportedOpsArgs")
 	@ParameterizedTest(name = "{index} {0}")
-	void supportedOps(String expectedFragment, Predicate predicate) {
+	void supportedOps(String expectedFragment, Predicate predicate, Map<String, Object> expectedParameters) {
 
 		Statement statement = Cypher.with(Cypher.literalOf(1).as("e"))
 			.where(Cypher.adapt(predicate).asCondition())
 			.returning("e")
 			.build();
 
+		assertThat(statement.getParameters()).containsAllEntriesOf(expectedParameters);
 		assertThat(statement.getCypher())
 			.isEqualTo("WITH 1 AS e WHERE " + expectedFragment + " RETURN e");
 	}
@@ -225,14 +237,6 @@ class QueryDSLAdapterTest {
 	}
 
 	@Test
-	void unsupportedLiterals() {
-
-		assertThatExceptionOfType(UnsupportedLiteralException.class)
-			.isThrownBy(() -> Cypher.adapt(Expressions.asDate(new Date())).asExpression())
-			.withMessageStartingWith("Unsupported literal type: class java.util.Date");
-	}
-
-	@Test
 	void queryingByPathBasedOnClassShouldWork() {
 
 		Path<Person> person = Expressions.path(Person.class, "n");
@@ -243,9 +247,10 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
 			.where(Cypher.adapt(expr).asCondition()).returning(Cypher.adapt(person).asName()).build();
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
+		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n");
 	}
 
 	@Test
@@ -257,9 +262,10 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.node("Person").named("n"))
 			.where(Cypher.adapt(p).asCondition()).returning(Cypher.name(person.toString())).build();
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
+		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n");
 	}
 
 	@Test
@@ -270,9 +276,10 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
 			.where(Cypher.adapt(p).asCondition()).returning(Cypher.adapt(person).asName()).build();
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
+		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (person:`Person`) WHERE person.firstName = 'P' AND person.age > 25 RETURN person");
+			.isEqualTo("MATCH (person:`Person`) WHERE person.firstName = $pcdsl01 AND person.age > $pcdsl02 RETURN person");
 	}
 
 	@Test
@@ -285,10 +292,10 @@ class QueryDSLAdapterTest {
 			.orderBy(Cypher.adapt(person.firstName).asExpression().descending())
 			.build();
 
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "Rickard");
 		assertThat(statement.getCypher())
 			.isEqualTo(
-				"MATCH (person:`Person`) WHERE person.firstName = 'Rickard' RETURN person.firstName ORDER BY person.firstName DESC");
+				"MATCH (person:`Person`) WHERE person.firstName = $pcdsl01 RETURN person.firstName ORDER BY person.firstName DESC");
 	}
 
 	@Test
@@ -301,9 +308,10 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName()) // <.>
 			.build();
 
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P"); // <.>
+		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n"); // <.>
 		// end::query-dsl-simple[]
 	}
 
@@ -335,9 +343,9 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName())
 			.build();
 
-		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "(?i).*rick.*");
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName =~ '(?i).*rick.*' RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName =~ $pcdsl01 RETURN n");
 	}
 
 	@Test

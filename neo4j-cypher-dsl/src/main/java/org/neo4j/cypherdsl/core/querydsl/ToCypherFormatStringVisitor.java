@@ -21,14 +21,10 @@ package org.neo4j.cypherdsl.core.querydsl;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
 
 import com.querydsl.core.types.Constant;
 import com.querydsl.core.types.Expression;
@@ -105,7 +101,7 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 			}
 			return builder.toString();
 		} else {
-			return "unknown operation with operator " + o.getOperator().name() + " and args " + o.getArgs();
+			throw new IllegalArgumentException("unknown operation with operator " + o.getOperator().name() + " and args " + o.getArgs());
 		}
 	}
 
@@ -167,24 +163,15 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 	public String visit(Constant<?> expr, CypherContext context) {
 
 		Object constantValue = expr.getConstant();
-		if (constantValue instanceof Map) {
-			context.add(createMapExpressionOfLiterals((Map<?, ?>) constantValue));
-		} else {
+		if (constantValue == null) {
+			context.add(Cypher.literalOf(null));
+		} else if (constantValue instanceof Boolean || constantValue instanceof Iterable || constantValue.getClass()
+			.isArray()) {
 			context.add(Cypher.literalOf(constantValue));
+		} else {
+			context.add(context.getOrCreateParameterFor(constantValue));
 		}
+
 		return "$E";
-	}
-
-	private MapExpression createMapExpressionOfLiterals(Map<?, ?> aMap) {
-
-		Map<String, Object> baseMap = new HashMap(aMap.size());
-		aMap.forEach((k, v) -> {
-			if (k instanceof CharSequence) {
-				baseMap.put(((CharSequence) k).toString(), Cypher.literalOf(v));
-			} else {
-				throw new UnsupportedLiteralException("The keys of a literal map must be Strings", k);
-			}
-		});
-		return Cypher.asExpression(baseMap);
 	}
 }

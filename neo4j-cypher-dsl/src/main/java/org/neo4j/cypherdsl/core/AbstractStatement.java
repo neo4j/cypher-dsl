@@ -39,6 +39,11 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 abstract class AbstractStatement implements Statement {
 
 	/**
+	 * Provides context during visiting of this statement.
+	 */
+	private final StatementContext context = new StatementContextImpl();
+
+	/**
 	 * The collected parameter information (names only and names + values).
 	 */
 	private volatile ParameterInformation parameterInformation;
@@ -47,6 +52,11 @@ abstract class AbstractStatement implements Statement {
 	 * The rendered Cypher statement.
 	 */
 	private volatile String cypher;
+
+	@Override
+	public StatementContext getContext() {
+		return context;
+	}
 
 	@Override
 	public Map<String, Object> getParameters() {
@@ -74,14 +84,14 @@ abstract class AbstractStatement implements Statement {
 		return result;
 	}
 
-	ParameterInformation getParameterInformation() {
+	private ParameterInformation getParameterInformation() {
 
 		ParameterInformation result = this.parameterInformation;
 		if (result == null) {
 			synchronized (this) {
 				result = this.parameterInformation;
 				if (result == null) {
-					this.parameterInformation = collectParameters(this);
+					this.parameterInformation = collectParameters();
 					result = this.parameterInformation;
 				}
 			}
@@ -92,14 +102,13 @@ abstract class AbstractStatement implements Statement {
 	/**
 	 * Collects all bound parameters from the statement.
 	 *
-	 * @param statement the statement to collect all bound parameters from
 	 * @return a map of used parameters with its bound values
 	 * @see org.neo4j.cypherdsl.core.Parameter#withValue(Object)
 	 */
-	private static ParameterInformation collectParameters(Statement statement) {
+	private ParameterInformation collectParameters() {
 
-		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor();
-		statement.accept(parameterCollectingVisitor);
+		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext());
+		this.accept(parameterCollectingVisitor);
 		return parameterCollectingVisitor.getResult();
 	}
 }
