@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core.querydsl;
 
 //CHECKSTYLE:OFF
-
 import static com.querydsl.core.alias.Alias.$;
 import static com.querydsl.core.alias.Alias.alias;
 import static com.querydsl.core.types.dsl.Expressions.asNumber;
@@ -33,6 +32,7 @@ import static com.querydsl.core.types.dsl.Expressions.stringOperation;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
+//CHECKSTYLE:ON
 
 import java.time.LocalDate;
 import java.time.OffsetTime;
@@ -95,9 +95,9 @@ class QueryDSLAdapterTest {
 		r.add(arguments("NOT (true XOR false)", booleanOperation(Ops.XNOR,  Expressions.TRUE,  Expressions.FALSE), Collections.emptyMap()));
 		r.add(arguments("true XOR false", booleanOperation(Ops.XOR,  Expressions.TRUE,  Expressions.FALSE), Collections.emptyMap()));
 
-		r.add(arguments("size(['x']) = 0", booleanOperation(Ops.COL_IS_EMPTY, constant(Arrays.asList("x"))), Collections.emptyMap()));
-		r.add(arguments("size(['x']) > $pcdsl01", numberOperation(Integer.class, Ops.COL_SIZE, constant(Arrays.asList("x"))).gt(1), expected(1)));
-		r.add(arguments("size(['x']) > $pcdsl01", numberOperation(Integer.class, Ops.COL_SIZE, constant(new String[]{"x"})).gt(1), expected(1)));
+		r.add(arguments("size($pcdsl01) = 0", booleanOperation(Ops.COL_IS_EMPTY, constant(Arrays.asList("x"))), expected(Collections.singletonList("x"))));
+		r.add(arguments("size($pcdsl01) > $pcdsl02", numberOperation(Integer.class, Ops.COL_SIZE, constant(Arrays.asList("x"))).gt(1), expected(Collections.singletonList("x"), 1)));
+		r.add(arguments("size($pcdsl01) > $pcdsl02", numberOperation(Integer.class, Ops.COL_SIZE, constant(new String[]{"x"})).gt(1), expected(new String[]{"x"}, 1)));
 
 		Map<String, String> aMap = new HashMap<>();
 		aMap.put("1", "a");

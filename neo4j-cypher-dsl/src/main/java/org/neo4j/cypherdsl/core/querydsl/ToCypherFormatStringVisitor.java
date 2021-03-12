@@ -165,8 +165,7 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 		Object constantValue = expr.getConstant();
 		if (constantValue == null) {
 			context.add(Cypher.literalOf(null));
-		} else if (constantValue instanceof Boolean || constantValue instanceof Iterable || constantValue.getClass()
-			.isArray()) {
+		} else if (constantValue instanceof Boolean) {
 			context.add(Cypher.literalOf(constantValue));
 		} else {
 			context.add(context.getOrCreateParameterFor(constantValue));
