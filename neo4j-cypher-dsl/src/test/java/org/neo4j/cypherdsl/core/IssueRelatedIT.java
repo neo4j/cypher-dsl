@@ -37,6 +37,12 @@ class IssueRelatedIT {
 	private final Node person = Cypher.node("Person").named("person");
 
 	@Test
+	void unionMustClearCache() {
+
+
+	}
+
+	@Test
 	void gh115() {
 		Node nodes = Cypher.node("Node").named("node").withProperties("id", Cypher.literalOf("node_42"));
 		StatementBuilder.OngoingReadingWithoutWhere matchNodes = Cypher.match(nodes);

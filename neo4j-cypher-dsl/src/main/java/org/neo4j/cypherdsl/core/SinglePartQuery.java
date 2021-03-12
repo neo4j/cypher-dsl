@@ -60,8 +60,10 @@ final class SinglePartQuery extends AbstractStatement implements SingleQuery {
 	@Override
 	public void accept(Visitor visitor) {
 
+		visitor.enter(this);
 		precedingClauses.forEach(c -> c.accept(visitor));
 		Visitable.visitIfNotNull(aReturn, visitor);
+		visitor.leave(this);
 	}
 
 	boolean doesReturnElements() {

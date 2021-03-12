@@ -3009,7 +3009,7 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
-					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION MATCH (b) WHERE b.b = 'B' RETURN b UNION MATCH (b) WHERE b.c = 'C' RETURN b");
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b UNION MATCH (b:`Bike`) WHERE b.c = 'C' RETURN b");
 		}
 
 		@Test
@@ -3030,7 +3030,7 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
-					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION ALL MATCH (b) WHERE b.b = 'B' RETURN b");
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION ALL MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b");
 		}
 
 		@Test
@@ -3063,7 +3063,7 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
-					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION ALL MATCH (b) WHERE b.b = 'B' RETURN b UNION ALL MATCH (b) WHERE b.c = 'C' RETURN b UNION ALL MATCH (b) WHERE b.d = 'D' RETURN b");
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION ALL MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b UNION ALL MATCH (b:`Bike`) WHERE b.c = 'C' RETURN b UNION ALL MATCH (b:`Bike`) WHERE b.d = 'D' RETURN b");
 		}
 
 		@Test

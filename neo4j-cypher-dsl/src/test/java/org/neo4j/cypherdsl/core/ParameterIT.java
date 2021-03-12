@@ -197,7 +197,7 @@ class ParameterIT {
 
 		assertThat(Renderer.getDefaultRenderer().render(statement))
 				.isEqualTo(
-						"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b) WHERE b.b = $p2 RETURN b UNION MATCH (b) WHERE b.c = $p3 RETURN b");
+						"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b:`Bike`) WHERE b.b = $p2 RETURN b UNION MATCH (b:`Bike`) WHERE b.c = $p3 RETURN b");
 
 		Map<String, Object> expectedParams = new HashMap<>();
 		expectedParams.put("p1", "A");

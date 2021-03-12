@@ -73,6 +73,7 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
+import org.neo4j.cypherdsl.core.Statement.SingleQuery;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -295,6 +296,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void leave(With with) {
 		builder.append(" ");
 		clearPreviouslyVisitedNamed(with);
+	}
+
+	void leave(SingleQuery statement) {
+		this.visitedNamed.clear();
 	}
 
 	private void clearPreviouslyVisitedNamed(With with) {
