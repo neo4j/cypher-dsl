@@ -65,7 +65,7 @@ class ConfigurableRenderer implements Renderer {
 	@Override
 	public String render(Statement statement) {
 
-		int key = Objects.hashCode(statement);
+		int key = Objects.hash(statement, statement.isRenderConstantsAsParameters());
 
 		String renderedContent;
 		try {
@@ -92,12 +92,12 @@ class ConfigurableRenderer implements Renderer {
 		return renderedContent;
 	}
 
-	private RenderingVisitor createVisitor(StatementContext meta) {
+	private RenderingVisitor createVisitor(StatementContext statementContext) {
 
 		if (!this.configuration.isPrettyPrint()) {
-			return new DefaultVisitor(meta);
+			return new DefaultVisitor(statementContext);
 		} else {
-			return new PrettyPrintingVisitor(meta, this.configuration.getIndentStyle(), this.configuration.getIndentSize());
+			return new PrettyPrintingVisitor(statementContext, this.configuration.getIndentStyle(), this.configuration.getIndentSize());
 		}
 	}
 

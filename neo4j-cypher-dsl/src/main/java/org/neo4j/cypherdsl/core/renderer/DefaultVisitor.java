@@ -61,6 +61,7 @@ import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PatternComprehension;
+import org.neo4j.cypherdsl.core.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.ProcedureName;
 import org.neo4j.cypherdsl.core.Properties;
@@ -525,12 +526,22 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(direction.getSymbolRight());
 	}
 
-	void enter(Parameter parameter) {
+	protected final void renderParameter(Parameter parameter) {
 
 		if (statementContext == null) {
 			throw new IllegalStateException("Parameter outside a statement context are not supported.");
 		}
 		builder.append("$").append(statementContext.getParameterName(parameter));
+	}
+
+	void enter(Parameter parameter) {
+
+		Object value = parameter.getValue();
+		if (value instanceof ConstantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
+			builder.append(((ConstantParameterHolder) value).asString());
+		} else {
+			renderParameter(parameter);
+		}
 	}
 
 	void enter(MapExpression map) {

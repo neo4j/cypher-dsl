@@ -29,6 +29,8 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.ConstantParameterHolder;
+import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
 
 import com.querydsl.core.types.Operator;
 import com.querydsl.core.types.Template;
@@ -74,6 +76,14 @@ public final class CypherContext {
 
 	Parameter<?> getOrCreateParameterFor(Object object) {
 
-		return parameters.computeIfAbsent(object, o -> Cypher.anonParameter(o));
+		return parameters.computeIfAbsent(object, o -> {
+			Object value;
+			try {
+				value = new ConstantParameterHolder(o);
+			} catch (UnsupportedLiteralException e) {
+				value = o;
+			}
+			return Cypher.anonParameter(value);
+		});
 	}
 }

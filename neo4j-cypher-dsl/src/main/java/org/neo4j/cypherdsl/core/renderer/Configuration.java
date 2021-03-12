@@ -64,6 +64,8 @@ public final class Configuration {
 	 */
 	private final int indentSize;
 
+	private final boolean renderLiteralParameters = false;
+
 	/**
 	 * Cypher is not pretty printed by default. No indentation settings apply.
 	 *
@@ -145,6 +147,10 @@ public final class Configuration {
 		return indentSize;
 	}
 
+	public boolean isRenderLiteralParameters() {
+		return renderLiteralParameters;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -154,12 +160,12 @@ public final class Configuration {
 			return false;
 		}
 		Configuration that = (Configuration) o;
-		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle;
+		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle && renderLiteralParameters == that.renderLiteralParameters;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(prettyPrint, indentStyle, indentSize);
+		return Objects.hash(prettyPrint, indentStyle, indentSize, renderLiteralParameters);
 	}
 
 	@Override

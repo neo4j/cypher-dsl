@@ -52,6 +52,9 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
+import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Ops;
@@ -183,18 +186,18 @@ class QueryDSLAdapterTest {
 		r.add(arguments("ceil($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.CEIL, asNumber(1)).gt(1), expected(1, 1.0)));
 		r.add(arguments("cos($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.COS, asNumber(1)).gt(1), expected(1, 1.0)));
 		r.add(arguments("cot($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.COT, asNumber(1)).gt(1), expected(1, 1.0)));
-		r.add(arguments("degrees($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.DEG, asNumber(1)).gt(1), expected(1)));
-		r.add(arguments("tan($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.TAN, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("degrees($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.DEG, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("tan($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.TAN, asNumber(1)).gt(1), expected(1,  1.0)));
 		r.add(arguments("sqrt($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SQRT, asNumber(4)).gt(1), expected(4, 1.0)));
 		r.add(arguments("sign($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SIGN, asNumber(1)).gt(1), expected(1, 1.0)));
-		r.add(arguments("sin($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SIN, asNumber(1)).gt(1), expected(1)));
-		r.add(arguments("round($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ROUND, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("sin($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.SIN, asNumber(1)).gt(1), expected(1, 1.0)));
+		r.add(arguments("round($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ROUND, asNumber(1)).gt(1), expected(1, 1.0)));
 		r.add(arguments("round($pcdsl01, $pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.ROUND2, asNumber(1), asNumber(1)).gt(1), expected(1, 1.0)));
-		r.add(arguments("radians($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.RAD, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("radians($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.RAD, asNumber(1)).gt(1), expected(1, 1.0)));
 		r.add(arguments("CASE WHEN $pcdsl01 < $pcdsl02 THEN $pcdsl01 ELSE $pcdsl02 END > $pcdsl03", numberOperation(Double.class, Ops.MathOps.MIN, asNumber(1), asNumber(2)).gt(1), expected(1, 2, 1.0)));
 		r.add(arguments("CASE WHEN $pcdsl01 > $pcdsl02 THEN $pcdsl01 ELSE $pcdsl02 END > $pcdsl03", numberOperation(Double.class, Ops.MathOps.MAX, asNumber(1), asNumber(2)).gt(1), expected(1, 2, 1.0)));
 		r.add(arguments("floor($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.FLOOR, asNumber(1.1)).gt(1), expected(1.1, 1.0)));
-		r.add(arguments("exp($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.EXP, asNumber(1)).gt(1), expected(1)));
+		r.add(arguments("exp($pcdsl01) > $pcdsl02", numberOperation(Double.class, Ops.MathOps.EXP, asNumber(1)).gt(1), expected(1, 1.0)));
 
 		Predicate p = Expressions.cases().when(Expressions.TRUE).then(Expressions.asNumber(1))
 			.when(Expressions.FALSE).then(Expressions.asNumber(2))
@@ -207,16 +210,42 @@ class QueryDSLAdapterTest {
 
 	@MethodSource("supportedOpsArgs")
 	@ParameterizedTest(name = "{index} {0}")
-	void supportedOps(String expectedFragment, Predicate predicate, Map<String, Object> expectedParameters) {
+	void supportedOpsWithParameters(String expectedFragment, Predicate predicate, Map<String, Object> expectedParameters) {
 
 		Statement statement = Cypher.with(Cypher.literalOf(1).as("e"))
 			.where(Cypher.adapt(predicate).asCondition())
 			.returning("e")
 			.build();
 
-		assertThat(statement.getParameters()).containsAllEntriesOf(expectedParameters);
+		statement.setRenderConstantsAsParameters(true);
+		assertThat(statement.getParameters()).containsExactlyEntriesOf(expectedParameters);
 		assertThat(statement.getCypher())
 			.isEqualTo("WITH 1 AS e WHERE " + expectedFragment + " RETURN e");
+	}
+
+	@MethodSource("supportedOpsArgs")
+	@ParameterizedTest(name = "{index} {0}")
+	void supportedOpsWithLiterals(String expectedFragment, Predicate predicate, Map<String, Object> expectedParameters) {
+
+		Statement statement = Cypher.with(Cypher.literalOf(1).as("e"))
+			.where(Cypher.adapt(predicate).asCondition())
+			.returning("e")
+			.build();
+
+		String expectedString = "WITH 1 AS e WHERE " + expectedFragment + " RETURN e";
+		Map<String, Object> finalExpectedParameters = new HashMap<>();
+		for (Map.Entry<String, Object> entry : expectedParameters.entrySet()) {
+			String k = entry.getKey();
+			Object v = entry.getValue();
+			try {
+				String replacement = Cypher.literalOf(v).asString();
+				expectedString = expectedString.replaceAll(java.util.regex.Pattern.quote("$" + k), replacement);
+			} catch (UnsupportedLiteralException e) {
+				finalExpectedParameters.put(k, v);
+			}
+		}
+		assertThat(statement.getParameters()).containsExactlyEntriesOf(finalExpectedParameters);
+		assertThat(statement.getCypher()).isEqualTo(expectedString);
 	}
 
 	static Stream<Arguments> unsupportedOpsShouldBeRecognizedBeforeHandArgs() {
@@ -247,10 +276,9 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
 			.where(Cypher.adapt(expr).asCondition()).returning(Cypher.adapt(person).asName()).build();
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
-		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
 	}
 
 	@Test
@@ -262,10 +290,9 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.node("Person").named("n"))
 			.where(Cypher.adapt(p).asCondition()).returning(Cypher.name(person.toString())).build();
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
-		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
 	}
 
 	@Test
@@ -276,10 +303,9 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
 			.where(Cypher.adapt(p).asCondition()).returning(Cypher.adapt(person).asName()).build();
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
-		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (person:`Person`) WHERE person.firstName = $pcdsl01 AND person.age > $pcdsl02 RETURN person");
+			.isEqualTo("MATCH (person:`Person`) WHERE person.firstName = 'P' AND person.age > 25 RETURN person");
 	}
 
 	@Test
@@ -292,10 +318,10 @@ class QueryDSLAdapterTest {
 			.orderBy(Cypher.adapt(person.firstName).asExpression().descending())
 			.build();
 
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "Rickard");
+		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo(
-				"MATCH (person:`Person`) WHERE person.firstName = $pcdsl01 RETURN person.firstName ORDER BY person.firstName DESC");
+				"MATCH (person:`Person`) WHERE person.firstName = 'Rickard' RETURN person.firstName ORDER BY person.firstName DESC");
 	}
 
 	@Test
@@ -308,11 +334,65 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName()) // <.>
 			.build();
 
+		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCypher())
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
+		// end::query-dsl-simple[]
+	}
+
+	@Test
+	void qClassToNodeShouldWorkNoConstants() {
+
+		// tag::query-dsl-simple-avoid-constants[]
+		QPerson n = new QPerson("n");
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode())
+			.where(Cypher.adapt(n.firstName.eq("P").and(n.age.gt(25))).asCondition())
+			.returning(Cypher.adapt(n).asName())
+			.build();
+
+		statement.setRenderConstantsAsParameters(true); // <.>
 		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P"); // <.>
 		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n"); // <.>
-		// end::query-dsl-simple[]
+		// end::query-dsl-simple-avoid-constants[]
+	}
+
+	@Test
+	void changingModeShouldWork() {
+
+		QPerson n = new QPerson("n");
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode())
+			.where(Cypher.adapt(n.firstName.eq("P").and(n.age.gt(25))).asCondition())
+			.returning(Cypher.adapt(n).asName())
+			.build();
+
+		statement.setRenderConstantsAsParameters(true); // <.>
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P"); // <.>
+		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n"); // <.>
+
+		statement.setRenderConstantsAsParameters(false);
+		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
+	}
+
+	@Test
+	void prettyPrinterShouldAlwaysUseConstants() {
+
+		QPerson n = new QPerson("n");
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode())
+			.where(Cypher.adapt(n.firstName.eq("P").and(n.age.gt(25))).asCondition())
+			.returning(Cypher.adapt(n).asName())
+			.build();
+
+		statement.setRenderConstantsAsParameters(true);
+		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
+		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
+			.isEqualTo("MATCH (n:Person)\n"
+				+ "WHERE n.firstName = 'P' AND n.age > 25\n"
+				+ "RETURN n");
 	}
 
 	@Test
@@ -343,9 +423,9 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName())
 			.build();
 
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "(?i).*rick.*");
+		assertThat(statement.getParameterNames()).isEmpty();
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName =~ $pcdsl01 RETURN n");
+			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName =~ '(?i).*rick.*' RETURN n");
 	}
 
 	@Test

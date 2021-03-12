@@ -23,26 +23,27 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import org.apiguardian.api.API;
 
 /**
- * Context for while rendering a statement.
- *
+ * An internal holder for a constant value that might be rendered as a parameter.
  * @author Michael J. Simons
- * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
-public interface StatementContext {
+public final class ConstantParameterHolder {
 
-	/**
-	 * Gets or creates the name of a parameter
-	 *
-	 * @param parameter The parameter who's name should be retrieved
-	 * @return The name of the parameter or a generated name
-	 */
-	String getParameterName(Parameter parameter);
+	private final Object value;
 
-	/**
-	 * Some constants may be rendered as parameters.
-	 * @return True if literal parameters hav
-	 */
-	boolean isRenderConstantsAsParameters();
+	private final String literalValue;
+
+	public ConstantParameterHolder(Object value) {
+		this.value = value;
+		this.literalValue = Cypher.literalOf(value).asString();
+	}
+
+	Object getValue() {
+		return value;
+	}
+
+	public String asString() {
+		return literalValue;
+	}
 }

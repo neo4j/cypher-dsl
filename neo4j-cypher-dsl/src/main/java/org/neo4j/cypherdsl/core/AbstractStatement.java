@@ -41,7 +41,7 @@ abstract class AbstractStatement implements Statement {
 	/**
 	 * Provides context during visiting of this statement.
 	 */
-	private final StatementContext context = new StatementContextImpl();
+	private final StatementContextImpl context = new StatementContextImpl();
 
 	/**
 	 * The collected parameter information (names only and names + values).
@@ -56,6 +56,21 @@ abstract class AbstractStatement implements Statement {
 	@Override
 	public StatementContext getContext() {
 		return context;
+	}
+
+	@Override
+	public boolean isRenderConstantsAsParameters() {
+		return this.context.isRenderConstantsAsParameters();
+	}
+
+	@Override
+	public void setRenderConstantsAsParameters(boolean renderConstantsAsParameters) {
+
+		synchronized (this) {
+			this.context.setRenderConstantsAsParameters(renderConstantsAsParameters);
+			this.cypher = null;
+			this.parameterInformation = null;
+		}
 	}
 
 	@Override

@@ -30,6 +30,8 @@ import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.Operator;
+import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
@@ -53,8 +55,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private int indentationLevel;
 	private boolean passedFirstReadingOrUpdatingClause;
 
-	PrettyPrintingVisitor(StatementContext meta, IndentStyle indentStyle, int indentSize) {
-		super(meta);
+	PrettyPrintingVisitor(StatementContext statementContext, IndentStyle indentStyle, int indentSize) {
+		super(statementContext);
 
 		if (indentStyle == IndentStyle.TAB) {
 			indentionProvider = (builder, width) -> {
@@ -233,6 +235,17 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 			}
 		}
 		builder.append("\n");
+	}
+
+	@Override
+	void enter(Parameter parameter) {
+
+		Object value = parameter.getValue();
+		if (value instanceof ConstantParameterHolder) {
+			builder.append(((ConstantParameterHolder) value).asString());
+		} else {
+			renderParameter(parameter);
+		}
 	}
 
 	@Override

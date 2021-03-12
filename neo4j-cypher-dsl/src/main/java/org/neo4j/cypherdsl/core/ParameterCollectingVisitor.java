@@ -75,9 +75,15 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 	void enter(Parameter parameter) {
 
 		String parameterName = statementContext.getParameterName(parameter);
+		Object newValue = parameter.getValue();
+		if (newValue instanceof ConstantParameterHolder) {
+			if (!statementContext.isRenderConstantsAsParameters()) {
+				return;
+			}
+			newValue = ((ConstantParameterHolder) newValue).getValue();
+		}
 		boolean knownParameterName = !this.names.add(parameterName);
 
-		Object newValue = parameter.getValue();
 		Object oldValue = knownParameterName && this.values.containsKey(parameterName) ?
 			this.values.get(parameterName) :
 			Parameter.NO_VALUE;

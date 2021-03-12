@@ -101,6 +101,22 @@ public interface Statement extends Visitable {
 	StatementContext getContext();
 
 	/**
+	 * Some constants may be rendered as parameters.
+	 * @return True if literal parameters hav
+	 */
+	boolean isRenderConstantsAsParameters();
+
+	/**
+	 * Use this method to configure whether some constant values should be rendered as parameters or as literals before
+	 * the first call to {@link Statement#getParameters()} or {@link Statement#getCypher()}.
+	 * <p>
+	 * Renderers are free to chose to ignore this.
+	 *
+	 * @param renderConstantsAsParameters Set to true to render constants as parameters (when using {@link #getCypher()}.
+	 */
+	void setRenderConstantsAsParameters(boolean renderConstantsAsParameters);
+
+	/**
 	 * Represents {@code RegularQuery}.
 	 *
 	 * @since 1.0

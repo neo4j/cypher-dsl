@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -102,7 +103,8 @@ public final class Parameter<T> implements Expression {
 	/**
 	 * @return the value bound to this parameter
 	 */
-	T getValue() {
+	@API(status = INTERNAL, since = "2021.1.0")
+	public T getValue() {
 		return value;
 	}
 

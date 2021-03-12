@@ -36,6 +36,7 @@ final class StatementContextImpl implements StatementContext {
 
 	private final AtomicInteger parameterCount = new AtomicInteger();
 	private final Map<Parameter<?>, String> parameterNames = new ConcurrentHashMap<>();
+	private boolean renderConstantsAsParameters = false;
 
 	@Override
 	public String getParameterName(Parameter parameter) {
@@ -43,5 +44,14 @@ final class StatementContextImpl implements StatementContext {
 		return parameterNames
 			.computeIfAbsent(parameter,
 				p -> p.isAnon() ? String.format("pcdsl%02d", parameterCount.incrementAndGet()) : p.getName());
+	}
+
+	@Override
+	public boolean isRenderConstantsAsParameters() {
+		return renderConstantsAsParameters;
+	}
+
+	void setRenderConstantsAsParameters(boolean renderConstantsAsParameters) {
+		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 }
