@@ -59,6 +59,11 @@ import com.querydsl.core.types.Visitor;
 @API(status = INTERNAL, since = "2021.1.0")
 public final class ToCypherFormatStringVisitor implements Visitor<String, CypherContext> {
 
+	public static final ToCypherFormatStringVisitor INSTANCE = new ToCypherFormatStringVisitor();
+
+	private ToCypherFormatStringVisitor() {
+	}
+
 	@Override
 	public String visit(FactoryExpression<?> e, CypherContext context) {
 

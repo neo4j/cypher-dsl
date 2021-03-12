@@ -34,46 +34,43 @@ import org.apiguardian.api.API;
 public interface ForeignAdapter<FE> {
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link Condition}.
+	 * Adapts a foreign expression into a Cypher-DSL {@link Condition}. The memoized expression should be something  that
+	 * can be evaluated into something boolean.
 	 *
-	 * @param expression An expression that can be evaluated into something boolean
 	 * @return A condition
 	 * @throws IllegalArgumentException if the expression doesn't resolve into something boolean
 	 */
-	Condition asCondition(FE expression);
+	Condition asCondition();
 
 	/**
 	 * Adapts a foreign expression into a Cypher-DSL {@link Expression}.
 	 *
-	 * @param expression the foreign expression
 	 * @return A native expression
 	 */
-	Expression asExpression(FE expression);
+	Expression asExpression();
 
 	/**
 	 * Adapts a foreign expression into a Cypher-DSL {@link Node}, that allows to to address it further down in queries.
 	 *
-	 * @param expression the foreign expression
 	 * @return A node
 	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
 	 */
-	Node asNode(FE expression);
+	Node asNode();
 
 	/**
 	 * Adapts a foreign expression into a Cypher-DSL {@link Relationship}, that allows to to address it further down in queries.
 	 *
-	 * @param expression the foreign expression
 	 * @return A node
 	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
 	 */
-	Relationship asRelationship(FE expression);
+	Relationship asRelationship();
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link SymbolicName}.
+	 * Adapts a foreign expression into a Cypher-DSL {@link SymbolicName}. The memoized expression should ideally be something
+	 * that is named or resolves to an alias.
 	 *
-	 * @param expression the foreign expression, which should ideally be something that is named or resolves to an alias.
 	 * @return A symbolic name
 	 * @throws IllegalArgumentException if a name cannot be derived from the expression.
 	 */
-	SymbolicName asName(FE expression);
+	SymbolicName asName();
 }

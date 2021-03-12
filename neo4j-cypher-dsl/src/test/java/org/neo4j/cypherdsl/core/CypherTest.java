@@ -50,6 +50,20 @@ class CypherTest {
 	}
 
 	@Test
+	void shouldNotAdaptNull() {
+
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(null))
+			.withMessage("Cannot adapt literal NULL expressions.");
+	}
+
+	@Test
+	void shouldFailOnUnadaptableThings() {
+
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(23))
+			.withMessageMatching("Cannot adapt expressions of .+ to Cypher-DSL expressions\\.");
+	}
+
+	@Test
 	void shouldNotCreateIllegalLiterals() {
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.literalOf(new CypherTest()))
 			.withMessageStartingWith("Unsupported literal type: ");

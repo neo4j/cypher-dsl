@@ -199,7 +199,7 @@ class QueryDSLAdapterTest {
 	void supportedOps(String expectedFragment, Predicate predicate) {
 
 		Statement statement = Cypher.with(Cypher.literalOf(1).as("e"))
-			.where(Cypher.adapt().asCondition(predicate))
+			.where(Cypher.adapt(predicate).asCondition())
 			.returning("e")
 			.build();
 
@@ -221,14 +221,14 @@ class QueryDSLAdapterTest {
 	@ParameterizedTest
 	void unsupportedOpsShouldBeRecognizedBeforeHand(Predicate predicate) {
 
-		Assertions.assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt().asCondition(predicate));
+		Assertions.assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(predicate).asCondition());
 	}
 
 	@Test
 	void unsupportedLiterals() {
 
 		assertThatExceptionOfType(UnsupportedLiteralException.class)
-			.isThrownBy(() -> Cypher.adapt().asExpression(Expressions.asDate(new Date())))
+			.isThrownBy(() -> Cypher.adapt(Expressions.asDate(new Date())).asExpression())
 			.withMessageStartingWith("Unsupported literal type: class java.util.Date");
 	}
 
@@ -241,8 +241,8 @@ class QueryDSLAdapterTest {
 		BooleanBuilder expr = new BooleanBuilder(predicate(Ops.EQ, personFirstName,
 			constant("P"))).and(predicate(Ops.GT, personAge, constant(25)));
 
-		Statement statement = Cypher.match(Cypher.adapt().asNode(person))
-			.where(Cypher.adapt().asCondition(expr)).returning(Cypher.adapt().asName(person)).build();
+		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
+			.where(Cypher.adapt(expr).asCondition()).returning(Cypher.adapt(person).asName()).build();
 		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
@@ -256,7 +256,7 @@ class QueryDSLAdapterTest {
 			.and($(person.getAge()).gt(25));
 
 		Statement statement = Cypher.match(Cypher.node("Person").named("n"))
-			.where(Cypher.adapt().asCondition(p)).returning(Cypher.name(person.toString())).build();
+			.where(Cypher.adapt(p).asCondition()).returning(Cypher.name(person.toString())).build();
 		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
@@ -268,8 +268,8 @@ class QueryDSLAdapterTest {
 		QPerson person = QPerson.person;
 		Predicate p = person.firstName.eq("P").and(person.age.gt(25));
 
-		Statement statement = Cypher.match(Cypher.adapt().asNode(person))
-			.where(Cypher.adapt().asCondition(p)).returning(Cypher.adapt().asName(person)).build();
+		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
+			.where(Cypher.adapt(p).asCondition()).returning(Cypher.adapt(person).asName()).build();
 		assertThat(statement.getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (person:`Person`) WHERE person.firstName = 'P' AND person.age > 25 RETURN person");
@@ -279,10 +279,10 @@ class QueryDSLAdapterTest {
 	void pathsShouldBeTurnedIntoExpressions() {
 
 		QPerson person = QPerson.person;
-		Statement statement = Cypher.match(Cypher.adapt().asNode(person))
-			.where(Cypher.adapt().asCondition(person.firstName.eq("Rickard")))
-			.returning(Cypher.adapt().asExpression(person.firstName))
-			.orderBy(Cypher.adapt().asExpression(person.firstName).descending())
+		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
+			.where(Cypher.adapt(person.firstName.eq("Rickard")).asCondition())
+			.returning(Cypher.adapt(person.firstName).asExpression())
+			.orderBy(Cypher.adapt(person.firstName).asExpression().descending())
 			.build();
 
 		assertThat(statement.getParameters()).isEmpty();
@@ -296,9 +296,9 @@ class QueryDSLAdapterTest {
 
 		// tag::query-dsl-simple[]
 		QPerson n = new QPerson("n"); // <.>
-		Statement statement = Cypher.match(Cypher.adapt().asNode(n)) // <.>
-			.where(Cypher.adapt().asCondition(n.firstName.eq("P").and(n.age.gt(25)))) // <.>
-			.returning(Cypher.adapt().asName(n)) // <.>
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode()) // <.>
+			.where(Cypher.adapt(n.firstName.eq("P").and(n.age.gt(25))).asCondition()) // <.>
+			.returning(Cypher.adapt(n).asName()) // <.>
 			.build();
 
 		assertThat(statement.getParameters()).isEmpty();
@@ -312,12 +312,12 @@ class QueryDSLAdapterTest {
 
 		// tag::query-dsl-parameters[]
 		QPerson n = new QPerson("n");
-		Statement statement = Cypher.match(Cypher.adapt().asNode(n))
-			.where(Cypher.adapt().asCondition(
-				n.firstName.eq(new Param<>(String.class, "name"))
-					.and(n.age.gt(new Param<>(Integer.class, "age")))) // <.>
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode())
+			.where(Cypher.adapt(n.firstName.eq(new Param<>(String.class, "name"))
+					.and(n.age.gt(new Param<>(Integer.class, "age"))) // <.>
+				).asCondition()
 			)
-			.returning(Cypher.adapt().asName(n))
+			.returning(Cypher.adapt(n).asName())
 			.build();
 
 		assertThat(statement.getParameterNames()).hasSize(2); // <.>
@@ -330,9 +330,9 @@ class QueryDSLAdapterTest {
 	void regexShouldBeSupported() {
 
 		QPerson n = new QPerson("n");
-		Statement statement = Cypher.match(Cypher.adapt().asNode(n))
-			.where(Cypher.adapt().asCondition(n.firstName.matches("(?i).*rick.*")))
-			.returning(Cypher.adapt().asName(n))
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode())
+			.where(Cypher.adapt(n.firstName.matches("(?i).*rick.*")).asCondition())
+			.returning(Cypher.adapt(n).asName())
 			.build();
 
 		assertThat(statement.getParameterNames()).isEmpty();
@@ -344,9 +344,9 @@ class QueryDSLAdapterTest {
 	void existShouldWork() {
 
 		QPerson n = new QPerson("n");
-		Statement statement = Cypher.match(Cypher.adapt().asNode(n))
-			.where(Cypher.adapt().asCondition(Expressions.predicate(Ops.EXISTS, n.firstName)))
-			.returning(Cypher.adapt().asName(n))
+		Statement statement = Cypher.match(Cypher.adapt(n).asNode())
+			.where(Cypher.adapt(Expressions.predicate(Ops.EXISTS, n.firstName)).asCondition())
+			.returning(Cypher.adapt(n).asName())
 			.build();
 
 		assertThat(statement.getParameterNames()).isEmpty();
@@ -357,21 +357,21 @@ class QueryDSLAdapterTest {
 	@Test
 	void shouldNotAdaptArbitraryThingsAsCondition() {
 
-		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt().asCondition(Expressions.TWO))
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(Expressions.TWO).asCondition())
 			.withMessage("Only Query-DSL predicates can be turned into Cypher-DSL's predicates.");
 	}
 
 	@Test
 	void shouldNotAdaptArbitraryThingsAsNodes() {
 
-		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt().asNode(Expressions.TWO))
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(Expressions.TWO).asNode())
 			.withMessage("Only Query-DSL paths can be turned into nodes.");
 	}
 
 	@Test
 	void shouldNotAdaptArbitraryThingsAsNames() {
 
-		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt().asName(Expressions.TWO))
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(Expressions.TWO).asName())
 			.withMessage("Only Query-DSL paths can be turned into names.");
 	}
 }

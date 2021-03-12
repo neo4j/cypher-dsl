@@ -759,30 +759,30 @@ public final class Cypher {
 	}
 
 	/**
-	 * The Query-DSL adapter. Can only be used when `com.querydsl:querydsl-core` is on the class path.
+	 * The foreign adapter factory. Can only be used when `com.querydsl:querydsl-core` is on the class path.
 	 */
-	private static volatile QueryDSLAdapter queryDSLAdapter;
+	private static volatile ForeignAdapterFactory foreignAdapterFactory;
 
 	/**
-	 * Provides access to the Query-DSL adapter. Please make sure you have `com.querydsl:querydsl-core` on the class path,
-	 * otherwise you will see some kind of {@link ClassNotFoundException} along various classes related to
-	 * {@code com.querydsl.core.*}.
-	 * @return The single QueryDSL adapter instance.
+	 * Provides access to the foreign DSL adapter. Please make sure you have the necessary runtime dependencies on the class path,
+	 * otherwise you will see some kind of {@link ClassNotFoundException} along various classes related to the foreign DSL.
+	 *
+	 * @return A foreign adapter
 	 * @since 2021.1.0
 	 */
-	public static QueryDSLAdapter adapt() {
+	public static <FE> ForeignAdapter<FE> adapt(FE expression) {
 
-		QueryDSLAdapter adapter = queryDSLAdapter;
-		if (adapter == null) {
+		ForeignAdapterFactory initializedForeignAdapterFactory = foreignAdapterFactory;
+		if (initializedForeignAdapterFactory == null) {
 			synchronized (Cypher.class) {
-				adapter = queryDSLAdapter;
-				if (adapter == null) {
-					queryDSLAdapter = new QueryDSLAdapter();
-					adapter = queryDSLAdapter;
+				initializedForeignAdapterFactory = foreignAdapterFactory;
+				if (initializedForeignAdapterFactory == null) {
+					foreignAdapterFactory = new ForeignAdapterFactory();
+					initializedForeignAdapterFactory = foreignAdapterFactory;
 				}
 			}
 		}
-		return adapter;
+		return initializedForeignAdapterFactory.getAdapterFor(expression);
 	}
 
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {

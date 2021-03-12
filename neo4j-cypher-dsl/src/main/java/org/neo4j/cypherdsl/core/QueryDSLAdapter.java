@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.querydsl.CypherContext;
@@ -37,40 +37,39 @@ import com.querydsl.core.types.Predicate;
  * @soundtrack Paul Kalkbrenner - Berlin Calling
  * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "2021.1.0")
-public final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Expression<?>> {
+@API(status = INTERNAL, since = "2021.1.0")
+final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Expression<?>> {
 
-	private final ToCypherFormatStringVisitor toFormatStringVisitor;
+	private final com.querydsl.core.types.Expression<?> expression;
 
-	QueryDSLAdapter() {
-
-		this.toFormatStringVisitor = new ToCypherFormatStringVisitor();
+	QueryDSLAdapter(com.querydsl.core.types.Expression<?> expression) {
+		this.expression = expression;
 	}
 
 	@Override
-	public Condition asCondition(com.querydsl.core.types.Expression<?> expression) {
+	public Condition asCondition() {
 
 		if (!(expression instanceof Predicate)) {
 			throw new IllegalArgumentException("Only Query-DSL predicates can be turned into Cypher-DSL's predicates.");
 		}
 
 		CypherContext context = new CypherContext();
-		String formatString = expression.accept(toFormatStringVisitor, context);
+		String formatString = expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
 
 		return new ExpressionCondition(Cypher.raw(formatString, context.getExpressions()));
 	}
 
 	@Override
-	public Expression asExpression(com.querydsl.core.types.Expression<?> expression) {
+	public Expression asExpression() {
 
 		CypherContext context = new CypherContext();
-		String formatString = expression.accept(toFormatStringVisitor, context);
+		String formatString = expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
 
 		return Cypher.raw(formatString, context.getExpressions());
 	}
 
 	@Override
-	public Node asNode(com.querydsl.core.types.Expression<?> expression) {
+	public Node asNode() {
 
 		if (!(expression instanceof Path<?>)) {
 			throw new IllegalArgumentException("Only Query-DSL paths can be turned into nodes.");
@@ -81,13 +80,13 @@ public final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.t
 	}
 
 	@Override
-	public Relationship asRelationship(com.querydsl.core.types.Expression<?> expression) {
+	public Relationship asRelationship() {
 
 		throw new UnsupportedOperationException("Not yet implemented.");
 	}
 
 	@Override
-	public SymbolicName asName(com.querydsl.core.types.Expression<?> expression) {
+	public SymbolicName asName() {
 
 		if (!(expression instanceof Path<?>)) {
 			throw new IllegalArgumentException("Only Query-DSL paths can be turned into names.");
