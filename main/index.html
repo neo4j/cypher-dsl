@@ -2379,9 +2379,9 @@ should work - at least from a syntactic point of view - out of the box.</p>
 <div id="appendix.query-dsl-support.query-dsl-simple" class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="1"></i><b>(1)</b>
-<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt().asNode(n)) <i class="conum" data-value="2"></i><b>(2)</b>
-    .where(Cypher.adapt().asCondition(n.firstName.eq(<span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>).and(n.age.gt(<span class="integer">25</span>)))) <i class="conum" data-value="3"></i><b>(3)</b>
-    .returning(Cypher.adapt().asName(n)) <i class="conum" data-value="4"></i><b>(4)</b>
+<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode()) <i class="conum" data-value="2"></i><b>(2)</b>
+    .where(Cypher.adapt(n.firstName.eq(<span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>).and(n.age.gt(<span class="integer">25</span>))).asCondition()) <i class="conum" data-value="3"></i><b>(3)</b>
+    .returning(Cypher.adapt(n).asName()) <i class="conum" data-value="4"></i><b>(4)</b>
     .build();
 
 assertThat(statement.getParameters()).isEmpty();
@@ -2418,12 +2418,12 @@ won&#8217;t return the expected results</td>
 <div id="appendix.query-dsl-support.query-dsl-parameters" class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
-<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt().asNode(n))
-    .where(Cypher.adapt().asCondition(
-        n.firstName.eq(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">String</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
-            .and(n.age.gt(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">Integer</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span>)))) <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode())
+    .where(Cypher.adapt(n.firstName.eq(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">String</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
+            .and(n.age.gt(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">Integer</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+        ).asCondition()
     )
-    .returning(Cypher.adapt().asName(n))
+    .returning(Cypher.adapt(n).asName())
     .build();
 
 assertThat(statement.getParameterNames()).hasSize(<span class="integer">2</span>); <i class="conum" data-value="2"></i><b>(2)</b>
@@ -3380,7 +3380,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-11 17:04:33 UTC
+Last updated 2021-03-12 08:01:33 UTC
 </div>
 </div>
 </body>
