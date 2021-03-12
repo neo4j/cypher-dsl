@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
 
 /**
  * @author Michael J. Simons
@@ -39,28 +37,12 @@ class CypherTest {
 	void sortDirectionShouldBeSpecified() {
 
 		SortItem sortItem = Cypher.sort(Cypher.literalFalse(), SortItem.Direction.ASC);
-		sortItem.accept(new Visitor() {
-			@Override public void enter(Visitable segment) {
+		sortItem.accept(segment -> {
 
-				if (segment instanceof SortItem.Direction) {
-					assertThat(segment).extracting("name").isEqualTo("ASC");
-				}
+			if (segment instanceof SortItem.Direction) {
+				assertThat(segment).extracting("name").isEqualTo("ASC");
 			}
 		});
-	}
-
-	@Test
-	void shouldNotAdaptNull() {
-
-		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(null))
-			.withMessage("Cannot adapt literal NULL expressions.");
-	}
-
-	@Test
-	void shouldFailOnUnadaptableThings() {
-
-		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(23))
-			.withMessageMatching("Cannot adapt expressions of .+ to Cypher-DSL expressions\\.");
 	}
 
 	@Test
