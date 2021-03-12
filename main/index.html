@@ -2384,10 +2384,9 @@ should work - at least from a syntactic point of view - out of the box.</p>
     .returning(Cypher.adapt(n).asName()) <i class="conum" data-value="4"></i><b>(4)</b>
     .build();
 
-assertThat(statement.getParameters()).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">pcdsl01</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="5"></i><b>(5)</b>
-assertThat(statement.getParameters()).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">pcdsl02</span><span class="delimiter">&quot;</span></span>, <span class="integer">25</span>);
+assertThat(statement.getParameters()).isEmpty();
 assertThat(statement.getCypher())
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age &gt; $pcdsl02 RETURN n</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="6"></i><b>(6)</b></code></pre>
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age &gt; 25 RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2411,16 +2410,39 @@ won&#8217;t return the expected results</td>
 <td><i class="conum" data-value="4"></i><b>4</b></td>
 <td>Return some Query-DSL properties and adapt it as expression</td>
 </tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The <code>Statement</code> offers a way to render all constants as parameters, so that they don&#8217;t bust the query cache:</p>
+</div>
+<div id="appendix.query-dsl-support.query-dsl-simple-avoid-constants" class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
+<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode())
+    .where(Cypher.adapt(n.firstName.eq(<span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>).and(n.age.gt(<span class="integer">25</span>))).asCondition())
+    .returning(Cypher.adapt(n).asName())
+    .build();
+
+statement.setRenderConstantsAsParameters(<span class="predefined-constant">true</span>); <i class="conum" data-value="1"></i><b>(1)</b>
+assertThat(statement.getParameters()).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">pcdsl01</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b>
+assertThat(statement.getParameters()).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">pcdsl02</span><span class="delimiter">&quot;</span></span>, <span class="integer">25</span>);
+assertThat(statement.getCypher())
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age &gt; $pcdsl02 RETURN n</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
 <tr>
-<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Set this to true before accessing parameters of the statement or rendering the statement</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
 <td>Access the statements parameters for generated parameter names</td>
 </tr>
 <tr>
-<td><i class="conum" data-value="6"></i><b>6</b></td>
-<td>Notice that most constants will be transported as named parameters. We are doing this for several reasons:
-Parameters don&#8217;t bust the query cache when the constant value changes, they are not subject to Cypher-Injection and
-last but not least, we cannot translate each constant into something that is valid Cypher, so we delegate this task
-to libraries like the Neo4j Java Driver further down the road.</td>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Compare the statement to the first listening. Constants are gone now</td>
 </tr>
 </table>
 </div>
@@ -3392,7 +3414,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-12 12:13:39 UTC
+Last updated 2021-03-12 17:23:21 UTC
 </div>
 </div>
 </body>
