@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 final class Operations {
 
 	private static final java.util.Set<Class<? extends Expression>> VALID_MUTATORS =
-		Collections.unmodifiableSet(new HashSet<>(Arrays.asList(Property.class, MapExpression.class, Parameter.class)));
+		Collections.unmodifiableSet(new HashSet<>(Arrays.asList(MapExpression.class, Parameter.class)));
 
 	static Operation concat(Expression op1, Expression op2) {
 
@@ -113,7 +113,8 @@ final class Operations {
 	static Operation mutate(Expression target, Expression value) {
 
 		Assertions.notNull(value, "New properties value must not be null");
-		Assertions.isTrue(VALID_MUTATORS.contains(value.getClass()), "A property container can only be mutated by a map, or a parameter or property pointing to a map.");
+		Assertions.isTrue(Property.class.isAssignableFrom(value.getClass()) || VALID_MUTATORS.contains(value.getClass()),
+			"A property container can only be mutated by a map, or a parameter or property pointing to a map.");
 
 		return Operation.create(target, Operator.MUTATE, value);
 	}
