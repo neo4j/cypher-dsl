@@ -25,24 +25,24 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Michael J. Simons
  */
-class PropertyTest {
+class InternalPropertyImplTest {
 
 	@Test
 	void simplePropertyGetNameShouldWork() {
 
-		assertThat(Property.create(SymbolicName.unresolved(), "simple").getName()).isEqualTo("simple");
+		assertThat(InternalPropertyImpl.create(SymbolicName.unresolved(), "simple").getName()).isEqualTo("simple");
 	}
 
 	@Test
 	void multiplePropertyGetNameShouldWork() {
 
-		assertThat(Property.create(SymbolicName.unresolved(), "foo", "bar").getName()).isEqualTo("foo.bar");
+		assertThat(InternalPropertyImpl.create(SymbolicName.unresolved(), "foo", "bar").getName()).isEqualTo("foo.bar");
 	}
 
 	@Test
 	void externalReferenceHasPriority() {
 
-		assertThat(Property.create(SymbolicName.unresolved(), "foo", "bar").referencedAs("something")
+		assertThat(InternalPropertyImpl.create(SymbolicName.unresolved(), "foo", "bar").referencedAs("something")
 			.getName()).isEqualTo("something");
 	}
 }

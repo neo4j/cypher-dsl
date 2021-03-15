@@ -96,7 +96,7 @@ class FunctionsIT {
 				.returning(
 					Functions.reduce(n)
 						.in(Functions.nodes(p))
-						.map(totalAge.add(Property.create(n, "age")))
+						.map(totalAge.add(Cypher.property(n, "age")))
 						.accumulateOn(totalAge)
 						.withInitialValueOf(Cypher.literalOf(0)).as("reduction")
 				).build();

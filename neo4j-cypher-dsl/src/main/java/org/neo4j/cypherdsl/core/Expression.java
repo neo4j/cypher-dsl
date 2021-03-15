@@ -353,6 +353,6 @@ public interface Expression extends Visitable {
 	 */
 	default Property property(String... names) {
 
-		return Property.create(this, names);
+		return InternalPropertyImpl.create(this, names);
 	}
 }

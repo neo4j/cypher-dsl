@@ -140,7 +140,7 @@ public final class Cypher {
 	 * @return A new property.
 	 */
 	public static Property property(Expression expression, String... names) {
-		return Property.create(expression, names);
+		return InternalPropertyImpl.create(expression, names);
 	}
 
 	/**
@@ -166,7 +166,7 @@ public final class Cypher {
 	 * @since 2021.0.0
 	 */
 	public static Property property(Expression expression, Expression lookup) {
-		return Property.create(expression, lookup);
+		return InternalPropertyImpl.create(expression, lookup);
 	}
 
 	/**

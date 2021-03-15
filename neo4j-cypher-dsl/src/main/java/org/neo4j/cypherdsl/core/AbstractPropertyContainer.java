@@ -40,12 +40,12 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 
 	@Override
 	public final Property property(String... names) {
-		return Property.create(this, names);
+		return InternalPropertyImpl.create(this, names);
 	}
 
 	@Override
 	public final Property property(Expression lookup) {
-		return Property.create(this, lookup);
+		return InternalPropertyImpl.create(this, lookup);
 	}
 
 	@Override
