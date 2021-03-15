@@ -37,12 +37,6 @@ class IssueRelatedIT {
 	private final Node person = Cypher.node("Person").named("person");
 
 	@Test
-	void unionMustClearCache() {
-
-
-	}
-
-	@Test
 	void gh115() {
 		Node nodes = Cypher.node("Node").named("node").withProperties("id", Cypher.literalOf("node_42"));
 		StatementBuilder.OngoingReadingWithoutWhere matchNodes = Cypher.match(nodes);
@@ -603,6 +597,15 @@ class IssueRelatedIT {
 			.returning(n)
 			.build().getCypher();
 		assertThat(cypher).isEqualTo("MATCH (n:`DeleteMe`) SET n = {} SET n.newProperty = 'aValue' RETURN n");
+	}
+
+	@Test // GH-168
+	void containersMustBeMutatableByProperties() {
+
+		Node nodeA = Cypher.node("Target").named("t");
+		Node nodeB = Cypher.node("Source").named("s");
+		String cypher = Cypher.match(nodeA, nodeB).mutate(nodeA, nodeB.property("whatever")).build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (t:`Target`), (s:`Source`) SET t += s.whatever");
 	}
 
 	@ParameterizedTest // GH-152
