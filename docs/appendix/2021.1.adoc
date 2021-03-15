@@ -1,5 +1,15 @@
 == 2021.1
 
+=== 2021.1.1
+
+This is a drop-in replacement for <<v2021.1.0>>. Introducing the interface for `Property` broke the `mutate` operation,
+for which no test was in place. This and the bug has been fixed.
+
+==== 🐛 Bug Fixes
+
+* GH-168 - Fix mutating containers by properties.
+
+[[v2021.1.0]]
 === 2021.1.0
 
 2021.1.0 comes with a ton of new features and a handful of breaking changes.
