@@ -565,7 +565,7 @@ table.CodeRay td.code>pre{padding:0}
 </li>
 <li><a href="#appendix">6. Appendix</a>
 <ul class="sectlevel2">
-<li><a href="#query-dslsupport">Query-DSL support</a></li>
+<li><a href="#query-dsl-support">Query-DSL support</a></li>
 <li><a href="#buildingtheneo4jcypher-dsl">Building the Neo4j Cypher-DSL</a></li>
 <li><a href="#arch-rules">Architecture</a></li>
 <li><a href="#changelog">Change log</a></li>
@@ -583,7 +583,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2021.1.0-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.1.0.</p>
 </div>
 </blockquote>
 </div>
@@ -675,7 +675,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2021.1.0-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.1.0<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -686,7 +686,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.1.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.1.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -2119,7 +2119,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="title">Listing 14. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.0-SNAPSHOT</code></pre>
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.0</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2170,7 +2170,7 @@ We recommend using it explicitly on the separate annotation processor classpath 
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -2345,7 +2345,7 @@ application like as follows to avoid dependency conflicts:</p>
 <h2 id="appendix"><a class="anchor" href="#appendix"></a>6. Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="query-dslsupport"><a class="anchor" href="#query-dslsupport"></a>Query-DSL support</h3>
+<h3 id="query-dsl-support"><a class="anchor" href="#query-dsl-support"></a>Query-DSL support</h3>
 <div class="paragraph">
 <p>The Neo4j Cypher-DSL has some support for <a href="http://www.querydsl.com">Query-DSL</a>. It can</p>
 </div>
@@ -2824,6 +2824,108 @@ RETURN p1,p2;</code></pre>
 <div class="sect2">
 <h3 id="changelog"><a class="anchor" href="#changelog"></a>Change log</h3>
 <div class="sect3">
+<h4 id="2021.1"><a class="anchor" href="#2021.1"></a>2021.1</h4>
+<div class="sect4">
+<h5 id="2021.0.0"><a class="anchor" href="#2021.0.0"></a>2021.0.0</h5>
+<div class="paragraph">
+<p>2021.0.0 comes with a ton of new features and a handful of breaking changes.
+Fear not, the breaking changes are resolvable by recompiling your application.
+We turned <code>Node</code>, <code>Relationship</code> and <code>Property into interfaces and provide now `NodeBase</code> and <code>RelationshipBase</code> so that you can
+use them to build a static meta-model of your application.` A <code>PropertyBase</code> might follow.</p>
+</div>
+<div class="paragraph">
+<p>Find out everything about the new possibility to define a static meta model in <a href="#static-meta-model">the manual</a>.
+The manual also includes a major port about the two new modules we offer:
+<code>org.neo4j:neo4j-cypher-dsl-codegen-core</code> and <code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6</code>.
+<code>neo4j-cypher-dsl-codegen-core</code> provides the infrastructure necessary to build code generators for creating a domain model
+following our recommendation and <code>neo4j-cypher-dsl-codegen-sdn6</code> is a first implementation of that:
+A Java annotation processor that can be added to any Spring Data Neo4j 6 project in version 6.0.6 or higher.
+It will find your annotated domain classes and turn them into a model you can use to build queries.</p>
+</div>
+<div class="paragraph">
+<p>Last but not least: We added support for some expressions of the more generic <a href="http://www.querydsl.com">QueryDSL</a>.
+This will require <code>com.querydsl:querydsl-core</code> on the class path but only if you decide to call <code>Cypher#adapt(foreignExpression)</code>.
+This is a feature that is driven by Spring Data Neo4j 6.1 in which we build upon this to provide a <code>QuerydslPredicateExecutor</code>.
+Find more in <a href="#query-dsl-support">this section of the manual</a>.</p>
+</div>
+<div class="sect5">
+<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-154 - Make Node and Relationship extendable.</p>
+</li>
+<li>
+<p>GH-155 - Provide infrastructure for generating a static meta model.</p>
+</li>
+<li>
+<p>GH-156 - Create an annotation processor for Spring Data Neo4j 6.</p>
+</li>
+<li>
+<p>GH-167 - Add support for some Query-DSL expressions.</p>
+</li>
+<li>
+<p>Introduce a statement context for allowing anonymous parameters
+(use <code>Cypher#anonParameter()</code> to define a parameter with a value but without a name. The name will be accessible on the statement
+after rendering).</p>
+</li>
+<li>
+<p>Make rendering of constants as parameters configurable.</p>
+</li>
+<li>
+<p>Allow specification of the direction while creating a sort item.</p>
+</li>
+<li>
+<p>Introduce an interface for Property.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="documentation"><a class="anchor" href="#documentation"></a>📖 Documentation</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-152 - Document usage of PatterElement in tests.</p>
+</li>
+<li>
+<p>GH-164 - Improve public extendable API and add documentation.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="bugfixes"><a class="anchor" href="#bugfixes"></a>🐛 Bug Fixes</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix SymbolicName#toString.</p>
+</li>
+<li>
+<p>Clear visited name cache after single queries.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-165 - Simplify poms.</p>
+</li>
+<li>
+<p>GH-166 - Improve Cypher.literalOf.</p>
+</li>
+<li>
+<p>Exclude all example projects from release.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="2021.0"><a class="anchor" href="#2021.0"></a>2021.0</h4>
 <div class="sect4">
 <h5 id="2021.0.2"><a class="anchor" href="#2021.0.2"></a>2021.0.2</h5>
@@ -2843,7 +2945,7 @@ This will already be the last release of the 2021.0 line.
 </table>
 </div>
 <div class="sect5">
-<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -2868,7 +2970,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="documentation"><a class="anchor" href="#documentation"></a>📖 Documentation</h6>
+<h6 id="documentation2"><a class="anchor" href="#documentation2"></a>📖 Documentation</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -2878,7 +2980,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes"><a class="anchor" href="#bugfixes"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes2"><a class="anchor" href="#bugfixes2"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -2891,7 +2993,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -2910,7 +3012,7 @@ This will already be the last release of the 2021.0 line.
 <div class="sect4">
 <h5 id="2021.0.1"><a class="anchor" href="#2021.0.1"></a>2021.0.1</h5>
 <div class="sect5">
-<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
+<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -2954,7 +3056,7 @@ RETURN d</code></pre>
 </div>
 </div>
 <div class="sect4">
-<h5 id="2021.0.0"><a class="anchor" href="#2021.0.0"></a>2021.0.0</h5>
+<h5 id="2021.0.02"><a class="anchor" href="#2021.0.02"></a>2021.0.0</h5>
 <div class="paragraph">
 <p>2021.0.0 comes with a lot of new features.
 Thanks to <a href="https://github.com/Andy2003">Andy</a> for his contributions!</p>
@@ -3022,7 +3124,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
+<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3065,7 +3167,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="documentation2"><a class="anchor" href="#documentation2"></a>📖 Documentation</h6>
+<h6 id="documentation3"><a class="anchor" href="#documentation3"></a>📖 Documentation</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3075,7 +3177,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes2"><a class="anchor" href="#bugfixes2"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes3"><a class="anchor" href="#bugfixes3"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3091,7 +3193,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3126,7 +3228,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.5"><a class="anchor" href="#2020.1.5"></a>2020.1.5</h5>
 <div class="sect5">
-<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
+<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3145,7 +3247,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.4"><a class="anchor" href="#2020.1.4"></a>2020.1.4</h5>
 <div class="sect5">
-<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
+<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3161,7 +3263,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.3"><a class="anchor" href="#2020.1.3"></a>2020.1.3</h5>
 <div class="sect5">
-<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
+<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3171,7 +3273,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes3"><a class="anchor" href="#bugfixes3"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes4"><a class="anchor" href="#bugfixes4"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3184,7 +3286,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.2"><a class="anchor" href="#2020.1.2"></a>2020.1.2</h5>
 <div class="sect5">
-<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
+<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3200,7 +3302,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes4"><a class="anchor" href="#bugfixes4"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes5"><a class="anchor" href="#bugfixes5"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3210,7 +3312,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3258,7 +3360,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.1"><a class="anchor" href="#2020.1.1"></a>2020.1.1</h5>
 <div class="sect5">
-<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
+<h6 id="features9"><a class="anchor" href="#features9"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3271,7 +3373,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.0"><a class="anchor" href="#2020.1.0"></a>2020.1.0</h5>
 <div class="sect5">
-<h6 id="features9"><a class="anchor" href="#features9"></a>🚀 Features</h6>
+<h6 id="features10"><a class="anchor" href="#features10"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3303,7 +3405,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes5"><a class="anchor" href="#bugfixes5"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes6"><a class="anchor" href="#bugfixes6"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3322,7 +3424,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3362,7 +3464,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <p>This is the first patch release for the rebooted Cypher-DSL project.</p>
 </div>
 <div class="sect5">
-<h6 id="features10"><a class="anchor" href="#features10"></a>🚀 Features</h6>
+<h6 id="features11"><a class="anchor" href="#features11"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3378,7 +3480,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3414,7 +3516,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-15 16:01:56 UTC
+Last updated 2021-03-15 16:19:11 UTC
 </div>
 </div>
 </body>
