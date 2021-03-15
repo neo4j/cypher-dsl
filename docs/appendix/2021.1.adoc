@@ -1,14 +1,14 @@
 == 2021.1
 
-=== 2021.0.0
+=== 2021.1.0
 
-2021.0.0 comes with a ton of new features and a handful of breaking changes.
+2021.1.0 comes with a ton of new features and a handful of breaking changes.
 Fear not, the breaking changes are resolvable by recompiling your application.
-We turned `Node`, `Relationship` and `Property into interfaces and provide now `NodeBase` and `RelationshipBase` so that you can
-use them to build a static meta-model of your application.` A `PropertyBase` might follow.
+We turned `Node`, `Relationship` and `Property` into interfaces and provide now `NodeBase` and `RelationshipBase` so that you can
+use them to build a static meta-model of your application. A `PropertyBase` might follow.
 
 Find out everything about the new possibility to define a static meta model in <<static-meta-model,the manual>>.
-The manual also includes a major port about the two new modules we offer:
+The manual also includes a major part about the two new modules we offer:
 `{groupId}:neo4j-cypher-dsl-codegen-core` and `{groupId}:neo4j-cypher-dsl-codegen-sdn6`.
 `neo4j-cypher-dsl-codegen-core` provides the infrastructure necessary to build code generators for creating a domain model
 following our recommendation and `neo4j-cypher-dsl-codegen-sdn6` is a first implementation of that:
