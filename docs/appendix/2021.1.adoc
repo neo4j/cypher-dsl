@@ -1,0 +1,50 @@
+== 2021.1
+
+=== 2021.0.0
+
+2021.0.0 comes with a ton of new features and a handful of breaking changes.
+Fear not, the breaking changes are resolvable by recompiling your application.
+We turned `Node`, `Relationship` and `Property into interfaces and provide now `NodeBase` and `RelationshipBase` so that you can
+use them to build a static meta-model of your application.` A `PropertyBase` might follow.
+
+Find out everything about the new possibility to define a static meta model in <<static-meta-model,the manual>>.
+The manual also includes a major port about the two new modules we offer:
+`{groupId}:neo4j-cypher-dsl-codegen-core` and `{groupId}:neo4j-cypher-dsl-codegen-sdn6`.
+`neo4j-cypher-dsl-codegen-core` provides the infrastructure necessary to build code generators for creating a domain model
+following our recommendation and `neo4j-cypher-dsl-codegen-sdn6` is a first implementation of that:
+A Java annotation processor that can be added to any Spring Data Neo4j 6 project in version 6.0.6 or higher.
+It will find your annotated domain classes and turn them into a model you can use to build queries.
+
+Last but not least: We added support for some expressions of the more generic http://www.querydsl.com[QueryDSL].
+This will require `com.querydsl:querydsl-core` on the class path but only if you decide to call `Cypher#adapt(foreignExpression)`.
+This is a feature that is driven by Spring Data Neo4j 6.1 in which we build upon this to provide a `QuerydslPredicateExecutor`.
+Find more in <<query-dsl-support, this section of the manual>>.
+
+==== 🚀 Features
+
+* GH-154 - Make Node and Relationship extendable.
+* GH-155 - Provide infrastructure for generating a static meta model.
+* GH-156 - Create an annotation processor for Spring Data Neo4j 6.
+* GH-167 - Add support for some Query-DSL expressions.
+* Introduce a statement context for allowing anonymous parameters
+  (use `Cypher#anonParameter()` to define a parameter with a value but without a name. The name will be accessible on the statement
+  after rendering).
+* Make rendering of constants as parameters configurable.
+* Allow specification of the direction while creating a sort item.
+* Introduce an interface for Property.
+
+==== 📖 Documentation
+
+* GH-152 - Document usage of PatterElement in tests.
+* GH-164 - Improve public extendable API and add documentation.
+
+==== 🐛 Bug Fixes
+
+* Fix SymbolicName#toString.
+* Clear visited name cache after single queries.
+
+==== 🧹 Housekeeping
+
+* GH-165 - Simplify poms.
+* GH-166 - Improve Cypher.literalOf.
+* Exclude all example projects from release.

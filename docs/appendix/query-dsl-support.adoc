@@ -1,3 +1,4 @@
+[[query-dsl-support]]
 == Query-DSL support
 
 The Neo4j Cypher-DSL has some support for http://www.querydsl.com[Query-DSL]. It can
