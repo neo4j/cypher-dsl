@@ -32,6 +32,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Movie;
+import org.neo4j.cypherdsl.examples.sdn6.movies.Person;
 import org.neo4j.cypherdsl.examples.sdn6.movies.PersonDetails;
 import org.neo4j.harness.Neo4j;
 import org.neo4j.harness.Neo4jBuilders;
@@ -136,10 +137,35 @@ class ApplicationIT {
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var details = exchange.getBody();
 
+		assertThat(details.getName()).isEqualTo("Tom Hanks");
 		assertThat(details.getActedIn()).hasSize(12);
 		assertThat(details.getDirected()).extracting(Movie::getTitle).containsExactly("That Thing You Do");
 		assertThat(details.getRelated()).hasSize(35);
 		assertThat(details.getBorn()).isEqualTo(1956);
+	}
+
+	@Test
+	@DisplayName("Using conditions pt1.")
+	void findPeopleBornInThe70tiesOrShouldWork1(@Autowired TestRestTemplate restTemplate) {
+
+		var exchange = restTemplate
+			.exchange("/api/people/findPeopleBornInThe70tiesOr/", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+			});
+		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
+		var people = exchange.getBody();
+		assertThat(people).hasSize(17);
+	}
+
+	@Test
+	@DisplayName("Using conditions pt2.")
+	void findPeopleBornInThe70tiesOrShouldWork2(@Autowired TestRestTemplate restTemplate) {
+
+		var exchange = restTemplate
+			.exchange("/api/people/findPeopleBornInThe70tiesOr?name={name}", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+			}, "Natalie Portman");
+		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
+		var people = exchange.getBody();
+		assertThat(people).hasSize(18);
 	}
 
 	@AfterAll

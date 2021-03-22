@@ -18,25 +18,19 @@
  */
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
-import java.util.Optional;
-
+// tag::additional-fragments[]
 import org.springframework.data.neo4j.repository.Neo4jRepository;
-import org.springframework.data.neo4j.repository.query.Query;
+import org.springframework.data.neo4j.repository.support.CypherdslConditionExecutor;
+import org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor;
+
+// end::additional-fragments[]
 
 /**
  * @author Michael J. Simons
  */
-public interface PeopleRepository extends Neo4jRepository<Person, Long> {
-
-	// TODO replace by query executor when ready
-	@Query("MATCH (person:Person {name: $name})\n"
-		+ "OPTIONAL MATCH (person)-[:DIRECTED]->(d:Movie)\n"
-		+ "OPTIONAL MATCH (person)<-[r:ACTED_IN]->(a:Movie)\n"
-		+ "OPTIONAL MATCH (person)-->(movies)<-[relatedRole:ACTED_IN]-(relatedPerson)\n"
-		+ "RETURN DISTINCT person,\n"
-		+ "collect(DISTINCT d) AS directed,\n"
-		+ "collect(DISTINCT a) AS actedIn,\n"
-		+ "collect(DISTINCT relatedPerson) AS related"
-	)
-	Optional<PersonDetails> getDetailsByName(String name);
+// tag::additional-fragments[]
+public interface PeopleRepository extends Neo4jRepository<Person, Long>,
+	CypherdslConditionExecutor<Person>, // <.>
+	CypherdslStatementExecutor<Person> { // <.>
 }
+// end::additional-fragments[]

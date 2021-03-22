@@ -45,17 +45,21 @@ final class Person extends NodeBase<Person> {
 
 final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> {
 
+	public static final String $TYPE = "ACTED_IN";
+
 	public final Property ROLE = this.property("role");
 
 	protected ActedIn(Person start, Movie end) {
-		super(start, "ACTED_IN", end);
+		super(start, $TYPE, end);
 	}
 }
 
 final class Directed<E extends NodeBase<?>> extends RelationshipBase<Person, E, Directed<E>> {
 
+	public static final String $TYPE  = "DIRECTED";
+
 	protected Directed(Person start, E end) {
-		super(start, "DIRECTED", end);
+		super(start, $TYPE, end);
 	}
 }
 ----

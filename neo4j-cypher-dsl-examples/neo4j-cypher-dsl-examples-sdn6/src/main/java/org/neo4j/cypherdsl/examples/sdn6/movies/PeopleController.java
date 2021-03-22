@@ -18,10 +18,13 @@
  */
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
+import java.util.Optional;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -32,15 +35,22 @@ import org.springframework.web.server.ResponseStatusException;
 @RequestMapping("/api/people")
 public class PeopleController {
 
-	private final PeopleRepository peopleRepository;
+	private final PeopleService peopleService;
 
-	public PeopleController(PeopleRepository peopleRepository) {
-		this.peopleRepository = peopleRepository;
+	public PeopleController(PeopleService peopleService) {
+		this.peopleService = peopleService;
 	}
 
 	@GetMapping("/details/{name}")
 	PersonDetails getDetails(@PathVariable String name) {
-		return peopleRepository.getDetailsByName(name)
+
+		return peopleService.findDetails(name)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+	}
+
+	@GetMapping("/findPeopleBornInThe70tiesOr")
+	Iterable<Person> findPeopleBornInThe70tiesOr(@RequestParam(name = "name") Optional<String> optionalName) {
+
+		return peopleService.findPeopleBornInThe70tiesOr(optionalName);
 	}
 }

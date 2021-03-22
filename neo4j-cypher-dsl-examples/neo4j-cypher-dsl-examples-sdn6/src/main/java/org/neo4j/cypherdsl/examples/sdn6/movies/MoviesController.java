@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Example;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,36 +30,30 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * @author Michael J. Simons
  */
-// tag::as-property[]
 @RestController
 @RequestMapping("/api/movies")
 public final class MoviesController {
 
-	private final MovieRepository movieRepository;
+	private final PeopleService peopleService;
 
-	private final PeopleRepository peopleRepository;
+	private final MovieService movieService;
 
-	MoviesController(MovieRepository movieRepository, PeopleRepository peopleRepository) {
-		this.movieRepository = movieRepository;
-		this.peopleRepository = peopleRepository;
+	public MoviesController(PeopleService peopleService, MovieService movieService) {
+		this.peopleService = peopleService;
+		this.movieService = movieService;
 	}
 
 	@GetMapping({ "", "/" })
 	public List<Movie> get() {
-		return movieRepository
-			.findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); // <.>
+		return movieService.findAll();
 	}
-	// end::as-property[]
 
 	@GetMapping({ "/relatedTo/{name}" })
 	public List<Movie> relatedTo(@PathVariable String name) {
 
-		return peopleRepository.findOne(Example.of(new Person(name, null)))
+		return peopleService.findOne(Example.of(new Person(name, null)))
 			.stream()
-			.flatMap(p -> movieRepository.findAllMoviesRelatedTo(p).stream())
+			.flatMap(p -> movieService.findAllRelatedTo(p).stream())
 			.collect(Collectors.toList());
 	}
-
-	// tag::as-property[]
 }
-// end::as-property[]

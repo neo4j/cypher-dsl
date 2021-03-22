@@ -31,6 +31,7 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Michael J. Simons
@@ -61,7 +62,10 @@ public final class Movie {
 
 	@JsonCreator
 	@PersistenceConstructor
-	public Movie(String title, String description, List<Actor> actors, List<Person> directors) {
+	public Movie(@JsonProperty("title") String title,
+		@JsonProperty("description") String description,
+		@JsonProperty("actors") List<Actor> actors,
+		@JsonProperty("directors") List<Person> directors) {
 		this.title = title;
 		this.description = description;
 		this.actors = actors == null ? List.of() : new ArrayList<>(actors);

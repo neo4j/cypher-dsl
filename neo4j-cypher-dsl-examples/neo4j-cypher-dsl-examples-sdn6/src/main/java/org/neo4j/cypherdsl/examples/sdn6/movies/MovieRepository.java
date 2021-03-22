@@ -18,56 +18,11 @@
  */
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
-import java.util.List;
-import java.util.Map;
-
-import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
-import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
+import org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor;
 
 /**
  * @author Michael J. Simons
  */
-interface MovieRepository extends Neo4jRepository<Movie, String>, MovieRepositoryExt {
+interface MovieRepository extends Neo4jRepository<Movie, String>, CypherdslStatementExecutor<Movie> {
 }
-
-interface MovieRepositoryExt {
-	List<Movie> findAllMoviesRelatedTo(Person person);
-}
-
-// tag::complex-queries[]
-class MovieRepositoryExtImpl implements MovieRepositoryExt {
-
-	private final Neo4jTemplate neo4jTemplate;
-
-	MovieRepositoryExtImpl(Neo4jTemplate neo4jTemplate) {
-
-		this.neo4jTemplate = neo4jTemplate;
-	}
-
-	@Override
-	public List<Movie> findAllMoviesRelatedTo(Person personOfInterest) {
-
-		var person = Person_.PERSON.named("p");
-		var actedIn = Movie_.MOVIE.named("a");
-		var directed = Movie_.MOVIE.named("d");
-		var m = Cypher.name("m");
-
-		var statement = Cypher.match(person)
-			.where(person.NAME.isEqualTo(Cypher.parameter("name")))
-			.with(person)
-			.optionalMatch(new ActedIn_(person, actedIn))
-			.optionalMatch(new Directed_(person, directed))
-			.with(Functions.collect(actedIn).add(Functions.collect(directed))
-				.as("movies"))
-			.unwind("movies").as(m)
-			.returningDistinct(m)
-			.orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
-			.build();
-
-		return this.neo4jTemplate.findAll(
-			statement, Map.of("name", personOfInterest.getName()), Movie.class);
-	}
-}
-// end::complex-queries[]

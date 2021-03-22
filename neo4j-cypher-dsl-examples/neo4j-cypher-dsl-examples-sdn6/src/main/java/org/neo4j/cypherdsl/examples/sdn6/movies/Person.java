@@ -24,6 +24,7 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Michael J. Simons
@@ -46,7 +47,7 @@ public final class Person {
 	}
 
 	@JsonCreator
-	public Person(String name, Integer born) {
+	public Person(@JsonProperty("name") String name, @JsonProperty("born") Integer born) {
 		this(null, name, born);
 	}
 

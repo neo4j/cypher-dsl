@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * This is a DTO based projection, containing a couple of additional details,
  * like the list of movies a person acted in, the movies they direct and which other
@@ -41,8 +44,10 @@ public final class PersonDetails {
 
 	private final List<Person> related;
 
-	public PersonDetails(String name, Integer born, List<Movie> actedIn,
-		List<Movie> directed, List<Person> related) {
+	@JsonCreator
+	public PersonDetails(
+		@JsonProperty("name") String name, @JsonProperty("born") Integer born, @JsonProperty("actedIn") List<Movie> actedIn,
+		@JsonProperty("directed") List<Movie> directed, @JsonProperty("related") List<Person> related) {
 		this.name = name;
 		this.born = born;
 		this.actedIn = new ArrayList<>(actedIn);

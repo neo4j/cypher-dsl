@@ -113,15 +113,39 @@ The generated classes can be used in variety of places:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/MoviesController.java[tag=as-property]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/MovieService.java[tag=as-property]
 ----
 <.> Pass the name of the property `TITLE` to Spring Data's sort facility
 
-Or build complex queries with it:
+Spring Data Neo4j 6.1 has two additional query fragments, that makes working with the Cypher-DSL very efficient:
 
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/MovieRepository.java[tag=complex-queries]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/PeopleRepository.java[tag=additional-fragments]
 ----
+<.> Allows to just add conditions to our generated queries
+<.> Provides an alternative to using @Query with strings
+
+Both interfaces are *independent*  of each other, they can be used together like in this example or separately (just picking the one you need).
+You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter https://docs.spring.io/spring-data/neo4j/docs/6.1.0-M5/reference/html/#sdn-mixins[Spring Data Neo4j Extensions].
+
+The repository above can be used like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/PeopleService.java[tag=using-person-repo]
+----
+<.> Using literals
+<.> Using an optional parameter
+<.> or when it's not filled, an empty condition
+<.> Project a person onto `PersonDetails`, using a complex query.
+
+Here is another complex example. The `MovieRepository` is also a `CypherdslStatementExecutor`:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/MovieService.java[tag=more-examples]
+----
+<.> Here we use an anonymous parameter to store the `name` value
 
 The full example is in `neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6`.
