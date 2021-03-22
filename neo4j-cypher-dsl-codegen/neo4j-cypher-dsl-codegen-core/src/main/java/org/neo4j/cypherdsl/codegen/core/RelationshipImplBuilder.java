@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
 
@@ -71,7 +72,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 	/**
 	 * The required relationship type.
 	 */
-	private final String relationshipType;
+	private final FieldSpec relationshipTypeField;
 
 	/**
 	 * This will be the final type name used as return type of various methods. It is not necessary the same as the initial
@@ -92,7 +93,15 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 	private RelationshipImplBuilder(Configuration configuration, String relationshipType, ClassName className, String fieldName) {
 		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(), configuration.getIndent());
-		this.relationshipType = relationshipType;
+
+		if (relationshipType == null) {
+			throw new IllegalStateException("Cannot build a RelationshipImpl without a single relationship type!");
+		}
+
+		this.relationshipTypeField = FieldSpec
+			.builder(String.class, configuration.getConstantFieldNameGenerator().generate("$TYPE"), Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
+			.initializer("$S", relationshipType)
+			.build();
 		this.parameterizedTypeName = className;
 	}
 
@@ -123,7 +132,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(startNodeParam)
 			.addParameter(endNodeParam)
-			.addStatement("super($N, $S, $N)", startNodeParam, relationshipType, endNodeParam)
+			.addStatement("super($N, $N, $N)", startNodeParam, relationshipTypeField, endNodeParam)
 			.build();
 	}
 
@@ -131,13 +140,12 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 		ParameterSpec symbolicName = ParameterSpec.builder(TYPE_NAME_SYMBOLIC_NAME, "symbolicName").build();
 		ParameterSpec start = ParameterSpec.builder(TYPE_NAME_NODE, "start").build();
-		ParameterSpec type = ParameterSpec.builder(TYPE_NAME_STRING, "type").build();
 		ParameterSpec properties = ParameterSpec.builder(ClassName.get(Properties.class), "properties").build();
 		ParameterSpec end = ParameterSpec.builder(TYPE_NAME_NODE, "end").build();
 		return MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PRIVATE)
-			.addParameters(Arrays.asList(symbolicName, start, type, properties, end))
-			.addStatement("super($N, $N, $N, $N, $N)", symbolicName, start, type, properties, end)
+			.addParameters(Arrays.asList(symbolicName, start, properties, end))
+			.addStatement("super($N, $N, $N, $N, $N)", symbolicName, start, relationshipTypeField, properties, end)
 			.build();
 
 	}
@@ -150,7 +158,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 			.addModifiers(Modifier.PUBLIC)
 			.returns(parameterizedTypeName)
 			.addParameter(newSymbolicName)
-			.addStatement("return new $T$L($N, getLeft(), getRequiredType(), getDetails().getProperties(), getRight())",
+			.addStatement("return new $T$L($N, getLeft(), getDetails().getProperties(), getRight())",
 				super.className, parameterizedTypeName == super.className ? "" : "<>", newSymbolicName)
 			.build();
 	}
@@ -165,22 +173,19 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 			.returns(parameterizedTypeName)
 			.addParameter(newProperties)
 			.addStatement(
-				"return new $T$L(getSymbolicName().orElse(null), getLeft(), getRequiredType(), Properties.create($N), getRight())",
+				"return new $T$L(getSymbolicName().orElse(null), getLeft(), Properties.create($N), getRight())",
 				super.className, parameterizedTypeName == super.className ? "" : "<>", newProperties)
 			.build();
 	}
 
 	private List<FieldSpec> buildFields() {
 
-		return generateFieldSpecsFromProperties().collect(Collectors.toList());
+		return Stream.concat(Stream.of(relationshipTypeField), generateFieldSpecsFromProperties()).collect(Collectors.toList());
 	}
 
 	@Override
 	protected JavaFile buildJavaFile() {
 
-		if (this.relationshipType == null) {
-			throw new IllegalStateException("Cannot build a RelationshipImpl without a single relationship type!");
-		}
 		TypeSpec.Builder builder = TypeSpec.classBuilder(super.className);
 		if (startNode == S && endNode == E) {
 			parameterizedTypeName = ParameterizedTypeName.get(super.className, S, E);

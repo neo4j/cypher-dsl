@@ -34,26 +34,28 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 // tag::simple-model[]
 public final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> { // <.>
 
+	public static final String $TYPE = "ACTED_IN";
+
 	public final Property ROLE = this.property("role"); // <.>
 
 	protected ActedIn(Person start, Movie end) {
-		super(start, "ACTED_IN", end); // <.>
+		super(start, $TYPE, end); // <.>
 	}
 
-	private ActedIn(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) { // <.>
-		super(symbolicName, start, type, properties, end);
+	private ActedIn(SymbolicName symbolicName, Node start, Properties properties, Node end) { // <.>
+		super(symbolicName, start, $TYPE, properties, end);
 	}
 
 	@Override
 	public ActedIn named(SymbolicName newSymbolicName) { // <.>
 
-		return new ActedIn(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
+		return new ActedIn(newSymbolicName, getLeft(), getDetails().getProperties(), getRight());
 	}
 
 	@Override
 	public ActedIn withProperties(MapExpression newProperties) { // <.>
 
-		return new ActedIn(getSymbolicName().orElse(null), getLeft(), getRequiredType(), Properties.create(newProperties), getRight());
+		return new ActedIn(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties), getRight());
 	}
 }
 // end::simple-model[]

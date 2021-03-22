@@ -35,24 +35,26 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 public final class UnboundRelation<S extends NodeBase<?>, E extends NodeBase<?>>
 	extends RelationshipBase<S, E, UnboundRelation<S, E>> {
 
+	public static final String $TYPE  = "UNBOUND";
+
 	protected UnboundRelation(S start, E end) {
-		super(start, "FREERIDING", end);
+		super(start, $TYPE, end);
 	}
 
-	private UnboundRelation(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
-		super(symbolicName, start, type, properties, end);
+	private UnboundRelation(SymbolicName symbolicName, Node start, Properties properties, Node end) {
+		super(symbolicName, start, $TYPE, properties, end);
 	}
 
 	@Override
 	public UnboundRelation<S, E> named(SymbolicName newSymbolicName) {
 
-		return new UnboundRelation<>(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
+		return new UnboundRelation<>(newSymbolicName, getLeft(), getDetails().getProperties(), getRight());
 	}
 
 	@Override
 	public UnboundRelation<S, E> withProperties(MapExpression newProperties) {
 
-		return new UnboundRelation<>(getSymbolicName().orElse(null), getLeft(), getRequiredType(),
+		return new UnboundRelation<>(getSymbolicName().orElse(null), getLeft(),
 			Properties.create(newProperties), getRight());
 	}
 }

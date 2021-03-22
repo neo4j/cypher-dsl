@@ -20,9 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
-import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
@@ -81,6 +79,10 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		this(symbolicName, start, Direction.LTR, properties, end, type);
 	}
 
+	protected RelationshipBase(SymbolicName symbolicName, String type,  Node start, Properties properties, Node end) {
+		this(symbolicName, start, Direction.LTR, properties, end, type);
+	}
+
 	@Override
 	public final SELF named(String newSymbolicName) {
 
@@ -123,15 +125,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	@Override
 	public final Node getLeft() {
 		return left;
-	}
-
-	protected final String getRequiredType() {
-
-		List<String> types = getDetails().getTypes().getValues();
-		if (types.size() != 1) {
-			throw new NoSuchElementException("No value present");
-		}
-		return types.get(0);
 	}
 
 	@Override

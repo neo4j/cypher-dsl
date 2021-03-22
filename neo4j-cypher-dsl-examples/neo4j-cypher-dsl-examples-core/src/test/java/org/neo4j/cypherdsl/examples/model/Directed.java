@@ -35,23 +35,25 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  */
 public final class Directed<E extends NodeBase<?>> extends RelationshipBase<Person, E, Directed<E>> {
 
+	public static final String $TYPE  = "DIRECTED";
+
 	protected Directed(Person start, E end) {
-		super(start, "DIRECTED", end);
+		super(start, $TYPE, end);
 	}
 
-	private Directed(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
-		super(symbolicName, start, type, properties, end);
+	private Directed(SymbolicName symbolicName, Node start, Properties properties, Node end) {
+		super(symbolicName, start, $TYPE, properties, end);
 	}
 
 	@Override
 	public Directed<E> named(SymbolicName newSymbolicName) {
 
-		return new Directed<>(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
+		return new Directed<>(newSymbolicName, getLeft(), getDetails().getProperties(), getRight());
 	}
 
 	@Override
 	public Directed<E> withProperties(MapExpression newProperties) {
 
-		return new Directed<>(getSymbolicName().orElse(null), getLeft(), getRequiredType(), Properties.create(newProperties), getRight());
+		return new Directed<>(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties), getRight());
 	}
 }

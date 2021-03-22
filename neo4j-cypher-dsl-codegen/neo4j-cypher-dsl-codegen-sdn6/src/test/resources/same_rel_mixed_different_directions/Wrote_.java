@@ -15,22 +15,25 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 )
 public final class Wrote_<S extends NodeBase<?>, E extends NodeBase<?>> extends
 	RelationshipBase<S, E, Wrote_<S, E>> {
+
+	public static final String $TYPE = "WROTE";
+
 	public Wrote_(S start, E end) {
-		super(start, "WROTE", end);
+		super(start, $TYPE, end);
 	}
 
-	private Wrote_(SymbolicName symbolicName, Node start, String type, Properties properties,
+	private Wrote_(SymbolicName symbolicName, Node start, Properties properties,
 			Node end) {
-		super(symbolicName, start, type, properties, end);
+		super(symbolicName, start, $TYPE, properties, end);
 	}
 
 	@Override
 	public Wrote_<S, E> named(SymbolicName newSymbolicName) {
-		return new Wrote_<>(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
+		return new Wrote_<>(newSymbolicName, getLeft(), getDetails().getProperties(), getRight());
 	}
 
 	@Override
 	public Wrote_<S, E> withProperties(MapExpression newProperties) {
-		return new Wrote_<>(getSymbolicName().orElse(null), getLeft(), getRequiredType(), Properties.create(newProperties), getRight());
+		return new Wrote_<>(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties), getRight());
 	}
 }
