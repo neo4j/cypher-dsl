@@ -1841,26 +1841,28 @@ It exists between people and movies (going from person to movie) and has an attr
 
 <span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">ActedIn</span> <span class="directive">extends</span> RelationshipBase&lt;Person, Movie, ActedIn&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
 
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> <span class="error">$</span>TYPE = <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>;
+
     <span class="directive">public</span> <span class="directive">final</span> Property ROLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">role</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b>
 
     <span class="directive">protected</span> ActedIn(Person start, Movie end) {
-        <span class="local-variable">super</span>(start, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>, end); <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="local-variable">super</span>(start, <span class="error">$</span>TYPE, end); <i class="conum" data-value="3"></i><b>(3)</b>
     }
 
-    <span class="directive">private</span> ActedIn(SymbolicName symbolicName, Node start, <span class="predefined-type">String</span> type, <span class="predefined-type">Properties</span> properties, Node end) { <i class="conum" data-value="4"></i><b>(4)</b>
-        <span class="local-variable">super</span>(symbolicName, start, type, properties, end);
+    <span class="directive">private</span> ActedIn(SymbolicName symbolicName, Node start, <span class="predefined-type">Properties</span> properties, Node end) { <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="local-variable">super</span>(symbolicName, start, <span class="error">$</span>TYPE, properties, end);
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> ActedIn named(SymbolicName newSymbolicName) { <i class="conum" data-value="5"></i><b>(5)</b>
 
-        <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(newSymbolicName, getLeft(), getRequiredType(), getDetails().getProperties(), getRight());
+        <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(newSymbolicName, getLeft(), getDetails().getProperties(), getRight());
     }
 
     <span class="annotation">@Override</span>
     <span class="directive">public</span> ActedIn withProperties(MapExpression newProperties) { <i class="conum" data-value="6"></i><b>(6)</b>
 
-        <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(getSymbolicName().orElse(<span class="predefined-constant">null</span>), getLeft(), getRequiredType(), <span class="predefined-type">Properties</span>.create(newProperties), getRight());
+        <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(getSymbolicName().orElse(<span class="predefined-constant">null</span>), getLeft(), <span class="predefined-type">Properties</span>.create(newProperties), getRight());
     }
 }</code></pre>
 </div>
@@ -1985,17 +1987,21 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 
 <span class="directive">final</span> <span class="type">class</span> <span class="class">ActedIn</span> <span class="directive">extends</span> RelationshipBase&lt;Person, Movie, ActedIn&gt; {
 
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> <span class="error">$</span>TYPE = <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>;
+
     <span class="directive">public</span> <span class="directive">final</span> Property ROLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">role</span><span class="delimiter">&quot;</span></span>);
 
     <span class="directive">protected</span> ActedIn(Person start, Movie end) {
-        <span class="local-variable">super</span>(start, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>, end);
+        <span class="local-variable">super</span>(start, <span class="error">$</span>TYPE, end);
     }
 }
 
 <span class="directive">final</span> <span class="type">class</span> <span class="class">Directed</span>&lt;E <span class="directive">extends</span> NodeBase&lt;?&gt;&gt; <span class="directive">extends</span> RelationshipBase&lt;Person, E, Directed&lt;E&gt;&gt; {
 
+    <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> <span class="error">$</span>TYPE  = <span class="string"><span class="delimiter">&quot;</span><span class="content">DIRECTED</span><span class="delimiter">&quot;</span></span>;
+
     <span class="directive">protected</span> Directed(Person start, E end) {
-        <span class="local-variable">super</span>(start, <span class="string"><span class="delimiter">&quot;</span><span class="content">DIRECTED</span><span class="delimiter">&quot;</span></span>, end);
+        <span class="local-variable">super</span>(start, <span class="error">$</span>TYPE, end);
     }
 }</code></pre>
 </div>
@@ -2265,21 +2271,25 @@ application like as follows to avoid dependency conflicts:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@RestController</span>
-<span class="annotation">@RequestMapping</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">/api/movies</span><span class="delimiter">&quot;</span></span>)
-<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">MoviesController</span> {
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">java.util.Collection</span>;
+<span class="keyword">import</span> <span class="include">java.util.List</span>;
+
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Cypher</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Functions</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.domain.Sort</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.stereotype.Service</span>;
+
+<span class="annotation">@Service</span>
+<span class="directive">final</span> <span class="type">class</span> <span class="class">MovieService</span> {
 
     <span class="directive">private</span> <span class="directive">final</span> MovieRepository movieRepository;
 
-    <span class="directive">private</span> <span class="directive">final</span> PeopleRepository peopleRepository;
-
-    MoviesController(MovieRepository movieRepository, PeopleRepository peopleRepository) {
+    MovieService(MovieRepository movieRepository) {
         <span class="local-variable">this</span>.movieRepository = movieRepository;
-        <span class="local-variable">this</span>.peopleRepository = peopleRepository;
     }
 
-    <span class="annotation">@GetMapping</span>({ <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">/</span><span class="delimiter">&quot;</span></span> })
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Movie&gt; get() {
+    <span class="predefined-type">List</span>&lt;Movie&gt; findAll() {
+
         <span class="keyword">return</span> movieRepository
             .findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); <i class="conum" data-value="1"></i><b>(1)</b>
     }
@@ -2295,44 +2305,145 @@ application like as follows to avoid dependency conflicts:</p>
 </table>
 </div>
 <div class="paragraph">
-<p>Or build complex queries with it:</p>
+<p>Spring Data Neo4j 6.1 has two additional query fragments, that makes working with the Cypher-DSL very efficient:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">class</span> <span class="class">MovieRepositoryExtImpl</span> <span class="directive">implements</span> MovieRepositoryExt {
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.Neo4jRepository</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslConditionExecutor</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor</span>;
 
-    <span class="directive">private</span> <span class="directive">final</span> Neo4jTemplate neo4jTemplate;
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">PeopleRepository</span> <span class="directive">extends</span> Neo4jRepository&lt;Person, <span class="predefined-type">Long</span>&gt;,
+    CypherdslConditionExecutor&lt;Person&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+    CypherdslStatementExecutor&lt;Person&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Allows to just add conditions to our generated queries</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Provides an alternative to using @Query with strings</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Both interfaces are <strong>independent</strong>  of each other, they can be used together like in this example or separately (just picking the one you need).
+You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter <a href="https://docs.spring.io/spring-data/neo4j/docs/6.1.0-M5/reference/html/#sdn-mixins">Spring Data Neo4j Extensions</a>.</p>
+</div>
+<div class="paragraph">
+<p>The repository above can be used like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">java.util.Optional</span>;
 
-    MovieRepositoryExtImpl(Neo4jTemplate neo4jTemplate) {
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Conditions</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Cypher</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Functions</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.stereotype.Service</span>;
 
-        <span class="local-variable">this</span>.neo4jTemplate = neo4jTemplate;
+<span class="annotation">@Service</span>
+<span class="directive">final</span> <span class="type">class</span> <span class="class">PeopleService</span> {
+
+    <span class="directive">static</span> <span class="directive">final</span> Person_ PERSON = Person_.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="directive">private</span> <span class="directive">final</span> PeopleRepository peopleRepository;
+
+    PeopleService(PeopleRepository peopleRepository) {
+        <span class="local-variable">this</span>.peopleRepository = peopleRepository;
     }
 
-    <span class="annotation">@Override</span>
-    <span class="directive">public</span> <span class="predefined-type">List</span>&lt;Movie&gt; findAllMoviesRelatedTo(Person personOfInterest) {
+    <span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornInThe70tiesOr(Optional&lt;<span class="predefined-type">String</span>&gt; optionalName) {
 
-        var person = Person_.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
-        var actedIn = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
-        var directed = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">d</span><span class="delimiter">&quot;</span></span>);
-        var m = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+        <span class="keyword">return</span> peopleRepository.findAll(
+            PERSON.BORN.gte(Cypher.literalOf(<span class="integer">1970</span>)).and(PERSON.BORN.lt(Cypher.literalOf(<span class="integer">1980</span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+                .or(optionalName
+                    .map(name -&gt; PERSON.NAME.isEqualTo(Cypher.anonParameter(name))) <i class="conum" data-value="2"></i><b>(2)</b>
+                    .orElseGet(Conditions::noCondition)) <i class="conum" data-value="3"></i><b>(3)</b>
+        );
+    }
 
-        var statement = Cypher.match(person)
-            .where(person.NAME.isEqualTo(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>)))
-            .with(person)
-            .optionalMatch(<span class="keyword">new</span> ActedIn_(person, actedIn))
-            .optionalMatch(<span class="keyword">new</span> Directed_(person, directed))
-            .with(Functions.collect(actedIn).add(Functions.collect(directed))
-                .as(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>))
-            .unwind(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>).as(m)
-            .returningDistinct(m)
-            .orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
-            .build();
+    Optional&lt;PersonDetails&gt; findDetails(<span class="predefined-type">String</span> name) {
 
-        <span class="keyword">return</span> <span class="local-variable">this</span>.neo4jTemplate.findAll(
-            statement, <span class="predefined-type">Map</span>.of(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, personOfInterest.getName()), Movie.class);
+        var d = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">d</span><span class="delimiter">&quot;</span></span>);
+        var a = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
+        var m = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>);
+        var r = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">relatedPerson</span><span class="delimiter">&quot;</span></span>);
+        var statement = Cypher.match(Person_.PERSON.withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Cypher.anonParameter(name)))
+            .optionalMatch(d.DIRECTORS)
+            .optionalMatch(a.ACTORS)
+            .optionalMatch(Person_.PERSON.relationshipTo(m).relationshipFrom(r, ActedIn_.<span class="error">$</span>TYPE))
+            .returningDistinct(
+                Person_.PERSON.getRequiredSymbolicName(),
+                Functions.collectDistinct(d).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">directed</span><span class="delimiter">&quot;</span></span>),
+                Functions.collectDistinct(a).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">actedIn</span><span class="delimiter">&quot;</span></span>),
+                Functions.collectDistinct(r).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">related</span><span class="delimiter">&quot;</span></span>)).build();
+
+        <span class="keyword">return</span> peopleRepository.findOne(statement, PersonDetails.class); <i class="conum" data-value="4"></i><b>(4)</b>
     }
 }</code></pre>
 </div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Using literals</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Using an optional parameter</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>or when it&#8217;s not filled, an empty condition</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Project a person onto <code>PersonDetails</code>, using a complex query.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Here is another complex example. The <code>MovieRepository</code> is also a <code>CypherdslStatementExecutor</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Collection</span>&lt;Movie&gt; findAllRelatedTo(Person person) {
+
+    var p = Person_.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+    var a = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
+    var d = Movie_.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">d</span><span class="delimiter">&quot;</span></span>);
+    var m = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+
+    var statement = Cypher.match(p)
+        .where(p.NAME.isEqualTo(Cypher.anonParameter(person.getName()))) <i class="conum" data-value="1"></i><b>(1)</b>
+        .with(p)
+        .optionalMatch(<span class="keyword">new</span> ActedIn_(p, a))
+        .optionalMatch(<span class="keyword">new</span> Directed_(p, d))
+        .with(Functions.collect(a).add(Functions.collect(d))
+            .as(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>))
+        .unwind(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>).as(m)
+        .returningDistinct(m)
+        .orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
+        .build();
+
+    <span class="keyword">return</span> <span class="local-variable">this</span>.movieRepository.findAll(statement);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Here we use an anonymous parameter to store the <code>name</code> value</td>
+</tr>
+</table>
 </div>
 <div class="paragraph">
 <p>The full example is in <code>neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6</code>.</p>
@@ -3533,7 +3644,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-03-15 18:14:03 UTC
+Last updated 2021-03-22 14:07:14 UTC
 </div>
 </div>
 </body>
