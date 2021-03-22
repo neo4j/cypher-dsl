@@ -34,8 +34,8 @@ import org.junit.jupiter.api.condition.EnabledIf;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Movie;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Person;
 import org.neo4j.cypherdsl.examples.sdn6.movies.PersonDetails;
-import org.neo4j.harness.Neo4j;
-import org.neo4j.harness.Neo4jBuilders;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.GraphDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -48,15 +48,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.util.FileCopyUtils;
+import org.testcontainers.containers.Neo4jContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * @author Michael J. Simons
  */
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnabledIf("is606OrHigher")
+@Testcontainers(disabledWithoutDocker = true)
 class ApplicationIT {
 
-	private static Neo4j neo4j;
+	@Container
+	private static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.2");
 
 	static boolean is606OrHigher() {
 		String version = Optional.of(EnableNeo4jRepositories.class)
@@ -70,22 +75,22 @@ class ApplicationIT {
 	}
 
 	@BeforeAll
-	static void startNeo4j() throws IOException {
-		String movies;
+	static void loadMovies() throws IOException {
 		ResourceLoader r = new DefaultResourceLoader();
-		try (var in = new InputStreamReader(r.getResource("classpath:movies.cypher").getInputStream())) {
-			movies = FileCopyUtils.copyToString(in);
+		try (var in = new InputStreamReader(r.getResource("classpath:movies.cypher").getInputStream());
+			var driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic("neo4j", neo4j.getAdminPassword()));
+			var session = driver.session();
+		) {
+			var movies = FileCopyUtils.copyToString(in);
+			session.run(movies);
 		}
-		neo4j = Neo4jBuilders.newInProcessBuilder()
-			.withFixture(movies)
-			.build();
 	}
 
 	@DynamicPropertySource
 	static void neo4jProperties(DynamicPropertyRegistry registry) {
-		registry.add("spring.neo4j.uri=", neo4j::boltURI);
+		registry.add("spring.neo4j.uri=", neo4j::getBoltUrl);
 		registry.add("spring.neo4j.authentication.username", () -> "neo4j");
-		registry.add("spring.neo4j.authentication.password", () -> "");
+		registry.add("spring.neo4j.authentication.password", () -> neo4j.getAdminPassword());
 	}
 
 	@Test

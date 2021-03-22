@@ -40,8 +40,8 @@
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>11</java.version>
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
-		<neo4j.version>4.2.3</neo4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
+		<testcontainers.version>1.15.2</testcontainers.version>
 	</properties>
 
 	<dependencies>
@@ -53,20 +53,14 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.neo4j.test</groupId>
-			<artifactId>neo4j-harness</artifactId>
-			<version>${neo4j.version}</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<artifactId>junit-vintage-engine</artifactId>
-					<groupId>org.junit.vintage</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>slf4j-nop</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>neo4j</artifactId>
+			<version>${testcontainers.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>junit-jupiter</artifactId>
+			<version>${testcontainers.version}</version>
 		</dependency>
 
 		<dependency>
