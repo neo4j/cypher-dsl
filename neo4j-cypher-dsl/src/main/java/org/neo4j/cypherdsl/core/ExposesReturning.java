@@ -32,7 +32,8 @@ import org.apiguardian.api.API;
 public interface ExposesReturning {
 
 	/**
-	 * Creates the {@code RETURN} clause.
+	 * Creates the {@code RETURN} clause. All variables passed via {@code variables} must be valid
+	 * {@link SymbolicName symbolic names}. {@link Expression#property(String...)} must be used to return single properties.
 	 *
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
@@ -60,7 +61,9 @@ public interface ExposesReturning {
 	StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions);
 
 	/**
-	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword.
+	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword. All variables passed via {@code variables}
+	 * must be valid {@link SymbolicName symbolic names}. {@link Expression#property(String...)} must be used to return
+	 * single properties.
 	 *
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
