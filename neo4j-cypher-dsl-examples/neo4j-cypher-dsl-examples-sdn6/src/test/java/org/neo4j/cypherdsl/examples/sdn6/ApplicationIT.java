@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -171,10 +170,5 @@ class ApplicationIT {
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(18);
-	}
-
-	@AfterAll
-	static void stopNeo4j() {
-		neo4j.close();
 	}
 }
