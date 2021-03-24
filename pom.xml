@@ -326,7 +326,7 @@
 					</configuration>
 					<executions>
 						<execution>
-							<id>compile-java-9</id>
+							<id>compile-java-11</id>
 							<phase>compile</phase>
 							<goals>
 								<goal>compile</goal>
