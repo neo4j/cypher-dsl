@@ -324,6 +324,22 @@
 						<release>${java.version}</release>
 						<compilerArgument>-Xlint:unchecked</compilerArgument>
 					</configuration>
+					<executions>
+						<execution>
+							<id>compile-java-9</id>
+							<phase>compile</phase>
+							<goals>
+								<goal>compile</goal>
+							</goals>
+							<configuration combine.self="override">
+								<release>11</release>
+								<compileSourceRoots>
+									<compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
+								</compileSourceRoots>
+								<multiReleaseOutput>true</multiReleaseOutput>
+							</configuration>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -597,6 +613,7 @@
 						</manifest>
 						<manifestEntries>
 							<Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
+							<Multi-Release>true</Multi-Release>
 						</manifestEntries>
 					</archive>
 				</configuration>
