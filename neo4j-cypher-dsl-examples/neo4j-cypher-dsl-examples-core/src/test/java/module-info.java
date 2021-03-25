@@ -19,6 +19,6 @@
 open module org.neo4j.cypherdsl.examples.core {
 
 	requires org.assertj.core;
-	requires org.junit.jupiter.api;
+	requires org.junit.jupiter;
 	requires org.neo4j.cypherdsl.core;
 }
