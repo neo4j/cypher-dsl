@@ -79,6 +79,9 @@
 					<execution>
 						<id>default-testCompile</id>
 						<configuration combine.self="append">
+							<compilerArgs>
+								<arg>-Aquerydsl.generatedAnnotationClass=com.querydsl.core.annotations.Generated</arg>
+							</compilerArgs>
 							<annotationProcessorPaths>
 								<annotationProcessorPath>
 									<groupId>com.querydsl</groupId>
