@@ -22,7 +22,7 @@ module org.neo4j.cypherdsl.codegen.core {
 
 	requires com.squareup.javapoet;
 	requires org.apiguardian.api;
-	requires org.neo4j.cypherdsl.core;
+	requires transitive org.neo4j.cypherdsl.core;
 
 	exports org.neo4j.cypherdsl.codegen.core;
 }
