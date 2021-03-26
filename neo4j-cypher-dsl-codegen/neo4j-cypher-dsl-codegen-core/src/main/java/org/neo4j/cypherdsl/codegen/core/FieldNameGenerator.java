@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
+import org.neo4j.cypherdsl.core.utils.Strings;
+
 /**
  * A generator for constant field names.
  *

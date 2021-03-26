@@ -84,6 +84,17 @@ public final class Strings {
 		return true;
 	}
 
+	/**
+	 * A convenience method to decide whether a given {@code codePoint} is a valid Java identifier at the given position {@code p}.
+	 *
+	 * @param p         Position on which the {@code codePoint} is supposed to be used as identifier
+	 * @param codePoint A codepoint
+	 * @return True if the codePoint could be used as part of an identifier at the given position
+	 */
+	public static boolean isValidJavaIdentifierPartAt(int p, int codePoint) {
+		return p == 0 && Character.isJavaIdentifierStart(codePoint) || p > 0 && Character.isJavaIdentifierPart(codePoint);
+	}
+
 	private static boolean containsText(CharSequence str) {
 		int strLen = str.length();
 		for (int i = 0; i < strLen; i++) {
