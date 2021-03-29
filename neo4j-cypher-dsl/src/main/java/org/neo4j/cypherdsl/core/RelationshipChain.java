@@ -80,6 +80,19 @@ public final class RelationshipChain implements RelationshipPattern {
 	}
 
 	/**
+	 * Replaces the last element of this chains with a copy of the relationship with the new symbolic name.
+	 *
+	 * @param newSymbolicName The new symbolic name to use
+	 * @return This chain
+	 * @since 2021.1.1
+	 */
+	public RelationshipChain named(SymbolicName newSymbolicName) {
+
+		Relationship lastElement = this.relationships.removeLast();
+		return this.add(lastElement.named(newSymbolicName));
+	}
+
+	/**
 	 * Changes the length of the last element of this chain to an unbounded pattern.
 	 *
 	 * @return This chain

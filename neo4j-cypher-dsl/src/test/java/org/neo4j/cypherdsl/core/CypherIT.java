@@ -100,6 +100,25 @@ class CypherIT {
 					.isEqualTo("MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`) RETURN b, u");
 			}
 
+			@Test
+			void simpleRelationshipChainNamed() {
+
+				for (RelationshipChain chain : new RelationshipChain[] {
+					userNode.relationshipTo(bikeNode, "OWNS")
+						.relationshipTo(Cypher.node("Brand"), "MADE_BY").named(SymbolicName.of("m")),
+					userNode.relationshipTo(bikeNode, "OWNS")
+						.relationshipTo(Cypher.node("Brand"), "MADE_BY").named("m")
+				}) {
+					Statement statement = Cypher
+						.match(chain)
+						.returning(bikeNode, userNode)
+						.build();
+
+					assertThat(cypherRenderer.render(statement))
+						.isEqualTo("MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`)-[m:`MADE_BY`]->(:`Brand`) RETURN b, u");
+				}
+			}
+
 			@Test // GH-169
 			void multipleRelationshipTypes() {
 				Statement statement = Cypher
