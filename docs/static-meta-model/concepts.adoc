@@ -2,20 +2,20 @@
 
 === A static meta model is optional
 
-First let's stress this: A static meta model is optional for the Cypher-DSL. It is completly ok to use the Cypher-DSL
+First let's stress this: a static meta model is optional for the Cypher-DSL. It is completely OK to use the Cypher-DSL
 as shown in the <<how-to-use-it.examples,examples in the "How to use it" part>>:
-All labels, types and properties can be named as you go.
+all labels, types and properties can be named as you go.
 The Cypher-DSL will still give you type-safety in regard to the Cypher's syntax.
 
-This fit's nicely with Neo4j's capabilities: Neo4j is a schema less database. Nodes, their relationships between each other,
+This fits nicely with Neo4j's capabilities: Neo4j is a schemaless database. Nodes, their relationships between each other,
 their labels and properties can be changed as you go but all of this information can still be queried.
 
 In a schemaless database or a database with dynamic scheme the scheme is often defined by the application.
 This definition takes many forms: It can be through an object mapper like https://github.com/neo4j/neo4j-ogm[Neo4j-OGM] or
-https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference[Spring Data Neo4j 6], or maybe in form of
+https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference[Spring Data Neo4j 6+], or maybe in form of
 Graph-QL schemes.
 
-Another source maybe the information we can retrieve from the database itself via https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_nodetypeproperties[`db.schema.nodeTypeProperties`] and
+Another source may be the information we can retrieve from the database itself via https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_nodetypeproperties[`db.schema.nodeTypeProperties`] and
 https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_reltypeproperties[`db.schema.relTypeProperties`].
 
 [[static-meta-model.building-blocks]]
@@ -24,9 +24,9 @@ https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure
 The Cypher DSL offers the following building blocks as part of the public API:
 
 * Two pattern elements:
-** Nodes via `Node` (and it's default implementation `NodeBase`)
-** Relationships via `Relationship` (and it's default implementation `RelationshipBase`)
-* `Property`, which is a a holder for properties
+** Nodes via `Node` (and its default implementation `NodeBase`)
+** Relationships via `Relationship` (and its default implementation `RelationshipBase`)
+* `Property`, which is a holder for properties
 
 When you use Cypher-DSL like this:
 
@@ -38,8 +38,8 @@ var statement = Cypher.match(m).returning(m).build();
 
 `m` will be a `Node` instance having the label `Movie` and an alias of `m`. `m` can be used everywhere where a pattern element
 can be used according to the openCypher spec.
-You don't have to care about it's type. That's why we vouched for the JDK11+ local type inference here and omitted the
-declaration of the type `Node`: It just reads better.
+You don't have to care about its type. That's why we vouched for the JDK11+ local type inference here and omitted the
+declaration of the type `Node`: it just reads better.
 
 === A very simple, static model
 
@@ -108,7 +108,7 @@ We have these scenarios:
 We either have a type that is used only between the same set of labels, or a type is used always with one fixed label or
 a type is used between arbitrary labels.
 
-To accomadate for that, the default relationship implementation, `RelationshipBase` spots three type parameters:
+To accommodate for that, the default relationship implementation, `RelationshipBase`, spots three type parameters:
 
 [source,java]
 ----
@@ -133,7 +133,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 <.> Required to rename this relationship
 <.> Required for querying properties
 
-In contrast to the movie, we don't see a static attribute allowing access to the relationship.
+In contrast to the movie, we don't need a static attribute allowing access to the relationship.
 This is stored at the owner. In this case, the `Person`:
 
 [source,java,indent=0,tabsize=4]
