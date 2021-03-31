@@ -28,10 +28,10 @@ dependencies {
 == How to use it
 
 You use the Cypher-DSL as you would write Cypher:
-It allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.
+it allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.
 
 The examples to follow are using JDK 11.
-We find the `var` keyword especially appealing in such a DSL as the types returned by the DSL much less important than
+We find the `var` keyword especially appealing in such a DSL as the types returned by the DSL are much less important than
 the further building methods they offer.
 
 IMPORTANT: The AST parts and intermediate build steps are immutable. That is, the methods create new intermediate steps.
@@ -44,7 +44,7 @@ Please get an instance of the default renderer via `org.neo4j.cypherdsl.renderer
 The renderer provides a single method `render` for rendering the AST into a string representation.
 
 Furthermore, the `Statement` will collect parameter names and if provided, parameter values.
-Parameter names and values are available after the statement has been build and can for example be used directly with
+Parameter names and values are available after the statement has been built and can for example be used directly with
 Neo4j-Java-Driver.
 
 [[how-to-use-it.examples]]
@@ -149,7 +149,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 A placeholder for a parameter can be defined via `Cypher.parameter("param")`.
 This placeholder will be rendered as `$param` and must be filled with the appropriate means of the environment you're working with.
 
-In addition, an arbitrary value can be bound to the name via ´Cypher.parameter("param", "a value")` or `Cypher.parameter("param").withValue("a value")`.
+In addition, an arbitrary value can be bound to the name via `Cypher.parameter("param", "a value")` or `Cypher.parameter("param").withValue("a value")`.
 `NULL` is a valid value.
 The Cypher-DSL will not use those values, but collect them for you.
 
@@ -175,14 +175,14 @@ var cypher = statement.getCypher();
 assertThat(cypher).isEqualTo("RETURN true AS t");
 ----
 
-This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and it's parameters.
+This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and its parameters.
 
 ==== Generating formatted Cypher
 
 The Cypher-DSL can also format the generated Cypher to some extend.
 The `Renderer` offers the overload `Renderer getRenderer(Configuration configuration)`, taking in an instance of `org.neo4j.cypherdsl.core.renderer.Configuration`.
 
-Instances of `Configuration` are threadsafe and reusable.
+Instances of `Configuration` are thread-safe and reusable.
 The class offers a couple of static convenience methods for retrieving some variants.
 
 [source, java,indent=0,tabsize=4]
