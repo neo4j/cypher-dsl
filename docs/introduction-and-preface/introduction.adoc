@@ -1,12 +1,12 @@
 == Purpose
 
-The Cypher-DSL has been developed with the needs of https://github.com/neo4j/sdn-rx[SDN/RX] in mind:
+The Cypher-DSL has been developed with the needs of https://github.com/neo4j/sdn-rx[SDN/RX] in mind (now superseded by https://github.com/spring-projects/spring-data-neo4j[SDN]):
 We wanted to avoid string concatenations in our query generation and decided do go with a builder approach, much like we
 find with https://www.jooq.org[jOOQ] or in the relational module of https://github.com/spring-projects/spring-data-jdbc/tree/1.1.6.RELEASE/spring-data-relational/src/main/java/org/springframework/data/relational/core/sql[Spring Data JDBC], but for Cypher.
 
 What we don't have - and don't need for our mapping purpose - at the moment is a code generator that reads the database schema
 and generates static classes representing labels and relationship types.
-That is still up to the mapping framework (in our case SDN/RX).
+That is still up to the mapping framework (in our case SDN).
 We however have a type safe API for Cypher that allows only generating valid Cypher constructs.
 
 We worked closely with the https://www.opencypher.org[OpenCypher spec] here and you find a lot of these concepts in the API.
@@ -22,7 +22,7 @@ Those can be used in any context supporting String-based queries, for example wi
 
 Parameters in the generated queries will use the `$form` and as such be compatible with all current versions of Neo4j.
 
-Users of SDN/RX respectively SDN 6 can use the generated `org.neo4j.cypherdsl.core.Statement` directly with the `Neo4jTemplate` or the `ReactiveNeo4jTemplate`.
+Users of SDN 6+ can use the generated `org.neo4j.cypherdsl.core.Statement` directly with the `Neo4jTemplate` or the `ReactiveNeo4jTemplate`.
 Both the imperative and the reactive variants allow the retrieval and counting of entities without rendering a String first,
 for example through `Neo4jTemplate#findAll(Statement, Class<T>)`.
 
