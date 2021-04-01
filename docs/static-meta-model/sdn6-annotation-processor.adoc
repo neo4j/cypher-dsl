@@ -70,6 +70,7 @@ application like as follows to avoid dependency conflicts:
     <groupId>{groupId}</groupId>
     <artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
     <version>{neo4j-cypher-dsl.version}</version>
+    <optional>true</optional>
     <exclusions>
         <exclusion>
             <groupId>org.slf4j</groupId>
