@@ -1,6 +1,6 @@
 == Purpose
 
-The Cypher-DSL has been developed with the needs of https://github.com/neo4j/sdn-rx[SDN/RX] in mind (now superseded by https://github.com/spring-projects/spring-data-neo4j[SDN]):
+The Cypher-DSL has been developed with the needs of Spring Data Neo4j.
 We wanted to avoid string concatenations in our query generation and decided do go with a builder approach, much like we
 find with https://www.jooq.org[jOOQ] or in the relational module of https://github.com/spring-projects/spring-data-jdbc/tree/1.1.6.RELEASE/spring-data-relational/src/main/java/org/springframework/data/relational/core/sql[Spring Data JDBC], but for Cypher.
 

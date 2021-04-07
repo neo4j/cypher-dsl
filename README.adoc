@@ -13,7 +13,7 @@ image:https://img.shields.io/maven-central/v/org.neo4j/neo4j-cypher-dsl.svg[Mave
 
 [abstract]
 --
-The Neo4j Cypher-DSL in its current form is a spin-off from Spring Data Neo4j⚡️RX (now Spring Data Neo4j 6+), where it is used to generate all Cypher queries.
+The Neo4j Cypher-DSL in its current form is a spin-off from Spring Data Neo4j 6+ (né Spring Data Neo4j⚡️RX), where it is used to generate all Cypher queries.
 We thank all contributors to all branches prior to 2020.0 for their effort in creating the previous verions.
 --
 

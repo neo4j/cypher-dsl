@@ -39,7 +39,7 @@ This manual is written for people interested in creating Cypher queries in a typ
 WARNING: The Cypher-DSL is considered _EXPERIMENTAL_ at the time of writing.
 This means you can and should use it and that we are looking actively for feedback, issues and problems.
 We will try to keep breaking changes to a minimum, but we reserve the right to modify public methods, parameters
-and behaviour in case we need those changes for the https://github.com/spring-projects/spring-data-neo4j[SDN] project.
+and behaviour in case we need those changes.
 All public classes inside `org.neo4j.cypherdsl` still subject to breaking changes are annotated with `@API(status = EXPERIMENTAL)`.
 
 include::introduction-and-preface/index.adoc[leveloffset=+1]
