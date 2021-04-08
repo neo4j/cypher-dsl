@@ -36,6 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -51,14 +52,16 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor8;
 import javax.lang.model.util.Elements;
+import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -345,22 +348,20 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 				if (!enclosedElement.getKind().isField()) {
 					continue;
 				}
-				VariableElement f = (VariableElement) enclosedElement;
 
-				Set<Element> declaredAnnotations = f.getAnnotationMirrors().stream()
+				Set<Element> declaredAnnotations = enclosedElement.getAnnotationMirrors().stream()
 					.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
 				if (declaredAnnotations.contains(targetNodeAnnotationType)) {
 
-					Element element = typeUtils.asElement(f.asType());
-					if (element instanceof TypeElement) {
-						actualTargetType = (TypeElement) element;
-					} else if (element instanceof TypeParameterElement) {
+					Element element = typeUtils.asElement(enclosedElement.asType());
+					actualTargetType = element.accept(new TypeElementVisitor<>(Function.identity()), null);
+					if (actualTargetType == null) {
 						messager.printMessage(Diagnostic.Kind.WARNING,
 							"Cannot resolve generic type, not generating a property for relationships referring to " + e
 								.getQualifiedName(), element);
 					}
 				} else {
-					properties.add(asPropertyDefinition(f));
+					properties.add(asPropertyDefinition(enclosedElement));
 				}
 			}
 
@@ -542,7 +543,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		return same;
 	}
 
-	private PropertyDefinition asPropertyDefinition(VariableElement e) {
+	private PropertyDefinition asPropertyDefinition(Element e) {
 
 		Optional<Property> optionalPropertyAnnotation = Optional.ofNullable(e.getAnnotation(Property.class));
 
@@ -576,7 +577,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		return propertyDefinition;
 	}
 
-	private RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, VariableElement e,
+	private RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
 		Map<TypeElement, NodeModelBuilder> nodeBuilders
 	) {
@@ -615,7 +616,17 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			relationshipType = fieldName;
 		}
 
-		DeclaredType declaredType = (DeclaredType) e.asType();
+		DeclaredType declaredType = e.asType().accept(new SimpleTypeVisitor8<DeclaredType, Void>() {
+			@Override
+			public DeclaredType visitDeclared(DeclaredType t, Void unused) {
+				return t;
+			}
+		}, null);
+
+		if (declaredType == null) {
+			return null;
+		}
+
 		TypeMirror relatedType = null;
 		if (declaredType.getTypeArguments().size() == 1) {
 			relatedType = declaredType.getTypeArguments().get(0);
@@ -742,9 +753,20 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 			Supplier<Boolean> simpleTypeOrCustomWriteTarget = () -> {
 				try {
-					DeclaredType declaredType = (DeclaredType) field.asType();
-					Class<?> fieldType = Class.forName(declaredType.asElement().toString());
+					Name className = field.asType().accept(new SimpleTypeVisitor8<Name, Void>() {
+						@Override
+						public Name visitPrimitive(PrimitiveType t, Void unused) {
+							// While I could use the fact that this is a primitive directly, I'd rather stick with the
+							// wrapper class so that in turn this can be passed on to the Spring infrastructure.
+							return typeUtils.boxedClass(t).getQualifiedName();
+						}
 
+						@Override
+						public Name visitDeclared(DeclaredType t, Void unused) {
+							return t.asElement().accept(new TypeElementVisitor<>(te -> te.getQualifiedName()), null);
+						}
+					}, null);
+					Class<?> fieldType = Class.forName(className.toString());
 					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions.hasCustomWriteTarget(fieldType);
 				} catch (ClassNotFoundException e) {
 					return false;
