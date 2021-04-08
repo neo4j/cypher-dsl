@@ -1,6 +1,6 @@
 == Possible Usage
 
-Please assume we did model the "Movie graph" (`:play movies` in Neo4j-Browser) with the following scheme
+Please assume we did model the "Movie graph" (`:play movies` in Neo4j-Browser) with the following scheme:
 
 image::movie-graph.png[]
 
@@ -90,7 +90,7 @@ Applicable to properties of nodes such as the title:
 include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/model/StaticModelIT.java[tag=query-node-by-properties]
 ----
 
-and relationships
+and relationships:
 
 [source,java,indent=0,tabsize=4]
 ----

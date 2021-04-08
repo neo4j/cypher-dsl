@@ -110,7 +110,7 @@ The processor supports the following arguments:
 | A flag whether `@Generated` should be added
 |===
 
-The generated classes can be used in variety of places:
+The generated classes can be used in a variety of places:
 
 [source,java,indent=0,tabsize=4]
 ----

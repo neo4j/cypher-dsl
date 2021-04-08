@@ -1,6 +1,6 @@
 == Calling arbitrary procedures and functions
 
-Neo4j has plethora of builtin procedures and functions.
+Neo4j has plethora of built-in procedures and functions.
 The Cypher-DSL does cover a lot of them already, and they can be called in a typesafe way on many `Expression`-instances
 taking in various expressions such as the results of other calls, literals or parameters.
 
@@ -9,7 +9,7 @@ More so, there are fantastic libraries out there like https://neo4j.com/labs/apo
 APOC has so many procedures and functions in so many categories that it is rather futile to add shims
 for all of them consistently.
 
-Probably the most important aspect of all: Many Neo4j users bring their knowledge to the database themselves,
+Probably the most important aspect of all: many Neo4j users bring their knowledge to the database themselves,
 in the form of their stored procedures. Those should be callable as well.
 
 The Cypher-DSL is flexible enough to call all those procedures and functions.
@@ -94,7 +94,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 <.> First we define a call as seen earlier and turn it into an expression
 <.> This expression is than used as any other expression
 
-Of course, arguments to those functions can be express as well. Either as literals or expressions.
+Of course, arguments to those functions can be expressed as well, either as literals or expressions.
 
 [[as-function-with-args]]
 [source,java,indent=0]
