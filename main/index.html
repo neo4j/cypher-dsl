@@ -603,7 +603,7 @@ table.CodeRay td.code>pre{padding:0}
 The Cypher-DSL is considered <em>EXPERIMENTAL</em> at the time of writing.
 This means you can and should use it and that we are looking actively for feedback, issues and problems.
 We will try to keep breaking changes to a minimum, but we reserve the right to modify public methods, parameters
-and behaviour in case we need those changes for the <a href="https://github.com/neo4j/sdn-rx">SDN/RX</a> project, the origin of the Cypher-DSL.
+and behaviour in case we need those changes.
 All public classes inside <code>org.neo4j.cypherdsl</code> still subject to breaking changes are annotated with <code>@API(status = EXPERIMENTAL)</code>.
 </td>
 </tr>
@@ -617,14 +617,14 @@ All public classes inside <code>org.neo4j.cypherdsl</code> still subject to brea
 <div class="sect2">
 <h3 id="purpose"><a class="anchor" href="#purpose"></a>1.1. Purpose</h3>
 <div class="paragraph">
-<p>The Cypher-DSL has been developed with the needs of <a href="https://github.com/neo4j/sdn-rx">SDN/RX</a> in mind:
+<p>The Cypher-DSL has been developed with the needs of Spring Data Neo4j.
 We wanted to avoid string concatenations in our query generation and decided do go with a builder approach, much like we
 find with <a href="https://www.jooq.org">jOOQ</a> or in the relational module of <a href="https://github.com/spring-projects/spring-data-jdbc/tree/1.1.6.RELEASE/spring-data-relational/src/main/java/org/springframework/data/relational/core/sql">Spring Data JDBC</a>, but for Cypher.</p>
 </div>
 <div class="paragraph">
 <p>What we don&#8217;t have - and don&#8217;t need for our mapping purpose - at the moment is a code generator that reads the database schema
 and generates static classes representing labels and relationship types.
-That is still up to the mapping framework (in our case SDN/RX).
+That is still up to the mapping framework (in our case SDN).
 We however have a type safe API for Cypher that allows only generating valid Cypher constructs.</p>
 </div>
 <div class="paragraph">
@@ -646,7 +646,7 @@ Those can be used in any context supporting String-based queries, for example wi
 <p>Parameters in the generated queries will use the <code>$form</code> and as such be compatible with all current versions of Neo4j.</p>
 </div>
 <div class="paragraph">
-<p>Users of SDN/RX respectively SDN 6 can use the generated <code>org.neo4j.cypherdsl.core.Statement</code> directly with the <code>Neo4jTemplate</code> or the <code>ReactiveNeo4jTemplate</code>.
+<p>Users of SDN 6+ can use the generated <code>org.neo4j.cypherdsl.core.Statement</code> directly with the <code>Neo4jTemplate</code> or the <code>ReactiveNeo4jTemplate</code>.
 Both the imperative and the reactive variants allow the retrieval and counting of entities without rendering a String first,
 for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code>.</p>
 </div>
@@ -696,11 +696,11 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <h3 id="how-to-use-it"><a class="anchor" href="#how-to-use-it"></a>2.2. How to use it</h3>
 <div class="paragraph">
 <p>You use the Cypher-DSL as you would write Cypher:
-It allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.</p>
+it allows to write down even complex Cypher queries from top to bottom in a type safe, compile time checked way.</p>
 </div>
 <div class="paragraph">
 <p>The examples to follow are using JDK 11.
-We find the <code>var</code> keyword especially appealing in such a DSL as the types returned by the DSL much less important than
+We find the <code>var</code> keyword especially appealing in such a DSL as the types returned by the DSL are much less important than
 the further building methods they offer.</p>
 </div>
 <div class="admonitionblock important">
@@ -726,7 +726,7 @@ The renderer provides a single method <code>render</code> for rendering the AST 
 </div>
 <div class="paragraph">
 <p>Furthermore, the <code>Statement</code> will collect parameter names and if provided, parameter values.
-Parameter names and values are available after the statement has been build and can for example be used directly with
+Parameter names and values are available after the statement has been built and can for example be used directly with
 Neo4j-Java-Driver.</p>
 </div>
 <div class="sect3">
@@ -968,7 +968,7 @@ assertThat(cypherRenderer.render(statement))
 This placeholder will be rendered as <code>$param</code> and must be filled with the appropriate means of the environment you&#8217;re working with.</p>
 </div>
 <div class="paragraph">
-<p>In addition, an arbitrary value can be bound to the name via ´Cypher.parameter("param", "a value")` or <code>Cypher.parameter("param").withValue("a value")</code>.
+<p>In addition, an arbitrary value can be bound to the name via <code>Cypher.parameter("param", "a value")</code> or <code>Cypher.parameter("param").withValue("a value")</code>.
 <code>NULL</code> is a valid value.
 The Cypher-DSL will not use those values, but collect them for you.</p>
 </div>
@@ -1030,7 +1030,7 @@ assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;
 </div>
 </div>
 <div class="paragraph">
-<p>This, together with <a href="#retrieving-parameters">the above</a>, makes the statement a complete accessor for a Cypher-statement and it&#8217;s parameters.</p>
+<p>This, together with <a href="#retrieving-parameters">the above</a>, makes the statement a complete accessor for a Cypher-statement and its parameters.</p>
 </div>
 </div>
 <div class="sect4">
@@ -1040,7 +1040,7 @@ assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;
 The <code>Renderer</code> offers the overload <code>Renderer getRenderer(Configuration configuration)</code>, taking in an instance of <code>org.neo4j.cypherdsl.core.renderer.Configuration</code>.</p>
 </div>
 <div class="paragraph">
-<p>Instances of <code>Configuration</code> are threadsafe and reusable.
+<p>Instances of <code>Configuration</code> are thread-safe and reusable.
 The class offers a couple of static convenience methods for retrieving some variants.</p>
 </div>
 <div class="listingblock">
@@ -1338,7 +1338,7 @@ their description in the Neo4j cypher manual:</p>
 <div class="sect2">
 <h3 id="callingarbitraryproceduresandfunctions"><a class="anchor" href="#callingarbitraryproceduresandfunctions"></a>4.3. Calling arbitrary procedures and functions</h3>
 <div class="paragraph">
-<p>Neo4j has plethora of builtin procedures and functions.
+<p>Neo4j has plethora of built-in procedures and functions.
 The Cypher-DSL does cover a lot of them already, and they can be called in a typesafe way on many <code>Expression</code>-instances
 taking in various expressions such as the results of other calls, literals or parameters.</p>
 </div>
@@ -1349,7 +1349,7 @@ APOC has so many procedures and functions in so many categories that it is rathe
 for all of them consistently.</p>
 </div>
 <div class="paragraph">
-<p>Probably the most important aspect of all: Many Neo4j users bring their knowledge to the database themselves,
+<p>Probably the most important aspect of all: many Neo4j users bring their knowledge to the database themselves,
 in the form of their stored procedures. Those should be callable as well.</p>
 </div>
 <div class="paragraph">
@@ -1514,7 +1514,7 @@ assertThat(cypherRenderer.render(statement)).isEqualTo(
 </table>
 </div>
 <div class="paragraph">
-<p>Of course, arguments to those functions can be express as well. Either as literals or expressions.</p>
+<p>Of course, arguments to those functions can be expressed as well, either as literals or expressions.</p>
 </div>
 <div id="as-function-with-args" class="listingblock">
 <div class="content">
@@ -1580,23 +1580,23 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 <div class="sect3">
 <h4 id="astaticmetamodelisoptional"><a class="anchor" href="#astaticmetamodelisoptional"></a>5.1.1. A static meta model is optional</h4>
 <div class="paragraph">
-<p>First let&#8217;s stress this: A static meta model is optional for the Cypher-DSL. It is completly ok to use the Cypher-DSL
+<p>First let&#8217;s stress this: a static meta model is optional for the Cypher-DSL. It is completely OK to use the Cypher-DSL
 as shown in the <a href="#how-to-use-it.examples">examples in the "How to use it" part</a>:
-All labels, types and properties can be named as you go.
+all labels, types and properties can be named as you go.
 The Cypher-DSL will still give you type-safety in regard to the Cypher&#8217;s syntax.</p>
 </div>
 <div class="paragraph">
-<p>This fit&#8217;s nicely with Neo4j&#8217;s capabilities: Neo4j is a schema less database. Nodes, their relationships between each other,
+<p>This fits nicely with Neo4j&#8217;s capabilities: Neo4j is a schemaless database. Nodes, their relationships between each other,
 their labels and properties can be changed as you go but all of this information can still be queried.</p>
 </div>
 <div class="paragraph">
 <p>In a schemaless database or a database with dynamic scheme the scheme is often defined by the application.
 This definition takes many forms: It can be through an object mapper like <a href="https://github.com/neo4j/neo4j-ogm">Neo4j-OGM</a> or
-<a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j 6</a>, or maybe in form of
+<a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j 6+</a>, or maybe in form of
 Graph-QL schemes.</p>
 </div>
 <div class="paragraph">
-<p>Another source maybe the information we can retrieve from the database itself via <a href="https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_nodetypeproperties"><code>db.schema.nodeTypeProperties</code></a> and
+<p>Another source may be the information we can retrieve from the database itself via <a href="https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_nodetypeproperties"><code>db.schema.nodeTypeProperties</code></a> and
 <a href="https://neo4j.com/docs/operations-manual/current/reference/procedures/#procedure_db_schema_reltypeproperties"><code>db.schema.relTypeProperties</code></a>.</p>
 </div>
 </div>
@@ -1612,16 +1612,16 @@ Graph-QL schemes.</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Nodes via <code>Node</code> (and it&#8217;s default implementation <code>NodeBase</code>)</p>
+<p>Nodes via <code>Node</code> (and its default implementation <code>NodeBase</code>)</p>
 </li>
 <li>
-<p>Relationships via <code>Relationship</code> (and it&#8217;s default implementation <code>RelationshipBase</code>)</p>
+<p>Relationships via <code>Relationship</code> (and its default implementation <code>RelationshipBase</code>)</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><code>Property</code>, which is a a holder for properties</p>
+<p><code>Property</code>, which is a holder for properties</p>
 </li>
 </ul>
 </div>
@@ -1637,8 +1637,8 @@ var statement = Cypher.match(m).returning(m).build();</code></pre>
 <div class="paragraph">
 <p><code>m</code> will be a <code>Node</code> instance having the label <code>Movie</code> and an alias of <code>m</code>. <code>m</code> can be used everywhere where a pattern element
 can be used according to the openCypher spec.
-You don&#8217;t have to care about it&#8217;s type. That&#8217;s why we vouched for the JDK11+ local type inference here and omitted the
-declaration of the type <code>Node</code>: It just reads better.</p>
+You don&#8217;t have to care about its type. That&#8217;s why we vouched for the JDK11+ local type inference here and omitted the
+declaration of the type <code>Node</code>: it just reads better.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1814,7 +1814,7 @@ We have these scenarios:</p>
 a type is used between arbitrary labels.</p>
 </div>
 <div class="paragraph">
-<p>To accomadate for that, the default relationship implementation, <code>RelationshipBase</code> spots three type parameters:</p>
+<p>To accommodate for that, the default relationship implementation, <code>RelationshipBase</code>, spots three type parameters:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -1896,7 +1896,7 @@ It exists between people and movies (going from person to movie) and has an attr
 </table>
 </div>
 <div class="paragraph">
-<p>In contrast to the movie, we don&#8217;t see a static attribute allowing access to the relationship.
+<p>In contrast to the movie, we don&#8217;t need a static attribute allowing access to the relationship.
 This is stored at the owner. In this case, the <code>Person</code>:</p>
 </div>
 <div class="listingblock">
@@ -1938,7 +1938,7 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 <div class="sect2">
 <h3 id="possibleusage"><a class="anchor" href="#possibleusage"></a>5.2. Possible Usage</h3>
 <div class="paragraph">
-<p>Please assume we did model the "Movie graph" (<code>:play movies</code> in Neo4j-Browser) with the following scheme</p>
+<p>Please assume we did model the "Movie graph" (<code>:play movies</code> in Neo4j-Browser) with the following scheme:</p>
 </div>
 <div class="imageblock">
 <div class="content">
@@ -2053,7 +2053,7 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="paragraph">
-<p>and relationships</p>
+<p>and relationships:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -2268,7 +2268,7 @@ application like as follows to avoid dependency conflicts:</p>
 </tbody>
 </table>
 <div class="paragraph">
-<p>The generated classes can be used in variety of places:</p>
+<p>The generated classes can be used in a variety of places:</p>
 </div>
 <div class="listingblock">
 <div class="content">
@@ -3645,7 +3645,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-01 19:16:13 UTC
+Last updated 2021-04-08 11:26:02 UTC
 </div>
 </div>
 </body>
