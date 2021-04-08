@@ -77,6 +77,17 @@
 			<timezone>+1</timezone>
 		</developer>
 		<developer>
+			<id>fbiville</id>
+			<name>Florent Biville</name>
+			<email>florent.biville at neo4j.com</email>
+			<organization>Neo Technology</organization>
+			<organizationUrl>http://www.neotechnology.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
 			<id>Andy2003</id>
 			<name>Andreas Berger</name>
 			<email>andreas at berger-ecommerce.com</email>
