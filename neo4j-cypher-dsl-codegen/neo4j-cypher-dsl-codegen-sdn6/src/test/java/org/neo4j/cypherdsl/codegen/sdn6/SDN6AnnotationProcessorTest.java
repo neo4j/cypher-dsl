@@ -93,6 +93,7 @@ class SDN6AnnotationProcessorTest {
 		"same_rel_mixed, 'Person, Movie, Book, Wrote', ",
 		"same_rel_mixed_different_directions, 'Person, Movie, Book, Wrote', ",
 		"abstract_rels, 'Person, Movie, Directed',",
+		"primitives, 'Connector', "
 	})
 	@ParameterizedTest
 	void validSourceFiles(String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
