@@ -44,6 +44,14 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	ExposesRelationships<RelationshipChain> named(String name);
 
 	/**
+	 * Turns the pattern into a named chain of relationships.
+	 *
+	 * @param name The name to be used.
+	 * @return A named relationship that can be chained with more relationship definitions.
+	 */
+	ExposesRelationships<RelationshipChain> named(SymbolicName name);
+
+	/**
 	 * Transform this pattern into a condition. All names of the patterns must be known upfront in the final statement,
 	 * as PatternExpressions are not allowed to introduce new variables.
 	 *

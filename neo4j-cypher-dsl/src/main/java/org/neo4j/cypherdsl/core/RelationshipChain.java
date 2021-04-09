@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.LinkedList;
+import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
@@ -37,19 +38,40 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class RelationshipChain implements RelationshipPattern {
 
-	private final LinkedList<Relationship> relationships = new LinkedList<>();
+	private final LinkedList<Relationship> relationships;
 
 	static RelationshipChain create(Relationship firstElement) {
 
-		return new RelationshipChain()
-			.add(firstElement);
+		return new RelationshipChain(firstElement);
+	}
+
+	private RelationshipChain(Relationship firstElement) {
+		this.relationships = new LinkedList<>();
+		this.relationships.add(firstElement);
+	}
+
+	private RelationshipChain(List<Relationship> firstElements, Relationship lastElement) {
+		this.relationships = new LinkedList<>(firstElements);
+		this.relationships.add(lastElement);
+	}
+
+	private RelationshipChain(List<Relationship> elements) {
+		this.relationships = new LinkedList<>(elements);
 	}
 
 	RelationshipChain add(Relationship element) {
 
 		Assertions.notNull(element, "Elements of a relationship chain must not be null.");
-		this.relationships.add(element);
-		return this;
+		return new RelationshipChain(this.relationships, element);
+	}
+
+	RelationshipChain replaceLast(Relationship element) {
+
+		Assertions.notNull(element, "Elements of a relationship chain must not be null.");
+		RelationshipChain newChain = new RelationshipChain(this.relationships);
+		newChain.relationships.removeLast();
+		newChain.relationships.add(element);
+		return newChain;
 	}
 
 	@Override
@@ -71,61 +93,63 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * Replaces the last element of this chains with a copy of the relationship with the new symbolic name.
 	 *
 	 * @param newSymbolicName The new symbolic name to use
-	 * @return This chain
+	 * @return A new chain
 	 */
+	@Override
 	public RelationshipChain named(String newSymbolicName) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.named(newSymbolicName));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.named(newSymbolicName));
 	}
 
 	/**
 	 * Replaces the last element of this chains with a copy of the relationship with the new symbolic name.
 	 *
 	 * @param newSymbolicName The new symbolic name to use
-	 * @return This chain
+	 * @return A new chain
 	 * @since 2021.1.1
 	 */
+	@Override
 	public RelationshipChain named(SymbolicName newSymbolicName) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.named(newSymbolicName));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.named(newSymbolicName));
 	}
 
 	/**
 	 * Changes the length of the last element of this chain to an unbounded pattern.
 	 *
-	 * @return This chain
+	 * @return A new chain
 	 * @since 1.1.1
 	 */
 	public RelationshipChain unbounded() {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.unbounded());
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.unbounded());
 	}
 
 	/**
 	 * Changes the length of the last element of this chain to a new minimum length
 	 *
 	 * @param minimum the new minimum
-	 * @return This chain
+	 * @return A new chain
 	 */
 	public RelationshipChain min(Integer minimum) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.min(minimum));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.min(minimum));
 	}
 
 	/**
 	 * Changes the length of the last element of this chain to a new maximum length
 	 *
 	 * @param maximum the new maximum
-	 * @return This chain
+	 * @return A new chain
 	 */
 	public RelationshipChain max(Integer maximum) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.max(maximum));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.max(maximum));
 	}
 
 	/**
@@ -133,36 +157,36 @@ public final class RelationshipChain implements RelationshipPattern {
 	 *
 	 * @param minimum the new minimum
 	 * @param maximum the new maximum
-	 * @return This chain
+	 * @return A new chain
 	 */
 	public RelationshipChain length(Integer minimum, Integer maximum) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.length(minimum, maximum));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.length(minimum, maximum));
 	}
 
 	/**
 	 * Adds properties to the last element of this chain.
 	 *
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
-	 * @return This chain
+	 * @return A new chain
 	 */
 	public RelationshipChain properties(MapExpression newProperties) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.withProperties(newProperties));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.withProperties(newProperties));
 	}
 
 	/**
 	 * Adds properties to the last element of this chain.
 	 *
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
-	 * @return This chain
+	 * @return A new chain
 	 */
 	public RelationshipChain properties(Object... keysAndValues) {
 
-		Relationship lastElement = this.relationships.removeLast();
-		return this.add(lastElement.withProperties(keysAndValues));
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.withProperties(keysAndValues));
 	}
 
 	@Override
