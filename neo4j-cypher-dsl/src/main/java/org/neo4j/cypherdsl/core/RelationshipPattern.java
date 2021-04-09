@@ -21,6 +21,9 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * A shared, public interface for  {@link Relationship relationships} and {@link RelationshipChain chains of relationships}.
@@ -41,6 +44,7 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @param name The name to be used.
 	 * @return A named relationship that can be chained with more relationship definitions.
 	 */
+	@NotNull @CheckReturnValue
 	ExposesRelationships<RelationshipChain> named(String name);
 
 	/**
@@ -49,6 +53,7 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @param name The name to be used.
 	 * @return A named relationship that can be chained with more relationship definitions.
 	 */
+	@NotNull @CheckReturnValue
 	ExposesRelationships<RelationshipChain> named(SymbolicName name);
 
 	/**
@@ -58,5 +63,6 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @return A condition based on this pattern.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	Condition asCondition();
 }

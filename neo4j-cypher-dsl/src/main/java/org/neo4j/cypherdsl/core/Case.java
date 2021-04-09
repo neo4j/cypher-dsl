@@ -25,8 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
@@ -69,6 +71,7 @@ public abstract class Case implements Visitable {
 	 * @param nextExpression The next expression to use.
 	 * @return An ongoing when builder.
 	 */
+	@NotNull @CheckReturnValue
 	public OngoingWhenThen when(Expression nextExpression) {
 		return new OngoingWhenThen(nextExpression);
 	}
@@ -85,6 +88,7 @@ public abstract class Case implements Visitable {
 		 * @param expression A new when expression.
 		 * @return An ongoing when builder.
 		 */
+		@NotNull @CheckReturnValue
 		OngoingWhenThen when(Expression expression);
 
 		/**
@@ -93,6 +97,7 @@ public abstract class Case implements Visitable {
 		 * @param defaultExpression The new default expression
 		 * @return An ongoing when builder.
 		 */
+		@NotNull @CheckReturnValue
 		CaseEnding elseDefault(Expression defaultExpression);
 	}
 
@@ -117,12 +122,13 @@ public abstract class Case implements Visitable {
 		/**
 		 * The renderable implementation of {@link SimpleCase}.
 		 */
-		public final static class EndingSimpleCase extends SimpleCase implements CaseEnding {
+		final static class EndingSimpleCase extends SimpleCase implements CaseEnding {
 
 			private EndingSimpleCase(Expression caseExpression, List<CaseWhenThen> caseWhenThens) {
 				super(caseExpression, caseWhenThens);
 			}
 
+			@Override
 			public CaseEnding elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
@@ -154,6 +160,7 @@ public abstract class Case implements Visitable {
 				super(caseWhenThens);
 			}
 
+			@Override
 			public CaseEnding elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
@@ -195,6 +202,7 @@ public abstract class Case implements Visitable {
 		 * @param expression The expression for the ongoing {@code WHEN} block.
 		 * @return An ongoing when builder.
 		 */
+		@NotNull @CheckReturnValue
 		public CaseEnding then(Expression expression) {
 
 			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, expression);

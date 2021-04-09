@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+
 /**
  * A step exposing logical operators {@code and} and {@code or} after a {@code where} clause.
  *
@@ -35,6 +38,7 @@ public interface ExposesLogicalOperators<T> {
 	 * @param condition An additional condition
 	 * @return The ongoing definition of a match
 	 */
+	@NotNull @CheckReturnValue
 	T and(Condition condition);
 
 	/**
@@ -45,6 +49,7 @@ public interface ExposesLogicalOperators<T> {
 	 * @param pathPattern An additional pattern to include in the conditions
 	 * @return The ongoing definition of a match
 	 */
+	@NotNull @CheckReturnValue
 	default T and(RelationshipPattern pathPattern) {
 		return this.and(new RelationshipPatternCondition(pathPattern));
 	}
@@ -57,6 +62,7 @@ public interface ExposesLogicalOperators<T> {
 	 * @param condition An additional condition
 	 * @return The ongoing definition of a match
 	 */
+	@NotNull @CheckReturnValue
 	T or(Condition condition);
 
 	/**
@@ -67,6 +73,7 @@ public interface ExposesLogicalOperators<T> {
 	 * @param pathPattern An additional pattern to include in the conditions
 	 * @return The ongoing definition of a match
 	 */
+	@NotNull @CheckReturnValue
 	default T or(RelationshipPattern pathPattern) {
 		return this.or(new RelationshipPatternCondition(pathPattern));
 	}

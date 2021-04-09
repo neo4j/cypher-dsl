@@ -21,12 +21,14 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An element with an alias. An alias has a subtle difference to a symbolic name in cypher. Nodes and relationships can
  * have symbolic names which in turn can be aliased as well.
  * <p>
- * Therefor, the Cypher generator needs both {@code Named} and {@code Aliased}.
+ * Therefore, the Cypher generator needs both {@code Named} and {@code Aliased}.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -37,6 +39,7 @@ public interface Aliased {
 	/**
 	 * @return the alias.
 	 */
+	@NotNull @Contract(pure = true)
 	String getAlias();
 
 	/**
@@ -44,6 +47,7 @@ public interface Aliased {
 	 *
 	 * @return A new symbolic name
 	 */
+	@NotNull @Contract(pure = true)
 	default SymbolicName asName() {
 		return SymbolicName.of(this.getAlias());
 	}

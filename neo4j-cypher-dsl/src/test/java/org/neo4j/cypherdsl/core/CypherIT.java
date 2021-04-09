@@ -165,6 +165,17 @@ class CypherIT {
 			}
 
 			@Test // GH-168
+			void unboundedRelationship() {
+				Statement statement = Cypher
+					.match(userNode.relationshipTo(bikeNode, "OWNS").unbounded())
+					.returning(bikeNode, userNode)
+					.build();
+
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo("MATCH (u:`User`)-[:`OWNS`*]->(b:`Bike`) RETURN b, u");
+			}
+
+			@Test // GH-168
 			void relationshipWithLength() {
 				Statement statement = Cypher
 					.match(userNode.relationshipTo(bikeNode, "OWNS").length(3, 5))
@@ -2510,6 +2521,19 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (u:`User`) WITH DISTINCT u CREATE (u)-[o:`OWNS`]->(b:`Bike`)");
 		}
+
+		@Test
+		void withWithStringVarsShouldWork() {
+			Statement statement;
+			statement = Cypher.match(userNode)
+				.withDistinct("u")
+				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) WITH DISTINCT u CREATE (u)-[o:`OWNS`]->(b:`Bike`)");
+		}
 	}
 
 	@Nested
@@ -2517,10 +2541,19 @@ class CypherIT {
 
 		@Test
 		void shouldRenderDeleteWithoutReturn() {
+			userNode.relationshipTo(userNode).relationshipTo(userNode).min(1);
 
 			Statement statement;
 			statement = Cypher.match(userNode)
 				.detachDelete(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) DETACH DELETE u");
+
+			statement = Cypher.match(userNode)
+				.detachDelete("u")
 				.build();
 
 			assertThat(cypherRenderer.render(statement))

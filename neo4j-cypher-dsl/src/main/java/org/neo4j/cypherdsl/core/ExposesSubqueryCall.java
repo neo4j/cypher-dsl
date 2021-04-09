@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Neo4jVersion;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * This exposes a call method taking in a statement that represents a valid, correlated subquery.
@@ -47,5 +49,6 @@ public interface ExposesSubqueryCall {
 	 * @param statement The statement representing the subquery.
 	 * @return An ongoing reading
 	 */
+	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere call(Statement statement);
 }

@@ -21,9 +21,12 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/PatternComprehension.html">PatternComprehension</a>
@@ -57,6 +60,7 @@ public final class PatternComprehension implements Expression {
 		 * @return The final definition of the pattern comprehension
 		 * @see #returning(Expression...)
 		 */
+		@NotNull @Contract(pure = true)
 		default PatternComprehension returning(Named... variables) {
 			return returning(Expressions.createSymbolicNames(variables));
 		}
@@ -65,6 +69,7 @@ public final class PatternComprehension implements Expression {
 		 * @param listDefinition Defines the elements to be returned from the pattern
 		 * @return The final definition of the pattern comprehension
 		 */
+		@NotNull @Contract(pure = true)
 		PatternComprehension returning(Expression... listDefinition);
 	}
 
@@ -79,6 +84,7 @@ public final class PatternComprehension implements Expression {
 		 * @param condition An initial condition to be used with {@code WHERE}
 		 * @return An ongoing definition of a pattern comprehension for furhter modification
 		 */
+		@NotNull @CheckReturnValue
 		OngoingDefinitionWithPatternAndWhere where(Condition condition);
 
 		/**
@@ -90,6 +96,7 @@ public final class PatternComprehension implements Expression {
 		 * @return A match or a call restricted by a where clause with no return items yet.
 		 * @since 2020.1.4
 		 */
+		@NotNull @CheckReturnValue
 		default OngoingDefinitionWithPatternAndWhere where(RelationshipPattern pathPattern) {
 
 			Assertions.notNull(pathPattern, "The path pattern must not be null.");

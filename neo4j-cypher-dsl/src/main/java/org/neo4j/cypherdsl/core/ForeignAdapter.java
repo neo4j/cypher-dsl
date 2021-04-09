@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Represents an adapter that allows to turn foreign expressions into Cypher-DSL {@link Expression expressions}.
@@ -40,6 +42,7 @@ public interface ForeignAdapter<FE> {
 	 * @return A condition
 	 * @throws IllegalArgumentException if the expression doesn't resolve into something boolean
 	 */
+	@NotNull @Contract(pure = true)
 	Condition asCondition();
 
 	/**
@@ -47,6 +50,7 @@ public interface ForeignAdapter<FE> {
 	 *
 	 * @return A native expression
 	 */
+	@NotNull @Contract(pure = true)
 	Expression asExpression();
 
 	/**
@@ -55,6 +59,7 @@ public interface ForeignAdapter<FE> {
 	 * @return A node
 	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
 	 */
+	@NotNull @Contract(pure = true)
 	Node asNode();
 
 	/**
@@ -63,6 +68,7 @@ public interface ForeignAdapter<FE> {
 	 * @return A node
 	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship asRelationship();
 
 	/**
@@ -72,5 +78,6 @@ public interface ForeignAdapter<FE> {
 	 * @return A symbolic name
 	 * @throws IllegalArgumentException if a name cannot be derived from the expression.
 	 */
+	@NotNull @Contract(pure = true)
 	SymbolicName asName();
 }

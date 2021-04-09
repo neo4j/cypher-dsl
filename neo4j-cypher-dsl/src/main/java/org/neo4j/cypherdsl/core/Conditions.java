@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -37,9 +39,9 @@ public final class Conditions {
 	 * Creates a condition that matches if the right hand side is a regular expression that matches the the left hand side via
 	 * {@code =~}.
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return A "matches" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return A "matches" comparison
 	 */
 	static Condition matches(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.MATCHES, rhs);
@@ -48,9 +50,9 @@ public final class Conditions {
 	/**
 	 * Creates a condition that matches if both expressions are equals according to {@code =}.
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return An "equals" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return An "equals" comparison
 	 */
 	static Condition isEqualTo(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.EQUALITY, rhs);
@@ -59,9 +61,9 @@ public final class Conditions {
 	/**
 	 * Creates a condition that matches if both expressions are equals according to {@code <>}.
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return An "not equals" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return An "not equals" comparison
 	 */
 	static Condition isNotEqualTo(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.INEQUALITY, rhs);
@@ -70,9 +72,9 @@ public final class Conditions {
 	/**
 	 * Creates a condition that matches if the left hand side is less than the right hand side..
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return An "less than" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return An "less than" comparison
 	 */
 	static Condition lt(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.LESS_THAN, rhs);
@@ -81,9 +83,9 @@ public final class Conditions {
 	/**
 	 * Creates a condition that matches if the left hand side is less than or equal the right hand side..
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return An "less than or equal" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return An "less than or equal" comparison
 	 */
 	static Condition lte(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.LESS_THAN_OR_EQUAL_TO, rhs);
@@ -92,9 +94,9 @@ public final class Conditions {
 	/**
 	 * Creates a condition that matches if the left hand side is greater than or equal the right hand side..
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return An "greater than or equal" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return An "greater than or equal" comparison
 	 */
 	static Condition gte(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.GREATER_THAN_OR_EQUAL_TO, rhs);
@@ -103,9 +105,9 @@ public final class Conditions {
 	/**
 	 * Creates a condition that matches if the left hand side is greater than the right hand side..
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
-	 * @return An "greater than" comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
+	 * @return An "greater than" comparison
 	 */
 	static Condition gt(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.GREATER_THAN, rhs);
@@ -117,7 +119,8 @@ public final class Conditions {
 	 * @param condition The condition to negate. Must not be null.
 	 * @return The negated condition.
 	 */
-	public static Condition not(Condition condition) {
+	@NotNull @Contract(pure = true)
+	public static Condition not(@NotNull Condition condition) {
 
 		Assertions.notNull(condition, "Condition to negate must not be null.");
 		return condition.not();
@@ -129,7 +132,8 @@ public final class Conditions {
 	 * @param pattern The pattern to negate. Must not be null.
 	 * @return A condition that evaluates to true when the pattern does not match.
 	 */
-	public static Condition not(PatternElement pattern) {
+	@NotNull @Contract(pure = true)
+	public static Condition not(@NotNull PatternElement pattern) {
 
 		Assertions.notNull(pattern, "Pattern to negate must not be null.");
 		return new ExcludedPattern(pattern);
@@ -138,8 +142,8 @@ public final class Conditions {
 	/**
 	 * Creates a condition that checks whether the {@code lhs} starts with the {@code rhs}.
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
 	 * @return A new condition.
 	 */
 	static Condition startsWith(Expression lhs, Expression rhs) {
@@ -149,8 +153,8 @@ public final class Conditions {
 	/**
 	 * Creates a condition that checks whether the {@code lhs} contains with the {@code rhs}.
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
 	 * @return A new condition.
 	 */
 	static Condition contains(Expression lhs, Expression rhs) {
@@ -160,8 +164,8 @@ public final class Conditions {
 	/**
 	 * Creates a condition that checks whether the {@code lhs} ends with the {@code rhs}.
 	 *
-	 * @param lhs The left hand side of the comparision
-	 * @param rhs The right hand side of the comparision
+	 * @param lhs The left hand side of the comparison
+	 * @param rhs The right hand side of the comparison
 	 * @return A new condition.
 	 */
 	static Condition endsWith(Expression lhs, Expression rhs) {
@@ -174,6 +178,7 @@ public final class Conditions {
 	 *
 	 * @return A placeholder condition.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Condition noCondition() {
 
 		return CompoundCondition.empty();

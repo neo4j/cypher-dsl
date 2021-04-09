@@ -23,6 +23,8 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.TimeZone;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Aggregates;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Lists;
 import org.neo4j.cypherdsl.core.BuiltInFunctions.Predicates;
@@ -49,7 +51,8 @@ public final class Functions {
 	 * @param node The node for which the internal id should be retrieved
 	 * @return A function call for {@code id()} on a node.
 	 */
-	public static FunctionInvocation id(Node node) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation id(@NotNull Node node) {
 
 		Assertions.notNull(node, "The node for id() is required.");
 
@@ -63,7 +66,8 @@ public final class Functions {
 	 * @param relationship The relationship for which the internal id should be retrieved
 	 * @return A function call for {@code id()} on a relationship.
 	 */
-	public static FunctionInvocation id(Relationship relationship) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation id(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship for id() is required.");
 
@@ -78,7 +82,8 @@ public final class Functions {
 	 * @return A function call for {@code keys()} on an expression.
 	 * @since 2021.0.2
 	 */
-	public static FunctionInvocation keys(Node node) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation keys(@NotNull Node node) {
 
 		Assertions.notNull(node, "The node parameter is required.");
 		return keys(node.getRequiredSymbolicName());
@@ -92,7 +97,8 @@ public final class Functions {
 	 * @return A function call for {@code keys()} on an expression.
 	 * @since 2021.0.2
 	 */
-	public static FunctionInvocation keys(Relationship relationship) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation keys(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship parameter is required.");
 		return keys(relationship.getRequiredSymbolicName());
@@ -106,14 +112,14 @@ public final class Functions {
 	 * @return A function call for {@code keys()} on an expression.
 	 * @since 2021.0.2
 	 */
-	public static FunctionInvocation keys(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation keys(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression parameter is required.");
 
 		Expression param = expression instanceof Named ? ((Named) expression).getRequiredSymbolicName() : expression;
 		return FunctionInvocation.create(Lists.KEYS, param);
 	}
-
 
 	/**
 	 * Creates a function invocation for {@code labels{}}.
@@ -122,7 +128,8 @@ public final class Functions {
 	 * @param node The node for which the labels should be retrieved
 	 * @return A function call for {@code labels()} on a node.
 	 */
-	public static FunctionInvocation labels(Node node) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation labels(@NotNull Node node) {
 
 		Assertions.notNull(node, "The node parameter is required.");
 
@@ -136,7 +143,8 @@ public final class Functions {
 	 * @param relationship The relationship for which the type should be retrieved
 	 * @return A function call for {@code type()} on a relationship.
 	 */
-	public static FunctionInvocation type(Relationship relationship) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation type(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship parameter is required.");
 
@@ -148,7 +156,8 @@ public final class Functions {
 	 * @return A function call for {@code count()} for one named node
 	 * @see #count(Expression)
 	 */
-	public static FunctionInvocation count(Node node) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation count(@NotNull Node node) {
 
 		Assertions.notNull(node, "The node parameter is required.");
 
@@ -162,6 +171,7 @@ public final class Functions {
 	 * @param expression An expression describing the things to count.
 	 * @return A function call for {@code count()} for an expression like {@link Cypher#asterisk()} etc.
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation count(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.COUNT, expression);
@@ -174,7 +184,8 @@ public final class Functions {
 	 * @return A function call for {@code count()} for one named node
 	 * @see #countDistinct(Expression)
 	 */
-	public static FunctionInvocation countDistinct(Node node) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation countDistinct(@NotNull Node node) {
 
 		Assertions.notNull(node, "The node parameter is required.");
 
@@ -188,6 +199,7 @@ public final class Functions {
 	 * @param expression An expression describing the things to count.
 	 * @return A function call for {@code count()} for an expression like {@link Cypher#asterisk()} etc.
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation countDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.COUNT, expression);
@@ -199,6 +211,7 @@ public final class Functions {
 	 * @param node The node who's properties should be returned.
 	 * @return A function call for {@code properties())}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(Node node) {
 
 		return FunctionInvocation.create(Scalars.PROPERTIES, node.getRequiredSymbolicName());
@@ -210,6 +223,7 @@ public final class Functions {
 	 * @param relationship The relationship who's properties should be returned.
 	 * @return A function call for {@code properties())}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(Relationship relationship) {
 
 		return FunctionInvocation.create(Scalars.PROPERTIES, relationship.getRequiredSymbolicName());
@@ -221,6 +235,7 @@ public final class Functions {
 	 * @param map The map who's properties should be returned.
 	 * @return A function call for {@code properties())}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(MapExpression map) {
 
 		return FunctionInvocation.create(Scalars.PROPERTIES, map);
@@ -233,6 +248,7 @@ public final class Functions {
 	 * @param expressions One or more expressions to be coalesced
 	 * @return A function call for {@code coalesce}.
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation coalesce(Expression... expressions) {
 
 		return FunctionInvocation.create(Scalars.COALESCE, expressions);
@@ -245,6 +261,7 @@ public final class Functions {
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code toLower()} for one expression
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toLower(Expression expression) {
 
 		return FunctionInvocation.create(Strings.TO_LOWER, expression);
@@ -260,6 +277,7 @@ public final class Functions {
 	 * @param expression The expression who's size is to be returned
 	 * @return A function call for {@code size()} for one expression
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation size(Expression expression) {
 
 		return FunctionInvocation.create(Scalars.SIZE, expression);
@@ -274,6 +292,7 @@ public final class Functions {
 	 * @param pattern The pattern for which {@code size()} should be invoked.
 	 * @return A function call for {@code size()} for a pattern
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation size(RelationshipPattern pattern) {
 
 		return FunctionInvocation.create(Scalars.SIZE, pattern);
@@ -286,6 +305,7 @@ public final class Functions {
 	 * @param expression The expression who's existence is to be evaluated
 	 * @return A function call for {@code exists()} for one expression
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation exists(Expression expression) {
 
 		return FunctionInvocation.create(Predicates.EXISTS, expression);
@@ -300,7 +320,8 @@ public final class Functions {
 	 * @param point2 Point 2
 	 * @return A function call for {@code distance()}
 	 */
-	public static FunctionInvocation distance(Expression point1, Expression point2) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation distance(@NotNull Expression point1, @NotNull Expression point2) {
 
 		Assertions.notNull(point1, "The distance function requires two points.");
 		Assertions.notNull(point2, "The distance function requires two points.");
@@ -315,6 +336,7 @@ public final class Functions {
 	 * @param parameterMap The map of parameters for {@code point()}
 	 * @return A function call for {@code point()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation point(MapExpression parameterMap) {
 
 		return point((Expression) parameterMap);
@@ -330,6 +352,7 @@ public final class Functions {
 	 * @return A function call for {@code point()}
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation point(Expression expression) {
 
 		return FunctionInvocation.create(Spatials.POINT, expression);
@@ -342,6 +365,7 @@ public final class Functions {
 	 * @param parameter A parameter referencing a {@code point()}
 	 * @return A function call for {@code point()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation point(Parameter parameter) {
 
 		return FunctionInvocation.create(Spatials.POINT, parameter);
@@ -354,6 +378,7 @@ public final class Functions {
 	 * @param expression The things to average
 	 * @return A function call for {@code avg()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation avg(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.AVG, expression);
@@ -366,6 +391,7 @@ public final class Functions {
 	 * @param expression The things to average
 	 * @return A function call for {@code avg()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation avgDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.AVG, expression);
@@ -378,7 +404,8 @@ public final class Functions {
 	 * @return A function call for {@code collect()}
 	 * @see #collect(Expression)
 	 */
-	public static FunctionInvocation collect(Named variable) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation collect(@NotNull Named variable) {
 
 		Assertions.notNull(variable, "The variable parameter is required.");
 
@@ -392,7 +419,8 @@ public final class Functions {
 	 * @return A function call for {@code collect()}
 	 * @see #collect(Expression)
 	 */
-	public static FunctionInvocation collectDistinct(Named variable) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation collectDistinct(@NotNull Named variable) {
 
 		Assertions.notNull(variable, "The variable parameter is required.");
 
@@ -406,6 +434,7 @@ public final class Functions {
 	 * @param expression The things to collect
 	 * @return A function call for {@code collect()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation collect(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.COLLECT, expression);
@@ -418,6 +447,7 @@ public final class Functions {
 	 * @param expression The things to collect
 	 * @return A function call for {@code collect()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation collectDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.COLLECT, expression);
@@ -430,6 +460,7 @@ public final class Functions {
 	 * @param expression A list from which the maximum element value is returned
 	 * @return A function call for {@code max()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation max(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.MAX, expression);
@@ -442,6 +473,7 @@ public final class Functions {
 	 * @param expression A list from which the maximum element value is returned
 	 * @return A function call for {@code max()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation maxDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.MAX, expression);
@@ -454,6 +486,7 @@ public final class Functions {
 	 * @param expression A list from which the minimum element value is returned
 	 * @return A function call for {@code min()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation min(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.MIN, expression);
@@ -466,6 +499,7 @@ public final class Functions {
 	 * @param expression A list from which the minimum element value is returned
 	 * @return A function call for {@code min()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation minDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.MIN, expression);
@@ -488,6 +522,7 @@ public final class Functions {
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileCont()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation percentileCont(Expression expression, Number percentile) {
 
 		assertPercentileArguments(Aggregates.PERCENTILE_CONT, expression, percentile);
@@ -503,6 +538,7 @@ public final class Functions {
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileCont()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation percentileContDistinct(Expression expression, Number percentile) {
 
 		assertPercentileArguments(Aggregates.PERCENTILE_CONT, expression, percentile);
@@ -518,6 +554,7 @@ public final class Functions {
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileDisc()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation percentileDisc(Expression expression, Number percentile) {
 
 		assertPercentileArguments(Aggregates.PERCENTILE_DISC, expression, percentile);
@@ -533,6 +570,7 @@ public final class Functions {
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileDisc()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation percentileDiscDistinct(Expression expression, Number percentile) {
 
 		assertPercentileArguments(Aggregates.PERCENTILE_DISC, expression, percentile);
@@ -547,6 +585,7 @@ public final class Functions {
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDev()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation stDev(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.ST_DEV, expression);
@@ -559,6 +598,7 @@ public final class Functions {
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDev()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation stDevDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.ST_DEV, expression);
@@ -571,6 +611,7 @@ public final class Functions {
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDevP()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation stDevP(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.ST_DEV_P, expression);
@@ -583,6 +624,7 @@ public final class Functions {
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDevP()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation stDevPDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.ST_DEV_P, expression);
@@ -595,6 +637,7 @@ public final class Functions {
 	 * @param expression An expression returning a set of numeric values
 	 * @return A function call for {@code sum()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sum(Expression expression) {
 
 		return FunctionInvocation.create(Aggregates.SUM, expression);
@@ -607,6 +650,7 @@ public final class Functions {
 	 * @param expression An expression returning a set of numeric values
 	 * @return A function call for {@code sum()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sumDistinct(Expression expression) {
 
 		return FunctionInvocation.createDistinct(Aggregates.SUM, expression);
@@ -618,6 +662,7 @@ public final class Functions {
 	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression)
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation range(Integer start, Integer end) {
 
 		return range(Cypher.literalOf(start), Cypher.literalOf(end));
@@ -629,7 +674,8 @@ public final class Functions {
 	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
 	 */
-	public static FunctionInvocation range(Expression start, Expression end) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation range(@NotNull Expression start, @NotNull Expression end) {
 		return range(start, end, null);
 	}
 
@@ -643,7 +689,8 @@ public final class Functions {
 	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
 	 */
-	public static FunctionInvocation range(Integer start, Integer end, Integer step) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation range(@NotNull Integer start, @NotNull Integer end, Integer step) {
 
 		return range(Cypher.literalOf(start), Cypher.literalOf(end), Cypher.literalOf(step));
 	}
@@ -657,7 +704,8 @@ public final class Functions {
 	 * @param step  the range's step
 	 * @return A function call for {@code range()}
 	 */
-	public static FunctionInvocation range(Expression start, Expression end, Expression step) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation range(@NotNull Expression start, @NotNull Expression end, Expression step) {
 
 		Assertions.notNull(start, "The expression for range is required.");
 		Assertions.notNull(end, "The expression for range is required.");
@@ -676,6 +724,7 @@ public final class Functions {
 	 * @param expression A list from which the head element is returned
 	 * @return A function call for {@code head()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation head(Expression expression) {
 
 		return FunctionInvocation.create(Scalars.HEAD, expression);
@@ -688,6 +737,7 @@ public final class Functions {
 	 * @param expression A list from which the last element is returned
 	 * @return A function call for {@code last()}
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation last(Expression expression) {
 
 		return FunctionInvocation.create(Scalars.LAST, expression);
@@ -701,7 +751,8 @@ public final class Functions {
 	 * @return A function call for {@code nodes()} on a path.
 	 * @since 1.1
 	 */
-	public static FunctionInvocation nodes(NamedPath path) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation nodes(@NotNull NamedPath path) {
 
 		Assertions.notNull(path, "The path for nodes is required.");
 		return FunctionInvocation.create(Lists.NODES,
@@ -716,7 +767,8 @@ public final class Functions {
 	 * @return A function call for {@code nodes{}} on a path represented by a symbolic name.
 	 * @since 2020.1.5
 	 */
-	public static FunctionInvocation nodes(SymbolicName symbolicName) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation nodes(@NotNull SymbolicName symbolicName) {
 
 		Assertions.notNull(symbolicName, "The symbolic name of the path for nodes is required.");
 		return FunctionInvocation.create(Lists.NODES, symbolicName);
@@ -730,7 +782,8 @@ public final class Functions {
 	 * @return A function call for {@code relationships()} on a path.
 	 * @since 2020.0.2
 	 */
-	public static FunctionInvocation relationships(NamedPath path) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation relationships(@NotNull NamedPath path) {
 
 		Assertions.notNull(path, "The path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS,
@@ -745,7 +798,8 @@ public final class Functions {
 	 * @return A function call for {@code relationships()} on a path represented by a symbolic name.
 	 * @since 2020.1.5
 	 */
-	public static FunctionInvocation relationships(SymbolicName symbolicName) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation relationships(@NotNull SymbolicName symbolicName) {
 
 		Assertions.notNull(symbolicName, "The symbolic name of the path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS, symbolicName);
@@ -759,7 +813,8 @@ public final class Functions {
 	 * @return A function call for {@code startNode()} on a path.
 	 * @since 2020.0.2
 	 */
-	public static FunctionInvocation startNode(Relationship relationship) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation startNode(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship for endNode is required.");
 		return FunctionInvocation.create(Scalars.START_NODE,
@@ -775,7 +830,8 @@ public final class Functions {
 	 * @return A function call for {@code endNode()} on a path.
 	 * @since 2020.0.2
 	 */
-	public static FunctionInvocation endNode(Relationship relationship) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation endNode(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship for endNode is required.");
 		return FunctionInvocation.create(Scalars.END_NODE,
@@ -791,6 +847,7 @@ public final class Functions {
 	 * @return A function call for {@code date()}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date() {
 
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE);
@@ -806,6 +863,7 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation calendarDate(Integer year, Integer month, Integer day) {
 
 		Assertions.notNull(year, "The year is required.");
@@ -825,6 +883,7 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation weekDate(Integer year, Integer week, Integer dayOfWeek) {
 
 		Assertions.notNull(year, "The year is required.");
@@ -856,6 +915,7 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation quarterDate(Integer year, Integer quarter, Integer dayOfQuarter) {
 
 		Assertions.notNull(year, "The year is required.");
@@ -886,6 +946,7 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation ordinalDate(Integer year, Integer ordinalDay) {
 
 		Assertions.notNull(year, "The year is required.");
@@ -909,7 +970,8 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation date(MapExpression components) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation date(@NotNull MapExpression components) {
 
 		Assertions.notNull(components, "The components is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, components);
@@ -924,7 +986,8 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation date(String temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation date(@NotNull String temporalValue) {
 
 		Assertions.hasText(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.literalOf(temporalValue));
@@ -939,7 +1002,8 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation date(Expression temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation date(@NotNull Expression temporalValue) {
 
 		Assertions.notNull(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, temporalValue);
@@ -952,6 +1016,7 @@ public final class Functions {
 	 * @return A function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime() {
 
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME);
@@ -965,7 +1030,8 @@ public final class Functions {
 	 * @return A function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation datetime(TimeZone timeZone) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation datetime(@NotNull TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
@@ -981,7 +1047,8 @@ public final class Functions {
 	 * @return A function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation datetime(MapExpression components) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation datetime(@NotNull MapExpression components) {
 
 		Assertions.notNull(components, "The components is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, components);
@@ -996,7 +1063,8 @@ public final class Functions {
 	 * @return A function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation datetime(String temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation datetime(@NotNull String temporalValue) {
 
 		Assertions.hasText(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, Cypher.literalOf(temporalValue));
@@ -1011,7 +1079,8 @@ public final class Functions {
 	 * @return A function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation datetime(Expression temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation datetime(@NotNull Expression temporalValue) {
 
 		Assertions.notNull(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, temporalValue);
@@ -1024,6 +1093,7 @@ public final class Functions {
 	 * @return A function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime() {
 
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME);
@@ -1037,7 +1107,8 @@ public final class Functions {
 	 * @return A function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localdatetime(TimeZone timeZone) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localdatetime(@NotNull TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
@@ -1053,7 +1124,8 @@ public final class Functions {
 	 * @return A function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localdatetime(MapExpression components) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localdatetime(@NotNull MapExpression components) {
 
 		Assertions.notNull(components, "The components is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, components);
@@ -1068,7 +1140,8 @@ public final class Functions {
 	 * @return A function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localdatetime(String temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localdatetime(@NotNull String temporalValue) {
 
 		Assertions.hasText(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, Cypher.literalOf(temporalValue));
@@ -1083,7 +1156,8 @@ public final class Functions {
 	 * @return A function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localdatetime(Expression temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localdatetime(@NotNull Expression temporalValue) {
 
 		Assertions.notNull(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, temporalValue);
@@ -1096,6 +1170,7 @@ public final class Functions {
 	 * @return A function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime() {
 
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME);
@@ -1109,7 +1184,8 @@ public final class Functions {
 	 * @return A function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localtime(TimeZone timeZone) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localtime(@NotNull TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
@@ -1125,7 +1201,8 @@ public final class Functions {
 	 * @return A function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localtime(MapExpression components) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localtime(@NotNull MapExpression components) {
 
 		Assertions.notNull(components, "The components is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, components);
@@ -1140,7 +1217,8 @@ public final class Functions {
 	 * @return A function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localtime(String temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localtime(@NotNull String temporalValue) {
 
 		Assertions.hasText(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, Cypher.literalOf(temporalValue));
@@ -1155,7 +1233,8 @@ public final class Functions {
 	 * @return A function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation localtime(Expression temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation localtime(@NotNull Expression temporalValue) {
 
 		Assertions.notNull(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, temporalValue);
@@ -1168,6 +1247,7 @@ public final class Functions {
 	 * @return A function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time() {
 
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME);
@@ -1181,7 +1261,8 @@ public final class Functions {
 	 * @return A function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation time(TimeZone timeZone) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation time(@NotNull TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, "The timezone is required.");
 		return FunctionInvocation
@@ -1201,7 +1282,8 @@ public final class Functions {
 	 * @return A function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation time(MapExpression components) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation time(@NotNull MapExpression components) {
 
 		Assertions.notNull(components, "The components is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, components);
@@ -1216,7 +1298,8 @@ public final class Functions {
 	 * @return A function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation time(String temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation time(@NotNull String temporalValue) {
 
 		Assertions.hasText(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, Cypher.literalOf(temporalValue));
@@ -1231,7 +1314,8 @@ public final class Functions {
 	 * @return A function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation time(Expression temporalValue) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation time(@NotNull Expression temporalValue) {
 
 		Assertions.notNull(temporalValue, "The temporalValue is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, temporalValue);
@@ -1246,7 +1330,8 @@ public final class Functions {
 	 * @return A function call for {@code duration({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation duration(MapExpression components) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation duration(@NotNull MapExpression components) {
 
 		Assertions.notNull(components, "The components is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, components);
@@ -1261,7 +1346,8 @@ public final class Functions {
 	 * @return A function call for {@code duration({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation duration(String temporalAmount) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation duration(@NotNull String temporalAmount) {
 
 		Assertions.hasText(temporalAmount, "The temporalAmount is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, Cypher.literalOf(temporalAmount));
@@ -1276,7 +1362,8 @@ public final class Functions {
 	 * @return A function call for {@code duration({})}.
 	 * @since 2020.1.0
 	 */
-	public static FunctionInvocation duration(Expression temporalAmount) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation duration(@NotNull Expression temporalAmount) {
 
 		Assertions.notNull(temporalAmount, "The temporalAmount is required.");
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, temporalAmount);
@@ -1289,6 +1376,7 @@ public final class Functions {
 	 * @return A function call for {@code shortestPath({})}.
 	 * @since 2020.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation shortestPath(Relationship relationship) {
 
 		return FunctionInvocation.create(Scalars.SHORTEST_PATH, relationship);
@@ -1301,7 +1389,8 @@ public final class Functions {
 	 * @return An ongoing definition for a function call to {@code reduce({})}.
 	 * @since 2020.1.5
 	 */
-	public static Reduction.OngoingDefinitionWithVariable reduce(SymbolicName variable) {
+	@NotNull @Contract(pure = true)
+	public static Reduction.OngoingDefinitionWithVariable reduce(@NotNull SymbolicName variable) {
 
 		return Reduction.of(variable);
 	}
@@ -1314,7 +1403,8 @@ public final class Functions {
 	 * @return A function call for {@code abs({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation abs(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation abs(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ABS, expression);
@@ -1328,7 +1418,8 @@ public final class Functions {
 	 * @return A function call for {@code ceil({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation ceil(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation ceil(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.CEIL, expression);
@@ -1342,7 +1433,8 @@ public final class Functions {
 	 * @return A function call for {@code floor({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation floor(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation floor(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.FLOOR, expression);
@@ -1355,6 +1447,7 @@ public final class Functions {
 	 * @return A function call for {@code rand({})}.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation rand() {
 
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.RAND);
@@ -1370,6 +1463,7 @@ public final class Functions {
 	 * @return A function call for {@code round({})}.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation round(Expression value, Expression... expression) {
 
 		if (expression == null || expression.length == 0) {
@@ -1393,7 +1487,8 @@ public final class Functions {
 	 * @return A function call for {@code sign({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation sign(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation sign(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIGN, expression);
@@ -1406,6 +1501,7 @@ public final class Functions {
 	 * @return A function call for {@code e({})}.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation e() {
 
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.E);
@@ -1419,7 +1515,8 @@ public final class Functions {
 	 * @return A function call for {@code exp({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation exp(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation exp(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.EXP, expression);
@@ -1433,7 +1530,8 @@ public final class Functions {
 	 * @return A function call for {@code log({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation log(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation log(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG, expression);
@@ -1447,7 +1545,8 @@ public final class Functions {
 	 * @return A function call for {@code log10({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation log10(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation log10(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG10, expression);
@@ -1461,7 +1560,8 @@ public final class Functions {
 	 * @return A function call for {@code sqrt({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation sqrt(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation sqrt(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SQRT, expression);
@@ -1475,7 +1575,8 @@ public final class Functions {
 	 * @return A function call for {@code acos({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation acos(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation acos(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ACOS, expression);
@@ -1489,7 +1590,8 @@ public final class Functions {
 	 * @return A function call for {@code asin({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation asin(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation asin(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ASIN, expression);
@@ -1503,7 +1605,8 @@ public final class Functions {
 	 * @return A function call for {@code atan({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation atan(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation atan(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ATAN, expression);
@@ -1518,7 +1621,8 @@ public final class Functions {
 	 * @return A function call for {@code atan2({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation atan2(Expression y, Expression x) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation atan2(@NotNull Expression y, @NotNull Expression x) {
 
 		Assertions.notNull(y, "y is required.");
 		Assertions.notNull(x, "x is required.");
@@ -1533,7 +1637,8 @@ public final class Functions {
 	 * @return A function call for {@code cos({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation cos(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation cos(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COS, expression);
@@ -1547,7 +1652,8 @@ public final class Functions {
 	 * @return A function call for {@code cot({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation cot(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation cot(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COT, expression);
@@ -1561,7 +1667,8 @@ public final class Functions {
 	 * @return A function call for {@code degrees({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation degrees(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation degrees(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.DEGREES, expression);
@@ -1575,7 +1682,8 @@ public final class Functions {
 	 * @return A function call for {@code haversin({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation haversin(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation haversin(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.HAVERSIN, expression);
@@ -1588,6 +1696,7 @@ public final class Functions {
 	 * @return A function call for {@code pi({})}.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static FunctionInvocation pi() {
 
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.PI);
@@ -1601,7 +1710,8 @@ public final class Functions {
 	 * @return A function call for {@code radians({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation radians(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation radians(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.RADIANS, expression);
@@ -1615,7 +1725,8 @@ public final class Functions {
 	 * @return A function call for {@code sin({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation sin(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation sin(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIN, expression);
@@ -1629,7 +1740,8 @@ public final class Functions {
 	 * @return A function call for {@code tan({})}.
 	 * @since 2021.0.0
 	 */
-	public static FunctionInvocation tan(Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation tan(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.TAN, expression);

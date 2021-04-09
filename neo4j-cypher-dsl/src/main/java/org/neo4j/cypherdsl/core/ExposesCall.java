@@ -23,6 +23,9 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.Arrays;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * Entrypoint for building procedure calls.
@@ -41,6 +44,7 @@ public interface ExposesCall<T> {
 	 * @param namespaceAndProcedure The procedure name of the procedure to call.
 	 * @return An ongoing definition of a call
 	 */
+	@NotNull @CheckReturnValue
 	T call(String... namespaceAndProcedure);
 
 	/**
@@ -56,6 +60,7 @@ public interface ExposesCall<T> {
 		 * @param arguments The list of new arguments, might be null or empty.
 		 * @return An ongoing standalone call on which yielded arguments might be configured.
 		 */
+		@NotNull @CheckReturnValue
 		T withArgs(Expression... arguments);
 	}
 
@@ -70,6 +75,7 @@ public interface ExposesCall<T> {
 		/**
 		 * @return A function invocation that can be used as an expression, for example as a property or inside a condition.
 		 */
+		@NotNull @Contract(pure = true)
 		Expression asFunction();
 	}
 
@@ -87,6 +93,7 @@ public interface ExposesCall<T> {
 		 * @param yieldedItems The list of items to be yielded.
 		 * @return The ongoing standalone call to be configured.
 		 */
+		@NotNull @CheckReturnValue
 		default T yield(String... yieldedItems) {
 
 			SymbolicName[] names = new SymbolicName[0];
@@ -104,6 +111,7 @@ public interface ExposesCall<T> {
 		 * @return The ongoing standalone call to be configured.
 		 * @since 2020.1.4
 		 */
+		@NotNull @CheckReturnValue
 		default T yield(Named... yieldedItems) {
 
 			SymbolicName[] names = new SymbolicName[0];
@@ -120,6 +128,7 @@ public interface ExposesCall<T> {
 		 * @param resultFields The list of result fields to be returned.
 		 * @return The ongoing standalone call to be configured.
 		 */
+		@NotNull @CheckReturnValue
 		T yield(SymbolicName... resultFields);
 
 		/**
@@ -129,6 +138,7 @@ public interface ExposesCall<T> {
 		 * @param aliasedResultFields The list of result fields to be returned with new aliases given.
 		 * @return The ongoing standalone call to be configured.
 		 */
+		@NotNull @CheckReturnValue
 		T yield(AliasedExpression... aliasedResultFields);
 	}
 

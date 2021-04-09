@@ -56,11 +56,6 @@ public final class Parameter<T> implements Expression {
 		return new Parameter<>(name, value);
 	}
 
-	static Parameter<Object> anon() {
-
-		return anon(NO_VALUE);
-	}
-
 	static <T> Parameter<T> anon(T value) {
 
 		return new Parameter<>(null, value);

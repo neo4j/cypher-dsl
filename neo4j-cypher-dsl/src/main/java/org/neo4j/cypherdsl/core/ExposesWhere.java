@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * A step exposing a several {@code where} methods that are provide entry points of adding conditions.
@@ -39,6 +41,7 @@ public interface ExposesWhere {
 	 * @param condition The new condition, must not be {@literal null}
 	 * @return A match or call restricted by a where clause with no return items yet.
 	 */
+	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingWithWhere where(Condition condition);
 
 	/**
@@ -51,6 +54,7 @@ public interface ExposesWhere {
 	 * @return A match or a call restricted by a where clause with no return items yet.
 	 * @since 1.0.1
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingWithWhere where(RelationshipPattern pathPattern) {
 
 		Assertions.notNull(pathPattern, "The path pattern must not be null.");

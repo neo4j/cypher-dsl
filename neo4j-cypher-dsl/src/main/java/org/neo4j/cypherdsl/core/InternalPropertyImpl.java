@@ -30,6 +30,12 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+/**
+ * An internal implementation of a {@link Property}.
+ *
+ * @author Michael J. Simons
+ * @since 2021.1.10
+ */
 @API(status = INTERNAL, since = "2021.1.0")
 final class InternalPropertyImpl implements Property {
 

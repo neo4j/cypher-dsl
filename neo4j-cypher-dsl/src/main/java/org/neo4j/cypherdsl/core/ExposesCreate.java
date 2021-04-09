@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * A step exposing a {@link #create(PatternElement...)} method.
@@ -36,5 +38,6 @@ public interface ExposesCreate {
 	 * @return An ongoing merge
 	 * @see Cypher#create(PatternElement...)
 	 */
+	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingUpdate create(PatternElement... pattern);
 }

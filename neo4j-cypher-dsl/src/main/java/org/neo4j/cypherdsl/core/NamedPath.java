@@ -23,6 +23,8 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
@@ -86,6 +88,7 @@ public final class NamedPath implements PatternElement, Named {
 		 * @param pattern The pattern to be used as named path.
 		 * @return A named path.
 		 */
+		@NotNull @Contract(pure = true)
 		NamedPath definedBy(RelationshipPattern pattern);
 
 		/**
@@ -95,6 +98,7 @@ public final class NamedPath implements PatternElement, Named {
 		 * @return A named path.
 		 * @since 2020.1.4
 		 */
+		@NotNull @Contract(pure = true)
 		NamedPath get();
 	}
 

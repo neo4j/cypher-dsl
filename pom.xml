@@ -160,6 +160,7 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.0.7</spring-data-neo4j.version>
+		<jetbrains-annotations.version>19.0.0</jetbrains-annotations.version>
 	</properties>
 
 	<dependencyManagement>
@@ -274,6 +275,13 @@
 						<groupId>org.springframework</groupId>
 					</exclusion>
 				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.jetbrains</groupId>
+				<artifactId>annotations</artifactId>
+				<version>${jetbrains-annotations.version}</version>
+				<scope>provided</scope>
+				<optional>true</optional>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

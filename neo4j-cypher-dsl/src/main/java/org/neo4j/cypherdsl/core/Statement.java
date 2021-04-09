@@ -25,6 +25,8 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 
 /**
@@ -43,6 +45,7 @@ public interface Statement extends Visitable {
 	/**
 	 * @return A new statement builder.
 	 */
+	@NotNull @Contract(pure = true)
 	static StatementBuilder builder() {
 
 		return new DefaultStatementBuilder();
@@ -53,6 +56,7 @@ public interface Statement extends Visitable {
 	 *                              String, but a fully qualified String is ok as well.
 	 * @return An entry point into a statement that starts with a call to stored procedure.
 	 */
+	@NotNull @Contract(pure = true)
 	static ProcedureCall.OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 
 		return new ProcedureCall.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
@@ -71,6 +75,7 @@ public interface Statement extends Visitable {
 	 * @return A map of all parameters with a bound value.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	Map<String, Object> getParameters();
 
 	/**
@@ -82,6 +87,7 @@ public interface Statement extends Visitable {
 	 * @return A set of parameter names being used.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	Collection<String> getParameterNames();
 
 	/**
@@ -95,15 +101,18 @@ public interface Statement extends Visitable {
 	 * @return A valid Cypher statement
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	String getCypher();
 
 	@API(status = INTERNAL, since = "2021.0.0")
+	@NotNull @Contract(pure = true)
 	StatementContext getContext();
 
 	/**
 	 * Some constants may be rendered as parameters.
 	 * @return True if literal parameters hav
 	 */
+	@NotNull @Contract(pure = true)
 	boolean isRenderConstantsAsParameters();
 
 	/**

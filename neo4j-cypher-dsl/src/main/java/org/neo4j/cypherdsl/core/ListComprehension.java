@@ -21,9 +21,12 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Atom.html#ListComprehension">ListComprehension</a>
@@ -75,6 +78,7 @@ public final class ListComprehension implements Expression {
 		 * @param list The source list.
 		 * @return An ongoing definition
 		 */
+		@NotNull @CheckReturnValue
 		OngoingDefinitionWithList in(Expression list);
 	}
 
@@ -89,6 +93,7 @@ public final class ListComprehension implements Expression {
 		 * @param condition the condition to start the {@code WHERE} clause with.
 		 * @return An ongoing definition
 		 */
+		@NotNull @CheckReturnValue
 		OngoingDefinitionWithoutReturn where(Condition condition);
 	}
 
@@ -102,6 +107,7 @@ public final class ListComprehension implements Expression {
 		 * @return The final definition of the list comprehension
 		 * @see #returning(Expression...)
 		 */
+		@NotNull @Contract(pure = true)
 		default ListComprehension returning(Named... variables) {
 			return returning(Expressions.createSymbolicNames(variables));
 		}
@@ -110,12 +116,14 @@ public final class ListComprehension implements Expression {
 		 * @param listDefinition Defines the elements to be returned from the pattern
 		 * @return The final definition of the list comprehension
 		 */
+		@NotNull @Contract(pure = true)
 		ListComprehension returning(Expression... listDefinition);
 
 		/**
 		 * @return Returns the list comprehension as is, without a {@literal WHERE} and returning each element of the
 		 * original list
 		 */
+		@NotNull @Contract(pure = true)
 		ListComprehension returning();
 	}
 

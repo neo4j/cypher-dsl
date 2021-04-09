@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -256,8 +258,10 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 *
 	 * @return A wrapper around the details of this relationship.
 	 */
+	@NotNull @Contract(pure = true)
 	Details getDetails();
 
+	@NotNull @Contract(pure = true)
 	Node getRight();
 
 	/**
@@ -266,6 +270,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new relationship.
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship named(String newSymbolicName);
 
 	/**
@@ -274,6 +279,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new relationship.
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship named(SymbolicName newSymbolicName);
 
 	/**
@@ -282,6 +288,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @return the new relationship
 	 * @since 1.1.1
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship unbounded();
 
 	/**
@@ -290,6 +297,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param minimum the new minimum
 	 * @return the new relationship
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship min(Integer minimum);
 
 	/**
@@ -298,6 +306,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship max(Integer maximum);
 
 	/**
@@ -307,6 +316,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship length(Integer minimum, Integer maximum);
 
 	/**
@@ -317,5 +327,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 *
 	 * @return the new relationship
 	 */
+	@NotNull @Contract(pure = true)
 	Relationship inverse();
 }

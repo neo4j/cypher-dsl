@@ -24,6 +24,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -122,6 +124,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @return A new chain
 	 * @since 1.1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public RelationshipChain unbounded() {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -134,6 +137,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @param minimum the new minimum
 	 * @return A new chain
 	 */
+	@NotNull @Contract(pure = true)
 	public RelationshipChain min(Integer minimum) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -146,6 +150,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @param maximum the new maximum
 	 * @return A new chain
 	 */
+	@NotNull @Contract(pure = true)
 	public RelationshipChain max(Integer maximum) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -159,6 +164,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @param maximum the new maximum
 	 * @return A new chain
 	 */
+	@NotNull @Contract(pure = true)
 	public RelationshipChain length(Integer minimum, Integer maximum) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -171,6 +177,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return A new chain
 	 */
+	@NotNull @Contract(pure = true)
 	public RelationshipChain properties(MapExpression newProperties) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -183,6 +190,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
 	 * @return A new chain
 	 */
+	@NotNull @Contract(pure = true)
 	public RelationshipChain properties(Object... keysAndValues) {
 
 		Relationship lastElement = this.relationships.getLast();

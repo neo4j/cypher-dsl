@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
+import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
 
@@ -28,6 +31,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
  * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
+@API(status = EXPERIMENTAL, since = "2020.0.1")
 public final class ProcedureCall extends AbstractStatement implements Statement {
 
 	private final ProcedureName name;

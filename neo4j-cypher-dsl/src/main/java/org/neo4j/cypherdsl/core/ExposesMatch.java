@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * A step exposing a {@link #match(PatternElement...)} method. This is one of the main entry points of most Cypher queries.
@@ -37,6 +39,7 @@ public interface ExposesMatch {
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern) {
 		return this.match(false, pattern);
 	}
@@ -47,6 +50,7 @@ public interface ExposesMatch {
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
 		return this.match(true, pattern);
 	}
@@ -59,5 +63,6 @@ public interface ExposesMatch {
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 * @since 2020.1.3
 	 */
+	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern);
 }

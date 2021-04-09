@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
@@ -56,6 +58,7 @@ public final class Cypher {
 	 * @param additionalLabels Additional labels
 	 * @return A new node representation
 	 */
+	@NotNull @Contract(pure = true)
 	public static Node node(String primaryLabel, String... additionalLabels) {
 
 		return new InternalNodeImpl(primaryLabel, additionalLabels);
@@ -69,6 +72,7 @@ public final class Cypher {
 	 * @param additionalLabels Additional labels
 	 * @return A new node representation
 	 */
+	@NotNull @Contract(pure = true)
 	public static Node node(String primaryLabel, List<String> additionalLabels) {
 
 		return new InternalNodeImpl(primaryLabel, additionalLabels.toArray(new String[] {}));
@@ -84,6 +88,7 @@ public final class Cypher {
 	 * @param additionalLabels Additional labels
 	 * @return A new node representation
 	 */
+	@NotNull @Contract(pure = true)
 	public static Node node(String primaryLabel, MapExpression properties, String... additionalLabels) {
 
 		return new InternalNodeImpl(null, primaryLabel, properties, additionalLabels);
@@ -92,6 +97,7 @@ public final class Cypher {
 	/**
 	 * @return A node matching any node.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Node anyNode() {
 		return new InternalNodeImpl();
 	}
@@ -99,6 +105,7 @@ public final class Cypher {
 	/**
 	 * @return The {@code *} wildcard literal.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Asterisk asterisk() {
 		return Asterisk.INSTANCE;
 	}
@@ -107,6 +114,7 @@ public final class Cypher {
 	 * @param symbolicName The new symbolic name
 	 * @return A node matching any node with the symbolic the given {@code symbolicName}.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Node anyNode(String symbolicName) {
 		return new InternalNodeImpl().named(symbolicName);
 	}
@@ -115,6 +123,7 @@ public final class Cypher {
 	 * @param symbolicName The new symbolic name
 	 * @return A node matching any node with the symbolic the given {@code symbolicName}.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Node anyNode(SymbolicName symbolicName) {
 		return new InternalNodeImpl().named(symbolicName);
 	}
@@ -127,6 +136,7 @@ public final class Cypher {
 	 *                      like {@code containerName.name1.name2}.
 	 * @return A new property
 	 */
+	@NotNull @Contract(pure = true)
 	public static Property property(String containerName, String... names) {
 		return property(name(containerName), names);
 	}
@@ -139,6 +149,7 @@ public final class Cypher {
 	 *                   like {@code expression.name1.name2}.
 	 * @return A new property.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Property property(Expression expression, String... names) {
 		return InternalPropertyImpl.create(expression, names);
 	}
@@ -152,6 +163,7 @@ public final class Cypher {
 	 * @return A new property
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Property property(String containerName, Expression lookup) {
 		return property(name(containerName), lookup);
 	}
@@ -165,6 +177,7 @@ public final class Cypher {
 	 * @return A new property.
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Property property(Expression expression, Expression lookup) {
 		return InternalPropertyImpl.create(expression, lookup);
 	}
@@ -176,6 +189,7 @@ public final class Cypher {
 	 * @return An ongoing definition of a named path
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static NamedPath.OngoingDefinitionWithName path(String name) {
 		return NamedPath.named(name);
 	}
@@ -187,6 +201,7 @@ public final class Cypher {
 	 * @return An ongoing definition of a named path
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static NamedPath.OngoingDefinitionWithName path(SymbolicName name) {
 		return NamedPath.named(name);
 	}
@@ -198,6 +213,7 @@ public final class Cypher {
 	 * @return An ongoing definition of a named path
 	 * @since 1.1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(String name) {
 		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
 	}
@@ -209,6 +225,7 @@ public final class Cypher {
 	 * @return An ongoing definition of a named path
 	 * @since 1.1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(SymbolicName name) {
 		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
 	}
@@ -219,6 +236,7 @@ public final class Cypher {
 	 * @param value The value of the symbolic name
 	 * @return A new symbolic name
 	 */
+	@NotNull @Contract(pure = true)
 	public static SymbolicName name(String value) {
 
 		return SymbolicName.of(value);
@@ -230,6 +248,7 @@ public final class Cypher {
 	 * @param name The name of the parameter, must not be null
 	 * @return The new parameter
 	 */
+	@NotNull @Contract(pure = true)
 	public static Parameter<Object> parameter(String name) {
 		return Parameter.create(name);
 	}
@@ -244,6 +263,7 @@ public final class Cypher {
 	 * @return The new parameter
 	 * @since 2021.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static <T> Parameter<T> parameter(String name, T value) {
 		return Parameter.create(name, value);
 	}
@@ -257,6 +277,7 @@ public final class Cypher {
 	 * @return The new parameter
 	 * @since 2021.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static <T> Parameter<T> anonParameter(T value) {
 		return Parameter.anon(value);
 	}
@@ -267,6 +288,7 @@ public final class Cypher {
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
 
 		return Statement.builder().optionalMatch(pattern);
@@ -279,6 +301,7 @@ public final class Cypher {
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern) {
 
 		return Statement.builder().match(pattern);
@@ -293,6 +316,7 @@ public final class Cypher {
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 * @since 2020.1.3
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
 		return Statement.builder().match(optional, pattern);
@@ -304,6 +328,7 @@ public final class Cypher {
 	 * @param pattern The patterns to create
 	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingUpdate create(
 		PatternElement... pattern) {
 
@@ -319,6 +344,7 @@ public final class Cypher {
 	 * @return An ongoing with clause.
 	 * @since 2020.1.2
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
 
 		return Statement.builder().with(variables);
@@ -333,6 +359,7 @@ public final class Cypher {
 	 * @return An ongoing with clause.
 	 * @since 2020.1.2
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
 
 		return Statement.builder().with(variables);
@@ -349,6 +376,7 @@ public final class Cypher {
 	 * @param expressions One ore more aliased expressions.
 	 * @return An ongoing with clause.
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 
 		return Statement.builder().with(expressions);
@@ -360,6 +388,7 @@ public final class Cypher {
 	 * @param pattern The patterns to merge
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingMerge merge(
 		PatternElement... pattern) {
 
@@ -373,6 +402,7 @@ public final class Cypher {
 	 * @param expression The expression to unwind
 	 * @return An ongoing {@code UNWIND}.
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingUnwind unwind(Expression expression) {
 
 		return Statement.builder().unwind(expression);
@@ -385,6 +415,7 @@ public final class Cypher {
 	 * @param expressions expressions to unwind
 	 * @return a new instance of {@link StatementBuilder.OngoingUnwind}
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingUnwind unwind(Expression... expressions) {
 
 		return Statement.builder().unwind(Cypher.listOf(expressions));
@@ -396,6 +427,7 @@ public final class Cypher {
 	 * @param expression The expression by which things should be sorted
 	 * @return A sort item, providing means to specify ascending or descending order
 	 */
+	@NotNull @Contract(pure = true)
 	public static SortItem sort(Expression expression) {
 
 		return SortItem.create(expression, null);
@@ -409,6 +441,7 @@ public final class Cypher {
 	 * @return A sort item
 	 * @since 2021.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static SortItem sort(Expression expression, SortItem.Direction direction) {
 
 		return SortItem.create(expression, direction);
@@ -420,6 +453,7 @@ public final class Cypher {
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}
 	 * @return A new map expression.
 	 */
+	@NotNull @Contract(pure = true)
 	public static MapExpression mapOf(Object... keysAndValues) {
 
 		return MapExpression.create(keysAndValues);
@@ -432,6 +466,7 @@ public final class Cypher {
 	 * @return A new map expression.
 	 * @since 2021.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static MapExpression asExpression(Map<String, Object> map) {
 
 		return MapExpression.create(map);
@@ -443,6 +478,7 @@ public final class Cypher {
 	 * @param expressions expressions to get combined into a list
 	 * @return a new instance of {@link ListExpression}
 	 */
+	@NotNull @Contract(pure = true)
 	public static ListExpression listOf(Expression... expressions) {
 
 		return ListExpression.create(expressions);
@@ -457,6 +493,7 @@ public final class Cypher {
 	 * @throws IllegalArgumentException when the object cannot be represented as a literal
 	 */
 	@SuppressWarnings("unchecked")
+	@NotNull @Contract(pure = true)
 	public static <T> Literal<T> literalOf(Object object) {
 
 		if (object == null) {
@@ -510,6 +547,7 @@ public final class Cypher {
 	/**
 	 * @return The {@literal true} literal.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Literal<Boolean> literalTrue() {
 		return BooleanLiteral.TRUE;
 	}
@@ -517,6 +555,7 @@ public final class Cypher {
 	/**
 	 * @return The {@literal false} literal.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Literal<Boolean> literalFalse() {
 		return BooleanLiteral.FALSE;
 	}
@@ -527,6 +566,7 @@ public final class Cypher {
 	 * @param statements the statements to union.
 	 * @return A union statement.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Statement union(Statement... statements) {
 		return unionImpl(false, statements);
 	}
@@ -537,6 +577,7 @@ public final class Cypher {
 	 * @param statements the statements to union.
 	 * @return A union statement.
 	 */
+	@NotNull @Contract(pure = true)
 	public static Statement unionAll(Statement... statements) {
 		return unionImpl(true, statements);
 	}
@@ -548,6 +589,7 @@ public final class Cypher {
 	 * @return A buildable statement
 	 * @since 1.0.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
 		return Statement.builder().returning(expressions);
 	}
@@ -559,6 +601,7 @@ public final class Cypher {
 	 * @return An ongoing definition.
 	 * @since 2020.0.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingDefinitionWithPattern listBasedOn(RelationshipPattern relationshipPattern) {
 		return PatternComprehension.basedOn(relationshipPattern);
 	}
@@ -570,6 +613,7 @@ public final class Cypher {
 	 * @return An ongoing definition.
 	 * @since 2020.1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingDefinitionWithPattern listBasedOn(NamedPath namedPath) {
 		return PatternComprehension.basedOn(namedPath);
 	}
@@ -581,6 +625,7 @@ public final class Cypher {
 	 * @return An ongoing definition of a list comprehension
 	 * @since 1.0.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingDefinitionWithVariable listWith(SymbolicName variable) {
 		return ListComprehension.with(variable);
 	}
@@ -591,6 +636,7 @@ public final class Cypher {
 	 * @param unquotedString An unquoted string
 	 * @return A quoted string with special chars escaped.
 	 */
+	@NotNull @Contract(pure = true)
 	public static String quote(String unquotedString) {
 		return literalOf(unquotedString).asString();
 	}
@@ -598,6 +644,7 @@ public final class Cypher {
 	/**
 	 * @return generic case expression start
 	 */
+	@NotNull @Contract(pure = true)
 	public static Case caseExpression() {
 		return Case.create();
 	}
@@ -606,6 +653,7 @@ public final class Cypher {
 	 * @param expression initial expression for the simple case statement
 	 * @return simple case expression start
 	 */
+	@NotNull @Contract(pure = true)
 	public static Case caseExpression(Expression expression) {
 		return Case.create(expression);
 	}
@@ -617,6 +665,7 @@ public final class Cypher {
 	 * @param procedureName The procedure name of the procedure to call. Might be fully qualified.
 	 * @return An ongoing definition of a call
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingStandaloneCallWithoutArguments call(String procedureName) {
 
 		Assertions.hasText(procedureName, "The procedure name must not be null or empty.");
@@ -629,6 +678,7 @@ public final class Cypher {
 	 * @param namespaceAndProcedure The procedure name of the procedure to call.
 	 * @return An ongoing definition of a call
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 		return Statement.call(namespaceAndProcedure);
 	}
@@ -643,6 +693,7 @@ public final class Cypher {
 	 * @since 2020.1.2
 	 */
 	@Neo4jVersion(minimum = "4.0.0")
+	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere call(Statement subquery) {
 		return Statement.builder().call(subquery);
 	}
@@ -656,6 +707,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression subList(Expression targetExpression, Integer start, Integer end) {
 
 		return ListOperator.subList(targetExpression, Cypher.literalOf(start), Cypher.literalOf(end));
@@ -670,6 +722,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression subList(Expression targetExpression, Expression start, Expression end) {
 
 		return ListOperator.subList(targetExpression, start, end);
@@ -683,6 +736,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression subListFrom(Expression targetExpression, Integer start) {
 
 		return ListOperator.subListFrom(targetExpression, Cypher.literalOf(start));
@@ -696,6 +750,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression subListFrom(Expression targetExpression, Expression start) {
 
 		return ListOperator.subListFrom(targetExpression, start);
@@ -709,6 +764,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression subListUntil(Expression targetExpression, Integer end) {
 
 		return ListOperator.subListUntil(targetExpression, Cypher.literalOf(end));
@@ -722,6 +778,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression subListUntil(Expression targetExpression, Expression end) {
 
 		return ListOperator.subListUntil(targetExpression, end);
@@ -735,6 +792,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static ListOperator valueAt(Expression targetExpression, Integer index) {
 
 		return ListOperator.valueAt(targetExpression, Cypher.literalOf(index));
@@ -748,6 +806,7 @@ public final class Cypher {
 	 * @return A range literal.
 	 * @since 2020.1.0
 	 */
+	@NotNull @Contract(pure = true)
 	public static ListOperator valueAt(Expression targetExpression, Expression index) {
 
 		return ListOperator.valueAt(targetExpression, index);
@@ -766,6 +825,7 @@ public final class Cypher {
 	 * @return An expression to reuse with the builder.
 	 * @since 2021.0.2
 	 */
+	@NotNull @Contract(pure = true)
 	public static Expression raw(String format, Object... mixedArgs) {
 
 		return RawLiteral.create(format, mixedArgs);
@@ -782,7 +842,9 @@ public final class Cypher {
 	 *
 	 * @return A foreign adapter
 	 * @since 2021.1.0
+	 * @throws IllegalArgumentException in case the object cannot be adapter
 	 */
+	@NotNull @Contract(pure = true)
 	public static <FE> ForeignAdapter<FE> adapt(FE expression) {
 
 		ForeignAdapterFactory initializedForeignAdapterFactory = foreignAdapterFactory;

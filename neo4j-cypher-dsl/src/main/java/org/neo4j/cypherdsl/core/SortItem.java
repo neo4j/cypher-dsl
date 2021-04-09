@@ -23,8 +23,11 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.support.Visitable;
 import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * A sort item can be used in an {@code ORDER BY} clause and changes the order of the items being returned from a query.
@@ -41,6 +44,7 @@ public final class SortItem implements Visitable {
 
 	static SortItem create(Expression expression, Direction direction) {
 
+		Assertions.notNull(expression, "Expression to sort must not be null.");
 		return new SortItem(expression, Optional.ofNullable(direction).orElse(SortItem.Direction.UNDEFINED));
 	}
 
@@ -53,6 +57,7 @@ public final class SortItem implements Visitable {
 	 * Creates a new sort item from {@literal this} instance, setting the sort direction to ascending.
 	 * @return A new sort item.
 	 */
+	@NotNull @Contract(pure = true)
 	public SortItem ascending() {
 		return new SortItem(this.expression, Direction.ASC);
 	}
@@ -61,6 +66,7 @@ public final class SortItem implements Visitable {
 	 * Creates a new sort item from {@literal this} instance, setting the sort direction to descending.
 	 * @return A new sort item.
 	 */
+	@NotNull @Contract(pure = true)
 	public SortItem descending() {
 		return new SortItem(this.expression, Direction.DESC);
 	}

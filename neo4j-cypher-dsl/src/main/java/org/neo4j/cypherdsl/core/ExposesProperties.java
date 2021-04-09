@@ -20,6 +20,9 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.Map;
 
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * A container that exposes methods to add properties with values to nodes or relationships.
  *
@@ -37,6 +40,7 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return The new property container.
 	 */
+	@NotNull @Contract(pure = true)
 	T withProperties(MapExpression newProperties);
 
 	/**
@@ -46,6 +50,7 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
 	 * @return The new property container.
 	 */
+	@NotNull @Contract(pure = true)
 	T withProperties(Object... keysAndValues);
 
 	/**
@@ -54,5 +59,6 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	 * @param newProperties A map with the new properties
 	 * @return The new property container.
 	 */
+	@NotNull @Contract(pure = true)
 	T withProperties(Map<String, Object> newProperties);
 }

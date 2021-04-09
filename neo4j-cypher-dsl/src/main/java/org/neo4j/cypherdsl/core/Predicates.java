@@ -21,7 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * Factory methods for creating predicates.
@@ -40,6 +43,7 @@ public final class Predicates {
 	 * @param property The property to be passed to {@code exists()}
 	 * @return A function call for {@code exists()} for one property
 	 */
+	@NotNull @Contract(pure = true)
 	public static Condition exists(Property property) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, property));
@@ -52,6 +56,7 @@ public final class Predicates {
 	 * @param pattern The pattern to be passed to {@code exists()}
 	 * @return A function call for {@code exists()} for one pattern
 	 */
+	@NotNull @Contract(pure = true)
 	public static Condition exists(RelationshipPattern pattern) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, pattern));
@@ -63,6 +68,7 @@ public final class Predicates {
 	 * @see #all(SymbolicName)
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction all(String variable) {
 
 		return all(SymbolicName.of(variable));
@@ -76,6 +82,7 @@ public final class Predicates {
 	 * @return A builder for the {@code all()} predicate function
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction all(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.ALL, variable);
@@ -87,6 +94,7 @@ public final class Predicates {
 	 * @see #any(SymbolicName)
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction any(String variable) {
 
 		return any(SymbolicName.of(variable));
@@ -100,6 +108,7 @@ public final class Predicates {
 	 * @return A builder for the {@code any()} predicate function
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction any(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.ANY, variable);
@@ -111,6 +120,7 @@ public final class Predicates {
 	 * @see #none(SymbolicName)
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction none(String variable) {
 
 		return none(SymbolicName.of(variable));
@@ -124,6 +134,7 @@ public final class Predicates {
 	 * @return A builder for the {@code none()} predicate function
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction none(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.NONE, variable);
@@ -135,6 +146,7 @@ public final class Predicates {
 	 * @see #single(SymbolicName)
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction single(String variable) {
 
 		return single(SymbolicName.of(variable));
@@ -148,6 +160,7 @@ public final class Predicates {
 	 * @return A builder for the {@code single()} predicate function
 	 * @since 1.1
 	 */
+	@NotNull @Contract(pure = true)
 	public static OngoingListBasedPredicateFunction single(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.SINGLE, variable);
@@ -162,6 +175,7 @@ public final class Predicates {
 		 * @param list A list
 		 * @return A builder to specify the where condition for the list based predicate
 		 */
+		@NotNull @CheckReturnValue
 		OngoingListBasedPredicateFunctionWithList in(Expression list);
 	}
 
@@ -174,6 +188,7 @@ public final class Predicates {
 		 * @param condition The condition for the list based predicate.
 		 * @return The final list based predicate function
 		 */
+		@NotNull @Contract(pure = true)
 		Condition where(Condition condition);
 	}
 

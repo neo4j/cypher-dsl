@@ -20,18 +20,24 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Exception thrown when extracting parameters from a statement leads to one parameter with a given name appearing
  * with different values.
  *
  * @author Andreas Berger
+ * @author Michael J. Simons
  * @since 2021.0.0
  */
 @API(status = EXPERIMENTAL, since = "2021.0.0")
@@ -41,11 +47,13 @@ public final class ConflictingParametersException extends RuntimeException {
 
 	public ConflictingParametersException(Map<String, Set<Object>> erroneousParameters) {
 		super(createMessage(erroneousParameters));
-		this.erroneousParameters = erroneousParameters;
+		this.erroneousParameters = new HashMap<>(erroneousParameters.size());
+		erroneousParameters.forEach((k, v) -> this.erroneousParameters.put(k, new HashSet<>(v)));
 	}
 
+	@NotNull @Contract(pure = true)
 	public Map<String, Set<Object>> getErroneousParameters() {
-		return erroneousParameters;
+		return Collections.unmodifiableMap(erroneousParameters);
 	}
 
 	private static String createMessage(Map<String, Set<Object>> errors) {

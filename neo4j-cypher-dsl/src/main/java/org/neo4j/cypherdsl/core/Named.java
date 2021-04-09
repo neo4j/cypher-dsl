@@ -23,6 +23,8 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A named thing exposes an optional {@link #getSymbolicName() symbolic name}.
@@ -36,12 +38,14 @@ public interface Named {
 	/**
 	 * @return An optional symbolic name.
 	 */
+	@NotNull @Contract(pure = true)
 	Optional<SymbolicName> getSymbolicName();
 
 	/**
 	 * @return A symbolic name
 	 * @throws IllegalStateException If this has not been named yet.
 	 */
+	@NotNull @Contract(pure = true)
 	default SymbolicName getRequiredSymbolicName() {
 		return getSymbolicName().orElseThrow(() -> new IllegalStateException("No name present."));
 	}

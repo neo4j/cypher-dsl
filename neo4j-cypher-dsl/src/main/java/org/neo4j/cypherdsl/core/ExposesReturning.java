@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * Return part of a statement.
@@ -38,6 +40,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(String... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -48,6 +51,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(Named... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -58,6 +62,7 @@ public interface ExposesReturning {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
+	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions);
 
 	/**
@@ -68,6 +73,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(String... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
@@ -78,6 +84,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Named... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
@@ -88,5 +95,6 @@ public interface ExposesReturning {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
+	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions);
 }

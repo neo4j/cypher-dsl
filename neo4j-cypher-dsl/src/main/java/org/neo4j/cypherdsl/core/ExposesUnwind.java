@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * A step exposing a {@link #unwind(Expression...)},{@link #unwind(Expression)}, {@link #unwind(String)} and method.
@@ -37,6 +39,7 @@ public interface ExposesUnwind {
 	 * @param expressions The things to unwind.
 	 * @return An ongoing definition of an unwind.
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingUnwind unwind(Expression... expressions) {
 		return unwind(Cypher.listOf(expressions));
 	}
@@ -47,6 +50,7 @@ public interface ExposesUnwind {
 	 * @param variable The thing to unwind.
 	 * @return An ongoing definition of an unwind.
 	 */
+	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingUnwind unwind(String variable) {
 		return unwind(Cypher.name(variable));
 	}

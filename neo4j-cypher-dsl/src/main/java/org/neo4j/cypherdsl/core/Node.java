@@ -23,6 +23,8 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/NodePattern.html">NodePattern</a>.
@@ -33,6 +35,7 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "1.0")
 public interface Node extends PatternElement, PropertyContainer, ExposesProperties<Node>, ExposesRelationships<Relationship> {
 
+	@NotNull @Contract(pure = true)
 	List<NodeLabel> getLabels();
 
 	/**
@@ -41,6 +44,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new node.
 	 */
+	@NotNull @Contract(pure = true)
 	Node named(String newSymbolicName);
 
 	/**
@@ -49,6 +53,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new node.
 	 */
+	@NotNull @Contract(pure = true)
 	Node named(SymbolicName newSymbolicName);
 
 	/**
@@ -57,6 +62,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param labelsToQuery A list of labels to query
 	 * @return A condition that checks whether this node has all of the labels to query
 	 */
+	@NotNull @Contract(pure = true)
 	Condition hasLabels(String... labelsToQuery);
 
 	/**
@@ -65,6 +71,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param otherNode The node to compare this node to.
 	 * @return A condition.
 	 */
+	@NotNull @Contract(pure = true)
 	Condition isEqualTo(Node otherNode);
 
 	/**
@@ -73,6 +80,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param otherNode The node to compare this node to.
 	 * @return A condition.
 	 */
+	@NotNull @Contract(pure = true)
 	Condition isNotEqualTo(Node otherNode);
 
 	/**
@@ -80,6 +88,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A condition.
 	 */
+	@NotNull @Contract(pure = true)
 	Condition isNull();
 
 	/**
@@ -87,6 +96,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A condition.
 	 */
+	@NotNull @Contract(pure = true)
 	Condition isNotNull();
 
 	/**
@@ -94,6 +104,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A sort item.
 	 */
+	@NotNull @Contract(pure = true)
 	SortItem descending();
 
 	/**
@@ -101,6 +112,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A sort item.
 	 */
+	@NotNull @Contract(pure = true)
 	SortItem ascending();
 
 	/**
@@ -109,15 +121,18 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param alias The alias to use.
 	 * @return The aliased expression.
 	 */
+	@NotNull @Contract(pure = true)
 	AliasedExpression as(String alias);
 
 	/**
 	 * @return A new function invocation returning the internal id of this node.
 	 */
+	@NotNull @Contract(pure = true)
 	FunctionInvocation internalId();
 
 	/**
 	 * @return A new function invocation returning the labels of this node.
 	 */
+	@NotNull @Contract(pure = true)
 	FunctionInvocation labels();
 }
