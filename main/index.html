@@ -583,7 +583,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2021.1.2-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.1.2.</p>
 </div>
 </blockquote>
 </div>
@@ -675,7 +675,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2021.1.2-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.1.2<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -686,7 +686,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.1.2-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.1.2</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -2125,7 +2125,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="title">Listing 14. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.2-SNAPSHOT</code></pre>
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.2</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2176,7 +2176,7 @@ We recommend using it explicitly on the separate annotation processor classpath 
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.2-SNAPSHOT</span><span class="delimiter">'</span></span>
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.2</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -2938,13 +2938,101 @@ RETURN p1,p2;</code></pre>
 <div class="sect3">
 <h4 id="2021.1"><a class="anchor" href="#2021.1"></a>2021.1</h4>
 <div class="sect4">
+<h5 id="2021.1.2"><a class="anchor" href="#2021.1.2"></a>2021.1.2</h5>
+<div class="paragraph">
+<p>This release comes with two notable things: It uses a couple of annotations on the API to guide developers using it correctly.
+IDEs like IDEA will now issue warnings if you don&#8217;t use a returned builder, or a new instance of an object while wrongly assuming
+you mutated state.</p>
+</div>
+<div class="paragraph">
+<p>In the light of that we discovered that the <code>RelationshipChain</code> pattern was mutable and returning a mutated instance while
+it should have returned a fresh one.</p>
+</div>
+<div class="paragraph">
+<p><em>Warning</em> This might be a breaking change for users having code like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>var pattern = Cypher.node("Start").named("s")
+  .relationshipTo(Cypher.anyNode())
+  .relationshipTo(Cypher.node("End").named("e"));
+pattern.named("x");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Prior to 2021.1.2 this would give the pattern the name <code>x</code> and modify it in place.
+From 2021.1.2 onwards you <strong>must</strong> use the returned value:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code>pattern = pattern.named("x");</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We think that this change is crucial and necessary as all other patterns are immutable as intended and in sum, they build
+up truly immutable statements. One pattern that is mutable like the above invalides the whole guarantee about the statement.</p>
+</div>
+<div class="sect5">
+<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Add <code>named(SymbolicName s)</code> to RelationshipChain.</p>
+</li>
+<li>
+<p>Generate $TYPE field containing the relationship type. [SDN 6 Annotation Processor]</p>
+</li>
+<li>
+<p>Introduce some optional annotations for guidance along the api.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="documentation"><a class="anchor" href="#documentation"></a>📖 Documentation</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-173 - Improve documentation. [A collection of small improvements]</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="bugfixes"><a class="anchor" href="#bugfixes"></a>🐛 Bug Fixes</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>GH-174 - Extract types via the visitor API and avoid casting element types. [SDN 6 Annotation Processor]</p>
+</li>
+<li>
+<p>Ensure immutability of <code>RelationshipChain</code>.</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Remove unnecessary close (will be taken care of via <code>@Container</code>). [Only test related]</p>
+</li>
+<li>
+<p>Run tests on JDK 16</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect4">
 <h5 id="2021.1.1"><a class="anchor" href="#2021.1.1"></a>2021.1.1</h5>
 <div class="paragraph">
 <p>This is a drop-in replacement for <a href="#v2021.1.0">2021.1.0</a>. Introducing the interface for <code>Property</code> broke the <code>mutate</code> operation,
 for which no test was in place. This and the bug has been fixed.</p>
 </div>
 <div class="sect5">
-<h6 id="bugfixes"><a class="anchor" href="#bugfixes"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes2"><a class="anchor" href="#bugfixes2"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -2978,7 +3066,7 @@ This is a feature that is driven by Spring Data Neo4j 6.1 in which we build upon
 Find more in <a href="#query-dsl-support">this section of the manual</a>.</p>
 </div>
 <div class="sect5">
-<h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
+<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3011,7 +3099,7 @@ after rendering).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="documentation"><a class="anchor" href="#documentation"></a>📖 Documentation</h6>
+<h6 id="documentation2"><a class="anchor" href="#documentation2"></a>📖 Documentation</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3024,7 +3112,7 @@ after rendering).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes2"><a class="anchor" href="#bugfixes2"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes3"><a class="anchor" href="#bugfixes3"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3037,7 +3125,7 @@ after rendering).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3074,7 +3162,7 @@ This will already be the last release of the 2021.0 line.
 </table>
 </div>
 <div class="sect5">
-<h6 id="features2"><a class="anchor" href="#features2"></a>🚀 Features</h6>
+<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3099,7 +3187,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="documentation2"><a class="anchor" href="#documentation2"></a>📖 Documentation</h6>
+<h6 id="documentation3"><a class="anchor" href="#documentation3"></a>📖 Documentation</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3109,7 +3197,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes3"><a class="anchor" href="#bugfixes3"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes4"><a class="anchor" href="#bugfixes4"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3122,7 +3210,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3141,7 +3229,7 @@ This will already be the last release of the 2021.0 line.
 <div class="sect4">
 <h5 id="2021.0.1"><a class="anchor" href="#2021.0.1"></a>2021.0.1</h5>
 <div class="sect5">
-<h6 id="features3"><a class="anchor" href="#features3"></a>🚀 Features</h6>
+<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3253,7 +3341,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="features4"><a class="anchor" href="#features4"></a>🚀 Features</h6>
+<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3296,7 +3384,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="documentation3"><a class="anchor" href="#documentation3"></a>📖 Documentation</h6>
+<h6 id="documentation4"><a class="anchor" href="#documentation4"></a>📖 Documentation</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3306,7 +3394,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes4"><a class="anchor" href="#bugfixes4"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes5"><a class="anchor" href="#bugfixes5"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3322,7 +3410,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3357,7 +3445,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.5"><a class="anchor" href="#2020.1.5"></a>2020.1.5</h5>
 <div class="sect5">
-<h6 id="features5"><a class="anchor" href="#features5"></a>🚀 Features</h6>
+<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3376,7 +3464,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.4"><a class="anchor" href="#2020.1.4"></a>2020.1.4</h5>
 <div class="sect5">
-<h6 id="features6"><a class="anchor" href="#features6"></a>🚀 Features</h6>
+<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3392,7 +3480,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.3"><a class="anchor" href="#2020.1.3"></a>2020.1.3</h5>
 <div class="sect5">
-<h6 id="features7"><a class="anchor" href="#features7"></a>🚀 Features</h6>
+<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3402,7 +3490,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes5"><a class="anchor" href="#bugfixes5"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes6"><a class="anchor" href="#bugfixes6"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3415,7 +3503,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 <div class="sect4">
 <h5 id="2020.1.2"><a class="anchor" href="#2020.1.2"></a>2020.1.2</h5>
 <div class="sect5">
-<h6 id="features8"><a class="anchor" href="#features8"></a>🚀 Features</h6>
+<h6 id="features9"><a class="anchor" href="#features9"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3431,7 +3519,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes6"><a class="anchor" href="#bugfixes6"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes7"><a class="anchor" href="#bugfixes7"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3441,7 +3529,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3489,7 +3577,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.1"><a class="anchor" href="#2020.1.1"></a>2020.1.1</h5>
 <div class="sect5">
-<h6 id="features9"><a class="anchor" href="#features9"></a>🚀 Features</h6>
+<h6 id="features10"><a class="anchor" href="#features10"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3502,7 +3590,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <div class="sect4">
 <h5 id="2020.1.0"><a class="anchor" href="#2020.1.0"></a>2020.1.0</h5>
 <div class="sect5">
-<h6 id="features10"><a class="anchor" href="#features10"></a>🚀 Features</h6>
+<h6 id="features11"><a class="anchor" href="#features11"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3534,7 +3622,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="bugfixes7"><a class="anchor" href="#bugfixes7"></a>🐛 Bug Fixes</h6>
+<h6 id="bugfixes8"><a class="anchor" href="#bugfixes8"></a>🐛 Bug Fixes</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3553,7 +3641,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3593,7 +3681,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 <p>This is the first patch release for the rebooted Cypher-DSL project.</p>
 </div>
 <div class="sect5">
-<h6 id="features11"><a class="anchor" href="#features11"></a>🚀 Features</h6>
+<h6 id="features12"><a class="anchor" href="#features12"></a>🚀 Features</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3609,7 +3697,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping7"><a class="anchor" href="#housekeeping7"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -3645,7 +3733,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-08 19:07:16 UTC
+Last updated 2021-04-09 13:06:50 UTC
 </div>
 </div>
 </body>
