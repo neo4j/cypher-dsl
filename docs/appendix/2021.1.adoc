@@ -1,5 +1,53 @@
 == 2021.1
 
+=== 2021.1.2
+
+This release comes with two notable things: It uses a couple of annotations on the API to guide developers using it correctly.
+IDEs like IDEA will now issue warnings if you don't use a returned builder, or a new instance of an object while wrongly assuming
+you mutated state.
+
+In the light of that we discovered that the `RelationshipChain` pattern was mutable and returning a mutated instance while
+it should have returned a fresh one.
+
+_Warning_ This might be a breaking change for users having code like this:
+
+```
+var pattern = Cypher.node("Start").named("s")
+  .relationshipTo(Cypher.anyNode())
+  .relationshipTo(Cypher.node("End").named("e"));
+pattern.named("x");
+```
+
+Prior to 2021.1.2 this would give the pattern the name `x` and modify it in place.
+From 2021.1.2 onwards you *must* use the returned value:
+
+```
+pattern = pattern.named("x");
+```
+
+We think that this change is crucial and necessary as all other patterns are immutable as intended and in sum, they build
+up truly immutable statements. One pattern that is mutable like the above invalides the whole guarantee about the statement.
+
+==== 🚀 Features
+
+* Add `named(SymbolicName s)` to RelationshipChain.
+* Generate $TYPE field containing the relationship type. [SDN 6 Annotation Processor]
+* Introduce some optional annotations for guidance along the api.
+
+==== 📖 Documentation
+
+* GH-173 - Improve documentation. [A collection of small improvements]
+
+==== 🐛 Bug Fixes
+
+* GH-174 - Extract types via the visitor API and avoid casting element types. [SDN 6 Annotation Processor]
+* Ensure immutability of `RelationshipChain`.
+
+==== 🧹 Housekeeping
+
+* Remove unnecessary close (will be taken care of via `@Container`). [Only test related]
+* Run tests on JDK 16
+
 === 2021.1.1
 
 This is a drop-in replacement for <<v2021.1.0>>. Introducing the interface for `Property` broke the `mutate` operation,
