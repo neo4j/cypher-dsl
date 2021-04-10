@@ -16,32 +16,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
+import org.neo4j.cypherdsl.core.Cypher;
 
 /**
- * Represents the literal value {@literal null}.
- *
- * @author Gerrit Meier
+ * An internal holder for a constant value that might be rendered as a parameter.
  * @author Michael J. Simons
- * @since 1.0
+ * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class NullLiteral extends LiteralBase<Void> {
+@API(status = INTERNAL, since = "2021.1.0")
+public final class ConstantParameterHolder {
 
-	static final NullLiteral INSTANCE = new NullLiteral();
+	private final Object value;
 
-	private NullLiteral() {
+	private final String literalValue;
 
-		super(null);
+	public ConstantParameterHolder(Object value) {
+		this.value = value;
+		this.literalValue = Cypher.literalOf(value).asString();
 	}
 
-	@Override
+	public Object getValue() {
+		return value;
+	}
+
 	public String asString() {
-		return "NULL";
+		return literalValue;
 	}
 }

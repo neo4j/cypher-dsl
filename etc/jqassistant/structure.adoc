@@ -31,7 +31,7 @@ RETURN t, t2
 ----
 
 The `renderer` package is not only free to use the whole `core`, it must do so to fulfill its purpose.
-The `support` and `utils` packages however should not have dependencies outside their own:
+The `ast` and `utils` packages however should not have dependencies outside their own:
 
 [[arch-rules.structure:supporting-packages-are-dependency-free]]
 [source,cypher,role=constraint,requiresConcepts="dependency:Package"]
@@ -39,6 +39,22 @@ The `support` and `utils` packages however should not have dependencies outside 
 ----
 MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]->(p1:Package)-[:DEPENDS_ON]->(p2:Package)<-[:CONTAINS]-(a)
-WHERE p1.fqn IN ['org.neo4j.cypherdsl.core.support', 'org.neo4j.cypherdsl.core.utils']
+WHERE p1.fqn IN ['org.neo4j.cypherdsl.core.ast', 'org.neo4j.cypherdsl.core.utils']
 RETURN p1,p2;
+----
+
+There should not be any internal, public API inside the core package.
+Everything that needs to be public for reasons (like being used in the renderer), must go into the `internal` package.
+This package won't be exported via `module-info.java`.
+
+[[arch-rules.structure:public-internal-api-is-in-internal-package]]
+[source,cypher,role=constraint,requiresConcepts="dependency:Package"]
+.Public internal API goes into a dedicated package
+----
+MATCH (c:Class)-[:IS_PART_OF]->(:Api {type: 'Internal'})
+MATCH (p:Package) - [:CONTAINS] -> (c)
+WHERE c.visibility = 'public'
+AND coalesce(c.abstract, false) = false
+AND p.fqn = 'org.neo4j.cypherdsl.core'
+RETURN c, p
 ----

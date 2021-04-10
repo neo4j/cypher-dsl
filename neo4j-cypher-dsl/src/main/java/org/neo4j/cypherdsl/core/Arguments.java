@@ -20,9 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Optional;
+
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * Specialized list of expressions that represents the arguments of a procedure call.
@@ -32,7 +35,7 @@ import org.neo4j.cypherdsl.core.support.Visitable;
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
-public final class Arguments extends TypedSubtree<Expression> {
+final class Arguments extends TypedSubtree<Expression> implements ProvidesAffixes {
 
 	Arguments(Expression... children) {
 		super(children);
@@ -41,5 +44,15 @@ public final class Arguments extends TypedSubtree<Expression> {
 	@Override
 	protected Visitable prepareVisit(Expression child) {
 		return Expressions.nameOrExpression(child);
+	}
+
+	@Override
+	public Optional<String> getPrefix() {
+		return Optional.of("(");
+	}
+
+	@Override
+	public Optional<String> getSuffix() {
+		return Optional.of(")");
 	}
 }

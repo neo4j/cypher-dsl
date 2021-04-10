@@ -16,32 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
- * Represents the literal value {@literal null}.
+ * AST representation of the {@literal DISTINCT} keyword.
  *
- * @author Gerrit Meier
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class NullLiteral extends LiteralBase<Void> {
+@API(status = INTERNAL, since = "1.0")
+public enum Distinct implements Visitable {
 
-	static final NullLiteral INSTANCE = new NullLiteral();
-
-	private NullLiteral() {
-
-		super(null);
-	}
-
-	@Override
-	public String asString() {
-		return "NULL";
-	}
+	/**
+	 * The single instance of the {@code DISTINCT} keyword.
+	 */
+	INSTANCE
 }

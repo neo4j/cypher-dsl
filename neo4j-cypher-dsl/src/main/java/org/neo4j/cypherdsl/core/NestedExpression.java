@@ -21,7 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * @author Michael J. Simons

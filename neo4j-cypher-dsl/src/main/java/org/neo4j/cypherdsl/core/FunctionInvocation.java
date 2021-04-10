@@ -24,8 +24,8 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Collections;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**

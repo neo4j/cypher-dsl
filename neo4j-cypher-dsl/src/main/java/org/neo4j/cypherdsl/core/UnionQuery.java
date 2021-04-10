@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**

@@ -21,7 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * Used to create patterns excluded in a where clause via {@literal not}.

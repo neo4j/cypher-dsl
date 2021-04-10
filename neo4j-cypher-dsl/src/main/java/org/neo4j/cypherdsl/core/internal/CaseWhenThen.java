@@ -16,32 +16,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
+import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * Represents the literal value {@literal null}.
+ * Represents a pair of `when-then` expressions.
  *
  * @author Gerrit Meier
  * @author Michael J. Simons
- * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class NullLiteral extends LiteralBase<Void> {
+@API(status = INTERNAL, since = "1.0")
+public final class CaseWhenThen implements Visitable {
 
-	static final NullLiteral INSTANCE = new NullLiteral();
+	private final Expression whenExpression;
+	private final Expression thenExpression;
 
-	private NullLiteral() {
+	public CaseWhenThen(Expression whenExpression, Expression thenExpression) {
 
-		super(null);
+		this.whenExpression = whenExpression;
+		this.thenExpression = thenExpression;
 	}
 
 	@Override
-	public String asString() {
-		return "NULL";
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		whenExpression.accept(visitor);
+		visitor.leave(this);
+		thenExpression.accept(visitor);
 	}
 }

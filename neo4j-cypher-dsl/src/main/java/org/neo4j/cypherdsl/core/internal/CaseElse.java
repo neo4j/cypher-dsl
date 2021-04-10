@@ -16,33 +16,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * Context for while rendering a statement.
- *
+ * Represents a finalizing `else` expression.
+ * @author Gerrit Meier
  * @author Michael J. Simons
- * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
- * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "2021.1.0")
-public interface StatementContext {
+@API(status = INTERNAL, since = "1.0")
+public final class CaseElse implements Visitable {
+	private final Expression elseExpression;
 
-	/**
-	 * Gets or creates the name of a parameter
-	 *
-	 * @param parameter The parameter who's name should be retrieved
-	 * @return The name of the parameter or a generated name
-	 */
-	String getParameterName(Parameter parameter);
+	public CaseElse(Expression elseExpression) {
+		this.elseExpression = elseExpression;
+	}
 
-	/**
-	 * Some constants may be rendered as parameters.
-	 * @return True if literal parameters hav
-	 */
-	boolean isRenderConstantsAsParameters();
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		elseExpression.accept(visitor);
+		visitor.leave(this);
+	}
 }

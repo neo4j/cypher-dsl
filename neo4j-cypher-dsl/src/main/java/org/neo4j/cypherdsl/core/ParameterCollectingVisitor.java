@@ -26,8 +26,10 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
+import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * This is an implementation of a visitor to the Cypher AST created by the Cypher builder

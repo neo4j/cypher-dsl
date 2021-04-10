@@ -16,34 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
-
-import static org.apiguardian.api.API.Status.INTERNAL;
-
-import org.apiguardian.api.API;
-
 /**
- * An internal holder for a constant value that might be rendered as a parameter.
- * @author Michael J. Simons
- * @since 2021.1.0
+ * Support for describing an abstract syntax tree.
  */
-@API(status = INTERNAL, since = "2021.1.0")
-public final class ConstantParameterHolder {
-
-	private final Object value;
-
-	private final String literalValue;
-
-	public ConstantParameterHolder(Object value) {
-		this.value = value;
-		this.literalValue = Cypher.literalOf(value).asString();
-	}
-
-	Object getValue() {
-		return value;
-	}
-
-	public String asString() {
-		return literalValue;
-	}
-}
+package org.neo4j.cypherdsl.core.ast;

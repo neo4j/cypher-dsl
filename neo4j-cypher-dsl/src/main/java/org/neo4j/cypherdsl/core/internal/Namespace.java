@@ -16,27 +16,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.support;
+package org.neo4j.cypherdsl.core.internal;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
+
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * @author Michael J. Simons
- * @since 1.0
+ * @soundtrack Apocalyptica - Cell-0
+ * @since 2020.0.1
  */
-@FunctionalInterface
-public interface Visitor {
+@API(status = INTERNAL, since = "2020.0.1")
+public final class Namespace extends LiteralBase<String[]> {
 
-	/**
-	 * Enter a {@link Visitable}.
-	 *
-	 * @param segment the segment to visit.
-	 */
-	void enter(Visitable segment);
+	Namespace(String[] value) {
+		super(value);
+	}
 
-	/**
-	 * Leave a {@link Visitable}.
-	 *
-	 * @param segment the visited segment.
-	 */
-	default void leave(Visitable segment) {
+	@Override
+	public void accept(Visitor visitor) {
+
+		visitor.enter(this);
+		visitor.leave(this);
+	}
+
+	@Override
+	public String asString() {
+
+		return Arrays.stream(getContent()).collect(Collectors.joining("."));
 	}
 }

@@ -20,8 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.List;
 
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * Represents a list of expressions. When visited, the expressions are treated as named expression if they have declared

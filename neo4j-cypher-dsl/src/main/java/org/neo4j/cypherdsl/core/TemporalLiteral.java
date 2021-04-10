@@ -29,7 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
+import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
  * Thrown when a QueryDSL operator cannot be used with the Cypher-DSL predicate converter.

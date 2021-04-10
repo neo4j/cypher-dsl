@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**

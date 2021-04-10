@@ -16,24 +16,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
-
-import static org.apiguardian.api.API.Status.INTERNAL;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
+package org.neo4j.cypherdsl.core.ast;
 
 /**
- * AST representation of the {@literal DISTINCT} keyword.
- *
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = INTERNAL, since = "1.0")
-public enum Distinct implements Visitable {
+@FunctionalInterface
+public interface Visitor {
 
 	/**
-	 * The single instance of the {@code DISTINCT} keyword.
+	 * Enter a {@link Visitable}.
+	 *
+	 * @param segment the segment to visit.
 	 */
-	INSTANCE
+	void enter(Visitable segment);
+
+	/**
+	 * Leave a {@link Visitable}.
+	 *
+	 * @param segment the visited segment.
+	 */
+	default void leave(Visitable segment) {
+	}
 }

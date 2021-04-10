@@ -16,14 +16,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html#RelationshipTypes">RelationshipTypes</a>
@@ -36,14 +38,22 @@ public final class RelationshipTypes implements Visitable {
 
 	private final List<String> values;
 
-	RelationshipTypes(List<String> values) {
+	public static RelationshipTypes of(String... types) {
+
+		List<String> listOfTypes = Arrays.stream(types)
+			.filter(type -> !(type == null || type.isEmpty()))
+			.collect(Collectors.toList());
+
+		return new RelationshipTypes(listOfTypes);
+	}
+
+	private RelationshipTypes(List<String> values) {
 		this.values = values;
 	}
 
 	/**
 	 * @return the list of types. The types are not escaped and must be escaped prior to rendering.
 	 */
-	@API(status = INTERNAL)
 	public List<String> getValues() {
 		return values;
 	}

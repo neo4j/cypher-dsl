@@ -16,32 +16,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
+import org.neo4j.cypherdsl.core.Literal;
 
 /**
- * Represents the literal value {@literal null}.
+ * Represents a literal with an optional content.
  *
- * @author Gerrit Meier
+ * @param <T> type of content
  * @author Michael J. Simons
- * @since 1.0
+ * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class NullLiteral extends LiteralBase<Void> {
+@API(status = INTERNAL, since = "2021.1.0")
+public abstract class LiteralBase<T> implements Literal<T> {
 
-	static final NullLiteral INSTANCE = new NullLiteral();
+	/**
+	 * The content of this literal.
+	 */
+	private T content;
 
-	private NullLiteral() {
-
-		super(null);
+	protected LiteralBase(T content) {
+		this.content = content;
 	}
 
-	@Override
-	public String asString() {
-		return "NULL";
+	/**
+	 * @return The content of this literal, may be {@literal null}
+	 */
+	public final T getContent() {
+		return content;
 	}
 }
+

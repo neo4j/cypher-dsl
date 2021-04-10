@@ -16,33 +16,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
-
-import static org.apiguardian.api.API.Status.INTERNAL;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
+package org.neo4j.cypherdsl.codegen.core;
 
 /**
- * Items yielded by a stand alone or in query call.
- *
  * @author Michael J. Simons
- * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
- * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.0.1")
-public final class YieldItems extends TypedSubtree<Expression> {
+final class Strings {
 
-	static YieldItems yieldAllOf(Expression... c) {
-
-		if (c == null || c.length == 0) {
-			throw new IllegalArgumentException("Cannot yield an empty list of items.");
-		}
-
-		return new YieldItems(c);
+	/**
+	 * A convenience method to decide whether a given {@code codePoint} is a valid Java identifier at the given position {@code p}.
+	 *
+	 * @param p         Position on which the {@code codePoint} is supposed to be used as identifier
+	 * @param codePoint A codepoint
+	 * @return True if the codePoint could be used as part of an identifier at the given position
+	 */
+	static boolean isValidJavaIdentifierPartAt(int p, int codePoint) {
+		return p == 0 && Character.isJavaIdentifierStart(codePoint) || p > 0 && Character.isJavaIdentifierPart(codePoint);
 	}
 
-	private YieldItems(Expression... children) {
-		super(children);
+	private Strings() {
 	}
 }

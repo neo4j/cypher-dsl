@@ -18,18 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -84,10 +83,19 @@ public final class Hint implements Visitable {
 	/**
 	 * Internal helper class to wrap up the properties used inside an index.
 	 */
-	@API(status = INTERNAL)
-	public final static class IndexProperties extends TypedSubtree<SymbolicName> {
+	private final static class IndexProperties extends TypedSubtree<SymbolicName> implements ProvidesAffixes {
 		IndexProperties(List<SymbolicName> properties) {
 			super(properties);
+		}
+
+		@Override
+		public Optional<String> getPrefix() {
+			return Optional.of("(");
+		}
+
+		@Override
+		public Optional<String> getSuffix() {
+			return Optional.of(")");
 		}
 	}
 

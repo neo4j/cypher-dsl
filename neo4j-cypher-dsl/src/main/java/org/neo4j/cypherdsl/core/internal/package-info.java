@@ -17,6 +17,11 @@
  * limitations under the License.
  */
 /**
- * Support for describing an abstract syntax tree.
+ * This is basically the kitchen sink for all classes that must be public but are not actually part of the public API.
+ * We will change them at will and don't give any guarantees about them. All classes inside that package are marked as
+ * {@link org.apiguardian.api.API.Status#INTERNAL}. The {@code internal} package won't be exported when the Cypher-DSL
+ * is run on the module path.
+ *
+ * @author Michael J. Simons
  */
-package org.neo4j.cypherdsl.core.support;
+package org.neo4j.cypherdsl.core.internal;

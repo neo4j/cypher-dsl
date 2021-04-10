@@ -23,10 +23,12 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -37,7 +39,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public final class CompoundCondition implements Condition {
+final class CompoundCondition implements Condition, ProvidesAffixes {
 
 	/**
 	 * The empty, compound condition.
@@ -180,5 +182,15 @@ public final class CompoundCondition implements Condition {
 	) {
 		Visitable.visitIfNotNull(operator, visitor);
 		condition.accept(visitor);
+	}
+
+	@Override
+	public Optional<String> getPrefix() {
+		return Optional.of("(");
+	}
+
+	@Override
+	public Optional<String> getSuffix() {
+		return Optional.of(")");
 	}
 }

@@ -16,32 +16,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
+import org.neo4j.cypherdsl.core.Parameter;
 
 /**
- * Represents the literal value {@literal null}.
+ * Context for while rendering a statement.
  *
- * @author Gerrit Meier
  * @author Michael J. Simons
- * @since 1.0
+ * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
+ * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public final class NullLiteral extends LiteralBase<Void> {
+@API(status = INTERNAL, since = "2021.1.0")
+public interface StatementContext {
 
-	static final NullLiteral INSTANCE = new NullLiteral();
+	/**
+	 * Gets or creates the name of a parameter
+	 *
+	 * @param parameter The parameter who's name should be retrieved
+	 * @return The name of the parameter or a generated name
+	 */
+	String getParameterName(Parameter parameter);
 
-	private NullLiteral() {
-
-		super(null);
-	}
-
-	@Override
-	public String asString() {
-		return "NULL";
-	}
+	/**
+	 * Some constants may be rendered as parameters.
+	 * @return True if literal parameters hav
+	 */
+	boolean isRenderConstantsAsParameters();
 }

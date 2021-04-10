@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.support;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
@@ -32,6 +32,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * This is a convenience class implementing a {@link Visitor} and it takes care of choosing the right methods

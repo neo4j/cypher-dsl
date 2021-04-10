@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.Objects;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Represents a property name: With a name in the graph and an optional name in the domain model.
@@ -43,8 +42,10 @@ public final class PropertyDefinition {
 	 */
 	public static PropertyDefinition create(String nameInGraph, String optionalNameInDomain) {
 
-		Assertions.hasText(nameInGraph, "The name of the property in the graph must not be null or empty.");
-		return new PropertyDefinition(nameInGraph, optionalNameInDomain);
+		if (nameInGraph == null || nameInGraph.trim().isEmpty()) {
+			throw new IllegalArgumentException("The name of the property in the graph must not be null or empty.");
+		}
+		return new PropertyDefinition(nameInGraph.trim(), optionalNameInDomain);
 	}
 
 	/**

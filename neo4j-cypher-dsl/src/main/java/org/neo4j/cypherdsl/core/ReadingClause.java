@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * @author Michael J. Simons

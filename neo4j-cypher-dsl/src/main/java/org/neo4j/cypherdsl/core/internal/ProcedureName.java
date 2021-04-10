@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
@@ -24,8 +24,8 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * @author Michael J. Simons
@@ -39,7 +39,7 @@ public final class ProcedureName implements Visitable {
 
 	private final String value;
 
-	static ProcedureName from(String... namespaceAndProcedure) {
+	public static ProcedureName from(String... namespaceAndProcedure) {
 		if (namespaceAndProcedure.length == 1) {
 			return new ProcedureName(namespaceAndProcedure[0]);
 		} else {
@@ -58,7 +58,7 @@ public final class ProcedureName implements Visitable {
 		this.value = value;
 	}
 
-	String getQualifiedName() {
+	public String getQualifiedName() {
 
 		String namespace = "";
 		if (this.optionalNamespace != null) {
@@ -80,7 +80,6 @@ public final class ProcedureName implements Visitable {
 	 *
 	 * @return The actual name of the procedure, without any namespace.
 	 */
-	@API(status = INTERNAL)
 	public String getValue() {
 		return value;
 	}
