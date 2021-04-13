@@ -2818,8 +2818,8 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
-WHERE
-  NOT type.fqn starts with 'org.neo4j.cypherdsl'
+WHERE NOT type.fqn starts with 'org.neo4j.cypherdsl'
+  AND type.fqn &lt;&gt; 'module-info'
 RETURN
   project as Project, collect(type) as TypeWithWrongName</code></pre>
 </div>
@@ -2919,15 +2919,31 @@ RETURN t, t2</code></pre>
 </div>
 <div class="paragraph">
 <p>The <code>renderer</code> package is not only free to use the whole <code>core</code>, it must do so to fulfill its purpose.
-The <code>support</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
+The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
 <div class="title">Listing 27. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
-WHERE p1.fqn IN ['org.neo4j.cypherdsl.core.support', 'org.neo4j.cypherdsl.core.utils']
+WHERE p1.fqn IN ['org.neo4j.cypherdsl.core.ast', 'org.neo4j.cypherdsl.core.utils']
 RETURN p1,p2;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>There should not be any internal, public API inside the core package.
+Everything that needs to be public for reasons (like being used in the renderer), must go into the <code>internal</code> package.
+This package won&#8217;t be exported via <code>module-info.java</code>.</p>
+</div>
+<div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
+<div class="title">Listing 28. Public internal API goes into a dedicated package</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
+MATCH (p:Package) - [:CONTAINS] -&gt; (c)
+WHERE c.visibility = 'public'
+AND coalesce(c.abstract, false) = false
+AND p.fqn = 'org.neo4j.cypherdsl.core'
+RETURN c, p</code></pre>
 </div>
 </div>
 </div>
@@ -3733,7 +3749,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-09 13:28:35 UTC
+Last updated 2021-04-13 10:20:14 UTC
 </div>
 </div>
 </body>
