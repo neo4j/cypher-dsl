@@ -30,3 +30,5 @@ We are gonna improve that as soon as we can depend on fixed automatic module nam
 
 Apart from this big change there is no change in any public API.
 This release should be a drop-in replacement for the prior release.
+
+A big thank you to https://github.com/sormuras[@sormuras] for his invaluable lessons about the Java module system.
