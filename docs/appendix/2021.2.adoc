@@ -20,13 +20,13 @@ module org.neo4j.cypherdsl.examples.core {
 }
 ----
 
-This release comes with a small catch: We do support using some https://github.com/querydsl/querydsl[QueryDSL].
+This release comes with a small catch: We do support using some https://github.com/querydsl/querydsl[QueryDSL] constructs.
 Query-DSL will have correct automatic module names in their 5.x release and we asked them to backport those to the
 4.x line on which the Cypher-DSL *optionally* depends (See https://github.com/querydsl/querydsl/pull/2805[2805]).
 
-Until than we statically require (that is "optional" in module speak) Query-DSL via the artifact name.
+Until then we statically require (that is "optional" in module speak) Query-DSL via the artifact name.
 This can cause errors when the artifact (`querydsl-core.jar`)  is renamed via the build process or similar.
 We are gonna improve that as soon as we can depend on fixed automatic module names.
 
 Apart from this big change there is no change in any public API.
-This release should be a drop-in replacement for the prior.
+This release should be a drop-in replacement for the prior release.
