@@ -19,9 +19,9 @@
 module org.neo4j.cypherdsl.core {
 
 	requires static querydsl.core; // Will be com.querydsl.core in a future Query-DSL release.
+	requires static org.jetbrains.annotations;
 
 	requires org.apiguardian.api;
-	requires org.jetbrains.annotations;
 
 	exports org.neo4j.cypherdsl.core;
 	exports org.neo4j.cypherdsl.core.renderer;
