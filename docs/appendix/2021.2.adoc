@@ -1,0 +1,32 @@
+== 2021.2
+
+=== 2021.2.0
+
+2021.2 doesn't bring any new features apart from being now a Java library supporting the Java module system not only with
+automatic module names but also with a correct `module-info.java` when running on JDK 11+ on the module path.
+
+The Cypher-DSL uses the technique of https://openjdk.java.net/jeps/238[JEP 238: Multi-Release JAR Files] to provide a
+`module-info.java` for projects being on JDK 11+.
+
+The MR-Jar allows us to compile for JDK 8 but also support JDK 11 (we choose 11 as it is the current LTS release as time of writing).
+
+To use the Cypher-DSL in a modular application you would need to require the following modules:
+
+[source,java]
+----
+module org.neo4j.cypherdsl.examples.core {
+
+	requires org.neo4j.cypherdsl.core;
+}
+----
+
+This release comes with a small catch: We do support using some https://github.com/querydsl/querydsl[QueryDSL].
+Query-DSL will have correct automatic module names in their 5.x release and we asked them to backport those to the
+4.x line on which the Cypher-DSL *optionally* depends (See https://github.com/querydsl/querydsl/pull/2805[2805]).
+
+Until than we statically require (that is "optional" in module speak) Query-DSL via the artifact name.
+This can cause errors when the artifact (`querydsl-core.jar`)  is renamed via the build process or similar.
+We are gonna improve that as soon as we can depend on fixed automatic module names.
+
+Apart from this big change there is no change in any public API.
+This release should be a drop-in replacement for the prior.
