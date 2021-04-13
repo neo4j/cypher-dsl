@@ -583,7 +583,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2021.1.3-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.2.0.</p>
 </div>
 </blockquote>
 </div>
@@ -675,7 +675,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2021.1.3-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.2.0<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -686,7 +686,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.1.3-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.2.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -2125,7 +2125,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="title">Listing 14. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.3-SNAPSHOT</code></pre>
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.0</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2176,7 +2176,7 @@ We recommend using it explicitly on the separate annotation processor classpath 
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.1.3-SNAPSHOT</span><span class="delimiter">'</span></span>
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -2951,6 +2951,48 @@ RETURN c, p</code></pre>
 </div>
 <div class="sect2">
 <h3 id="changelog"><a class="anchor" href="#changelog"></a>Change log</h3>
+<div class="sect3">
+<h4 id="2021.2"><a class="anchor" href="#2021.2"></a>2021.2</h4>
+<div class="sect4">
+<h5 id="2021.2.0"><a class="anchor" href="#2021.2.0"></a>2021.2.0</h5>
+<div class="paragraph">
+<p>2021.2 doesn&#8217;t bring any new features apart from being now a Java library supporting the Java module system not only with
+automatic module names but also with a correct <code>module-info.java</code> when running on JDK 11+ on the module path.</p>
+</div>
+<div class="paragraph">
+<p>The Cypher-DSL uses the technique of <a href="https://openjdk.java.net/jeps/238">JEP 238: Multi-Release JAR Files</a> to provide a
+<code>module-info.java</code> for projects being on JDK 11+.</p>
+</div>
+<div class="paragraph">
+<p>The MR-Jar allows us to compile for JDK 8 but also support JDK 11 (we choose 11 as it is the current LTS release as time of writing).</p>
+</div>
+<div class="paragraph">
+<p>To use the Cypher-DSL in a modular application you would need to require the following modules:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">module org.neo4j.cypherdsl.examples.core {
+
+        requires org.neo4j.cypherdsl.core;
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This release comes with a small catch: We do support using some <a href="https://github.com/querydsl/querydsl">QueryDSL</a>.
+Query-DSL will have correct automatic module names in their 5.x release and we asked them to backport those to the
+4.x line on which the Cypher-DSL <strong>optionally</strong> depends (See <a href="https://github.com/querydsl/querydsl/pull/2805">2805</a>).</p>
+</div>
+<div class="paragraph">
+<p>Until than we statically require (that is "optional" in module speak) Query-DSL via the artifact name.
+This can cause errors when the artifact (<code>querydsl-core.jar</code>)  is renamed via the build process or similar.
+We are gonna improve that as soon as we can depend on fixed automatic module names.</p>
+</div>
+<div class="paragraph">
+<p>Apart from this big change there is no change in any public API.
+This release should be a drop-in replacement for the prior.</p>
+</div>
+</div>
+</div>
 <div class="sect3">
 <h4 id="2021.1"><a class="anchor" href="#2021.1"></a>2021.1</h4>
 <div class="sect4">
@@ -3749,7 +3791,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-13 11:38:44 UTC
+Last updated 2021-04-13 11:45:36 UTC
 </div>
 </div>
 </body>
