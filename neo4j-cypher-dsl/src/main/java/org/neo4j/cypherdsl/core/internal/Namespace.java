@@ -16,33 +16,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * Items yielded by a stand alone or in query call.
- *
  * @author Michael J. Simons
- * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
+ * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
-public final class YieldItems extends TypedSubtree<Expression> {
+public final class Namespace extends LiteralBase<String[]> {
 
-	static YieldItems yieldAllOf(Expression... c) {
-
-		if (c == null || c.length == 0) {
-			throw new IllegalArgumentException("Cannot yield an empty list of items.");
-		}
-
-		return new YieldItems(c);
+	Namespace(String[] value) {
+		super(value);
 	}
 
-	private YieldItems(Expression... children) {
-		super(children);
+	@Override
+	public void accept(Visitor visitor) {
+
+		visitor.enter(this);
+		visitor.leave(this);
+	}
+
+	@Override
+	public String asString() {
+
+		return Arrays.stream(getContent()).collect(Collectors.joining("."));
 	}
 }

@@ -11,8 +11,8 @@ The following naming conventions are used throughout the project:
 ----
 MATCH
   (project:Maven:Project)-[:CREATES]->(:Artifact)-[:CONTAINS]->(type:Type)
-WHERE
-  NOT type.fqn starts with 'org.neo4j.cypherdsl'
+WHERE NOT type.fqn starts with 'org.neo4j.cypherdsl'
+  AND type.fqn <> 'module-info'
 RETURN
   project as Project, collect(type) as TypeWithWrongName
 ----

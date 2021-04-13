@@ -16,38 +16,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.ast;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
-import java.util.Arrays;
-import java.util.stream.Collectors;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import java.util.Optional;
 
 /**
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
- * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.0.1")
-public final class Namespace extends LiteralBase<String[]> {
+public interface ProvidesAffixes {
 
-	Namespace(String[] value) {
-		super(value);
+	/**
+	 * @return A prefix for this visitable.
+	 */
+	default Optional<String> getPrefix() {
+		return Optional.empty();
 	}
 
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		visitor.leave(this);
-	}
-
-	@Override
-	public String asString() {
-
-		return Arrays.stream(getContent()).collect(Collectors.joining("."));
+	/**
+	 * @return A suffix for this visitable.
+	 */
+	default Optional<String> getSuffix() {
+		return Optional.empty();
 	}
 }

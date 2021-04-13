@@ -20,9 +20,13 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Optional;
+
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.internal.LiteralBase;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -44,11 +48,8 @@ public final class ListOperator implements Expression {
 		}
 	};
 
-	/**
-	 * This is not a public API and just used internally for structuring the tree.
-	 */
 	@API(status = INTERNAL, since = "1.0")
-	public static final class Details implements Visitable {
+	static final class Details implements Visitable, ProvidesAffixes {
 
 		/**
 		 * An optional start for the range (inclusive if given).
@@ -79,6 +80,16 @@ public final class ListOperator implements Expression {
 			Visitable.visitIfNotNull(this.dots, visitor);
 			Visitable.visitIfNotNull(this.optionalEnd, visitor);
 			visitor.leave(this);
+		}
+
+		@Override
+		public Optional<String> getPrefix() {
+			return Optional.of("[");
+		}
+
+		@Override
+		public Optional<String> getSuffix() {
+			return Optional.of("]");
 		}
 	}
 

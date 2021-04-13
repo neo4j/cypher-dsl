@@ -22,7 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * An operator. See <a href="https://neo4j.com/docs/cypher-manual/current/syntax/operators/#query-operators-summary">Operators</a>.

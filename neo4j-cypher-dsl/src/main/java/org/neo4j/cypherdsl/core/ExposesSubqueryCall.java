@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.support.Neo4jVersion;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**

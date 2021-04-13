@@ -29,8 +29,10 @@ import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.internal.RelationshipLength;
+import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -91,9 +93,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 
 	/**
 	 * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html">RelationshipDetail</a>.
-	 * This is not a public API and just used internally for structuring the tree.
 	 */
-	@API(status = INTERNAL, since = "1.0")
+	@API(status = EXPERIMENTAL, since = "1.0")
 	final class Details implements Visitable {
 
 		/**
@@ -115,7 +116,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 				.filter(type -> !(type == null || type.isEmpty()))
 				.collect(Collectors.toList());
 
-			return create(direction, symbolicName, 	listOfTypes.isEmpty()  ? null : new RelationshipTypes(listOfTypes));
+			return create(direction, symbolicName, 	listOfTypes.isEmpty()  ? null : RelationshipTypes.of(types));
 		}
 
 		static Details create(Direction direction, SymbolicName symbolicName, RelationshipTypes types) {
@@ -159,7 +160,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 
 		Details unbounded() {
 
-			return new Details(this.direction, this.symbolicName, this.types, new RelationshipLength(), this.properties);
+			return new Details(this.direction, this.symbolicName, this.types, RelationshipLength.unbounded(), this.properties);
 		}
 
 		Details inverse() {
@@ -177,8 +178,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			}
 
 			RelationshipLength newLength = Optional.ofNullable(this.length)
-				.map(l -> new RelationshipLength(minimum, l.getMaximum()))
-				.orElseGet(() -> new RelationshipLength(minimum, null));
+				.map(l -> RelationshipLength.of(minimum, l.getMaximum()))
+				.orElseGet(() -> RelationshipLength.of(minimum, null));
 
 			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
 		}
@@ -190,8 +191,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			}
 
 			RelationshipLength newLength = Optional.ofNullable(this.length)
-				.map(l -> new RelationshipLength(l.getMinimum(), maximum))
-				.orElseGet(() -> new RelationshipLength(null, maximum));
+				.map(l -> RelationshipLength.of(l.getMinimum(), maximum))
+				.orElseGet(() -> RelationshipLength.of(null, maximum));
 
 			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
 		}

@@ -16,12 +16,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * Expresses the length of a relationship.
@@ -38,16 +38,18 @@ public final class RelationshipLength implements Visitable {
 
 	private final boolean unbounded;
 
-	RelationshipLength() {
-		this.minimum = null;
-		this.maximum = null;
-		this.unbounded = true;
+	public static RelationshipLength unbounded() {
+		return new RelationshipLength(null, null);
 	}
 
-	RelationshipLength(Integer minimum, Integer maximum) {
+	public static RelationshipLength of(Integer minimum, Integer maximum) {
+		return new RelationshipLength(minimum, maximum);
+	}
+
+	private RelationshipLength(Integer minimum, Integer maximum) {
 		this.minimum = minimum;
 		this.maximum = maximum;
-		this.unbounded = false;
+		this.unbounded = minimum == null && maximum == null;
 	}
 
 	/**

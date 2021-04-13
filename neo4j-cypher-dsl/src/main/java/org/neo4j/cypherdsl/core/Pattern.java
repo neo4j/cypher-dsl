@@ -23,7 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 
 /**
  * A pattern is something that can be matched. It consists of one or more pattern elements. Those can be nodes or chains
@@ -35,7 +35,7 @@ import org.neo4j.cypherdsl.core.support.TypedSubtree;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public final class Pattern extends TypedSubtree<PatternElement> {
+final class Pattern extends TypedSubtree<PatternElement> {
 
 	Pattern(List<PatternElement> patternElements) {
 		super(patternElements);

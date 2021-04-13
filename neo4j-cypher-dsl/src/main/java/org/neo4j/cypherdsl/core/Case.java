@@ -19,16 +19,17 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.support.Visitable;
-import org.neo4j.cypherdsl.core.support.Visitor;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.internal.CaseElse;
+import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
@@ -59,10 +60,6 @@ public abstract class Case implements Visitable {
 
 	void setCaseElse(CaseElse caseElse) {
 		this.caseElse = caseElse;
-	}
-
-	List<CaseWhenThen> getCaseWhenThens() {
-		return caseWhenThens;
 	}
 
 	/**
@@ -175,7 +172,7 @@ public abstract class Case implements Visitable {
 			getCaseExpression().accept(visitor);
 		}
 
-		getCaseWhenThens().forEach(caseWhenThen -> caseWhenThen.accept(visitor));
+		caseWhenThens.forEach(caseWhenThen -> caseWhenThen.accept(visitor));
 
 		if (caseElse != null) {
 			caseElse.accept(visitor);
@@ -187,7 +184,7 @@ public abstract class Case implements Visitable {
 	/**
 	 * Helper class to collect `when` expressions and create {@link CaseWhenThen} instances when the `then` is provided.
 	 */
-	@API(status = INTERNAL, since = "1.0")
+	@API(status = EXPERIMENTAL, since = "1.0")
 	public final class OngoingWhenThen {
 
 		final Expression whenExpression;
@@ -206,66 +203,12 @@ public abstract class Case implements Visitable {
 		public CaseEnding then(Expression expression) {
 
 			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, expression);
-			getCaseWhenThens().add(caseWhenThen);
+			caseWhenThens.add(caseWhenThen);
 			if (getCaseExpression() != null) {
-				return new SimpleCase.EndingSimpleCase(Case.this.getCaseExpression(), getCaseWhenThens());
+				return new SimpleCase.EndingSimpleCase(Case.this.getCaseExpression(), caseWhenThens);
 			} else {
-				return new GenericCase.EndingGenericCase(getCaseWhenThens());
+				return new GenericCase.EndingGenericCase(caseWhenThens);
 			}
-		}
-	}
-
-	/**
-	 * Represents a pair of `when-then` expressions.
-	 */
-	@API(status = INTERNAL, since = "1.0")
-	public final class CaseWhenThen implements Visitable {
-
-		private final Expression whenExpression;
-		private final Expression thenExpression;
-
-		private CaseWhenThen(Expression whenExpression, Expression thenExpression) {
-
-			this.whenExpression = whenExpression;
-			this.thenExpression = thenExpression;
-		}
-
-		/**
-		 * Creates a new case/when expression with an additional {@code WHEN} block.
-		 *
-		 * @param nextExpression The next expression to use.
-		 * @return An ongoing when builder.
-		 */
-		public OngoingWhenThen when(Expression nextExpression) {
-			return new OngoingWhenThen(nextExpression);
-		}
-
-		@Override
-		public void accept(Visitor visitor) {
-			visitor.enter(this);
-			whenExpression.accept(visitor);
-			visitor.leave(this);
-			thenExpression.accept(visitor);
-		}
-
-	}
-
-	/**
-	 * Represents a finalizing `else` expression.
-	 */
-	@API(status = INTERNAL, since = "1.0")
-	public final class CaseElse implements Visitable {
-		private final Expression elseExpression;
-
-		private CaseElse(Expression elseExpression) {
-			this.elseExpression = elseExpression;
-		}
-
-		@Override
-		public void accept(Visitor visitor) {
-			visitor.enter(this);
-			elseExpression.accept(visitor);
-			visitor.leave(this);
 		}
 	}
 

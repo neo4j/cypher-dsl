@@ -31,12 +31,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
-import org.neo4j.cypherdsl.core.Arguments;
 import org.neo4j.cypherdsl.core.Case;
-import org.neo4j.cypherdsl.core.CompoundCondition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.Delete;
-import org.neo4j.cypherdsl.core.Distinct;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
@@ -44,7 +41,6 @@ import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
 import org.neo4j.cypherdsl.core.ListExpression;
-import org.neo4j.cypherdsl.core.ListOperator;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.MapProjection;
@@ -52,7 +48,6 @@ import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.Named;
-import org.neo4j.cypherdsl.core.Namespace;
 import org.neo4j.cypherdsl.core.NestedExpression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
@@ -61,31 +56,36 @@ import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PatternComprehension;
-import org.neo4j.cypherdsl.core.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.ProcedureCall;
-import org.neo4j.cypherdsl.core.ProcedureName;
 import org.neo4j.cypherdsl.core.Properties;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.RelationshipLength;
-import org.neo4j.cypherdsl.core.RelationshipTypes;
 import org.neo4j.cypherdsl.core.Remove;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
-import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.Unwind;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
-import org.neo4j.cypherdsl.core.YieldItems;
-import org.neo4j.cypherdsl.core.support.ReflectiveVisitor;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.internal.CaseElse;
+import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
+import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
+import org.neo4j.cypherdsl.core.internal.Distinct;
+import org.neo4j.cypherdsl.core.internal.Namespace;
+import org.neo4j.cypherdsl.core.internal.ProcedureName;
+import org.neo4j.cypherdsl.core.internal.RelationshipLength;
+import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
+import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.internal.YieldItems;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
+import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
@@ -193,6 +193,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return false;
 		}
 
+		if (visitable instanceof ProvidesAffixes) {
+			((ProvidesAffixes) visitable).getPrefix().ifPresent(this::doWithPrefix);
+		}
+
 		if (visitable instanceof AliasedExpression) {
 			currentAliasedElements.push((AliasedExpression) visitable);
 		}
@@ -216,6 +220,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		separatorOnCurrentLevel().ifPresent(ref -> ref.set(", "));
 
+		if (visitable instanceof ProvidesAffixes) {
+			((ProvidesAffixes) visitable).getSuffix().ifPresent(this::doWithSuffix);
+		}
+
 		if (visitable instanceof TypedSubtree) {
 			enableSeparator(currentLevel + 1, false);
 		}
@@ -234,6 +242,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		--currentLevel;
+	}
+
+	protected void doWithPrefix(String prefix) {
+		this.builder.append(prefix);
+	}
+
+	protected void doWithSuffix(String suffix) {
+		this.builder.append(suffix);
 	}
 
 	void enter(Match match) {
@@ -425,14 +441,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (operation.needsGrouping()) {
 			builder.append(")");
 		}
-	}
-
-	void enter(CompoundCondition compoundCondition) {
-		builder.append("(");
-	}
-
-	void leave(CompoundCondition compoundCondition) {
-		builder.append(")");
 	}
 
 	void enter(Literal<?> expression) {
@@ -631,15 +639,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append("CASE ");
 	}
 
-	void enter(Case.CaseWhenThen caseWhenExpression) {
+	void enter(CaseWhenThen caseWhenExpression) {
 		builder.append(" WHEN ");
 	}
 
-	void leave(Case.CaseWhenThen caseWhenExpression) {
+	void leave(CaseWhenThen caseWhenExpression) {
 		builder.append(" THEN ");
 	}
 
-	void enter(Case.CaseElse caseElseExpression) {
+	void enter(CaseElse caseElseExpression) {
 		builder.append(" ELSE ");
 	}
 
@@ -662,16 +670,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(procedureName.getValue());
 	}
 
-	void enter(Arguments arguments) {
-
-		builder.append("(");
-	}
-
-	void leave(Arguments arguments) {
-
-		builder.append(")");
-	}
-
 	void enter(YieldItems yieldItems) {
 
 		builder.append(" YIELD ");
@@ -680,16 +678,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void leave(ProcedureCall procedureCall) {
 
 		builder.append(" ");
-	}
-
-	void enter(ListOperator.Details details) {
-
-		builder.append("[");
-	}
-
-	void leave(ListOperator.Details details) {
-
-		builder.append("]");
 	}
 
 	void enter(Enum<?> statement) {
@@ -721,16 +709,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(Hint hint) {
 
 		builder.append(" USING ");
-	}
-
-	void enter(Hint.IndexProperties indexProperties) {
-
-		builder.append("(");
-	}
-
-	void leave(Hint.IndexProperties indexProperties) {
-
-		builder.append(")");
 	}
 
 	@Override

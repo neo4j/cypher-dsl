@@ -23,7 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 
 /**
  * Represents the list of sort items that make up the order of records in a result set.

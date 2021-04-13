@@ -16,27 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.support;
-
 /**
- * @author Michael J. Simons
- * @since 1.0
+ * Support for describing an abstract syntax tree.
  */
-@FunctionalInterface
-public interface Visitor {
-
-	/**
-	 * Enter a {@link Visitable}.
-	 *
-	 * @param segment the segment to visit.
-	 */
-	void enter(Visitable segment);
-
-	/**
-	 * Leave a {@link Visitable}.
-	 *
-	 * @param segment the visited segment.
-	 */
-	default void leave(Visitable segment) {
-	}
-}
+package org.neo4j.cypherdsl.core.ast;

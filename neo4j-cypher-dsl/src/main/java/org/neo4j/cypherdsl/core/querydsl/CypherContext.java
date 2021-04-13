@@ -28,9 +28,9 @@ import java.util.Map;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.support.UnsupportedLiteralException;
+import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 
 import com.querydsl.core.types.Operator;
 import com.querydsl.core.types.Template;

@@ -43,5 +43,29 @@ public interface Literal<T> extends Expression {
 	 */
 	@NotNull @Contract(pure = true)
 	String asString();
-}
 
+	/**
+	 * Thrown when a given object cannot be used as a Cypher-DSL-Literal.
+	 *
+	 * @since 2021.1.0
+	 */
+	@API(status = EXPERIMENTAL, since = "2021.1.0")
+	final class UnsupportedLiteralException extends IllegalArgumentException {
+
+		private final Class<?> unsupportedType;
+
+		public UnsupportedLiteralException(String message, Object unsupportedObject) {
+			super(message);
+			this.unsupportedType = unsupportedObject.getClass();
+		}
+
+		public UnsupportedLiteralException(Object unsupportedObject) {
+			super("Unsupported literal type: " + unsupportedObject.getClass());
+			this.unsupportedType = unsupportedObject.getClass();
+		}
+
+		public Class<?> getUnsupportedType() {
+			return unsupportedType;
+		}
+	}
+}

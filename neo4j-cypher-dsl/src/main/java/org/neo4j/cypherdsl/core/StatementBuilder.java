@@ -24,7 +24,6 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
-import org.neo4j.cypherdsl.core.support.Neo4jVersion;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 

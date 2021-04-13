@@ -21,7 +21,7 @@ package org.neo4j.cypherdsl.core.renderer;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 
-import org.neo4j.cypherdsl.core.CompoundCondition;
+import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
@@ -31,14 +31,15 @@ import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
+import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
-import org.neo4j.cypherdsl.core.StatementContext;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 
 /**
  * @author Andreas Berger
@@ -151,14 +152,18 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		super.enter(map);
 	}
 
-	void enter(CompoundCondition operator) {
-		indentationLevel++;
-		super.enter(operator);
+	void enter(Condition condition) {
+
+		if (condition instanceof ProvidesAffixes) {
+			indentationLevel++;
+		}
 	}
 
-	void leave(CompoundCondition operator) {
-		indentationLevel--;
-		super.leave(operator);
+	void leave(Condition condition) {
+
+		if (condition instanceof ProvidesAffixes) {
+			indentationLevel--;
+		}
 	}
 
 	@Override

@@ -27,7 +27,9 @@ import java.util.Map;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.internal.ProcedureName;
+import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * Shall be the common interfaces for queries that we support.

@@ -16,36 +16,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 
 /**
- * Represents a literal with an optional content.
+ * Items yielded by a stand alone or in query call.
  *
- * @param <T> type of content
  * @author Michael J. Simons
- * @since 2021.1.0
+ * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
+ * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2021.1.0")
-abstract class LiteralBase<T> implements Literal<T> {
+@API(status = INTERNAL, since = "2020.0.1")
+public final class YieldItems extends TypedSubtree<Expression> {
 
-	/**
-	 * The content of this literal.
-	 */
-	private T content;
+	public static YieldItems yieldAllOf(Expression... c) {
 
-	LiteralBase(T content) {
-		this.content = content;
+		if (c == null || c.length == 0) {
+			throw new IllegalArgumentException("Cannot yield an empty list of items.");
+		}
+
+		return new YieldItems(c);
 	}
 
-	/**
-	 * @return The content of this literal, may be {@literal null}
-	 */
-	public final T getContent() {
-		return content;
+	private YieldItems(Expression... children) {
+		super(children);
 	}
 }
-

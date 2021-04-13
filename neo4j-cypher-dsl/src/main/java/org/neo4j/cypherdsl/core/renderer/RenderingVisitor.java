@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import org.neo4j.cypherdsl.core.support.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * Internal interface for various implementations of {@link Visitor visitors} that provide a rendered view of the visitable
@@ -29,7 +29,7 @@ import org.neo4j.cypherdsl.core.support.Visitor;
 interface RenderingVisitor extends Visitor {
 
 	/**
-	 * @return Renderer content after this visitor has been accepted by a {@link org.neo4j.cypherdsl.core.support.Visitable}.
+	 * @return Renderer content after this visitor has been accepted by a {@link org.neo4j.cypherdsl.core.ast.Visitable}.
 	 */
 	String getRenderedContent();
 }

@@ -59,7 +59,7 @@ public final class Strings {
 	}
 
 	/**
-	 * This is a literal copy of {@link javax.lang.model.SourceVersion#isIdentifier(CharSequence)} included here to
+	 * This is a literal copy of {@code javax.lang.model.SourceVersion#isIdentifier(CharSequence)} included here to
 	 * be not dependent on the compiler module.
 	 *
 	 * @param name A possible Java identifier
@@ -85,7 +85,7 @@ public final class Strings {
 	}
 
 	/**
-	 * A convinience method to decide whether a given {@code codePoint} is a valid Java identifier at the given position {@code p}.
+	 * A convenience method to decide whether a given {@code codePoint} is a valid Java identifier at the given position {@code p}.
 	 *
 	 * @param p         Position on which the {@code codePoint} is supposed to be used as identifier
 	 * @param codePoint A codepoint

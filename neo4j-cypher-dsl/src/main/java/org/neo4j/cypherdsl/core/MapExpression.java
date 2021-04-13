@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -27,8 +27,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.support.TypedSubtree;
-import org.neo4j.cypherdsl.core.support.Visitable;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -41,7 +41,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @soundtrack Rammstein - RAMMSTEIN
  * @since 1.0
  */
-@API(status = INTERNAL, since = "1.0")
+@API(status = EXPERIMENTAL, since = "1.0")
 public final class MapExpression extends TypedSubtree<Expression> implements Expression {
 
 	static MapExpression create(Map<String, Object> map) {

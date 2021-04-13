@@ -1269,7 +1269,7 @@ public final class Functions {
 			.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
 	}
 
-	private static MapExpression timezoneMapLiteralOf(TimeZone timeZone) {
+	private static Expression timezoneMapLiteralOf(TimeZone timeZone) {
 		return Cypher.mapOf("timezone", Cypher.literalOf(timeZone.getID()));
 	}
 

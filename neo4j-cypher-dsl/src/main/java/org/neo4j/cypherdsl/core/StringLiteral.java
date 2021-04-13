@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
  * The string representation of a string literal will be a quoted Cypher string in single tickmarks with
