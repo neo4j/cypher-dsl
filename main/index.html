@@ -2978,18 +2978,18 @@ automatic module names but also with a correct <code>module-info.java</code> whe
 </div>
 </div>
 <div class="paragraph">
-<p>This release comes with a small catch: We do support using some <a href="https://github.com/querydsl/querydsl">QueryDSL</a>.
+<p>This release comes with a small catch: We do support using some <a href="https://github.com/querydsl/querydsl">QueryDSL</a> constructs.
 Query-DSL will have correct automatic module names in their 5.x release and we asked them to backport those to the
 4.x line on which the Cypher-DSL <strong>optionally</strong> depends (See <a href="https://github.com/querydsl/querydsl/pull/2805">2805</a>).</p>
 </div>
 <div class="paragraph">
-<p>Until than we statically require (that is "optional" in module speak) Query-DSL via the artifact name.
+<p>Until then we statically require (that is "optional" in module speak) Query-DSL via the artifact name.
 This can cause errors when the artifact (<code>querydsl-core.jar</code>)  is renamed via the build process or similar.
 We are gonna improve that as soon as we can depend on fixed automatic module names.</p>
 </div>
 <div class="paragraph">
 <p>Apart from this big change there is no change in any public API.
-This release should be a drop-in replacement for the prior.</p>
+This release should be a drop-in replacement for the prior release.</p>
 </div>
 </div>
 </div>
@@ -3791,7 +3791,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-13 11:45:36 UTC
+Last updated 2021-04-13 11:52:34 UTC
 </div>
 </div>
 </body>
