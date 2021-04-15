@@ -52,7 +52,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Name;
+import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
@@ -130,13 +130,13 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 	private final Neo4jConversions conversions = new Neo4jConversions();
 
 	private Types typeUtils;
-	private Elements elementUtils;
 	private Filer filer;
 	private Messager messager;
 
 	private TypeElement nodeAnnotationType;
 	private TypeElement relationshipAnnotationType;
 	private TypeElement compositePropertyAnnotationType;
+	private TypeElement convertWithAnnotationType;
 	private TypeElement targetNodeAnnotationType;
 	private TypeElement relationshipPropertiesAnnotationType;
 	private TypeElement sdnIdAnnotationType;
@@ -150,25 +150,27 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		super.init(processingEnv);
 
 		this.typeUtils = processingEnv.getTypeUtils();
-		this.elementUtils = processingEnv.getElementUtils();
 		this.filer = processingEnv.getFiler();
 		this.messager = processingEnv.getMessager();
 
 		this.configuration = createConfiguration(processingEnv);
 
-		this.nodeAnnotationType = this.elementUtils.getTypeElement(NODE_ANNOTATION);
-		this.relationshipPropertiesAnnotationType = this.elementUtils.getTypeElement(RELATIONSHIP_PROPERTIES_ANNOTATION);
+		Elements elementUtils = processingEnv.getElementUtils();
+		this.nodeAnnotationType = elementUtils.getTypeElement(NODE_ANNOTATION);
+		this.relationshipPropertiesAnnotationType = elementUtils.getTypeElement(RELATIONSHIP_PROPERTIES_ANNOTATION);
 
-		this.relationshipAnnotationType = this.elementUtils
+		this.relationshipAnnotationType = elementUtils
 			.getTypeElement("org.springframework.data.neo4j.core.schema.Relationship");
-		this.compositePropertyAnnotationType = this.elementUtils
+		this.compositePropertyAnnotationType = elementUtils
 			.getTypeElement("org.springframework.data.neo4j.core.schema.CompositeProperty");
-		this.targetNodeAnnotationType = this.elementUtils
+		this.convertWithAnnotationType = elementUtils
+			.getTypeElement("org.springframework.data.neo4j.core.convert.ConvertWith");
+		this.targetNodeAnnotationType = elementUtils
 			.getTypeElement("org.springframework.data.neo4j.core.schema.TargetNode");
 
-		this.sdnIdAnnotationType = this.elementUtils.getTypeElement("org.springframework.data.neo4j.core.schema.Id");
-		this.sdcIdAnnotationType = this.elementUtils.getTypeElement("org.springframework.data.annotation.Id");
-		this.generatedValueAnnotationType = this.elementUtils
+		this.sdnIdAnnotationType = elementUtils.getTypeElement("org.springframework.data.neo4j.core.schema.Id");
+		this.sdcIdAnnotationType = elementUtils.getTypeElement("org.springframework.data.annotation.Id");
+		this.generatedValueAnnotationType = elementUtils
 			.getTypeElement("org.springframework.data.neo4j.core.schema.GeneratedValue");
 	}
 
@@ -753,26 +755,49 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 			Supplier<Boolean> simpleTypeOrCustomWriteTarget = () -> {
 				try {
-					Name className = field.asType().accept(new SimpleTypeVisitor8<Name, Void>() {
+					String className = field.asType().accept(new SimpleTypeVisitor8<String, Void>() {
 						@Override
-						public Name visitPrimitive(PrimitiveType t, Void unused) {
+						public String visitPrimitive(PrimitiveType t, Void unused) {
 							// While I could use the fact that this is a primitive directly, I'd rather stick with the
 							// wrapper class so that in turn this can be passed on to the Spring infrastructure.
-							return typeUtils.boxedClass(t).getQualifiedName();
+							return typeUtils.boxedClass(t).getQualifiedName().toString();
 						}
 
 						@Override
-						public Name visitDeclared(DeclaredType t, Void unused) {
-							return t.asElement().accept(new TypeElementVisitor<>(te -> te.getQualifiedName()), null);
+						public String visitDeclared(DeclaredType t, Void unused) {
+							return t.asElement().accept(new TypeElementVisitor<>(new TypeElementNameFunction()), null);
 						}
 					}, null);
-					Class<?> fieldType = Class.forName(className.toString());
+					Class<?> fieldType = Class.forName(className);
 					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions.hasCustomWriteTarget(fieldType);
 				} catch (ClassNotFoundException e) {
+					e.printStackTrace();
 					return false;
 				}
 			};
-			return explicitRelationship || !(isTargetNodeOrComposite || simpleTypeOrCustomWriteTarget.get());
+
+			if (explicitRelationship) {
+				return true;
+			}
+
+			return !(isTargetNodeOrComposite || declaredAnnotations.contains(convertWithAnnotationType) || simpleTypeOrCustomWriteTarget.get());
+		}
+	}
+
+	/**
+	 * Recursively extracts a loadable and instantiable name from a canonical class name by checking whether the current
+	 * element is a nesting type. If so, the enclosing element will be visited and this elements simple name will be
+	 * appended with a {@literal $}.
+	 */
+	private static class TypeElementNameFunction implements Function<TypeElement, String> {
+		@Override
+		public String apply(TypeElement typeElement) {
+			NestingKind nestingKind = typeElement.getNestingKind();
+			if (nestingKind.isNested()) {
+				return typeElement.getEnclosingElement().accept(new TypeElementVisitor<>(this), null) + "$"
+					+ typeElement.getSimpleName();
+			}
+			return typeElement.getQualifiedName().toString();
 		}
 	}
 }
