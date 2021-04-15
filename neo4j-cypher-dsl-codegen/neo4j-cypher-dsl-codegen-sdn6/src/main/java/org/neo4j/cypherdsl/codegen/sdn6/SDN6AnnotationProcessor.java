@@ -58,6 +58,7 @@ import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor8;
 import javax.lang.model.util.Elements;
@@ -787,15 +788,16 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		 */
 		private boolean isAssociation(Set<Element> declaredAnnotations, VariableElement field) {
 
+			TypeMirror typeMirrorOfField = field.asType();
 			boolean explicitRelationship =
-				declaredAnnotations.contains(relationshipAnnotationType) || result.containsKey(field.asType());
+				declaredAnnotations.contains(relationshipAnnotationType) || result.containsKey(typeMirrorOfField);
 			boolean isTargetNodeOrComposite =
 				declaredAnnotations.contains(targetNodeAnnotationType) || declaredAnnotations
 					.contains(compositePropertyAnnotationType);
 
 			Supplier<Boolean> simpleTypeOrCustomWriteTarget = () -> {
 				try {
-					String className = field.asType().accept(new SimpleTypeVisitor8<String, Void>() {
+					String className = typeMirrorOfField.accept(new SimpleTypeVisitor8<String, Void>() {
 						@Override
 						public String visitPrimitive(PrimitiveType t, Void unused) {
 							// While I could use the fact that this is a primitive directly, I'd rather stick with the
@@ -808,6 +810,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 							return t.asElement().accept(new TypeElementVisitor<>(new TypeElementNameFunction()), null);
 						}
 					}, null);
+					// This is likely to fail for everything but primitives as the associated thing is currently compiled
 					Class<?> fieldType = Class.forName(className);
 					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions.hasCustomWriteTarget(fieldType);
 				} catch (ClassNotFoundException e) {
@@ -817,6 +820,11 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 			if (explicitRelationship) {
 				return true;
+			}
+
+			// They will be converted anyway
+			if (describesEnum(typeMirrorOfField)) {
+				return false;
 			}
 
 			return !(isTargetNodeOrComposite || declaredAnnotations.contains(convertWithAnnotationType) || simpleTypeOrCustomWriteTarget.get());
@@ -838,5 +846,16 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			}
 			return typeElement.getQualifiedName().toString();
 		}
+	}
+
+	private boolean describesEnum(TypeMirror typeMirror) {
+		List<? extends TypeMirror> superTypes = typeUtils.directSupertypes(typeMirror);
+		if (!(superTypes.size() == 1 && superTypes.get(0).getKind().equals(TypeKind.DECLARED))) {
+			return false;
+		}
+
+		TypeMirror tm = superTypes.get(0);
+		String name = ((DeclaredType) tm).asElement().accept(new TypeElementVisitor<>(new TypeElementNameFunction()), null);
+		return Enum.class.getName().equals(name);
 	}
 }

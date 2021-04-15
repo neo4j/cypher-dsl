@@ -16,6 +16,11 @@ The processor generates a static meta model for each annotated class found in th
 The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version `2021.1.0` or later on it's classpath.
 We recommend using it explicitly on the separate annotation processor classpath (via `--processor-path` to `javac`).
 
+TIP: Please make sure to use `@Relationship` when you use the annotation processor. While we do our best to detect possible,
+     implicit associations during annotation processing, we can't load classes that are being processed that very moment
+     to check if the Spring infrastructure would provide a custom converter for them and make them a simple property.
+     We won't generate fields when in doubt but relationships if we find the corresponding class.
+
 === Configure your build
 
 ==== Maven
