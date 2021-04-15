@@ -56,6 +56,8 @@ public class ConnectorTransport {
 	@ConvertWith(converter = InnerInnerClassConverter.class)
 	private InnerClass.InnerInnerClass innerInnerClass;
 
+	private InnerClass.InnerInnerClass innerInnerClassButWithoutConverter;
+
 	public ConnectorTransport(ConnectorTransportType value) {
 		this.value = value;
 	}

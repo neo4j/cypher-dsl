@@ -108,6 +108,12 @@ The processor supports the following arguments:
 
 | org.neo4j.cypherdsl.codegen.add_at_generated
 | A flag whether `@Generated` should be added
+
+| org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes
+| A comma separated list of custom Spring converter classes (Can be `Converter`, `GenericConverter`, `ConverterAware`,
+  pretty much everything you can register with `org.springframework.data.neo4j.core.convert.Neo4jConversions` ). However,
+  these converters must have a default-non-args constructor in the context of the annotation processor.
+
 |===
 
 The generated classes can be used in a variety of places:

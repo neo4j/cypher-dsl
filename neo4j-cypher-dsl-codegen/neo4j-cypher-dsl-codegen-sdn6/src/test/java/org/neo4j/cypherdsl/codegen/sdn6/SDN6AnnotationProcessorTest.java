@@ -25,11 +25,14 @@ import java.util.Arrays;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
 import org.junit.jupiter.params.converter.ConvertWith;
 import org.junit.jupiter.params.converter.SimpleArgumentConverter;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
@@ -82,6 +85,53 @@ class SDN6AnnotationProcessorTest {
 		}
 	}
 
+	/**
+	 * A test converter spotting a non-default constructor, so that it cannot be instantiated
+	 */
+	static class SomeConverter implements Converter<String, String> {
+
+		SomeConverter(@SuppressWarnings("unused") boolean ignoreMe) {
+		}
+
+		@Override
+		public String convert(String source) {
+			return new StringBuilder(source).reverse().toString();
+		}
+	}
+
+	@ValueSource(strings = { "foo", "org.neo4j.cypherdsl.codegen.sdn6.SDN6AnnotationProcessorTest$SomeConverter",
+		"org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes.InnerInnerClassConverter" })
+	@ParameterizedTest
+	void shouldNotFailWithInvalidConverters(String converter) {
+		Compilation compilation = getCompiler("-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=" + converter)
+			.withProcessors(new SDN6AnnotationProcessor())
+			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/valid/simple"));
+
+		CompilationSubject.assertThat(compilation).succeeded();
+		String expectedMessage;
+		if (converter.endsWith("InnerInnerClassConverter")) {
+			expectedMessage = "Cannot use dedicated Neo4j persistent property converter of type `" + converter + "` as Spring converter, it will be ignored.";
+		} else {
+			expectedMessage = "Cannot load converter of type `" + converter + "`, it will be ignored: ";
+		}
+		CompilationSubject.assertThat(compilation).hadWarningContaining(expectedMessage);
+	}
+
+	@Test
+	void shouldRecognizeGlobalConvertersOnInnerClasses() {
+		Compilation compilation = getCompiler(
+			"-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes.SpringBasedConverter")
+			.withProcessors(new SDN6AnnotationProcessor())
+			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/valid/enums_and_inner_classes"));
+
+		CompilationSubject.assertThat(compilation).succeeded();
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(
+				"org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes.ConnectorTransport_")
+			.hasSourceEquivalentTo(
+				JavaFileObjects.forResource("enums_and_inner_classes/ConnectorTransportWithGlobalConverter_.java"));
+	}
+
 	@CsvSource({
 		"ids, 'InternalGeneratedId, InternalGeneratedIdWithSpringId, ExternalGeneratedId',",
 		"simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
@@ -127,7 +177,8 @@ class SDN6AnnotationProcessorTest {
 			if (source instanceof String && String[].class.isAssignableFrom(targetType)) {
 				return Arrays.stream(((String) source).split("\\s*,\\s*")).map(String::trim).toArray(String[]::new);
 			} else {
-				throw new IllegalArgumentException("Conversion from " + source.getClass() + " to " + targetType + " not supported.");
+				throw new IllegalArgumentException(
+					"Conversion from " + source.getClass() + " to " + targetType + " not supported.");
 			}
 		}
 	}

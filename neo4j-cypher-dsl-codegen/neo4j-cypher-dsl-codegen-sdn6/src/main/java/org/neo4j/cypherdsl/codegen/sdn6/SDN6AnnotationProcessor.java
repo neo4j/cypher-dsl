@@ -74,6 +74,7 @@ import org.neo4j.cypherdsl.codegen.core.PropertyDefinition;
 import org.neo4j.cypherdsl.codegen.core.RelationshipModelBuilder;
 import org.neo4j.cypherdsl.codegen.core.RelationshipPropertyDefinition;
 import org.springframework.data.neo4j.core.convert.Neo4jConversions;
+import org.springframework.data.neo4j.core.convert.Neo4jPersistentPropertyConverter;
 import org.springframework.data.neo4j.core.convert.Neo4jSimpleTypes;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
@@ -95,12 +96,14 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 	Configuration.PROPERTY_INDENT_STYLE,
 	Configuration.PROPERTY_INDENT_SIZE,
 	Configuration.PROPERTY_TIMESTAMP,
-	Configuration.PROPERTY_ADD_AT_GENERATED
+	Configuration.PROPERTY_ADD_AT_GENERATED,
+	SDN6AnnotationProcessor.PROPERTY_CUSTOM_CONVERTER_CLASSES
 })
 public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 	static final String NODE_ANNOTATION = "org.springframework.data.neo4j.core.schema.Node";
 	static final String RELATIONSHIP_PROPERTIES_ANNOTATION = "org.springframework.data.neo4j.core.schema.RelationshipProperties";
+	static final String PROPERTY_CUSTOM_CONVERTER_CLASSES = "org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes";
 
 	// Resources
 	// * http://hannesdorfmann.com/annotation-processing/annotationprocessing101/
@@ -127,8 +130,6 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		}
 	}
 
-	private final Neo4jConversions conversions = new Neo4jConversions();
-
 	private Types typeUtils;
 	private Filer filer;
 	private Messager messager;
@@ -144,6 +145,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 	private TypeElement generatedValueAnnotationType;
 
 	private Configuration configuration;
+	private Neo4jConversions conversions;
 
 	@Override
 	public synchronized void init(ProcessingEnvironment processingEnv) {
@@ -154,6 +156,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		this.messager = processingEnv.getMessager();
 
 		this.configuration = createConfiguration(processingEnv);
+		this.conversions = createConversions(processingEnv);
 
 		Elements elementUtils = processingEnv.getElementUtils();
 		this.nodeAnnotationType = elementUtils.getTypeElement(NODE_ANNOTATION);
@@ -172,6 +175,42 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		this.sdcIdAnnotationType = elementUtils.getTypeElement("org.springframework.data.annotation.Id");
 		this.generatedValueAnnotationType = elementUtils
 			.getTypeElement("org.springframework.data.neo4j.core.schema.GeneratedValue");
+	}
+
+	/**
+	 * Create an instance of {@link Neo4jConversions} and registers optional additional converters with it.
+	 * The converters must have a default-non-args constructor.
+	 * @param processingEnv The processing environment
+	 * @return a conversions instance
+	 */
+	private Neo4jConversions createConversions(ProcessingEnvironment processingEnv) {
+
+		Map<String, String> options = processingEnv.getOptions();
+		if (!options.containsKey(PROPERTY_CUSTOM_CONVERTER_CLASSES)) {
+			return new Neo4jConversions();
+		}
+		String classNames = options.get(PROPERTY_CUSTOM_CONVERTER_CLASSES);
+		List<Object> converters = new ArrayList<>();
+		Arrays.stream(classNames.split(",")).map(String::trim).filter(cn -> !cn.isEmpty())
+			.forEach(cn -> {
+				try {
+					Class<?> clazz = Class.forName(cn);
+					if (Neo4jPersistentPropertyConverter.class.isAssignableFrom(clazz)) {
+						messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING,
+							"Cannot use dedicated Neo4j persistent property converter of type `" + cn + "` as Spring converter, it will be ignored.");
+						return;
+					}
+					converters.add(clazz.getDeclaredConstructor().newInstance());
+				} catch (Exception e) {
+					String message = e.getMessage();
+					if (e instanceof ClassNotFoundException) {
+						message = "Class `" + cn + "` not found";
+					}
+					messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING,
+						"Cannot load converter of type `" + cn + "`, it will be ignored: " + message + ".");
+				}
+			});
+		return new Neo4jConversions(converters);
 	}
 
 	/**
@@ -224,9 +263,8 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		Map<String, List<RelationshipModelBuilder>> relationshipBuilders =
 			populateListOfRelationships(computeRelationshipDefinitions(relationshipFields, relationshipProperties, nodeBuilders));
 
-		List<ModelBuilder<?>> allBuilders = new ArrayList<>();
-		allBuilders.addAll(nodeBuilders.values());
-		relationshipBuilders.values().stream().forEach(allBuilders::addAll);
+		List<ModelBuilder<?>> allBuilders = new ArrayList<>(nodeBuilders.values());
+		relationshipBuilders.values().forEach(allBuilders::addAll);
 		try {
 			writeSourceFiles(allBuilders);
 		} catch (IOException e) {
@@ -288,14 +326,14 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 				enclosingElement = enclosingElement.getEnclosingElement();
 			}
 
-			if (enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
-				String q = ((PackageElement) enclosingElement).getQualifiedName().toString();
-				packageName = q + (q.isEmpty() || subpackages.isEmpty() ? "" : ".") + subpackages.stream().collect(Collectors.joining("."));
-			} else if (enclosingElement == null) {
+			if (enclosingElement == null) {
 				int lastDot = qualifiedName.lastIndexOf('.');
 				if (lastDot > 0) {
 					packageName = qualifiedName.substring(0, lastDot);
 				}
+			} else if (enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
+				String q = ((PackageElement) enclosingElement).getQualifiedName().toString();
+				packageName = q + (q.isEmpty() || subpackages.isEmpty() ? "" : ".") + String.join(".", subpackages);
 			}
 
 			NodeModelBuilder builder = NodeModelBuilder.create(configuration, packageName, suggestedTypeName)
@@ -696,24 +734,29 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		}
 
 		private boolean isInternalId(VariableElement e, Set<Element> declaredAnnotations) {
+
 			boolean idAnnotationPresent = declaredAnnotations.contains(sdcIdAnnotationType) || declaredAnnotations.contains(sdnIdAnnotationType);
-			if (!(idAnnotationPresent && declaredAnnotations.contains(generatedValueAnnotationType))) {
+			if (!idAnnotationPresent) {
 				return false;
 			}
-			AnnotationMirror generatedValue = e.getAnnotationMirrors().stream()
-				.filter(m -> m.getAnnotationType().asElement().equals(generatedValueAnnotationType)).findFirst().get();
+
+			return e.getAnnotationMirrors().stream()
+				.filter(m -> m.getAnnotationType().asElement().equals(generatedValueAnnotationType))
+				.findFirst()
+				.map(generatedValue -> isUsingInternalIdGenerator(e, generatedValue))
+				.orElse(false);
+		}
+
+		private boolean isUsingInternalIdGenerator(VariableElement e, AnnotationMirror generatedValue) {
 
 			Map<String, ? extends AnnotationValue> values = generatedValue
 				.getElementValues().entrySet().stream()
-				.collect(
-					Collectors.toMap(entry -> entry.getKey().getSimpleName().toString(), entry -> entry.getValue()));
+				.collect(Collectors.toMap(entry -> entry.getKey().getSimpleName().toString(), Map.Entry::getValue));
 
 			DeclaredType generatorClassValue = values.containsKey("generatorClass") ?
-				(DeclaredType) values.get("generatorClass").getValue() :
-				null;
+				(DeclaredType) values.get("generatorClass").getValue() : null;
 			DeclaredType valueValue = values.containsKey("value") ?
-				(DeclaredType) values.get("value").getValue() :
-				null;
+				(DeclaredType) values.get("value").getValue() : null;
 
 			String name = null;
 			if (generatorClassValue != null && valueValue != null && !generatorClassValue.equals(valueValue)) {
@@ -729,10 +772,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			}
 
 			// The defaults will not be materialized
-			if (name == null || "org.springframework.data.neo4j.core.schema.GeneratedValue.InternalIdGenerator".equals(name)) {
-				return true;
-			}
-			return false;
+			return name == null || "org.springframework.data.neo4j.core.schema.GeneratedValue.InternalIdGenerator".equals(name);
 		}
 
 		Map<FieldType, List<VariableElement>> getResult() {
