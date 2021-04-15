@@ -811,7 +811,6 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 					Class<?> fieldType = Class.forName(className);
 					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions.hasCustomWriteTarget(fieldType);
 				} catch (ClassNotFoundException e) {
-					e.printStackTrace();
 					return false;
 				}
 			};
