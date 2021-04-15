@@ -2139,6 +2139,21 @@ Inside those classes <code>@Relationship</code> and <code>@Property</code> are r
 <p>The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version <code>2021.1.0</code> or later on it&#8217;s classpath.
 We recommend using it explicitly on the separate annotation processor classpath (via <code>--processor-path</code> to <code>javac</code>).</p>
 </div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Please make sure to use <code>@Relationship</code> when you use the annotation processor. While we do our best to detect possible,
+     implicit associations during annotation processing, we can&#8217;t load classes that are being processed that very moment
+     to check if the Spring infrastructure would provide a custom converter for them and make them a simple property.
+     We won&#8217;t generate fields when in doubt but relationships if we find the corresponding class.
+</td>
+</tr>
+</table>
+</div>
 <div class="sect3">
 <h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>5.3.1. Configure your build</h4>
 <div class="sect4">
@@ -3800,7 +3815,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-15 11:54:38 UTC
+Last updated 2021-04-15 14:29:45 UTC
 </div>
 </div>
 </body>
