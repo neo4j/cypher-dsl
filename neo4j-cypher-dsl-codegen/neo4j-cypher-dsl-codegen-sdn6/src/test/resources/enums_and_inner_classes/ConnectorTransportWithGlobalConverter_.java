@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes;
+package org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes;
 
 import java.util.List;
 import javax.annotation.Generated;

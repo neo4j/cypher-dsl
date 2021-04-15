@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.same_properties_for_rel_type;
+package org.neo4j.cypherdsl.codegen.sdn6.models.same_properties_for_rel_type;
 
 import java.util.List;
 import javax.annotation.Generated;

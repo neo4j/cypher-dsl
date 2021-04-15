@@ -100,12 +100,12 @@ class SDN6AnnotationProcessorTest {
 	}
 
 	@ValueSource(strings = { "foo", "org.neo4j.cypherdsl.codegen.sdn6.SDN6AnnotationProcessorTest$SomeConverter",
-		"org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes.InnerInnerClassConverter" })
+		"org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes.InnerInnerClassConverter" })
 	@ParameterizedTest
 	void shouldNotFailWithInvalidConverters(String converter) {
 		Compilation compilation = getCompiler("-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=" + converter)
 			.withProcessors(new SDN6AnnotationProcessor())
-			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/valid/simple"));
+			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/simple"));
 
 		CompilationSubject.assertThat(compilation).succeeded();
 		String expectedMessage;
@@ -120,14 +120,14 @@ class SDN6AnnotationProcessorTest {
 	@Test
 	void shouldRecognizeGlobalConvertersOnInnerClasses() {
 		Compilation compilation = getCompiler(
-			"-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes.SpringBasedConverter")
+			"-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes.SpringBasedConverter")
 			.withProcessors(new SDN6AnnotationProcessor())
-			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/valid/enums_and_inner_classes"));
+			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/enums_and_inner_classes"));
 
 		CompilationSubject.assertThat(compilation).succeeded();
 		CompilationSubject.assertThat(compilation)
 			.generatedSourceFile(
-				"org.neo4j.cypherdsl.codegen.sdn6.models.valid.enums_and_inner_classes.ConnectorTransport_")
+				"org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes.ConnectorTransport_")
 			.hasSourceEquivalentTo(
 				JavaFileObjects.forResource("enums_and_inner_classes/ConnectorTransportWithGlobalConverter_.java"));
 	}
@@ -152,12 +152,12 @@ class SDN6AnnotationProcessorTest {
 
 		Compilation compilation = getCompiler()
 			.withProcessors(new SDN6AnnotationProcessor())
-			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/valid/" + scenario));
+			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/" + scenario));
 
 		CompilationSubject.assertThat(compilation).succeeded();
 		if ("abstract_rels".equals(scenario)) {
 			CompilationSubject.assertThat(compilation).hadWarningContaining(
-				"Cannot resolve generic type, not generating a property for relationships referring to org.neo4j.cypherdsl.codegen.sdn6.models.valid.abstract_rels.Actor");
+				"Cannot resolve generic type, not generating a property for relationships referring to org.neo4j.cypherdsl.codegen.sdn6.models.abstract_rels.Actor");
 		} else {
 			CompilationSubject.assertThat(compilation).hadWarningCount(0);
 		}
@@ -165,7 +165,7 @@ class SDN6AnnotationProcessorTest {
 		for (String expectedSourceFile : expected) {
 			String finalName = scenario + "." + (subpackage == null ? "" : subpackage + ".") + expectedSourceFile + "_";
 			CompilationSubject.assertThat(compilation)
-				.generatedSourceFile("org.neo4j.cypherdsl.codegen.sdn6.models.valid." + finalName)
+				.generatedSourceFile("org.neo4j.cypherdsl.codegen.sdn6.models." + finalName)
 				.hasSourceEquivalentTo(JavaFileObjects.forResource(finalName.replaceAll("\\.", "/") + ".java"));
 		}
 	}

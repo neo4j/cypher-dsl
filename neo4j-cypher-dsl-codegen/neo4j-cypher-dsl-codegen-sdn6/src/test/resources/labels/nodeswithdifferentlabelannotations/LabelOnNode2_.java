@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.labels.nodeswithdifferentlabelannotations;
+package org.neo4j.cypherdsl.codegen.sdn6.models.labels.nodeswithdifferentlabelannotations;
 
 import java.util.List;
 import javax.annotation.Generated;

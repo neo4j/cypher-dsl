@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.primitives;
+package org.neo4j.cypherdsl.codegen.sdn6.models.primitives;
 
 import java.util.List;
 import javax.annotation.Generated;

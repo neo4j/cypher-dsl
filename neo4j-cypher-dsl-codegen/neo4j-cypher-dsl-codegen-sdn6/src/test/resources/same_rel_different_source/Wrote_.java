@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.same_rel_different_source;
+package org.neo4j.cypherdsl.codegen.sdn6.models.same_rel_different_source;
 
 import javax.annotation.Generated;
 import org.neo4j.cypherdsl.core.MapExpression;

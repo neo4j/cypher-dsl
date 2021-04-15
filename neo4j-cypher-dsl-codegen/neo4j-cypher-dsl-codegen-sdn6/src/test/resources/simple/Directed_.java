@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.simple;
+package org.neo4j.cypherdsl.codegen.sdn6.models.simple;
 
 import javax.annotation.Generated;
 import org.neo4j.cypherdsl.core.MapExpression;

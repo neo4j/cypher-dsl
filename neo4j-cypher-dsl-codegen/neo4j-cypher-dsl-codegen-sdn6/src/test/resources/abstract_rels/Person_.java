@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.abstract_rels;
+package org.neo4j.cypherdsl.codegen.sdn6.models.abstract_rels;
 
 import java.util.List;
 import javax.annotation.Generated;

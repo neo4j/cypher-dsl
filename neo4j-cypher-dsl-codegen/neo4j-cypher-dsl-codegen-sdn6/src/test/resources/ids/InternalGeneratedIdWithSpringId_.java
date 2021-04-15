@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.ids;
+package org.neo4j.cypherdsl.codegen.sdn6.models.ids;
 
 import java.util.List;
 import javax.annotation.Generated;

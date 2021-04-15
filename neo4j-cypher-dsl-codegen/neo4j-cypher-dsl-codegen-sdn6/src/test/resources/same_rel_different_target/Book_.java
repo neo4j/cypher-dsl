@@ -1,4 +1,4 @@
-package org.neo4j.cypherdsl.codegen.sdn6.models.valid.same_rel_different_target;
+package org.neo4j.cypherdsl.codegen.sdn6.models.same_rel_different_target;
 
 import java.util.List;
 import javax.annotation.Generated;
