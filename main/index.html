@@ -2265,6 +2265,12 @@ application like as follows to avoid dependency conflicts:</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.add_at_generated</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">A flag whether <code>@Generated</code> should be added</p></td>
 </tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">A comma separated list of custom Spring converter classes (Can be <code>Converter</code>, <code>GenericConverter</code>, <code>ConverterAware</code>,
+  pretty much everything you can register with <code>org.springframework.data.neo4j.core.convert.Neo4jConversions</code> ). However,
+  these converters must have a default-non-args constructor in the context of the annotation processor.</p></td>
+</tr>
 </tbody>
 </table>
 <div class="paragraph">
@@ -3794,7 +3800,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-15 09:51:36 UTC
+Last updated 2021-04-15 11:31:38 UTC
 </div>
 </div>
 </body>
