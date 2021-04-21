@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
@@ -144,6 +145,9 @@ public interface Statement extends Visitable {
 	 */
 	ResultSummary executeWith(QueryRunner queryRunner);
 
+	/**
+	 * @since TBA
+	 */
 	Mono<ResultSummary> executeWith(RxQueryRunner queryRunner);
 
 	/**
@@ -174,6 +178,12 @@ public interface Statement extends Visitable {
 		<T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction);
 
 		default List<Record> fetchWith(QueryRunner queryRunner) {
+			return fetchWith(queryRunner, Function.identity());
+		}
+
+		<T> Flux<T> fetchWith(RxQueryRunner queryRunner, Function<Record, T> mappingFunction);
+
+		default Flux<Record> fetchWith(RxQueryRunner queryRunner) {
 			return fetchWith(queryRunner, Function.identity());
 		}
 

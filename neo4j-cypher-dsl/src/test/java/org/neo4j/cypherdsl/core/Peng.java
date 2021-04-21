@@ -3,13 +3,11 @@ package org.neo4j.cypherdsl.core;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.Transaction;
-import org.neo4j.driver.Value;
 import org.neo4j.driver.reactive.RxSession;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -32,13 +30,17 @@ public class Peng {
 
 		rr = Mono.usingWhen(
 			Mono.fromSupplier(driver::rxSession),
-			 s -> Mono.fromDirect(s.writeTransaction(queryWithoutResult::executeWith)),
+			s -> Mono.fromDirect(s.writeTransaction(queryWithoutResult::executeWith)),
 			RxSession::close
 		).block();
 
 		System.out.println(rr);
-		if(true)System.exit(0);
 
+		Flux.usingWhen(Mono.fromSupplier(driver::rxSession),
+			queryWithResult::fetchWith,
+			RxSession::close)
+			.doOnNext(System.out::println)
+			.collectList().block();
 
 		try (Session session = driver.session()) {
 
@@ -50,7 +52,7 @@ public class Peng {
 			}
 
 			try (Transaction tx = session.beginTransaction()) {
-				ResultSummary summary  = queryWithResult
+				ResultSummary summary = queryWithResult
 					.streamWith(tx, s -> s.forEach(System.out::println));
 				System.out.println(summary);
 				tx.commit();

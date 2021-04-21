@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -163,5 +164,13 @@ abstract class AbstractStatement implements Statement {
 		Result result = queryRunner.run(getCypher(), getParameters());
 		consumer.accept(result.stream());
 		return result.consume();
+	}
+
+	public final <T> Flux<T> fetchWith(RxQueryRunner queryRunner, Function<Record, T> mappingFunction) {
+
+		// TODO convert parameters
+		return Mono.fromCallable(() -> new Query(getCypher(), getParameters()))
+			.flatMapMany(q -> queryRunner.run(q).records())
+			.map(mappingFunction);
 	}
 }
