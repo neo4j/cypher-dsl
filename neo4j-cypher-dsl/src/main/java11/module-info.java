@@ -18,14 +18,15 @@
  */
 module org.neo4j.cypherdsl.core {
 
-	requires static querydsl.core; // Will be com.querydsl.core in a future Query-DSL release.
+	requires static org.neo4j.driver;
 	requires static org.jetbrains.annotations;
+	requires static querydsl.core; // Will be com.querydsl.core in a future Query-DSL release.
 
 	requires org.apiguardian.api;
 
 	exports org.neo4j.cypherdsl.core;
-	exports org.neo4j.cypherdsl.core.renderer;
 	exports org.neo4j.cypherdsl.core.ast;
+	exports org.neo4j.cypherdsl.core.renderer;
 
 	exports org.neo4j.cypherdsl.core.utils to org.neo4j.cypherdsl.codegen.core;
 }

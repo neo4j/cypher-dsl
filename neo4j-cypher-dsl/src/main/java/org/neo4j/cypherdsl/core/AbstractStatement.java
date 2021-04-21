@@ -20,13 +20,18 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+import org.neo4j.driver.QueryRunner;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.summary.ResultSummary;
 
 /**
  * The abstract statement provides possible state shared across various statement implementations. Use cases are collecting
@@ -126,5 +131,16 @@ abstract class AbstractStatement implements Statement {
 		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext());
 		this.accept(parameterCollectingVisitor);
 		return parameterCollectingVisitor.getResult();
+	}
+
+	@Override
+	public final ResultSummary executeWith(QueryRunner queryRunner) {
+		// TODO convert parameters
+		return queryRunner.run(getCypher(), getParameters()).consume();
+	}
+
+	public final <T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction) {
+		// TODO convert parameters
+		return queryRunner.run(getCypher(), getParameters()).list(mappingFunction);
 	}
 }

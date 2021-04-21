@@ -68,5 +68,4 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 			super(parts, remainder);
 		}
 	}
-
 }

@@ -202,9 +202,17 @@
 				</exclusions>
 			</dependency>
 			<dependency>
+				<groupId>org.neo4j.driver</groupId>
+				<artifactId>neo4j-java-driver</artifactId>
+				<version>4.2.4</version>
+				<optional>true</optional>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
 				<groupId>com.querydsl</groupId>
 				<artifactId>querydsl-core</artifactId>
 				<version>${querydsl.version}</version>
+				<optional>true</optional>
 				<scope>provided</scope>
 			</dependency>
 			<dependency>

@@ -22,7 +22,10 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -31,6 +34,9 @@ import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArg
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.driver.QueryRunner;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.summary.ResultSummary;
 
 /**
  * Shall be the common interfaces for queries that we support.
@@ -130,6 +136,11 @@ public interface Statement extends Visitable {
 	void setRenderConstantsAsParameters(boolean renderConstantsAsParameters);
 
 	/**
+	 * @since 2021.2.0
+	 */
+	ResultSummary executeWith(QueryRunner queryRunner);
+
+	/**
 	 * Represents {@code RegularQuery}.
 	 *
 	 * @since 1.0
@@ -153,5 +164,11 @@ public interface Statement extends Visitable {
 	 * @since 2021.2.0
 	 */
 	interface ResultQuery extends Statement {
+
+		<T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction);
+
+		default List<Record> fetchWith(QueryRunner queryRunner) {
+			return fetchWith(queryRunner, Function.identity());
+		}
 	}
 }
