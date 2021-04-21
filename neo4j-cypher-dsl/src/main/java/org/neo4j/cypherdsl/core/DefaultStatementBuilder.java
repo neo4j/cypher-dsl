@@ -314,7 +314,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		if (this.currentOngoingCall != null) {
-			visitables.add(this.currentOngoingCall.build());
+			visitables.add(this.currentOngoingCall.buildCall());
 		}
 
 		if (clearAfter) {
@@ -367,7 +367,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return;
 		}
 
-		this.currentSinglePartElements.add(this.currentOngoingCall.build());
+		this.currentSinglePartElements.add(this.currentOngoingCall.buildCall());
 		this.currentOngoingCall = null;
 	}
 
@@ -1178,7 +1178,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return argumentsList;
 		}
 
-		abstract <T extends Visitable> T build();
+		abstract Statement buildCall();
 	}
 
 	static final class StandaloneCallBuilder extends AbstractCallBuilder implements
@@ -1226,6 +1226,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			return ProcedureCallImpl.create(procedureName, createArgumentList(), null,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
+		}
+
+		@Override
+		Statement buildCall() {
+			return build();
 		}
 	}
 
@@ -1284,6 +1289,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return (ResultQuery) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
+
+		@Override
+		Statement buildCall() {
+			return build();
+		}
 	}
 
 
@@ -1300,7 +1310,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		ProcedureCall build() {
+		Statement buildCall() {
 
 			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
