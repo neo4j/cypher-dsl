@@ -27,9 +27,10 @@ import java.util.Map;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
-import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
  * Shall be the common interfaces for queries that we support.
@@ -59,9 +60,9 @@ public interface Statement extends Visitable {
 	 * @return An entry point into a statement that starts with a call to stored procedure.
 	 */
 	@NotNull @Contract(pure = true)
-	static ProcedureCall.OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
+	static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 
-		return new ProcedureCall.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
+		return new DefaultStatementBuilder.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
 	}
 
 	/**
@@ -95,7 +96,7 @@ public interface Statement extends Visitable {
 	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher
 	 * will use escaped literals and correct placeholders like {@code $param} for parameters. The placeholders for
-	 * parameters can be retrieved via {@link #getParameterNames}. Bounded values for paramters can be retrieved via
+	 * parameters can be retrieved via {@link #getParameterNames}. Bounded values for parameters can be retrieved via
 	 * {@link #getParameters()}.
 	 * <p>
 	 * This method is threadsafe
@@ -112,6 +113,7 @@ public interface Statement extends Visitable {
 
 	/**
 	 * Some constants may be rendered as parameters.
+	 *
 	 * @return True if literal parameters hav
 	 */
 	@NotNull @Contract(pure = true)
@@ -141,5 +143,15 @@ public interface Statement extends Visitable {
 	 * @since 1.0
 	 */
 	interface SingleQuery extends RegularQuery {
+	}
+
+	/**
+	 * A query that returns items from the graph. The shape of those items can be pretty much anything:
+	 * A list of records containing only properties, or nodes with properties mixed with relationships and
+	 * so on. The only guarantee given is that the query will return some data if a match happens.
+	 *
+	 * @since 2021.2.0
+	 */
+	interface ResultQuery extends Statement {
 	}
 }

@@ -34,13 +34,22 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-final class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery {
+class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery {
+
+	static MultiPartQuery create(List<MultiPartElement> parts, SinglePartQuery remainder) {
+
+		if (remainder instanceof ResultQuery) {
+			return new MultiPartQueryWithResult(parts, remainder);
+		} else {
+			return new MultiPartQuery(parts, remainder);
+		}
+	}
 
 	private final List<MultiPartElement> parts;
 
 	private final SinglePartQuery remainder;
 
-	MultiPartQuery(List<MultiPartElement> parts, SinglePartQuery remainder) {
+	private MultiPartQuery(List<MultiPartElement> parts, SinglePartQuery remainder) {
 
 		this.parts = new ArrayList<>(parts);
 		this.remainder = remainder;
@@ -53,7 +62,11 @@ final class MultiPartQuery extends AbstractStatement implements Statement.Single
 		remainder.accept(visitor);
 	}
 
-	boolean doesReturnElements() {
-		return this.remainder.doesReturnElements();
+	final static class MultiPartQueryWithResult extends MultiPartQuery implements ResultQuery {
+
+		private MultiPartQueryWithResult(List<MultiPartElement> parts, SinglePartQuery remainder) {
+			super(parts, remainder);
+		}
 	}
+
 }

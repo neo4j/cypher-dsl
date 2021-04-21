@@ -36,11 +36,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-final class SinglePartQuery extends AbstractStatement implements SingleQuery {
-
-	private final List<Visitable> precedingClauses;
-
-	private final Return aReturn;
+class SinglePartQuery extends AbstractStatement implements SingleQuery {
 
 	static SinglePartQuery create(List<Visitable> precedingClauses, Return aReturn) {
 
@@ -48,13 +44,18 @@ final class SinglePartQuery extends AbstractStatement implements SingleQuery {
 			Assertions.notNull(aReturn, "A return clause is required.");
 		}
 
-		return new SinglePartQuery(precedingClauses, aReturn);
+		if (aReturn == null) {
+			return new SinglePartQuery(precedingClauses);
+		} else {
+			return new SinglePartQueryWithResult(precedingClauses, aReturn);
+		}
 	}
 
-	private SinglePartQuery(List<Visitable> precedingClauses, Return aReturn) {
+	private final List<Visitable> precedingClauses;
+
+	private SinglePartQuery(List<Visitable> precedingClauses) {
 
 		this.precedingClauses = new ArrayList<>(precedingClauses);
-		this.aReturn = aReturn;
 	}
 
 	@Override
@@ -62,11 +63,25 @@ final class SinglePartQuery extends AbstractStatement implements SingleQuery {
 
 		visitor.enter(this);
 		precedingClauses.forEach(c -> c.accept(visitor));
-		Visitable.visitIfNotNull(aReturn, visitor);
 		visitor.leave(this);
 	}
 
-	boolean doesReturnElements() {
-		return this.aReturn != null;
+	final static class SinglePartQueryWithResult extends SinglePartQuery implements ResultQuery {
+
+		private final Return aReturn;
+
+		private SinglePartQueryWithResult(List<Visitable> precedingClauses, Return aReturn) {
+			super(precedingClauses);
+
+			this.aReturn = aReturn;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+			visitor.enter(this);
+			super.precedingClauses.forEach(c -> c.accept(visitor));
+			aReturn.accept(visitor);
+			visitor.leave(this);
+		}
 	}
 }

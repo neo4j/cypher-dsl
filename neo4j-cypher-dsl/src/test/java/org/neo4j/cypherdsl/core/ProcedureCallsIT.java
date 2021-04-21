@@ -44,6 +44,25 @@ class ProcedureCallsIT {
 	}
 
 	@Test
+	void shouldGenerateStatementsOfCorrectType() {
+
+		Statement call = Cypher.call("db", "labels").build();
+		assertThat(call).isInstanceOf(ProcedureCall.class);
+		assertThat(call).isInstanceOf(Statement.class);
+		assertThat(call).isNotInstanceOf(Statement.ResultQuery.class);
+
+		call = Cypher.call("db", "labels").yield("label").build();
+		assertThat(call).isInstanceOf(ProcedureCall.class);
+		assertThat(call).isInstanceOf(Statement.class);
+		assertThat(call).isInstanceOf(Statement.ResultQuery.class);
+
+		call = Cypher.call("db", "labels").yield("label").returning("label").build();
+		assertThat(call).isInstanceOf(Statement.SingleQuery.class);
+		assertThat(call).isInstanceOf(Statement.class);
+		assertThat(call).isInstanceOf(Statement.ResultQuery.class);
+	}
+
+	@Test
 	void withArgs() {
 
 		Statement call = Cypher

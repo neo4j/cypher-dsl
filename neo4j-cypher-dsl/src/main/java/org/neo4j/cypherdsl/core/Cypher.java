@@ -33,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
-import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**

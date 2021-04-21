@@ -26,9 +26,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithArguments;
-import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithReturnFields;
-import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
+import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.Statement.ResultQuery;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableMatchAndUpdate;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableOngoingMergeAction;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMatchAndUpdate;
@@ -36,9 +35,9 @@ import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMerge;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingUpdate;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
-import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -75,12 +74,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 	/**
 	 * Current ongoing call.
 	 */
-	private ProcedureCall.Builder currentOngoingCall;
+	private AbstractCallBuilder currentOngoingCall;
 
 	DefaultStatementBuilder() {
 	}
 
-	DefaultStatementBuilder(ProcedureCall.Builder currentOngoingCall) {
+	DefaultStatementBuilder(AbstractCallBuilder currentOngoingCall) {
 		this.currentOngoingCall = currentOngoingCall;
 	}
 
@@ -298,7 +297,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		if (multiPartElements.isEmpty()) {
 			return singlePartQuery;
 		} else {
-			return new MultiPartQuery(multiPartElements, singlePartQuery);
+			return MultiPartQuery.create(multiPartElements, singlePartQuery);
 		}
 	}
 
@@ -405,6 +404,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public OngoingReadingWithoutWhere usingScan(Node node) {
 
@@ -412,6 +412,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public OngoingReadingWithoutWhere usingJoinOn(SymbolicName... names) {
 
@@ -430,24 +431,28 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.distinct = distinct;
 		}
 
+		@NotNull
 		@Override
 		public final OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem) {
 			orderBuilder.orderBy(sortItem);
 			return this;
 		}
 
+		@NotNull
 		@Override
-		public final TerminalOngoingOrderDefinition orderBy(Expression expression) {
+		public final TerminalOngoingOrderDefinition orderBy(@NotNull Expression expression) {
 			orderBuilder.orderBy(expression);
 			return this;
 		}
 
+		@NotNull
 		@Override
-		public final TerminalOngoingOrderDefinition and(Expression expression) {
+		public final TerminalOngoingOrderDefinition and(@NotNull Expression expression) {
 			orderBuilder.and(expression);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		@SuppressWarnings("unchecked")
 		public final DefaultStatementWithReturnBuilder descending() {
@@ -455,6 +460,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return this;
 		}
 
+		@NotNull
 		@Override
 		@SuppressWarnings("unchecked")
 		public final DefaultStatementWithReturnBuilder ascending() {
@@ -462,12 +468,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return this;
 		}
 
+		@NotNull
 		@Override
 		@SuppressWarnings("unchecked")
 		public final OngoingReadingAndReturn skip(Number number) {
 			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
+		@NotNull
 		@Override
 		@SuppressWarnings("unchecked")
 		public final OngoingReadingAndReturn skip(Expression expression) {
@@ -480,14 +488,16 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return limit(number == null ? null : new NumberLiteral(number));
 		}
 
+		@NotNull
 		@Override
 		public final OngoingReadingAndReturn limit(Expression expression) {
 			orderBuilder.limit(expression);
 			return this;
 		}
 
+		@NotNull
 		@Override
-		public Statement build() {
+		public ResultQuery build() {
 
 			Return returning = null;
 			if (!returnList.isEmpty()) {
@@ -498,7 +508,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 					orderBuilder.getLimit());
 			}
 
-			return DefaultStatementBuilder.this.buildImpl(false, returning);
+			return (ResultQuery) DefaultStatementBuilder.this.buildImpl(false, returning);
 		}
 
 		protected final void addExpressions(Expression... expressions) {
@@ -795,9 +805,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 	 * In case {@code updateType} is of {@link UpdateType#MERGE} or {@link UpdateType#CREATE} they will
 	 * be treated as pattern, otherwise as expression.
 	 *
-	 * @param updateType The update type to create
+	 * @param updateType           The update type to create
 	 * @param patternOrExpressions A list of pattern or expression
-	 * @param <T> The type of {@code patternOrExpressions}
+	 * @param <T>                  The type of {@code patternOrExpressions}
 	 * @return Ongoing builder
 	 */
 	@SafeVarargs
@@ -847,7 +857,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 	 * @param possibleSetOperations A mixed list of expressions (property and list operations)
 	 * @return A reified list of expressions that all target properties
 	 */
-	private static List<Expression> prepareSetExpressions(UpdateType updateType, List<Expression> possibleSetOperations) {
+	private static List<Expression> prepareSetExpressions(UpdateType updateType,
+		List<Expression> possibleSetOperations) {
 
 		List<Expression> propertyOperations = new ArrayList<>();
 		List<Expression> listOfExpressions = new ArrayList<>();
@@ -879,8 +890,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 			if (listOfExpressions.isEmpty()) {
 				for (Expression operation : propertyOperations) {
 					if (((Operation) operation).getOperator() != Operator.MUTATE) {
-						throw new IllegalArgumentException("Only property operations based on the " + Operator.MUTATE
-								+ " are supported inside a mutating SET.");
+						throw new IllegalArgumentException(
+							"Only property operations based on the " + Operator.MUTATE  + " are supported inside a mutating SET.");
 					}
 				}
 			} else if (propertyOperations.isEmpty()) {
@@ -958,19 +969,16 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 	}
 
-	protected final class DefaultStatementWithUpdateBuilder extends DefaultStatementWithReturnBuilder
-		implements BuildableMatchAndUpdate {
+	protected final class DefaultStatementWithUpdateBuilder implements BuildableMatchAndUpdate {
 
 		final UpdatingClauseBuilder builder;
 
 		protected DefaultStatementWithUpdateBuilder(UpdateType updateType, PatternElement... pattern) {
-			super(false);
 
 			this.builder = getUpdatingClauseBuilder(updateType, pattern);
 		}
 
 		protected DefaultStatementWithUpdateBuilder(UpdateType updateType, Expression... expressions) {
-			super(false);
 
 			this.builder = getUpdatingClauseBuilder(updateType, expressions);
 		}
@@ -981,24 +989,30 @@ class DefaultStatementBuilder implements StatementBuilder,
 			Assertions.notNull(returnedExpressions, "Expressions to return are required.");
 			Assertions.notEmpty(returnedExpressions, "At least one expressions to return is required.");
 
-			super.returnList.addAll(Arrays.asList(returnedExpressions));
-			return this;
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+
+			DefaultStatementWithReturnBuilder delegate = new DefaultStatementWithReturnBuilder(false);
+			delegate.returnList.addAll(Arrays.asList(returnedExpressions));
+			return delegate;
 		}
 
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... returnedExpressions) {
 
-			returning(returnedExpressions);
-			super.distinct = true;
-			return this;
+			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(
+				returnedExpressions);
+			delegate.distinct = true;
+			return delegate;
 		}
 
+		@NotNull
 		@Override
 		@SuppressWarnings("unchecked")
 		public OngoingUpdate delete(Expression... deletedExpressions) {
 			return delete(false, deletedExpressions);
 		}
 
+		@NotNull
 		@Override
 		@SuppressWarnings("unchecked")
 		public OngoingUpdate detachDelete(Expression... deletedExpressions) {
@@ -1077,11 +1091,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.with(distinct, returnedExpressions);
 		}
 
+		@NotNull
 		@Override
 		public Statement build() {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return super.build();
+			return DefaultStatementBuilder.this.buildImpl(false, null);
 		}
 	}
 
@@ -1115,6 +1130,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.expressionToUnwind = expressionToUnwind;
 		}
 
+		@NotNull
 		@Override
 		public OngoingReading as(String variable) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(new Unwind(expressionToUnwind, variable));
@@ -1122,6 +1138,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 	}
 
+	@NotNull
 	@Override
 	public InQueryCallBuilder call(String... namespaceAndProcedure) {
 
@@ -1136,14 +1153,160 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return inQueryCallBuilder;
 	}
 
-	private final class InQueryCallBuilder extends ProcedureCall.Builder implements
-		OngoingInQueryCallWithoutArguments, OngoingInQueryCallWithArguments,
+	abstract static class AbstractCallBuilder {
+
+		protected final ProcedureName procedureName;
+
+		protected Expression[] arguments;
+
+		protected final DefaultStatementBuilder.ConditionBuilder conditionBuilder = new DefaultStatementBuilder.ConditionBuilder();
+
+		AbstractCallBuilder(ProcedureName procedureName) {
+			this(procedureName, null);
+		}
+
+		AbstractCallBuilder(ProcedureName procedureName, Expression[] arguments) {
+			this.procedureName = procedureName;
+			this.arguments = arguments;
+		}
+
+		Arguments createArgumentList() {
+			Arguments argumentsList = null;
+			if (arguments != null && arguments.length > 0) {
+				argumentsList = new Arguments(arguments);
+			}
+			return argumentsList;
+		}
+
+		abstract <T extends Visitable> T build();
+	}
+
+	static final class StandaloneCallBuilder extends AbstractCallBuilder implements
+
+		OngoingStandaloneCallWithoutArguments,
+		OngoingStandaloneCallWithArguments {
+
+		StandaloneCallBuilder(ProcedureName procedureName) {
+			super(procedureName);
+		}
+
+		@NotNull
+		@Override
+		public StandaloneCallBuilder withArgs(Expression... arguments) {
+
+			super.arguments = arguments;
+			return this;
+		}
+
+		@NotNull
+		@Override
+		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(SymbolicName... resultFields) {
+
+			return new YieldingStandaloneCallBuilder(procedureName, arguments, resultFields);
+		}
+
+		@NotNull
+		@Override
+		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(AliasedExpression... aliasedResultFields) {
+
+			return new YieldingStandaloneCallBuilder(procedureName,  arguments, aliasedResultFields);
+		}
+
+		@Override
+		public Expression asFunction() {
+
+			if (super.arguments == null || super.arguments.length == 0) {
+				return FunctionInvocation.create(procedureName::getQualifiedName);
+			}
+			return FunctionInvocation.create(procedureName::getQualifiedName, super.arguments);
+		}
+
+		@Override
+		public ProcedureCall build() {
+
+			return ProcedureCallImpl.create(procedureName, createArgumentList(), null,
+				conditionBuilder.buildCondition().map(Where::new).orElse(null));
+		}
+	}
+
+	private static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
+		implements ExposesWhere, ExposesReturning, OngoingStandaloneCallWithReturnFields {
+
+		private final YieldItems yieldItems;
+
+		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, SymbolicName... resultFields) {
+			super(procedureName, arguments);
+			this.yieldItems = YieldItems.yieldAllOf(resultFields);
+		}
+
+		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, AliasedExpression... aliasedResultFields) {
+			super(procedureName, arguments);
+			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
+		}
+
+		@Override
+		public StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
+
+			return new DefaultStatementBuilder(this).returning(expressions);
+		}
+
+		@Override
+		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
+
+			return new DefaultStatementBuilder(this).returningDistinct(expressions);
+		}
+
+		@Override
+		public StatementBuilder.OngoingReadingWithWhere where(Condition newCondition) {
+
+			conditionBuilder.where(newCondition);
+			return new DefaultStatementBuilder(this);
+		}
+
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
+			return new DefaultStatementBuilder(this).with(expressions);
+		}
+
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
+			return new DefaultStatementBuilder(this).withDistinct(expressions);
+		}
+
+		@Override
+		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement) {
+			return new DefaultStatementBuilder(this).call(statement);
+		}
+
+		@Override
+		public ResultQuery build() {
+
+			return (ResultQuery) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
+				conditionBuilder.buildCondition().map(Where::new).orElse(null));
+		}
+	}
+
+
+	private final class InQueryCallBuilder extends AbstractCallBuilder implements
+
+		OngoingInQueryCallWithoutArguments,
+		OngoingInQueryCallWithArguments,
 		OngoingInQueryCallWithReturnFields {
+
+		private YieldItems yieldItems;
 
 		InQueryCallBuilder(ProcedureName procedureName) {
 			super(procedureName);
 		}
 
+		@Override
+		ProcedureCall build() {
+
+			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
+				conditionBuilder.buildCondition().map(Where::new).orElse(null));
+		}
+
+		@NotNull
 		@Override
 		public InQueryCallBuilder withArgs(Expression... arguments) {
 
@@ -1151,20 +1314,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public InQueryCallBuilder yield(SymbolicName... resultFields) {
 
-			super.yieldItems = YieldItems.yieldAllOf(resultFields);
+			this.yieldItems = YieldItems.yieldAllOf(resultFields);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public InQueryCallBuilder yield(AliasedExpression... aliasedResultFields) {
 
-			super.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
+			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingWithWhere where(Condition newCondition) {
 
@@ -1252,7 +1418,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		protected void orderBy(SortItem... sortItem) {
-			Arrays.stream(sortItem).forEach(this.sortItemList::add);
+			this.sortItemList.addAll(Arrays.asList(sortItem));
 		}
 
 		protected void orderBy(Expression expression) {

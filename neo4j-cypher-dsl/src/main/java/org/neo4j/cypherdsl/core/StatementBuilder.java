@@ -20,10 +20,11 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.ProcedureCall.OngoingInQueryCallWithoutArguments;
+import org.neo4j.cypherdsl.core.Statement.ResultQuery;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
@@ -169,7 +170,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReadingAndReturn
-		extends TerminalExposesOrderBy, TerminalExposesSkip, TerminalExposesLimit, BuildableStatement {
+		extends TerminalExposesOrderBy, TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultQuery> {
 	}
 
 	/**
@@ -237,7 +238,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingMatchAndReturnWithOrder extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement {
+	interface OngoingMatchAndReturnWithOrder extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultQuery> {
 
 		/**
 		 * Adds another expression to the list of order items.
@@ -255,7 +256,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface TerminalOngoingOrderDefinition extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement {
+	interface TerminalOngoingOrderDefinition extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultQuery> {
 
 		/**
 		 * Specifies descending order and jumps back to defining the match and return statement.
@@ -319,15 +320,16 @@ public interface StatementBuilder
 	/**
 	 * A statement that has all information required to be build and exposes a build method.
 	 *
+	 * @param <T> the type of the statement that is returned
 	 * @since 1.0
 	 */
-	interface BuildableStatement {
+	interface BuildableStatement<T extends Statement> {
 
 		/**
 		 * @return The statement ready to be used, i.e. in a renderer.
 		 */
 		@NotNull @Contract(pure = true)
-		Statement build();
+		T build();
 
 		/**
 		 * @return Creates a statement that returns an explain plan for the original statement.
@@ -476,7 +478,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface TerminalExposesLimit extends BuildableStatement {
+	interface TerminalExposesLimit extends BuildableStatement<ResultQuery> {
 
 		/**
 		 * Limits the number of returned records.
@@ -485,7 +487,7 @@ public interface StatementBuilder
 		 * @return A buildable match statement.
 		 */
 		@NotNull @CheckReturnValue
-		BuildableStatement limit(Number number);
+		BuildableStatement<ResultQuery> limit(Number number);
 
 		/**
 		 * Limits the number of returned records.
@@ -495,7 +497,7 @@ public interface StatementBuilder
 		 * @since 2021.0.0
 		 */
 		@NotNull @CheckReturnValue
-		BuildableStatement limit(Expression expression);
+		BuildableStatement<ResultQuery> limit(Expression expression);
 	}
 
 	/**
@@ -863,5 +865,51 @@ public interface StatementBuilder
 		default BuildableOngoingMergeAction mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
 		}
+	}
+
+	/**
+	 * The union of a buildable statement and call exposing new arguments and yields.
+	 */
+	interface OngoingStandaloneCallWithoutArguments extends
+		StatementBuilder.BuildableStatement<Statement>, ExposesCall.ExposesWithArgs<OngoingStandaloneCallWithArguments>,
+		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
+	}
+
+	/**
+	 * The union of a buildable statement and call exposing yields.
+	 */
+	interface OngoingStandaloneCallWithArguments extends
+		StatementBuilder.BuildableStatement<Statement>,
+		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
+	}
+
+	/**
+	 * A buildable statement exposing where and return clauses.
+	 */
+	interface OngoingStandaloneCallWithReturnFields extends
+		StatementBuilder.BuildableStatement<ResultQuery>,
+		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+	}
+
+	/**
+	 * The union of an in-query call exposing new arguments and yields.
+	 */
+	interface OngoingInQueryCallWithoutArguments extends
+		ExposesCall.ExposesWithArgs<OngoingInQueryCallWithArguments>,
+		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
+	}
+
+	/**
+	 * The union of an in-query call exposing yields.
+	 */
+	interface OngoingInQueryCallWithArguments extends
+		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
+	}
+
+	/**
+	 * An in-query call exposing where and return clauses.
+	 */
+	interface OngoingInQueryCallWithReturnFields extends
+		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 }

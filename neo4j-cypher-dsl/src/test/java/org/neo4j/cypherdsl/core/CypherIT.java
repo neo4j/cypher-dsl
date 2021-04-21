@@ -51,6 +51,28 @@ class CypherIT {
 		assertThat(statement.getCypher()).isSameAs(cypher);
 	}
 
+	@Test
+	void shouldGenerateStatementsOfCorrectType() {
+
+		Statement statement = Cypher.returning(Cypher.literalTrue().as("t")).build();
+		assertThat(statement).isInstanceOf(Statement.ResultQuery.class);
+		assertThat(statement).isInstanceOf(Statement.SingleQuery.class);
+
+		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
+			.set(bikeNode.property("x").to(Cypher.literalTrue()))
+			.build();
+		assertThat(statement).isNotInstanceOf(Statement.ResultQuery.class);
+		assertThat(statement).isInstanceOf(Statement.SingleQuery.class);
+
+		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
+			.set(bikeNode.property("x").to(Cypher.literalTrue()))
+			.with(bikeNode)
+			.returning(bikeNode)
+			.build();
+		assertThat(statement).isInstanceOf(Statement.ResultQuery.class);
+		assertThat(statement).isInstanceOf(MultiPartQuery.class);
+	}
+
 	@Nested
 	class SingleQuerySinglePart {
 
