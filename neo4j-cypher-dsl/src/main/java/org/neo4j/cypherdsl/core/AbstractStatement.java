@@ -20,17 +20,24 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import reactor.core.publisher.Mono;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+import org.neo4j.driver.Query;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.reactive.RxQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
 /**
@@ -139,8 +146,22 @@ abstract class AbstractStatement implements Statement {
 		return queryRunner.run(getCypher(), getParameters()).consume();
 	}
 
+	public Mono<ResultSummary> executeWith(RxQueryRunner queryRunner) {
+
+		// TODO convert parameters
+		return Mono.fromCallable(() -> new Query(getCypher(), getParameters()))
+			.flatMap(q -> Mono.from(queryRunner.run(q).consume()));
+	}
+
 	public final <T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction) {
 		// TODO convert parameters
 		return queryRunner.run(getCypher(), getParameters()).list(mappingFunction);
+	}
+
+	public final ResultSummary streamWith(QueryRunner queryRunner, Consumer<Stream<Record>> consumer) {
+		// TODO convert parameters
+		Result result = queryRunner.run(getCypher(), getParameters());
+		consumer.accept(result.stream());
+		return result.consume();
 	}
 }

@@ -21,9 +21,12 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import reactor.core.publisher.Mono;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -36,6 +39,7 @@ import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.reactive.RxQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
 /**
@@ -136,9 +140,11 @@ public interface Statement extends Visitable {
 	void setRenderConstantsAsParameters(boolean renderConstantsAsParameters);
 
 	/**
-	 * @since 2021.2.0
+	 * @since TBA
 	 */
 	ResultSummary executeWith(QueryRunner queryRunner);
+
+	Mono<ResultSummary> executeWith(RxQueryRunner queryRunner);
 
 	/**
 	 * Represents {@code RegularQuery}.
@@ -161,7 +167,7 @@ public interface Statement extends Visitable {
 	 * A list of records containing only properties, or nodes with properties mixed with relationships and
 	 * so on. The only guarantee given is that the query will return some data if a match happens.
 	 *
-	 * @since 2021.2.0
+	 * @since TBA
 	 */
 	interface ResultQuery extends Statement {
 
@@ -170,5 +176,7 @@ public interface Statement extends Visitable {
 		default List<Record> fetchWith(QueryRunner queryRunner) {
 			return fetchWith(queryRunner, Function.identity());
 		}
+
+		ResultSummary streamWith(QueryRunner queryRunner, Consumer<Stream<Record>> streamHandler);
 	}
 }

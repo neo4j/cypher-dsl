@@ -161,6 +161,7 @@
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.0.7</spring-data-neo4j.version>
 		<jetbrains-annotations.version>19.0.0</jetbrains-annotations.version>
+		<neo4j-java-driver.version>4.2.4</neo4j-java-driver.version>
 	</properties>
 
 	<dependencyManagement>
@@ -204,9 +205,16 @@
 			<dependency>
 				<groupId>org.neo4j.driver</groupId>
 				<artifactId>neo4j-java-driver</artifactId>
-				<version>4.2.4</version>
+				<version>${neo4j-java-driver.version}</version>
 				<optional>true</optional>
 				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-bom</artifactId>
+				<version>2020.0.6</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.querydsl</groupId>

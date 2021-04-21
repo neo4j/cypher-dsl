@@ -21,6 +21,7 @@ module org.neo4j.cypherdsl.core {
 	requires static org.neo4j.driver;
 	requires static org.jetbrains.annotations;
 	requires static querydsl.core; // Will be com.querydsl.core in a future Query-DSL release.
+	requires static reactor.core;
 
 	requires org.apiguardian.api;
 
