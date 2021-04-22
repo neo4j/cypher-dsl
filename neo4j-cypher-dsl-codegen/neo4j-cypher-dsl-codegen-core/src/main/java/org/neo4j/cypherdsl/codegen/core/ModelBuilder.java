@@ -95,6 +95,7 @@ public interface ModelBuilder<SELF extends ModelBuilder> {
 	 * has been called will lead to an {@link IllegalStateException}.
 	 *
 	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
+	 * @return The generated class as a string
 	 */
 	String writeToString();
 
@@ -105,6 +106,7 @@ public interface ModelBuilder<SELF extends ModelBuilder> {
 	 * <p>
 	 * An appendable that is also closable will still be open after passing it to this method.
 	 *
+	 * @param appendable To where the generated source could should be appended to
 	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
 	 */
 	void writeTo(Appendable appendable);
