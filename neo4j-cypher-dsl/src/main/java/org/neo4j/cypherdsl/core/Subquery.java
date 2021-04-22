@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.Statement.ResultQuery;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -48,7 +47,7 @@ public final class Subquery implements Visitable {
 	 */
 	static Subquery call(Statement statement) {
 
-		boolean validReturn = statement instanceof ResultQuery || statement instanceof UnionQuery;
+		boolean validReturn = statement instanceof ResultStatement || statement instanceof UnionQuery;
 		if (!validReturn) {
 			throw new IllegalArgumentException("Only a statement that returns elements, either via RETURN or YIELD, can be used in a subquery.");
 		}

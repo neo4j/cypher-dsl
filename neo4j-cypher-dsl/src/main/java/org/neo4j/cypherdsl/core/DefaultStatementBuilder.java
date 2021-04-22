@@ -27,7 +27,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.Statement.ResultQuery;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableMatchAndUpdate;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableOngoingMergeAction;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMatchAndUpdate;
@@ -497,7 +496,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public ResultQuery build() {
+		public ResultStatement build() {
 
 			Return returning = null;
 			if (!returnList.isEmpty()) {
@@ -508,7 +507,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 					orderBuilder.getLimit());
 			}
 
-			return (ResultQuery) DefaultStatementBuilder.this.buildImpl(false, returning);
+			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(false, returning);
 		}
 
 		protected final void addExpressions(Expression... expressions) {
@@ -1284,9 +1283,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public ResultQuery build() {
+		public ResultStatement build() {
 
-			return (ResultQuery) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
+			return (ResultStatement) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
 

@@ -66,7 +66,7 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		visitor.leave(this);
 	}
 
-	final static class SinglePartQueryWithResult extends SinglePartQuery implements ResultQuery {
+	final static class SinglePartQueryWithResult extends SinglePartQuery implements ResultStatement {
 
 		private final Return aReturn;
 

@@ -72,7 +72,7 @@ class ProcedureCallImpl extends AbstractStatement implements ProcedureCall {
 		visitor.leave(this);
 	}
 
-	final static class ProcedureCallImplWithResult extends ProcedureCallImpl implements ResultQuery {
+	final static class ProcedureCallImplWithResult extends ProcedureCallImpl implements ResultStatement {
 
 		private ProcedureCallImplWithResult(ProcedureName name, Arguments arguments,
 			YieldItems yieldItems, Where optionalWhere) {

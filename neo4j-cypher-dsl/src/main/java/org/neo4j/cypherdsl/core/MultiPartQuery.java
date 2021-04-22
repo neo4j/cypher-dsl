@@ -38,7 +38,7 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 
 	static MultiPartQuery create(List<MultiPartElement> parts, SinglePartQuery remainder) {
 
-		if (remainder instanceof ResultQuery) {
+		if (remainder instanceof ResultStatement) {
 			return new MultiPartQueryWithResult(parts, remainder);
 		} else {
 			return new MultiPartQuery(parts, remainder);
@@ -62,7 +62,7 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 		remainder.accept(visitor);
 	}
 
-	final static class MultiPartQueryWithResult extends MultiPartQuery implements ResultQuery {
+	final static class MultiPartQueryWithResult extends MultiPartQuery implements ResultStatement {
 
 		private MultiPartQueryWithResult(List<MultiPartElement> parts, SinglePartQuery remainder) {
 			super(parts, remainder);

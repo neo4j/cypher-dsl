@@ -21,15 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -39,7 +34,6 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.driver.QueryRunner;
-import org.neo4j.driver.Record;
 import org.neo4j.driver.reactive.RxQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -141,11 +135,36 @@ public interface Statement extends Visitable {
 	void setRenderConstantsAsParameters(boolean renderConstantsAsParameters);
 
 	/**
+	 * If the Neo4j Java Driver is on the classpath, this method can be used to pass a {@link QueryRunner} to the statement,
+	 * execute it and retrieve a result summary.
+	 * <p>
+	 * All parameters with given values will be passed to the database. Please have a look at {@link ResultStatement} for
+	 * further details about parameter conversions
+	 * <p>
+	 * No resources passed to this method (neither sessions, transactions nor other query runners) will be closed.
+	 * Resources opened inside the method will be closed.
+	 *
+	 * @param queryRunner a query runner
+	 * @return A result summary (including server information, counters etc).
 	 * @since TBA
 	 */
 	ResultSummary executeWith(QueryRunner queryRunner);
 
 	/**
+	 * If the Neo4j Java Driver is on the classpath, this method can be used to pass a {@link RxQueryRunner} to the statement,
+	 * execute it and retrieve a result summary in a reactive fashion.
+	 * This method also requires Project Reactor to be available.
+	 * <p>
+	 * All parameters with given values will be passed to the database. Please have a look at {@link ResultStatement} for
+	 * further details about parameter conversions
+	 * <p>
+	 * No resources passed to this method (neither sessions, transactions nor other query runners) will be closed.
+	 * Resources opened inside the method will be closed.
+	 * <p>
+	 * No statement will be generated and no parameters will be converted unless something subscribes to the result.
+	 *
+	 * @param queryRunner a reactive query runner
+	 * @return A result summary (including server information, counters etc).
 	 * @since TBA
 	 */
 	Mono<ResultSummary> executeWith(RxQueryRunner queryRunner);
@@ -164,29 +183,5 @@ public interface Statement extends Visitable {
 	 * @since 1.0
 	 */
 	interface SingleQuery extends RegularQuery {
-	}
-
-	/**
-	 * A query that returns items from the graph. The shape of those items can be pretty much anything:
-	 * A list of records containing only properties, or nodes with properties mixed with relationships and
-	 * so on. The only guarantee given is that the query will return some data if a match happens.
-	 *
-	 * @since TBA
-	 */
-	interface ResultQuery extends Statement {
-
-		<T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction);
-
-		default List<Record> fetchWith(QueryRunner queryRunner) {
-			return fetchWith(queryRunner, Function.identity());
-		}
-
-		<T> Flux<T> fetchWith(RxQueryRunner queryRunner, Function<Record, T> mappingFunction);
-
-		default Flux<Record> fetchWith(RxQueryRunner queryRunner) {
-			return fetchWith(queryRunner, Function.identity());
-		}
-
-		ResultSummary streamWith(QueryRunner queryRunner, Consumer<Stream<Record>> streamHandler);
 	}
 }

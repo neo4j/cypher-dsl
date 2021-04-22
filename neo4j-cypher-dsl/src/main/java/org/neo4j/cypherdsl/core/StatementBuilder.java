@@ -24,7 +24,6 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.Statement.ResultQuery;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
@@ -170,7 +169,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReadingAndReturn
-		extends TerminalExposesOrderBy, TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultQuery> {
+		extends TerminalExposesOrderBy, TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultStatement> {
 	}
 
 	/**
@@ -238,7 +237,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingMatchAndReturnWithOrder extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultQuery> {
+	interface OngoingMatchAndReturnWithOrder extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultStatement> {
 
 		/**
 		 * Adds another expression to the list of order items.
@@ -256,7 +255,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface TerminalOngoingOrderDefinition extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultQuery> {
+	interface TerminalOngoingOrderDefinition extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultStatement> {
 
 		/**
 		 * Specifies descending order and jumps back to defining the match and return statement.
@@ -478,7 +477,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface TerminalExposesLimit extends BuildableStatement<ResultQuery> {
+	interface TerminalExposesLimit extends BuildableStatement<ResultStatement> {
 
 		/**
 		 * Limits the number of returned records.
@@ -487,7 +486,7 @@ public interface StatementBuilder
 		 * @return A buildable match statement.
 		 */
 		@NotNull @CheckReturnValue
-		BuildableStatement<ResultQuery> limit(Number number);
+		BuildableStatement<ResultStatement> limit(Number number);
 
 		/**
 		 * Limits the number of returned records.
@@ -497,7 +496,7 @@ public interface StatementBuilder
 		 * @since 2021.0.0
 		 */
 		@NotNull @CheckReturnValue
-		BuildableStatement<ResultQuery> limit(Expression expression);
+		BuildableStatement<ResultStatement> limit(Expression expression);
 	}
 
 	/**
@@ -887,7 +886,7 @@ public interface StatementBuilder
 	 * A buildable statement exposing where and return clauses.
 	 */
 	interface OngoingStandaloneCallWithReturnFields extends
-		StatementBuilder.BuildableStatement<ResultQuery>,
+		StatementBuilder.BuildableStatement<ResultStatement>,
 		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 

@@ -31,6 +31,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -67,6 +68,7 @@ abstract class AbstractStatement implements Statement {
 	 */
 	private volatile String cypher;
 
+	@NotNull
 	@Override
 	public StatementContext getContext() {
 		return context;
@@ -87,16 +89,19 @@ abstract class AbstractStatement implements Statement {
 		}
 	}
 
+	@NotNull
 	@Override
 	public Map<String, Object> getParameters() {
 		return getParameterInformation().values;
 	}
 
+	@NotNull
 	@Override
 	public Set<String> getParameterNames() {
 		return getParameterInformation().names;
 	}
 
+	@NotNull
 	@Override
 	public String getCypher() {
 
@@ -143,34 +148,49 @@ abstract class AbstractStatement implements Statement {
 
 	@Override
 	public final ResultSummary executeWith(QueryRunner queryRunner) {
-		// TODO convert parameters
-		return queryRunner.run(getCypher(), getParameters()).consume();
+
+		return queryRunner.run(createQuery()).consume();
 	}
 
-	public Mono<ResultSummary> executeWith(RxQueryRunner queryRunner) {
+	@Override
+	public final Mono<ResultSummary> executeWith(RxQueryRunner queryRunner) {
 
-		// TODO convert parameters
-		return Mono.fromCallable(() -> new Query(getCypher(), getParameters()))
+		return Mono.fromCallable(this::createQuery)
 			.flatMap(q -> Mono.from(queryRunner.run(q).consume()));
 	}
 
+	// @Override @see ResultStatement#fetchWith(QueryRunner, Function)
 	public final <T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction) {
-		// TODO convert parameters
-		return queryRunner.run(getCypher(), getParameters()).list(mappingFunction);
+
+		return queryRunner.run(this.createQuery()).list(mappingFunction);
 	}
 
+	// @Override @see ResultStatement#streamWith(QueryRunner, Consumer)
 	public final ResultSummary streamWith(QueryRunner queryRunner, Consumer<Stream<Record>> consumer) {
-		// TODO convert parameters
-		Result result = queryRunner.run(getCypher(), getParameters());
-		consumer.accept(result.stream());
+
+		Result result = queryRunner.run(this.createQuery());
+		try (Stream<Record> stream = result.stream()) {
+			consumer.accept(stream);
+		}
 		return result.consume();
 	}
 
+	// @Override @see ResultStatement#fetchWith(RxQueryRunner, Function)
 	public final <T> Flux<T> fetchWith(RxQueryRunner queryRunner, Function<Record, T> mappingFunction) {
 
-		// TODO convert parameters
-		return Mono.fromCallable(() -> new Query(getCypher(), getParameters()))
+		return Mono.fromCallable(this::createQuery)
 			.flatMapMany(q -> queryRunner.run(q).records())
 			.map(mappingFunction);
+	}
+
+	/**
+	 * Turns this statement into a query that the Neo4j driver can understand, including any named and anonymous
+	 * parameter that have a value assigned.
+	 *
+	 * @return A query.
+	 */
+	private Query createQuery() {
+
+		return new Query(getCypher(), getParameters());
 	}
 }
