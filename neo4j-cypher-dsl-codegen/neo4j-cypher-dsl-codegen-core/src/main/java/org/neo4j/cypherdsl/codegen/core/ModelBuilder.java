@@ -94,8 +94,8 @@ public interface ModelBuilder<SELF extends ModelBuilder> {
 	 * this method several times or any of the other {@code writeTo} methods, but changing the builder after this method
 	 * has been called will lead to an {@link IllegalStateException}.
 	 *
-	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
 	 * @return The generated class as a string
+	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
 	 */
 	String writeToString();
 
