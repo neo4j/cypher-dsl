@@ -47,17 +47,7 @@ public final class Subquery implements Visitable {
 	 */
 	static Subquery call(Statement statement) {
 
-		boolean validReturn = false;
-		if (statement instanceof SinglePartQuery) {
-			validReturn = ((SinglePartQuery) statement).doesReturnElements();
-		} else if (statement instanceof MultiPartQuery) {
-			validReturn = ((MultiPartQuery) statement).doesReturnElements();
-		} else if (statement instanceof ProcedureCall) {
-			validReturn = ((ProcedureCall) statement).doesReturnElements();
-		} else if (statement instanceof UnionQuery) {
-			validReturn = true;
-		}
-
+		boolean validReturn = statement instanceof ResultStatement || statement instanceof UnionQuery;
 		if (!validReturn) {
 			throw new IllegalArgumentException("Only a statement that returns elements, either via RETURN or YIELD, can be used in a subquery.");
 		}

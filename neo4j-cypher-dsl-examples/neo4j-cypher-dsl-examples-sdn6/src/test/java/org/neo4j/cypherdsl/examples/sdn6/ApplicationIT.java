@@ -60,8 +60,9 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class ApplicationIT {
 
 	@Container
-	private static Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.2");
+	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.2").withReuse(true);
 
+	@SuppressWarnings("unused") // It is used via {@code @EnableIf}
 	static boolean is606OrHigher() {
 		String version = Optional.of(EnableNeo4jRepositories.class)
 			.map(Class::getPackage).map(Package::getImplementationVersion)
@@ -78,13 +79,14 @@ class ApplicationIT {
 		ResourceLoader r = new DefaultResourceLoader();
 		try (var in = new InputStreamReader(r.getResource("classpath:movies.cypher").getInputStream());
 			var driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic("neo4j", neo4j.getAdminPassword()));
-			var session = driver.session();
+			var session = driver.session()
 		) {
 			var movies = FileCopyUtils.copyToString(in);
 			session.run(movies);
 		}
 	}
 
+	@SuppressWarnings("unused") // Used via Spring magic
 	@DynamicPropertySource
 	static void neo4jProperties(DynamicPropertyRegistry registry) {
 		registry.add("spring.neo4j.uri=", neo4j::getBoltUrl);
@@ -141,6 +143,7 @@ class ApplicationIT {
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var details = exchange.getBody();
 
+		assertThat(details).isNotNull();
 		assertThat(details.getName()).isEqualTo("Tom Hanks");
 		assertThat(details.getActedIn()).hasSize(12);
 		assertThat(details.getDirected()).extracting(Movie::getTitle).containsExactly("That Thing You Do");

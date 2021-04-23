@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.querydsl.CypherContext;
 import org.neo4j.cypherdsl.core.querydsl.ToCypherFormatStringVisitor;
 
@@ -56,7 +57,7 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 		CypherContext context = new CypherContext();
 		String formatString = expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
 
-		return new ExpressionCondition(Cypher.raw(formatString, context.getExpressions()));
+		return new ExpressionCondition(Cypher.raw(formatString, (Object[]) context.getExpressions()));
 	}
 
 	@Override
@@ -65,7 +66,7 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 		CypherContext context = new CypherContext();
 		String formatString = expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
 
-		return Cypher.raw(formatString, context.getExpressions());
+		return Cypher.raw(formatString, (Object[]) context.getExpressions());
 	}
 
 	@Override
@@ -79,6 +80,7 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 		return Cypher.node(entityPath.getRoot().getType().getSimpleName()).named(entityPath.getMetadata().getName());
 	}
 
+	@NotNull
 	@Override
 	public Relationship asRelationship() {
 

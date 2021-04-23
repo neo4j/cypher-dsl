@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.driver.QueryRunner;
 
 /**
  * A decorated statement. Used for <code>EXPLAIN</code> and <code>PROFILE</code>'d queries.
@@ -35,7 +36,7 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 
 	private enum Decoration implements Visitable {
 
-		EXPLAIN, PROFILE;
+		EXPLAIN, PROFILE
 	}
 
 	private final Decoration decoration;
@@ -57,6 +58,10 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 			throw new IllegalArgumentException("Cannot explain an already explained or profiled query.");
 		}
 
+		if (target instanceof ResultStatement && Decoration.PROFILE.equals(decoration)) {
+			return new DecoratedQueryWithResult(target);
+		}
+
 		return new DecoratedQuery(target, decoration);
 	}
 
@@ -70,5 +75,16 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 
 		this.decoration.accept(visitor);
 		this.target.accept(visitor);
+	}
+
+	/**
+	 * Only profiled queries can have a result statement.
+	 * Explained queries are only useful with {@link Statement#executeWith(QueryRunner)}.
+	 */
+	final static class DecoratedQueryWithResult extends DecoratedQuery implements ResultStatement {
+
+		private DecoratedQueryWithResult(Statement target) {
+			super(target, Decoration.PROFILE);
+		}
 	}
 }

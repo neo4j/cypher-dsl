@@ -20,13 +20,27 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
+
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+import org.neo4j.driver.Query;
+import org.neo4j.driver.QueryRunner;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.reactive.RxQueryRunner;
+import org.neo4j.driver.summary.ResultSummary;
 
 /**
  * The abstract statement provides possible state shared across various statement implementations. Use cases are collecting
@@ -54,6 +68,7 @@ abstract class AbstractStatement implements Statement {
 	 */
 	private volatile String cypher;
 
+	@NotNull
 	@Override
 	public StatementContext getContext() {
 		return context;
@@ -74,16 +89,19 @@ abstract class AbstractStatement implements Statement {
 		}
 	}
 
+	@NotNull
 	@Override
 	public Map<String, Object> getParameters() {
 		return getParameterInformation().values;
 	}
 
+	@NotNull
 	@Override
 	public Set<String> getParameterNames() {
 		return getParameterInformation().names;
 	}
 
+	@NotNull
 	@Override
 	public String getCypher() {
 
@@ -126,5 +144,53 @@ abstract class AbstractStatement implements Statement {
 		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext());
 		this.accept(parameterCollectingVisitor);
 		return parameterCollectingVisitor.getResult();
+	}
+
+	@Override
+	public final ResultSummary executeWith(QueryRunner queryRunner) {
+
+		return queryRunner.run(createQuery()).consume();
+	}
+
+	@Override
+	public final Mono<ResultSummary> executeWith(RxQueryRunner queryRunner) {
+
+		return Mono.fromCallable(this::createQuery)
+			.flatMap(q -> Mono.from(queryRunner.run(q).consume()));
+	}
+
+	// @Override @see ResultStatement#fetchWith(QueryRunner, Function)
+	public final <T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction) {
+
+		return queryRunner.run(this.createQuery()).list(mappingFunction);
+	}
+
+	// @Override @see ResultStatement#streamWith(QueryRunner, Consumer)
+	public final ResultSummary streamWith(QueryRunner queryRunner, Consumer<Stream<Record>> consumer) {
+
+		Result result = queryRunner.run(this.createQuery());
+		try (Stream<Record> stream = result.stream()) {
+			consumer.accept(stream);
+		}
+		return result.consume();
+	}
+
+	// @Override @see ResultStatement#fetchWith(RxQueryRunner, Function)
+	public final <T> Flux<T> fetchWith(RxQueryRunner queryRunner, Function<Record, T> mappingFunction) {
+
+		return Mono.fromCallable(this::createQuery)
+			.flatMapMany(q -> queryRunner.run(q).records())
+			.map(mappingFunction);
+	}
+
+	/**
+	 * Turns this statement into a query that the Neo4j driver can understand, including any named and anonymous
+	 * parameter that have a value assigned.
+	 *
+	 * @return A query.
+	 */
+	private Query createQuery() {
+
+		return new Query(getCypher(), getParameters());
 	}
 }

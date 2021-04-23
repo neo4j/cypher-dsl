@@ -50,6 +50,8 @@ include::properties/index.adoc[leveloffset=+1]
 
 include::functions/index.adoc[leveloffset=+1]
 
+include::driver-integration/index.adoc[leveloffset=+1]
+
 include::static-meta-model/index.adoc[leveloffset=+1]
 
 include::appendix/index.adoc[leveloffset=+1]

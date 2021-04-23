@@ -94,6 +94,7 @@ public interface ModelBuilder<SELF extends ModelBuilder> {
 	 * this method several times or any of the other {@code writeTo} methods, but changing the builder after this method
 	 * has been called will lead to an {@link IllegalStateException}.
 	 *
+	 * @return The generated class as a string
 	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
 	 */
 	String writeToString();
@@ -105,6 +106,7 @@ public interface ModelBuilder<SELF extends ModelBuilder> {
 	 * <p>
 	 * An appendable that is also closable will still be open after passing it to this method.
 	 *
+	 * @param appendable To where the generated source could should be appended to
 	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
 	 */
 	void writeTo(Appendable appendable);

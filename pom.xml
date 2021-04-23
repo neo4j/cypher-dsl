@@ -159,8 +159,9 @@
 		<sha1></sha1>
 		<slf4j.version>1.7.26</slf4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
-		<spring-data-neo4j.version>6.0.7</spring-data-neo4j.version>
+		<spring-data-neo4j.version>6.0.8</spring-data-neo4j.version>
 		<jetbrains-annotations.version>19.0.0</jetbrains-annotations.version>
+		<neo4j-java-driver.version>4.2.4</neo4j-java-driver.version>
 	</properties>
 
 	<dependencyManagement>
@@ -202,10 +203,21 @@
 				</exclusions>
 			</dependency>
 			<dependency>
+				<groupId>org.neo4j.driver</groupId>
+				<artifactId>neo4j-java-driver</artifactId>
+				<version>${neo4j-java-driver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-bom</artifactId>
+				<version>2020.0.6</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
 				<groupId>com.querydsl</groupId>
 				<artifactId>querydsl-core</artifactId>
 				<version>${querydsl.version}</version>
-				<scope>provided</scope>
 			</dependency>
 			<dependency>
 				<groupId>com.squareup</groupId>
@@ -247,6 +259,11 @@
 				<artifactId>mockito-junit-jupiter</artifactId>
 				<version>${mockito.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>

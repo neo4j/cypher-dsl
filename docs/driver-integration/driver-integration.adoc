@@ -1,0 +1,269 @@
+== Introduction
+
+The Cypher-DSL is - apart from https://github.com/apiguardian-team/apiguardian[API Guardian] - dependency free.
+It has however some optional dependency you can add to use more functionality.
+One of those dependencies is the https://github.com/neo4j/neo4j-java-driver[Neo4j-Java-Driver].
+The Neo4j-Java-Driver - or sometimes Bolt for Java or Bolt-Driver - implements Neo4j's Bolt protocol
+and provides a connection to a single Neo4j instance or a cluster.
+
+While the Cypher-DSL creates statements that eventually will be rendered as a `String`, it has some knowledge about the
+statements generated:
+
+* Will the statements return something?
+* Or will the statements just run updates?
+* Will the statements be profiled?
+* Do the statements carry parameter definitions and values for parameters?
+
+We can use that knowledge to provide a thin shim for using the Cypher-DSL with the API the Neo4j-Java-Driver provides
+without reinventing the wheel.
+
+In most cases the Cypher-DSL will generate one of two types of statements:
+
+* `org.neo4j.cypherdsl.core.Statement`: A statement without a result. It can be executed, but it cannot be fetched.
+  You will be able to check for the number of affected database entities tia the driver's `ResultSummary`.
+* `org.neo4j.cypherdsl.core.ResultStatement`: A statement known to have a result. It can be executed or fetched.
+
+Both interfaces provide the appropriate methods, which will be discussed below.
+
+NOTE: This API is not required to use the driver nor is the driver required for using the Cypher-DSL.
+      The main API provided with the Cypher-DSL is `Statement#getCypher()` for retrieving a Cypher-String and optional call
+      to `Statement#getParameters()` to retrieve parameters stored with the statement.
+      +
+      Those can be used in many ways and forms with the Neo4j-Java-Driver or mapping frameworks like
+      Neo4j-OGM or Spring Data Neo4j 6+.
+
+== Add additional dependencies
+
+[source,xml,subs="verbatim,attributes"]
+.Neo4j-Java-Driver added via Maven
+----
+<dependency>
+	<groupId>org.neo4j.driver</groupId>
+	<artifactId>neo4j-java-driver</artifactId>
+    <artifactId>4.2.4</artifactId>
+</dependency>
+----
+
+Any 4.x version of the Driver will work, we currently test against 4.2.4.
+In case you want to use our integration with reactive sessions, you will have to add https://projectreactor.io[Project Reactor].
+We took the freedom to settle on one of the reactive libraries out there for our integration.
+
+The publishers defined by Reactor can be converted into other libraries types or you can use the driver directly.
+The driver itself uses the vendor agnostic https://www.reactive-streams.org[Reactive Streams spec].
+
+The coordinates are:
+
+[source,xml,subs="verbatim,attributes"]
+.Optional Project reactor dependencies.
+----
+<dependency>
+    <groupId>io.projectreactor</groupId>
+    <artifactId>reactor-core</artifactId>
+    <artifactId>3.4.5</artifactId>
+</dependency>
+----
+
+We test with 2020.0.6 ("Europium") of reactor.
+
+For your convenience, the Gradle version for both depedencies:
+
+[source,groovy,subs="verbatim,attributes"]
+.Gradle variant for additional dependencies
+----
+dependencies {
+    implementation 'org.neo4j.driver:neo4j-java-driver:4.2.4'
+    implementation 'io.projectreactor:reactor-core:3.4.5'
+}
+----
+
+[[imperative-api]]
+== Imperative (blocking) API
+
+You create an instance of the Neo4j driver.
+This instance should be a long living instance in your application:
+
+.Create a driver instance
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=create-driver]
+----
+
+Both `org.neo4j.driver.Session` and `org.neo4j.driver.Transaction` implement a `QueryRunner` (the same applies for the
+reactive variants).
+It is your responsibility to pick the right kind of interaction with the database (auto commit, transactions or transactional functions).
+If you pass a `Session` to the Cypher-DSL, auto commit transactions will be used. If you pass in a transaction object,
+unmanaged transactions will be used and you must commit or rollback as needed and take care for retries.
+
+A safe bet is to pass one of the Cypher-DSL methods to the driver as a READ or WRITE transaction.
+
+TIP: The Cypher-DSL won't close, commit or rollback anything you pass to it. You open resources, you close them. In all
+     cases where the Cypher-DSL opens or provides a resource, it will take care closing it correctly.
+
+Our goal when writing this small integration with the official driver was to apply best practices when working with the
+driver without adding too much cognitive overhead or introducing new types.
+
+=== Executing statements
+
+We first have a look at statements that don't return data, but may execute updates or call stored procedures.
+We will use <<statement-without-result,the following listing>> as example:
+
+[[statement-without-result]]
+.Example statement that does not return any data.
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result]
+----
+
+==== Inside transactional functions
+
+The driver has the concept of _transactional functions_. This basically describes a transaction manager understanding the
+semantics of a Neo4j cluster, possible errors that can occur, routing and such.
+The transaction manager is able to retry statements in certain error cases.
+
+Transactional functions are passed as `TransactionalWork<T>` to a session.
+The `executeWith` API on `Statement` fits this interface and you can pass it as a method reference.
+It will always return a result summary:
+
+[[statement-without-result-tx-function]]
+.Executing statements in a managed transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result-tx-function]
+----
+<.> Open a session
+<.> Pass the `executeWith` method from the Cypher-DSL statement to the driver
+<.> Do something with the result summary
+
+TIP: Read more about transactional functions in the official manual: https://neo4j.com/docs/driver-manual/4.0/session-api/configuration/#driver-simple-transaction-fn[Imperative sessions and transaction functions].
+
+==== With an unmanaged transaction
+
+A transaction you retrieve from a session is called unmanaged transaction.
+It is your responsibility to commit or rollback and close it.
+
+[[statement-without-result-unmanaged-tx]]
+.Executing statements in an unmanaged transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result-unmanaged-tx]
+----
+<.> Get a transaction from the session
+<.> Pass it to the statement, execute and get the result summary
+<.> Do more things in the transaction, than commit or rollback it
+
+The advantage here is that you have more control and are not limited to idempotent operations for the transactional function.
+The disadvantage has been hidden away in that example: You have to take care of exceptions that might happen due to cluster
+errors yourself.
+
+If you want to use an auto-commit transaction (for example for a `PERIODIC COMMIT` or an APOC call), just pass a `Session`
+to `executeWith`.
+
+=== Fetching data
+
+The following examples will use this statement, returning the title of movies in the Movie-Graph:
+
+[[statement-with-result]]
+.Example statement that does return data.
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result]
+----
+
+We provide two forms of accessing data via the imperative API: Pulling everything into a list or streaming records.
+The <<reactive-api,reactive API>> is fully non-blocking and uses a publishing API.
+
+==== Inside transactional functions
+
+[[statement-with-result-tx-function]]
+.Fetching statements in a managed transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function]
+----
+<.> Open a session
+<.> Pass the `fetchWith` method from the Cypher-DSL statement to the driver
+<.> The `readTransaction` (or `writeTransaction`) returns whatever the transactional work returns
+    Our transactional work `fetchWith` returns a `java.util.List` of records
+    Here we turn it into a Java stream (not connected to Neo4j) and map and collect it
+
+`fetchWith` does support a second parameter, a mapping function `Function<Record, T> mappingFunction`. We can use this
+with a transactional function as well and do the mapping inside the transaction.
+For the example, this form here is easier to read, but the other one may have benefits in regards of memory allocation.
+
+You also can stream the result. In contrast to the plain Driver API, we don't hand out the stream itself but expect a
+closure dealing with the stream. We do this to make it impossible to use the stream - which is still connected to the database -
+outside the transaction. With managed transactions, it looks like this:
+
+[[statement-with-result-tx-function-stream]]
+.Streaming statements in a managed transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function-stream]
+----
+<.> Open a session
+<.> Open a managed transaction, but don't pass a method reference this time
+<.> Instead, call `streamWith`, pass the transaction and a consumer for the stream `s`.
+<.> Inside this example, we fully materialize the stream and map records as they pass by
+    As the streaming method will always return the result summary, this will also be the type of the transaction function
+
+==== With an unmanaged transaction
+
+Now the same examples with unmanaged transactions. First, listening them. Here we pass a mapping function directly to `fetchWith`.
+The pattern of opening a session and transaction is the same as before.
+
+[[statement-with-result-unmanaged-tx]]
+.Listening results with an unmanaged transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-unmanaged-tx]
+----
+<.> The unmanaged transaction passed to the statement,
+<.> and the mapping function applied. `moviesTitle` is a `List` containing `String` elements in the end.
+
+The streaming example looks pretty similar to the one applied with the transactional function.
+As we pass the `Session` object itself, we are using an auto-commit transaction.
+
+[[statement-with-result-auto-commit-stream]]
+.Streaming results with an auto-commit-transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-auto-commit-stream]
+----
+
+Again, please note that the stream is only available in the closure. It is not meant to live outside the transactional scope.
+
+[[reactive-api]]
+== Reactive API
+
+For the reactive API only the variants inside a transactional function are presented as they are probably the most complex
+ones to get right: You have to deal with to resources: The session itself and the inner publisher returned from the transactional
+function.
+
+=== Executing statements
+
+The most important part in the following example is not necessarily our API, but the use of Reactors `fromDirect` operator when converting
+a publisher of a single element into a `Mono`: That operator trusts the user that the publisher will return zero or one element
+and doesn't cancel after the first item being emitted and thus rolling back the transaction:
+
+[[statement-without-result-tx-function-reactive-stream]]
+.Reactive streaming results with an managed transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result-tx-function-reactive-stream]
+----
+<.> The session should be opened non-blocking and as late as possible
+<.> This is the actual call from the Cypher-DSL into the driver
+<.> Closed what you opened
+<.> The reactive `executeWith`-variant returns the summary as well
+
+=== Fetching results
+
+This example uses our original statement and arbitrary skips 2 elements and then takes only 30 elements.
+As the transaction is managed by the driver, canceling the publisher via `take()` won't rollback the transaction.
+
+[[statement-with-result-tx-function-reactive-stream]]
+.Reactive streaming results with an managed transaction
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function-reactive-stream]
+----

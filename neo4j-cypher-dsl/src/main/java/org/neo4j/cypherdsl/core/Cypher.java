@@ -33,8 +33,8 @@ import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
-import org.neo4j.cypherdsl.core.ProcedureCall.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -839,6 +839,8 @@ public final class Cypher {
 	 * Provides access to the foreign DSL adapter. Please make sure you have the necessary runtime dependencies on the class path,
 	 * otherwise you will see some kind of {@link ClassNotFoundException} along various classes related to the foreign DSL.
 	 *
+	 * @param expression The expression that should be adapted
+	 * @param <FE> The type of the expression
 	 * @return A foreign adapter
 	 * @since 2021.1.0
 	 * @throws IllegalArgumentException in case the object cannot be adapter
