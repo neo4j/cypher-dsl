@@ -31,9 +31,9 @@ import org.neo4j.cypherdsl.core.internal.YieldItems;
  * and those who don't.
  *
  * @author Michael J. Simons
- * @since TBA
+ * @since 2021.2.1
  */
-@API(status = INTERNAL, since = "TBA")
+@API(status = INTERNAL, since = "2021.2.1")
 class ProcedureCallImpl extends AbstractStatement implements ProcedureCall {
 
 	static ProcedureCall create(ProcedureName name, Arguments arguments, YieldItems yieldItems, Where optionalWhere) {

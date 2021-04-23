@@ -56,9 +56,9 @@ import org.neo4j.driver.summary.ResultSummary;
  *
  * @author Michael J. Simons
  * @soundtrack Motörhead - Live At Brixton Academy
- * @since TBA
+ * @since 2021.2.1
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = EXPERIMENTAL, since = "2021.2.1")
 public interface ResultStatement extends Statement {
 
 	/**

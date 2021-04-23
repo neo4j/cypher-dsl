@@ -146,7 +146,7 @@ public interface Statement extends Visitable {
 	 *
 	 * @param queryRunner a query runner
 	 * @return A result summary (including server information, counters etc).
-	 * @since TBA
+	 * @since 2021.2.1
 	 */
 	ResultSummary executeWith(QueryRunner queryRunner);
 
