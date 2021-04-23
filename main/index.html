@@ -556,14 +556,22 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#callingarbitraryproceduresandfunctions">4.3. Calling arbitrary procedures and functions</a></li>
 </ul>
 </li>
-<li><a href="#static-meta-model">5. Building a static meta model</a>
+<li><a href="#driver-integration">5. Integration with the Neo4j-Java-Driver</a>
 <ul class="sectlevel2">
-<li><a href="#concepts">5.1. Concepts</a></li>
-<li><a href="#possibleusage">5.2. Possible Usage</a></li>
-<li><a href="#thespringdataneo4j6annotationprocessor">5.3. The Spring Data Neo4j 6 annotation processor</a></li>
+<li><a href="#introduction2">5.1. Introduction</a></li>
+<li><a href="#addadditionaldependencies">5.2. Add additional dependencies</a></li>
+<li><a href="#imperative-api">5.3. Imperative (blocking) API</a></li>
+<li><a href="#reactive-api">5.4. Reactive API</a></li>
 </ul>
 </li>
-<li><a href="#appendix">6. Appendix</a>
+<li><a href="#static-meta-model">6. Building a static meta model</a>
+<ul class="sectlevel2">
+<li><a href="#concepts">6.1. Concepts</a></li>
+<li><a href="#possibleusage">6.2. Possible Usage</a></li>
+<li><a href="#thespringdataneo4j6annotationprocessor">6.3. The Spring Data Neo4j 6 annotation processor</a></li>
+</ul>
+</li>
+<li><a href="#appendix">7. Appendix</a>
 <ul class="sectlevel2">
 <li><a href="#query-dsl-support">Query-DSL support</a></li>
 <li><a href="#buildingtheneo4jcypher-dsl">Building the Neo4j Cypher-DSL</a></li>
@@ -1573,12 +1581,512 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 </div>
 </div>
 <div class="sect1">
-<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>5. Building a static meta model</h2>
+<h2 id="driver-integration"><a class="anchor" href="#driver-integration"></a>5. Integration with the Neo4j-Java-Driver</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="concepts"><a class="anchor" href="#concepts"></a>5.1. Concepts</h3>
+<h3 id="introduction2"><a class="anchor" href="#introduction2"></a>5.1. Introduction</h3>
+<div class="paragraph">
+<p>The Cypher-DSL is - apart from <a href="https://github.com/apiguardian-team/apiguardian">API Guardian</a> - dependency free.
+It has however some optional dependency you can add to use more functionality.
+One of those dependencies is the <a href="https://github.com/neo4j/neo4j-java-driver">Neo4j-Java-Driver</a>.
+The Neo4j-Java-Driver - or sometimes Bolt for Java or Bolt-Driver - implements Neo4j&#8217;s Bolt protocol
+and provides a connection to a single Neo4j instance or a cluster.</p>
+</div>
+<div class="paragraph">
+<p>While the Cypher-DSL creates statements that eventually will be rendered as a <code>String</code>, it has some knowledge about the
+statements generated:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Will the statements return something?</p>
+</li>
+<li>
+<p>Or will the statements just run updates?</p>
+</li>
+<li>
+<p>Will the statements be profiled?</p>
+</li>
+<li>
+<p>Do the statements carry parameter definitions and values for parameters?</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>We can use that knowledge to provide a thin shim for using the Cypher-DSL with the API the Neo4j-Java-Driver provides
+without reinventing the wheel.</p>
+</div>
+<div class="paragraph">
+<p>In most cases the Cypher-DSL will generate one of two types of statements:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>org.neo4j.cypherdsl.core.Statement</code>: A statement without a result. It can be executed, but it cannot be fetched.
+You will be able to check for the number of affected database entities tia the driver&#8217;s <code>ResultSummary</code>.</p>
+</li>
+<li>
+<p><code>org.neo4j.cypherdsl.core.ResultStatement</code>: A statement known to have a result. It can be executed or fetched.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Both interfaces provide the appropriate methods, which will be discussed below.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This API is not required to use the driver nor is the driver required for using the Cypher-DSL.
+      The main API provided with the Cypher-DSL is <code>Statement#getCypher()</code> for retrieving a Cypher-String and optional call
+      to <code>Statement#getParameters()</code> to retrieve parameters stored with the statement.
+     <br>
+      Those can be used in many ways and forms with the Neo4j-Java-Driver or mapping frameworks like
+      Neo4j-OGM or Spring Data Neo4j 6+.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="addadditionaldependencies"><a class="anchor" href="#addadditionaldependencies"></a>5.2. Add additional dependencies</h3>
+<div class="listingblock">
+<div class="title">Listing 14. Neo4j-Java-Driver added via Maven</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+        <span class="tag">&lt;groupId&gt;</span>org.neo4j.driver<span class="tag">&lt;/groupId&gt;</span>
+        <span class="tag">&lt;artifactId&gt;</span>neo4j-java-driver<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>4.2.4<span class="tag">&lt;/artifactId&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Any 4.x version of the Driver will work, we currently test against 4.2.4.
+In case you want to use our integration with reactive sessions, you will have to add <a href="https://projectreactor.io">Project Reactor</a>.
+We took the freedom to settle on one of the reactive libraries out there for our integration.</p>
+</div>
+<div class="paragraph">
+<p>The publishers defined by Reactor can be converted into other libraries types or you can use the driver directly.
+The driver itself uses the vendor agnostic <a href="https://www.reactive-streams.org">Reactive Streams spec</a>.</p>
+</div>
+<div class="paragraph">
+<p>The coordinates are:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 15. Optional Project reactor dependencies.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>io.projectreactor<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>reactor-core<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>3.4.5<span class="tag">&lt;/artifactId&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We test with 2020.0.6 ("Europium") of reactor.</p>
+</div>
+<div class="paragraph">
+<p>For your convenience, the Gradle version for both depedencies:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 16. Gradle variant for additional dependencies</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j.driver:neo4j-java-driver:4.2.4</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">io.projectreactor:reactor-core:3.4.5</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="imperative-api"><a class="anchor" href="#imperative-api"></a>5.3. Imperative (blocking) API</h3>
+<div class="paragraph">
+<p>You create an instance of the Neo4j driver.
+This instance should be a long living instance in your application:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 17. Create a driver instance</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic(<span class="string"><span class="delimiter">&quot;</span><span class="content">neo4j</span><span class="delimiter">&quot;</span></span>, neo4j.getAdminPassword()));</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Both <code>org.neo4j.driver.Session</code> and <code>org.neo4j.driver.Transaction</code> implement a <code>QueryRunner</code> (the same applies for the
+reactive variants).
+It is your responsibility to pick the right kind of interaction with the database (auto commit, transactions or transactional functions).
+If you pass a <code>Session</code> to the Cypher-DSL, auto commit transactions will be used. If you pass in a transaction object,
+unmanaged transactions will be used and you must commit or rollback as needed and take care for retries.</p>
+</div>
+<div class="paragraph">
+<p>A safe bet is to pass one of the Cypher-DSL methods to the driver as a READ or WRITE transaction.</p>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+The Cypher-DSL won&#8217;t close, commit or rollback anything you pass to it. You open resources, you close them. In all
+     cases where the Cypher-DSL opens or provides a resource, it will take care closing it correctly.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Our goal when writing this small integration with the official driver was to apply best practices when working with the
+driver without adding too much cognitive overhead or introducing new types.</p>
+</div>
 <div class="sect3">
-<h4 id="astaticmetamodelisoptional"><a class="anchor" href="#astaticmetamodelisoptional"></a>5.1.1. A static meta model is optional</h4>
+<h4 id="executingstatements"><a class="anchor" href="#executingstatements"></a>5.3.1. Executing statements</h4>
+<div class="paragraph">
+<p>We first have a look at statements that don&#8217;t return data, but may execute updates or call stored procedures.
+We will use <a href="#statement-without-result">the following listing</a> as example:</p>
+</div>
+<div id="statement-without-result" class="listingblock">
+<div class="title">Listing 18. Example statement that does not return any data.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+var statement = Cypher.create(m)
+    .set(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.anonParameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">statementWithoutResult</span><span class="delimiter">&quot;</span></span>)))
+    .build();</code></pre>
+</div>
+</div>
+<div class="sect4">
+<h5 id="insidetransactionalfunctions"><a class="anchor" href="#insidetransactionalfunctions"></a>Inside transactional functions</h5>
+<div class="paragraph">
+<p>The driver has the concept of <em>transactional functions</em>. This basically describes a transaction manager understanding the
+semantics of a Neo4j cluster, possible errors that can occur, routing and such.
+The transaction manager is able to retry statements in certain error cases.</p>
+</div>
+<div class="paragraph">
+<p>Transactional functions are passed as <code>TransactionalWork&lt;T&gt;</code> to a session.
+The <code>executeWith</code> API on <code>Statement</code> fits this interface and you can pass it as a method reference.
+It will always return a result summary:</p>
+</div>
+<div id="statement-without-result-tx-function" class="listingblock">
+<div class="title">Listing 19. Executing statements in a managed transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
+    var summary = session.writeTransaction(statement::executeWith); <i class="conum" data-value="2"></i><b>(2)</b>
+    assertThat(summary.counters().nodesCreated()).isEqualTo(<span class="integer">1</span>); <i class="conum" data-value="3"></i><b>(3)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Open a session</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Pass the <code>executeWith</code> method from the Cypher-DSL statement to the driver</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Do something with the result summary</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock tip">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-tip" title="Tip"></i>
+</td>
+<td class="content">
+Read more about transactional functions in the official manual: <a href="https://neo4j.com/docs/driver-manual/4.0/session-api/configuration/#driver-simple-transaction-fn">Imperative sessions and transaction functions</a>.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="withanunmanagedtransaction"><a class="anchor" href="#withanunmanagedtransaction"></a>With an unmanaged transaction</h5>
+<div class="paragraph">
+<p>A transaction you retrieve from a session is called unmanaged transaction.
+It is your responsibility to commit or rollback and close it.</p>
+</div>
+<div id="statement-without-result-unmanaged-tx" class="listingblock">
+<div class="title">Listing 20. Executing statements in an unmanaged transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session();
+    var tx = session.beginTransaction() <i class="conum" data-value="1"></i><b>(1)</b>
+) {
+    var summary = statement.executeWith(tx); <i class="conum" data-value="2"></i><b>(2)</b>
+    tx.commit(); <i class="conum" data-value="3"></i><b>(3)</b>
+
+    assertThat(summary.counters().nodesCreated()).isEqualTo(<span class="integer">1</span>);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Get a transaction from the session</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Pass it to the statement, execute and get the result summary</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Do more things in the transaction, than commit or rollback it</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The advantage here is that you have more control and are not limited to idempotent operations for the transactional function.
+The disadvantage has been hidden away in that example: You have to take care of exceptions that might happen due to cluster
+errors yourself.</p>
+</div>
+<div class="paragraph">
+<p>If you want to use an auto-commit transaction (for example for a <code>PERIODIC COMMIT</code> or an APOC call), just pass a <code>Session</code>
+to <code>executeWith</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="fetchingdata"><a class="anchor" href="#fetchingdata"></a>5.3.2. Fetching data</h4>
+<div class="paragraph">
+<p>The following examples will use this statement, returning the title of movies in the Movie-Graph:</p>
+</div>
+<div id="statement-with-result" class="listingblock">
+<div class="title">Listing 21. Example statement that does return data.</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
+var statement = Cypher.match(m).returning(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>)).build();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>We provide two forms of accessing data via the imperative API: Pulling everything into a list or streaming records.
+The <a href="#reactive-api">reactive API</a> is fully non-blocking and uses a publishing API.</p>
+</div>
+<div class="sect4">
+<h5 id="insidetransactionalfunctions2"><a class="anchor" href="#insidetransactionalfunctions2"></a>Inside transactional functions</h5>
+<div id="statement-with-result-tx-function" class="listingblock">
+<div class="title">Listing 22. Fetching statements in a managed transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    var moviesTitles = session.readTransaction(statement::fetchWith) <i class="conum" data-value="2"></i><b>(2)</b>
+        .stream() <i class="conum" data-value="3"></i><b>(3)</b>
+        .map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
+        .collect(Collectors.toList());
+
+    assertMovieTitleList(moviesTitles);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Open a session</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Pass the <code>fetchWith</code> method from the Cypher-DSL statement to the driver</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>readTransaction</code> (or <code>writeTransaction</code>) returns whatever the transactional work returns
+Our transactional work <code>fetchWith</code> returns a <code>java.util.List</code> of records
+Here we turn it into a Java stream (not connected to Neo4j) and map and collect it</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p><code>fetchWith</code> does support a second parameter, a mapping function <code>Function&lt;Record, T&gt; mappingFunction</code>. We can use this
+with a transactional function as well and do the mapping inside the transaction.
+For the example, this form here is easier to read, but the other one may have benefits in regards of memory allocation.</p>
+</div>
+<div class="paragraph">
+<p>You also can stream the result. In contrast to the plain Driver API, we don&#8217;t hand out the stream itself but expect a
+closure dealing with the stream. We do this to make it impossible to use the stream - which is still connected to the database -
+outside the transaction. With managed transactions, it looks like this:</p>
+</div>
+<div id="statement-with-result-tx-function-stream" class="listingblock">
+<div class="title">Listing 23. Streaming statements in a managed transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
+
+    var summary = session.readTransaction(tx -&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+        statement.streamWith(tx, s -&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
+            var moviesTitles = s.map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
+                .collect(Collectors.toList()); <i class="conum" data-value="4"></i><b>(4)</b>
+            assertMovieTitleList(moviesTitles);
+        })
+    );
+    assertThat(summary.query().text()).isEqualTo(statement.getCypher());
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Open a session</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Open a managed transaction, but don&#8217;t pass a method reference this time</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Instead, call <code>streamWith</code>, pass the transaction and a consumer for the stream <code>s</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Inside this example, we fully materialize the stream and map records as they pass by
+As the streaming method will always return the result summary, this will also be the type of the transaction function</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="withanunmanagedtransaction2"><a class="anchor" href="#withanunmanagedtransaction2"></a>With an unmanaged transaction</h5>
+<div class="paragraph">
+<p>Now the same examples with unmanaged transactions. First, listening them. Here we pass a mapping function directly to <code>fetchWith</code>.
+The pattern of opening a session and transaction is the same as before.</p>
+</div>
+<div id="statement-with-result-unmanaged-tx" class="listingblock">
+<div class="title">Listing 24. Listening results with an unmanaged transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session();
+    var tx = session.beginTransaction()) {
+
+    var moviesTitles = statement.fetchWith(
+        tx, <i class="conum" data-value="1"></i><b>(1)</b>
+        r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString() <i class="conum" data-value="2"></i><b>(2)</b>
+    );
+    tx.commit();
+
+    assertMovieTitleList(moviesTitles);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The unmanaged transaction passed to the statement,</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>and the mapping function applied. <code>moviesTitle</code> is a <code>List</code> containing <code>String</code> elements in the end.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The streaming example looks pretty similar to the one applied with the transactional function.
+As we pass the <code>Session</code> object itself, we are using an auto-commit transaction.</p>
+</div>
+<div id="statement-with-result-auto-commit-stream" class="listingblock">
+<div class="title">Listing 25. Streaming results with an auto-commit-transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) {
+
+    var summary = statement.streamWith(session, stream -&gt; {
+        var moviesTitles = stream
+            .map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
+            .collect(Collectors.toList());
+        assertMovieTitleList(moviesTitles);
+    });
+    assertThat(summary.query().text()).isEqualTo(statement.getCypher());
+}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Again, please note that the stream is only available in the closure. It is not meant to live outside the transactional scope.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="reactive-api"><a class="anchor" href="#reactive-api"></a>5.4. Reactive API</h3>
+<div class="paragraph">
+<p>For the reactive API only the variants inside a transactional function are presented as they are probably the most complex
+ones to get right: You have to deal with to resources: The session itself and the inner publisher returned from the transactional
+function.</p>
+</div>
+<div class="sect3">
+<h4 id="executingstatements2"><a class="anchor" href="#executingstatements2"></a>5.4.1. Executing statements</h4>
+<div class="paragraph">
+<p>The most important part in the following example is not necessarily our API, but the use of Reactors <code>fromDirect</code> operator when converting
+a publisher of a single element into a <code>Mono</code>: That operator trusts the user that the publisher will return zero or one element
+and doesn&#8217;t cancel after the first item being emitted and thus rolling back the transaction:</p>
+</div>
+<div id="statement-without-result-tx-function-reactive-stream" class="listingblock">
+<div class="title">Listing 26. Reactive streaming results with an managed transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">Mono.usingWhen(
+    Mono.fromSupplier(driver::rxSession), <i class="conum" data-value="1"></i><b>(1)</b>
+    s -&gt; Mono.fromDirect(s.writeTransaction(statement::executeWith)), <i class="conum" data-value="2"></i><b>(2)</b>
+    RxSession::close <i class="conum" data-value="3"></i><b>(3)</b>
+).as(StepVerifier::create)
+    .expectNextMatches(r -&gt; r.counters().nodesCreated() == <span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
+    .verifyComplete();</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The session should be opened non-blocking and as late as possible</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>This is the actual call from the Cypher-DSL into the driver</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Closed what you opened</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The reactive <code>executeWith</code>-variant returns the summary as well</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="fetchingresults"><a class="anchor" href="#fetchingresults"></a>5.4.2. Fetching results</h4>
+<div class="paragraph">
+<p>This example uses our original statement and arbitrary skips 2 elements and then takes only 30 elements.
+As the transaction is managed by the driver, canceling the publisher via <code>take()</code> won&#8217;t rollback the transaction.</p>
+</div>
+<div id="statement-with-result-tx-function-reactive-stream" class="listingblock">
+<div class="title">Listing 27. Reactive streaming results with an managed transaction</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">Flux.usingWhen(
+    Mono.fromSupplier(driver::rxSession),
+    s -&gt; s.readTransaction(statement::fetchWith),
+    RxSession::close
+)
+    .skip(<span class="integer">2</span>)
+    .take(<span class="integer">30</span>)
+    .as(StepVerifier::create)
+    .expectNextCount(<span class="integer">30</span>)
+    .verifyComplete();</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>6. Building a static meta model</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="concepts"><a class="anchor" href="#concepts"></a>6.1. Concepts</h3>
+<div class="sect3">
+<h4 id="astaticmetamodelisoptional"><a class="anchor" href="#astaticmetamodelisoptional"></a>6.1.1. A static meta model is optional</h4>
 <div class="paragraph">
 <p>First let&#8217;s stress this: a static meta model is optional for the Cypher-DSL. It is completely OK to use the Cypher-DSL
 as shown in the <a href="#how-to-use-it.examples">examples in the "How to use it" part</a>:
@@ -1601,7 +2109,7 @@ Graph-QL schemes.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="static-meta-model.building-blocks"><a class="anchor" href="#static-meta-model.building-blocks"></a>5.1.2. Building blocks</h4>
+<h4 id="static-meta-model.building-blocks"><a class="anchor" href="#static-meta-model.building-blocks"></a>6.1.2. Building blocks</h4>
 <div class="paragraph">
 <p>The Cypher DSL offers the following building blocks as part of the public API:</p>
 </div>
@@ -1642,7 +2150,7 @@ declaration of the type <code>Node</code>: it just reads better.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="averysimplestaticmodel"><a class="anchor" href="#averysimplestaticmodel"></a>5.1.3. A very simple, static model</h4>
+<h4 id="averysimplestaticmodel"><a class="anchor" href="#averysimplestaticmodel"></a>6.1.3. A very simple, static model</h4>
 <div class="paragraph">
 <p>Both <code>NodeBase</code> and  <code>RelationshipBase</code> are meant to be extended to put your static model into something that is usable
 with the Cypher-DSL.</p>
@@ -1928,7 +2436,7 @@ This is stored at the owner. In this case, the <code>Person</code>:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="summary2"><a class="anchor" href="#summary2"></a>5.1.4. Summary</h4>
+<h4 id="summary2"><a class="anchor" href="#summary2"></a>6.1.4. Summary</h4>
 <div class="paragraph">
 <p>While there are possible other ways to define a static meta model with the Cypher-DSL, this is the way we create them with
 the <code>neo4j-cypher-dsl-codegen</code> models.</p>
@@ -1936,7 +2444,7 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="possibleusage"><a class="anchor" href="#possibleusage"></a>5.2. Possible Usage</h3>
+<h3 id="possibleusage"><a class="anchor" href="#possibleusage"></a>6.2. Possible Usage</h3>
 <div class="paragraph">
 <p>Please assume we did model the "Movie graph" (<code>:play movies</code> in Neo4j-Browser) with the following scheme:</p>
 </div>
@@ -2007,7 +2515,7 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="workwithproperties"><a class="anchor" href="#workwithproperties"></a>5.2.1. Work with properties</h4>
+<h4 id="workwithproperties"><a class="anchor" href="#workwithproperties"></a>6.2.1. Work with properties</h4>
 <div class="paragraph">
 <p>Properties can be used like normal objects:</p>
 </div>
@@ -2036,7 +2544,7 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect3">
-<h4 id="querynodesorrelationshipsbyproperties"><a class="anchor" href="#querynodesorrelationshipsbyproperties"></a>5.2.2. Query nodes or relationships by properties</h4>
+<h4 id="querynodesorrelationshipsbyproperties"><a class="anchor" href="#querynodesorrelationshipsbyproperties"></a>6.2.2. Query nodes or relationships by properties</h4>
 <div class="paragraph">
 <p>Use <code>withProperties</code> (and <code>named</code> you like) to model your queries as needed.
 Applicable to properties of nodes such as the title:</p>
@@ -2076,7 +2584,7 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect3">
-<h4 id="workwithrelationships"><a class="anchor" href="#workwithrelationships"></a>5.2.3. Work with relationships</h4>
+<h4 id="workwithrelationships"><a class="anchor" href="#workwithrelationships"></a>6.2.3. Work with relationships</h4>
 <div class="paragraph">
 <p>Relationships can be worked with like with properties:</p>
 </div>
@@ -2118,12 +2626,12 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect2">
-<h3 id="thespringdataneo4j6annotationprocessor"><a class="anchor" href="#thespringdataneo4j6annotationprocessor"></a>5.3. The Spring Data Neo4j 6 annotation processor</h3>
+<h3 id="thespringdataneo4j6annotationprocessor"><a class="anchor" href="#thespringdataneo4j6annotationprocessor"></a>6.3. The Spring Data Neo4j 6 annotation processor</h3>
 <div class="paragraph">
 <p>We provide a Java annotation processor for <a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j</a> under the following coordinates:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 14. Coordinates of the SDN 6 annotation processor</div>
+<div class="title">Listing 28. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
 <pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.1-SNAPSHOT</code></pre>
 </div>
@@ -2155,7 +2663,7 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 </table>
 </div>
 <div class="sect3">
-<h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>5.3.1. Configure your build</h4>
+<h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>6.3.1. Configure your build</h4>
 <div class="sect4">
 <h5 id="maven"><a class="anchor" href="#maven"></a>Maven</h5>
 <div class="paragraph">
@@ -2240,7 +2748,7 @@ application like as follows to avoid dependency conflicts:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="usage"><a class="anchor" href="#usage"></a>5.3.2. Usage</h4>
+<h4 id="usage"><a class="anchor" href="#usage"></a>6.3.2. Usage</h4>
 <div class="paragraph">
 <p>The processor supports the following arguments:</p>
 </div>
@@ -2475,7 +2983,7 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 </div>
 </div>
 <div class="sect1">
-<h2 id="appendix"><a class="anchor" href="#appendix"></a>6. Appendix</h2>
+<h2 id="appendix"><a class="anchor" href="#appendix"></a>7. Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="query-dsl-support"><a class="anchor" href="#query-dsl-support"></a>Query-DSL support</h3>
@@ -2693,7 +3201,7 @@ We use the following in our tests:</p>
 <p>The build requires a local copy of the project:</p>
 </div>
 <div id="clone-cypher-dsl" class="listingblock">
-<div class="title">Listing 15. Clone the Neo4j Cypher-DSL</div>
+<div class="title">Listing 29. Clone the Neo4j Cypher-DSL</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ git clone git@github.com:neo4j-contrib/cypher-dsl.git</code></pre>
 </div>
@@ -2706,7 +3214,7 @@ We use the following in our tests:</p>
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 16. Verify your JDK</div>
+<div class="title">Listing 30. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;11.0.10&quot; 2021-01-19
@@ -2718,7 +3226,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixe
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 17. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 31. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability           Origin
@@ -2735,7 +3243,7 @@ native-image             21.0.0              Native Image                  Early
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 18. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 32. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -2744,7 +3252,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 19. Build with default settings on Windows</div>
+<div class="title">Listing 33. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -2756,7 +3264,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 20. Skipping native tests</div>
+<div class="title">Listing 34. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -2768,7 +3276,7 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 21. Skipping native tests</div>
+<div class="title">Listing 35. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -2835,7 +3343,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 22. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 36. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -2856,7 +3364,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 23. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 37. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -2868,7 +3376,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 24. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 38. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -2893,7 +3401,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 25. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 39. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -2925,7 +3433,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 26. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 40. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -2943,7 +3451,7 @@ RETURN t, t2</code></pre>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 27. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 41. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -2957,7 +3465,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 28. Public internal API goes into a dedicated package</div>
+<div class="title">Listing 42. Public internal API goes into a dedicated package</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 MATCH (p:Package) - [:CONTAINS] -&gt; (c)
@@ -3815,7 +4323,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-15 14:29:45 UTC
+Last updated 2021-04-23 15:26:54 UTC
 </div>
 </div>
 </body>
