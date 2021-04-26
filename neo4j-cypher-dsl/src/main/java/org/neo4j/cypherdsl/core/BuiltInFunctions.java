@@ -86,7 +86,8 @@ final class BuiltInFunctions {
 	enum Strings implements FunctionDefinition {
 
 		TO_LOWER("toLower"),
-		TRIM("trim");
+		TRIM("trim"),
+		SPLIT("split");
 
 		private final String implementationName;
 
