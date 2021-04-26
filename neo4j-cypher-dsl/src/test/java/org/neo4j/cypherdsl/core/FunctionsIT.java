@@ -324,7 +324,10 @@ class FunctionsIT {
 			), "RETURN duration({days: 14, hours: 16, minutes: 12})"),
 			Arguments
 				.of(Functions.duration("P14DT16H12M"), "RETURN duration('P14DT16H12M')"),
-			Arguments.of(Functions.duration(Cypher.parameter("$myDateParameter")), "RETURN duration($myDateParameter)")
+			Arguments.of(Functions.duration(Cypher.parameter("$myDateParameter")), "RETURN duration($myDateParameter)"),
+			Arguments.of(Functions.toInteger(Cypher.literalOf("23")), "RETURN toInteger('23')"),
+			Arguments.of(Functions.toFloat(Cypher.literalOf("23.42")), "RETURN toFloat('23.42')"),
+			Arguments.of(Functions.toBoolean(Cypher.literalOf("false")), "RETURN toBoolean('false')")
 		);
 	}
 }

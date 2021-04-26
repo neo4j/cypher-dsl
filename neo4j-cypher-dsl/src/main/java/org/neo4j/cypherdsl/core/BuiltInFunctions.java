@@ -65,7 +65,11 @@ final class BuiltInFunctions {
 		SIZE("size"),
 
 		START_NODE("startNode"),
-		TYPE("type");
+		TYPE("type"),
+
+		TO_INTEGER("toInteger"),
+		TO_FLOAT("toFloat"),
+		TO_BOOLEAN("toBoolean");
 
 		private final String implementationName;
 

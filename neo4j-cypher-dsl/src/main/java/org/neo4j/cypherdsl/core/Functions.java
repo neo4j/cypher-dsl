@@ -1746,4 +1746,46 @@ public final class Functions {
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.TAN, expression);
 	}
+
+	/**
+	 * Creates a function invocation for {@code toInteger({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tointeger">toInteger</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code toInteger({})}.
+	 * @since 2021.2.1
+	 */
+	public static Object toInteger(@NotNull Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(Scalars.TO_INTEGER, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code toFloat({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tofloat">toFloat</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code toFloat({})}.
+	 * @since 2021.2.1
+	 */
+	public static Object toFloat(@NotNull Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(Scalars.TO_FLOAT, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code toBoolean({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-toboolean">toBoolean</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code toBoolean({})}.
+	 * @since 2021.2.1
+	 */
+	public static Object toBoolean(@NotNull Expression expression) {
+
+		Assertions.notNull(expression, "The expression is required.");
+		return FunctionInvocation.create(Scalars.TO_BOOLEAN, expression);
+	}
 }
