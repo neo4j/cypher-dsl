@@ -211,6 +211,7 @@ class FunctionsIT {
 			Arguments.of(Functions.countDistinct(e1), "RETURN count(DISTINCT e1)"),
 			Arguments.of(Functions.coalesce(e1, e2), "RETURN coalesce(e1, e2)"),
 			Arguments.of(Functions.toLower(e1), "RETURN toLower(e1)"),
+			Arguments.of(Functions.trim(e1), "RETURN trim(e1)"),
 			Arguments.of(Functions.size(e1), "RETURN size(e1)"),
 			Arguments.of(Functions.size(r), "RETURN size((n:`Node`)-[r]->(m:`Node2`))"),
 			Arguments.of(Functions.exists(e1), "RETURN exists(e1)"),
