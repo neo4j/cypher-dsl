@@ -1755,7 +1755,8 @@ public final class Functions {
 	 * @return A function call for {@code toInteger({})}.
 	 * @since 2021.2.1
 	 */
-	public static Object toInteger(@NotNull Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation toInteger(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(Scalars.TO_INTEGER, expression);
@@ -1769,7 +1770,8 @@ public final class Functions {
 	 * @return A function call for {@code toFloat({})}.
 	 * @since 2021.2.1
 	 */
-	public static Object toFloat(@NotNull Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation toFloat(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(Scalars.TO_FLOAT, expression);
@@ -1783,7 +1785,8 @@ public final class Functions {
 	 * @return A function call for {@code toBoolean({})}.
 	 * @since 2021.2.1
 	 */
-	public static Object toBoolean(@NotNull Expression expression) {
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation toBoolean(@NotNull Expression expression) {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(Scalars.TO_BOOLEAN, expression);
