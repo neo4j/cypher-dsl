@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.lang.reflect.Array;
+import java.net.URI;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,7 @@ import java.util.function.Consumer;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
@@ -794,7 +796,7 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static ListOperator valueAt(Expression targetExpression, Integer index) {
 
-		return ListOperator.valueAt(targetExpression, Cypher.literalOf(index));
+		return valueAt(targetExpression, Cypher.literalOf(index));
 	}
 
 	/**
@@ -859,6 +861,55 @@ public final class Cypher {
 			}
 		}
 		return initializedForeignAdapterFactory.getAdapterFor(expression);
+	}
+
+	/**
+	 * Starts building a {@code LOAD CSV} clause by using a periodic commit. The default rate of the database will be used.
+	 *
+	 * @return An ongoing definition of a {@code LOAD CSV} clause
+	 * @since 2021.2.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static ExposesLoadCSV usingPeriodicCommit() {
+
+		return usingPeriodicCommit(null);
+	}
+
+	/**
+	 * Starts building a {@code LOAD CSV} clause by using a periodic commit.
+	 *
+	 * @param rate The rate to be used. No checks are done on the rate, the database will verify valid values.
+	 * @return An ongoing definition of a {@code LOAD CSV} clause
+	 * @since 2021.2.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static ExposesLoadCSV usingPeriodicCommit(@Nullable Integer rate) {
+
+		return LoadCSVStatementBuilder.usingPeriodicCommit(rate);
+	}
+
+	/**
+	 * Starts building a {@code LOAD CSV}. No headers are assumed.
+	 *
+	 * @param from The {@link URI} to load data from. Any uri that is resolvable by the database itself is valid.
+	 * @return An ongoing definition of a {@code LOAD CSV} clause
+	 * @since 2021.2.1
+	 */
+	public static LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from) {
+
+		return loadCSV(from, false);
+	}
+
+	/**
+	 * Starts building a {@code LOAD CSV}.
+	 *
+	 * @param from        The {@link URI} to load data from. Any uri that is resolvable by the database itself is valid.
+	 * @param withHeaders Set to {@literal true} if the csv file contains header
+	 * @return An ongoing definition of a {@code LOAD CSV} clause
+	 */
+	public static LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
+
+		return LoadCSVStatementBuilder.loadCSV(from, withHeaders);
 	}
 
 	private static Statement unionImpl(boolean unionAll, Statement... statements) {

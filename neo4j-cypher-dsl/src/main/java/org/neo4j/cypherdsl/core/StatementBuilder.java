@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
-
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -221,7 +220,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingReadingAndWith extends OngoingReading, ExposesMatch {
+	interface OngoingReadingAndWith extends OngoingReading, ExposesMatch, ExposesLoadCSV {
 	}
 
 	/**

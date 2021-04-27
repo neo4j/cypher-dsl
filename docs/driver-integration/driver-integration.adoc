@@ -235,8 +235,8 @@ Again, please note that the stream is only available in the closure. It is not m
 [[reactive-api]]
 == Reactive API
 
-For the reactive API only the variants inside a transactional function are presented as they are probably the most complex
-ones to get right: You have to deal with to resources: The session itself and the inner publisher returned from the transactional
+For the reactive API the variants inside a transactional function are focussed here as they are probably the most complex
+ones to get right: You have to deal with to resources: The session itself, and the inner publisher returned from the transactional
 function.
 
 === Executing statements
@@ -258,6 +258,8 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/te
 
 === Fetching results
 
+==== With a reactive, transactional function
+
 This example uses our original statement and arbitrary skips 2 elements and then takes only 30 elements.
 As the transaction is managed by the driver, canceling the publisher via `take()` won't rollback the transaction.
 
@@ -266,4 +268,19 @@ As the transaction is managed by the driver, canceling the publisher via `take()
 [source, java,indent=0,tabsize=4]
 ----
 include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function-reactive-stream]
+----
+
+==== Inside an auto-commit transaction
+
+One use case might be the bulk loading of data.
+By using an auto-commit transaction we effectively state that we neither manage a transaction ourselves nor we want the driver
+to manage one for us.
+In this case we use Neo4j's `LOAD CSV` clause that basically describes a Cypher script that runs in its own transaction.
+The server might or might not start streaming results after the configured periodic commit rate has been hit:
+
+[[periodic-commit-statement]]
+.Using `PERIODIC COMMIT LOAD CSV` from a reactive auto-commit transaction:
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=periodic-commit-statement]
 ----

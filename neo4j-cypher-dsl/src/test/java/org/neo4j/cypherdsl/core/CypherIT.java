@@ -2974,6 +2974,14 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("WITH {a: 'X', b: 'Y'} AS m RETURN m['a'], m.a");
 		}
+
+		@Test
+		void indexedProperties() {
+
+			SymbolicName alias = SymbolicName.of("line");
+			Statement statement = Cypher.returning(Cypher.valueAt(alias, 1)).build();
+			assertThat(statement.getCypher()).isEqualTo("RETURN line[1]");
+		}
 	}
 
 	@Nested

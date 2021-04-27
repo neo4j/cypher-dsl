@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -35,11 +36,13 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.ResultStatement;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
 import org.neo4j.driver.reactive.RxSession;
+import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -53,6 +56,7 @@ class ExecutableStatementsIT {
 
 	@Container
 	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.2")
+		.withClasspathResourceMapping("/books.csv", "/import/books.csv", BindMode.READ_ONLY)
 		.withReuse(true);
 
 	private static Driver driver;
@@ -260,6 +264,40 @@ class ExecutableStatementsIT {
 			.expectNextCount(30)
 			.verifyComplete();
 		// end::statement-with-result-tx-function-reactive-stream[]
+	}
+
+	@Test
+	void usingPeriodicCommit() {
+
+		// tag::periodic-commit-statement[]
+		var row = Cypher.name("row");
+		var a = Cypher.node("Author").withProperties("name", Functions.trim(Cypher.name("author"))).named("a");
+		var m = Cypher.node("Book").withProperties("name", row.property("Title")).named("b");
+
+		var statement = Cypher.usingPeriodicCommit(10)
+			.loadCSV(URI.create("file:///books.csv"), true).as(row).withFieldTerminator(";")
+			.create(m)
+			.with(m.getRequiredSymbolicName(), row)
+			.unwind(Functions.split(row.property("Authors"), "&")).as("author")
+			.merge(a)
+			.create(a.relationshipTo(m, "WROTE").named("r"))
+			.returningDistinct(m.property("name").as("name"))
+			.build();
+
+		Flux.using(driver::rxSession, statement::fetchWith, RxSession::close)
+			.as(StepVerifier::create)
+			.expectNextCount(50)
+			.verifyComplete();
+		// end::periodic-commit-statement[]
+
+		try (var session = driver.session()) {
+
+			var books = session.run("MATCH (b:Book) RETURN count(b)").single().get(0).asLong();
+			var authors = session.run("MATCH (a:Author) RETURN count(a)").single().get(0).asLong();
+
+			assertThat(books).isEqualTo(50L);
+			assertThat(authors).isEqualTo(5L);
+		}
 	}
 
 	void assertMovieTitleList(List<String> movieTitles) {

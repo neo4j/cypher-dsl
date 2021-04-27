@@ -274,6 +274,7 @@ public final class Functions {
 	 *
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code trim()} for one expression
+	 * @since 2021.2.1
 	 */
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation trim(@NotNull Expression expression) {
@@ -1839,5 +1840,29 @@ public final class Functions {
 
 		Assertions.notNull(expression, "The expression is required.");
 		return FunctionInvocation.create(Scalars.TO_BOOLEAN, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code linenumber({})}. Only applicable inside an {@code LOAD CSV} clause.
+	 *
+	 * @return A function call for {@code linenumber({})}.
+	 * @since 2021.2.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation linenumber() {
+
+		return FunctionInvocation.create(() -> "linenumber");
+	}
+
+	/**
+	 * Creates a function invocation for {@code file({})}. Only applicable inside an {@code LOAD CSV} clause.
+	 *
+	 * @return A function call for {@code file({})}.
+	 * @since 2021.2.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation file() {
+
+		return FunctionInvocation.create(() -> "file");
 	}
 }

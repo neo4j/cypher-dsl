@@ -72,20 +72,22 @@ import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.Unwind;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.CaseElse;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.internal.Distinct;
+import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.Namespace;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
+import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
-import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
-import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
-import org.neo4j.cypherdsl.core.ast.TypedSubtree;
-import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
@@ -710,6 +712,34 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		builder.append(" USING ");
 	}
+
+	void enter(LoadCSV loadCSV) {
+
+		builder.append("LOAD CSV");
+		if (loadCSV.isWithHeaders()) {
+			builder.append(" WITH HEADERS");
+		}
+		builder.append(" FROM '")
+			.append(loadCSV.getUri().toString())
+			.append("' AS ")
+			.append(loadCSV.getAlias());
+
+		if (loadCSV.getFieldTerminator() != null) {
+			builder.append(" FIELDTERMINATOR '")
+				.append(loadCSV.getFieldTerminator())
+				.append("'");
+		}
+		builder.append(" ");
+	}
+
+	void enter(UsingPeriodicCommit usingPeriodicCommit) {
+
+		builder.append("USING PERIODIC COMMIT ");
+		if (usingPeriodicCommit.getRate() != null) {
+			builder.append(usingPeriodicCommit.getRate()).append(" ");
+		}
+	}
+
 
 	@Override
 	public String getRenderedContent() {
