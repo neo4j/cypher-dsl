@@ -2011,8 +2011,8 @@ As we pass the <code>Session</code> object itself, we are using an auto-commit t
 <div class="sect2">
 <h3 id="reactive-api"><a class="anchor" href="#reactive-api"></a>5.4. Reactive API</h3>
 <div class="paragraph">
-<p>For the reactive API only the variants inside a transactional function are presented as they are probably the most complex
-ones to get right: You have to deal with to resources: The session itself and the inner publisher returned from the transactional
+<p>For the reactive API the variants inside a transactional function are focussed here as they are probably the most complex
+ones to get right: You have to deal with to resources: The session itself, and the inner publisher returned from the transactional
 function.</p>
 </div>
 <div class="sect3">
@@ -2057,6 +2057,8 @@ and doesn&#8217;t cancel after the first item being emitted and thus rolling bac
 </div>
 <div class="sect3">
 <h4 id="fetchingresults"><a class="anchor" href="#fetchingresults"></a>5.4.2. Fetching results</h4>
+<div class="sect4">
+<h5 id="withareactivetransactionalfunction"><a class="anchor" href="#withareactivetransactionalfunction"></a>With a reactive, transactional function</h5>
 <div class="paragraph">
 <p>This example uses our original statement and arbitrary skips 2 elements and then takes only 30 elements.
 As the transaction is managed by the driver, canceling the publisher via <code>take()</code> won&#8217;t rollback the transaction.</p>
@@ -2074,6 +2076,40 @@ As the transaction is managed by the driver, canceling the publisher via <code>t
     .as(StepVerifier::create)
     .expectNextCount(<span class="integer">30</span>)
     .verifyComplete();</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="insideanauto-committransaction"><a class="anchor" href="#insideanauto-committransaction"></a>Inside an auto-commit transaction</h5>
+<div class="paragraph">
+<p>One use case might be the bulk loading of data.
+By using an auto-commit transaction we effectively state that we neither manage a transaction ourselves nor we want the driver
+to manage one for us.
+In this case we use Neo4j&#8217;s <code>LOAD CSV</code> clause that basically describes a Cypher script that runs in its own transaction.
+The server might or might not start streaming results after the configured periodic commit rate has been hit:</p>
+</div>
+<div id="periodic-commit-statement" class="listingblock">
+<div class="title">Listing 28. Using <code>PERIODIC COMMIT LOAD CSV</code> from a reactive auto-commit transaction:</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var row = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">row</span><span class="delimiter">&quot;</span></span>);
+var a = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Author</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Functions.trim(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>))).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
+var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Book</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, row.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">Title</span><span class="delimiter">&quot;</span></span>)).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>);
+
+var statement = Cypher.usingPeriodicCommit(<span class="integer">10</span>)
+    .loadCSV(<span class="predefined-type">URI</span>.create(<span class="string"><span class="delimiter">&quot;</span><span class="content">file:///books.csv</span><span class="delimiter">&quot;</span></span>), <span class="predefined-constant">true</span>).as(row).withFieldTerminator(<span class="string"><span class="delimiter">&quot;</span><span class="content">;</span><span class="delimiter">&quot;</span></span>)
+    .create(m)
+    .with(m.getRequiredSymbolicName(), row)
+    .unwind(Functions.split(row.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">Authors</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">&amp;</span><span class="delimiter">&quot;</span></span>)).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>)
+    .merge(a)
+    .create(a.relationshipTo(m, <span class="string"><span class="delimiter">&quot;</span><span class="content">WROTE</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>))
+    .returningDistinct(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
+    .build();
+
+Flux.using(driver::rxSession, statement::fetchWith, RxSession::close)
+    .as(StepVerifier::create)
+    .expectNextCount(<span class="integer">50</span>)
+    .verifyComplete();</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -2631,7 +2667,7 @@ Assertions.assertThat(cypher)
 <p>We provide a Java annotation processor for <a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j</a> under the following coordinates:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 28. Coordinates of the SDN 6 annotation processor</div>
+<div class="title">Listing 29. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
 <pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.1-SNAPSHOT</code></pre>
 </div>
@@ -3201,7 +3237,7 @@ We use the following in our tests:</p>
 <p>The build requires a local copy of the project:</p>
 </div>
 <div id="clone-cypher-dsl" class="listingblock">
-<div class="title">Listing 29. Clone the Neo4j Cypher-DSL</div>
+<div class="title">Listing 30. Clone the Neo4j Cypher-DSL</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ git clone git@github.com:neo4j-contrib/cypher-dsl.git</code></pre>
 </div>
@@ -3214,7 +3250,7 @@ We use the following in our tests:</p>
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 30. Verify your JDK</div>
+<div class="title">Listing 31. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;11.0.10&quot; 2021-01-19
@@ -3226,7 +3262,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixe
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 31. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 32. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability           Origin
@@ -3243,7 +3279,7 @@ native-image             21.0.0              Native Image                  Early
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 32. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 33. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -3252,7 +3288,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 33. Build with default settings on Windows</div>
+<div class="title">Listing 34. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -3264,7 +3300,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 34. Skipping native tests</div>
+<div class="title">Listing 35. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -3276,7 +3312,7 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 35. Skipping native tests</div>
+<div class="title">Listing 36. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -3343,7 +3379,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 36. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 37. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -3364,7 +3400,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 37. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 38. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -3376,7 +3412,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 38. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 39. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -3401,7 +3437,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 39. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 40. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -3433,7 +3469,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 40. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 41. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -3451,7 +3487,7 @@ RETURN t, t2</code></pre>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 41. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 42. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -3465,7 +3501,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 42. Public internal API goes into a dedicated package</div>
+<div class="title">Listing 43. Public internal API goes into a dedicated package</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 MATCH (p:Package) - [:CONTAINS] -&gt; (c)
@@ -4323,7 +4359,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-04-26 14:33:40 UTC
+Last updated 2021-04-27 05:48:53 UTC
 </div>
 </div>
 </body>
