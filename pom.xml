@@ -131,6 +131,7 @@
 		<java.version>8</java.version>
 		<javapoet.version>1.13.0</javapoet.version>
 		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
+		<jetbrains-annotations.version>19.0.0</jetbrains-annotations.version>
 		<jqassistant-dashboard-plugin.version>${jqassistant.version}</jqassistant-dashboard-plugin.version>
 		<jqassistant.plugin.git.version>1.8.0</jqassistant.plugin.git.version>
 		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
@@ -152,6 +153,7 @@
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven.version>3.6.3</maven.version>
 		<mockito.version>3.6.0</mockito.version>
+		<neo4j-java-driver.version>4.2.4</neo4j-java-driver.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>4.4.0</querydsl.version>
@@ -160,8 +162,6 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.0.8</spring-data-neo4j.version>
-		<jetbrains-annotations.version>19.0.0</jetbrains-annotations.version>
-		<neo4j-java-driver.version>4.2.4</neo4j-java-driver.version>
 	</properties>
 
 	<dependencyManagement>
@@ -203,18 +203,6 @@
 				</exclusions>
 			</dependency>
 			<dependency>
-				<groupId>org.neo4j.driver</groupId>
-				<artifactId>neo4j-java-driver</artifactId>
-				<version>${neo4j-java-driver.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>io.projectreactor</groupId>
-				<artifactId>reactor-bom</artifactId>
-				<version>2020.0.6</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
 				<groupId>com.querydsl</groupId>
 				<artifactId>querydsl-core</artifactId>
 				<version>${querydsl.version}</version>
@@ -223,6 +211,13 @@
 				<groupId>com.squareup</groupId>
 				<artifactId>javapoet</artifactId>
 				<version>${javapoet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-bom</artifactId>
+				<version>2020.0.6</version>
+				<type>pom</type>
+				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.apiguardian</groupId>
@@ -242,6 +237,13 @@
 				<scope>test</scope>
 			</dependency>
 			<dependency>
+				<groupId>org.jetbrains</groupId>
+				<artifactId>annotations</artifactId>
+				<version>${jetbrains-annotations.version}</version>
+				<scope>provided</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
 				<groupId>org.junit</groupId>
 				<artifactId>junit-bom</artifactId>
 				<version>${junit-jupiter.version}</version>
@@ -259,6 +261,11 @@
 				<artifactId>mockito-junit-jupiter</artifactId>
 				<version>${mockito.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j.driver</groupId>
+				<artifactId>neo4j-java-driver</artifactId>
+				<version>${neo4j-java-driver.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -292,13 +299,6 @@
 						<groupId>org.springframework</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.jetbrains</groupId>
-				<artifactId>annotations</artifactId>
-				<version>${jetbrains-annotations.version}</version>
-				<scope>provided</scope>
-				<optional>true</optional>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -337,10 +337,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
-					<configuration>
-						<release>${java.version}</release>
-						<compilerArgument>-Xlint:unchecked</compilerArgument>
-					</configuration>
 					<executions>
 						<execution>
 							<id>compile-java-11</id>
@@ -357,6 +353,10 @@
 							</configuration>
 						</execution>
 					</executions>
+					<configuration>
+						<release>${java.version}</release>
+						<compilerArgument>-Xlint:unchecked</compilerArgument>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
