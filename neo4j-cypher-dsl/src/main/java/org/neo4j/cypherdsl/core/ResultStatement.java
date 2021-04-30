@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -30,6 +31,7 @@ import java.util.stream.Stream;
 import org.apiguardian.api.API;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.async.AsyncQueryRunner;
 import org.neo4j.driver.reactive.RxQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -100,6 +102,27 @@ public interface ResultStatement extends Statement {
 	 * @return A publisher of records.
 	 */
 	default Flux<Record> fetchWith(RxQueryRunner queryRunner) {
+		return fetchWith(queryRunner, Function.identity());
+	}
+
+	/**
+	 * Asynchronously fetches a list of records from a database via the given {@code queryRunner}.
+	 * The {@code mappingFunction} is used for converting records into a custom types.
+	 *
+	 * @param queryRunner     Any type of asynchronous query runner. Neither sessions nor transactions will be closed.
+	 * @param mappingFunction A mapping function.
+	 * @param <T>             The type of the returned objects
+	 * @return A completable future of a list of records
+	 */
+	<T> CompletableFuture<List<T>> fetchWith(AsyncQueryRunner queryRunner, Function<Record, T> mappingFunction);
+
+	/**
+	 * Asynchronously fetches a list of records from a database via the given {@code queryRunner}.
+	 *
+	 * @param queryRunner Any type of asynchronous query runner. Neither sessions nor transactions will be closed.
+	 * @return A completable future of a list of records
+	 */
+	default CompletableFuture<List<Record>> fetchWith(AsyncQueryRunner queryRunner) {
 		return fetchWith(queryRunner, Function.identity());
 	}
 

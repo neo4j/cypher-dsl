@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.examples.drivers;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -298,6 +299,40 @@ class ExecutableStatementsIT {
 			assertThat(books).isEqualTo(50L);
 			assertThat(authors).isEqualTo(5L);
 		}
+	}
+
+	@Test
+	void statementWithoutResultAsync() {
+
+		var m = Cypher.node("Test").named("m");
+		var statement = Cypher.create(m)
+			.set(m.property("name").to(Cypher.anonParameter("statementWithoutResult")))
+			.build();
+
+		var session = driver.asyncSession();
+
+		var futureResultSummary = statement.executeWith(session);
+		await().until(futureResultSummary::isDone);
+		assertThat(futureResultSummary).isCompletedWithValueMatching(r -> r.counters().nodesCreated() == 1);
+
+		var closingSession = session.closeAsync().toCompletableFuture();
+		await().until(closingSession::isDone);
+	}
+
+	@Test
+	void statementWithResultAsync() {
+
+		var m = Cypher.node("Movie").named("m");
+		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+
+		var session = driver.asyncSession();
+
+		var futureResultSummary = statement.fetchWith(session);
+		await().until(futureResultSummary::isDone);
+		assertThat(futureResultSummary).isCompletedWithValueMatching(r -> r.size() == 38);
+
+		var closingSession = session.closeAsync().toCompletableFuture();
+		await().until(closingSession::isDone);
 	}
 
 	void assertMovieTitleList(List<String> movieTitles) {

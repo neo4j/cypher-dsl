@@ -117,6 +117,7 @@
 		<asciidoctor-maven-plugin.version>1.6.0</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.0.1</asciidoctorj-diagram.version>
 		<assertj.version>3.15.0</assertj.version>
+		<awaitility.version>4.0.3</awaitility.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.7.0</checker-qual.version>
@@ -229,6 +230,11 @@
 				<artifactId>assertj-core</artifactId>
 				<version>${assertj.version}</version>
 				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.awaitility</groupId>
+				<artifactId>awaitility</artifactId>
+				<version>${awaitility.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.checkerframework</groupId>

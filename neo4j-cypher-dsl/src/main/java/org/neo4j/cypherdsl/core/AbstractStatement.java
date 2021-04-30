@@ -26,6 +26,7 @@ import reactor.core.publisher.Mono;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -39,6 +40,7 @@ import org.neo4j.driver.Query;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
+import org.neo4j.driver.async.AsyncQueryRunner;
 import org.neo4j.driver.reactive.RxQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -159,6 +161,14 @@ abstract class AbstractStatement implements Statement {
 			.flatMap(q -> Mono.from(queryRunner.run(q).consume()));
 	}
 
+	@Override
+	public final CompletableFuture<ResultSummary> executeWith(AsyncQueryRunner queryRunner) {
+
+		return queryRunner.runAsync(createQuery())
+			.thenCompose(c -> c.consumeAsync())
+			.toCompletableFuture();
+	}
+
 	// @Override @see ResultStatement#fetchWith(QueryRunner, Function)
 	public final <T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction) {
 
@@ -181,6 +191,14 @@ abstract class AbstractStatement implements Statement {
 		return Mono.fromCallable(this::createQuery)
 			.flatMapMany(q -> queryRunner.run(q).records())
 			.map(mappingFunction);
+	}
+
+	// @Override @see ResultStatement#fetchWith(AsyncQueryRunner, Function)
+	public final <T> CompletableFuture<List<T>> fetchWith(AsyncQueryRunner queryRunner, Function<Record, T> mappingFunction) {
+
+		return queryRunner.runAsync(createQuery())
+			.thenCompose(c -> c.listAsync(mappingFunction))
+			.toCompletableFuture();
 	}
 
 	/**
