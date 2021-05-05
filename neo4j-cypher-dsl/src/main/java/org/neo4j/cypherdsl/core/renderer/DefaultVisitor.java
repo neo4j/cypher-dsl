@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -122,7 +122,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	/**
 	 * Keeps track of named objects that have been already visited.
 	 */
-	private final java.util.Set<Named> visitedNamed = new HashSet<>();
+	private final Deque<java.util.Set<Named>> dequeOfVisitedNamed = new ArrayDeque<>(new HashSet<>());
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
@@ -133,7 +133,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	/**
 	 * Keeps track if currently in an aliased expression so that the content can be skipped when already visited.
 	 */
-	private final Deque<AliasedExpression> currentAliasedElements = new LinkedList<>();
+	private final Deque<AliasedExpression> currentAliasedElements = new ArrayDeque<>();
 
 	/**
 	 * A flag if we can skip aliasing. This is currently the case in exactly one scenario: A aliased expression passed
@@ -161,6 +161,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	DefaultVisitor(StatementContext statementContext) {
 		this.statementContext = statementContext;
+		this.dequeOfVisitedNamed.push(new HashSet<>());
 	}
 
 	private void enableSeparator(int level, boolean on) {
@@ -318,14 +319,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void leave(SingleQuery statement) {
-		this.visitedNamed.clear();
+		this.dequeOfVisitedNamed.peek().clear();
 	}
 
 	private void clearPreviouslyVisitedNamed(With with) {
 		// We need to clear the named cache after defining a with.
 		// Everything not taken into the next step has to go.
-		// TODO This must be probably nested for subqueries, too
 		java.util.Set<Named> retain = new HashSet<>();
+		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
 		with.accept(segment -> {
 			if (segment instanceof SymbolicName) {
 				visitedNamed.stream()
@@ -333,7 +334,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 					.forEach(retain::add);
 			}
 		});
-		this.visitedNamed.retainAll(retain);
+		visitedNamed.retainAll(retain);
 	}
 
 	void enter(Delete delete) {
@@ -455,6 +456,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		// This is only relevant for nodes in relationships.
 		// Otherwise all the labels would be rendered again.
+		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
 		skipNodeContent = visitedNamed.contains(node);
 		visitedNamed.add(node);
 
@@ -689,12 +691,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Subquery subquery) {
 
+		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.peek()));
 		builder.append("CALL {");
 	}
 
 	void leave(Subquery subquery) {
 
 		builder.append("} ");
+		dequeOfVisitedNamed.pop();
 	}
 
 	void enter(ExistentialSubquery subquery) {

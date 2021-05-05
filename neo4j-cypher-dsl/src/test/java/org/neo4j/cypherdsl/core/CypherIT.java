@@ -4109,7 +4109,7 @@ class CypherIT {
 							"    name: u.name,\n" +
 							"    nesting2:  {\n" +
 							"      name: b.name,\n" +
-							"      pattern: [(u:User)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+							"      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
 							"        .x,\n" +
 							"        .y\n" +
 							"      }]\n" +
@@ -4162,7 +4162,7 @@ class CypherIT {
 							"\t\tname: u.name,\n" +
 							"\t\tnesting2:  {\n" +
 							"\t\t\tname: b.name,\n" +
-							"\t\t\tpattern: [(u:User)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+							"\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
 							"\t\t\t\t.x,\n" +
 							"\t\t\t\t.y\n" +
 							"\t\t\t}]\n" +
