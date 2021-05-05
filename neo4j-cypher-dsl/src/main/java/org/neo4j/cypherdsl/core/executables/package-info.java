@@ -16,9 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-open module org.neo4j.cypherdsl.examples.core {
-
-	requires org.assertj.core;
-	requires org.junit.jupiter;
-	requires org.neo4j.cypherdsl.core;
-}
+/**
+ * Provides an optional integration with the Neo4j Java driver and Project Reactor / Reactive streams.
+ */
+package org.neo4j.cypherdsl.core.executables;

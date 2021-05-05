@@ -23,7 +23,7 @@ In most cases the Cypher-DSL will generate one of two types of statements:
   You will be able to check for the number of affected database entities tia the driver's `ResultSummary`.
 * `org.neo4j.cypherdsl.core.ResultStatement`: A statement known to have a result. It can be executed or fetched.
 
-Both interfaces provide the appropriate methods, which will be discussed below.
+Both interfaces can be turned into _ExecutableStatements_, providing the appropriate methods, which will be discussed below.
 
 NOTE: This API is not required to use the driver nor is the driver required for using the Cypher-DSL.
       The main API provided with the Cypher-DSL is `Statement#getCypher()` for retrieving a Cypher-String and optional call
@@ -46,10 +46,7 @@ NOTE: This API is not required to use the driver nor is the driver required for 
 
 Any 4.x version of the Driver will work, we currently test against 4.2.4.
 In case you want to use our integration with reactive sessions, you will have to add https://projectreactor.io[Project Reactor].
-We took the freedom to settle on one of the reactive libraries out there for our integration.
-
-The publishers defined by Reactor can be converted into other libraries types or you can use the driver directly.
-The driver itself uses the vendor agnostic https://www.reactive-streams.org[Reactive Streams spec].
+To the outside world we expose - much like the driver - the vendor agnostic https://www.reactive-streams.org[Reactive Streams spec].
 
 The coordinates are:
 
@@ -238,6 +235,15 @@ Again, please note that the stream is only available in the closure. It is not m
 For the reactive API the variants inside a transactional function are focussed here as they are probably the most complex
 ones to get right: You have to deal with to resources: The session itself, and the inner publisher returned from the transactional
 function.
+
+To create a reactive, executable statement from either a `Statement` or `ResultStatement` use the factory methods from `ReactiveExecutableStatement`:
+
+[[create-statement-without-result]]
+.Reactive Example statement that does not return any data.
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=create-statement-without-result-reactive]
+----
 
 === Executing statements
 

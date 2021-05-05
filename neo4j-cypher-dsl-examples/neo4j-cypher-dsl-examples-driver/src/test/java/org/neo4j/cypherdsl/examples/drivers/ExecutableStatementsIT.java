@@ -39,6 +39,8 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.ResultStatement;
+import org.neo4j.cypherdsl.core.executables.ExecutableStatement;
+import org.neo4j.cypherdsl.core.executables.ReactiveExecutableStatement;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
@@ -84,9 +86,9 @@ class ExecutableStatementsIT {
 
 		// tag::statement-without-result[]
 		var m = Cypher.node("Test").named("m");
-		var statement = Cypher.create(m)
+		var statement = ExecutableStatement.of(Cypher.create(m)
 			.set(m.property("name").to(Cypher.anonParameter("statementWithoutResult")))
-			.build();
+			.build());
 		// end::statement-without-result[]
 
 		// tag::statement-without-result-unmanaged-tx[]
@@ -105,9 +107,9 @@ class ExecutableStatementsIT {
 	void statementWithoutResultWithTxFunction() {
 
 		var m = Cypher.node("Test").named("m");
-		var statement = Cypher.create(m)
+		var statement = ExecutableStatement.of(Cypher.create(m)
 			.set(m.property("name").to(Cypher.anonParameter("statementWithoutResultWithTxFunction")))
-			.build();
+			.build());
 
 		// tag::statement-without-result-tx-function[]
 		try (var session = driver.session()) { // <.>
@@ -122,7 +124,8 @@ class ExecutableStatementsIT {
 
 		// tag::statement-with-result[]
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ExecutableStatement.of(Cypher.match(m)
+			.returning(m.property("title").as("title")).build());
 		// end::statement-with-result[]
 
 		// tag::statement-with-result-unmanaged-tx[]
@@ -144,7 +147,7 @@ class ExecutableStatementsIT {
 	void statementsWithResultListedWithTxFunction() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ExecutableStatement.of(Cypher.match(m).returning(m.property("title").as("title")).build());
 
 		// tag::statement-with-result-tx-function[]
 		try (var session = driver.session()) { // <.>
@@ -163,7 +166,8 @@ class ExecutableStatementsIT {
 	void statementsWithResultStreamed() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ExecutableStatement.of(Cypher.match(m)
+			.returning(m.property("title").as("title")).build());
 
 		// tag::statement-with-result-auto-commit-stream[]
 		try (var session = driver.session()) {
@@ -183,7 +187,8 @@ class ExecutableStatementsIT {
 	void statementsWithResultStreamedInTxFunction() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ExecutableStatement.of(Cypher.match(m)
+			.returning(m.property("title").as("title")).build());
 
 		// tag::statement-with-result-tx-function-stream[]
 		try (var session = driver.session()) { // <.>
@@ -204,7 +209,8 @@ class ExecutableStatementsIT {
 	void statementsWithResultStreamedProfiled() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = (ResultStatement) Cypher.match(m).returning(m.property("title").as("title")).profile();
+		var statement = ExecutableStatement.of((ResultStatement) Cypher.match(m)
+			.returning(m.property("title").as("title")).profile());
 
 		try (var session = driver.session()) {
 
@@ -219,10 +225,12 @@ class ExecutableStatementsIT {
 	@Test
 	void statementsWithoutResultReactive() {
 
+		// tag::create-statement-without-result-reactive[]
 		var m = Cypher.node("Test").named("m");
-		var statement = Cypher.create(m)
+		var statement = ReactiveExecutableStatement.of(Cypher.create(m)
 			.set(m.property("name").to(Cypher.anonParameter("statementsWithoutResultReactive")))
-			.build();
+			.build());
+		// end::create-statement-without-result-reactive[]
 
 		// tag::statement-without-result-tx-function-reactive-stream[]
 		Mono.usingWhen(
@@ -239,7 +247,8 @@ class ExecutableStatementsIT {
 	void statementsWithResultReactive() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ReactiveExecutableStatement.of(Cypher.match(m)
+			.returning(m.property("title").as("title")).build());
 
 		Flux.usingWhen(Mono.fromSupplier(driver::rxSession), statement::fetchWith, RxSession::close)
 			.as(StepVerifier::create)
@@ -251,7 +260,8 @@ class ExecutableStatementsIT {
 	void statementsWithResultReactiveTxFunction() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ReactiveExecutableStatement.of(Cypher.match(m)
+			.returning(m.property("title").as("title")).build());
 
 		// tag::statement-with-result-tx-function-reactive-stream[]
 		Flux.usingWhen(
@@ -275,7 +285,7 @@ class ExecutableStatementsIT {
 		var a = Cypher.node("Author").withProperties("name", Functions.trim(Cypher.name("author"))).named("a");
 		var m = Cypher.node("Book").withProperties("name", row.property("Title")).named("b");
 
-		var statement = Cypher.usingPeriodicCommit(10)
+		var statement = ReactiveExecutableStatement.of(Cypher.usingPeriodicCommit(10)
 			.loadCSV(URI.create("file:///books.csv"), true).as(row).withFieldTerminator(";")
 			.create(m)
 			.with(m.getRequiredSymbolicName(), row)
@@ -283,7 +293,7 @@ class ExecutableStatementsIT {
 			.merge(a)
 			.create(a.relationshipTo(m, "WROTE").named("r"))
 			.returningDistinct(m.property("name").as("name"))
-			.build();
+			.build());
 
 		Flux.using(driver::rxSession, statement::fetchWith, RxSession::close)
 			.as(StepVerifier::create)
@@ -305,9 +315,9 @@ class ExecutableStatementsIT {
 	void statementWithoutResultAsync() {
 
 		var m = Cypher.node("Test").named("m");
-		var statement = Cypher.create(m)
+		var statement = ReactiveExecutableStatement.of(Cypher.create(m)
 			.set(m.property("name").to(Cypher.anonParameter("statementWithoutResult")))
-			.build();
+			.build());
 
 		var session = driver.asyncSession();
 
@@ -323,7 +333,8 @@ class ExecutableStatementsIT {
 	void statementWithResultAsync() {
 
 		var m = Cypher.node("Movie").named("m");
-		var statement = Cypher.match(m).returning(m.property("title").as("title")).build();
+		var statement = ExecutableStatement.of(Cypher.match(m)
+			.returning(m.property("title").as("title")).build());
 
 		var session = driver.asyncSession();
 
