@@ -34,6 +34,7 @@ import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
+import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
@@ -92,6 +93,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(Return returning) {
 		trimNewline();
+		indent(indentationLevel);
 		super.enter(returning);
 	}
 
@@ -229,6 +231,22 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		trimNewline();
 		indent(indentationLevel);
 		builder.append("}");
+	}
+
+	@Override
+	void enter(Subquery subquery) {
+		trimNewline();
+		indent(indentationLevel);
+		indentationLevel++;
+		super.enter(subquery);
+	}
+
+	@Override
+	void leave(Subquery subquery) {
+		indentationLevel--;
+		trimNewline();
+		indent(indentationLevel);
+		super.leave(subquery);
 	}
 
 	private void trimNewline() {

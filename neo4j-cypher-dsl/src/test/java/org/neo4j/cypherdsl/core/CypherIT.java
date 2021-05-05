@@ -4032,9 +4032,26 @@ class CypherIT {
 				.with(userNode)
 				.match(bikeNode)
 				.create(userNode.relationshipTo(bikeNode, "LIKES"))
-				.returning(userNode.project(
+					.with(userNode)
+					.call(Cypher
+							.with(userNode)
+							.match(userNode.relationshipTo(Cypher.anyNode("x"), "SOMETHING"))
+							.call(Cypher
+									.with(Cypher.anyNode("x"))
+									.match(Cypher.anyNode("x").relationshipTo(Cypher.anyNode("y"), "DEEPER"))
+									.returning(Cypher.anyNode("y")
+											.project("bar")
+											.as("bar"))
+									.build()
+							)
+							.returning(Cypher.anyNode("x")
+									.project("foo", "bar", Cypher.name("bar"))
+									.as("anyThing"))
+							.build())
+					.returning(userNode.project(
 					"name",
 					userNode.property("name"),
+					"anyThing", Cypher.name("anyThing"),
 					"nesting1",
 					Cypher.mapOf(
 						"name",
@@ -4056,32 +4073,49 @@ class CypherIT {
 			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
 				.isEqualTo(
 					"MATCH (u:User)\n" +
-					"WHERE (u.name = 'Max'\n" +
-					"  AND u.lastName = 'Mustermann'\n" +
-					"  AND EXISTS {\n" +
-					"    MATCH (u)-[:LIKES]->(b:Bike)\n" +
-					"    WHERE ((b)-[:LINK]->()\n" +
-					"      OR EXISTS {\n" +
-					"        MATCH (b)-[:LINK]->()\n" +
-					"      })\n" +
-					"  })\n" +
-					"SET u.lastName = $newName\n" +
-					"WITH u\n" +
-					"MATCH (b:Bike)\n" +
-					"CREATE (u)-[:LIKES]->(b)\n" +
-					"RETURN u {\n" +
-					"  name: u.name,\n" +
-					"  nesting1:  {\n" +
-					"    name: u.name,\n" +
-					"    nesting2:  {\n" +
-					"      name: b.name,\n" +
-					"      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
-					"        .x,\n" +
-					"        .y\n" +
-					"      }]\n" +
-					"    }\n" +
-					"  }\n" +
-					"}"
+							"WHERE (u.name = 'Max'\n" +
+							"  AND u.lastName = 'Mustermann'\n" +
+							"  AND EXISTS {\n" +
+							"    MATCH (u)-[:LIKES]->(b:Bike)\n" +
+							"    WHERE ((b)-[:LINK]->()\n" +
+							"      OR EXISTS {\n" +
+							"        MATCH (b)-[:LINK]->()\n" +
+							"      })\n" +
+							"  })\n" +
+							"SET u.lastName = $newName\n" +
+							"WITH u\n" +
+							"MATCH (b:Bike)\n" +
+							"CREATE (u)-[:LIKES]->(b)\n" +
+							"WITH u\n" +
+							"CALL {\n" +
+							"  WITH u\n" +
+							"  MATCH (u)-[:SOMETHING]->(x)\n" +
+							"  CALL {\n" +
+							"    WITH x\n" +
+							"    MATCH (x)-[:DEEPER]->(y)\n" +
+							"    RETURN y {\n" +
+							"      .bar\n" +
+							"    } AS bar\n" +
+							"  }\n" +
+							"  RETURN x {\n" +
+							"    .foo,\n" +
+							"    bar: bar\n" +
+							"  } AS anyThing\n" +
+							"}\n" +
+							"RETURN u {\n" +
+							"  name: u.name,\n" +
+							"  anyThing: anyThing,\n" +
+							"  nesting1:  {\n" +
+							"    name: u.name,\n" +
+							"    nesting2:  {\n" +
+							"      name: b.name,\n" +
+							"      pattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+							"        .x,\n" +
+							"        .y\n" +
+							"      }]\n" +
+							"    }\n" +
+							"  }\n" +
+							"}"
 				);
 		}
 
@@ -4092,32 +4126,49 @@ class CypherIT {
 				Configuration.IndentStyle.TAB).build()).render(statement))
 				.isEqualTo(
 					"MATCH (u:User)\n" +
-					"WHERE (u.name = 'Max'\n" +
-					"\tAND u.lastName = 'Mustermann'\n" +
-					"\tAND EXISTS {\n" +
-					"\t\tMATCH (u)-[:LIKES]->(b:Bike)\n" +
-					"\t\tWHERE ((b)-[:LINK]->()\n" +
-					"\t\t\tOR EXISTS {\n" +
-					"\t\t\t\tMATCH (b)-[:LINK]->()\n" +
-					"\t\t\t})\n" +
-					"\t})\n" +
-					"SET u.lastName = $newName\n" +
-					"WITH u\n" +
-					"MATCH (b:Bike)\n" +
-					"CREATE (u)-[:LIKES]->(b)\n" +
-					"RETURN u {\n" +
-					"\tname: u.name,\n" +
-					"\tnesting1:  {\n" +
-					"\t\tname: u.name,\n" +
-					"\t\tnesting2:  {\n" +
-					"\t\t\tname: b.name,\n" +
-					"\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
-					"\t\t\t\t.x,\n" +
-					"\t\t\t\t.y\n" +
-					"\t\t\t}]\n" +
-					"\t\t}\n" +
-					"\t}\n" +
-					"}"
+							"WHERE (u.name = 'Max'\n" +
+							"\tAND u.lastName = 'Mustermann'\n" +
+							"\tAND EXISTS {\n" +
+							"\t\tMATCH (u)-[:LIKES]->(b:Bike)\n" +
+							"\t\tWHERE ((b)-[:LINK]->()\n" +
+							"\t\t\tOR EXISTS {\n" +
+							"\t\t\t\tMATCH (b)-[:LINK]->()\n" +
+							"\t\t\t})\n" +
+							"\t})\n" +
+							"SET u.lastName = $newName\n" +
+							"WITH u\n" +
+							"MATCH (b:Bike)\n" +
+							"CREATE (u)-[:LIKES]->(b)\n" +
+							"WITH u\n" +
+							"CALL {\n" +
+							"\tWITH u\n" +
+							"\tMATCH (u)-[:SOMETHING]->(x)\n" +
+							"\tCALL {\n" +
+							"\t\tWITH x\n" +
+							"\t\tMATCH (x)-[:DEEPER]->(y)\n" +
+							"\t\tRETURN y {\n" +
+							"\t\t\t.bar\n" +
+							"\t\t} AS bar\n" +
+							"\t}\n" +
+							"\tRETURN x {\n" +
+							"\t\t.foo,\n" +
+							"\t\tbar: bar\n" +
+							"\t} AS anyThing\n" +
+							"}\n" +
+							"RETURN u {\n" +
+							"\tname: u.name,\n" +
+							"\tanyThing: anyThing,\n" +
+							"\tnesting1:  {\n" +
+							"\t\tname: u.name,\n" +
+							"\t\tnesting2:  {\n" +
+							"\t\t\tname: b.name,\n" +
+							"\t\t\tpattern: [(u)-[:LIKES]->(other) WHERE other.foo = $foo | other {\n" +
+							"\t\t\t\t.x,\n" +
+							"\t\t\t\t.y\n" +
+							"\t\t\t}]\n" +
+							"\t\t}\n" +
+							"\t}\n" +
+							"}"
 				);
 		}
 
