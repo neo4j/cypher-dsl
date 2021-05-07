@@ -833,6 +833,20 @@ public final class Cypher {
 	}
 
 	/**
+	 * Creates a {@code RETURN} clause from a raw Cypher expression created via {@link Cypher#raw(String, Object...)}.
+	 * The expression maybe aliased but it must resolve to a raw element
+	 *
+	 * @param rawExpression Must be a plain raw or an aliased raw expression. To eventually render as valid Cypher, it must
+	 *                      contain the {@code RETURN} keyword.
+	 * @return A match that can be build now
+	 * @since 2021.2.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+		return Statement.builder().returningRaw(rawExpression);
+	}
+
+	/**
 	 * The foreign adapter factory. Can only be used when `com.querydsl:querydsl-core` is on the class path.
 	 */
 	private static volatile ForeignAdapterFactory foreignAdapterFactory;

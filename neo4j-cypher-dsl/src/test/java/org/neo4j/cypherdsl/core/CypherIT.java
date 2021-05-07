@@ -4224,5 +4224,24 @@ class CypherIT {
 					"RETURN a"
 				);
 		}
+
+		@Test
+		void prettyPrintingQueryStartingWithSubquery() {
+			String rawQuery = "MATCH (node) RETURN node";
+			SymbolicName node = Cypher.name("node");
+			ResultStatement resultStatement = Cypher
+				.call(Cypher
+					.returningRaw(Cypher.raw(rawQuery).as(node))
+					.build()
+				)
+				.returning(node)
+				.build();
+
+			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(resultStatement))
+				.isEqualTo("CALL {\n"
+							+ "  MATCH (node) RETURN node AS node\n"
+							+ "}\n"
+							+ "RETURN node");
+		}
 	}
 }
