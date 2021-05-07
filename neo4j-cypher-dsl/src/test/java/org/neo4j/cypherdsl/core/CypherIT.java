@@ -493,10 +493,17 @@ class CypherIT {
 
 			@Test
 			void distinct() {
+				String expected = "MATCH (u:`User`) RETURN DISTINCT u SKIP 1 LIMIT 1";
+
 				Statement statement = Cypher.match(userNode).returningDistinct(userNode).skip(1).limit(1).build();
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
-						"MATCH (u:`User`) RETURN DISTINCT u SKIP 1 LIMIT 1");
+						expected);
+
+				statement = Cypher.match(userNode).returningDistinct("u").skip(1).limit(1).build();
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo(
+						expected);
 			}
 		}
 	}

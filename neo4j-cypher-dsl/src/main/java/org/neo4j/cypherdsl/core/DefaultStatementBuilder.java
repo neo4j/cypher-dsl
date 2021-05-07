@@ -195,17 +195,22 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final OngoingReadingAndReturn returning(Expression... expressions) {
 
-		return returning(false, expressions);
+		return returning(false, false, expressions);
 	}
 
 	@Override
 	public final OngoingReadingAndReturn returningDistinct(Expression... expressions) {
-		return returning(true, expressions);
+		return returning(false, true, expressions);
 	}
 
-	private OngoingReadingAndReturn returning(boolean distinct, Expression... expressions) {
+	@Override
+	public @NotNull StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+		return returning(true, false, rawExpression);
+	}
 
-		DefaultStatementWithReturnBuilder ongoingMatchAndReturn = new DefaultStatementWithReturnBuilder(distinct);
+	private OngoingReadingAndReturn returning(boolean raw, boolean distinct, Expression... expressions) {
+
+		DefaultStatementWithReturnBuilder ongoingMatchAndReturn = new DefaultStatementWithReturnBuilder(raw, distinct);
 		ongoingMatchAndReturn.addExpressions(expressions);
 		return ongoingMatchAndReturn;
 	}
@@ -433,10 +438,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected final List<Expression> returnList = new ArrayList<>();
 		protected final OrderBuilder orderBuilder = new OrderBuilder();
+		protected boolean rawReturn;
 		protected boolean distinct;
 
-		protected DefaultStatementWithReturnBuilder(boolean distinct) {
+		protected DefaultStatementWithReturnBuilder(boolean rawReturn, boolean distinct) {
 			this.distinct = distinct;
+			this.rawReturn = rawReturn;
 		}
 
 		@NotNull
@@ -507,15 +514,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public ResultStatement build() {
 
-			Return returning = null;
-			if (!returnList.isEmpty()) {
-
-				ExpressionList returnItems = new ExpressionList(this.returnList);
-				returning = new Return(distinct, returnItems, orderBuilder.buildOrder().orElse(null),
-					orderBuilder.getSkip(),
-					orderBuilder.getLimit());
-			}
-
+			Return returning = Return.create(rawReturn, distinct, returnList, orderBuilder);
 			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(false, returning);
 		}
 
@@ -570,6 +569,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndReturn returning(Expression... expressions) {
 
@@ -578,12 +578,21 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.returning(expressions);
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.returningDistinct(expressions);
+		}
+
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.returningRaw(rawExpression);
 		}
 
 		@Override
@@ -1007,6 +1016,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.builder = getUpdatingClauseBuilder(updateType, expressions);
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndReturn returning(Expression... returnedExpressions) {
 
@@ -1015,17 +1025,26 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 
-			DefaultStatementWithReturnBuilder delegate = new DefaultStatementWithReturnBuilder(false);
+			DefaultStatementWithReturnBuilder delegate = new DefaultStatementWithReturnBuilder(false, false);
 			delegate.returnList.addAll(Arrays.asList(returnedExpressions));
 			return delegate;
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... returnedExpressions) {
 
-			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(
-				returnedExpressions);
+			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(returnedExpressions);
 			delegate.distinct = true;
+			return delegate;
+		}
+
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+
+			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(rawExpression);
+			delegate.rawReturn = true;
 			return delegate;
 		}
 
@@ -1269,18 +1288,27 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
 		}
 
+		@NotNull
 		@Override
 		public StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returning(expressions);
 		}
 
+		@NotNull
 		@Override
 		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
 		}
 
+		@NotNull
+		@Override
+		public StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+			return new DefaultStatementBuilder(this.buildCall()).returningRaw(rawExpression);
+		}
+
+		@NotNull
 		@Override
 		public StatementBuilder.OngoingReadingWithWhere where(Condition newCondition) {
 
@@ -1288,21 +1316,25 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return new DefaultStatementBuilder(this.buildCall());
 		}
 
+		@NotNull
 		@Override
 		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 			return new DefaultStatementBuilder(this.buildCall()).with(expressions);
 		}
 
+		@NotNull
 		@Override
 		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 			return new DefaultStatementBuilder(this.buildCall()).withDistinct(expressions);
 		}
 
+		@NotNull
 		@Override
 		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement) {
 			return new DefaultStatementBuilder(this.buildCall()).call(statement);
 		}
 
+		@NotNull
 		@Override
 		public ResultStatement build() {
 
@@ -1369,6 +1401,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this;
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndReturn returning(Expression... expressions) {
 
@@ -1376,6 +1409,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.returning(expressions);
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 
@@ -1383,6 +1417,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.returningDistinct(expressions);
 		}
 
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.returningRaw(rawExpression);
+		}
+
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 
@@ -1390,6 +1432,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.with(expressions);
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 
@@ -1397,6 +1440,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.withDistinct(expressions);
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingWithoutWhere call(Statement statement) {
 

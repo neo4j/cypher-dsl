@@ -306,7 +306,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(Return returning) {
-		builder.append("RETURN ");
+		if (!returning.isRaw()) {
+			builder.append("RETURN ");
+		}
 	}
 
 	void enter(With with) {

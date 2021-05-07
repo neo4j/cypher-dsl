@@ -68,4 +68,8 @@ public final class AliasedExpression implements Aliased, Expression {
 		Expressions.nameOrExpression(this.delegate).accept(visitor);
 		visitor.leave(this);
 	}
+
+	Expression getDelegate() {
+		return delegate;
+	}
 }

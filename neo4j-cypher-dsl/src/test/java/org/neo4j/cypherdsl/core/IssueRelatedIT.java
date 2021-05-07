@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -645,5 +646,37 @@ class IssueRelatedIT {
 		}
 		String cypher = Cypher.match(result).returning("s", "l", "e").build().getCypher();
 		assertThat(cypher).isEqualTo(expected);
+	}
+
+	@Test // GH-187
+	void returningRawShouldWork() {
+
+		String userProvidedCypher = "MATCH (this)-[:LINK]-(o:Other) RETURN o";
+		Node node = Cypher.node("Node").named("node");
+		SymbolicName result = Cypher.name("result");
+		Statement statement = Cypher
+			.match(node)
+			.call(Cypher
+				.with(node)
+				// https://neo4j.com/docs/cypher-manual/current/clauses/call-subquery/#subquery-correlated-importing
+				// > Aliasing or expressions are not supported in importing WITH clauses - e.g. WITH a AS b or WITH a+1 AS b.
+				.with(node.as("this"))
+				.returningRaw(Cypher.raw(userProvidedCypher).as(result))
+				.build()
+			)
+			.returning(result.project("foo", "bar"))
+			.build();
+
+		String cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
+		assertThat(cypher).isEqualTo("MATCH (node:Node)\n"
+			+ "CALL {\n"
+			+ "  WITH node\n"
+			+ "  WITH node AS this\n"
+			+ "  MATCH (this)-[:LINK]-(o:Other) RETURN o AS result\n"
+			+ "}\n"
+			+ "RETURN result {\n"
+			+ "  .foo,\n"
+			+ "  .bar\n"
+			+ "}");
 	}
 }

@@ -90,11 +90,23 @@ public interface ExposesReturning {
 	}
 
 	/**
-	 * Create a match that returns the distinct set of one or more expressions.
+	 * Creates a {@code RETURN} clause returning the distinct set of one or more expressions.
 	 *
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
 	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions);
+
+	/**
+	 * Creates a {@code RETURN} clause from a raw Cypher expression created via {@link Cypher#raw(String, Object...)}.
+	 * The expression maybe aliased but it must resolve to a raw element
+	 *
+	 * @param rawExpression Must be a plain raw or an aliased raw expression. To eventually render as valid Cypher, it must
+	 *                      contain the {@code RETURN} keyword.
+	 * @return A match that can be build now
+	 * @since 2021.2.1
+	 */
+	@NotNull @CheckReturnValue
+	StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression);
 }
