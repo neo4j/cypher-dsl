@@ -20,14 +20,16 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.LiteralBase;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -41,7 +43,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = Status.INTERNAL)
 final class RawLiteral implements Expression {
 
-	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("(?<!\\\\)\\$E");
+	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("((\\\\?\\$(\\w+))(?:\\s*|$))");
 
 	static class RawElement extends LiteralBase<String> {
 
@@ -60,21 +62,54 @@ final class RawLiteral implements Expression {
 
 		Assertions.hasText(format, "Cannot create a raw literal without a format.");
 
-		List<Expression> content = new ArrayList<>();
+		Map<String, Parameter> parameters = new HashMap<>();
+		List<Object> all = new ArrayList<>();
+		for (Object mixedArg : mixedArgs) {
+			if (mixedArg instanceof Parameter) {
+				Parameter parameter = (Parameter) mixedArg;
+				if (!parameter.isAnon()) {
+					parameters.put(parameter.getName(), parameter);
+				}
+			}
+			all.add(mixedArg);
+		}
+
 		Matcher m = EXPRESSION_PATTERN.matcher(format);
+		// We need to match 2 times to remove
+		while (m.find()) {
+			if (parameters.containsKey(m.group(3))) {
+				all.remove(parameters.get(m.group(3)));
+			}
+		}
+
+		List<Expression> content = new ArrayList<>();
+		m = EXPRESSION_PATTERN.matcher(format);
 		int i = 0;
 		int cnt = 0;
 		while (m.find()) {
-			if (cnt >= mixedArgs.length) {
-				throw new IllegalArgumentException("Too few arguments for the raw literal format `" + format + "`.");
-			}
+			if ("$E".equals(m.group(2))) {
+				content.add(new RawElement(format.substring(i, m.start(2))));
+				if (cnt >= all.size()) {
+					throw new IllegalArgumentException(
+						"Too few arguments for the raw literal format `" + format + "`.");
+				}
+				content.add(getMixedArg(all.get(cnt++)));
+				i = m.end(2);
+			} else if (parameters.containsKey(m.group(3))) {
+				Parameter e = parameters.get(m.group(3));
 
-			content.add(new RawElement(format.substring(i, m.start())));
-			content.add(getMixedArg(mixedArgs[cnt++]));
-			i = m.end();
+				content.add(new RawElement(format.substring(i, m.start(2))));
+				content.add(e);
+				i = m.end(2);
+
+				all.remove(e);
+			} else {
+				content.add(new RawElement(format.substring(i, m.end())));
+				i = m.end();
+			}
 		}
 
-		if (cnt < mixedArgs.length) {
+		if (cnt < all.size()) {
 			throw new IllegalArgumentException("Too many arguments for the raw literal format `" + format + "`.");
 		}
 
