@@ -235,6 +235,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Subquery subquery) {
+		passedFirstReadingOrUpdatingClause = true;
 		trimNewline();
 		indent(indentationLevel);
 		indentationLevel++;
