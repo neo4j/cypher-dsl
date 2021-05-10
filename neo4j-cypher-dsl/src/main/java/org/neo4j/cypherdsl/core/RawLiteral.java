@@ -44,6 +44,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 final class RawLiteral implements Expression {
 
 	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("((\\\\?\\$(\\w+))(?:\\s*|$))");
+	private static final String EXPRESSION_PLACEHOLDER = "$E";
 
 	static class RawElement extends LiteralBase<String> {
 
@@ -74,11 +75,15 @@ final class RawLiteral implements Expression {
 			all.add(mixedArg);
 		}
 
-		Matcher m = EXPRESSION_PATTERN.matcher(format);
-		// We need to match 2 times to remove
-		while (m.find()) {
-			if (parameters.containsKey(m.group(3))) {
-				all.remove(parameters.get(m.group(3)));
+		Matcher m;
+		if (!parameters.isEmpty()) {
+			m = EXPRESSION_PATTERN.matcher(format);
+			// "Reserve" all placeholders that match actual parameter names by removing them from the all
+			// args list so that they are taken with precedence.
+			while (m.find()) {
+				if (parameters.containsKey(m.group(3))) {
+					all.remove(parameters.get(m.group(3)));
+				}
 			}
 		}
 
@@ -87,7 +92,7 @@ final class RawLiteral implements Expression {
 		int i = 0;
 		int cnt = 0;
 		while (m.find()) {
-			if ("$E".equals(m.group(2))) {
+			if (EXPRESSION_PLACEHOLDER.equals(m.group(2))) {
 				content.add(new RawElement(format.substring(i, m.start(2))));
 				if (cnt >= all.size()) {
 					throw new IllegalArgumentException(
