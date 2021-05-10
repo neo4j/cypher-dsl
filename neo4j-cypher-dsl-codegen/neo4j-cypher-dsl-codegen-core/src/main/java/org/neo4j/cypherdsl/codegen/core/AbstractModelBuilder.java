@@ -114,7 +114,7 @@ abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuil
 	 * Central method to trigger building of the {@link #javaFile} if that has not been done yet. {@link #buildJavaFile()} is
 	 * supposed to fail when it realizes the build has already been done.
 	 *
-	 * @return
+	 * @return a JavaPoet {@link JavaFile} that can be written to file or string.
 	 */
 	protected abstract JavaFile buildJavaFile();
 

@@ -36,12 +36,12 @@
 	<description>Example how to use the SDN 6 code generator.</description>
 
 	<properties>
-		<checkstyle.version>8.29</checkstyle.version>
+		<checkstyle.version>8.42</checkstyle.version>
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>11</java.version>
 		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
-		<testcontainers.version>1.15.2</testcontainers.version>
+		<testcontainers.version>1.15.3</testcontainers.version>
 	</properties>
 
 	<dependencies>
