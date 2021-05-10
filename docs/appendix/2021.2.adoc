@@ -1,5 +1,35 @@
 == 2021.2
 
+=== 2021.2.1
+
+==== 🚀 Features
+
+* Distinguish between statements and result statements: The Cypher-DSL knows whether a statement would actually return
+  data or not
+* Provide optional integration with the Neo4j-Java-Driver to execute statements.
+* Allow to register Spring converters with the annotation processor. [codegen]
+* GH-182 - Add support for scalar converter functions.
+* GH-183 - Add trim function.
+* GH-184 - Add split function.
+* GH-180 - Add support for LOAD CSV and friends.
+* GH-187 - Add `returningRaw` for returning arbitrary (aliased) Cypher fragments (bot as part of a statement or as a
+  general `RETURN xxx` clause without preceding query)
+* Resolve named parameters in raw literals: You can mix now the expression placeholder `$E` and named parameters in raw
+  Cypher literals giving you much more flexibility in regards what to pass to the raw litera.
+
+==== 🐛 Bug Fixes
+
+* GH-177 - Create a valid loadable and instantiable name when working on nested, inner classes. [codegen]
+* GH-186 - Pretty print subqueries and fix double rendering of Labels after subquery.
+
+==== 🧹 Housekeeping
+
+* Remove unnecessary subpackage 'valid'. [codegen] (test code only)
+* Upgrade to GraalVM 21.1.0.
+* Update Spring dependencies for codegen.
+
+Thanks to https://github.com/Andy2003[@Andy2003] for contributing to this release.
+
 === 2021.2.0
 
 2021.2 doesn't bring any new features apart from being now a Java library supporting the Java module system not only with
