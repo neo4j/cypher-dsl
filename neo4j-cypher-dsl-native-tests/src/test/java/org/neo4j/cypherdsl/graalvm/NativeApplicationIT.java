@@ -42,6 +42,12 @@ class NativeApplicationIT {
 
 		var statements = List.of(
 			"MATCH (m:`Movie`) RETURN m",
+			"MATCH (m:`Movie`) WHERE (m.title = $title OR m.title = $pTitle OR m.title = $pcdsl01) RETURN m",
+			"pTitle=someTitle",
+			"pcdsl01=someOtherTitle",
+			"pTitle",
+			"pcdsl01",
+			"title",
 			"MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}"
 		);
 
@@ -51,6 +57,7 @@ class NativeApplicationIT {
 		p.onExit().thenAccept(done -> {
 			try (var in = new BufferedReader(new InputStreamReader(done.getInputStream()))) {
 				var generatedStatements = in.lines().collect(Collectors.toSet());
+				generatedStatements.forEach(System.out::println);
 				Assertions.assertTrue(generatedStatements.containsAll(statements));
 			} catch (IOException e) {
 			}

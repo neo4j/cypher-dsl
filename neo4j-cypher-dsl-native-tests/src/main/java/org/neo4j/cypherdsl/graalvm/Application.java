@@ -34,6 +34,10 @@ public class Application {
 	public static void main(String... a) {
 
 		System.out.println(cypherRenderer.render(findAllMovies()));
+		var statement = generateQueryWithParams();
+		statement.getParameters().forEach((k, v) -> System.out.println(k + "=" + v));
+		statement.getParameterNames().forEach(System.out::println);
+		System.out.println(cypherRenderer.render(statement));
 		System.out.println(cypherRenderer.render(generateComplexQuery()));
 	}
 
@@ -41,6 +45,17 @@ public class Application {
 
 		var m = Cypher.node("Movie").named("m");
 		return Cypher.match(m)
+			.returning(m)
+			.build();
+	}
+
+	private static Statement generateQueryWithParams() {
+
+		var m = Cypher.node("Movie").named("m");
+		return Cypher.match(m)
+			.where(m.property("title").isEqualTo(Cypher.parameter("title")))
+			.or(m.property("title").isEqualTo(Cypher.parameter("pTitle", "someTitle")))
+			.or(m.property("title").isEqualTo(Cypher.anonParameter("someOtherTitle")))
 			.returning(m)
 			.build();
 	}
@@ -54,7 +69,8 @@ public class Application {
 				person.project(
 					"livesIn",
 					Cypher.subList(
-						Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN")).returning(location.project("name")),
+						Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN"))
+							.returning(location.project("name")),
 						Cypher.parameter("personLivedInOffset"),
 						Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
 					)

@@ -4,6 +4,10 @@
     "allDeclaredMethods" : true
   },
   {
+    "name" : "org.neo4j.cypherdsl.core.ParameterCollectingVisitor",
+    "allDeclaredMethods" : true
+  },
+  {
     "name" : "org.neo4j.cypherdsl.core.renderer.PrettyPrintingVisitor",
     "allDeclaredMethods" : true
   }

@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Objects;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -107,6 +109,6 @@ public final class Parameter<T> implements Expression {
 	 * @return true if the Parameter has a bound value
 	 */
 	boolean hasValue() {
-		return value != NO_VALUE;
+		return !Objects.equals(value, NO_VALUE);
 	}
 }
