@@ -65,12 +65,12 @@ public interface Expression extends Visitable {
 	/**
 	 * Transform this expression into a condition.
 	 *
-	 * @return this expression as a condition
+	 * @return this expression as a condition. Will return the same instance if it is already a condition.
 	 * @since TBA
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition asCondition() {
-		return new ExpressionCondition(this);
+		return this instanceof Condition ? (Condition) this : new ExpressionCondition(this);
 	}
 
 	/**
