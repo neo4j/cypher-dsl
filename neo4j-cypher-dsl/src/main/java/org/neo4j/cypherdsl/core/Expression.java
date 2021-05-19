@@ -63,6 +63,17 @@ public interface Expression extends Visitable {
 	}
 
 	/**
+	 * Transform this expression into a condition.
+	 *
+	 * @return this expression as a condition
+	 * @since TBA
+	 */
+	@NotNull @Contract(pure = true)
+	default Condition asCondition() {
+		return new ExpressionCondition(this);
+	}
+
+	/**
 	 * Creates a {@code lhs = rhs} condition.
 	 *
 	 * @param rhs The right hand side of the condition

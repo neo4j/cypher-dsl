@@ -101,17 +101,6 @@ public class SymbolicName implements Expression {
 	}
 
 	/**
-	 * Transform this symbolic name so it can be used directly as condition.
-	 *
-	 * @return this name as a condition
-	 * @since 2021.0.0
-	 */
-	@NotNull @Contract(pure = true)
-	public Condition asCondition() {
-		return new ExpressionCondition(this);
-	}
-
-	/**
 	 * A list will never be a valid entry for a map projection, so this convenient method prevents trying to create one
 	 * from a list of objects. It will delegate to {@link #project(Object...)} with the content of the list.
 	 *
