@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -108,6 +109,8 @@ import org.neo4j.cypherdsl.core.utils.Strings;
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("`");
+
+	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
 	/**
 	 * Target of all rendering.
@@ -432,11 +435,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (type == Operator.Type.LABEL) {
 			return;
 		}
-		if (type != Operator.Type.PREFIX && operator != Operator.EXPONENTIATION) {
+
+		boolean skipSpaces = SKIP_SPACES.contains(operator);
+		if (type != Operator.Type.PREFIX && !skipSpaces) {
 			builder.append(" ");
 		}
 		builder.append(operator.getRepresentation());
-		if (type != Operator.Type.POSTFIX && operator != Operator.EXPONENTIATION) {
+		if (type != Operator.Type.POSTFIX && !skipSpaces) {
 			builder.append(" ");
 		}
 	}

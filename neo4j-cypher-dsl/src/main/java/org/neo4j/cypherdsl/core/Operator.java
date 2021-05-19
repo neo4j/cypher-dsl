@@ -43,6 +43,14 @@ public enum Operator implements Visitable {
 	 */
 	SUBTRACTION("-"),
 	/**
+	 * Unary minus operator.
+	 */
+	UNARY_MINUS("-", Type.PREFIX),
+	/**
+	 * Unary plus operator.
+	 */
+	UNARY_PLUS("+", Type.PREFIX),
+	/**
 	 * Standard multiplication operator.
 	 */
 	MULTIPLICATION("*"),

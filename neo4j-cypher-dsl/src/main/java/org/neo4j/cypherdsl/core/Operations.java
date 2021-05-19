@@ -34,10 +34,36 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-final class Operations {
+public final class Operations {
 
 	private static final java.util.Set<Class<? extends Expression>> VALID_MUTATORS =
 		Collections.unmodifiableSet(new HashSet<>(Arrays.asList(MapExpression.class, Parameter.class)));
+
+	/**
+	 * Creates an unary minus operation.
+	 *
+	 * @param e The expression to which the unary minus should be applied. We don't check if it's a numeric expression,
+	 *          but in hindsight to generate semantically correct Cypher, it's recommended that is one.
+	 * @return An unary minus operation.
+	 * @since 2021.2.3
+	 */
+	public static Operation minus(Expression e) {
+
+		return Operation.create(Operator.UNARY_MINUS, e);
+	}
+
+	/**
+	 * Creates an unary plus operation.
+	 *
+	 * @param e The expression to which the unary plus should be applied. We don't check if it's a numeric expression,
+	 *          but in hindsight to generate semantically correct Cypher, it's recommended that is one.
+	 * @return An unary plus operation.
+	 * @since 2021.2.3
+	 */
+	public static Expression plus(Expression e) {
+
+		return Operation.create(Operator.UNARY_PLUS, e);
+	}
 
 	static Operation concat(Expression op1, Expression op2) {
 

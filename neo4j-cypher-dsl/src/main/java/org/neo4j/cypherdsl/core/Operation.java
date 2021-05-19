@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -46,12 +47,28 @@ public final class Operation implements Expression {
 	private static final EnumSet<Operator> LABEL_OPERATORS = EnumSet.of(Operator.SET_LABEL, Operator.REMOVE_LABEL);
 	private static final EnumSet<Operator.Type> NEEDS_GROUPING_BY_TYPE = EnumSet
 		.complementOf(EnumSet.of(Operator.Type.PROPERTY, Operator.Type.LABEL));
-	private static final EnumSet<Operator> DONT_GROUP = EnumSet.of(Operator.EXPONENTIATION, Operator.PIPE);
+	private static final EnumSet<Operator> DONT_GROUP = EnumSet.of(Operator.EXPONENTIATION, Operator.PIPE, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
+
+	static Operation create(@NotNull Operator operator, @NotNull Expression expression) {
+
+		Assertions.notNull(operator, "Operator must not be null.");
+		Assertions.isTrue(operator.isUnary(), "Operator must be unary.");
+		Assertions.notNull(expression, "The expression must not be null.");
+
+		switch (operator.getType()) {
+			case PREFIX:
+				return new Operation(null, operator, expression);
+			case POSTFIX:
+				return new Operation(expression, operator, (Expression) null);
+			default:
+				throw new IllegalArgumentException("Invalid operator type " + operator.getType());
+		}
+	}
 
 	static Operation create(Expression op1, Operator operator, Expression op2) {
 
 		Assertions.notNull(op1, "The first operand must not be null.");
-		Assertions.notNull(operator, "Operator must not be empty.");
+		Assertions.notNull(operator, "Operator must not be null.");
 		Assertions.notNull(op2, "The second operand must not be null.");
 
 		return new Operation(op1, operator, op2);
@@ -91,9 +108,11 @@ public final class Operation implements Expression {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		Expressions.nameOrExpression(left).accept(visitor);
+		if (left != null) {
+			Expressions.nameOrExpression(left).accept(visitor);
+		}
 		operator.accept(visitor);
-		right.accept(visitor);
+		Visitable.visitIfNotNull(right, visitor);
 		visitor.leave(this);
 	}
 

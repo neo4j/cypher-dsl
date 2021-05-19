@@ -25,9 +25,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -2701,7 +2706,35 @@ class CypherIT {
 	}
 
 	@Nested
+	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class OperationsAndComparisons {
+
+		private Stream<Arguments> operatorsToTest() {
+			return Stream.of(
+				Arguments.of("Unary minus", Operations.minus(Cypher.literalOf(1)), "RETURN -1"),
+				Arguments.of("Unary plus", Operations.plus(Cypher.literalOf(1)), "RETURN +1")
+			);
+		}
+
+		@ParameterizedTest(name = "{0}")
+		@MethodSource("operatorsToTest")
+		void unaryOperatorsShouldWork(String name, Expression operator, String expected) {
+			assertThat(cypherRenderer.render(Cypher.returning(operator).build())).isEqualTo(expected);
+		}
+
+		@Test
+		void preconditionsShouldBeAssertedOnUnary() {
+
+			assertThatIllegalArgumentException()
+				.isThrownBy(() -> Operation.create(Operator.OR, Cypher.literalTrue())).withMessage("Operator must be unary.");
+
+			// Likely to be fail in IDEA when the JetBrains annotations are present and asserted by the ides runner
+			assertThatIllegalArgumentException()
+				.isThrownBy(() -> Operation.create(null, Cypher.literalTrue())).withMessage("Operator must not be null.");
+
+			assertThatIllegalArgumentException()
+				.isThrownBy(() -> Operation.create(Operator.UNARY_MINUS, null)).withMessage("The expression must not be null.");
+		}
 
 		@Test
 		void shouldRenderOperations() {
