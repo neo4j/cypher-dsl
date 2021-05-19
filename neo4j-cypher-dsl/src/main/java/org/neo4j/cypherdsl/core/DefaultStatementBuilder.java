@@ -1252,13 +1252,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public Expression asFunction() {
+		public Expression asFunction(boolean distinct) {
 
 			if (super.arguments == null || super.arguments.length == 0) {
 				return FunctionInvocation.create(procedureName::getQualifiedName);
 			}
-			return FunctionInvocation.create(procedureName::getQualifiedName, super.arguments);
+			if (distinct) {
+				return FunctionInvocation.createDistinct(procedureName::getQualifiedName, super.arguments);
+			} else {
+				return FunctionInvocation.create(procedureName::getQualifiedName, super.arguments);
+			}
 		}
+
 
 		@Override
 		public ProcedureCall build() {

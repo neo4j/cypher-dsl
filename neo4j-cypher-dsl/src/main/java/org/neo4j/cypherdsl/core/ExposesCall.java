@@ -76,7 +76,17 @@ public interface ExposesCall<T> {
 		 * @return A function invocation that can be used as an expression, for example as a property or inside a condition.
 		 */
 		@NotNull @Contract(pure = true)
-		Expression asFunction();
+		default Expression asFunction() {
+			return asFunction(false);
+		}
+
+		/**
+		 * @param distinct Set to true for adding the {@code DISTINCT} for any of the aggregating functions.
+		 * @return A distinct function invocation that can be used as an expression, for example as a property or inside a condition.
+		 * @since 2021.2.2
+		 */
+		@NotNull @Contract(pure = true)
+		Expression asFunction(boolean distinct);
 	}
 
 	/**

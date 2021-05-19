@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -178,6 +179,20 @@ class ProcedureCallsIT {
 			.build();
 		assertThat(cypherRenderer.render(stmt))
 			.isEqualTo("MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.firstName = 'Michael', p.surname = 'Hunger' RETURN p");
+	}
+
+	@Test
+	void dynamicDistinct() {
+
+		assertThat(cypherRenderer.render(Cypher.returning(Cypher.call("aVg").withArgs(Cypher.literalOf(1)).asFunction(true)).build()))
+			.isEqualTo("RETURN aVg(DISTINCT 1)");
+	}
+
+	@Test
+	void dynamicDistinctUnsupported() {
+
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.call("foobar").withArgs(Cypher.literalOf(1)).asFunction(true))
+			.withMessage("The distinct operator can only be applied within aggregate functions.");
 	}
 
 	@Test // GH-101

@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import org.apiguardian.api.API;
@@ -48,7 +49,9 @@ public final class FunctionInvocation implements Expression {
 		String getImplementationName();
 
 		default boolean isAggregate() {
-			return false;
+			return Arrays.stream(BuiltInFunctions.Aggregates.values())
+				.map(BuiltInFunctions.Aggregates::getImplementationName)
+				.anyMatch(v -> v.equalsIgnoreCase(getImplementationName()));
 		}
 	}
 

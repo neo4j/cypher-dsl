@@ -66,7 +66,7 @@ public interface Expression extends Visitable {
 	 * Transform this expression into a condition.
 	 *
 	 * @return this expression as a condition. Will return the same instance if it is already a condition.
-	 * @since TBA
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition asCondition() {
