@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -31,7 +32,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class AliasedExpression implements Aliased, Expression {
+public final class AliasedExpression implements Aliased, Expression, IdentifiableElement {
 
 	private final Expression delegate;
 
@@ -71,5 +72,11 @@ public final class AliasedExpression implements Aliased, Expression {
 
 	Expression getDelegate() {
 		return delegate;
+	}
+
+	@NotNull
+	@Override
+	public Expression asExpression() {
+		return this;
 	}
 }

@@ -238,7 +238,7 @@ class LoadCSVIT {
 			.loadCSV(URI.create("file:///employees.csv"), true)
 			.as(row)
 			.merge(e)
-			.with(e.getRequiredSymbolicName(), row)
+			.with(e, row)
 			.unwind(Functions.split(row.property("Skills"), Cypher.literalOf(":"))).as(skill)
 			.merge(s)
 			.merge(e.relationshipTo(s, "HAS_EXPERIENCE").named("r"))

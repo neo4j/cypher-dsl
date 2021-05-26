@@ -29,8 +29,8 @@ import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.utils.LRUCache;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.utils.LRUCache;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
@@ -47,7 +47,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @since 1.0
  */
 @API(status = Status.EXPERIMENTAL, since = "1.0")
-public class SymbolicName implements Expression {
+public class SymbolicName implements Expression, IdentifiableElement {
 
 	private static final Map<String, SymbolicName> CACHE = Collections.synchronizedMap(new LRUCache<>(32));
 
@@ -154,5 +154,11 @@ public class SymbolicName implements Expression {
 	@Override
 	public int hashCode() {
 		return value == null ? super.hashCode() : Objects.hash(value);
+	}
+
+	@NotNull
+	@Override
+	public Expression asExpression() {
+		return this;
 	}
 }

@@ -358,12 +358,42 @@ public final class Cypher {
 	 *
 	 * @param variables One ore more variables.
 	 * @return An ongoing with clause.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
+
+		return Statement.builder().with(variables);
+	}
+
+	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
+	 *
+	 * @param elements One ore more variables.
+	 * @return An ongoing with clause.
 	 * @since 2020.1.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
 
-		return Statement.builder().with(variables);
+		return Statement.builder().with(elements);
+	}
+
+	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
+	 *
+	 * @param expressions One ore more aliased expressions.
+	 * @return An ongoing with clause.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions) {
+
+		return Statement.builder().with(expressions);
 	}
 
 	/**
@@ -374,7 +404,7 @@ public final class Cypher {
 	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
 	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.
 	 *
-	 * @param expressions One ore more aliased expressions.
+	 * @param expressions One ore more expressions.
 	 * @return An ongoing with clause.
 	 */
 	@NotNull @Contract(pure = true)

@@ -18,40 +18,29 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
-import java.util.Optional;
-
-import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * A named thing exposes {@link #getSymbolicName()}, making the thing identifiable.
+ * This interface represents an element that can be for example an identifiable part of the {@code WITH} clause.
+ * It has been introduced to circumvent the absence of union types in Java
+ * and to avoid an overload of {@link StatementBuilder#with(Expression...)} with an {@code Object...} parameter
+ * to allow passing {@link Named named things} or {@link AliasedExpression aliased expression} into a pipeline.
+ * <p>
+ * There should be no need to implement this on your own.
  *
  * @author Michael J. Simons
- * @since 1.0
+ * @soundtrack Fatoni &amp; Edgar Wasser - Delirium
+ * @since 2021.2.2
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-public interface Named extends IdentifiableElement {
+public interface IdentifiableElement {
 
 	/**
-	 * @return An optional symbolic name.
+	 * Transform this element into an expression
+	 *
+	 * @return this element as an expression. Will return the same instance if it is already an expression.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	Optional<SymbolicName> getSymbolicName();
-
-	/**
-	 * @return A symbolic name
-	 * @throws IllegalStateException If this has not been named yet.
-	 */
-	@NotNull @Contract(pure = true)
-	default SymbolicName getRequiredSymbolicName() {
-		return getSymbolicName().orElseThrow(() -> new IllegalStateException("No name present."));
-	}
-
-	@Override @NotNull
-	default Expression asExpression() {
-		return getRequiredSymbolicName();
-	}
+	Expression asExpression();
 }

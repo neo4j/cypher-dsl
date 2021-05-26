@@ -58,4 +58,8 @@ final class Expressions {
 
 	private Expressions() {
 	}
+
+	public static Expression[] createSymbolicNames(IdentifiableElement[] variables) {
+		return Arrays.stream(variables).map(IdentifiableElement::asExpression).toArray(Expression[]::new);
+	}
 }

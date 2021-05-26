@@ -221,8 +221,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
-		return with(false, Expressions.createSymbolicNames(variables));
+	public final OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
+		return with(false, variables);
+	}
+
+	@Override
+	public final OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
+		return with(false, Expressions.createSymbolicNames(elements));
+	}
+
+	@Override @NotNull
+	public OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions) {
+		return with((Expression[]) expressions);
 	}
 
 	@Override

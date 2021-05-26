@@ -390,7 +390,7 @@ class IssueRelatedIT {
 		SymbolicName nn = Cypher.name("nn");
 
 		Node rnNode = Cypher.node("SomeLabel").named(rn);
-		AliasedExpression rnAliasedAsNN = rnNode.as("nn");
+		Expression rnAliasedAsNN = rnNode.as("nn");
 		Statement statement = Cypher.match(Cypher.node("User").named(u), rnNode, Cypher.node("SomeLabel").named(nn))
 			.withDistinct(u, rn, rnAliasedAsNN)
 			.returning(u, rn, rnAliasedAsNN)
@@ -678,5 +678,77 @@ class IssueRelatedIT {
 			+ "  .foo,\n"
 			+ "  .bar\n"
 			+ "}");
+	}
+
+	@Test // GH-190
+	void mixedWithShouldMakeSense() {
+
+		Node node = Cypher.node("Node").named("node");
+		Expression someExpression = Cypher.literalFalse();
+
+		Property ll = node.property("ll");
+		Property l = node.property("l");
+
+		AliasedExpression aCase = Cypher.caseExpression().when(ll.isNull())
+			.then(l)
+			.elseDefault(ll)
+			.as("l");
+
+		String cypher = Cypher.match(node).with(node, someExpression.as("f"), aCase)
+			.returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo(
+			"MATCH (node:`Node`) WITH node, false AS f, CASE WHEN node.ll IS NULL THEN node.l ELSE node.ll END AS l RETURN *");
+	}
+
+	@Test // GH-190
+	void withAliasOnTopLevel() {
+
+		String cypher = Cypher.with(Cypher.literalFalse().as("f"))
+			.returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo("WITH false AS f RETURN *");
+	}
+
+	@Test // GH-190
+	void mixedWithDistinctShouldMakeSense() {
+
+		Node node = Cypher.node("Node").named("node");
+		Expression someExpression = Cypher.literalFalse();
+
+		Property ll = node.property("ll");
+		Property l = node.property("l");
+
+		AliasedExpression aCase = Cypher.caseExpression().when(ll.isNull())
+			.then(l)
+			.elseDefault(ll)
+			.as("l");
+
+		String cypher = Cypher.match(node).withDistinct(node, someExpression.as("f"), aCase)
+			.returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo(
+			"MATCH (node:`Node`) WITH DISTINCT node, false AS f, CASE WHEN node.ll IS NULL THEN node.l ELSE node.ll END AS l RETURN *");
+	}
+
+	@Test // GH-190
+	void heterogenAliasWithDistinctShouldMakeSense() {
+
+		Node node = Cypher.node("Node").named("node");
+		Expression someExpression = Cypher.literalFalse();
+
+		String cypher = Cypher.match(node).withDistinct(someExpression.as("f"), Functions.date().as("aDate"))
+			.returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo(
+			"MATCH (node:`Node`) WITH DISTINCT false AS f, date() AS aDate RETURN *");
+	}
+
+	@Test // GH-190
+	void symbolicNameAndAlias() {
+
+		Node node = Cypher.node("Node").named("node");
+		Expression someExpression = Cypher.literalFalse();
+
+		String cypher = Cypher.match(node).with((Expression) Cypher.name("n"), someExpression.as("f"), Functions.date().as("aDate"))
+			.returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo(
+			"MATCH (node:`Node`) WITH n, false AS f, date() AS aDate RETURN *");
 	}
 }
