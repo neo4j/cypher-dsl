@@ -56,13 +56,25 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	/**
 	 * Always creates a relationship from start to end (left to right).
 	 *
-	 * @param start start node
-	 * @param end   end node
-	 * @param type  type of the relationship
+	 * @param start           start node
+	 * @param end             end node
+	 * @param type            type of the relationship
+	 * @param additionalTypes additional types to add to the relationship
 	 */
-	protected RelationshipBase(S start, String type, E end) {
+	protected RelationshipBase(S start, String type, E end, String... additionalTypes) {
 
-		this(null, start, Direction.LTR, end, type);
+		this(null, start, Direction.LTR, end, mergeTypesIfNecessary(type, additionalTypes));
+	}
+
+	private static String[] mergeTypesIfNecessary(String type, String... additionalTypes) {
+
+		if (additionalTypes != null && additionalTypes.length > 0) {
+			String[] result = new String[1 + additionalTypes.length];
+			result[0] = type;
+			System.arraycopy(additionalTypes, 0, result, 1, additionalTypes.length);
+			return result;
+		}
+		return new String[] { type };
 	}
 
 	/**
@@ -74,9 +86,9 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 * @param end          end node
 	 * @param type         type of the relationship
 	 */
-	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end) {
+	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end, String... additionalTypes) {
 
-		this(symbolicName, start, Direction.LTR, properties, end, type);
+		this(symbolicName, start, Direction.LTR, properties, end, mergeTypesIfNecessary(type, additionalTypes));
 	}
 
 	protected RelationshipBase(SymbolicName symbolicName, String type,  Node start, Properties properties, Node end) {

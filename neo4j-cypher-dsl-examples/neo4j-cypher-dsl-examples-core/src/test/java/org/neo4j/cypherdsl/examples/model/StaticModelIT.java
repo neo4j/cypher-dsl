@@ -227,4 +227,41 @@ class StaticModelIT {
 					and(person.property("age").gt(Cypher.literalOf(25)))).returning(person).build().getCypher()
 		).isEqualTo("MATCH (person:`Person`) WHERE (person.firstName = 'P' AND person.age > 25) RETURN person");
 	}
+
+	@Test
+	void inheritanceMappingExampleNodes() {
+
+		var cypher = Cypher.match(Division.DIVISION)
+			.returning(Division.DIVISION.NAME)
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches("MATCH \\(\\w+:`DefaultNode`:`Division`\\) RETURN \\w+\\.name");
+	}
+
+	@Test
+	void inheritanceMatchOnRelationshipsShouldWork() {
+
+		var cypher = Cypher.match(Department.DEPARTMENT.BELONGS_TO)
+			.returning(Division.DIVISION.asExpression(), Department.DEPARTMENT.BELONGS_TO.CREATED_AT)
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches(
+				"MATCH \\(\\w+:`DefaultNode`:`Department`\\)-\\[\\w+:`COOP_REL`\\|`BELONGS_TO`]->\\(\\w+:`DefaultNode`:`Division`\\) RETURN \\w+, \\w+\\.createdAt");
+	}
+
+	@Test
+	void inheritanceMatchOnRelationshipsShouldWorkInverse() {
+
+		var inversRelationship = Department.DEPARTMENT.BELONGS_TO.inverse();
+		var cypher = Cypher.match(inversRelationship)
+			.returning(Division.DIVISION.asExpression(), Department.DEPARTMENT.BELONGS_TO.CREATED_AT
+				.referencedAs(inversRelationship.getRequiredSymbolicName().getValue()))
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches(
+				"MATCH \\(\\w+:`DefaultNode`:`Division`\\)<-\\[\\w+:`COOP_REL`\\|`BELONGS_TO`]-\\(\\w+:`DefaultNode`:`Department`\\) RETURN \\w+, \\w+\\.createdAt");
+	}
 }
