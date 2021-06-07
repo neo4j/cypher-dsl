@@ -240,6 +240,19 @@ class StaticModelIT {
 	}
 
 	@Test
+	void namedInheritedModelShouldWork() {
+
+		var division = Division.DIVISION.named("d");
+
+		var cypher = Cypher.match(division)
+			.returning(division.NAME)
+			.build().getCypher();
+
+		Assertions.assertThat(cypher)
+			.matches("MATCH \\(d:`DefaultNode`:`Division`\\) RETURN d\\.name");
+	}
+
+	@Test
 	void inheritanceMatchOnRelationshipsShouldWork() {
 
 		var cypher = Cypher.match(Department.DEPARTMENT.BELONGS_TO)

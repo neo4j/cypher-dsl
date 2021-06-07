@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  * @author Michael J. Simons
  * @param <T> The final type of what is described here
  */
-public abstract class AbstractNodeDefinition<T> extends NodeBase<AbstractNodeDefinition<T>> {
+public abstract class AbstractNodeDefinition<T extends AbstractNodeDefinition<T>> extends NodeBase<T> {
 
 	public final Property ID = this.property("id");
 
