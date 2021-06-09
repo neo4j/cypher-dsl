@@ -21,7 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -3526,6 +3529,23 @@ class CypherIT {
 					.returning(name.remainder(Cypher.literalOf(2)))).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN [a IN [1, 2, 3, 4] WHERE a > 2 | (a % 2)]");
+		}
+
+		@Test // GH-189
+		void simpleWithCollection() {
+
+			SymbolicName name = Cypher.name("a");
+			Collection<Expression> literals = new ArrayList<>();
+			literals.add(Cypher.literalOf(1));
+			literals.add(Cypher.literalOf(2));
+			literals.add(Cypher.literalOf(3));
+			literals.add(Cypher.literalOf(4));
+			Statement statement = Cypher.returning(
+					Cypher.listWith(name)
+							.in(Cypher.listOf(literals))
+							.returning()).build();
+			assertThat(cypherRenderer.render(statement))
+					.isEqualTo("RETURN [a IN [1, 2, 3, 4]]");
 		}
 
 		@Test

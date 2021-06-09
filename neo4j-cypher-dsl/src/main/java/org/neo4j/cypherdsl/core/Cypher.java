@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.net.URI;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -513,6 +514,18 @@ public final class Cypher {
 	public static ListExpression listOf(Expression... expressions) {
 
 		return ListExpression.create(expressions);
+	}
+
+	/**
+	 * Creates a {@link ListExpression list-expression} from several expressions.
+	 *
+	 * @param expressions expressions to get combined into a list
+	 * @return a new instance of {@link ListExpression}
+	 */
+	@NotNull @Contract(pure = true)
+	public static ListExpression listOf(Collection<Expression> expressions) {
+
+		return  Cypher.listOf(expressions.toArray(new Expression[0]));
 	}
 
 	/**
