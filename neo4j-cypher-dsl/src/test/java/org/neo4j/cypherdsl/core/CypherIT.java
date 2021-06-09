@@ -554,6 +554,7 @@ class CypherIT {
 
 	@Nested
 	class SingleQueryMultiPart {
+
 		@Test
 		void simpleWith() {
 			Statement statement = Cypher
@@ -571,6 +572,18 @@ class CypherIT {
 		void shouldRenderLeadingWith() {
 			Statement statement = Cypher
 				.with(Cypher.parameter("listOfPropertyMaps").as("p"))
+				.unwind("p").as("item")
+				.returning("item")
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("WITH $listOfPropertyMaps AS p UNWIND p AS item RETURN item");
+		}
+
+		@Test // GH-189
+		void shouldRenderLeadingWithBasedOnExpression() {
+			Statement statement = Cypher
+				.with(Collections.singleton(Cypher.parameter("listOfPropertyMaps").as("p")))
 				.unwind("p").as("item")
 				.returning("item")
 				.build();

@@ -508,6 +508,23 @@ public final class Cypher {
 	}
 
 	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
+	 * <p>
+	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
+	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.
+	 *
+	 * @param expressions One ore more expressions.
+	 * @return An ongoing with clause.
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+
+		return with(expressions.toArray(new Expression[] {}));
+	}
+
+	/**
 	 * Starts building a statement based on a {@code MERGE} clause.
 	 *
 	 * @param pattern The patterns to merge
