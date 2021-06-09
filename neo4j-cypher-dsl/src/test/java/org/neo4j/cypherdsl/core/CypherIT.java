@@ -3247,6 +3247,32 @@ class CypherIT {
 					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b UNION MATCH (b:`Bike`) WHERE b.c = 'C' RETURN b");
 		}
 
+		@Test // GH-189
+		void shouldRenderUnionsBasedOnStatementCollections() {
+
+			Statement statement1 = Cypher.match(bikeNode)
+				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement2 = Cypher.match(bikeNode)
+				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement3 = Cypher.match(bikeNode)
+				.where(bikeNode.property("c").isEqualTo(Cypher.literalOf("C")))
+				.returning(bikeNode)
+				.build();
+			Statement statement;
+			Statement[] statements = {statement1, statement2, statement3};
+			statement = Cypher.union(Arrays.asList(statements));
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b UNION MATCH (b:`Bike`) WHERE b.c = 'C' RETURN b");
+		}
+
 		@Test
 		void shouldRenderAllUnions() {
 
@@ -3262,6 +3288,28 @@ class CypherIT {
 
 			Statement statement;
 			statement = Cypher.unionAll(statement1, statement2);
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION ALL MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b");
+		}
+
+		@Test // GH-189
+		void shouldRenderAllUnionsBasedOnStatementCollections() {
+
+			Statement statement1 = Cypher.match(bikeNode)
+				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement2 = Cypher.match(bikeNode)
+				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement;
+			Statement[] statements = {statement1, statement2};
+			statement = Cypher.unionAll(Arrays.asList(statements));
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(

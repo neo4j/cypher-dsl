@@ -750,6 +750,17 @@ public final class Cypher {
 	}
 
 	/**
+	 * Creates a {@code UNION} statement from several other statements. No checks are applied for matching return types.
+	 *
+	 * @param statements the statements to union.
+	 * @return A union statement.
+	 */
+	@NotNull @Contract(pure = true)
+	public static Statement union(Collection<Statement> statements) {
+		return union(statements.toArray(new Statement[] {}));
+	}
+
+	/**
 	 * Creates a {@code UNION ALL} statement from several other statements. No checks are applied for matching return types.
 	 *
 	 * @param statements the statements to union.
@@ -758,6 +769,17 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static Statement unionAll(Statement... statements) {
 		return unionImpl(true, statements);
+	}
+
+	/**
+	 * Creates a {@code UNION ALL} statement from several other statements. No checks are applied for matching return types.
+	 *
+	 * @param statements the statements to union.
+	 * @return A union statement.
+	 */
+	@NotNull @Contract(pure = true)
+	public static Statement unionAll(Collection<Statement> statements) {
+		return unionAll(statements.toArray(new Statement[] {}));
 	}
 
 	/**
