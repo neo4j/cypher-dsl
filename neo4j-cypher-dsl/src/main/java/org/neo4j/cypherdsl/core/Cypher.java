@@ -160,6 +160,19 @@ public final class Cypher {
 	}
 
 	/**
+	 * Dereferences a property for a symbolic name, most likely pointing to a property container like a node or a relationship.
+	 *
+	 * @param containerName The symbolic name of a property container
+	 * @param names         The names of the properties to dereference. More than one name does create a nested property
+	 *                      like {@code containerName.name1.name2}.
+	 * @return A new property
+	 */
+	@NotNull @Contract(pure = true)
+	public static Property property(String containerName, Collection<String> names) {
+		return property(name(containerName), names.toArray(new String[] {}));
+	}
+
+	/**
 	 * Dereferences a property on a arbitrary expression.
 	 *
 	 * @param expression The expression that describes some sort of accessible map
@@ -170,6 +183,19 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static Property property(Expression expression, String... names) {
 		return InternalPropertyImpl.create(expression, names);
+	}
+
+	/**
+	 * Dereferences a property on a arbitrary expression.
+	 *
+	 * @param expression The expression that describes some sort of accessible map
+	 * @param names      The names of the properties to dereference. More than one name does create a nested property
+	 *                   like {@code expression.name1.name2}.
+	 * @return A new property.
+	 */
+	@NotNull @Contract(pure = true)
+	public static Property property(Expression expression, Collection<String> names) {
+		return InternalPropertyImpl.create(expression, names.toArray(new String[] {}));
 	}
 
 	/**

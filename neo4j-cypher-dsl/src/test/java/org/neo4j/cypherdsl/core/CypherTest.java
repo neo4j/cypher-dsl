@@ -91,6 +91,31 @@ class CypherTest {
 	}
 
 	@Test // GH-189
+	void shouldCreatePropertyWithNameFromCollectionPointingToSymbolicName() {
+		Property property = Cypher.property("a", Collections.singleton("b"));
+		AtomicInteger counter = new AtomicInteger(0);
+		property.accept(segment -> {
+			int cnt = counter.incrementAndGet();
+			switch (cnt) {
+				case 1:
+					assertThat(segment).isInstanceOf(Property.class);
+					break;
+				case 2:
+					assertThat(segment).isInstanceOf(SymbolicName.class).extracting("value").isEqualTo("a");
+					break;
+				case 3:
+					assertThat(segment).isInstanceOf(PropertyLookup.class);
+					break;
+				case 4:
+					assertThat(segment).isInstanceOf(SymbolicName.class).extracting("value").isEqualTo("b");
+					break;
+				default:
+					fail("Unexpected segment: " + segment.getClass());
+			}
+		});
+	}
+
+	@Test // GH-189
 	void shouldCreateAdditionalLabelsFromCollection() {
 		Node node = Cypher.node("Primary", MapExpression.create(), Collections.singleton("Secondary"));
 		assertThat(node.getLabels()).extracting("value").containsExactly("Primary", "Secondary");

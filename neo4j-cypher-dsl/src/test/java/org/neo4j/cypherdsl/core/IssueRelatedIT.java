@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -821,5 +823,15 @@ class IssueRelatedIT {
 			+ "MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) "
 			+ "WHERE a.asset_id = node.asset_id "
 			+ "WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata");
+	}
+
+	@Test // GH-189
+	void propertyForExpressionWithCollectionOfNames() {
+
+		Node node = Cypher.node("Node").named("n");
+
+		String cypher = Cypher.match(node).returning(Cypher.property(node.getRequiredSymbolicName(), Collections.singleton("name")))
+		.build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (n:`Node`) RETURN n.name");
 	}
 }
