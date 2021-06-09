@@ -109,7 +109,7 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static Node node(String primaryLabel, MapExpression properties, Collection<String> additionalLabels) {
 
-		return new InternalNodeImpl(null, primaryLabel, properties, additionalLabels.toArray(new String[] {}));
+		return node(primaryLabel, properties, additionalLabels.toArray(new String[] {}));
 	}
 
 	/**
@@ -195,7 +195,7 @@ public final class Cypher {
 	 */
 	@NotNull @Contract(pure = true)
 	public static Property property(Expression expression, Collection<String> names) {
-		return InternalPropertyImpl.create(expression, names.toArray(new String[] {}));
+		return property(expression, names.toArray(new String[] {}));
 	}
 
 	/**
@@ -659,7 +659,7 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static ListExpression listOf(Collection<Expression> expressions) {
 
-		return  Cypher.listOf(expressions.toArray(new Expression[0]));
+		return Cypher.listOf(expressions.toArray(new Expression[0]));
 	}
 
 	/**
