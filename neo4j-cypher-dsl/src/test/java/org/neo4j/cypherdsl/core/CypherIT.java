@@ -2190,6 +2190,24 @@ class CypherIT {
 					"MERGE (u:`User`)-[o:`OWNS`]->(b:`Bike`)");
 		}
 
+		@Test // GH-189
+		void shouldRenderMergeBasedOnPatternExpressionCollectionWithoutReturn() {
+			Statement statement;
+			statement = Cypher.merge(Collections.singleton(userNode))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`)");
+
+			statement = Cypher.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`)-[o:`OWNS`]->(b:`Bike`)");
+		}
+
 		@Test
 		void shouldRenderMultipleMergesWithoutReturn() {
 			Statement statement;

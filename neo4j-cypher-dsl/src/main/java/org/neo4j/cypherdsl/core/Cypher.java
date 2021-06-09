@@ -531,10 +531,21 @@ public final class Cypher {
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingMerge merge(
-		PatternElement... pattern) {
+	public static StatementBuilder.OngoingMerge merge(PatternElement... pattern) {
 
 		return Statement.builder().merge(pattern);
+	}
+
+	/**
+	 * Starts building a statement based on a {@code MERGE} clause.
+	 *
+	 * @param pattern The patterns to merge
+	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingMerge merge(Collection<PatternElement> pattern) {
+
+		return merge(pattern.toArray(new PatternElement[] {}));
 	}
 
 	/**
