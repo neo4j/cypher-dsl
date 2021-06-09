@@ -339,6 +339,18 @@ public final class Cypher {
 	}
 
 	/**
+	 * Prepares an optional match statement.
+	 *
+	 * @param pattern The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<PatternElement> pattern) {
+
+		return optionalMatch(pattern.toArray(new PatternElement[] {}));
+	}
+
+	/**
 	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
 	 * retrieve a node or a relationship, which both are pattern elements.
 	 *
@@ -355,6 +367,19 @@ public final class Cypher {
 	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
 	 * retrieve a node or a relationship, which both are pattern elements.
 	 *
+	 * @param pattern The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingWithoutWhere match(Collection<PatternElement> pattern) {
+
+		return match(pattern.toArray(new PatternElement[] {}));
+	}
+
+	/**
+	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
+	 * retrieve a node or a relationship, which both are pattern elements.
+	 *
 	 * @param optional A flag whether the {@code MATCH} clause includes the {@code OPTIONAL} keyword.
 	 * @param pattern  The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
@@ -364,6 +389,21 @@ public final class Cypher {
 	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
 		return Statement.builder().match(optional, pattern);
+	}
+
+	/**
+	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
+	 * retrieve a node or a relationship, which both are pattern elements.
+	 *
+	 * @param optional A flag whether the {@code MATCH} clause includes the {@code OPTIONAL} keyword.
+	 * @param pattern  The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2020.1.3
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, Collection<PatternElement> pattern) {
+
+		return match(optional, pattern.toArray(new PatternElement[] {}));
 	}
 
 	/**

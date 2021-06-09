@@ -23,8 +23,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -729,10 +729,23 @@ class CypherIT {
 
 	@Nested
 	class MultipleMatches {
+
 		@Test
 		void simple() {
 			Statement statement = Cypher
 				.match(bikeNode)
+				.match(userNode, Cypher.node("U").named("o"))
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) RETURN b");
+		}
+
+		@Test // GH-189
+		void simpleWithPatternCollection() {
+			Statement statement = Cypher
+				.match(Collections.singleton(bikeNode))
 				.match(userNode, Cypher.node("U").named("o"))
 				.returning(bikeNode)
 				.build();
@@ -789,6 +802,45 @@ class CypherIT {
 		void optional() {
 			Statement statement = Cypher
 				.optionalMatch(bikeNode)
+				.match(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("OPTIONAL MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test
+		void optionalWithFlag() {
+			Statement statement = Cypher
+				.match(true, bikeNode)
+				.match(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("OPTIONAL MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test // GH-189
+		void optionalWithFlagAndPatternCollection() {
+			Statement statement = Cypher
+				.match(true, Collections.singleton(bikeNode))
+				.match(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("OPTIONAL MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test // GH-189
+		void optionalWithPatternCollection() {
+			Statement statement = Cypher
+				.optionalMatch(Collections.singleton(bikeNode))
 				.match(userNode, Cypher.node("U").named("o"))
 				.where(userNode.property("a").isNull())
 				.returning(bikeNode)
