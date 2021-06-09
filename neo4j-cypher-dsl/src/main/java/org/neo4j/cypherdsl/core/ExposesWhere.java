@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
@@ -58,6 +59,6 @@ public interface ExposesWhere {
 	default StatementBuilder.OngoingReadingWithWhere where(RelationshipPattern pathPattern) {
 
 		Assertions.notNull(pathPattern, "The path pattern must not be null.");
-		return this.where(new RelationshipPatternCondition(pathPattern));
+		return this.where(RelationshipPatternCondition.of(pathPattern));
 	}
 }

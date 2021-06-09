@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -212,7 +213,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	@Override
 	public final Condition asCondition() {
-		return new RelationshipPatternCondition(this);
+		return RelationshipPatternCondition.of(this);
 	}
 
 	// ------------------------------------------------------------------------

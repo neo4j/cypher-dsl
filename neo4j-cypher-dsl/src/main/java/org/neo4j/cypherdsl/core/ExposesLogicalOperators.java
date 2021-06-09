@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
@@ -51,7 +52,7 @@ public interface ExposesLogicalOperators<T> {
 	 */
 	@NotNull @CheckReturnValue
 	default T and(RelationshipPattern pathPattern) {
-		return this.and(new RelationshipPatternCondition(pathPattern));
+		return this.and(RelationshipPatternCondition.of(pathPattern));
 	}
 
 	/**
@@ -75,6 +76,6 @@ public interface ExposesLogicalOperators<T> {
 	 */
 	@NotNull @CheckReturnValue
 	default T or(RelationshipPattern pathPattern) {
-		return this.or(new RelationshipPatternCondition(pathPattern));
+		return this.or(RelationshipPatternCondition.of(pathPattern));
 	}
 }

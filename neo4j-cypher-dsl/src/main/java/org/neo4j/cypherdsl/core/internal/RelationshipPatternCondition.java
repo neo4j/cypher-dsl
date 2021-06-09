@@ -16,11 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Condition;
+import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -31,11 +33,15 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0.1
  */
 @API(status = INTERNAL, since = "1.0")
-final class RelationshipPatternCondition implements Condition {
+public final class RelationshipPatternCondition implements Condition {
 
 	private final RelationshipPattern pathPattern;
 
-	RelationshipPatternCondition(RelationshipPattern pathPattern) {
+	public static RelationshipPatternCondition of(RelationshipPattern pathPattern) {
+		return new RelationshipPatternCondition(pathPattern);
+	}
+
+	private RelationshipPatternCondition(RelationshipPattern pathPattern) {
 		this.pathPattern = pathPattern;
 	}
 

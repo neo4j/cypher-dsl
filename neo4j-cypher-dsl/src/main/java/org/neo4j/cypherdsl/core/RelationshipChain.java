@@ -28,6 +28,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -199,7 +200,7 @@ public final class RelationshipChain implements RelationshipPattern {
 
 	@Override
 	public Condition asCondition() {
-		return new RelationshipPatternCondition(this);
+		return RelationshipPatternCondition.of(this);
 	}
 
 	@Override

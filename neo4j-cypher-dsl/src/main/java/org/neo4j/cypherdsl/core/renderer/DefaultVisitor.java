@@ -85,6 +85,7 @@ import org.neo4j.cypherdsl.core.internal.Namespace;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipLength;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
@@ -161,6 +162,23 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 * Will be set to true when entering an already visited node.
 	 */
 	private boolean skipNodeContent = false;
+
+	/**
+	 * Will be set to true when entering an already visited relationship.
+	 */
+	private boolean skipRelationshipContent = false;
+
+	/**
+	 * Will be true when inside a {@link RelationshipPatternCondition}.
+	 */
+	private boolean inRelationshipCondition = false;
+
+	/**
+	 * Will be set to true when entering a {@link RelationshipPatternCondition}: In this case only existing symbolic names
+	 * may be used, new ones must not be introduced. We can deduce from looking at {@link #dequeOfVisitedNamed} which will
+	 * contain the list of named elements in the scope of the current subquery or with clause.
+	 */
+	private boolean skipSymbolicName = false;
 
 	DefaultVisitor(StatementContext statementContext) {
 		this.statementContext = statementContext;
@@ -302,6 +320,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 				break;
 		}
 		builder.append(" ");
+	}
+
+	void enter(RelationshipPatternCondition condition) {
+		inRelationshipCondition = true;
+	}
+
+	void leave(RelationshipPatternCondition condition) {
+		inRelationshipCondition = false;
 	}
 
 	void enter(Distinct distinct) {
@@ -472,6 +498,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 				.map(SymbolicName::getValue).orElseGet(() -> resolve(node.getRequiredSymbolicName()));
 			builder.append(symbolicName);
 		}
+
+		skipSymbolicName = inRelationshipCondition;
 	}
 
 	void leave(Node node) {
@@ -479,6 +507,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(")");
 
 		skipNodeContent = false;
+		skipSymbolicName = false;
 	}
 
 	void enter(NodeLabel nodeLabel) {
@@ -492,7 +521,21 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(SymbolicName symbolicName) {
+
+		if (skipSymbolicName) {
+			return;
+		}
+
 		builder.append(resolve(symbolicName));
+	}
+
+	void enter(Relationship relationship) {
+
+
+		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
+		skipRelationshipContent = visitedNamed.contains(relationship);
+		visitedNamed.add(relationship);
+
 	}
 
 	void enter(Relationship.Details details) {
@@ -502,9 +545,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (details.hasContent()) {
 			builder.append("[");
 		}
+
+		skipSymbolicName = inRelationshipCondition && !skipRelationshipContent;
 	}
 
 	void enter(RelationshipTypes types) {
+
+		if (skipRelationshipContent) {
+			return;
+		}
 
 		builder
 			.append(types.getValues().stream()
@@ -513,6 +562,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(RelationshipLength length) {
+
+		if (skipRelationshipContent) {
+			return;
+		}
 
 		Integer minimum = length.getMinimum();
 		Integer maximum = length.getMaximum();
@@ -543,6 +596,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			builder.append("]");
 		}
 		builder.append(direction.getSymbolRight());
+
+		skipSymbolicName = false;
+	}
+
+	void leave(Relationship relationship) {
+
+		skipRelationshipContent = false;
 	}
 
 	protected final void renderParameter(Parameter parameter) {

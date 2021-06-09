@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 
 /**
  * Shared interface for all conditions.
@@ -78,7 +79,7 @@ public interface Condition extends Expression {
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition and(RelationshipPattern pathPattern) {
-		return CompoundCondition.create(this, Operator.AND, new RelationshipPatternCondition(pathPattern));
+		return CompoundCondition.create(this, Operator.AND, RelationshipPatternCondition.of(pathPattern));
 	}
 
 	/**
@@ -93,7 +94,7 @@ public interface Condition extends Expression {
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition or(RelationshipPattern pathPattern) {
-		return CompoundCondition.create(this, Operator.OR, new RelationshipPatternCondition(pathPattern));
+		return CompoundCondition.create(this, Operator.OR, RelationshipPatternCondition.of(pathPattern));
 	}
 
 	/**
@@ -108,7 +109,7 @@ public interface Condition extends Expression {
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition xor(RelationshipPattern pathPattern) {
-		return CompoundCondition.create(this, Operator.XOR, new RelationshipPatternCondition(pathPattern));
+		return CompoundCondition.create(this, Operator.XOR, RelationshipPatternCondition.of(pathPattern));
 	}
 
 	/**

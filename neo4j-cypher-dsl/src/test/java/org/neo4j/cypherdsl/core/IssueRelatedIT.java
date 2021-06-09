@@ -751,4 +751,27 @@ class IssueRelatedIT {
 		assertThat(cypher).isEqualTo(
 			"MATCH (node:`Node`) WITH n, false AS f, date() AS aDate RETURN *");
 	}
+
+	@Test // GH-192
+	void patternExpressionsAreNotAllowedToIntroduceNewVariables() {
+
+		Node bike = Cypher.node("Bike").named("b");
+		Node owner = Cypher.node("Person").named("o");
+		Relationship owns = owner.relationshipTo(bike, "OWNS").named("r");
+		Property p = owns.property("x");
+
+		Statement statement = Cypher.match(bike)
+			.where(owns.asCondition())
+			.with(bike)
+			.match(owns)
+			.returning(bike.property("f"), p)
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (b:`Bike`) WHERE (:`Person`)-[:`OWNS`]->(b) WITH b MATCH (o:`Person`)-[r:`OWNS`]->(b) RETURN b.f, r.x");
+
+		statement = Cypher.match(owns)
+			.where(owns.asCondition())
+			.returning(owns)
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (o:`Person`)-[r:`OWNS`]->(b:`Bike`) WHERE (o)-[r]->(b) RETURN r");
+	}
 }
