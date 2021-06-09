@@ -575,6 +575,19 @@ public final class Cypher {
 	}
 
 	/**
+	 * Starts building a statement starting with an {@code UNWIND} clause. The expressions passed will be turned into a
+	 * list expression
+	 *
+	 * @param expressions expressions to unwind
+	 * @return a new instance of {@link StatementBuilder.OngoingUnwind}
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingUnwind unwind(Collection<Expression> expressions) {
+
+		return unwind(expressions.toArray(new Expression[] {}));
+	}
+
+	/**
 	 * Creates a new {@link SortItem} to be used as part of an {@link Order}.
 	 *
 	 * @param expression The expression by which things should be sorted

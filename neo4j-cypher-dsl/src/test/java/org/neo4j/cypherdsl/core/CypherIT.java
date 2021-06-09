@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -3150,8 +3151,20 @@ class CypherIT {
 		@Test
 		void shouldRenderLeadingUnwind() {
 
-			Statement statement;
-			statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+				.as("n").returning(Cypher.name("n"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"UNWIND [1, true, false] AS n RETURN n");
+		}
+
+		@Test // GH-189
+		void shouldRenderLeadingUnwindBasedOnExpressionCollection() {
+
+			Expression[] expressions = {Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse()};
+			Statement statement = Cypher.unwind(Arrays.asList(expressions))
 				.as("n").returning(Cypher.name("n"))
 				.build();
 
@@ -3163,8 +3176,7 @@ class CypherIT {
 		@Test
 		void shouldRenderLeadingUnwindWithUpdate() {
 
-			Statement statement;
-			statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
 				.as("n")
 				.merge(bikeNode.withProperties("b", Cypher.name("n")))
 				.returning(bikeNode)
@@ -3178,8 +3190,7 @@ class CypherIT {
 		@Test
 		void shouldRenderLeadingUnwindWithCreate() {
 
-			Statement statement;
-			statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
 				.as("n")
 				.create(bikeNode.withProperties("b", Cypher.name("n")))
 				.returning(bikeNode)
@@ -3193,10 +3204,8 @@ class CypherIT {
 		@Test
 		void shouldRenderUnwind() {
 
-			Statement statement;
-
 			AliasedExpression collected = Functions.collect(bikeNode).as("collected");
-			statement = Cypher.match(bikeNode)
+			Statement statement = Cypher.match(bikeNode)
 				.with(collected)
 				.unwind(collected).as("x")
 				.with("x")
