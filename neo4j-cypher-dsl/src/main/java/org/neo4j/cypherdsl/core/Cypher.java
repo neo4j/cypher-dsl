@@ -896,6 +896,17 @@ public final class Cypher {
 	}
 
 	/**
+	 * Starts defining a procedure call of the procedure with the given qualified name.
+	 *
+	 * @param namespaceAndProcedure The procedure name of the procedure to call.
+	 * @return An ongoing definition of a call
+	 */
+	@NotNull @Contract(pure = true)
+	public static OngoingStandaloneCallWithoutArguments call(Collection<String> namespaceAndProcedure) {
+		return call(namespaceAndProcedure.toArray(new String[] {}));
+	}
+
+	/**
 	 * Starts building a statement based on one subquery.
 	 *
 	 * @param subquery The statement representing the subquery
