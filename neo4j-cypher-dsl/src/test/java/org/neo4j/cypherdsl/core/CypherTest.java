@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.assertj.core.api.Assertions.fail;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -87,6 +88,12 @@ class CypherTest {
 					fail("Unexpected segment: " + segment.getClass());
 			}
 		});
+	}
+
+	@Test // GH-189
+	void shouldCreateAdditionalLabelsFromCollection() {
+		Node node = Cypher.node("Primary", MapExpression.create(), Collections.singleton("Secondary"));
+		assertThat(node.getLabels()).extracting("value").containsExactly("Primary", "Secondary");
 	}
 
 }

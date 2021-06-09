@@ -97,6 +97,22 @@ public final class Cypher {
 	}
 
 	/**
+	 * Create a new Node representation with at least one label, the "primary" label. This is required. All other labels
+	 * are optional. This method also takes a map of properties. This allows the returned node object to be used in a
+	 * {@code MATCH} or {@code MERGE} statement.
+	 *
+	 * @param primaryLabel     The primary label this node is identified by.
+	 * @param properties       The properties expected to exist on the node.
+	 * @param additionalLabels Additional labels
+	 * @return A new node representation
+	 */
+	@NotNull @Contract(pure = true)
+	public static Node node(String primaryLabel, MapExpression properties, Collection<String> additionalLabels) {
+
+		return new InternalNodeImpl(null, primaryLabel, properties, additionalLabels.toArray(new String[] {}));
+	}
+
+	/**
 	 * @return A node matching any node.
 	 */
 	@NotNull @Contract(pure = true)
