@@ -795,6 +795,18 @@ public final class Cypher {
 	}
 
 	/**
+	 * A {@literal RETURN} statement without a previous match.
+	 *
+	 * @param expressions The expressions to return
+	 * @return A buildable statement
+	 * @since 1.0.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+		return returning(expressions.toArray(new Expression[] {}));
+	}
+
+	/**
 	 * Creates a list comprehension starting with a {@link Relationship} or a {@link RelationshipChain chain of relationships}.
 	 *
 	 * @param relationshipPattern The relationship pattern on which the new list comprehension is based on.

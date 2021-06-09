@@ -3130,6 +3130,24 @@ class CypherIT {
 	}
 
 	@Nested
+	class Returning {
+
+		@Test
+		void shouldRenderLeadingReturning() {
+
+			String cypher = Cypher.returning(Cypher.literalOf(1)).build().getCypher();
+			assertThat(cypher).isEqualTo("RETURN 1");
+		}
+
+		@Test // GH-189
+		void shouldRenderLeadingReturningBasedOnExpressionCollection() {
+
+			String cypher = Cypher.returning(Arrays.asList(Cypher.literalOf(1))).build().getCypher();
+			assertThat(cypher).isEqualTo("RETURN 1");
+		}
+	}
+
+	@Nested
 	class UnwindRendering {
 
 		@Test
