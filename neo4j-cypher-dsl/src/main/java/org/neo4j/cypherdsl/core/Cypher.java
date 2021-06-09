@@ -413,10 +413,21 @@ public final class Cypher {
 	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingUpdate create(
-		PatternElement... pattern) {
+	public static StatementBuilder.OngoingUpdate create(PatternElement... pattern) {
 
 		return Statement.builder().create(pattern);
+	}
+
+	/**
+	 * Starts building a statement based on a {@code CREATE} clause.
+	 *
+	 * @param pattern The patterns to create
+	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern) {
+
+		return create(pattern.toArray(new PatternElement[] {}));
 	}
 
 	/**
