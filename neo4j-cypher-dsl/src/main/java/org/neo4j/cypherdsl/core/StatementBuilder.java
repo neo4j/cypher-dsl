@@ -748,6 +748,15 @@ public interface StatementBuilder
 		OngoingUpdate delete(Expression... expressions);
 
 		/**
+		 * Creates a delete step with one or more expressions to be deleted.
+		 *
+		 * @param expressions The expressions to be deleted.
+		 * @return A match with a delete clause that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		OngoingUpdate delete(Collection<Expression> expressions);
+
+		/**
 		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
 		 * been matched previously.
 		 *
