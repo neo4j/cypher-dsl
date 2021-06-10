@@ -803,6 +803,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem) {
+			return orderBy(sortItem.toArray(new SortItem[] {}));
+		}
+
+		@NotNull
+		@Override
 		public OngoingOrderDefinition orderBy(@NotNull Expression expression) {
 			orderBuilder.orderBy(expression);
 			return this;

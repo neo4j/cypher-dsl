@@ -619,6 +619,16 @@ public interface StatementBuilder
 		OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem);
 
 		/**
+		 * Order the result set by one or more {@link SortItem sort items}. Those can be retrieved for
+		 * all expression with {@link Cypher#sort(Expression)} or directly from properties.
+		 *
+		 * @param sortItem One or more sort items
+		 * @return A build step that still offers methods for defining skip and limit
+		 */
+		@NotNull @CheckReturnValue
+		OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem);
+
+		/**
 		 * Order the result set by an expression.
 		 *
 		 * @param expression The expression to order by
