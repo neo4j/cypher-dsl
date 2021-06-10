@@ -1261,6 +1261,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return new YieldingStandaloneCallBuilder(procedureName,  arguments, aliasedResultFields);
 		}
 
+		@NotNull
 		@Override
 		public Expression asFunction(boolean distinct) {
 
@@ -1274,7 +1275,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		}
 
-
+		@NotNull
 		@Override
 		public ProcedureCall build() {
 
@@ -1360,6 +1361,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		Statement buildCall() {
 			return build();
+		}
+
+		@NotNull
+		@Override
+		public  StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
+			return new DefaultStatementBuilder(this.buildCall()).match(optional, pattern);
 		}
 	}
 
@@ -1461,6 +1468,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.call(statement);
+		}
+
+		@NotNull
+		@Override
+		public
+		StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.match(optional, pattern);
 		}
 	}
 

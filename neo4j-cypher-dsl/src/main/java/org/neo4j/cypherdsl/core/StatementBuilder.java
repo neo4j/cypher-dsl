@@ -949,7 +949,7 @@ public interface StatementBuilder
 	 */
 	interface OngoingStandaloneCallWithReturnFields extends
 		StatementBuilder.BuildableStatement<ResultStatement>,
-		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 
 	/**
@@ -971,6 +971,6 @@ public interface StatementBuilder
 	 * An in-query call exposing where and return clauses.
 	 */
 	interface OngoingInQueryCallWithReturnFields extends
-		ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 }

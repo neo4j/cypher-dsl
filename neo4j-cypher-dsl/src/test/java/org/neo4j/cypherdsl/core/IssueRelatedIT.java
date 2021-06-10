@@ -774,4 +774,52 @@ class IssueRelatedIT {
 			.build();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (o:`Person`)-[r:`OWNS`]->(b:`Bike`) WHERE (o)-[r]->(b) RETURN r");
 	}
+
+	@Test // GH-193
+	void matchAfterYieldShouldWorkStandalone() {
+
+		Node g = Cypher.node("Group").named("g");
+		Node a = Cypher.node("Asset").named("a");
+		Node d = Cypher.node("Device").named("d");
+		SymbolicName node = Cypher.name("node");
+		String cypher = Cypher.call("db.index.fulltext.queryNodes")
+			.withArgs(Cypher.literalOf("livesearch"), Cypher.literalOf("*a*"))
+			.yield(node)
+			.match(g.relationshipTo(a, "GROUPS").relationshipFrom(Cypher.node("Deploy"), "ON")
+				.relationshipFrom(d, "SCHEDULED"))
+			.where(a.property("asset_id").isEqualTo(Cypher.property(node, "asset_id")))
+			.withDistinct(Functions.collect(d.project(d.property("sigfox_id"), a)).as("assetdata"))
+			.returning("assetdata").build().getCypher();
+		assertThat(cypher).isEqualTo(
+			"CALL db.index.fulltext.queryNodes('livesearch', '*a*') "
+			+ "YIELD node "
+			+ "MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) "
+			+ "WHERE a.asset_id = node.asset_id "
+			+ "WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata");
+	}
+
+	@Test // GH-193
+	void matchAfterYieldShouldWorkInQuery() {
+
+		Node g = Cypher.node("Group").named("g");
+		Node a = Cypher.node("Asset").named("a");
+		Node d = Cypher.node("Device").named("d");
+		SymbolicName node = Cypher.name("node");
+		SymbolicName nameOfIndex = Cypher.name("nameOfIndex");
+		String cypher = Cypher.with(Cypher.parameter("p").as(nameOfIndex))
+				.call("db.index.fulltext.queryNodes")
+				.withArgs(nameOfIndex, Cypher.literalOf("*a*"))
+				.yield(node)
+				.match(g.relationshipTo(a, "GROUPS").relationshipFrom(Cypher.node("Deploy"), "ON")
+					.relationshipFrom(d, "SCHEDULED"))
+				.where(a.property("asset_id").isEqualTo(Cypher.property(node, "asset_id")))
+				.withDistinct(Functions.collect(d.project(d.property("sigfox_id"), a)).as("assetdata"))
+				.returning("assetdata").build().getCypher();
+		assertThat(cypher).isEqualTo(
+			"WITH $p AS nameOfIndex CALL db.index.fulltext.queryNodes(nameOfIndex, '*a*') "
+			+ "YIELD node "
+			+ "MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) "
+			+ "WHERE a.asset_id = node.asset_id "
+			+ "WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata");
+	}
 }
