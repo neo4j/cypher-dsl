@@ -849,4 +849,22 @@ class IssueRelatedIT {
 
 		assertThat(cypher).isEqualTo("MATCH (n:`Node`) WITH n WITH n CALL my.procedure() YIELD x WITH n RETURN n");
 	}
+
+	@Test // GH-189
+	void exposesWithDistinctBasedOnExpressionCollectionOnNext() {
+
+		Node node = Cypher.node("Node").named("n");
+
+		String cypher = Cypher.match(node)
+				.withDistinct(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementBuilder
+				.withDistinct(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementWithWithBuilder
+				.call("my.procedure")
+				.yield("x")
+				.withDistinct(Collections.singleton(node.getRequiredSymbolicName())) // InQueryCallBuilder
+				.returning(node).build().getCypher();
+
+		assertThat(cypher).isEqualTo(
+				"MATCH (n:`Node`) WITH DISTINCT n WITH DISTINCT n CALL my.procedure() YIELD x WITH DISTINCT n RETURN n"
+		);
+	}
 }
