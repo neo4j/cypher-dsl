@@ -349,6 +349,16 @@ class CypherIT {
 						"MATCH (u:`User`) RETURN u ORDER BY u.name");
 			}
 
+			@Test // GH-189
+			void sortOrderDefaultBasedOnSortItemCollection() {
+				Statement statement = Cypher.match(userNode).returning(userNode)
+					.orderBy(Collections.singleton(Cypher.sort(userNode.property("name")))).build();
+
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo(
+						"MATCH (u:`User`) RETURN u ORDER BY u.name");
+			}
+
 			@Test
 			void sortOrderAscending() {
 				Statement statement = Cypher.match(userNode).returning(userNode)

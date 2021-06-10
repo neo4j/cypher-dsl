@@ -484,6 +484,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public final OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem) {
+			return orderBy(sortItem.toArray(new SortItem[] {}));
+		}
+
+		@NotNull
+		@Override
 		public final TerminalOngoingOrderDefinition orderBy(@NotNull Expression expression) {
 			orderBuilder.orderBy(expression);
 			return this;
