@@ -50,6 +50,7 @@ public interface ExposesMatch {
 	 *
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
 	 */
 	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere match(Collection<PatternElement> pattern) {
@@ -72,6 +73,7 @@ public interface ExposesMatch {
 	 *
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
 	 */
 	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<PatternElement> pattern) {

@@ -93,6 +93,7 @@ public interface StatementBuilder
 	 *
 	 * @param expressions The expressions to start the query with
 	 * @return An ongoing read, exposing return and further matches.
+	 * @since 2021.2.2
 	 */
 	@NotNull @CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
@@ -444,6 +445,7 @@ public interface StatementBuilder
 		 *
 		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 		 * @return A match that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
@@ -503,6 +505,7 @@ public interface StatementBuilder
 		 *
 		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 		 * @return A match that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions);
@@ -533,6 +536,7 @@ public interface StatementBuilder
 		 *
 		 * @param sortItem One or more sort items
 		 * @return A build step that still offers methods for defining skip and limit
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem);
@@ -624,6 +628,7 @@ public interface StatementBuilder
 		 *
 		 * @param sortItem One or more sort items
 		 * @return A build step that still offers methods for defining skip and limit
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem);
@@ -752,6 +757,7 @@ public interface StatementBuilder
 		 *
 		 * @param expressions The expressions to be deleted.
 		 * @return A match with a delete clause that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		OngoingUpdate delete(Collection<Expression> expressions);
@@ -794,6 +800,7 @@ public interface StatementBuilder
 		 *
 		 * @param expressions The expressions to be deleted.
 		 * @return A match with a delete clause that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		OngoingUpdate detachDelete(Collection<Expression> expressions);
@@ -822,6 +829,7 @@ public interface StatementBuilder
 		 *
 		 * @param expressions The list of expressions to use in a set clause.
 		 * @return An ongoing match and update
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate set(Collection<Expression> expressions);
@@ -888,6 +896,7 @@ public interface StatementBuilder
 		 * @param node   The node who's labels are to be changed
 		 * @param labels The labels to be set
 		 * @return A match with a SET clause that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate set(Node node, Collection<String> labels);
@@ -908,6 +917,7 @@ public interface StatementBuilder
 		 * @param node   The node who's labels are to be changed
 		 * @param labels The labels to be removed
 		 * @return A match with a REMOVE clause that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate remove(Node node, Collection<String> labels);
@@ -926,6 +936,7 @@ public interface StatementBuilder
 		 *
 		 * @param properties The properties to be removed
 		 * @return A match with a REMOVE clause that can be build now
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate remove(Collection<Property> properties);
@@ -1002,6 +1013,7 @@ public interface StatementBuilder
 		 *
 		 * @param expressions The list of expressions to use in a set clause.
 		 * @return An ongoing match and update
+		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
 		BuildableOngoingMergeAction set(Collection<Expression> expressions);

@@ -105,6 +105,7 @@ public final class Cypher {
 	 * @param properties       The properties expected to exist on the node.
 	 * @param additionalLabels Additional labels
 	 * @return A new node representation
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static Node node(String primaryLabel, MapExpression properties, Collection<String> additionalLabels) {
@@ -166,6 +167,7 @@ public final class Cypher {
 	 * @param names         The names of the properties to dereference. More than one name does create a nested property
 	 *                      like {@code containerName.name1.name2}.
 	 * @return A new property
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static Property property(String containerName, Collection<String> names) {
@@ -192,6 +194,7 @@ public final class Cypher {
 	 * @param names      The names of the properties to dereference. More than one name does create a nested property
 	 *                   like {@code expression.name1.name2}.
 	 * @return A new property.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static Property property(Expression expression, Collection<String> names) {
@@ -343,6 +346,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<PatternElement> pattern) {
@@ -369,6 +373,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere match(Collection<PatternElement> pattern) {
@@ -398,7 +403,7 @@ public final class Cypher {
 	 * @param optional A flag whether the {@code MATCH} clause includes the {@code OPTIONAL} keyword.
 	 * @param pattern  The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
-	 * @since 2020.1.3
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, Collection<PatternElement> pattern) {
@@ -423,6 +428,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The patterns to create
 	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern) {
@@ -517,6 +523,7 @@ public final class Cypher {
 	 *
 	 * @param expressions One ore more expressions.
 	 * @return An ongoing with clause.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
@@ -541,6 +548,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The patterns to merge
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingMerge merge(Collection<PatternElement> pattern) {
@@ -580,6 +588,7 @@ public final class Cypher {
 	 *
 	 * @param expressions expressions to unwind
 	 * @return a new instance of {@link StatementBuilder.OngoingUnwind}
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingUnwind unwind(Collection<Expression> expressions) {
@@ -655,6 +664,7 @@ public final class Cypher {
 	 *
 	 * @param expressions expressions to get combined into a list
 	 * @return a new instance of {@link ListExpression}
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static ListExpression listOf(Collection<Expression> expressions) {
@@ -754,6 +764,7 @@ public final class Cypher {
 	 *
 	 * @param statements the statements to union.
 	 * @return A union statement.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static Statement union(Collection<Statement> statements) {
@@ -776,6 +787,7 @@ public final class Cypher {
 	 *
 	 * @param statements the statements to union.
 	 * @return A union statement.
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static Statement unionAll(Collection<Statement> statements) {
@@ -799,7 +811,7 @@ public final class Cypher {
 	 *
 	 * @param expressions The expressions to return
 	 * @return A buildable statement
-	 * @since 1.0.1
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
@@ -900,6 +912,7 @@ public final class Cypher {
 	 *
 	 * @param namespaceAndProcedure The procedure name of the procedure to call.
 	 * @return An ongoing definition of a call
+	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static OngoingStandaloneCallWithoutArguments call(Collection<String> namespaceAndProcedure) {

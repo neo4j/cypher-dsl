@@ -3810,14 +3810,10 @@ class CypherIT {
 		void simpleWithCollection() {
 
 			SymbolicName name = Cypher.name("a");
-			Collection<Expression> literals = new ArrayList<>();
-			literals.add(Cypher.literalOf(1));
-			literals.add(Cypher.literalOf(2));
-			literals.add(Cypher.literalOf(3));
-			literals.add(Cypher.literalOf(4));
+			Expression[] expressions = {Cypher.literalOf(1), Cypher.literalOf(2), Cypher.literalOf(3), Cypher.literalOf(4)};
 			Statement statement = Cypher.returning(
 					Cypher.listWith(name)
-							.in(Cypher.listOf(literals))
+							.in(Cypher.listOf(Arrays.asList(expressions)))
 							.returning()).build();
 			assertThat(cypherRenderer.render(statement))
 					.isEqualTo("RETURN [a IN [1, 2, 3, 4]]");
