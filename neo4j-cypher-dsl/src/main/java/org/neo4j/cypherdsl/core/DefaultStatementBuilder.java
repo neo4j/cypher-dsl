@@ -171,6 +171,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 					.on(type, UpdateType.SET, expressions);
 				return DefaultStatementBuilder.this;
 			}
+
+			@Override
+			public BuildableOngoingMergeAction set(Collection<Expression> expressions) {
+				return set(expressions.toArray(new Expression[] {}));
+			}
 		};
 	}
 
@@ -309,9 +314,21 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
+	public final BuildableMatchAndUpdate set(Collection<Expression> expressions) {
+
+		return set(expressions.toArray(new Expression[] {}));
+	}
+
+	@Override
 	public final BuildableMatchAndUpdate set(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
+	}
+
+	@Override
+	public final BuildableMatchAndUpdate set(Node named, Collection<String> labels) {
+
+		return set(named, labels.toArray(new String[] {}));
 	}
 
 	@Override
@@ -687,11 +704,25 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		@SuppressWarnings("unchecked")
+		public BuildableMatchAndUpdate set(Collection<Expression> expressions) {
+
+			return set(expressions.toArray(new Expression[] {}));
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.set(node, labels);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
+
+			return set(node, labels.toArray(new String[] {}));
 		}
 
 		@Override
@@ -1183,11 +1214,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
+		public BuildableMatchAndUpdate set(Collection<Expression> keyValuePairs) {
+
+			return set(keyValuePairs.toArray(new Expression[] {}));
+		}
+
+		@Override
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
 				UpdateType.SET, Operations.set(node, labels));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
+
+			return set(node, labels.toArray(new String[] {}));
 		}
 
 		@Override

@@ -817,6 +817,16 @@ public interface StatementBuilder
 		BuildableMatchAndUpdate set(Expression... expressions);
 
 		/**
+		 * Adds a {@code SET} clause to the statement. The list of expressions must be even, each pair will be turned into
+		 * SET operation.
+		 *
+		 * @param expressions The list of expressions to use in a set clause.
+		 * @return An ongoing match and update
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate set(Collection<Expression> expressions);
+
+		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
 		 *
 		 * @param variable   The named thing to modify
@@ -871,6 +881,16 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate set(Node node, String... labels);
+
+		/**
+		 * Creates {@code SET} clause for setting the given labels to a node.
+		 *
+		 * @param node   The node who's labels are to be changed
+		 * @param labels The labels to be set
+		 * @return A match with a SET clause that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate set(Node node, Collection<String> labels);
 
 		/**
 		 * Creates {@code SET} clause for removing the given labels from a node.
@@ -956,6 +976,16 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableOngoingMergeAction set(Expression... expressions);
+
+		/**
+		 * Adds a {@code SET} clause to the statement. The list of expressions must be even, each pair will be turned into
+		 * SET operation.
+		 *
+		 * @param expressions The list of expressions to use in a set clause.
+		 * @return An ongoing match and update
+		 */
+		@NotNull @CheckReturnValue
+		BuildableOngoingMergeAction set(Collection<Expression> expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
