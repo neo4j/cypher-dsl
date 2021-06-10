@@ -768,6 +768,19 @@ class CypherIT {
 				.isEqualTo("MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) RETURN b");
 		}
 
+		@Test // GH-189
+		void simpleWithPatternCollectionInExposesMatch() {
+			PatternElement[] patternElements = {userNode, Cypher.node("U").named("o")};
+			Statement statement = Cypher
+					.match(Collections.singleton(bikeNode))
+					.match(Arrays.asList(patternElements))
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) RETURN b");
+		}
+
 		@Test
 		void simpleWhere() {
 			Statement statement = Cypher
@@ -930,6 +943,20 @@ class CypherIT {
 			Statement statement = Cypher
 				.match(bikeNode)
 				.optionalMatch(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (b:`Bike`) OPTIONAL MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test
+		void optionalNextBasedOnPatternElementCollection() {
+			PatternElement[] patternElements = {userNode, Cypher.node("U").named("o")};
+			Statement statement = Cypher
+					.match(bikeNode)
+					.optionalMatch(Arrays.asList(patternElements))
 				.where(userNode.property("a").isNull())
 				.returning(bikeNode)
 				.build();
