@@ -903,6 +903,16 @@ public interface StatementBuilder
 		BuildableMatchAndUpdate remove(Node node, String... labels);
 
 		/**
+		 * Creates {@code SET} clause for removing the given labels from a node.
+		 *
+		 * @param node   The node who's labels are to be changed
+		 * @param labels The labels to be removed
+		 * @return A match with a REMOVE clause that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate remove(Node node, Collection<String> labels);
+
+		/**
 		 * Creates {@code SET} clause for removing the enumerated properties
 		 *
 		 * @param properties The properties to be removed
@@ -910,6 +920,15 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate remove(Property... properties);
+
+		/**
+		 * Creates {@code SET} clause for removing the enumerated properties
+		 *
+		 * @param properties The properties to be removed
+		 * @return A match with a REMOVE clause that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate remove(Collection<Property> properties);
 	}
 
 	/**

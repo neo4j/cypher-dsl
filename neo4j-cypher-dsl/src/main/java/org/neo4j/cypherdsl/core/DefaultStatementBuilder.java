@@ -345,9 +345,21 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
+	public final BuildableMatchAndUpdate remove(Collection<Property> properties) {
+
+		return remove(properties.toArray(new Property[] {}));
+	}
+
+	@Override
 	public final BuildableMatchAndUpdate remove(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
+	}
+
+	@Override
+	public final BuildableMatchAndUpdate remove(Node named, Collection<String> labels) {
+
+		return remove(named, labels.toArray(new String[] {}));
 	}
 
 	@Override
@@ -742,11 +754,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
+		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
+
+			return remove(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.remove(properties);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
+
+			return remove(properties.toArray(new Property[] {}));
 		}
 
 		@Override
@@ -1250,10 +1274,22 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
+		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
+
+			return remove(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
+
+			return remove(properties.toArray(new Property[] {}));
 		}
 
 		@Override
