@@ -89,6 +89,15 @@ public interface StatementBuilder
 	OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
 
 	/**
+	 * Allows for queries starting with {@code with range(1,10) as x return x} or similar.
+	 *
+	 * @param expressions The expressions to start the query with
+	 * @return An ongoing read, exposing return and further matches.
+	 */
+	@NotNull @CheckReturnValue
+	OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
+
+	/**
 	 * An ongoing update statement that can be used to chain more update statements or add a with or return clause.
 	 *
 	 * @since 1.0
