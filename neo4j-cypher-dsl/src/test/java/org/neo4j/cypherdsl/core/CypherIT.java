@@ -1954,7 +1954,7 @@ class CypherIT {
 		}
 
 		@Test
-		void multileLevelsOfChaining() {
+		void multipleLevelsOfChaining() {
 			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
 				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
 				.mutate(bikeNode, Cypher.mapOf("c", Cypher.literalOf("D")))

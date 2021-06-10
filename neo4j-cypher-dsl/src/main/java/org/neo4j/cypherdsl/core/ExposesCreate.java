@@ -46,7 +46,7 @@ public interface ExposesCreate {
 	/**
 	 * @param pattern patterns to create
 	 * @return An ongoing merge
-	 * @see Cypher#create(Collection) <PatternElement>)
+	 * @see Cypher#create(Collection)
 	 */
 	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern);

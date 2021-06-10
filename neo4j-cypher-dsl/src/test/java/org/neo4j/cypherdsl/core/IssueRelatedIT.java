@@ -833,4 +833,20 @@ class IssueRelatedIT {
 		.build().getCypher();
 		assertThat(cypher).isEqualTo("MATCH (n:`Node`) RETURN n.name");
 	}
+
+	@Test // GH-189
+	void exposesWithBasedOnExpressionCollectionOnNext() {
+
+		Node node = Cypher.node("Node").named("n");
+
+		String cypher = Cypher.match(node)
+				.with(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementBuilder
+				.with(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementWithWithBuilder
+				.call("my.procedure")
+				.yield("x")
+				.with(Collections.singleton(node.getRequiredSymbolicName())) // InQueryCallBuilder
+				.returning(node).build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (n:`Node`) WITH n WITH n CALL my.procedure() YIELD x WITH n RETURN n");
+	}
 }

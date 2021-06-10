@@ -249,9 +249,21 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
+	public final OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+
+		return with(expressions.toArray(new Expression[] {}));
+	}
+
+	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 
 		return with(true, expressions);
+	}
+
+	@Override
+	public final OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
+
+		return withDistinct(expressions.toArray(new Expression[] {}));
 	}
 
 	private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Expression... expressions) {
@@ -681,11 +693,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+
+			return with(expressions.toArray(new Expression[] {}));
+		}
+
+		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.withDistinct(expressions);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
+
+			return withDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@Override
@@ -1141,8 +1165,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> returnedExpressions) {
+			return with(returnedExpressions.toArray(new Expression[] {}));
+		}
+
+		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... returnedExpressions) {
 			return this.with(true, returnedExpressions);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> returnedExpressions) {
+			return withDistinct(returnedExpressions.toArray(new Expression[] {}));
 		}
 
 		@Override
@@ -1358,8 +1392,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+			return with(expressions.toArray(new Expression[] {}));
+		}
+
+		@NotNull
+		@Override
 		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 			return new DefaultStatementBuilder(this.buildCall()).withDistinct(expressions);
+		}
+
+		@NotNull
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
+			return withDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
@@ -1474,10 +1520,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+
+			return with(expressions.toArray(new Expression[] {}));
+		}
+
+		@NotNull
+		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.withDistinct(expressions);
+		}
+
+		@NotNull
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
+
+			return withDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull

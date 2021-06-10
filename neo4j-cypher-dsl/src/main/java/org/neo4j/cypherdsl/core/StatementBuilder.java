@@ -27,6 +27,8 @@ import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
+import java.util.Collection;
+
 /**
  * @author Michael J. Simons
  * @author Gerrit Meier
@@ -429,6 +431,15 @@ public interface StatementBuilder
 		OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
 
 		/**
+		 * Create a match that returns one or more expressions.
+		 *
+		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
+		 * @return A match that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
+
+		/**
 		 * @param variables The variables to pass on to the next part
 		 * @return A match that can be build now
 		 * @see #withDistinct(Expression...)
@@ -477,6 +488,15 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions);
+
+		/**
+		 * Create a match that returns the distinct set of one or more expressions.
+		 *
+		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
+		 * @return A match that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions);
 	}
 
 	/**
