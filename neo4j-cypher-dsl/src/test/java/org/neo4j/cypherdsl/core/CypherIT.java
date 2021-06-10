@@ -2547,7 +2547,7 @@ class CypherIT {
 		}
 
 		@Test // GH-189
-		void shouldRenderCreateWithPatternElementCollectionWithoutReturn() {
+		void shouldRenderCreateBasedOnPatternElementCollectionWithoutReturn() {
 			Statement statement;
 			statement = Cypher.create(Collections.singleton(userNode))
 				.build();
@@ -2578,6 +2578,27 @@ class CypherIT {
 			statement = Cypher
 				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
 				.create(Cypher.node("Other"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CREATE (u:`User`)-[o:`OWNS`]->(b:`Bike`) CREATE (:`Other`)");
+		}
+
+		@Test
+		void shouldRenderMultipleCreatesBasedOnPatternElementCollectionWithoutReturn() {
+			Statement statement;
+			statement = Cypher.create(userNode)
+				.create(Collections.singleton(bikeNode))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CREATE (u:`User`) CREATE (b:`Bike`)");
+
+			statement = Cypher
+				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.create(Collections.singleton(Cypher.node("Other")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))

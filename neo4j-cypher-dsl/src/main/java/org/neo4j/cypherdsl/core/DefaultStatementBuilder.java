@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -126,6 +127,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 	public final OngoingUpdate create(PatternElement... pattern) {
 
 		return update(UpdateType.CREATE, pattern);
+	}
+
+	@Override
+	public final OngoingUpdate create(Collection<PatternElement> pattern) {
+
+		return create(pattern.toArray(new PatternElement[] {}));
 	}
 
 	@Override
@@ -720,6 +727,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
+		public OngoingUpdate create(Collection<PatternElement> pattern) {
+
+			return create(pattern.toArray(new PatternElement[]{}));
+		}
+
+		@Override
 		public OngoingMerge merge(PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
@@ -1137,6 +1150,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public OngoingUpdate create(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.create(pattern);
+		}
+
+		@Override
+		public OngoingUpdate create(Collection<PatternElement> pattern) {
+			return create(pattern.toArray(new PatternElement[] {}));
 		}
 
 		private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Expression... returnedExpressions) {
