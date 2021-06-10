@@ -295,6 +295,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
+	public final OngoingUpdate detachDelete(Collection<Expression> expressions) {
+
+		return detachDelete(expressions.toArray(new Expression[] {}));
+	}
+
+	@Override
 	public final BuildableMatchAndUpdate set(Expression... expressions) {
 
 		this.closeCurrentOngoingUpdate();
@@ -660,6 +667,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.detachDelete(expressions);
+		}
+
+		@Override
+		@SuppressWarnings("unchecked")
+		public OngoingUpdate detachDelete(Collection<Expression> expressions) {
+
+			return detachDelete(expressions.toArray(new Expression[] {}));
 		}
 
 		@Override
@@ -1140,6 +1154,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@SuppressWarnings("unchecked")
 		public OngoingUpdate detachDelete(Expression... deletedExpressions) {
 			return delete(true, deletedExpressions);
+		}
+
+		@NotNull
+		@Override
+		@SuppressWarnings("unchecked")
+		public OngoingUpdate detachDelete(Collection<Expression> deletedExpressions) {
+			return detachDelete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
 		@Override

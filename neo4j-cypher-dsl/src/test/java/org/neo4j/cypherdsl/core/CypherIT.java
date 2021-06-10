@@ -2785,6 +2785,47 @@ class CypherIT {
 		}
 
 		@Test
+		void shouldRenderDeleteBasedOnExpressionCollectionWithoutReturn() {
+			userNode.relationshipTo(userNode).relationshipTo(userNode).min(1);
+
+			Statement statement;
+			statement = Cypher.match(userNode)
+				.detachDelete(Collections.singleton(userNode.getRequiredSymbolicName()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) DETACH DELETE u");
+
+			statement = Cypher.match(userNode)
+				.with(userNode)
+				.detachDelete(Collections.singleton(userNode.getRequiredSymbolicName()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) WITH u DETACH DELETE u");
+
+			statement = Cypher.match(userNode)
+				.where(userNode.property("a").isNotNull()).and(userNode.property("b").isNull())
+				.delete(Collections.singleton(userNode.getRequiredSymbolicName()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) WHERE (u.a IS NOT NULL AND u.b IS NULL) DELETE u");
+
+			Expression[] namedOnes = {userNode.getRequiredSymbolicName(), bikeNode.getRequiredSymbolicName()};
+			statement = Cypher.match(userNode, bikeNode)
+					.delete(Arrays.asList(namedOnes))
+					.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`), (b:`Bike`) DELETE u, b");
+		}
+
+		@Test
 		void shouldRenderDeleteWithReturn() {
 
 			Statement statement;

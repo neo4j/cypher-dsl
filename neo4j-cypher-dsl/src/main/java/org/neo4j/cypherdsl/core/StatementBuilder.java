@@ -788,6 +788,15 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		OngoingUpdate detachDelete(Expression... expressions);
+
+		/**
+		 * Starts building a delete step that will use {@code DETACH} to remove relationships.
+		 *
+		 * @param expressions The expressions to be deleted.
+		 * @return A match with a delete clause that can be build now
+		 */
+		@NotNull @CheckReturnValue
+		OngoingUpdate detachDelete(Collection<Expression> expressions);
 	}
 
 	/**
