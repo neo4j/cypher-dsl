@@ -211,8 +211,19 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
+	public final OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+
+		return returning(expressions.toArray(new Expression[] {}));
+	}
+
+	@Override
 	public final OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 		return returning(false, true, expressions);
+	}
+
+	@Override
+	public final OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+		return returningDistinct(expressions.toArray(new Expression[] {}));
 	}
 
 	@Override
@@ -656,6 +667,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.returning(expressions);
 		}
 
+
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+
+			return returning(expressions.toArray(new Expression[] {}));
+		}
+
 		@NotNull
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
@@ -663,6 +682,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.returningDistinct(expressions);
+		}
+
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+
+			return returningDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
@@ -1174,11 +1200,25 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public OngoingReadingAndReturn returning(Collection<Expression> returnedExpressions) {
+
+			return returning(returnedExpressions.toArray(new Expression[] {}));
+		}
+
+		@NotNull
+		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... returnedExpressions) {
 
 			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(returnedExpressions);
 			delegate.distinct = true;
 			return delegate;
+		}
+
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Collection<Expression> returnedExpressions) {
+
+			return returningDistinct(returnedExpressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
@@ -1498,9 +1538,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+
+			return returning(expressions.toArray(new Expression[] {}));
+		}
+
+		@NotNull
+		@Override
 		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
+		}
+
+		@NotNull
+		@Override
+		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+
+			return returningDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
@@ -1630,10 +1684,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+
+			return returning(expressions.toArray(new Expression[] {}));
+		}
+
+		@NotNull
+		@Override
 		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returningDistinct(expressions);
+		}
+
+		@NotNull
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+
+			return returningDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
