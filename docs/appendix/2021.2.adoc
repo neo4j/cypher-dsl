@@ -1,5 +1,32 @@
 == 2021.2
 
+=== 2021.2.2
+
+==== 🚀 Features
+
+* Allow all expresions to be used as conditions. [improvement]
+* Add support for unary minus and plus operations. [new-feature]
+* Add support for generatic dynamic distinct aggregating function calls. [new-feature]
+* GH-190 - Introduce a union type for named things and aliased expressions.
+* Provide means to pass additional types to the relationship base class. [new-feature]
+* GH-193 - Allow MATCH after YIELD.
+* GH-189 - Provide an alternate api for methods consuming collections via vargs.
+
+==== 📖 Documentation
+
+* Improve inheritance example. [static-model, codegen]
+
+==== 🐛 Bug Fixes
+
+* Fix parameter collector when running as GraalVM native image
+* GH-192 - Don't introduce new symbolic names in conditional pattern expressions.
+
+==== 🧹 Housekeeping
+
+* GH-178 - Upgrade SDN 6 examples to Spring Boot 2.5 final.
+
+Thanks to https://github.com/meistermeier[@meistermeier] for the contribution of the API improvements in regard to collections.
+
 === 2021.2.1
 
 ==== 🚀 Features
