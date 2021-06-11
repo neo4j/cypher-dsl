@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.net.URI;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -96,6 +97,23 @@ public final class Cypher {
 	}
 
 	/**
+	 * Create a new Node representation with at least one label, the "primary" label. This is required. All other labels
+	 * are optional. This method also takes a map of properties. This allows the returned node object to be used in a
+	 * {@code MATCH} or {@code MERGE} statement.
+	 *
+	 * @param primaryLabel     The primary label this node is identified by.
+	 * @param properties       The properties expected to exist on the node.
+	 * @param additionalLabels Additional labels
+	 * @return A new node representation
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static Node node(String primaryLabel, MapExpression properties, Collection<String> additionalLabels) {
+
+		return node(primaryLabel, properties, additionalLabels.toArray(new String[] {}));
+	}
+
+	/**
 	 * @return A node matching any node.
 	 */
 	@NotNull @Contract(pure = true)
@@ -143,6 +161,20 @@ public final class Cypher {
 	}
 
 	/**
+	 * Dereferences a property for a symbolic name, most likely pointing to a property container like a node or a relationship.
+	 *
+	 * @param containerName The symbolic name of a property container
+	 * @param names         The names of the properties to dereference. More than one name does create a nested property
+	 *                      like {@code containerName.name1.name2}.
+	 * @return A new property
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static Property property(String containerName, Collection<String> names) {
+		return property(name(containerName), names.toArray(new String[] {}));
+	}
+
+	/**
 	 * Dereferences a property on a arbitrary expression.
 	 *
 	 * @param expression The expression that describes some sort of accessible map
@@ -153,6 +185,20 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static Property property(Expression expression, String... names) {
 		return InternalPropertyImpl.create(expression, names);
+	}
+
+	/**
+	 * Dereferences a property on a arbitrary expression.
+	 *
+	 * @param expression The expression that describes some sort of accessible map
+	 * @param names      The names of the properties to dereference. More than one name does create a nested property
+	 *                   like {@code expression.name1.name2}.
+	 * @return A new property.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static Property property(Expression expression, Collection<String> names) {
+		return property(expression, names.toArray(new String[] {}));
 	}
 
 	/**
@@ -296,6 +342,19 @@ public final class Cypher {
 	}
 
 	/**
+	 * Prepares an optional match statement.
+	 *
+	 * @param pattern The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<PatternElement> pattern) {
+
+		return optionalMatch(pattern.toArray(new PatternElement[] {}));
+	}
+
+	/**
 	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
 	 * retrieve a node or a relationship, which both are pattern elements.
 	 *
@@ -306,6 +365,20 @@ public final class Cypher {
 	public static StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern) {
 
 		return Statement.builder().match(pattern);
+	}
+
+	/**
+	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
+	 * retrieve a node or a relationship, which both are pattern elements.
+	 *
+	 * @param pattern The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingWithoutWhere match(Collection<PatternElement> pattern) {
+
+		return match(pattern.toArray(new PatternElement[] {}));
 	}
 
 	/**
@@ -324,16 +397,43 @@ public final class Cypher {
 	}
 
 	/**
+	 * Starts building a statement based on a match clause. Use {@link Cypher#node(String, String...)} and related to
+	 * retrieve a node or a relationship, which both are pattern elements.
+	 *
+	 * @param optional A flag whether the {@code MATCH} clause includes the {@code OPTIONAL} keyword.
+	 * @param pattern  The patterns to match
+	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, Collection<PatternElement> pattern) {
+
+		return match(optional, pattern.toArray(new PatternElement[] {}));
+	}
+
+	/**
 	 * Starts building a statement based on a {@code CREATE} clause.
 	 *
 	 * @param pattern The patterns to create
 	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingUpdate create(
-		PatternElement... pattern) {
+	public static StatementBuilder.OngoingUpdate create(PatternElement... pattern) {
 
 		return Statement.builder().create(pattern);
+	}
+
+	/**
+	 * Starts building a statement based on a {@code CREATE} clause.
+	 *
+	 * @param pattern The patterns to create
+	 * @return An ongoing {@code CREATE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern) {
+
+		return create(pattern.toArray(new PatternElement[] {}));
 	}
 
 	/**
@@ -414,16 +514,46 @@ public final class Cypher {
 	}
 
 	/**
+	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
+	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
+	 * arguments to have an alias.
+	 * <p>
+	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
+	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.
+	 *
+	 * @param expressions One ore more expressions.
+	 * @return An ongoing with clause.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+
+		return with(expressions.toArray(new Expression[] {}));
+	}
+
+	/**
 	 * Starts building a statement based on a {@code MERGE} clause.
 	 *
 	 * @param pattern The patterns to merge
 	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingMerge merge(
-		PatternElement... pattern) {
+	public static StatementBuilder.OngoingMerge merge(PatternElement... pattern) {
 
 		return Statement.builder().merge(pattern);
+	}
+
+	/**
+	 * Starts building a statement based on a {@code MERGE} clause.
+	 *
+	 * @param pattern The patterns to merge
+	 * @return An ongoing {@code MERGE} that can be used to specify {@code WITH} and {@code RETURNING} etc.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingMerge merge(Collection<PatternElement> pattern) {
+
+		return merge(pattern.toArray(new PatternElement[] {}));
 	}
 
 	/**
@@ -450,6 +580,20 @@ public final class Cypher {
 	public static StatementBuilder.OngoingUnwind unwind(Expression... expressions) {
 
 		return Statement.builder().unwind(Cypher.listOf(expressions));
+	}
+
+	/**
+	 * Starts building a statement starting with an {@code UNWIND} clause. The expressions passed will be turned into a
+	 * list expression
+	 *
+	 * @param expressions expressions to unwind
+	 * @return a new instance of {@link StatementBuilder.OngoingUnwind}
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingUnwind unwind(Collection<Expression> expressions) {
+
+		return unwind(expressions.toArray(new Expression[] {}));
 	}
 
 	/**
@@ -513,6 +657,19 @@ public final class Cypher {
 	public static ListExpression listOf(Expression... expressions) {
 
 		return ListExpression.create(expressions);
+	}
+
+	/**
+	 * Creates a {@link ListExpression list-expression} from several expressions.
+	 *
+	 * @param expressions expressions to get combined into a list
+	 * @return a new instance of {@link ListExpression}
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static ListExpression listOf(Collection<Expression> expressions) {
+
+		return Cypher.listOf(expressions.toArray(new Expression[0]));
 	}
 
 	/**
@@ -603,6 +760,18 @@ public final class Cypher {
 	}
 
 	/**
+	 * Creates a {@code UNION} statement from several other statements. No checks are applied for matching return types.
+	 *
+	 * @param statements the statements to union.
+	 * @return A union statement.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static Statement union(Collection<Statement> statements) {
+		return union(statements.toArray(new Statement[] {}));
+	}
+
+	/**
 	 * Creates a {@code UNION ALL} statement from several other statements. No checks are applied for matching return types.
 	 *
 	 * @param statements the statements to union.
@@ -611,6 +780,18 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static Statement unionAll(Statement... statements) {
 		return unionImpl(true, statements);
+	}
+
+	/**
+	 * Creates a {@code UNION ALL} statement from several other statements. No checks are applied for matching return types.
+	 *
+	 * @param statements the statements to union.
+	 * @return A union statement.
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static Statement unionAll(Collection<Statement> statements) {
+		return unionAll(statements.toArray(new Statement[] {}));
 	}
 
 	/**
@@ -623,6 +804,18 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
 		return Statement.builder().returning(expressions);
+	}
+
+	/**
+	 * A {@literal RETURN} statement without a previous match.
+	 *
+	 * @param expressions The expressions to return
+	 * @return A buildable statement
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+		return returning(expressions.toArray(new Expression[] {}));
 	}
 
 	/**
@@ -712,6 +905,18 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 		return Statement.call(namespaceAndProcedure);
+	}
+
+	/**
+	 * Starts defining a procedure call of the procedure with the given qualified name.
+	 *
+	 * @param namespaceAndProcedure The procedure name of the procedure to call.
+	 * @return An ongoing definition of a call
+	 * @since 2021.2.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static OngoingStandaloneCallWithoutArguments call(Collection<String> namespaceAndProcedure) {
+		return call(namespaceAndProcedure.toArray(new String[] {}));
 	}
 
 	/**

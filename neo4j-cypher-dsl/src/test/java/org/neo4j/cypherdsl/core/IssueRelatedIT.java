@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Collections;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -821,5 +822,49 @@ class IssueRelatedIT {
 			+ "MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) "
 			+ "WHERE a.asset_id = node.asset_id "
 			+ "WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata");
+	}
+
+	@Test // GH-189
+	void propertyForExpressionWithCollectionOfNames() {
+
+		Node node = Cypher.node("Node").named("n");
+
+		String cypher = Cypher.match(node).returning(Cypher.property(node.getRequiredSymbolicName(), Collections.singleton("name")))
+		.build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (n:`Node`) RETURN n.name");
+	}
+
+	@Test // GH-189
+	void exposesWithBasedOnExpressionCollectionOnNext() {
+
+		Node node = Cypher.node("Node").named("n");
+
+		String cypher = Cypher.match(node)
+				.with(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementBuilder
+				.with(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementWithWithBuilder
+				.call("my.procedure")
+				.yield("x")
+				.with(Collections.singleton(node.getRequiredSymbolicName())) // InQueryCallBuilder
+				.returning(node).build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (n:`Node`) WITH n WITH n CALL my.procedure() YIELD x WITH n RETURN n");
+	}
+
+	@Test // GH-189
+	void exposesWithDistinctBasedOnExpressionCollectionOnNext() {
+
+		Node node = Cypher.node("Node").named("n");
+
+		String cypher = Cypher.match(node)
+				.withDistinct(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementBuilder
+				.withDistinct(Collections.singleton(node.getRequiredSymbolicName())) // DefaultStatementWithWithBuilder
+				.call("my.procedure")
+				.yield("x")
+				.withDistinct(Collections.singleton(node.getRequiredSymbolicName())) // InQueryCallBuilder
+				.returning(node).build().getCypher();
+
+		assertThat(cypher).isEqualTo(
+				"MATCH (n:`Node`) WITH DISTINCT n WITH DISTINCT n CALL my.procedure() YIELD x WITH DISTINCT n RETURN n"
+		);
 	}
 }

@@ -27,6 +27,8 @@ import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
+import java.util.Collection;
+
 /**
  * @author Michael J. Simons
  * @author Gerrit Meier
@@ -85,6 +87,16 @@ public interface StatementBuilder
 	 */
 	@NotNull @CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
+
+	/**
+	 * Allows for queries starting with {@code with range(1,10) as x return x} or similar.
+	 *
+	 * @param expressions The expressions to start the query with
+	 * @return An ongoing read, exposing return and further matches.
+	 * @since 2021.2.2
+	 */
+	@NotNull @CheckReturnValue
+	OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
 
 	/**
 	 * An ongoing update statement that can be used to chain more update statements or add a with or return clause.
@@ -429,6 +441,16 @@ public interface StatementBuilder
 		OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
 
 		/**
+		 * Create a match that returns one or more expressions.
+		 *
+		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
+		 * @return A match that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
+
+		/**
 		 * @param variables The variables to pass on to the next part
 		 * @return A match that can be build now
 		 * @see #withDistinct(Expression...)
@@ -477,6 +499,16 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions);
+
+		/**
+		 * Create a match that returns the distinct set of one or more expressions.
+		 *
+		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
+		 * @return A match that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions);
 	}
 
 	/**
@@ -496,6 +528,18 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem);
+
+
+		/**
+		 * Order the result set by one or more {@link SortItem sort items}. Those can be retrieved for
+		 * all expression with {@link Cypher#sort(Expression)} or directly from properties.
+		 *
+		 * @param sortItem One or more sort items
+		 * @return A build step that still offers methods for defining skip and limit
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem);
 
 		/**
 		 * Order the result set by an expression.
@@ -577,6 +621,17 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem);
+
+		/**
+		 * Order the result set by one or more {@link SortItem sort items}. Those can be retrieved for
+		 * all expression with {@link Cypher#sort(Expression)} or directly from properties.
+		 *
+		 * @param sortItem One or more sort items
+		 * @return A build step that still offers methods for defining skip and limit
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem);
 
 		/**
 		 * Order the result set by an expression.
@@ -698,6 +753,16 @@ public interface StatementBuilder
 		OngoingUpdate delete(Expression... expressions);
 
 		/**
+		 * Creates a delete step with one or more expressions to be deleted.
+		 *
+		 * @param expressions The expressions to be deleted.
+		 * @return A match with a delete clause that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		OngoingUpdate delete(Collection<Expression> expressions);
+
+		/**
 		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
 		 * been matched previously.
 		 *
@@ -729,6 +794,16 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		OngoingUpdate detachDelete(Expression... expressions);
+
+		/**
+		 * Starts building a delete step that will use {@code DETACH} to remove relationships.
+		 *
+		 * @param expressions The expressions to be deleted.
+		 * @return A match with a delete clause that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		OngoingUpdate detachDelete(Collection<Expression> expressions);
 	}
 
 	/**
@@ -747,6 +822,17 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate set(Expression... expressions);
+
+		/**
+		 * Adds a {@code SET} clause to the statement. The list of expressions must be even, each pair will be turned into
+		 * SET operation.
+		 *
+		 * @param expressions The list of expressions to use in a set clause.
+		 * @return An ongoing match and update
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate set(Collection<Expression> expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
@@ -805,6 +891,17 @@ public interface StatementBuilder
 		BuildableMatchAndUpdate set(Node node, String... labels);
 
 		/**
+		 * Creates {@code SET} clause for setting the given labels to a node.
+		 *
+		 * @param node   The node who's labels are to be changed
+		 * @param labels The labels to be set
+		 * @return A match with a SET clause that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate set(Node node, Collection<String> labels);
+
+		/**
 		 * Creates {@code SET} clause for removing the given labels from a node.
 		 *
 		 * @param node   The node who's labels are to be changed
@@ -815,6 +912,17 @@ public interface StatementBuilder
 		BuildableMatchAndUpdate remove(Node node, String... labels);
 
 		/**
+		 * Creates {@code SET} clause for removing the given labels from a node.
+		 *
+		 * @param node   The node who's labels are to be changed
+		 * @param labels The labels to be removed
+		 * @return A match with a REMOVE clause that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate remove(Node node, Collection<String> labels);
+
+		/**
 		 * Creates {@code SET} clause for removing the enumerated properties
 		 *
 		 * @param properties The properties to be removed
@@ -822,6 +930,16 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableMatchAndUpdate remove(Property... properties);
+
+		/**
+		 * Creates {@code SET} clause for removing the enumerated properties
+		 *
+		 * @param properties The properties to be removed
+		 * @return A match with a REMOVE clause that can be build now
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		BuildableMatchAndUpdate remove(Collection<Property> properties);
 	}
 
 	/**
@@ -888,6 +1006,17 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableOngoingMergeAction set(Expression... expressions);
+
+		/**
+		 * Adds a {@code SET} clause to the statement. The list of expressions must be even, each pair will be turned into
+		 * SET operation.
+		 *
+		 * @param expressions The list of expressions to use in a set clause.
+		 * @return An ongoing match and update
+		 * @since 2021.2.2
+		 */
+		@NotNull @CheckReturnValue
+		BuildableOngoingMergeAction set(Collection<Expression> expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.

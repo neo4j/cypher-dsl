@@ -25,6 +25,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
+import java.util.Arrays;
+
 /**
  * @author Michael J. Simons
  */
@@ -41,6 +43,16 @@ class ProcedureCallsIT {
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
 
 		call = Cypher.call("db.labels").build();
+		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
+	}
+
+	@Test
+	void simpleBasedOnStringCollection() {
+
+		String expected = "CALL db.labels()";
+
+		String[] prodecureCallPart = {"db", "labels"};
+		Statement call = Cypher.call(Arrays.asList(prodecureCallPart)).build();
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
 	}
 

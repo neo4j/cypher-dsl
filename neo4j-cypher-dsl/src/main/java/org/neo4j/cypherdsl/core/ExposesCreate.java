@@ -24,6 +24,8 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
+import java.util.Collection;
+
 /**
  * A step exposing a {@link #create(PatternElement...)} method.
  *
@@ -40,4 +42,13 @@ public interface ExposesCreate {
 	 */
 	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingUpdate create(PatternElement... pattern);
+
+	/**
+	 * @param pattern patterns to create
+	 * @return An ongoing merge
+	 * @see Cypher#create(Collection)
+	 * @since 2021.2.2
+	 */
+	@NotNull @CheckReturnValue
+	StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern);
 }

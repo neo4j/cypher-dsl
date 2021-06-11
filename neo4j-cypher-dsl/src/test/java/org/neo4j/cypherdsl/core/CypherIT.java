@@ -21,6 +21,8 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -345,6 +347,16 @@ class CypherIT {
 						"MATCH (u:`User`) RETURN u ORDER BY u.name");
 			}
 
+			@Test // GH-189
+			void sortOrderDefaultBasedOnSortItemCollection() {
+				Statement statement = Cypher.match(userNode).returning(userNode)
+					.orderBy(Collections.singleton(Cypher.sort(userNode.property("name")))).build();
+
+				assertThat(cypherRenderer.render(statement))
+					.isEqualTo(
+						"MATCH (u:`User`) RETURN u ORDER BY u.name");
+			}
+
 			@Test
 			void sortOrderAscending() {
 				Statement statement = Cypher.match(userNode).returning(userNode)
@@ -551,6 +563,7 @@ class CypherIT {
 
 	@Nested
 	class SingleQueryMultiPart {
+
 		@Test
 		void simpleWith() {
 			Statement statement = Cypher
@@ -568,6 +581,18 @@ class CypherIT {
 		void shouldRenderLeadingWith() {
 			Statement statement = Cypher
 				.with(Cypher.parameter("listOfPropertyMaps").as("p"))
+				.unwind("p").as("item")
+				.returning("item")
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("WITH $listOfPropertyMaps AS p UNWIND p AS item RETURN item");
+		}
+
+		@Test // GH-189
+		void shouldRenderLeadingWithBasedOnExpression() {
+			Statement statement = Cypher
+				.with(Collections.singleton(Cypher.parameter("listOfPropertyMaps").as("p")))
 				.unwind("p").as("item")
 				.returning("item")
 				.build();
@@ -726,11 +751,37 @@ class CypherIT {
 
 	@Nested
 	class MultipleMatches {
+
 		@Test
 		void simple() {
 			Statement statement = Cypher
 				.match(bikeNode)
 				.match(userNode, Cypher.node("U").named("o"))
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) RETURN b");
+		}
+
+		@Test // GH-189
+		void simpleWithPatternCollection() {
+			Statement statement = Cypher
+				.match(Collections.singleton(bikeNode))
+				.match(userNode, Cypher.node("U").named("o"))
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) RETURN b");
+		}
+
+		@Test // GH-189
+		void simpleWithPatternCollectionInExposesMatch() {
+			PatternElement[] patternElements = {userNode, Cypher.node("U").named("o")};
+			Statement statement = Cypher
+					.match(Collections.singleton(bikeNode))
+					.match(Arrays.asList(patternElements))
 				.returning(bikeNode)
 				.build();
 
@@ -786,6 +837,45 @@ class CypherIT {
 		void optional() {
 			Statement statement = Cypher
 				.optionalMatch(bikeNode)
+				.match(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("OPTIONAL MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test
+		void optionalWithFlag() {
+			Statement statement = Cypher
+				.match(true, bikeNode)
+				.match(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("OPTIONAL MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test // GH-189
+		void optionalWithFlagAndPatternCollection() {
+			Statement statement = Cypher
+				.match(true, Collections.singleton(bikeNode))
+				.match(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("OPTIONAL MATCH (b:`Bike`) MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test // GH-189
+		void optionalWithPatternCollection() {
+			Statement statement = Cypher
+				.optionalMatch(Collections.singleton(bikeNode))
 				.match(userNode, Cypher.node("U").named("o"))
 				.where(userNode.property("a").isNull())
 				.returning(bikeNode)
@@ -861,6 +951,20 @@ class CypherIT {
 			Statement statement = Cypher
 				.match(bikeNode)
 				.optionalMatch(userNode, Cypher.node("U").named("o"))
+				.where(userNode.property("a").isNull())
+				.returning(bikeNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (b:`Bike`) OPTIONAL MATCH (u:`User`), (o:`U`) WHERE u.a IS NULL RETURN b");
+		}
+
+		@Test
+		void optionalNextBasedOnPatternElementCollection() {
+			PatternElement[] patternElements = {userNode, Cypher.node("U").named("o")};
+			Statement statement = Cypher
+					.match(bikeNode)
+					.optionalMatch(Arrays.asList(patternElements))
 				.where(userNode.property("a").isNull())
 				.returning(bikeNode)
 				.build();
@@ -1858,7 +1962,7 @@ class CypherIT {
 		}
 
 		@Test
-		void multileLevelsOfChaining() {
+		void multipleLevelsOfChaining() {
 			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
 				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
 				.mutate(bikeNode, Cypher.mapOf("c", Cypher.literalOf("D")))
@@ -2108,6 +2212,24 @@ class CypherIT {
 		void shouldRenderMergeWithoutReturn() {
 			Statement statement;
 			statement = Cypher.merge(userNode)
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`)");
+
+			statement = Cypher.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`)-[o:`OWNS`]->(b:`Bike`)");
+		}
+
+		@Test // GH-189
+		void shouldRenderMergeBasedOnPatternExpressionCollectionWithoutReturn() {
+			Statement statement;
+			statement = Cypher.merge(Collections.singleton(userNode))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2432,6 +2554,24 @@ class CypherIT {
 					"CREATE (u:`User`)-[o:`OWNS`]->(b:`Bike`)");
 		}
 
+		@Test // GH-189
+		void shouldRenderCreateBasedOnPatternElementCollectionWithoutReturn() {
+			Statement statement;
+			statement = Cypher.create(Collections.singleton(userNode))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CREATE (u:`User`)");
+
+			statement = Cypher.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CREATE (u:`User`)-[o:`OWNS`]->(b:`Bike`)");
+		}
+
 		@Test
 		void shouldRenderMultipleCreatesWithoutReturn() {
 			Statement statement;
@@ -2446,6 +2586,27 @@ class CypherIT {
 			statement = Cypher
 				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
 				.create(Cypher.node("Other"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CREATE (u:`User`)-[o:`OWNS`]->(b:`Bike`) CREATE (:`Other`)");
+		}
+
+		@Test
+		void shouldRenderMultipleCreatesBasedOnPatternElementCollectionWithoutReturn() {
+			Statement statement;
+			statement = Cypher.create(userNode)
+				.create(Collections.singleton(bikeNode))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CREATE (u:`User`) CREATE (b:`Bike`)");
+
+			statement = Cypher
+				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.create(Collections.singleton(Cypher.node("Other")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2615,6 +2776,47 @@ class CypherIT {
 			statement = Cypher.match(userNode, bikeNode)
 				.delete(userNode, bikeNode)
 				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`), (b:`Bike`) DELETE u, b");
+		}
+
+		@Test
+		void shouldRenderDeleteBasedOnExpressionCollectionWithoutReturn() {
+			userNode.relationshipTo(userNode).relationshipTo(userNode).min(1);
+
+			Statement statement;
+			statement = Cypher.match(userNode)
+				.detachDelete(Collections.singleton(userNode.getRequiredSymbolicName()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) DETACH DELETE u");
+
+			statement = Cypher.match(userNode)
+				.with(userNode)
+				.detachDelete(Collections.singleton(userNode.getRequiredSymbolicName()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) WITH u DETACH DELETE u");
+
+			statement = Cypher.match(userNode)
+				.where(userNode.property("a").isNotNull()).and(userNode.property("b").isNull())
+				.delete(Collections.singleton(userNode.getRequiredSymbolicName()))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) WHERE (u.a IS NOT NULL AND u.b IS NULL) DELETE u");
+
+			Expression[] namedOnes = {userNode.getRequiredSymbolicName(), bikeNode.getRequiredSymbolicName()};
+			statement = Cypher.match(userNode, bikeNode)
+					.delete(Arrays.asList(namedOnes))
+					.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -3025,6 +3227,24 @@ class CypherIT {
 	}
 
 	@Nested
+	class Returning {
+
+		@Test
+		void shouldRenderLeadingReturning() {
+
+			String cypher = Cypher.returning(Cypher.literalOf(1)).build().getCypher();
+			assertThat(cypher).isEqualTo("RETURN 1");
+		}
+
+		@Test // GH-189
+		void shouldRenderLeadingReturningBasedOnExpressionCollection() {
+
+			String cypher = Cypher.returning(Arrays.asList(Cypher.literalOf(1))).build().getCypher();
+			assertThat(cypher).isEqualTo("RETURN 1");
+		}
+	}
+
+	@Nested
 	class UnwindRendering {
 
 		@Test
@@ -3046,8 +3266,20 @@ class CypherIT {
 		@Test
 		void shouldRenderLeadingUnwind() {
 
-			Statement statement;
-			statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+				.as("n").returning(Cypher.name("n"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"UNWIND [1, true, false] AS n RETURN n");
+		}
+
+		@Test // GH-189
+		void shouldRenderLeadingUnwindBasedOnExpressionCollection() {
+
+			Expression[] expressions = {Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse()};
+			Statement statement = Cypher.unwind(Arrays.asList(expressions))
 				.as("n").returning(Cypher.name("n"))
 				.build();
 
@@ -3059,8 +3291,7 @@ class CypherIT {
 		@Test
 		void shouldRenderLeadingUnwindWithUpdate() {
 
-			Statement statement;
-			statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
 				.as("n")
 				.merge(bikeNode.withProperties("b", Cypher.name("n")))
 				.returning(bikeNode)
@@ -3074,8 +3305,7 @@ class CypherIT {
 		@Test
 		void shouldRenderLeadingUnwindWithCreate() {
 
-			Statement statement;
-			statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
+			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
 				.as("n")
 				.create(bikeNode.withProperties("b", Cypher.name("n")))
 				.returning(bikeNode)
@@ -3089,10 +3319,8 @@ class CypherIT {
 		@Test
 		void shouldRenderUnwind() {
 
-			Statement statement;
-
 			AliasedExpression collected = Functions.collect(bikeNode).as("collected");
-			statement = Cypher.match(bikeNode)
+			Statement statement = Cypher.match(bikeNode)
 				.with(collected)
 				.unwind(collected).as("x")
 				.with("x")
@@ -3134,6 +3362,32 @@ class CypherIT {
 					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b UNION MATCH (b:`Bike`) WHERE b.c = 'C' RETURN b");
 		}
 
+		@Test // GH-189
+		void shouldRenderUnionsBasedOnStatementCollections() {
+
+			Statement statement1 = Cypher.match(bikeNode)
+				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement2 = Cypher.match(bikeNode)
+				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement3 = Cypher.match(bikeNode)
+				.where(bikeNode.property("c").isEqualTo(Cypher.literalOf("C")))
+				.returning(bikeNode)
+				.build();
+			Statement statement;
+			Statement[] statements = {statement1, statement2, statement3};
+			statement = Cypher.union(Arrays.asList(statements));
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b UNION MATCH (b:`Bike`) WHERE b.c = 'C' RETURN b");
+		}
+
 		@Test
 		void shouldRenderAllUnions() {
 
@@ -3149,6 +3403,28 @@ class CypherIT {
 
 			Statement statement;
 			statement = Cypher.unionAll(statement1, statement2);
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (b:`Bike`) WHERE b.a = 'A' RETURN b UNION ALL MATCH (b:`Bike`) WHERE b.b = 'B' RETURN b");
+		}
+
+		@Test // GH-189
+		void shouldRenderAllUnionsBasedOnStatementCollections() {
+
+			Statement statement1 = Cypher.match(bikeNode)
+				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement2 = Cypher.match(bikeNode)
+				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(bikeNode)
+				.build();
+
+			Statement statement;
+			Statement[] statements = {statement1, statement2};
+			statement = Cypher.unionAll(Arrays.asList(statements));
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -3526,6 +3802,19 @@ class CypherIT {
 					.returning(name.remainder(Cypher.literalOf(2)))).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN [a IN [1, 2, 3, 4] WHERE a > 2 | (a % 2)]");
+		}
+
+		@Test // GH-189
+		void simpleWithCollection() {
+
+			SymbolicName name = Cypher.name("a");
+			Expression[] expressions = {Cypher.literalOf(1), Cypher.literalOf(2), Cypher.literalOf(3), Cypher.literalOf(4)};
+			Statement statement = Cypher.returning(
+					Cypher.listWith(name)
+							.in(Cypher.listOf(Arrays.asList(expressions)))
+							.returning()).build();
+			assertThat(cypherRenderer.render(statement))
+					.isEqualTo("RETURN [a IN [1, 2, 3, 4]]");
 		}
 
 		@Test
