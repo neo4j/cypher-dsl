@@ -988,6 +988,7 @@ class CypherIT {
 
 	@Nested
 	class FunctionRendering {
+
 		@Test
 		void inWhereClause() {
 			Statement statement = Cypher.match(userNode).where(userNode.internalId().isEqualTo(Cypher.literalOf(1L)))
@@ -1005,6 +1006,24 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) RETURN count(u)");
+		}
+
+		@Test // GH-195
+		void inReturnClauseBasedOnExpressionCollection() {
+			Statement statement = Cypher.match(userNode).returning(Collections.singleton(Functions.count(userNode))).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) RETURN count(u)");
+		}
+
+		@Test // GH-195
+		void inDistinctReturnClauseBasedOnExpressionCollection() {
+			Statement statement = Cypher.match(userNode).returningDistinct(Collections.singleton(Functions.count(userNode))).build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) RETURN DISTINCT count(u)");
 		}
 
 		@Test
