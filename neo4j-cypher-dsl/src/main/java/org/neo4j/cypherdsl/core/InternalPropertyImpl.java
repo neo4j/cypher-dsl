@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -84,6 +85,7 @@ final class InternalPropertyImpl implements Property {
 	 */
 	private final String externalReference;
 
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	InternalPropertyImpl(Optional<Named> container, Expression containerReference, List<PropertyLookup> names,
 		String externalReference) {
 
@@ -93,16 +95,19 @@ final class InternalPropertyImpl implements Property {
 		this.externalReference = externalReference;
 	}
 
+	@NotNull
 	@Override
 	public List<PropertyLookup> getNames() {
 		return names;
 	}
 
+	@NotNull
 	@Override
 	public Named getContainer() {
 		return container;
 	}
 
+	@NotNull
 	@Override
 	public String getName() {
 		return externalReference != null ?
@@ -112,6 +117,7 @@ final class InternalPropertyImpl implements Property {
 				.collect(Collectors.joining("."));
 	}
 
+	@NotNull
 	@Override
 	public Property referencedAs(String newReference) {
 
@@ -119,6 +125,7 @@ final class InternalPropertyImpl implements Property {
 			newReference);
 	}
 
+	@NotNull
 	@Override
 	public Operation to(Expression expression) {
 		return Operations.set(this, expression);

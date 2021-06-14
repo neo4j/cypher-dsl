@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
@@ -45,6 +46,7 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 		super(content);
 	}
 
+	@NotNull
 	@Override
 	public String asString() {
 

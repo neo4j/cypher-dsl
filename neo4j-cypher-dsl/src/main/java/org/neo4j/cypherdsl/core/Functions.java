@@ -416,7 +416,7 @@ public final class Functions {
 	 * @return A function call for {@code point()}
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation point(Parameter parameter) {
+	public static FunctionInvocation point(Parameter<?> parameter) {
 
 		return FunctionInvocation.create(Spatials.POINT, parameter);
 	}
@@ -950,7 +950,7 @@ public final class Functions {
 				throw new IllegalArgumentException("week is required when using dayOfWeek.");
 			}
 			parameters[i++] = "dayOfWeek";
-			parameters[i++] = Cypher.literalOf(dayOfWeek);
+			parameters[i] = Cypher.literalOf(dayOfWeek);
 		}
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf(parameters));
 	}
@@ -978,11 +978,8 @@ public final class Functions {
 			parameters[i++] = Cypher.literalOf(quarter);
 		}
 		if (dayOfQuarter != null) {
-			if (dayOfQuarter == null) {
-				throw new IllegalArgumentException("quarter is required when using dayOfQuarter.");
-			}
 			parameters[i++] = "dayOfQuarter";
-			parameters[i++] = Cypher.literalOf(dayOfQuarter);
+			parameters[i] = Cypher.literalOf(dayOfQuarter);
 		}
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf(parameters));
 	}
@@ -1006,7 +1003,7 @@ public final class Functions {
 		parameters[i++] = Cypher.literalOf(year);
 		if (ordinalDay != null) {
 			parameters[i++] = "ordinalDay";
-			parameters[i++] = Cypher.literalOf(ordinalDay);
+			parameters[i] = Cypher.literalOf(ordinalDay);
 		}
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf(parameters));
 	}

@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -51,7 +52,7 @@ class ExpressionTest {
 					break;
 				case 2:
 					assertThat(segment)
-						.isInstanceOfSatisfying(Operator.class, v -> assertThat(v)).isEqualTo(expectedOperator);
+						.isInstanceOfSatisfying(Operator.class, Assertions::assertThat).isEqualTo(expectedOperator);
 					break;
 				case 3:
 					assertThat(segment)
@@ -81,7 +82,7 @@ class ExpressionTest {
 					break;
 				case 2:
 					assertThat(segment)
-						.isInstanceOfSatisfying(Operator.class, v -> assertThat(v)).isEqualTo(expectedOperator);
+						.isInstanceOfSatisfying(Operator.class, Assertions::assertThat).isEqualTo(expectedOperator);
 					break;
 				case 3:
 					assertThat(segment)
@@ -94,6 +95,7 @@ class ExpressionTest {
 		assertThat(counter.get()).isEqualTo(4);
 	}
 
+	@SuppressWarnings("unused")
 	private static Stream<Arguments> mathematicalOperators() {
 		return Stream.of(
 			Arguments.of(Cypher.literalOf(1).add(Cypher.literalOf(2)), Operator.ADDITION),
@@ -105,6 +107,7 @@ class ExpressionTest {
 		);
 	}
 
+	@SuppressWarnings("unused")
 	private static Stream<Arguments> stringOperators() {
 		return Stream.of(
 			Arguments.of(Cypher.literalOf("a").concat(Cypher.literalOf("b")), Operator.CONCAT),

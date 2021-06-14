@@ -85,7 +85,7 @@ public interface PropertyContainer extends Named {
 	 * @since 2020.1.5
 	 */
 	@NotNull @Contract(pure = true)
-	Operation mutate(Parameter parameter);
+	Operation mutate(Parameter<?> parameter);
 
 	/**
 	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not

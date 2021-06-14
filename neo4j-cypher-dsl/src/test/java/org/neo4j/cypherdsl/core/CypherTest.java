@@ -47,6 +47,7 @@ class CypherTest {
 	}
 
 	@Test
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	void shouldNotCreateIllegalLiterals() {
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.literalOf(new CypherTest()))
 			.withMessageStartingWith("Unsupported literal type: ");
@@ -62,7 +63,14 @@ class CypherTest {
 		Literal<?> listLiteral = Cypher.literalOf(params);
 
 		assertThat(listLiteral).isInstanceOf(ListLiteral.class)
-			.returns("[false, true]", v -> v.asString());
+			.returns("[false, true]", Literal::asString);
+	}
+
+	@Test
+	void shouldQuoteStrings() {
+
+		assertThat(Cypher.quote("foo")).isEqualTo("'foo'");
+		assertThat(Cypher.quote("fo`o")).isEqualTo("'fo`o'");
 	}
 
 	@Test

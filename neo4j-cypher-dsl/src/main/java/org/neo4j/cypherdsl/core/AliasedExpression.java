@@ -44,6 +44,7 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 		this.alias = alias;
 	}
 
+	@NotNull
 	@Override
 	public String getAlias() {
 		return alias;
@@ -55,6 +56,7 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 	 * @param newAlias The new alias to use
 	 * @return A new aliased, expression.
 	 */
+	@NotNull
 	@Override
 	public AliasedExpression as(String newAlias) {
 

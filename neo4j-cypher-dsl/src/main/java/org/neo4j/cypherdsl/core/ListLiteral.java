@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
@@ -40,6 +41,7 @@ public final class ListLiteral extends LiteralBase<Iterable<Literal<?>>> {
 		super(content);
 	}
 
+	@NotNull
 	@Override
 	public String asString() {
 

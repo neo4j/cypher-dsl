@@ -68,6 +68,6 @@ class BuiltInFunctionsTest {
 				+ "\t}"
 				+ "\n";
 
-		System.err.println(String.format(template, function.getImplementationName(), function.toString()));
+		System.err.println(String.format(template, function.getImplementationName(), function));
 	}
 }

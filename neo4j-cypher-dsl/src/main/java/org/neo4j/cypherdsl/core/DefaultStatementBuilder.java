@@ -102,13 +102,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	private void addVisitables(Visitable[] visitables) {
-		for (int i = 0; i < visitables.length; i++) {
-			if (visitables[i] != null) {
-				this.currentSinglePartElements.add(visitables[i]);
+		for (Visitable visitable : visitables) {
+			if (visitable != null) {
+				this.currentSinglePartElements.add(visitable);
 			}
 		}
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
@@ -122,30 +123,34 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public final OngoingUpdate create(PatternElement... pattern) {
 
 		return update(UpdateType.CREATE, pattern);
 	}
 
+	@NotNull
 	@Override
 	public final OngoingUpdate create(Collection<PatternElement> pattern) {
 
 		return create(pattern.toArray(new PatternElement[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final OngoingMerge merge(PatternElement... pattern) {
 
 		return update(UpdateType.MERGE, pattern);
 	}
 
+	@NotNull
 	@Override
 	public final OngoingMergeAction onCreate() {
 		return ongoingOnAfterMerge(MergeAction.Type.ON_CREATE);
 	}
 
+	@NotNull
 	@Override
 	public final OngoingMergeAction onMatch() {
 		return ongoingOnAfterMerge(MergeAction.Type.ON_MATCH);
@@ -158,6 +163,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			"MERGE must have been invoked before defining an event.");
 		return new OngoingMergeAction() {
 
+			@NotNull
 			@Override
 			public BuildableOngoingMergeAction mutate(Expression target, Expression properties) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
@@ -165,6 +171,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				return DefaultStatementBuilder.this;
 			}
 
+			@NotNull
 			@Override
 			public BuildableOngoingMergeAction set(Expression... expressions) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
@@ -172,6 +179,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				return DefaultStatementBuilder.this;
 			}
 
+			@NotNull
 			@Override
 			public BuildableOngoingMergeAction set(Collection<Expression> expressions) {
 				return set(expressions.toArray(new Expression[] {}));
@@ -204,30 +212,35 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingAndReturn returning(Expression... expressions) {
 
 		return returning(false, false, expressions);
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingAndReturn returning(Collection<Expression> expressions) {
 
 		return returning(expressions.toArray(new Expression[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 		return returning(false, true, expressions);
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
 		return returningDistinct(expressions.toArray(new Expression[] {}));
 	}
 
+	@NotNull
 	@Override
-	public @NotNull StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+	public StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 		return returning(true, false, rawExpression);
 	}
 
@@ -238,44 +251,52 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ongoingMatchAndReturn;
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
 		return with(false, Expressions.createSymbolicNames(variables));
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
 		return with(false, variables);
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
 		return with(false, Expressions.createSymbolicNames(elements));
 	}
 
-	@Override @NotNull
+	@NotNull
+	@Override
 	public OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions) {
 		return with((Expression[]) expressions);
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 
 		return with(false, expressions);
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
 
 		return with(expressions.toArray(new Expression[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 
 		return with(true, expressions);
 	}
 
+	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
 
@@ -289,34 +310,35 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ongoingMatchAndWith;
 	}
 
+	@NotNull
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public final OngoingUpdate delete(Expression... expressions) {
 
 		return update(UpdateType.DELETE, expressions);
 	}
 
+	@NotNull
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public final OngoingUpdate delete(Collection<Expression> expressions) {
 
 		return delete(expressions.toArray(new Expression[] {}));
 	}
 
+	@NotNull
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public final OngoingUpdate detachDelete(Expression... expressions) {
 
 		return update(UpdateType.DETACH_DELETE, expressions);
 	}
 
+	@NotNull
 	@Override
-	@SuppressWarnings("unchecked") // This method returns `this`, implementing `OngoingUpdate`
 	public final OngoingUpdate detachDelete(Collection<Expression> expressions) {
 
 		return detachDelete(expressions.toArray(new Expression[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Expression... expressions) {
 
@@ -324,24 +346,28 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Collection<Expression> expressions) {
 
 		return set(expressions.toArray(new Expression[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Node named, Collection<String> labels) {
 
 		return set(named, labels.toArray(new String[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
@@ -349,30 +375,35 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Property... properties) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Collection<Property> properties) {
 
 		return remove(properties.toArray(new Property[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Node named, String... labels) {
 
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
 	}
 
+	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Node named, Collection<String> labels) {
 
 		return remove(named, labels.toArray(new String[] {}));
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithWhere where(Condition newCondition) {
 
@@ -380,6 +411,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithWhere and(Condition additionalCondition) {
 
@@ -387,6 +419,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithWhere or(Condition additionalCondition) {
 
@@ -394,16 +427,17 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public Statement build() {
 
-		return buildImpl(false, null);
+		return buildImpl(null);
 	}
 
-	protected final Statement buildImpl(boolean clearCurrentBuildSteps, Return returning) {
+	protected final Statement buildImpl(Return returning) {
 
 		SinglePartQuery singlePartQuery = SinglePartQuery.create(
-			buildListOfVisitables(clearCurrentBuildSteps), returning);
+			buildListOfVisitables(false), returning);
 
 		if (multiPartElements.isEmpty()) {
 			return singlePartQuery;
@@ -432,21 +466,22 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return visitables;
 	}
 
+	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	protected final DefaultStatementBuilder addWith(Optional<With> optionalWith) {
 
 		optionalWith.ifPresent(with -> multiPartElements.add(new MultiPartElement(buildListOfVisitables(true), with)));
 		return this;
 	}
 
-	protected final DefaultStatementBuilder addUpdatingClause(UpdatingClause updatingClause) {
+	protected final void addUpdatingClause(UpdatingClause updatingClause) {
 
 		// Close current match
 		closeCurrentOngoingMatch();
 
 		this.currentSinglePartElements.add(updatingClause);
-		return this;
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere call(Statement statement) {
 
@@ -476,6 +511,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.currentOngoingUpdate = null;
 	}
 
+	@NotNull
 	@Override
 	public final Condition asCondition() {
 
@@ -486,6 +522,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ExistentialSubquery.exists(this.currentOngoingMatch.buildMatch());
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere usingIndex(Property... properties) {
 
@@ -493,6 +530,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere usingIndexSeek(Property... properties) {
 
@@ -558,7 +596,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public final DefaultStatementWithReturnBuilder descending() {
 			orderBuilder.descending();
 			return this;
@@ -566,7 +603,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public final DefaultStatementWithReturnBuilder ascending() {
 			orderBuilder.ascending();
 			return this;
@@ -574,19 +610,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public final OngoingReadingAndReturn skip(Number number) {
 			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public final OngoingReadingAndReturn skip(Expression expression) {
 			orderBuilder.skip(expression);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public final OngoingReadingAndReturn limit(Number number) {
 			return limit(number == null ? null : new NumberLiteral(number));
@@ -604,7 +639,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public ResultStatement build() {
 
 			Return returning = Return.create(rawReturn, distinct, returnList, orderBuilder);
-			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(false, returning);
+			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(returning);
 		}
 
 		protected final void addExpressions(Expression... expressions) {
@@ -699,8 +734,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.returningRaw(rawExpression);
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate delete(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
@@ -708,15 +743,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.delete(expressions);
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate delete(Collection<Expression> expressions) {
 
 			return delete(expressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate detachDelete(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
@@ -724,15 +759,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.detachDelete(expressions);
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate detachDelete(Collection<Expression> expressions) {
 
 			return detachDelete(expressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public BuildableMatchAndUpdate set(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
@@ -740,15 +775,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.set(expressions);
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public BuildableMatchAndUpdate set(Collection<Expression> expressions) {
 
 			return set(expressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
@@ -756,13 +791,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.set(node, labels);
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
 
 			return set(node, labels.toArray(new String[] {}));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
@@ -771,6 +807,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.mutate(target, properties);
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
@@ -779,12 +816,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.remove(node, labels);
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
 
 			return remove(node, labels.toArray(new String[] {}));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
@@ -793,12 +832,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.remove(properties);
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
 
 			return remove(properties.toArray(new Property[] {}));
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
 
@@ -807,12 +848,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.with(expressions);
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
 
 			return with(expressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
 
@@ -821,19 +864,22 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.withDistinct(expressions);
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
 
 			return withDistinct(expressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithWhere where(Condition newCondition) {
+		public OrderableOngoingReadingAndWithWithWhere where(@NotNull Condition newCondition) {
 
 			conditionBuilder.where(newCondition);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithWhere and(Condition additionalCondition) {
 
@@ -841,6 +887,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithWhere or(Condition additionalCondition) {
 
@@ -848,6 +895,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
@@ -856,8 +904,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.match(optional, pattern);
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate create(PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
@@ -865,12 +913,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.create(pattern);
 		}
 
+		@NotNull
 		@Override
 		public OngoingUpdate create(Collection<PatternElement> pattern) {
 
 			return create(pattern.toArray(new PatternElement[]{}));
 		}
 
+		@NotNull
 		@Override
 		public OngoingMerge merge(PatternElement... pattern) {
 
@@ -887,6 +937,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.unwind(expression);
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingWithoutWhere call(Statement statement) {
 
@@ -895,6 +946,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.call(statement);
 		}
 
+		@NotNull
 		@Override
 		public InQueryCallBuilder call(String... namespaceAndProcedure) {
 
@@ -946,19 +998,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingReadingAndWithWithSkip skip(Number number) {
 			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingReadingAndWithWithSkip skip(Expression expression) {
 			orderBuilder.skip(expression);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public OngoingReadingAndWith limit(Number number) {
 			return limit(number == null ? null : new NumberLiteral(number));
@@ -985,7 +1036,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	 */
 	enum UpdateType {
 		DELETE, DETACH_DELETE, SET, MUTATE, REMOVE,
-		CREATE, MERGE;
+		CREATE, MERGE
 	}
 
 	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
@@ -1095,11 +1146,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 							"Only property operations based on the " + Operator.MUTATE  + " are supported inside a mutating SET.");
 					}
 				}
-			} else if (propertyOperations.isEmpty()) {
+			} else {
 				for (int i = 0; i < listOfExpressions.size(); i += 2) {
 					Expression rhs = listOfExpressions.get(i + 1);
 					if (rhs instanceof Parameter) {
-						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), (Parameter) rhs));
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), rhs));
 					} else if (rhs instanceof MapExpression) {
 						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), (MapExpression) rhs));
 					} else {
@@ -1147,7 +1198,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		static class MergeBuilder extends AbstractUpdatingClauseBuilder<Merge> implements
 			SupportsActionsOnTheUpdatingClause {
 
-			private List<MergeAction> mergeActions = new ArrayList<>();
+			private final List<MergeAction> mergeActions = new ArrayList<>();
 
 			MergeBuilder(List<PatternElement> patternElements) {
 				super(patternElements);
@@ -1232,32 +1283,29 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate delete(Expression... deletedExpressions) {
 			return delete(false, deletedExpressions);
 		}
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate delete(Collection<Expression> deletedExpressions) {
 			return delete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate detachDelete(Expression... deletedExpressions) {
 			return delete(true, deletedExpressions);
 		}
 
 		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate detachDelete(Collection<Expression> deletedExpressions) {
 			return detachDelete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
 		public OngoingMerge merge(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
@@ -1270,6 +1318,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate set(Expression... keyValuePairs) {
 
@@ -1277,12 +1326,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate set(Collection<Expression> keyValuePairs) {
 
 			return set(keyValuePairs.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
@@ -1291,12 +1342,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				UpdateType.SET, Operations.set(node, labels));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
 
 			return set(node, labels.toArray(new String[] {}));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
@@ -1305,6 +1358,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				UpdateType.MUTATE, Operations.mutate(target, properties));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
@@ -1313,12 +1367,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				Operations.set(node, labels));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
 
 			return remove(node, labels.toArray(new String[] {}));
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
@@ -1326,39 +1382,45 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 		}
 
+		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
 
 			return remove(properties.toArray(new Property[] {}));
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... returnedExpressions) {
 			return this.with(false, returnedExpressions);
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> returnedExpressions) {
 			return with(returnedExpressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... returnedExpressions) {
 			return this.with(true, returnedExpressions);
 		}
 
+		@NotNull
 		@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> returnedExpressions) {
 			return withDistinct(returnedExpressions.toArray(new Expression[] {}));
 		}
 
+		@NotNull
 		@Override
-		@SuppressWarnings("unchecked")
 		public OngoingUpdate create(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.create(pattern);
 		}
 
+		@NotNull
 		@Override
 		public OngoingUpdate create(Collection<PatternElement> pattern) {
 			return create(pattern.toArray(new PatternElement[] {}));
@@ -1374,7 +1436,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public Statement build() {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.buildImpl(false, null);
+			return DefaultStatementBuilder.this.buildImpl(null);
 		}
 	}
 
@@ -1410,7 +1472,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReading as(String variable) {
+		public OngoingReading as(@NotNull String variable) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(new Unwind(expressionToUnwind, variable));
 			return DefaultStatementBuilder.this;
 		}
@@ -1451,8 +1513,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 			return argumentsList;
 		}
-
-		abstract Statement buildCall();
 	}
 
 	static final class StandaloneCallBuilder extends AbstractCallBuilder implements
@@ -1506,11 +1566,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			return ProcedureCallImpl.create(procedureName, createArgumentList(), null,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
-		}
-
-		@Override
-		Statement buildCall() {
-			return build();
 		}
 	}
 
@@ -1609,7 +1664,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
 
-		@Override
 		Statement buildCall() {
 			return build();
 		}
@@ -1634,7 +1688,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 			super(procedureName);
 		}
 
-		@Override
 		Statement buildCall() {
 
 			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,

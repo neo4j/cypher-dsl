@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.driver.QueryRunner;
 
 /**
  * A decorated statement. Used for <code>EXPLAIN</code> and <code>PROFILE</code>'d queries.
@@ -79,7 +78,7 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 
 	/**
 	 * Only profiled queries can have a result statement.
-	 * Explained queries are only useful with {@link Statement#executeWith(QueryRunner)}.
+	 * Explained queries are only useful with {@link org.neo4j.cypherdsl.core.executables.ExecutableStatement#executeWith(org.neo4j.driver.QueryRunner)}.
 	 */
 	final static class DecoratedQueryWithResult extends DecoratedQuery implements ResultStatement {
 

@@ -116,7 +116,7 @@ public interface Statement extends Visitable {
 	 *
 	 * @return True if literal parameters hav
 	 */
-	@NotNull @Contract(pure = true)
+	@Contract(pure = true)
 	boolean isRenderConstantsAsParameters();
 
 	/**

@@ -39,7 +39,7 @@ public interface StatementContext {
 	 * @param parameter The parameter who's name should be retrieved
 	 * @return The name of the parameter or a generated name
 	 */
-	String getParameterName(Parameter parameter);
+	String getParameterName(Parameter<?> parameter);
 
 	/**
 	 * Some constants may be rendered as parameters.

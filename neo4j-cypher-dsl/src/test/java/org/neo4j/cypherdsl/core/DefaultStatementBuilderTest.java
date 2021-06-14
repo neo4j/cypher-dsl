@@ -39,7 +39,8 @@ class DefaultStatementBuilderTest {
 	}
 
 	@Nested
-	class returningPreconditionsShouldBeAsserted {
+	class ReturningPreconditionsShouldBeAsserted {
+
 		@Test
 		void forExpressions() {
 

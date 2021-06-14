@@ -886,6 +886,7 @@ class CypherIT {
 		}
 
 		@Test
+		@SuppressWarnings({ "ResultOfMethodCallIgnored" }) // That is the purpose of this test
 		void usingSameWithStepWithoutReassign() {
 			StatementBuilder.OrderableOngoingReadingAndWith firstStep = Cypher.match(bikeNode).with(bikeNode);
 
@@ -899,6 +900,7 @@ class CypherIT {
 		}
 
 		@Test
+		@SuppressWarnings({ "ResultOfMethodCallIgnored" }) // That is the purpose of this test
 		void usingSameWithStepWithoutReassignThenUpdate() {
 			StatementBuilder.OrderableOngoingReadingAndWith firstStep = Cypher.match(bikeNode).with(bikeNode);
 
@@ -1069,6 +1071,8 @@ class CypherIT {
 
 		@Test // GH-257
 		void functionsBasedOnRelationships() {
+			String expected = "MATCH p = shortestPath((bacon:`Person` {name: 'Kevin Bacon'})-[*]-(meg:`Person` {name: 'Meg Ryan'})) RETURN p";
+
 			Relationship relationship = Cypher.node("Person").named("bacon")
 				.withProperties("name", Cypher.literalOf("Kevin Bacon"))
 				.relationshipBetween(
@@ -1076,9 +1080,12 @@ class CypherIT {
 				.unbounded();
 			Statement statement = Cypher.match(Cypher.shortestPath("p").definedBy(relationship)).returning("p").build();
 
-			assertThat(cypherRenderer.render(statement))
-				.isEqualTo(
-					"MATCH p = shortestPath((bacon:`Person` {name: 'Kevin Bacon'})-[*]-(meg:`Person` {name: 'Meg Ryan'})) RETURN p");
+			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
+
+			SymbolicName p = Cypher.name("p");
+			statement = Cypher.match(Cypher.shortestPath(p).definedBy(relationship)).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 		}
 	}
 
@@ -1253,7 +1260,7 @@ class CypherIT {
 		@Test // GH-110
 		void multipleEmptyConditionsMustCollapse() {
 
-			Supplier<Condition> no = () -> org.neo4j.cypherdsl.core.Conditions.noCondition(); // Just aliased due to the qualified import
+			Supplier<Condition> no = org.neo4j.cypherdsl.core.Conditions::noCondition; // Just aliased due to the qualified import
 			String expected = "MATCH (u:`User`) RETURN u";
 
 			Statement statement;
@@ -1283,7 +1290,7 @@ class CypherIT {
 		@Test // GH-110
 		void multipleEmptyConditionsMustCollapse2() {
 
-			Supplier<Condition> no = () -> org.neo4j.cypherdsl.core.Conditions.noCondition(); // Just aliased due to the qualified import
+			Supplier<Condition> no = org.neo4j.cypherdsl.core.Conditions::noCondition; // Just aliased due to the qualified import
 			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
 			String expected = "MATCH (u:`User`) WHERE u.a = true RETURN u";
 
@@ -1322,7 +1329,7 @@ class CypherIT {
 		@Test // GH-110
 		void multipleEmptyConditionsMustCollapse3() {
 
-			Supplier<Condition> no = () -> org.neo4j.cypherdsl.core.Conditions.noCondition(); // Just aliased due to the qualified import
+			Supplier<Condition> no = org.neo4j.cypherdsl.core.Conditions::noCondition; // Just aliased due to the qualified import
 			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
 			Supplier<Condition> f = () -> userNode.property("b").isEqualTo(Cypher.literalFalse());
 			String expected = "MATCH (u:`User`) WHERE (u.a = true AND u.b = false) RETURN u";
@@ -2195,9 +2202,9 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (u:`User`) SET u.p = 'Hallo, Welt' SET u.p = 'Hallo', u.g = 'Welt'");
 
-			assertThatIllegalArgumentException().isThrownBy(() -> {
-				Cypher.match(userNode).set(userNode.property("g"));
-			}).withMessage("The list of expression to set must be even.");
+			//noinspection ResultOfMethodCallIgnored
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(userNode).set(userNode.property("g")))
+				.withMessage("The list of expression to set must be even.");
 		}
 
 		@Test
@@ -2408,7 +2415,7 @@ class CypherIT {
 		@Test // GH-104
 		void singleCreateAction() {
 
-			Literal<String> halloWeltString = Cypher.<String>literalOf("Hallo, Welt");
+			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
 			for (Statement statement : new Statement[] {
 				Cypher.merge(userNode)
 					.onCreate().set(userNode.property("p").to(halloWeltString))
@@ -2755,7 +2762,6 @@ class CypherIT {
 
 		@Test
 		void shouldRenderDeleteWithoutReturn() {
-			userNode.relationshipTo(userNode).relationshipTo(userNode).min(1);
 
 			Statement statement;
 			statement = Cypher.match(userNode)
@@ -2803,7 +2809,6 @@ class CypherIT {
 
 		@Test
 		void shouldRenderDeleteBasedOnExpressionCollectionWithoutReturn() {
-			userNode.relationshipTo(userNode).relationshipTo(userNode).min(1);
 
 			Statement statement;
 			statement = Cypher.match(userNode)
@@ -2930,6 +2935,7 @@ class CypherIT {
 	@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 	class OperationsAndComparisons {
 
+		@SuppressWarnings("unused") // This the source of test parameters
 		private Stream<Arguments> operatorsToTest() {
 			return Stream.of(
 				Arguments.of("Unary minus", Operations.minus(Cypher.literalOf(1)), "RETURN -1"),
@@ -2939,11 +2945,12 @@ class CypherIT {
 
 		@ParameterizedTest(name = "{0}")
 		@MethodSource("operatorsToTest")
-		void unaryOperatorsShouldWork(String name, Expression operator, String expected) {
+		void unaryOperatorsShouldWork(@SuppressWarnings("unused") String name, Expression operator, String expected) {
 			assertThat(cypherRenderer.render(Cypher.returning(operator).build())).isEqualTo(expected);
 		}
 
 		@Test
+		@SuppressWarnings("ConstantConditions") // This is what the test is about
 		void preconditionsShouldBeAssertedOnUnary() {
 
 			assertThatIllegalArgumentException()
@@ -3117,6 +3124,7 @@ class CypherIT {
 		void chainedInProjection() {
 
 			Node node = Cypher.node("Person").named("p");
+			//noinspection ResultOfMethodCallIgnored
 			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(node)
 				.returning(node.project("__internalNeo4jId__", Functions.id(node), "name")
 					.and(node.property("home.location", "y"))
@@ -3258,7 +3266,7 @@ class CypherIT {
 		@Test // GH-189
 		void shouldRenderLeadingReturningBasedOnExpressionCollection() {
 
-			String cypher = Cypher.returning(Arrays.asList(Cypher.literalOf(1))).build().getCypher();
+			String cypher = Cypher.returning(Collections.singletonList(Cypher.literalOf(1))).build().getCypher();
 			assertThat(cypher).isEqualTo("RETURN 1");
 		}
 	}
@@ -3504,6 +3512,7 @@ class CypherIT {
 				.returning(bikeNode)
 				.build();
 
+			//noinspection ResultOfMethodCallIgnored
 			assertThatIllegalArgumentException().isThrownBy(() ->
 				Cypher.union(statement, statement3)).withMessage("Cannot mix union and union all!");
 
@@ -3597,16 +3606,16 @@ class CypherIT {
 				Node person = Cypher.node("Person");
 				Statement statement = Cypher.match(person).returning(person.project("something")).build();
 				assertThat(cypherRenderer.render(statement))
-					.matches("MATCH \\([a-zA-Z].*\\d{3}:`Person`\\) RETURN [a-zA-Z].*\\d{3}\\{\\.something\\}");
+					.matches("MATCH \\([a-zA-Z].*\\d{3}:`Person`\\) RETURN [a-zA-Z].*\\d{3}\\{\\.something}");
 			}
 
 			@Test
-			void generatedSymbolicNameMustPrevendNodeContentDoubleRenderingAswWell() {
+			void generatedSymbolicNameMustPreventNodeContentDoubleRenderingAswWell() {
 
 				Node person = Cypher.node("Person");
-				person.getRequiredSymbolicName();
+				assertThat(person.getRequiredSymbolicName()).isNotNull();
 				Node movie = Cypher.node("Movie");
-				movie.getRequiredSymbolicName();
+				assertThat(movie.getRequiredSymbolicName()).isNotNull();
 				Relationship directed = person.relationshipTo(movie, "DIRECTED");
 				Relationship actedIn = person.relationshipTo(movie, "ACTED_IN");
 				Statement statement = Cypher.match(directed)
@@ -3616,7 +3625,7 @@ class CypherIT {
 
 				assertThat(cypherRenderer.render(statement))
 					.matches(
-						"MATCH \\(\\w+:`Person`\\)-\\[\\w+:`DIRECTED`\\]->\\(\\w+:`Movie`\\) MATCH \\(\\w+\\)-\\[\\w+:`ACTED_IN`\\]->\\(\\w+\\) RETURN \\w+, \\w+");
+						"MATCH \\(\\w+:`Person`\\)-\\[\\w+:`DIRECTED`]->\\(\\w+:`Movie`\\) MATCH \\(\\w+\\)-\\[\\w+:`ACTED_IN`]->\\(\\w+\\) RETURN \\w+, \\w+");
 			}
 
 			@Test
@@ -3695,7 +3704,7 @@ class CypherIT {
 
 				Statement statement = Cypher.match(rel).returning(rel.project("something")).build();
 				assertThat(cypherRenderer.render(statement)).matches(
-					"MATCH \\(:`Person`\\)-\\[[a-zA-Z]*\\d{3}:`ACTED_IN`\\]->\\(:`Movie`\\) RETURN [a-zA-Z]*\\d{3}\\{\\.something\\}");
+					"MATCH \\(:`Person`\\)-\\[[a-zA-Z]*\\d{3}:`ACTED_IN`]->\\(:`Movie`\\) RETURN [a-zA-Z]*\\d{3}\\{\\.something}");
 			}
 		}
 
@@ -3713,7 +3722,7 @@ class CypherIT {
 					"MATCH (n) RETURN n{.*}");
 		}
 
-		@Test
+		@SuppressWarnings("ResultOfMethodCallIgnored") @Test
 		void invalid() {
 
 			String expectedMessage = "FunctionInvocation{functionName='id'} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";

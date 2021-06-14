@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.LiteralBase;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -43,7 +44,9 @@ public final class ListOperator implements Expression {
 	 * A literal for the dots.
 	 */
 	private static final Literal<String> DOTS = new LiteralBase<String>("..") {
-		@Override public String asString() {
+		@NotNull
+		@Override
+		public String asString() {
 			return super.getContent();
 		}
 	};

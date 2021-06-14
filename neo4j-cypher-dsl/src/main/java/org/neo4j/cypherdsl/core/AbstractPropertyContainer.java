@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -33,28 +34,33 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 @API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractPropertyContainer implements PropertyContainer {
 
+	@NotNull
 	@Override
-	public final Property property(String name) {
+	public final Property property(@NotNull String name) {
 		return property(new String[]{name});
 	}
 
+	@NotNull
 	@Override
 	public final Property property(String... names) {
 		return InternalPropertyImpl.create(this, names);
 	}
 
+	@NotNull
 	@Override
 	public final Property property(Expression lookup) {
 		return InternalPropertyImpl.create(this, lookup);
 	}
 
+	@NotNull
 	@Override
-	public final Operation mutate(Parameter parameter) {
+	public final Operation mutate(Parameter<?> parameter) {
 		return Operations.mutate(this.getSymbolicName()
 						.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
 				parameter);
 	}
 
+	@NotNull
 	@Override
 	public final Operation mutate(MapExpression properties) {
 		return Operations.mutate(this.getSymbolicName()
@@ -62,11 +68,13 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 				properties);
 	}
 
+	@NotNull
 	@Override
 	public final MapProjection project(List<Object> entries) {
 		return project(entries.toArray());
 	}
 
+	@NotNull
 	@Override
 	public final MapProjection project(Object... entries) {
 		return getRequiredSymbolicName().project(entries);

@@ -138,24 +138,28 @@ public final class ListComprehension implements Expression {
 			this.variable = variable;
 		}
 
+		@NotNull
 		@Override
 		public OngoingDefinitionWithList in(Expression list) {
 			this.listExpression = list;
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public OngoingDefinitionWithoutReturn where(Condition condition) {
 			this.where = new Where(condition);
 			return this;
 		}
 
+		@NotNull
 		@Override
 		public ListComprehension returning() {
 
 			return new ListComprehension(variable, listExpression, where, null);
 		}
 
+		@NotNull
 		@Override
 		public ListComprehension returning(Expression... expressions) {
 

@@ -39,9 +39,9 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class MapProjection implements Expression {
 
-	private SymbolicName name;
+	private final SymbolicName name;
 
-	private MapExpression map;
+	private final MapExpression map;
 
 	static MapProjection create(SymbolicName name, Object... content) {
 
@@ -106,12 +106,10 @@ public final class MapProjection implements Expression {
 					lastExpression = (Expression) next;
 					i += 2;
 				} else {
-					lastKey = null;
 					lastExpression = PropertyLookup.forName((String) current);
 					i += 1;
 				}
 			} else if (current instanceof Expression) {
-				lastKey = null;
 				lastExpression = (Expression) current;
 				i += 1;
 			}

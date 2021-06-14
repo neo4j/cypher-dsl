@@ -125,6 +125,7 @@ public abstract class Case implements Visitable {
 				super(caseExpression, caseWhenThens);
 			}
 
+			@NotNull
 			@Override
 			public CaseEnding elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
@@ -158,7 +159,7 @@ public abstract class Case implements Visitable {
 			}
 
 			@Override
-			public CaseEnding elseDefault(Expression defaultExpression) {
+			public @NotNull CaseEnding elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
 			}

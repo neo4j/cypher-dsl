@@ -66,12 +66,14 @@ final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder imple
 			this.source = source;
 		}
 
+		@NotNull
 		@Override
 		public LoadCSVStatementBuilder as(String alias) {
 
 			return DefaultLoadCSVStatementBuilder.create(this, alias, source);
 		}
 
+		@NotNull
 		@Override
 		public OngoingLoadCSV loadCSV(URI newUri, boolean newWithHeaders) {
 

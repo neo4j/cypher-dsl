@@ -57,7 +57,7 @@ public final class FunctionInvocation implements Expression {
 
 	static FunctionInvocation create(FunctionDefinition definition) {
 
-		return new FunctionInvocation(definition.getImplementationName(), new Expression[0]);
+		return new FunctionInvocation(definition.getImplementationName());
 	}
 
 	static FunctionInvocation create(FunctionDefinition definition, Expression... expressions) {

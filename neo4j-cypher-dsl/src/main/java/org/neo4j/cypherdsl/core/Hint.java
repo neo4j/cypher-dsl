@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -42,7 +43,7 @@ public final class Hint implements Visitable {
 
 	private enum Type implements Visitable {
 
-		INDEX, INDEX_SEEK, SCAN, JOIN_ON;
+		INDEX, INDEX_SEEK, SCAN, JOIN_ON
 	}
 
 	private final static class IndexReference implements Visitable {
@@ -60,8 +61,7 @@ public final class Hint implements Visitable {
 		}
 
 		boolean pointsToSameContainer(SymbolicName otherSymbolicName, NodeLabel otherLabel) {
-			return this.symbolicName.equals(otherSymbolicName) &&
-					(this.optionalLabel == null && otherLabel == null || this.optionalLabel.equals(otherLabel));
+			return this.symbolicName.equals(otherSymbolicName) && Objects.equals(this.optionalLabel, otherLabel);
 		}
 
 		@Override

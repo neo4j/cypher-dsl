@@ -40,7 +40,7 @@ final class StatementContextImpl implements StatementContext {
 	private boolean renderConstantsAsParameters = false;
 
 	@Override
-	public String getParameterName(Parameter parameter) {
+	public String getParameterName(Parameter<?> parameter) {
 
 		return parameterNames
 			.computeIfAbsent(parameter,
