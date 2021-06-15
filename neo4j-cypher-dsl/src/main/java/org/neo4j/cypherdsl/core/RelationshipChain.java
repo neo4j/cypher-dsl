@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class RelationshipChain implements RelationshipPattern {
+public final class RelationshipChain implements RelationshipPattern, ExposesPatternLengthAccessors<RelationshipChain> {
 
 	private final LinkedList<Relationship> relationships;
 
@@ -131,6 +131,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @since 1.1.1
 	 */
 	@NotNull @Contract(pure = true)
+	@Override
 	public RelationshipChain unbounded() {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -144,6 +145,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @return A new chain
 	 */
 	@NotNull @Contract(pure = true)
+	@Override
 	public RelationshipChain min(Integer minimum) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -157,6 +159,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @return A new chain
 	 */
 	@NotNull @Contract(pure = true)
+	@Override
 	public RelationshipChain max(Integer maximum) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -171,6 +174,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @return A new chain
 	 */
 	@NotNull @Contract(pure = true)
+	@Override
 	public RelationshipChain length(Integer minimum, Integer maximum) {
 
 		Relationship lastElement = this.relationships.getLast();

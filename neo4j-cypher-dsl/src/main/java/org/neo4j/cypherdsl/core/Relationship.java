@@ -43,7 +43,8 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public interface Relationship extends RelationshipPattern, PropertyContainer, ExposesProperties<Relationship> {
+public interface Relationship extends RelationshipPattern, PropertyContainer, ExposesProperties<Relationship>,
+	ExposesPatternLengthAccessors<Relationship> {
 
 	/**
 	 * While the direction in the schema package is centered around the node, the direction here is the direction between two nodes.
@@ -282,43 +283,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 */
 	@NotNull @Contract(pure = true)
 	Relationship named(SymbolicName newSymbolicName);
-
-	/**
-	 * Creates a new relationship with an unbound length minimum length
-	 *
-	 * @return the new relationship
-	 * @since 1.1.1
-	 */
-	@NotNull @Contract(pure = true)
-	Relationship unbounded();
-
-	/**
-	 * Creates a new relationship with a new minimum length
-	 *
-	 * @param minimum the new minimum
-	 * @return the new relationship
-	 */
-	@NotNull @Contract(pure = true)
-	Relationship min(Integer minimum);
-
-	/**
-	 * Creates a new relationship with a new maximum length
-	 *
-	 * @param maximum the new maximum
-	 * @return the new relationship
-	 */
-	@NotNull @Contract(pure = true)
-	Relationship max(Integer maximum);
-
-	/**
-	 * Creates a new relationship with a new length
-	 *
-	 * @param minimum the new minimum
-	 * @param maximum the new maximum
-	 * @return the new relationship
-	 */
-	@NotNull @Contract(pure = true)
-	Relationship length(Integer minimum, Integer maximum);
 
 	/**
 	 * Creates a new relationship, inverting the direction but keeping the semantics intact

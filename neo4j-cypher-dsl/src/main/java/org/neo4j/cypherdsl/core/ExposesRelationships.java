@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public interface ExposesRelationships<T extends RelationshipPattern> {
+public interface ExposesRelationships<T extends RelationshipPattern & ExposesPatternLengthAccessors<?>> {
 
 	/**
 	 * Starts building an outgoing relationship to the {@code other} {@link Node node}.
