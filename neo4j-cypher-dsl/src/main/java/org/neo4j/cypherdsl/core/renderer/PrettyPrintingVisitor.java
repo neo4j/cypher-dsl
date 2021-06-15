@@ -262,7 +262,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	}
 
 	@Override
-	void enter(Parameter parameter) {
+	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
 		if (value instanceof ConstantParameterHolder) {

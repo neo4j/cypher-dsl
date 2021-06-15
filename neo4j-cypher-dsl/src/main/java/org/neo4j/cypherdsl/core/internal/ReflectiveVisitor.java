@@ -108,7 +108,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 	@Override
 	public final void leave(Visitable visitable) {
 
-		if (currentVisitedElements.peek() == visitable) {
+		if (visitable != null && currentVisitedElements.peek() == visitable) {
 			executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.LEAVE), visitable);
 			postLeave(visitable);
 			currentVisitedElements.pop();

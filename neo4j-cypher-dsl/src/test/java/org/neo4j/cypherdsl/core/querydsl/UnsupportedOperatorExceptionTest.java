@@ -16,37 +16,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.internal;
+package org.neo4j.cypherdsl.core.querydsl;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+import com.querydsl.core.types.Ops;
 
 /**
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
- * @since 2020.0.1
  */
-@API(status = INTERNAL, since = "2020.0.1")
-public final class Namespace extends LiteralBase<String[]> {
+class UnsupportedOperatorExceptionTest {
 
-	Namespace(String[] value) {
-		super(value);
-	}
+	@Test
+	void unsupportedOperatorShouldBeAccessible() {
 
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		visitor.leave(this);
-	}
-
-	@NotNull
-	@Override
-	public String asString() {
-
-		return String.join(".", getContent());
+		Assertions.assertThat(new UnsupportedOperatorException(Ops.MathOps.ABS).getUnsupportedOperator())
+			.isEqualTo(Ops.MathOps.ABS);
 	}
 }

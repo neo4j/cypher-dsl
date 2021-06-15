@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -350,10 +351,19 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void leave(SingleQuery statement) {
+
+		if (dequeOfVisitedNamed.isEmpty()) {
+			return;
+		}
 		this.dequeOfVisitedNamed.peek().clear();
 	}
 
 	private void clearPreviouslyVisitedNamed(With with) {
+
+		if (dequeOfVisitedNamed.isEmpty()) {
+			return;
+		}
+
 		// We need to clear the named cache after defining a with.
 		// Everything not taken into the next step has to go.
 		java.util.Set<Named> retain = new HashSet<>();
@@ -489,9 +499,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		// This is only relevant for nodes in relationships.
 		// Otherwise all the labels would be rendered again.
-		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
-		skipNodeContent = visitedNamed.contains(node);
-		visitedNamed.add(node);
+		if (!dequeOfVisitedNamed.isEmpty()) {
+			java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
+			skipNodeContent = visitedNamed.contains(node);
+			visitedNamed.add(node);
+		}
 
 		if (skipNodeContent) {
 			String symbolicName = node.getSymbolicName()
@@ -531,11 +543,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Relationship relationship) {
 
+		if (dequeOfVisitedNamed.isEmpty()) {
+			return;
+		}
 
 		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
 		skipRelationshipContent = visitedNamed.contains(relationship);
 		visitedNamed.add(relationship);
-
 	}
 
 	void enter(Relationship.Details details) {
@@ -605,7 +619,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		skipRelationshipContent = false;
 	}
 
-	protected final void renderParameter(Parameter parameter) {
+	protected final void renderParameter(Parameter<?> parameter) {
 
 		if (statementContext == null) {
 			throw new IllegalStateException("Parameter outside a statement context are not supported.");
@@ -613,7 +627,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append("$").append(statementContext.getParameterName(parameter));
 	}
 
-	void enter(Parameter parameter) {
+	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
 		if (value instanceof ConstantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
@@ -758,7 +772,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Subquery subquery) {
 
-		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.peek()));
+		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		builder.append("CALL {");
 	}
 

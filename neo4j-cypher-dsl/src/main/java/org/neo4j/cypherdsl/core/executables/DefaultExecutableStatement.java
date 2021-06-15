@@ -30,6 +30,7 @@ import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.driver.Query;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.async.AsyncQueryRunner;
+import org.neo4j.driver.async.ResultCursor;
 import org.neo4j.driver.summary.ResultSummary;
 
 /**
@@ -74,7 +75,7 @@ class DefaultExecutableStatement implements ExecutableStatement {
 	public final CompletableFuture<ResultSummary> executeWith(AsyncQueryRunner queryRunner) {
 
 		return queryRunner.runAsync(createQuery())
-			.thenCompose(c -> c.consumeAsync())
+			.thenCompose(ResultCursor::consumeAsync)
 			.toCompletableFuture();
 	}
 

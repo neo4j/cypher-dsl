@@ -77,16 +77,19 @@ public final class RelationshipChain implements RelationshipPattern {
 		return newChain;
 	}
 
+	@NotNull
 	@Override
 	public RelationshipChain relationshipTo(Node other, String... types) {
 		return this.add(this.relationships.getLast().getRight().relationshipTo(other, types));
 	}
 
+	@NotNull
 	@Override
 	public RelationshipChain relationshipFrom(Node other, String... types) {
 		return this.add(this.relationships.getLast().getRight().relationshipFrom(other, types));
 	}
 
+	@NotNull
 	@Override
 	public RelationshipChain relationshipBetween(Node other, String... types) {
 		return this.add(this.relationships.getLast().getRight().relationshipBetween(other, types));
@@ -98,6 +101,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @param newSymbolicName The new symbolic name to use
 	 * @return A new chain
 	 */
+	@NotNull
 	@Override
 	public RelationshipChain named(String newSymbolicName) {
 
@@ -112,6 +116,7 @@ public final class RelationshipChain implements RelationshipPattern {
 	 * @return A new chain
 	 * @since 2021.1.1
 	 */
+	@NotNull
 	@Override
 	public RelationshipChain named(SymbolicName newSymbolicName) {
 
@@ -198,6 +203,7 @@ public final class RelationshipChain implements RelationshipPattern {
 		return this.replaceLast(lastElement.withProperties(keysAndValues));
 	}
 
+	@NotNull
 	@Override
 	public Condition asCondition() {
 		return RelationshipPatternCondition.of(this);

@@ -47,6 +47,7 @@ public final class CypherContext {
 	private final Templates templates = CypherTemplates.DEFAULT;
 
 	private final List<Expression> expressions = new ArrayList<>();
+	@SuppressWarnings("FieldCanBeLocal")
 	private final String TO_STRING_VALUE_OF_UNSUPPORTED = "'" + CypherTemplates.UNSUPPORTED_MARKER + "'";
 
 	private final Map<Object, Parameter<?>> parameters = new IdentityHashMap<>();
@@ -56,15 +57,17 @@ public final class CypherContext {
 	}
 
 	public Expression[] getExpressions() {
-		return this.expressions.toArray(new Expression[this.expressions.size()]);
+		return this.expressions.toArray(new Expression[0]);
 	}
 
 	Template getTemplate(Operator op) {
 
 		Template template = templates.getTemplate(op);
-		for (Template.Element element : template.getElements()) {
-			if (TO_STRING_VALUE_OF_UNSUPPORTED.equals(element.toString())) {
-				throw new UnsupportedOperatorException(op);
+		if (template != null) {
+			for (Template.Element element : template.getElements()) {
+				if (TO_STRING_VALUE_OF_UNSUPPORTED.equals(element.toString())) {
+					throw new UnsupportedOperatorException(op);
+				}
 			}
 		}
 		return template;

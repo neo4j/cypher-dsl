@@ -103,7 +103,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingUpdate extends BuildableStatement,
+	interface OngoingUpdate extends BuildableStatement<Statement>,
 		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet {
 	}
 
@@ -956,7 +956,7 @@ public interface StatementBuilder
 	 *
 	 * @since 2021.0.0
 	 */
-	interface BuildableMatchAndUpdate extends OngoingMatchAndUpdate, BuildableStatement {
+	interface BuildableMatchAndUpdate extends OngoingMatchAndUpdate, BuildableStatement<Statement> {
 	}
 
 	/**

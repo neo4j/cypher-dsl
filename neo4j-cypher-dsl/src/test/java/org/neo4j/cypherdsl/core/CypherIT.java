@@ -2741,6 +2741,15 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WITH DISTINCT u CREATE (u)-[o:`OWNS`]->(b:`Bike`)");
+
+			statement = Cypher.match(userNode)
+				.withDistinct(userNode.getRequiredSymbolicName())
+				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MATCH (u:`User`) WITH DISTINCT u CREATE (u)-[o:`OWNS`]->(b:`Bike`)");
 		}
 
 		@Test
@@ -3743,20 +3752,24 @@ class CypherIT {
 
 		@Test
 		void orderOnWithShouldWork() {
-			Statement statement = Cypher
-				.match(
-					Cypher.node("Movie").named("m").relationshipFrom(Cypher.node("Person").named("p"), "ACTED_IN")
-						.named("r")
-				)
-				.with(Cypher.name("m"), Cypher.name("p"))
-				.orderBy(
-					Cypher.sort(Cypher.property("m", "title")),
-					Cypher.sort(Cypher.property("p", "name"))
-				).returning(Cypher.property("m", "title").as("movie"),
-					Functions.collect(Cypher.property("p", "name")).as("actors")).build();
 
-			String expected = "MATCH (m:`Movie`)<-[r:`ACTED_IN`]-(p:`Person`) WITH m, p ORDER BY m.title, p.name RETURN m.title AS movie, collect(p.name) AS actors";
-			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
+			SortItem byTitle = Cypher.sort(Cypher.property("m", "title"));
+			SortItem byName = Cypher.sort(Cypher.property("p", "name"));
+
+			Supplier<StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere> baseStatementSupplier = () -> Cypher
+				.match(Cypher.node("Movie").named("m").relationshipFrom(Cypher.node("Person").named("p"), "ACTED_IN")
+					.named("r"))
+				.with(Cypher.name("m"), Cypher.name("p"));
+
+			for (StatementBuilder.OrderableOngoingReadingAndWithWithWhere orderedStatement : new StatementBuilder.OrderableOngoingReadingAndWithWithWhere[] {
+				baseStatementSupplier.get().orderBy(byTitle, byName),
+				baseStatementSupplier.get().orderBy(Arrays.asList(byTitle, byName)) }
+			) {
+				Statement statement = orderedStatement.returning(Cypher.property("m", "title").as("movie"),
+					Functions.collect(Cypher.property("p", "name")).as("actors")).build();
+				String expected = "MATCH (m:`Movie`)<-[r:`ACTED_IN`]-(p:`Person`) WITH m, p ORDER BY m.title, p.name RETURN m.title AS movie, collect(p.name) AS actors";
+				assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
+			}
 		}
 
 		@Test
@@ -4422,6 +4435,20 @@ class CypherIT {
 								.returning(otherNode.project("x", "y"))
 						)
 					))).build();
+		}
+
+		@Test
+		void configurationOfIndentWithShouldWork() {
+
+			assertThat(Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentSize(5).build())
+				.render(Cypher.match(Cypher.node("Node")).where(org.neo4j.cypherdsl.core.Conditions.isTrue()).and(
+					org.neo4j.cypherdsl.core.Conditions.isFalse()).returning(Cypher.asterisk()).build()))
+				.isEqualTo(
+					"MATCH (:Node)\n" +
+					"WHERE (true\n" +
+					"     AND false)\n" +
+					"RETURN *"
+				);
 		}
 
 		@Test

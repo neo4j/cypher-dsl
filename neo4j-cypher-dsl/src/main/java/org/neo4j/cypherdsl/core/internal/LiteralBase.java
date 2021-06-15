@@ -36,7 +36,7 @@ public abstract class LiteralBase<T> implements Literal<T> {
 	/**
 	 * The content of this literal.
 	 */
-	private T content;
+	private final T content;
 
 	protected LiteralBase(T content) {
 		this.content = content;
