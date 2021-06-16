@@ -44,7 +44,7 @@ public final class FunctionInvocation implements Expression {
 	 * Defines metadata for a function.
 	 */
 	@API(status = EXPERIMENTAL, since = "2020.1.0")
-	interface FunctionDefinition {
+	public interface FunctionDefinition {
 
 		String getImplementationName();
 
@@ -55,12 +55,27 @@ public final class FunctionInvocation implements Expression {
 		}
 	}
 
-	static FunctionInvocation create(FunctionDefinition definition) {
+	/**
+	 * Creates a {@link FunctionInvocation} based on a simple definition without any arguments.
+	 *
+	 * @param definition The definition of a function
+	 * @return The invocation (a valid expression)
+	 * @since 2021.2.3
+	 */
+	public static FunctionInvocation create(FunctionDefinition definition) {
 
 		return new FunctionInvocation(definition.getImplementationName());
 	}
 
-	static FunctionInvocation create(FunctionDefinition definition, Expression... expressions) {
+	/**
+	 * Creates a {@link FunctionInvocation} based on a simple definition with arguments.
+	 *
+	 * @param definition The definition of a function
+	 * @param expressions The arguments to the function
+	 * @return The invocation (a valid expression)
+	 * @since 2021.2.3
+	 */
+	public static FunctionInvocation create(FunctionDefinition definition, Expression... expressions) {
 
 		String message = "The expression for " + definition.getImplementationName() + "() is required.";
 
@@ -70,7 +85,16 @@ public final class FunctionInvocation implements Expression {
 		return new FunctionInvocation(definition.getImplementationName(), expressions);
 	}
 
-	static FunctionInvocation createDistinct(FunctionDefinition definition, Expression... expressions) {
+	/**
+	 * Creates a {@link FunctionInvocation} based on a simple definition with arguments and adds the {@code distinct}
+	 * operator to it. This is only supported with {@link FunctionDefinition#isAggregate()} returning {@literal true}.
+ 	 *
+	 * @param definition The definition of a function
+	 * @param expressions The arguments to the function
+	 * @return The invocation (a valid expression)
+	 * @since 2021.2.3
+	 */
+	public static FunctionInvocation createDistinct(FunctionDefinition definition, Expression... expressions) {
 
 		Assertions
 			.isTrue(definition.isAggregate(), "The distinct operator can only be applied within aggregate functions.");
@@ -87,7 +111,15 @@ public final class FunctionInvocation implements Expression {
 		return new FunctionInvocation(definition.getImplementationName(), newExpressions);
 	}
 
-	static FunctionInvocation create(FunctionDefinition definition, PatternElement pattern) {
+	/**
+	 * Creates a new function invocation for a pattern element.
+	 *
+	 * @param definition The definition of the function
+	 * @param pattern The argument to the function
+	 * @return A function invocation
+	 * @since 2021.2.3
+	 */
+	public static FunctionInvocation create(FunctionDefinition definition, PatternElement pattern) {
 
 		Assertions.notNull(pattern, "The pattern for " + definition.getImplementationName() + "() is required.");
 
