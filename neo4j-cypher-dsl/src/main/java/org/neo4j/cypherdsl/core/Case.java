@@ -20,16 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
-import org.neo4j.cypherdsl.core.internal.CaseElse;
+import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
-import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
@@ -39,28 +35,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public abstract class Case implements Visitable {
-
-	private CaseElse caseElse;
-	private final List<CaseWhenThen> caseWhenThens;
-
-	static Case create(Expression caseExpression) {
-		return new SimpleCase(caseExpression, new ArrayList<>());
-	}
-
-	static Case create() {
-		return new GenericCase(new ArrayList<>());
-	}
-
-	Case(List<CaseWhenThen> caseWhenThens) {
-		this.caseWhenThens = caseWhenThens;
-	}
-
-	abstract Expression getCaseExpression();
-
-	void setCaseElse(CaseElse caseElse) {
-		this.caseElse = caseElse;
-	}
+public interface Case extends Expression, ProvidesAffixes {
 
 	/**
 	 * Creates a new case/when expression with an additional {@code WHEN} block.
@@ -69,15 +44,31 @@ public abstract class Case implements Visitable {
 	 * @return An ongoing when builder.
 	 */
 	@NotNull @CheckReturnValue
-	public OngoingWhenThen when(Expression nextExpression) {
-		return new OngoingWhenThen(nextExpression);
+	OngoingWhenThen when(Expression nextExpression);
+
+	/**
+	 * Extension the {@link Case} interface to support simple case with an initial expression / condition.
+	 */
+	@API(status = EXPERIMENTAL, since = "1.0")
+	interface SimpleCase extends Case {
+	}
+
+	/**
+	 * Extension of the {@link Case} interface to support generic case.
+	 */
+	@API(status = EXPERIMENTAL, since = "1.0")
+	interface GenericCase extends Case {
+	}
+
+	static Case create(@Nullable Expression expression) {
+		return expression == null ? new AbstractCase.GenericCaseImpl() : new AbstractCase.SimpleCaseImpl(expression);
 	}
 
 	/**
 	 * Specification for a renderable, complete CASE statement
 	 */
 	@API(status = EXPERIMENTAL, since = "1.0")
-	public interface CaseEnding extends Condition {
+	interface CaseEnding extends Case {
 
 		/**
 		 * Adds a new {@code WHEN} block.
@@ -95,104 +86,14 @@ public abstract class Case implements Visitable {
 		 * @return An ongoing when builder.
 		 */
 		@NotNull @CheckReturnValue
-		CaseEnding elseDefault(Expression defaultExpression);
-	}
-
-	/**
-	 * Special implementation of the {@link Case} class to support simple case with an initial expression / condition.
-	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
-	public static class SimpleCase extends Case {
-
-		private final Expression caseExpression;
-
-		private SimpleCase(Expression caseExpression, List<CaseWhenThen> caseWhenThens) {
-			super(caseWhenThens);
-			this.caseExpression = caseExpression;
-		}
-
-		@Override
-		Expression getCaseExpression() {
-			return caseExpression;
-		}
-
-		/**
-		 * The renderable implementation of {@link SimpleCase}.
-		 */
-		final static class EndingSimpleCase extends SimpleCase implements CaseEnding {
-
-			private EndingSimpleCase(Expression caseExpression, List<CaseWhenThen> caseWhenThens) {
-				super(caseExpression, caseWhenThens);
-			}
-
-			@NotNull
-			@Override
-			public CaseEnding elseDefault(Expression defaultExpression) {
-				this.setCaseElse(new CaseElse(defaultExpression));
-				return this;
-			}
-		}
-	}
-
-	/**
-	 * Implementation of the {@link Case} class to support generic case.
-	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
-	public static class GenericCase extends Case {
-
-		private GenericCase(List<CaseWhenThen> caseWhenThens) {
-			super(caseWhenThens);
-		}
-
-		@Override
-		Expression getCaseExpression() {
-			return null;
-		}
-
-		/**
-		 * The renderable implementation of {@link GenericCase}.
-		 */
-		public final static class EndingGenericCase extends GenericCase implements CaseEnding {
-
-			private EndingGenericCase(List<CaseWhenThen> caseWhenThens) {
-				super(caseWhenThens);
-			}
-
-			@Override
-			public @NotNull CaseEnding elseDefault(Expression defaultExpression) {
-				this.setCaseElse(new CaseElse(defaultExpression));
-				return this;
-			}
-		}
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		if (getCaseExpression() != null) {
-			getCaseExpression().accept(visitor);
-		}
-
-		caseWhenThens.forEach(caseWhenThen -> caseWhenThen.accept(visitor));
-
-		if (caseElse != null) {
-			caseElse.accept(visitor);
-		}
-
-		visitor.leave(this);
+		Case elseDefault(Expression defaultExpression);
 	}
 
 	/**
 	 * Helper class to collect `when` expressions and create {@link CaseWhenThen} instances when the `then` is provided.
 	 */
 	@API(status = EXPERIMENTAL, since = "1.0")
-	public final class OngoingWhenThen {
-
-		final Expression whenExpression;
-
-		private OngoingWhenThen(Expression whenExpression) {
-			this.whenExpression = whenExpression;
-		}
+	interface OngoingWhenThen {
 
 		/**
 		 * Ends this {@code WHEN} block with an expression.
@@ -201,16 +102,6 @@ public abstract class Case implements Visitable {
 		 * @return An ongoing when builder.
 		 */
 		@NotNull @CheckReturnValue
-		public CaseEnding then(Expression expression) {
-
-			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, expression);
-			caseWhenThens.add(caseWhenThen);
-			if (getCaseExpression() != null) {
-				return new SimpleCase.EndingSimpleCase(Case.this.getCaseExpression(), caseWhenThens);
-			} else {
-				return new GenericCase.EndingGenericCase(caseWhenThens);
-			}
-		}
+		CaseEnding then(Expression expression);
 	}
-
 }

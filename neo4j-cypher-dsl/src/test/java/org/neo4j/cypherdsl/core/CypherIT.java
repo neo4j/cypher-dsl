@@ -3994,6 +3994,7 @@ class CypherIT {
 				Cypher.caseExpression(node.property("value"))
 					.when(Cypher.literalOf("blubb"))
 					.then(Cypher.literalTrue())
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4008,6 +4009,7 @@ class CypherIT {
 					.when(Cypher.literalOf("blubb"))
 					.then(Cypher.literalTrue())
 					.elseDefault(Cypher.literalFalse())
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4023,6 +4025,7 @@ class CypherIT {
 					.then(Cypher.literalTrue())
 					.when(Cypher.literalOf("bla"))
 					.then(Cypher.literalFalse())
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4040,6 +4043,7 @@ class CypherIT {
 					.when(Cypher.literalOf("bla"))
 					.then(Cypher.literalFalse())
 					.elseDefault(Cypher.literalOf(1))
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4054,6 +4058,7 @@ class CypherIT {
 				Cypher.caseExpression()
 					.when(node.property("value").isEqualTo(Cypher.literalOf("blubb")))
 					.then(Cypher.literalTrue())
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4068,6 +4073,7 @@ class CypherIT {
 					.when(node.property("value").isEqualTo(Cypher.literalOf("blubb")))
 					.then(Cypher.literalTrue())
 					.elseDefault(Cypher.literalFalse())
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4083,6 +4089,7 @@ class CypherIT {
 					.then(Cypher.literalTrue())
 					.when(node.property("value").isEqualTo(Cypher.literalOf("bla")))
 					.then(Cypher.literalFalse())
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -4100,6 +4107,7 @@ class CypherIT {
 					.when(node.property("value").isEqualTo(Cypher.literalOf("bla")))
 					.then(Cypher.literalFalse())
 					.elseDefault(Cypher.literalOf(1))
+					.asCondition()
 			).returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))

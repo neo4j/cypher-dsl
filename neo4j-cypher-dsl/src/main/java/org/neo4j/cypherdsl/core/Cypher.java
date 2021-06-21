@@ -870,7 +870,7 @@ public final class Cypher {
 	 */
 	@NotNull @Contract(pure = true)
 	public static Case caseExpression() {
-		return Case.create();
+		return Case.create(null);
 	}
 
 	/**
@@ -878,7 +878,7 @@ public final class Cypher {
 	 * @return simple case expression start
 	 */
 	@NotNull @Contract(pure = true)
-	public static Case caseExpression(Expression expression) {
+	public static Case caseExpression(@Nullable Expression expression) {
 		return Case.create(expression);
 	}
 
