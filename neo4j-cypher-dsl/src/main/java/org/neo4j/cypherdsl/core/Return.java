@@ -83,4 +83,12 @@ public final class Return implements Visitable {
 	public boolean isRaw() {
 		return raw;
 	}
+
+	Distinct getDistinct() {
+		return distinct;
+	}
+
+	ReturnBody getBody() {
+		return body;
+	}
 }

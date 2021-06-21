@@ -21,9 +21,9 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.Distinct;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.Distinct;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/With.html">With</a>.
@@ -40,6 +40,12 @@ public final class With implements Visitable {
 	private final ReturnBody body;
 
 	private final Where where;
+
+	With(Return returnClause, Where where) {
+		this.distinct = returnClause.getDistinct();
+		this.body = returnClause.getBody();
+		this.where = where;
+	}
 
 	With(boolean distinct, ExpressionList returnItems, Order order, Skip skip, Limit limit, Where where) {
 		this.distinct = distinct ? Distinct.INSTANCE : null;
