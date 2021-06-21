@@ -79,7 +79,7 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 			Assertions.isInstanceOf(Expression.class, input[i + 1], "Value needs to be of type Expression.");
 			Assertions.isTrue(!knownKeys.contains(input[i]), "Duplicate key '" + input[i] + "'");
 
-			final KeyValueMapEntry entry = new KeyValueMapEntry(key, (Expression) input[i + 1]);
+			final KeyValueMapEntry entry = KeyValueMapEntry.create(key, (Expression) input[i + 1]);
 			newContent.add(entry);
 			knownKeys.add(entry.getKey());
 		}

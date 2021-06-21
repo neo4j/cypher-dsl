@@ -22,7 +22,9 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Helper class, only for internal use.
@@ -38,7 +40,26 @@ public final class KeyValueMapEntry implements Expression {
 
 	private final Expression value;
 
-	KeyValueMapEntry(String key, Expression value) {
+	/**
+	 * Create a new {@link KeyValueMapEntry}. This is hardly useful in direct usage, but might be handy to compose clauses
+	 * outside the fluent api.
+	 *
+	 * @param key   the key of this entry
+	 * @param value the value of this entry
+	 * @return A new, immutable map entry.
+	 * @since 2021.2.3
+	 */
+	@NotNull
+	@API(status = EXPERIMENTAL, since = "2021.2.3")
+	public static KeyValueMapEntry create(@NotNull String key, @NotNull Expression value) {
+
+		Assertions.notNull(key, "Key is required.");
+		Assertions.notNull(value, "Value is required.");
+
+		return new KeyValueMapEntry(key, value);
+	}
+
+	private KeyValueMapEntry(String key, Expression value) {
 		this.key = key;
 		this.value = value;
 	}

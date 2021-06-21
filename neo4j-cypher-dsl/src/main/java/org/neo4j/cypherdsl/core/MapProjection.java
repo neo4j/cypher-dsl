@@ -43,7 +43,14 @@ public final class MapProjection implements Expression {
 
 	private final MapExpression map;
 
-	static MapProjection create(SymbolicName name, Object... content) {
+	/**
+	 * Create a new map projection with the given, mixed content
+	 * @param name The symbolic name of this project
+	 * @param content The projected content
+	 * @return A new map projection
+	 * @since 2021.2.3
+	 */
+	public static MapProjection create(SymbolicName name, Object... content) {
 
 		return new MapProjection(name, MapExpression.withEntries(createNewContent(content)));
 	}
@@ -119,7 +126,7 @@ public final class MapProjection implements Expression {
 
 			if (lastKey != null) {
 				Assertions.isTrue(!knownKeys.contains(lastKey), "Duplicate key '" + lastKey + "'");
-				newContent.add(new KeyValueMapEntry(lastKey, lastExpression));
+				newContent.add(KeyValueMapEntry.create(lastKey, lastExpression));
 				knownKeys.add(lastKey);
 			} else if (lastExpression instanceof SymbolicName || lastExpression instanceof PropertyLookup) {
 				newContent.add(lastExpression);
@@ -131,7 +138,9 @@ public final class MapProjection implements Expression {
 				newContent.addAll(names);
 			} else if (lastExpression instanceof AliasedExpression) {
 				AliasedExpression aliasedExpression = (AliasedExpression) lastExpression;
-				newContent.add(new KeyValueMapEntry(aliasedExpression.getAlias(), aliasedExpression));
+				newContent.add(KeyValueMapEntry.create(aliasedExpression.getAlias(), aliasedExpression));
+			} else if (lastExpression instanceof KeyValueMapEntry) {
+				newContent.add(lastExpression);
 			} else if (lastExpression == null) {
 				throw new IllegalArgumentException("Could not determine an expression from the given content!");
 			} else {
