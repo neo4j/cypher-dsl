@@ -107,8 +107,9 @@ public final class Operations {
 	 * @param target The target that should be modified
 	 * @param value  The new value of the target
 	 * @return A new operation.
+	 * @since 2021.2.3
 	 */
-	static Operation set(Expression target, Expression value) {
+	public static Operation set(Expression target, Expression value) {
 
 		return Operation.create(target, Operator.SET, value);
 	}
@@ -122,7 +123,7 @@ public final class Operations {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	static Operation mutate(Expression target, MapExpression value) {
+	public static Operation mutate(Expression target, MapExpression value) {
 
 		return Operation.create(target, Operator.MUTATE, value);
 	}
@@ -136,7 +137,7 @@ public final class Operations {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	static Operation mutate(Expression target, Expression value) {
+	public static Operation mutate(Expression target, Expression value) {
 
 		Assertions.notNull(value, "New properties value must not be null");
 		Assertions.isTrue(Property.class.isAssignableFrom(value.getClass()) || VALID_MUTATORS.contains(value.getClass()),
