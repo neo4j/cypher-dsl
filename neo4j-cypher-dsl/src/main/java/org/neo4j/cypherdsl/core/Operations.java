@@ -145,12 +145,28 @@ public final class Operations {
 		return Operation.create(target, Operator.MUTATE, value);
 	}
 
-	static Operation set(Node target, String... label) {
+	/**
+	 * Creates an operation adding one or more labels from a given {@link Node node}.
+	 *
+	 * @param target The target of the new labels
+	 * @param label  The labels to be added
+	 * @return A set operation
+	 * @since 2021.2.3
+	 */
+	public static Operation set(Node target, String... label) {
 
 		return Operation.create(target, Operator.SET_LABEL, label);
 	}
 
-	static Operation remove(Node target, String... label) {
+	/**
+	 * Creates an operation removing one or more labels from a given {@link Node node}.
+	 *
+	 * @param target The target of the remove operation
+	 * @param label  The labels to be removed
+	 * @return A remove operation
+	 * @since 2021.2.3
+	 */
+	public static Operation remove(Node target, String... label) {
 
 		return Operation.create(target, Operator.REMOVE_LABEL, label);
 	}
