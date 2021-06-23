@@ -47,6 +47,31 @@ class CypherDSLExamplesTest {
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
 
 	@Test
+	void escapingNames() {
+
+		// tag::escaping[]
+		var relationship = Cypher.node("Person").named("a")
+			.relationshipTo(Cypher.node("Movie").named("m"), "ACTED_IN").named("r");
+
+		var statement = Cypher.match(relationship).returning(relationship).build();
+
+		var defaultRenderer = Renderer.getDefaultRenderer();
+		assertThat(defaultRenderer.render(statement))
+			.isEqualTo("MATCH (a:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN r");
+
+		var escapeOnlyIfNecessary = Configuration.newConfig().alwaysEscapeNames(false).build();
+
+		var renderer = Renderer.getRenderer(escapeOnlyIfNecessary);
+		assertThat(renderer.render(statement))
+			.isEqualTo("MATCH (a:Person)-[r:ACTED_IN]->(m:Movie) RETURN r");
+
+		renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		assertThat(renderer.render(statement))
+			.isEqualTo("MATCH (a:Person)-[r:ACTED_IN]->(m:Movie)\nRETURN r");
+		// end::escaping[]
+	}
+
+	@Test
 	void findAllMovies() {
 
 		// tag::cypher-dsl-e1[]

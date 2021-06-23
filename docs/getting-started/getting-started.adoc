@@ -192,6 +192,18 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 <.> Get a "pretty printing" instance of the renderer configuration and retrieve a renderer based on it
 <.> Enjoy formatted Cypher.
 
+==== Escaping names
+
+The default renderer in its default configuration will escape all names (labels and relationship types) by default.
+So `Movie` becomes `++`Movie`++` and `ACTED_IN` becomes `++`ACTED_IN`++`.
+If you don't want this, you can either create a dedicated configuration for a renderer with that setting turned off or use
+the pretty printing renderer:
+
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=escaping]
+----
+
 ==== Inserting raw Cypher
 
 `Cypher.raw` allows for creating arbitrary expressions from raw String literals.
