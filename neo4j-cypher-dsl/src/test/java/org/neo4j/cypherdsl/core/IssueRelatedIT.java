@@ -100,7 +100,7 @@ class IssueRelatedIT {
 
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo(
-				"MATCH (app:`Location` {uuid: $app_uuid})<-[:`PART_OF`*0..3]-(loc_start:`Location`), (loc_start)<-[:`IN`|`IN_ANALYTICS`]-(r:`Resume`) WITH DISTINCT r, loc_start, app MATCH (r)-[:`IN_COHORT_OF`]->(o:`Offer` {is_valid: true})-[:`IN`]->(app) WITH DISTINCT r, loc_start, app, o MATCH (o:`Offer`)-[:`FOR`]->(start_n:`ResumeNode`) WHERE id(start_n) IN $start_ids RETURN DISTINCT r, loc_start, app, o, start_n");
+				"MATCH (app:`Location` {uuid: $app_uuid})<-[:`PART_OF`*0..3]-(loc_start:`Location`), (loc_start)<-[:`IN`|`IN_ANALYTICS`]-(r:`Resume`) WITH DISTINCT r, loc_start, app MATCH (r)-[:`IN_COHORT_OF`]->(o:`Offer` {is_valid: true})-[:`IN`]->(app) WITH DISTINCT r, loc_start, app, o MATCH (o)-[:`FOR`]->(start_n:`ResumeNode`) WHERE id(start_n) IN $start_ids RETURN DISTINCT r, loc_start, app, o, start_n");
 	}
 
 	@Test
@@ -866,5 +866,65 @@ class IssueRelatedIT {
 		assertThat(cypher).isEqualTo(
 				"MATCH (n:`Node`) WITH DISTINCT n WITH DISTINCT n CALL my.procedure() YIELD x WITH DISTINCT n RETURN n"
 		);
+	}
+
+	@Test // GH-197
+	void symbolicNamesInNotConditionsMustNotBeResolvedWhenConditionIsARelationshipPatternV1() {
+
+		Node node = Cypher.node("Division").named("node");
+		Statement q = Cypher.match(node)
+			.withDistinct(node)
+			.where(Conditions
+				.not(Cypher.anyNode(node.getRequiredSymbolicName()).relationshipTo(Cypher.node("Department"), "IN")
+					.relationshipTo(Cypher.node("Department"), "INSIDE")
+					.properties("rel_property", Cypher.literalTrue())
+					.relationshipTo(Cypher.node("Employee"), "EMPLOYS")
+				)).returning(Cypher.asterisk()).build();
+
+		assertThat(Renderer.getRenderer(Configuration.newConfig().build()).render(q)).isEqualTo(
+			"MATCH (node:`Division`) WITH DISTINCT node WHERE NOT (node)-[:`IN`]->(:`Department`)-[:`INSIDE` {rel_property: true}]->(:`Department`)-[:`EMPLOYS`]->(:`Employee`) RETURN *");
+
+		assertThat(Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(q)).isEqualTo(
+			"MATCH (node:Division) WITH DISTINCT node WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {rel_property: true}]->(:Department)-[:EMPLOYS]->(:Employee) RETURN *");
+
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(q))
+			.isEqualTo(
+				"MATCH (node:Division)\n" +
+				"WITH DISTINCT node\n" +
+				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE  {\n" +
+				"  rel_property: true\n" +
+				"}]->(:Department)-[:EMPLOYS]->(:Employee)\n" +
+				"RETURN *"
+			);
+	}
+
+	@Test // GH-197
+	void symbolicNamesInNotConditionsMustNotBeResolvedWhenConditionIsARelationshipPatternV2() {
+
+		Node node = Cypher.node("Division").named("node");
+		Statement q = Cypher.match(node)
+			.withDistinct(node)
+			.where(Conditions
+				.not(node.relationshipTo(Cypher.node("Department"), "IN")
+					.relationshipTo(Cypher.node("Department"), "INSIDE")
+					.properties("rel_property", Cypher.literalTrue())
+					.relationshipTo(Cypher.node("Employee"), "EMPLOYS")
+				)).returning(Cypher.asterisk()).build();
+
+		assertThat(Renderer.getRenderer(Configuration.newConfig().build()).render(q)).isEqualTo(
+			"MATCH (node:`Division`) WITH DISTINCT node WHERE NOT (node)-[:`IN`]->(:`Department`)-[:`INSIDE` {rel_property: true}]->(:`Department`)-[:`EMPLOYS`]->(:`Employee`) RETURN *");
+
+		assertThat(Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(q)).isEqualTo(
+			"MATCH (node:Division) WITH DISTINCT node WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {rel_property: true}]->(:Department)-[:EMPLOYS]->(:Employee) RETURN *");
+
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(q))
+			.isEqualTo(
+				"MATCH (node:Division)\n" +
+				"WITH DISTINCT node\n" +
+				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE  {\n" +
+				"  rel_property: true\n" +
+				"}]->(:Department)-[:EMPLOYS]->(:Employee)\n" +
+				"RETURN *"
+			);
 	}
 }

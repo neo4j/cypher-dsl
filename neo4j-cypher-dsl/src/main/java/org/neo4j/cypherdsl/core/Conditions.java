@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -127,16 +128,15 @@ public final class Conditions {
 	}
 
 	/**
-	 * Negates the given pattern element: The pattern must not matched to be included in the reuslt.
+	 * Negates the given pattern element: The pattern must not matched to be included in the result.
 	 *
 	 * @param pattern The pattern to negate. Must not be null.
 	 * @return A condition that evaluates to true when the pattern does not match.
 	 */
 	@NotNull @Contract(pure = true)
-	public static Condition not(@NotNull PatternElement pattern) {
+	public static Condition not(@NotNull RelationshipPattern pattern) {
 
-		Assertions.notNull(pattern, "Pattern to negate must not be null.");
-		return new ExcludedPattern(pattern);
+		return RelationshipPatternCondition.not(pattern);
 	}
 
 	/**

@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
+import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.Delete;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
@@ -330,11 +332,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
-	void enter(RelationshipPatternCondition condition) {
-		inRelationshipCondition = true;
+	void enter(Condition condition) {
+		inRelationshipCondition = condition instanceof RelationshipPatternCondition;
 	}
 
-	void leave(RelationshipPatternCondition condition) {
+	void leave(Condition condition) {
 		inRelationshipCondition = false;
 	}
 
@@ -383,6 +385,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			}
 		});
 		visitedNamed.retainAll(retain);
+	}
+
+	private boolean hasBeenVisited(Collection<Named> visited, Named needle) {
+
+		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
+			.map(Named::getSymbolicName)
+			.anyMatch(s -> s.equals(needle.getSymbolicName()));
 	}
 
 	void enter(Delete delete) {
@@ -508,7 +517,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		// Otherwise all the labels would be rendered again.
 		if (!dequeOfVisitedNamed.isEmpty()) {
 			java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
-			skipNodeContent = visitedNamed.contains(node);
+			skipNodeContent = hasBeenVisited(visitedNamed, node);
 			visitedNamed.add(node);
 		}
 
@@ -555,7 +564,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
-		skipRelationshipContent = visitedNamed.contains(relationship);
+		skipRelationshipContent = hasBeenVisited(visitedNamed, relationship);
 		visitedNamed.add(relationship);
 	}
 

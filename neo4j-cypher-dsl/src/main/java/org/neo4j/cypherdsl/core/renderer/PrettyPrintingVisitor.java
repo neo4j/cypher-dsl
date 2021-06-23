@@ -36,10 +36,10 @@ import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
-import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 
 /**
  * @author Andreas Berger
@@ -153,18 +153,22 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		super.enter(map);
 	}
 
+	@Override
 	void enter(Condition condition) {
 
 		if (condition instanceof ProvidesAffixes) {
 			indentationLevel++;
 		}
+		super.enter(condition);
 	}
 
+	@Override
 	void leave(Condition condition) {
 
 		if (condition instanceof ProvidesAffixes) {
 			indentationLevel--;
 		}
+		super.leave(condition);
 	}
 
 	@Override

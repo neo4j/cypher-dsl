@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Condition;
+import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -35,13 +36,20 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = INTERNAL, since = "1.0")
 public final class RelationshipPatternCondition implements Condition {
 
-	private final RelationshipPattern pathPattern;
-
 	public static RelationshipPatternCondition of(RelationshipPattern pathPattern) {
-		return new RelationshipPatternCondition(pathPattern);
+		return new RelationshipPatternCondition(false, pathPattern);
 	}
 
-	private RelationshipPatternCondition(RelationshipPattern pathPattern) {
+	public static RelationshipPatternCondition not(RelationshipPattern pathPattern) {
+		return new RelationshipPatternCondition(true, pathPattern);
+	}
+
+	private final boolean not;
+
+	private final RelationshipPattern pathPattern;
+
+	private RelationshipPatternCondition(boolean not, RelationshipPattern pathPattern) {
+		this.not = not;
 		this.pathPattern = pathPattern;
 	}
 
@@ -49,6 +57,9 @@ public final class RelationshipPatternCondition implements Condition {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
+		if (not) {
+			Operator.NOT.accept(visitor);
+		}
 		pathPattern.accept(visitor);
 		visitor.leave(this);
 	}
