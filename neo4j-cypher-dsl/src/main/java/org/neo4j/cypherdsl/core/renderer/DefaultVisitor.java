@@ -69,7 +69,7 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
-import org.neo4j.cypherdsl.core.Statement.SingleQuery;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
@@ -359,7 +359,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		clearPreviouslyVisitedNamed(with);
 	}
 
-	void leave(SingleQuery statement) {
+	void leave(Statement statement) {
 
 		if (dequeOfVisitedNamed.isEmpty()) {
 			return;

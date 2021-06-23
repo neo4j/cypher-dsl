@@ -927,4 +927,16 @@ class IssueRelatedIT {
 				"RETURN *"
 			);
 	}
+
+	@Test // GH-197
+	void symbolicNamesMustBeClearedAfterUnion() {
+
+		Node actor = Cypher.node("Actor").named("n");
+		Node movie = Cypher.node("Movie").named("n");
+		Statement stmt = Cypher.unionAll(
+			Cypher.match(actor).returning(actor.property("name").as("name")).build(),
+			Cypher.match(movie).returning(movie.property("title").as("name")).build()
+		);
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Actor`) RETURN n.name AS name UNION ALL MATCH (n:`Movie`) RETURN n.title AS name");
+	}
 }
