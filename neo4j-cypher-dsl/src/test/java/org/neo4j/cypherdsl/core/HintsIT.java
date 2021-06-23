@@ -125,7 +125,7 @@ class HintsIT {
 				.withProperties("name", Cypher.literalOf("Foo"), "type", Cypher.literalOf("Bar"));
 
 			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(m)
-				.usingIndex(m.property("a", "name"))
+				.usingIndex(m.property("name"))
 				.returning(m)
 				.build())
 				.withMessage("Exactly one label is required to define the index.");
@@ -144,18 +144,24 @@ class HintsIT {
 				.withMessage("Cannot use a property without a reference to a container inside an index hint.");
 		}
 
+		@Neo4jVersion(minimum = "4.3")
 		@Test
-		void indexOnRelationshipPropertiesAreNotPossible() {
+		void indexesOnRelationshipsShouldWork() {
 
 			Node m = Cypher.node("Method").named("m")
 				.withProperties("name", Cypher.literalOf("Foo"), "type", Cypher.literalOf("Bar"));
 
-			Relationship r = m.relationshipTo(Cypher.node("Method"), "CALLS");
-			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(m)
+			Relationship r = m.relationshipTo(Cypher.node("Method"), "CALLS")
+				.named("r")
+				.withProperties("whatever", Cypher.literalTrue());
+
+			Statement statement = Cypher.match(r)
 				.usingIndex(r.property("whatever"))
 				.returning(m)
-				.build())
-				.withMessage("Index hints can only be applied to nodes.");
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (m:`Method` {name: 'Foo', type: 'Bar'})-[r:`CALLS` {whatever: true}]->(:`Method`) USING INDEX r:`CALLS`(whatever) RETURN m");
 		}
 
 		@Test

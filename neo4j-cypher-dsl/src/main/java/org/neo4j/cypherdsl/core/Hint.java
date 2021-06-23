@@ -30,6 +30,7 @@ import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -99,7 +100,15 @@ public final class Hint implements Visitable {
 		}
 	}
 
-	static Hint useIndexFor(boolean seek, Property... properties) {
+	/**
+	 * Creates an index hint. Mostly useful when building elements outside the fluent DSL.
+	 *
+	 * @param seek       Set to true to use the index for seeks only
+	 * @param properties The properties to use in the index, must know their container
+	 * @return A hint
+	 * @since 2021.2.3
+	 */
+	public static Hint useIndexFor(boolean seek, Property... properties) {
 
 		Assertions.notEmpty(properties, "Cannot use an index without properties!");
 
@@ -108,17 +117,23 @@ public final class Hint implements Visitable {
 		for (Property property : properties) {
 			Named container = property.getContainer();
 
-			Assertions
-				.notNull(container, "Cannot use a property without a reference to a container inside an index hint.");
-			Assertions.isTrue(container instanceof Node, "Index hints can only be applied to nodes.");
-
-			List<NodeLabel> labels = ((Node) container).getLabels();
-			Assertions.isTrue(labels.size() == 1, "Exactly one label is required to define the index.");
-
+			Assertions.notNull(container, "Cannot use a property without a reference to a container inside an index hint.");
 			Assertions.isTrue(property.getNames().size() == 1,
 				"One single property is required. Nested properties are not supported.");
 
-			NodeLabel label = labels.get(0);
+			NodeLabel label;
+			if (container instanceof Node) {
+				List<NodeLabel> labels = ((Node) container).getLabels();
+				Assertions.isTrue(labels.size() == 1, "Exactly one label is required to define the index.");
+				label = labels.get(0);
+			} else if (container instanceof Relationship) {
+				RelationshipTypes types = ((Relationship) container).getDetails().getTypes();
+				Assertions.isTrue(types.getValues().size() == 1, "Exactly one type is required to define the index.");
+				label = new NodeLabel(types.getValues().get(0));
+			} else {
+				throw new IllegalArgumentException("A property index can only be used for Nodes or Relationships.");
+			}
+
 			SymbolicName symbolicName = container.getRequiredSymbolicName();
 
 			if (indexReference == null) {
@@ -134,7 +149,14 @@ public final class Hint implements Visitable {
 			new IndexProperties(deferencedProperties));
 	}
 
-	static Hint useScanFor(Node node) {
+	/**
+	 * Creates an index scan hint. Mostly useful when building elements outside the fluent DSL.
+	 *
+	 * @param node The node who's label and name should be used to define the scan hint
+	 * @return A hint
+	 * @since 2021.2.3
+	 */
+	public static Hint useScanFor(Node node) {
 
 		Assertions.notNull(node, "Cannot apply a SCAN hint without a node.");
 		List<NodeLabel> labels = node.getLabels();
@@ -145,7 +167,14 @@ public final class Hint implements Visitable {
 			null);
 	}
 
-	static Hint useJoinOn(SymbolicName... name) {
+	/**
+	 * Creates a join hint on one or more symbolic names.
+	 *
+	 * @param name The names that are supposed to provide the join point
+	 * @return A hint
+	 * @since 2021.2.3
+	 */
+	public static Hint useJoinOn(SymbolicName... name) {
 
 		Assertions.notEmpty(name, "At least one name is required to define a JOIN hint.");
 		return new Hint(Type.JOIN_ON, Arrays.stream(name).map(IndexReference::new).collect(Collectors.toList()), null);
