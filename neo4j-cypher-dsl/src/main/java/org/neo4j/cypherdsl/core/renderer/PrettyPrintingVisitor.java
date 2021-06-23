@@ -18,7 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import org.neo4j.cypherdsl.core.Condition;
@@ -57,8 +56,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private int indentationLevel;
 	private boolean passedFirstReadingOrUpdatingClause;
 
-	PrettyPrintingVisitor(StatementContext statementContext, IndentStyle indentStyle, int indentSize) {
-		super(statementContext);
+	PrettyPrintingVisitor(StatementContext statementContext, boolean alwaysEscapeNames, IndentStyle indentStyle, int indentSize) {
+		super(statementContext, alwaysEscapeNames);
 
 		if (indentStyle == IndentStyle.TAB) {
 			indentionProvider = (builder, width) -> {
@@ -270,13 +269,5 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		} else {
 			renderParameter(parameter);
 		}
-	}
-
-	@Override
-	protected Optional<String> escapeName(CharSequence unescapedName) {
-		if (unescapedName == null) {
-			return Optional.empty();
-		}
-		return Optional.of(super.escapeIfNecessary(unescapedName.toString()));
 	}
 }

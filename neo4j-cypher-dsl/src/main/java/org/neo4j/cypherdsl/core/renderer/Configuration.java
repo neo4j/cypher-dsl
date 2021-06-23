@@ -37,7 +37,10 @@ import org.apiguardian.api.API;
 public final class Configuration {
 
 	private static final Configuration DEFAULT_CONFIG = newConfig().build();
-	private static final Configuration PRETTY_PRINTING = newConfig().withPrettyPrint(true).build();
+	private static final Configuration PRETTY_PRINTING = newConfig()
+		.withPrettyPrint(true)
+		.alwaysEscapeNames(false)
+		.build();
 
 	/**
 	 * Enum for the available indent styles.
@@ -64,7 +67,11 @@ public final class Configuration {
 	 */
 	private final int indentSize;
 
-	private final boolean renderLiteralParameters = false;
+	/**
+	 * A flag if all names (node labels and relationship types) should be escaped all the time. Defaults to {@literal true}.
+	 * When pretty printing, this defaults to {@literal false}.
+	 */
+	private final boolean alwaysEscapeNames;
 
 	/**
 	 * Cypher is not pretty printed by default. No indentation settings apply.
@@ -97,6 +104,7 @@ public final class Configuration {
 		private boolean prettyPrint = false;
 		private IndentStyle indentStyle = IndentStyle.SPACE;
 		private int indentSize = 2;
+		private boolean alwaysEscapeNames = true;
 
 		private Builder() {
 		}
@@ -107,6 +115,9 @@ public final class Configuration {
 
 		public Builder withPrettyPrint(boolean prettyPrint) {
 			this.prettyPrint = prettyPrint;
+			if (this.prettyPrint) {
+				return this.alwaysEscapeNames(false);
+			}
 			return this;
 		}
 
@@ -124,13 +135,19 @@ public final class Configuration {
 			return this;
 		}
 
+		public Builder alwaysEscapeNames(boolean alwaysEscapeNames) {
+			this.alwaysEscapeNames = alwaysEscapeNames;
+			return this;
+		}
+
 		public Configuration build() {
-			return new Configuration(prettyPrint, indentStyle, indentSize);
+			return new Configuration(prettyPrint, alwaysEscapeNames, indentStyle, indentSize);
 		}
 	}
 
-	private Configuration(boolean prettyPrint, IndentStyle indentStyle, int indentSize) {
+	private Configuration(boolean prettyPrint, boolean alwaysEscapeNames, IndentStyle indentStyle, int indentSize) {
 		this.prettyPrint = prettyPrint;
+		this.alwaysEscapeNames = alwaysEscapeNames;
 		this.indentStyle = indentStyle;
 		this.indentSize = indentSize;
 	}
@@ -147,8 +164,8 @@ public final class Configuration {
 		return indentSize;
 	}
 
-	public boolean isRenderLiteralParameters() {
-		return renderLiteralParameters;
+	public boolean isAlwaysEscapeNames() {
+		return alwaysEscapeNames;
 	}
 
 	@Override
@@ -160,12 +177,12 @@ public final class Configuration {
 			return false;
 		}
 		Configuration that = (Configuration) o;
-		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle && renderLiteralParameters == that.renderLiteralParameters;
+		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle && alwaysEscapeNames == that.alwaysEscapeNames;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(prettyPrint, indentStyle, indentSize, renderLiteralParameters);
+		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames);
 	}
 
 	@Override

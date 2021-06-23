@@ -95,9 +95,9 @@ class ConfigurableRenderer implements Renderer {
 	private RenderingVisitor createVisitor(StatementContext statementContext) {
 
 		if (!this.configuration.isPrettyPrint()) {
-			return new DefaultVisitor(statementContext);
+			return new DefaultVisitor(statementContext, this.configuration.isAlwaysEscapeNames());
 		} else {
-			return new PrettyPrintingVisitor(statementContext, this.configuration.getIndentStyle(), this.configuration.getIndentSize());
+			return new PrettyPrintingVisitor(statementContext, this.configuration.isAlwaysEscapeNames(), this.configuration.getIndentStyle(), this.configuration.getIndentSize());
 		}
 	}
 

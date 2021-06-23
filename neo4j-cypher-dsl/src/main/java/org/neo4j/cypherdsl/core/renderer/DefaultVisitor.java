@@ -181,9 +181,16 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private boolean skipSymbolicName = false;
 
+	private final boolean alwaysEscapeNames;
+
 	DefaultVisitor(StatementContext statementContext) {
+		this(statementContext, true);
+	}
+
+	DefaultVisitor(StatementContext statementContext, boolean alwaysEscapeNames) {
 		this.statementContext = statementContext;
 		this.dequeOfVisitedNamed.push(new HashSet<>());
+		this.alwaysEscapeNames = alwaysEscapeNames;
 	}
 
 	private void enableSeparator(int level, boolean on) {
@@ -838,17 +845,21 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 * @param unescapedName The name to escape.
 	 * @return An empty optional when the unescaped name is {@literal null}, otherwise the correctly escaped name, safe to be used in statements.
 	 */
-	protected Optional<String> escapeName(CharSequence unescapedName) {
+	protected final Optional<String> escapeName(String unescapedName) {
 
 		if (unescapedName == null) {
 			return Optional.empty();
 		}
 
-		Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(unescapedName);
-		return Optional.of(String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``")));
+		if (alwaysEscapeNames) {
+			Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(unescapedName);
+			return Optional.of(String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``")));
+		} else {
+			return Optional.of(escapeIfNecessary(unescapedName));
+		}
 	}
 
-	protected String escapeIfNecessary(String potentiallyNonIdentifier) {
+	protected final String escapeIfNecessary(String potentiallyNonIdentifier) {
 
 		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier) || potentiallyNonIdentifier.trim().isEmpty()) {
 			return potentiallyNonIdentifier;

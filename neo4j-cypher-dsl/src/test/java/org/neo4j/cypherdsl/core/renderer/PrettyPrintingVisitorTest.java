@@ -30,7 +30,8 @@ import org.junit.jupiter.params.provider.CsvSource;
  */
 class PrettyPrintingVisitorTest {
 
-	private final PrettyPrintingVisitor prettyPrintingVisitor = new PrettyPrintingVisitor(null, Configuration.IndentStyle.TAB, 4);
+	private final PrettyPrintingVisitor prettyPrintingVisitor = new PrettyPrintingVisitor(null,
+		false, Configuration.IndentStyle.TAB, 4);
 
 	@ParameterizedTest
 	@CsvSource({

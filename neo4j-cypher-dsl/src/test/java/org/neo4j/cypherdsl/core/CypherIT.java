@@ -4446,6 +4446,16 @@ class CypherIT {
 		}
 
 		@Test
+		void escapingNamesShouldBeOptionalInNonPrettyPrintToo() {
+
+			Renderer renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
+			assertThat(renderer.render(Cypher.match(Cypher.node("Fine").named("a")).returning("a").build()))
+				.isEqualTo("MATCH (a:Fine) RETURN a");
+			assertThat(renderer.render(Cypher.match(Cypher.node("Not Fine").named("a")).returning("a").build()))
+				.isEqualTo("MATCH (a:`Not Fine`) RETURN a");
+		}
+
+		@Test
 		void configurationOfIndentWithShouldWork() {
 
 			assertThat(Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentSize(5).build())
