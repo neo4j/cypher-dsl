@@ -1090,6 +1090,37 @@ assertThat(renderer.render(mergeStatement))
 </div>
 </div>
 <div class="sect4">
+<h5 id="escapingnames"><a class="anchor" href="#escapingnames"></a>Escaping names</h5>
+<div class="paragraph">
+<p>The default renderer in its default configuration will escape all names (labels and relationship types) by default.
+So <code>Movie</code> becomes <code>`Movie`</code> and <code>ACTED_IN</code> becomes <code>`ACTED_IN`</code>.
+If you don&#8217;t want this, you can either create a dedicated configuration for a renderer with that setting turned off or use
+the pretty printing renderer:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var relationship = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>)
+    .relationshipTo(Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>);
+
+var statement = Cypher.match(relationship).returning(relationship).build();
+
+var defaultRenderer = <span class="predefined-type">Renderer</span>.getDefaultRenderer();
+assertThat(defaultRenderer.render(statement))
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:`Person`)-[r:`ACTED_IN`]-&gt;(m:`Movie`) RETURN r</span><span class="delimiter">&quot;</span></span>);
+
+var escapeOnlyIfNecessary = <span class="predefined-type">Configuration</span>.newConfig().alwaysEscapeNames(<span class="predefined-constant">false</span>).build();
+
+var renderer = <span class="predefined-type">Renderer</span>.getRenderer(escapeOnlyIfNecessary);
+assertThat(renderer.render(statement))
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:Person)-[r:ACTED_IN]-&gt;(m:Movie) RETURN r</span><span class="delimiter">&quot;</span></span>);
+
+renderer = <span class="predefined-type">Renderer</span>.getRenderer(<span class="predefined-type">Configuration</span>.prettyPrinting());
+assertThat(renderer.render(statement))
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:Person)-[r:ACTED_IN]-&gt;(m:Movie)</span><span class="char">\n</span><span class="content">RETURN r</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
 <h5 id="insertingrawcypher"><a class="anchor" href="#insertingrawcypher"></a>Inserting raw Cypher</h5>
 <div class="paragraph">
 <p><code>Cypher.raw</code> allows for creating arbitrary expressions from raw String literals.
@@ -4507,7 +4538,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-23 13:57:56 UTC
+Last updated 2021-06-23 14:23:52 UTC
 </div>
 </div>
 </body>
