@@ -109,7 +109,7 @@ The processor supports the following arguments:
 | The number of whitespaces for the indent style `SPACE`
 
 | org.neo4j.cypherdsl.codegen.timestamp
-| An optional timestampe in ISO_OFFSET_DATE_TIME format for the generated classes. Defaults to the time of generation.
+| An optional timestamp in ISO_OFFSET_DATE_TIME format for the generated classes. Defaults to the time of generation.
 
 | org.neo4j.cypherdsl.codegen.add_at_generated
 | A flag whether `@Generated` should be added

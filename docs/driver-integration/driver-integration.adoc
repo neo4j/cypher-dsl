@@ -20,7 +20,7 @@ without reinventing the wheel.
 In most cases the Cypher-DSL will generate one of two types of statements:
 
 * `org.neo4j.cypherdsl.core.Statement`: A statement without a result. It can be executed, but it cannot be fetched.
-  You will be able to check for the number of affected database entities tia the driver's `ResultSummary`.
+  You will be able to check for the number of affected database entities via the driver's `ResultSummary`.
 * `org.neo4j.cypherdsl.core.ResultStatement`: A statement known to have a result. It can be executed or fetched.
 
 Both interfaces can be turned into _ExecutableStatements_, providing the appropriate methods, which will be discussed below.
@@ -232,7 +232,7 @@ Again, please note that the stream is only available in the closure. It is not m
 [[reactive-api]]
 == Reactive API
 
-For the reactive API the variants inside a transactional function are focussed here as they are probably the most complex
+For the reactive API the variants inside a transactional function are focused here as they are probably the most complex
 ones to get right: You have to deal with to resources: The session itself, and the inner publisher returned from the transactional
 function.
 

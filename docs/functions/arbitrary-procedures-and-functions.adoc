@@ -107,7 +107,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 
 === Summary
 
-Through `Cypher.call` any procedure or function can be called iin case one of your favorite procedures is missing in `org.neo4j.cypherdsl.core.Functions`.
+Through `Cypher.call` any procedure or function can be called in case one of your favorite procedures is missing in `org.neo4j.cypherdsl.core.Functions`.
 All clauses, including `YIELD` and `WHERE` on procedures are supported.
 All procedures can be turned into functions.
 The Cypher-DSL however does not check if the procedure that is used as a function is actually eligible to do so.
