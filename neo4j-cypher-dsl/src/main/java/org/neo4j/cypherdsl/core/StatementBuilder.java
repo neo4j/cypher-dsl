@@ -62,9 +62,19 @@ public interface StatementBuilder
 	/**
 	 * Starts a with clause by passing named expressions to it.
 	 *
-	 * @param elements The expressions to start the query with
+	 * @param expressions The expressions to start the query with
 	 * @return An ongoing read, exposing return and further matches.
 	 * @since 2020.1.2
+	 */
+	@NotNull @CheckReturnValue
+	OrderableOngoingReadingAndWithWithoutWhere with(Named... expressions);
+
+	/**
+	 * Starts a with clause by passing named expressions to it.
+	 *
+	 * @param elements The expressions to start the query with
+	 * @return An ongoing read, exposing return and further matches.
+	 * @since 2020.2.2
 	 */
 	@NotNull @CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements);
@@ -411,6 +421,16 @@ public interface StatementBuilder
 		}
 
 		/**
+		 * @param variables The variables to pass on to the next part
+		 * @return A match that can be build now
+		 * @see #with(Expression...)
+		 */
+		@NotNull @CheckReturnValue
+		default OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
+			return with(Expressions.createSymbolicNames(variables));
+		}
+
+		/**
 		 * @param elements The variables to pass on to the next part
 		 * @return A match that can be build now
 		 * @see #with(Expression...)
@@ -468,6 +488,16 @@ public interface StatementBuilder
 		@NotNull @CheckReturnValue
 		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(SymbolicName... variables) {
 			return withDistinct((Expression[]) variables);
+		}
+
+		/**
+		 * @param variables The variables to pass on to the next part
+		 * @return A match that can be build now
+		 * @see #withDistinct(Expression...)
+		 */
+		@NotNull @CheckReturnValue
+		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(Named... variables) {
+			return withDistinct(Expressions.createSymbolicNames(variables));
 		}
 
 		/**
