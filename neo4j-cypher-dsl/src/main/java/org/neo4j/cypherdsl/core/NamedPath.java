@@ -92,6 +92,15 @@ public final class NamedPath implements PatternElement, Named {
 		NamedPath definedBy(RelationshipPattern pattern);
 
 		/**
+		 * Create a new named path based on a single node.
+		 *
+		 * @param node The node to be used in named path.
+		 * @return A named path.
+		 */
+		@NotNull @Contract(pure = true)
+		NamedPath definedBy(Node node);
+
+		/**
 		 * Create a new named path that references a given, symbolic name. No checks are done if the referenced name
 		 * actually points to a path.
 		 *
@@ -130,6 +139,11 @@ public final class NamedPath implements PatternElement, Named {
 		}
 
 		@Override
+		public @NotNull NamedPath definedBy(Node node) {
+			return new NamedPath(name, node);
+		}
+
+		@Override
 		public NamedPath get() {
 			return new NamedPath(name);
 		}
@@ -159,6 +173,11 @@ public final class NamedPath implements PatternElement, Named {
 	private NamedPath(SymbolicName name, RelationshipPattern optionalPattern) {
 		this.name = name;
 		this.optionalPattern = optionalPattern;
+	}
+
+	private NamedPath(SymbolicName name, Node node) {
+		this.name = name;
+		this.optionalPattern = node;
 	}
 
 	private NamedPath(SymbolicName name, FunctionInvocation algorithm) {
