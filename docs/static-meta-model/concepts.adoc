@@ -60,7 +60,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 <.> This constructor is optional, it is used in the next two steps
 <.> `named` must be overridden and must return new copies of the node, with the changed symbolic name.
     It must be overridden to guarantee type integrity.
-<.> Same as obove
+<.> Same as above
 
 With that in place, you can already use it like this:
 

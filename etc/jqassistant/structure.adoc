@@ -3,7 +3,7 @@
 
 ==== Neo4j-Cypher-DSL Core
 
-The core of the Cypher-DSL is consist of a set of classese that loosely reassemble the https://www.opencypher.org[openCypher spec],
+The core of the Cypher-DSL is consist of a set of classes that loosely reassemble the https://www.opencypher.org[openCypher spec],
 especially in the https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Cypher.html[railroad diagrams].
 
 The main package of the core module is `org.neo4j.cypherdsl.core` which also reflects in the JDK module name: `org.neo4j.cypherdsl.core`.
