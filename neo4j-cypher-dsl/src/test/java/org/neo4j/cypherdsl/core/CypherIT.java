@@ -4192,7 +4192,7 @@ class CypherIT {
 		@Test // GH-200
 		void shouldThrowExceptionIfIncompleteNamedPathProvided() {
 			NamedPath p = Cypher.path("p").definedBy(null);
-			assertThatThrownBy(()-> Cypher.path("x").definedBy(p))
+			assertThatThrownBy(() -> Cypher.path("x").definedBy(p))
 				.hasMessageContaining("Cannot use the provided NamedPath because the pattern is null.");
 		}
 	}
