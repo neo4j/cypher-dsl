@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -4163,11 +4164,36 @@ class CypherIT {
 		}
 
 		@Test // GH-200
+		void shouldWorkWithRelationshipPatterns() {
+			RelationshipPattern relationshipPattern = Cypher.anyNode("n").relationshipTo(Cypher.anyNode("m"));
+			NamedPath p = Cypher.path("p").definedBy(relationshipPattern);
+			Statement statement = Cypher.match(p).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n)-->(m) RETURN p");
+		}
+
+		@Test // GH-200
 		void shouldWorkWithNodes() {
 			NamedPath p = Cypher.path("p").definedBy(Cypher.anyNode("n"));
 			Statement statement = Cypher.match(p).returning(p).build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n) RETURN p");
+		}
+
+		@Test // GH-200
+		void shouldWorkWithNamedPaths() {
+			NamedPath p = Cypher.path("p").definedBy(Cypher.anyNode("n"));
+			NamedPath x = Cypher.path("x").definedBy(p);
+			Statement statement = Cypher.match(x).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n) RETURN p");
+		}
+
+		@Test // GH-200
+		void shouldThrowExceptionIfIncompleteNamedPathProvided() {
+			NamedPath p = Cypher.path("p").definedBy(null);
+			assertThatThrownBy(()-> Cypher.path("x").definedBy(p))
+				.hasMessageContaining("Cannot use the provided NamedPath because the pattern is null.");
 		}
 	}
 
