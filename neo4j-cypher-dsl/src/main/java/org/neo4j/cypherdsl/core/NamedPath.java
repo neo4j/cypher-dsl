@@ -83,13 +83,14 @@ public final class NamedPath implements PatternElement, Named {
 	public interface OngoingDefinitionWithName {
 
 		/**
-		 * Create a new named path based on a relationship pattern.
+		 * Create a new named path based on a {@link PatternElement} single node.
+		 * If a {@link NamedPath} will be provided, it will get used directly.
 		 *
-		 * @param pattern The pattern to be used as named path.
+		 * @param patternElement The PatternElement to be used in named path.
 		 * @return A named path.
 		 */
 		@NotNull @Contract(pure = true)
-		NamedPath definedBy(RelationshipPattern pattern);
+		NamedPath definedBy(PatternElement patternElement);
 
 		/**
 		 * Create a new named path that references a given, symbolic name. No checks are done if the referenced name
@@ -125,7 +126,10 @@ public final class NamedPath implements PatternElement, Named {
 		}
 
 		@Override
-		public NamedPath definedBy(RelationshipPattern pattern) {
+		public NamedPath definedBy(PatternElement pattern) {
+			if (pattern instanceof NamedPath) {
+				return (NamedPath) pattern;
+			}
 			return new NamedPath(name, pattern);
 		}
 
@@ -156,7 +160,7 @@ public final class NamedPath implements PatternElement, Named {
 		this.optionalPattern = null;
 	}
 
-	private NamedPath(SymbolicName name, RelationshipPattern optionalPattern) {
+	private NamedPath(SymbolicName name, PatternElement optionalPattern) {
 		this.name = name;
 		this.optionalPattern = optionalPattern;
 	}

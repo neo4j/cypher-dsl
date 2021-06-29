@@ -4161,6 +4161,33 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN [p = (n)-[:`LIKES`|`OWNS`*]->() | p]");
 		}
+
+		@Test // GH-200
+		void shouldWorkWithRelationshipPatterns() {
+			RelationshipPattern relationshipPattern = Cypher.anyNode("n").relationshipTo(Cypher.anyNode("m"));
+			NamedPath p = Cypher.path("p").definedBy(relationshipPattern);
+			Statement statement = Cypher.match(p).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n)-->(m) RETURN p");
+		}
+
+		@Test // GH-200
+		void shouldWorkWithNodes() {
+			NamedPath p = Cypher.path("p").definedBy(Cypher.anyNode("n"));
+			Statement statement = Cypher.match(p).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n) RETURN p");
+		}
+
+		@Test // GH-200
+		void shouldDirectlyUseProvidedNamedPaths() {
+			NamedPath p = Cypher.path("p").definedBy(Cypher.anyNode("n"));
+			NamedPath x = Cypher.path("x").definedBy(p);
+			Statement statement = Cypher.match(x).returning(p).build();
+
+			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n) RETURN p");
+		}
+
 	}
 
 	@Nested
