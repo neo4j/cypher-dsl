@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -4181,7 +4180,7 @@ class CypherIT {
 		}
 
 		@Test // GH-200
-		void shouldWorkWithNamedPaths() {
+		void shouldDirectlyUseProvidedNamedPaths() {
 			NamedPath p = Cypher.path("p").definedBy(Cypher.anyNode("n"));
 			NamedPath x = Cypher.path("x").definedBy(p);
 			Statement statement = Cypher.match(x).returning(p).build();
@@ -4189,12 +4188,6 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH p = (n) RETURN p");
 		}
 
-		@Test // GH-200
-		void shouldThrowExceptionIfIncompleteNamedPathProvided() {
-			NamedPath p = Cypher.path("p").definedBy(null);
-			assertThatThrownBy(() -> Cypher.path("x").definedBy(p))
-				.hasMessageContaining("Cannot use the provided NamedPath because the pattern is null.");
-		}
 	}
 
 	@Nested

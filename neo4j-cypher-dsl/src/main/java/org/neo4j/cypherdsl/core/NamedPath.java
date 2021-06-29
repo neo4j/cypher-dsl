@@ -84,6 +84,7 @@ public final class NamedPath implements PatternElement, Named {
 
 		/**
 		 * Create a new named path based on a {@link PatternElement} single node.
+		 * If a {@link NamedPath} will be provided, it will get used directly.
 		 *
 		 * @param patternElement The PatternElement to be used in named path.
 		 * @return A named path.
@@ -126,17 +127,10 @@ public final class NamedPath implements PatternElement, Named {
 
 		@Override
 		public NamedPath definedBy(PatternElement pattern) {
-			PatternElement newOptionalNewPattern = pattern;
-			SymbolicName newName = name;
 			if (pattern instanceof NamedPath) {
-				if (((NamedPath) pattern).optionalPattern != null) {
-					newOptionalNewPattern = (PatternElement) ((NamedPath) pattern).optionalPattern;
-					newName = ((NamedPath) pattern).name;
-				} else {
-					throw new IllegalArgumentException("Cannot use the provided NamedPath because the pattern is null.");
-				}
+				return (NamedPath) pattern;
 			}
-			return new NamedPath(newName, newOptionalNewPattern);
+			return new NamedPath(name, pattern);
 		}
 
 		@Override
