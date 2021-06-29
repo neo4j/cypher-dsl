@@ -154,7 +154,7 @@
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven.version>3.6.3</maven.version>
 		<mockito.version>3.9.0</mockito.version>
-		<neo4j-java-driver.version>4.2.5</neo4j-java-driver.version>
+		<neo4j-java-driver.version>4.2.7</neo4j-java-driver.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>4.4.0</querydsl.version>
@@ -162,7 +162,7 @@
 		<sha1></sha1>
 		<slf4j.version>1.7.26</slf4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
-		<spring-data-neo4j.version>6.1.1</spring-data-neo4j.version>
+		<spring-data-neo4j.version>6.1.2</spring-data-neo4j.version>
 	</properties>
 
 	<dependencyManagement>
