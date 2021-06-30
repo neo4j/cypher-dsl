@@ -1,0 +1,21 @@
+^\Q/*\E$
+^\Q * Copyright (c) "Neo4j"\E$
+^\Q * Neo4j Sweden AB [http://neo4j.com]\E$
+^\Q *\E$
+^\Q * This file is part of Neo4j.\E$
+^\Q *\E$
+^\Q * Neo4j is free software: you can redistribute it and/or modify\E$
+^\Q * it under the terms of the GNU General Public License as published by\E$
+^\Q * the Free Software Foundation, either version 3 of the License, or\E$
+^\Q * (at your option) any later version.\E$
+^\Q *\E$
+^\Q * This program is distributed in the hope that it will be useful,\E$
+^\Q * but WITHOUT ANY WARRANTY; without even the implied warranty of\E$
+^\Q * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\E$
+^\Q * GNU General Public License for more details.\E$
+^\Q *\E$
+^\Q * You should have received a copy of the GNU General Public License\E$
+^\Q * along with this program.  If not, see <http://www.gnu.org/licenses/>.\E$
+^\Q */\E$
+^\Qpackage\E .+;$
+^.*$

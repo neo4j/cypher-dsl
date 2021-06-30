@@ -104,4 +104,4 @@ jobs:
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
-          -pl org.neo4j:neo4j-cypher-dsl-examples,org.neo4j:neo4j-cypher-dsl-examples-core,org.neo4j:neo4j-cypher-dsl-examples-sdn6
+          -pl org.neo4j:neo4j-cypher-dsl-examples,org.neo4j:neo4j-cypher-dsl-examples-core,org.neo4j:neo4j-cypher-dsl-examples-parser,org.neo4j:neo4j-cypher-dsl-examples-sdn6

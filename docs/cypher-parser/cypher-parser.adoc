@@ -1,0 +1,210 @@
+== Introduction
+
+The `cypher-dsl-parser` module ins an optional add-on to the Cypher-DSL that takes your existing Cypher - either whole statements
+or fragments like clauses or expressions - and turn them into Cypher-DSL statements or expressions.
+Those fragments can be used to add custom Cypher to your generated statements without resorting to raw String literals.
+It allows sanitizing user input, add additional filters for labels and types to rewrite queries and more.
+
+The parser itself is based on Neo4j's official Cypher-Parser, thus supporting the same constructs as Neo4j itself.
+However, while we could theoretically parse all expressions that Neo4j {neo4j-version} supports, we might cannot translate all of them
+into elements of the Cypher-DSL. In such cases an `UnsupportedOperationException` will be thrown.
+
+NOTE: The current version of the Cypher-DSL-Parser modules is rather big. This is due to the fact that we must shade the
+      Scala-Lang library. Neo4j's parsers depends on it. This is likely to change in the future. Until then, we rather not
+      try to shade only the few required classes and risk a `ClassNotFoundException`, but include the whole library.
+      +
+      The decision for shading has been made for compatibility reasons: People may have a different Scala version in place
+      or might even use this library embedded. So it's safer to shade what we support and not depend on it.
+
+== Getting started
+
+=== Add additional dependencies
+
+==== Maven
+
+[source,xml,subs="verbatim,attributes"]
+.Cypher-DSL parser added via Maven
+----
+<dependency>
+    <groupId>{groupId}</groupId>
+    <artifactId>neo4j-cypher-dsl-parser</artifactId>
+    <version>{neo4j-cypher-dsl.version}</version>
+</dependency>
+----
+
+==== Gradle
+
+[source,groovy,subs="verbatim,attributes"]
+.Gradle variant for additional dependencies
+----
+dependencies {
+    implementation '{groupId}:neo4j-cypher-dsl-parser:{neo4j-cypher-dsl.version}'
+}
+----
+
+=== Minimum JDK version
+
+The Cypher-Parser requires JDK 11 to run which is the same version that Neo4j {neo4j-version} requires.
+
+=== Main entry point
+
+The main entry point to parsing Cypher strings into Cypher-DSL objects is
+
+[[main-entry-pint]]
+.Cypher Parser
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/CypherDSLParserExamplesTest.java[tag=main-entry-point]
+----
+
+It provides a list of static methods:
+
+[cols=2*,options=header]
+|===
+|Method
+|What it does
+
+|`parseNode`
+|Parses a pattern like `(n:Node {withOrWithout: 'properties'})` into a `Node`
+
+|`parseRelationship`
+|Parses a pattern like `(m)-[{a: 'b', c: 'd'}]->(n)` into a `RelationshipPattern`.
+ The pattern might be a `Relationship` or `RelationshipChain`.
+
+|`parseExpression`
+|Parses an arbitrary expression.
+
+|`parseClause`
+|Parses a full clause like `MATCH (m:Movie)` or `DELETE n` etc. These clauses might be modified via
+ callbacks and then passed on into `org.neo4j.cypherdsl.core.Statement.of`. This will take them
+ in order and create a whole statement out of it. It is your responsibility to make sure those clauses are
+ meaningful in the given order.
+
+|`parseStatement`
+|Parses a whole statement. The result can be rendered or used in a union or subquery call.
+
+|`parses`
+|An alias for `parseStatement`.
+
+|===
+
+The `README` for the parser module itself contains not only our whole TCK for the parser,
+but also several examples of calling it. Have a look here: https://github.com/neo4j-contrib/cypher-dsl/blob/main/neo4j-cypher-dsl-parser/README.adoc[neo4j-cypher-dsl-parser/README.adoc].
+
+All the methods mention above provide an overload taking in an additional `org.neo4j.cypherdsl.parser.Option` instance
+allowing to interact with the parser. Please have a look at the JavaAPI for information about the options class.
+The following examples show some ways of using it.
+Most of the configurable options represent ways to provide filters for labels or types or are callbacks when certain expressions are created.
+
+== Examples
+
+=== Parsing user input and call in a subquery
+
+This is helpful when you create an outer query that maybe enriched by a user.
+Here we assume the user does the right thing and don't modify the query any further:
+
+[[example-using-input]]
+.Just using the user supplied input
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/CypherDSLParserExamplesTest.java[tag=example-using-input]
+----
+<.> A valid standalone query that is also a valid subquery
+<.> Just parse it into a `Statement` object
+<.> Use the Cypher-DSL as explained throughout the docs
+<.> Use the overload of `call` that takes a `Statement` and a collection of expression that should be imported into the subquery
+<.> Notice how to `WITH` clauses are generated: The first one is the importing one, the second one the aliasing one
+<.> This is the original query
+
+=== Ensure an alias for the return clause
+
+We are going to work with the same test as in <<example-using-input>>, so this is not repeated.
+Here we  make sure the query supplied by the user returns something with a required alias.
+
+[[example-required-alias]]
+.Using a callback to make sure that a query has an alias
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/CypherDSLParserExamplesTest.java[tag=example-required-alias]
+----
+<.> This is a `Function` that receives an expressions and returns a new one. It
+    checks if the provided expressions obeys to some criteria: Here being something that is aliased or not
+<.> We start building new options
+<.> The callback from step one is passed as callback to the event `ON_RETURN_ITEM` and will be called for every item
+<.> The final option instance will be applied to the parser. The statement will render to the same result as <<example-using-input,the first example>>.
+
+== Preventing certain things
+
+Callbacks can of course be used to prevent things.
+Any exception thrown will halt the parsing.
+<<example-preventing-things>> shows how:
+
+[[example-preventing-things]]
+.Preventing input that deletes properties
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/CypherDSLParserExamplesTest.java[tag=example-preventing-things]
+----
+<.> Create a callback that just throws an unchecked exception
+<.> Configure it for the event that should be prevented
+<.> Parsing will not be possible
+
+=== Shape the return clause the way you want
+
+The parser provides `ReturnDefinition` as value object. It contains information to be passed to the `Clauses` factory to shape
+a `RETURN` clause the way you need:
+
+[[example-example-shape-the-return-clause]]
+.Shaping the return clause
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/CypherDSLParserExamplesTest.java[tag=example-shape-the-return-clause]
+----
+<.> Create a factory method that takes in a definition and uses its information to build the `RETURN`.
+    Or examples filters the attributes being returned and enforces an alias.
+    It also adds some arbitrary sorting and keeps sort and limit values from the original
+<.> It than is parsed to the options
+<.> The statement has the new `RETURN` clause.
+
+=== Enforcing labels
+
+The parser can enforce labels to be present or absent with filters. This can be individually achieved when parsing node patterns,
+setting or removing labels with a `BiFunction` like the following:
+
+[[a-label-enforcing-functions]]
+.Shaping the return clause
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-parser/src/test/java/org/neo4j/cypherdsl/parser/RewriteTest.java[tag=enforcing-labels-function]
+----
+<.> Decide on the event type what is supposed to happen
+
+Putting this function in action involves the `Options` class again:
+
+[[enforcing-on-parse]]
+.Enforcing a label is always set on the pattern
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-parser/src/test/java/org/neo4j/cypherdsl/parser/RewriteTest.java[tag=enforcing-on-parse]
+----
+
+This can safely be used to match only nodes spotting such a label for example.
+
+[[enforcing-on-set]]
+.Enforcing that a new collection of labels always contains a specific
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-parser/src/test/java/org/neo4j/cypherdsl/parser/RewriteTest.java[tag=enforcing-on-set]
+----
+
+Of course, we can prevent a label to be removed:
+
+[[enforcing-on-remove]]
+.Preventing a specific label to be removed
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-parser/src/test/java/org/neo4j/cypherdsl/parser/RewriteTest.java[tag=enforcing-on-remove]
+----
+
+Changing relationship types via a filter is possible as well, but as relationships might only have one type, the number of
+usecases is smaller.

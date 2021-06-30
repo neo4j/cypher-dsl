@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
@@ -51,6 +52,12 @@ public final class RelationshipPatternCondition implements Condition {
 	private RelationshipPatternCondition(boolean not, RelationshipPattern pathPattern) {
 		this.not = not;
 		this.pathPattern = pathPattern;
+	}
+
+	@Override
+	@NotNull
+	public Condition not() {
+		return new RelationshipPatternCondition(!this.not, this.pathPattern);
 	}
 
 	@Override

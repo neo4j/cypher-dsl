@@ -39,6 +39,7 @@ import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.Delete;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
+import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
@@ -795,6 +796,18 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void leave(Subquery subquery) {
 
 		builder.append("} ");
+		dequeOfVisitedNamed.pop();
+	}
+
+	void enter(Foreach foreach) {
+
+		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
+		builder.append("FOREACH (");
+	}
+
+	void leave(Foreach subquery) {
+
+		builder.setCharAt(builder.length() - 1, ')');
 		dequeOfVisitedNamed.pop();
 	}
 

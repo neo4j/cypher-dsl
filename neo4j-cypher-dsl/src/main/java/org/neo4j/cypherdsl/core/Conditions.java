@@ -234,6 +234,15 @@ public final class Conditions {
 	}
 
 	/**
+	 * @return A condition that checks whether a node has a set of given labels or a relationship a set of given types.
+	 * @since 2021.3.0
+	 */
+	public static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
+
+		return HasLabelCondition.create(symbolicName, labelsOrTypes);
+	}
+
+	/**
 	 * Not to be instantiated.
 	 */
 	private Conditions() {

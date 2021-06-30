@@ -49,5 +49,44 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingWithoutWhere call(Statement statement);
+	default StatementBuilder.OngoingReadingWithoutWhere call(Statement statement) {
+		return call(statement, new IdentifiableElement[0]);
+	}
+
+	/**
+	 * The {@link Statement subquery} parameter must be a valid subquery.
+	 * <ul>
+	 * <li>must end with a RETURN clause</li>
+	 * <li>cannot refer to variables from the enclosing query</li>
+	 * <li>cannot return variables with the same names as variables in the enclosing query</li>
+	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
+	 * </ul>
+	 *
+	 * @param statement The statement representing the subquery.
+	 * @param imports   Additional things that should be imported into the subquery.
+	 * @return An ongoing reading
+	 * @since 2021.3.0
+	 */
+	@NotNull @CheckReturnValue
+	default StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, String... imports) {
+		return call(statement, (IdentifiableElement[]) Expressions.createSymbolicNames(imports));
+	}
+
+	/**
+	 * The {@link Statement subquery} parameter must be a valid subquery.
+	 * <ul>
+	 * <li>must end with a RETURN clause</li>
+	 * <li>cannot refer to variables from the enclosing query</li>
+	 * <li>cannot return variables with the same names as variables in the enclosing query</li>
+	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
+	 * </ul>
+	 *
+	 * @param statement The statement representing the subquery.
+	 * @param imports   Additional things that should be imported into the subquery. {@link AliasedExpression aliased expressions}
+	 *                  will automatically imported twice (once as WITH a, then WITH a AS alias).
+	 * @return An ongoing reading
+	 * @since 2021.3.0
+	 */
+	@NotNull @CheckReturnValue
+	StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports);
 }

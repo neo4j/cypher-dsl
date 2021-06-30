@@ -94,3 +94,8 @@ The reason for staying on JDK 8 is the fact that the Cypher-DSL is widely used i
 Spring Data Neo4j shares JDK 8 as baseline with the Spring Framework until Spring Framework 6 is released.
 
 The minimal required JDK version to build the Cypher-DSL is *JDK 11*. To build the native examples, GraalVM 11 is required.
+
+== Licensing
+
+The Cypher-DSL itself is licenced under the https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0],
+the parser module is licensed under https://www.gnu.org/licenses/gpl-3.0.html[the GNU General Public License 3].

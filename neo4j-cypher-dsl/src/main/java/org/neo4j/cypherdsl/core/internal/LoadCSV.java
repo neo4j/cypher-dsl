@@ -28,7 +28,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.Clause;
 
 /**
  * A representation of the {@code LOAD CSV} clause, including it's periodic commit and field terminator configuration.
@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @since 2021.2.1
  */
 @API(status = INTERNAL, since = "2021.2.1")
-public final class LoadCSV implements Visitable {
+public final class LoadCSV implements Clause {
 
 	private final URI uri;
 

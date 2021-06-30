@@ -101,6 +101,7 @@
 	<modules>
 		<module>neo4j-cypher-dsl</module>
 		<module>neo4j-cypher-dsl-codegen</module>
+		<module>neo4j-cypher-dsl-parser</module>
 		<module>neo4j-cypher-dsl-native-tests</module>
 		<module>neo4j-cypher-dsl-examples</module>
 	</modules>
@@ -116,6 +117,7 @@
 		<apiguardian.version>1.1.1</apiguardian.version>
 		<asciidoctor-maven-plugin.version>1.6.0</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.0.1</asciidoctorj-diagram.version>
+		<asciidoctorj.version>2.4.2</asciidoctorj.version>
 		<assertj.version>3.15.0</assertj.version>
 		<awaitility.version>4.1.0</awaitility.version>
 		<cglib.version>3.3.0</cglib.version>
@@ -127,7 +129,7 @@
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<flatten-maven-plugin.version>1.2.1</flatten-maven-plugin.version>
 		<guava.version>30.0-jre</guava.version>
-		<jacoco-maven-plugin.version>0.8.6</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
 		<java-module-name></java-module-name>
 		<java.version>8</java.version>
 		<javapoet.version>1.13.0</javapoet.version>
@@ -148,61 +150,35 @@
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.2.0</maven-javadoc-plugin.version>
 		<maven-pmd-plugin.version>3.11.0</maven-pmd-plugin.version>
+		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-scm-plugin.version>1.11.2</maven-scm-plugin.version>
+		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
 		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<maven.version>3.6.3</maven.version>
+		<maven.version>3.8.1</maven.version>
 		<mockito.version>3.9.0</mockito.version>
+		<moditect-maven-plugin.version>1.0.0.RC1</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>4.2.7</neo4j-java-driver.version>
+		<neo4j.version>4.3.2</neo4j.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>4.4.0</querydsl.version>
+		<reactor.version>2020.0.6</reactor.version>
 		<revision>9999</revision>
 		<sha1></sha1>
 		<slf4j.version>1.7.26</slf4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.1.2</spring-data-neo4j.version>
-		<reactor.version>2020.0.6</reactor.version>
 	</properties>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>cglib</groupId>
-				<artifactId>cglib</artifactId>
-				<version>${cglib.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
 				<!-- Only added to avoid dependency convergence errors -->
 				<groupId>com.google.code.findbugs</groupId>
 				<artifactId>jsr305</artifactId>
 				<version>${jsr305.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>com.google.errorprone</groupId>
-				<artifactId>error_prone_annotations</artifactId>
-				<version>${error_prone_annotations.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.guava</groupId>
-				<artifactId>guava</artifactId>
-				<version>${guava.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>com.google.testing.compile</groupId>
-				<artifactId>compile-testing</artifactId>
-				<version>${compile-testing.version}</version>
-				<scope>test</scope>
-				<exclusions>
-					<exclusion>
-						<artifactId>junit</artifactId>
-						<groupId>junit</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.querydsl</groupId>
@@ -215,24 +191,9 @@
 				<version>${javapoet.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>io.projectreactor</groupId>
-				<artifactId>reactor-bom</artifactId>
-				<version>${reactor.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.apiguardian</groupId>
-				<artifactId>apiguardian-api</artifactId>
-				<version>${apiguardian.version}</version>
-				<scope>provided</scope>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.assertj</groupId>
-				<artifactId>assertj-core</artifactId>
-				<version>${assertj.version}</version>
-				<scope>test</scope>
+				<groupId>org.asciidoctor</groupId>
+				<artifactId>asciidoctorj</artifactId>
+				<version>${asciidoctorj.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.awaitility</groupId>
@@ -240,36 +201,15 @@
 				<version>${awaitility.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.checkerframework</groupId>
-				<artifactId>checker-qual</artifactId>
-				<version>${checker-qual.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jetbrains</groupId>
-				<artifactId>annotations</artifactId>
-				<version>${jetbrains-annotations.version}</version>
-				<scope>provided</scope>
-				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>org.junit</groupId>
-				<artifactId>junit-bom</artifactId>
-				<version>${junit-jupiter.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-core</artifactId>
-				<version>${mockito.version}</version>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.mockito</groupId>
-				<artifactId>mockito-junit-jupiter</artifactId>
-				<version>${mockito.version}</version>
-				<scope>test</scope>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-javacc-parser</artifactId>
+				<version>${neo4j.version}</version>
+				<exclusions>
+					<exclusion>
+						<artifactId>scala-reflect</artifactId>
+						<groupId>org.scala-lang</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.neo4j.driver</groupId>
@@ -309,6 +249,88 @@
 					</exclusion>
 				</exclusions>
 			</dependency>
+			<dependency>
+				<groupId>org.apiguardian</groupId>
+				<artifactId>apiguardian-api</artifactId>
+				<version>${apiguardian.version}</version>
+				<scope>provided</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>org.jetbrains</groupId>
+				<artifactId>annotations</artifactId>
+				<version>${jetbrains-annotations.version}</version>
+				<scope>provided</scope>
+				<optional>true</optional>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-bom</artifactId>
+				<version>${reactor.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>${junit-jupiter.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>cglib</groupId>
+				<artifactId>cglib</artifactId>
+				<version>${cglib.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.errorprone</groupId>
+				<artifactId>error_prone_annotations</artifactId>
+				<version>${error_prone_annotations.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>${guava.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.testing.compile</groupId>
+				<artifactId>compile-testing</artifactId>
+				<version>${compile-testing.version}</version>
+				<scope>test</scope>
+				<exclusions>
+					<exclusion>
+						<artifactId>junit</artifactId>
+						<groupId>junit</groupId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.assertj</groupId>
+				<artifactId>assertj-core</artifactId>
+				<version>${assertj.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.checkerframework</groupId>
+				<artifactId>checker-qual</artifactId>
+				<version>${checker-qual.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-junit-jupiter</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -316,9 +338,19 @@
 		<pluginManagement>
 			<plugins>
 				<plugin>
+					<groupId>org.moditect</groupId>
+					<artifactId>moditect-maven-plugin</artifactId>
+					<version>${moditect-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-shade-plugin</artifactId>
+					<version>${maven-shade-plugin.version}</version>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -373,8 +405,11 @@
 					<version>${maven-javadoc-plugin.version}</version>
 					<configuration>
 						<detectOfflineLinks>false</detectOfflineLinks>
-						<detectJavaApiLink>false</detectJavaApiLink>
-						<source>${java.version}</source>
+						<detectJavaApiLink>true</detectJavaApiLink>
+						<release>8</release>
+						<additionalOptions>
+							<additionalOption>--release ${java.version}</additionalOption>
+						</additionalOptions>
 						<tags>
 							<tag>
 								<name>soundtrack</name>
@@ -422,6 +457,11 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-resources-plugin</artifactId>
+					<version>${maven-resources-plugin.version}</version>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>${maven-site-plugin.version}</version>
 				</plugin>
@@ -434,7 +474,7 @@
 						<keepBlankLines>true</keepBlankLines>
 						<nrOfIndentSpace>-1</nrOfIndentSpace>
 						<sortProperties>true</sortProperties>
-						<sortDependencies>groupId,artifactId</sortDependencies>
+						<sortDependencies>scope,groupId,artifactId</sortDependencies>
 						<createBackupFile>false</createBackupFile>
 					</configuration>
 				</plugin>
@@ -676,7 +716,7 @@
 				<executions>
 					<execution>
 						<id>flatten</id>
-						<phase>process-resources</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>flatten</goal>
 						</goals>
@@ -728,6 +768,7 @@
 						<setanchors></setanchors>
 						<idprefix></idprefix>
 						<idseparator></idseparator>
+						<neo4j-version>${neo4j.version}</neo4j-version>
 						<neo4j-java-driver-version>${neo4j-java-driver.version}</neo4j-java-driver-version>
 						<reactor-version>${reactor.version}</reactor-version>
 					</attributes>

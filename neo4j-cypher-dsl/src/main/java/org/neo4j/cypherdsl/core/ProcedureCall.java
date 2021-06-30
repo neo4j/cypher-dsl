@@ -30,5 +30,5 @@ import org.apiguardian.api.API;
  * @since 2020.0.1
  */
 @API(status = EXPERIMENTAL, since = "2020.0.1")
-public interface ProcedureCall extends Statement {
+public interface ProcedureCall extends Statement, Clause {
 }

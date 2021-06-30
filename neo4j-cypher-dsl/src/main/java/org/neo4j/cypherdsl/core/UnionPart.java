@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.Statement.SingleQuery;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -37,9 +36,9 @@ public final class UnionPart implements Visitable {
 
 	private final boolean all;
 
-	private final SingleQuery query;
+	private final Statement query;
 
-	UnionPart(boolean all, SingleQuery query) {
+	UnionPart(boolean all, Statement query) {
 		this.all = all;
 		this.query = query;
 	}
@@ -52,7 +51,7 @@ public final class UnionPart implements Visitable {
 		return all;
 	}
 
-	SingleQuery getQuery() {
+	Statement getQuery() {
 		return query;
 	}
 

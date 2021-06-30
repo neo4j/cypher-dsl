@@ -18,11 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.neo4j.cypherdsl.core.ast.Visitable;
-
 /**
  * @author Michael J. Simons
  * @since 1.0
  */
-interface ReadingClause extends Visitable {
+interface ReadingClause extends Clause {
 }

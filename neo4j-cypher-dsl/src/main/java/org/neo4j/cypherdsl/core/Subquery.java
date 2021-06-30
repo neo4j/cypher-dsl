@@ -20,7 +20,11 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -35,27 +39,70 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 @API(status = EXPERIMENTAL, since = "2020.1.2")
 @Neo4jVersion(minimum = "4.0.0")
-public final class Subquery implements Visitable {
+public final class Subquery implements Clause {
 
+	private final With imports;
+	private final With renames;
 	private final Statement statement;
 
 	/**
 	 * The {@code statement} must return elements, either through a {@literal RETURN} or {@literal YIELD} clause.
 	 *
 	 * @param statement The statement to wrap into a subquery.
+	 * @param imports   additional imports
 	 * @return A subquery.
 	 */
-	static Subquery call(Statement statement) {
-
-		boolean validReturn = statement instanceof ResultStatement || statement instanceof UnionQuery;
-		if (!validReturn) {
-			throw new IllegalArgumentException("Only a statement that returns elements, either via RETURN or YIELD, can be used in a subquery.");
-		}
-
-		return new Subquery(statement);
+	static Subquery call(Statement statement, IdentifiableElement... imports) {
+		return call(statement, false, imports);
 	}
 
-	Subquery(Statement statement) {
+	/**
+	 * The {@code statement} must return elements, either through a {@literal RETURN} or {@literal YIELD} clause.
+	 *
+	 * @param statement      The statement to wrap into a subquery.
+	 * @param skipAssertions Set to true to skip assertions about the statement that should make up the subquery. This comes in handy
+	 *                       when building a statement based on a list of flat clauses and not through the fluent api.
+	 * @return A subquery.
+	 */
+	static Subquery call(Statement statement, boolean skipAssertions, IdentifiableElement... imports) {
+
+		if (!skipAssertions) {
+			boolean clausesBasedWithReturn = statement instanceof ClausesBasedStatement && ((ClausesBasedStatement) statement).doesReturnOrYield();
+			boolean validReturn = statement instanceof ResultStatement || statement instanceof UnionQuery || clausesBasedWithReturn;
+			if (!validReturn) {
+				throw new IllegalArgumentException("Only a statement that returns elements, either via RETURN or YIELD, can be used in a subquery.");
+			}
+		}
+
+		With optionalImports = null;
+		With optionalRenames = null;
+		if (imports.length > 0) {
+			ExpressionList returnItems = new ExpressionList(Arrays.stream(imports)
+				.map(i -> {
+					if (i instanceof AliasedExpression) {
+						return ((AliasedExpression) i).getDelegate();
+					} else {
+						return i.asExpression();
+					}
+				})
+				.collect(Collectors.toList()));
+
+			optionalImports = new With(false, returnItems, null, null, null, null);
+
+			returnItems = new ExpressionList(Arrays.stream(imports)
+				.filter(i -> i instanceof AliasedExpression)
+				.map(AliasedExpression.class::cast)
+				.collect(Collectors.toList()));
+
+			optionalRenames = new With(false, returnItems, null, null, null, null);
+		}
+
+		return new Subquery(optionalImports, optionalRenames, statement);
+	}
+
+	private Subquery(@Nullable With imports, @Nullable With renames, Statement statement) {
+		this.imports = imports;
+		this.renames = renames;
 		this.statement = statement;
 	}
 
@@ -63,6 +110,8 @@ public final class Subquery implements Visitable {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
+		Visitable.visitIfNotNull(this.imports, visitor);
+		Visitable.visitIfNotNull(this.renames, visitor);
 		statement.accept(visitor);
 		visitor.leave(this);
 	}

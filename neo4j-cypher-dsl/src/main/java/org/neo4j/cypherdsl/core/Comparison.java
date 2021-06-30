@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -85,6 +86,18 @@ public final class Comparison implements Condition {
 			Expressions.nameOrExpression(right).accept(visitor);
 		}
 		visitor.leave(this);
+	}
+
+	@NotNull
+	@Override
+	public Condition not() {
+
+		if (this.comparator == Operator.IS_NULL) {
+			return new Comparison(left, Operator.IS_NOT_NULL, right);
+		} else if (this.comparator == Operator.IS_NOT_NULL) {
+			return new Comparison(left, Operator.IS_NULL, right);
+		}
+		return Condition.super.not();
 	}
 }
 

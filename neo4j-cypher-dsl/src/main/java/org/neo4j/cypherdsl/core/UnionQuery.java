@@ -35,7 +35,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = INTERNAL, since = "1.0")
 final class UnionQuery extends AbstractStatement implements Statement.RegularQuery {
 
-	static UnionQuery create(boolean unionAll, List<SingleQuery> queries) {
+	static UnionQuery create(boolean unionAll, List<Statement> queries) {
 
 		Assertions.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
 
@@ -46,11 +46,11 @@ final class UnionQuery extends AbstractStatement implements Statement.RegularQue
 
 	private final boolean all;
 
-	private final SingleQuery firstQuery;
+	private final Statement firstQuery;
 
 	private final List<UnionPart> additionalQueries;
 
-	private UnionQuery(boolean all, SingleQuery firstQuery, List<UnionPart> additionalQueries) {
+	private UnionQuery(boolean all, Statement firstQuery, List<UnionPart> additionalQueries) {
 		this.all = all;
 		this.firstQuery = firstQuery;
 		this.additionalQueries = additionalQueries;
@@ -62,9 +62,9 @@ final class UnionQuery extends AbstractStatement implements Statement.RegularQue
 	 * @param newAdditionalQueries more additional queries
 	 * @return A new union query
 	 */
-	UnionQuery addAdditionalQueries(List<SingleQuery> newAdditionalQueries) {
+	UnionQuery addAdditionalQueries(List<Statement> newAdditionalQueries) {
 
-		List<SingleQuery> queries = new ArrayList<>();
+		List<Statement> queries = new ArrayList<>();
 		queries.add(firstQuery);
 		queries.addAll(additionalQueries.stream().map(UnionPart::getQuery).collect(Collectors.toList()));
 		queries.addAll(newAdditionalQueries);
