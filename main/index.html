@@ -1690,41 +1690,33 @@ This API is not required to use the driver nor is the driver required for using 
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j.driver<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-java-driver<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>4.2.4<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>4.2.7<span class="tag">&lt;/artifactId&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Any 4.x version of the Driver will work, we currently test against 4.2.4.
+<p>Any 4.x version of the Driver will work, we currently test against 4.2.7.
 In case you want to use our integration with reactive sessions, you will have to add <a href="https://projectreactor.io">Project Reactor</a>.
 To the outside world we expose - much like the driver - the vendor agnostic <a href="https://www.reactive-streams.org">Reactive Streams spec</a>.</p>
 </div>
 <div class="paragraph">
-<p>The coordinates are:</p>
+<p>The coordinates of Project reactor are <code>io.projectreactor:reactor-core</code>. Those can be added in the appropriate form to a
+Maven or Gradle project.
+We test with 2020.0.6 of Reactor and use their BOM module imported into dependency management instead of a fixed
+version for the core module itself:</p>
 </div>
 <div class="listingblock">
 <div class="title">Listing 15. Optional Project reactor dependencies.</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
-    <span class="tag">&lt;groupId&gt;</span>io.projectreactor<span class="tag">&lt;/groupId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>reactor-core<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>3.4.5<span class="tag">&lt;/artifactId&gt;</span>
-<span class="tag">&lt;/dependency&gt;</span></code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>We test with 2020.0.6 ("Europium") of reactor.</p>
-</div>
-<div class="paragraph">
-<p>For your convenience, the Gradle version for both depedencies:</p>
-</div>
-<div class="listingblock">
-<div class="title">Listing 16. Gradle variant for additional dependencies</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j.driver:neo4j-java-driver:4.2.4</span><span class="delimiter">'</span></span>
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">io.projectreactor:reactor-core:3.4.5</span><span class="delimiter">'</span></span>
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependencyManagement&gt;</span>
+    <span class="tag">&lt;dependency&gt;</span>
+        <span class="tag">&lt;groupId&gt;</span>io.projectreactor<span class="tag">&lt;/groupId&gt;</span>
+        <span class="tag">&lt;artifactId&gt;</span>reactor-bom<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2020.0.6<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;type&gt;</span>pom<span class="tag">&lt;/type&gt;</span>
+        <span class="tag">&lt;scope&gt;</span>import<span class="tag">&lt;/scope&gt;</span>
+    <span class="tag">&lt;/dependency&gt;</span>
+<span class="tag">&lt;/dependencyManagement&gt;</span></code></pre>
 </div>
 </div>
 </div>
@@ -1735,7 +1727,7 @@ To the outside world we expose - much like the driver - the vendor agnostic <a h
 This instance should be a long living instance in your application:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 17. Create a driver instance</div>
+<div class="title">Listing 16. Create a driver instance</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic(<span class="string"><span class="delimiter">&quot;</span><span class="content">neo4j</span><span class="delimiter">&quot;</span></span>, neo4j.getAdminPassword()));</code></pre>
 </div>
@@ -1774,7 +1766,7 @@ driver without adding too much cognitive overhead or introducing new types.</p>
 We will use <a href="#statement-without-result">the following listing</a> as example:</p>
 </div>
 <div id="statement-without-result" class="listingblock">
-<div class="title">Listing 18. Example statement that does not return any data.</div>
+<div class="title">Listing 17. Example statement that does not return any data.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 var statement = ExecutableStatement.of(Cypher.create(m)
@@ -1795,7 +1787,7 @@ The <code>executeWith</code> API on <code>Statement</code> fits this interface a
 It will always return a result summary:</p>
 </div>
 <div id="statement-without-result-tx-function" class="listingblock">
-<div class="title">Listing 19. Executing statements in a managed transaction</div>
+<div class="title">Listing 18. Executing statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
     var summary = session.writeTransaction(statement::executeWith); <i class="conum" data-value="2"></i><b>(2)</b>
@@ -1839,7 +1831,7 @@ Read more about transactional functions in the official manual: <a href="https:/
 It is your responsibility to commit or rollback and close it.</p>
 </div>
 <div id="statement-without-result-unmanaged-tx" class="listingblock">
-<div class="title">Listing 20. Executing statements in an unmanaged transaction</div>
+<div class="title">Listing 19. Executing statements in an unmanaged transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session();
     var tx = session.beginTransaction() <i class="conum" data-value="1"></i><b>(1)</b>
@@ -1884,7 +1876,7 @@ to <code>executeWith</code>.</p>
 <p>The following examples will use this statement, returning the title of movies in the Movie-Graph:</p>
 </div>
 <div id="statement-with-result" class="listingblock">
-<div class="title">Listing 21. Example statement that does return data.</div>
+<div class="title">Listing 20. Example statement that does return data.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 var statement = ExecutableStatement.of(Cypher.match(m)
@@ -1898,7 +1890,7 @@ The <a href="#reactive-api">reactive API</a> is fully non-blocking and uses a pu
 <div class="sect4">
 <h5 id="insidetransactionalfunctions2"><a class="anchor" href="#insidetransactionalfunctions2"></a>Inside transactional functions</h5>
 <div id="statement-with-result-tx-function" class="listingblock">
-<div class="title">Listing 22. Fetching statements in a managed transaction</div>
+<div class="title">Listing 21. Fetching statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
 
@@ -1940,7 +1932,7 @@ closure dealing with the stream. We do this to make it impossible to use the str
 outside the transaction. With managed transactions, it looks like this:</p>
 </div>
 <div id="statement-with-result-tx-function-stream" class="listingblock">
-<div class="title">Listing 23. Streaming statements in a managed transaction</div>
+<div class="title">Listing 22. Streaming statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
 
@@ -1984,7 +1976,7 @@ As the streaming method will always return the result summary, this will also be
 The pattern of opening a session and transaction is the same as before.</p>
 </div>
 <div id="statement-with-result-unmanaged-tx" class="listingblock">
-<div class="title">Listing 24. Listening results with an unmanaged transaction</div>
+<div class="title">Listing 23. Listening results with an unmanaged transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session();
     var tx = session.beginTransaction()) {
@@ -2016,7 +2008,7 @@ The pattern of opening a session and transaction is the same as before.</p>
 As we pass the <code>Session</code> object itself, we are using an auto-commit transaction.</p>
 </div>
 <div id="statement-with-result-auto-commit-stream" class="listingblock">
-<div class="title">Listing 25. Streaming results with an auto-commit-transaction</div>
+<div class="title">Listing 24. Streaming results with an auto-commit-transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) {
 
@@ -2047,7 +2039,7 @@ function.</p>
 <p>To create a reactive, executable statement from either a <code>Statement</code> or <code>ResultStatement</code> use the factory methods from <code>ReactiveExecutableStatement</code>:</p>
 </div>
 <div id="create-statement-without-result" class="listingblock">
-<div class="title">Listing 26. Reactive Example statement that does not return any data.</div>
+<div class="title">Listing 25. Reactive Example statement that does not return any data.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 var statement = ReactiveExecutableStatement.of(Cypher.create(m)
@@ -2063,7 +2055,7 @@ a publisher of a single element into a <code>Mono</code>: That operator trusts t
 and doesn&#8217;t cancel after the first item being emitted and thus rolling back the transaction:</p>
 </div>
 <div id="statement-without-result-tx-function-reactive-stream" class="listingblock">
-<div class="title">Listing 27. Reactive streaming results with an managed transaction</div>
+<div class="title">Listing 26. Reactive streaming results with an managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Mono.usingWhen(
     Mono.fromSupplier(driver::rxSession), <i class="conum" data-value="1"></i><b>(1)</b>
@@ -2104,7 +2096,7 @@ and doesn&#8217;t cancel after the first item being emitted and thus rolling bac
 As the transaction is managed by the driver, canceling the publisher via <code>take()</code> won&#8217;t rollback the transaction.</p>
 </div>
 <div id="statement-with-result-tx-function-reactive-stream" class="listingblock">
-<div class="title">Listing 28. Reactive streaming results with an managed transaction</div>
+<div class="title">Listing 27. Reactive streaming results with an managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Flux.usingWhen(
     Mono.fromSupplier(driver::rxSession),
@@ -2129,7 +2121,7 @@ In this case we use Neo4j&#8217;s <code>LOAD CSV</code> clause that basically de
 The server might or might not start streaming results after the configured periodic commit rate has been hit:</p>
 </div>
 <div id="periodic-commit-statement" class="listingblock">
-<div class="title">Listing 29. Using <code>PERIODIC COMMIT LOAD CSV</code> from a reactive auto-commit transaction:</div>
+<div class="title">Listing 28. Using <code>PERIODIC COMMIT LOAD CSV</code> from a reactive auto-commit transaction:</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var row = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">row</span><span class="delimiter">&quot;</span></span>);
 var a = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Author</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Functions.trim(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>))).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
@@ -2707,7 +2699,7 @@ Assertions.assertThat(cypher)
 <p>We provide a Java annotation processor for <a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j</a> under the following coordinates:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 30. Coordinates of the SDN 6 annotation processor</div>
+<div class="title">Listing 29. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
 <pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.3-SNAPSHOT</code></pre>
 </div>
@@ -3277,7 +3269,7 @@ We use the following in our tests:</p>
 <p>The build requires a local copy of the project:</p>
 </div>
 <div id="clone-cypher-dsl" class="listingblock">
-<div class="title">Listing 31. Clone the Neo4j Cypher-DSL</div>
+<div class="title">Listing 30. Clone the Neo4j Cypher-DSL</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ git clone git@github.com:neo4j-contrib/cypher-dsl.git</code></pre>
 </div>
@@ -3290,7 +3282,7 @@ We use the following in our tests:</p>
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 32. Verify your JDK</div>
+<div class="title">Listing 31. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;11.0.10&quot; 2021-01-19
@@ -3302,7 +3294,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixe
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 33. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 32. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability           Origin
@@ -3319,7 +3311,7 @@ native-image             21.0.0              Native Image                  Early
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 34. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 33. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -3328,7 +3320,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 35. Build with default settings on Windows</div>
+<div class="title">Listing 34. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -3340,7 +3332,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 36. Skipping native tests</div>
+<div class="title">Listing 35. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -3352,7 +3344,7 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 37. Skipping native tests</div>
+<div class="title">Listing 36. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -3419,7 +3411,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 38. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 37. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -3440,7 +3432,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 39. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 38. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -3452,7 +3444,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 40. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 39. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -3477,7 +3469,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 41. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 40. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -3509,7 +3501,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 42. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 41. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -3527,7 +3519,7 @@ RETURN t, t2</code></pre>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 43. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 42. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -3541,7 +3533,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 44. Public internal API goes into a dedicated package</div>
+<div class="title">Listing 43. Public internal API goes into a dedicated package</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 MATCH (p:Package) - [:CONTAINS] -&gt; (c)
@@ -4538,7 +4530,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-06-29 15:44:29 UTC
+Last updated 2021-07-01 12:56:31 UTC
 </div>
 </div>
 </body>
