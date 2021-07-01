@@ -163,6 +163,7 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.1.2</spring-data-neo4j.version>
+		<reactor.version>2020.0.6</reactor.version>
 	</properties>
 
 	<dependencyManagement>
@@ -216,7 +217,7 @@
 			<dependency>
 				<groupId>io.projectreactor</groupId>
 				<artifactId>reactor-bom</artifactId>
-				<version>2020.0.6</version>
+				<version>${reactor.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -725,6 +726,8 @@
 						<setanchors></setanchors>
 						<idprefix></idprefix>
 						<idseparator></idseparator>
+						<neo4j-java-driver-version>${neo4j-java-driver.version}</neo4j-java-driver-version>
+						<reactor-version>${reactor.version}</reactor-version>
 					</attributes>
 					<requires>
 						<require>asciidoctor-diagram</require>
