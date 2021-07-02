@@ -141,15 +141,15 @@ public final class Configuration {
 		}
 
 		public Configuration build() {
-			return new Configuration(prettyPrint, alwaysEscapeNames, indentStyle, indentSize);
+			return new Configuration(this);
 		}
 	}
 
-	private Configuration(boolean prettyPrint, boolean alwaysEscapeNames, IndentStyle indentStyle, int indentSize) {
-		this.prettyPrint = prettyPrint;
-		this.alwaysEscapeNames = alwaysEscapeNames;
-		this.indentStyle = indentStyle;
-		this.indentSize = indentSize;
+	private Configuration(Builder builder) {
+		this.prettyPrint = builder.prettyPrint;
+		this.alwaysEscapeNames = builder.alwaysEscapeNames;
+		this.indentStyle = builder.indentStyle;
+		this.indentSize = builder.indentSize;
 	}
 
 	public boolean isPrettyPrint() {
