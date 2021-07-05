@@ -1,5 +1,44 @@
 == 2021.2
 
+=== 2021.2.3
+
+2021.2.3 is a rather big release as it contains many small improvements and API functionality required by our next major
+release. Those are brought in now so that they can be benefial to others without bumping a major version.
+
+==== 🚀 Features
+
+* GH-195 - Add collection parameter support for `ExposesReturning`.
+* Introduce a `ExposesPatternLengthAccessors` for uniform access to relationships and chains thereof. [improvement]
+* Allow creating instances of `FunctionInvocation` directly. [improvement]
+* Provide factory methods of `MapProjection` and `KeyValueMapEntry` as public API.
+* Provide `set` and `remove` labels operation as public API.
+* Provide `set` and `mutate` of expressions as public API.
+* Provide factory methods of `Hints` as public API.
+* GH-200 - Provide an API to define named paths based on a `Node` pattern.
+* Provide an option to escape names only when necessary. [improvement]
+
+==== 📖 Documentation
+
+* Add documentation for escaping names.
+* GH-198 - Fix spelling errors in JavaDoc and documentation.
+
+==== 🐛 Bug Fixes
+
+* Make `Case` an interface and let it extend `Expression`. [bug]
+* GH-197 - Fix eagerly resolved symbolic names in negated pattern conditions.
+* GH-197 - Clear name cache after leaving a statement.
+* GH-199 - Bring back `with(Named… vars)`.
+
+==== 🧹 Housekeeping
+
+* Don't use fixed driver versions in doc.
+* Pass builder as constructor argument.
+* Improve `Return` and `With` internals.
+* Update Driver, SDN integration and Spring Boot example dependencies.
+* GH-202 - Make API Guardian an optional / provided dependency.
+
+Thanks to https://github.com/meistermeier[@meistermeier] and https://github.com/aldrinm[@aldrinm] for their contributions.
+
 === 2021.2.2
 
 ==== 🚀 Features
