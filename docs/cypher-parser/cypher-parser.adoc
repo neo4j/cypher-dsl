@@ -254,3 +254,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main
 <.> Create an instance of parsing options. It's probably a good idea todo this once and store them away in an instance variable.
     Options are thread safe.
 <.> Apply them when calling the corresponding parse method
+
+Now it's enough to pass `"name contains \"Ricci\" OR name ends with 'Hirsch'"` into the exchange presented above and things
+will work out of the box.
+Further validation and sanitiy checks are of course up to you.
