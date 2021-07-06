@@ -556,22 +556,30 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#callingarbitraryproceduresandfunctions">4.3. Calling arbitrary procedures and functions</a></li>
 </ul>
 </li>
-<li><a href="#driver-integration">5. Integration with the Neo4j-Java-Driver</a>
+<li><a href="#cypher-parser">5. Parsing existing Cypher</a>
 <ul class="sectlevel2">
 <li><a href="#introduction2">5.1. Introduction</a></li>
-<li><a href="#addadditionaldependencies">5.2. Add additional dependencies</a></li>
-<li><a href="#imperative-api">5.3. Imperative (blocking) API</a></li>
-<li><a href="#reactive-api">5.4. Reactive API</a></li>
+<li><a href="#gettingstarted">5.2. Getting started</a></li>
+<li><a href="#examples">5.3. Examples</a></li>
+<li><a href="#preventingcertainthings">5.4. Preventing certain things</a></li>
 </ul>
 </li>
-<li><a href="#static-meta-model">6. Building a static meta model</a>
+<li><a href="#driver-integration">6. Integration with the Neo4j-Java-Driver</a>
 <ul class="sectlevel2">
-<li><a href="#concepts">6.1. Concepts</a></li>
-<li><a href="#possibleusage">6.2. Possible Usage</a></li>
-<li><a href="#thespringdataneo4j6annotationprocessor">6.3. The Spring Data Neo4j 6 annotation processor</a></li>
+<li><a href="#introduction3">6.1. Introduction</a></li>
+<li><a href="#addadditionaldependencies2">6.2. Add additional dependencies</a></li>
+<li><a href="#imperative-api">6.3. Imperative (blocking) API</a></li>
+<li><a href="#reactive-api">6.4. Reactive API</a></li>
 </ul>
 </li>
-<li><a href="#appendix">7. Appendix</a>
+<li><a href="#static-meta-model">7. Building a static meta model</a>
+<ul class="sectlevel2">
+<li><a href="#concepts">7.1. Concepts</a></li>
+<li><a href="#possibleusage">7.2. Possible Usage</a></li>
+<li><a href="#thespringdataneo4j6annotationprocessor">7.3. The Spring Data Neo4j 6 annotation processor</a></li>
+</ul>
+</li>
+<li><a href="#appendix">8. Appendix</a>
 <ul class="sectlevel2">
 <li><a href="#query-dsl-support">Query-DSL support</a></li>
 <li><a href="#buildingtheneo4jcypher-dsl">Building the Neo4j Cypher-DSL</a></li>
@@ -1612,10 +1620,452 @@ The Cypher-DSL however does not check if the procedure that is used as a functio
 </div>
 </div>
 <div class="sect1">
-<h2 id="driver-integration"><a class="anchor" href="#driver-integration"></a>5. Integration with the Neo4j-Java-Driver</h2>
+<h2 id="cypher-parser"><a class="anchor" href="#cypher-parser"></a>5. Parsing existing Cypher</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="introduction2"><a class="anchor" href="#introduction2"></a>5.1. Introduction</h3>
+<div class="paragraph">
+<p>The <code>cypher-dsl-parser</code> module ins an optional add-on to the Cypher-DSL that takes your existing Cypher - either whole statements
+or fragments like clauses or expressions - and turn them into Cypher-DSL statements or expressions.
+Those fragments can be used to add custom Cypher to your generated statements without resorting to raw String literals.
+It allows sanitizing user input, add additional filters for labels and types to rewrite queries and more.</p>
+</div>
+<div class="paragraph">
+<p>The parser itself is based on Neo4j&#8217;s official Cypher-Parser, thus supporting the same constructs as Neo4j itself.
+However, while we could theoretically parse all expressions that Neo4j 4.3.2 supports, we might cannot translate all of them
+into elements of the Cypher-DSL. In such cases an <code>UnsupportedOperationException</code> will be thrown.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+The current version of the Cypher-DSL-Parser modules is rather big. This is due to the fact that we must shade the
+      Scala-Lang library. Neo4j&#8217;s parsers depends on it. This is likely to change in the future. Until then, we rather not
+      try to shade only the few required classes and risk a <code>ClassNotFoundException</code>, but include the whole library.
+     <br>
+      The decision for shading has been made for compatibility reasons: People may have a different Scala version in place
+      or might even use this library embedded. So it&#8217;s safer to shade what we support and not depend on it.
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="gettingstarted"><a class="anchor" href="#gettingstarted"></a>5.2. Getting started</h3>
+<div class="sect3">
+<h4 id="addadditionaldependencies"><a class="anchor" href="#addadditionaldependencies"></a>5.2.1. Add additional dependencies</h4>
+<div class="sect4">
+<h5 id="maven"><a class="anchor" href="#maven"></a>Maven</h5>
+<div class="listingblock">
+<div class="title">Listing 14. Cypher-DSL parser added via Maven</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-parser<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>{neo4j-cypher-dsl.version}<span class="tag">&lt;/version&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="gradle"><a class="anchor" href="#gradle"></a>Gradle</h5>
+<div class="listingblock">
+<div class="title">Listing 15. Gradle variant for additional dependencies</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:{neo4j-cypher-dsl.version}</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="minimumjdkversion"><a class="anchor" href="#minimumjdkversion"></a>5.2.2. Minimum JDK version</h4>
+<div class="paragraph">
+<p>The Cypher-Parser requires JDK 11 to run which is the same version that Neo4j 4.3.2 requires.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="mainentrypoint"><a class="anchor" href="#mainentrypoint"></a>5.2.3. Main entry point</h4>
+<div class="paragraph">
+<p>The main entry point to parsing Cypher strings into Cypher-DSL objects is</p>
+</div>
+<div id="main-entry-pint" class="listingblock">
+<div class="title">Listing 16. Cypher Parser</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.parser.CypherParser</span>;</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>It provides a list of static methods:</p>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Method</th>
+<th class="tableblock halign-left valign-top">What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parseNode</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parses a pattern like <code>(n:Node {withOrWithout: 'properties'})</code> into a <code>Node</code></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parseRelationship</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parses a pattern like <code>(m)-[{a: 'b', c: 'd'}]&#8594;(n)</code> into a <code>RelationshipPattern</code>.
+ The pattern might be a <code>Relationship</code> or <code>RelationshipChain</code>.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parseExpression</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parses an arbitrary expression.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parseClause</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parses a full clause like <code>MATCH (m:Movie)</code> or <code>DELETE n</code> etc. These clauses might be modified via
+ callbacks and then passed on into <code>org.neo4j.cypherdsl.core.Statement.of</code>. This will take them
+ in order and create a whole statement out of it. It is your responsibility to make sure those clauses are
+ meaningful in the given order.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parseStatement</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Parses a whole statement. The result can be rendered or used in a union or subquery call.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parses</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">An alias for <code>parseStatement</code>.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>The <code>README</code> for the parser module itself contains not only our whole TCK for the parser,
+but also several examples of calling it. Have a look here: <a href="https://github.com/neo4j-contrib/cypher-dsl/blob/main/neo4j-cypher-dsl-parser/README.adoc">neo4j-cypher-dsl-parser/README.adoc</a>.</p>
+</div>
+<div class="paragraph">
+<p>All the methods mention above provide an overload taking in an additional <code>org.neo4j.cypherdsl.parser.Option</code> instance
+allowing to interact with the parser. Please have a look at the JavaAPI for information about the options class.
+The following examples show some ways of using it.
+Most of the configurable options represent ways to provide filters for labels or types or are callbacks when certain expressions are created.</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="examples"><a class="anchor" href="#examples"></a>5.3. Examples</h3>
+<div class="sect3">
+<h4 id="parsinguserinputandcallinasubquery"><a class="anchor" href="#parsinguserinputandcallinasubquery"></a>5.3.1. Parsing user input and call in a subquery</h4>
+<div class="paragraph">
+<p>This is helpful when you create an outer query that maybe enriched by a user.
+Here we assume the user does the right thing and don&#8217;t modify the query any further:</p>
+</div>
+<div id="example-using-input" class="listingblock">
+<div class="title">Listing 17. Just using the user supplied input</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var userProvidedCypher
+    = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN o as result</span><span class="delimiter">&quot;</span></span>; <i class="conum" data-value="1"></i><b>(1)</b>
+var userStatement = CypherParser.parse(userProvidedCypher); <i class="conum" data-value="2"></i><b>(2)</b>
+
+var node = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Node</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>);
+var result = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">result</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher <i class="conum" data-value="3"></i><b>(3)</b>
+    .match(node)
+    .call(<i class="conum" data-value="4"></i><b>(4)</b>
+        userStatement,
+        node.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">this</span><span class="delimiter">&quot;</span></span>)
+    )
+    .returning(result.project(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span>))
+    .build()
+    .getCypher();
+
+assertThat(cypher).isEqualTo(
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (node:`Node`) </span><span class="delimiter">&quot;</span></span>
+    + <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL {</span><span class="delimiter">&quot;</span></span>
+    + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node </span><span class="delimiter">&quot;</span></span>
+    + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node AS this </span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="5"></i><b>(5)</b>
+    + <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="6"></i><b>(6)</b>
+    + <span class="string"><span class="delimiter">&quot;</span><span class="content">} </span><span class="delimiter">&quot;</span></span>
+    + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN result{.foo, .bar}</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>A valid standalone query that is also a valid subquery</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Just parse it into a <code>Statement</code> object</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Use the Cypher-DSL as explained throughout the docs</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>Use the overload of <code>call</code> that takes a <code>Statement</code> and a collection of expression that should be imported into the subquery</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>Notice how to <code>WITH</code> clauses are generated: The first one is the importing one, the second one the aliasing one</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>This is the original query</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="ensureanaliasforthereturnclause"><a class="anchor" href="#ensureanaliasforthereturnclause"></a>5.3.2. Ensure an alias for the return clause</h4>
+<div class="paragraph">
+<p>We are going to work with the same test as in <a href="#example-using-input">Listing 17</a>, so this is not repeated.
+Here we  make sure the query supplied by the user returns something with a required alias.</p>
+</div>
+<div id="example-required-alias" class="listingblock">
+<div class="title">Listing 18. Using a callback to make sure that a query has an alias</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var userProvidedCypher = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN o</span><span class="delimiter">&quot;</span></span>;
+
+Function&lt;<span class="predefined-type">Expression</span>, AliasedExpression&gt; ensureAlias = r -&gt; {
+    <span class="keyword">if</span> (!(r <span class="keyword">instanceof</span> AliasedExpression)) {
+        <span class="keyword">return</span> r.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">result</span><span class="delimiter">&quot;</span></span>);
+    }
+    <span class="keyword">return</span> (AliasedExpression) r;
+}; <i class="conum" data-value="1"></i><b>(1)</b>
+
+var options = Options.newOptions() <i class="conum" data-value="2"></i><b>(2)</b>
+    .withCallback( <i class="conum" data-value="3"></i><b>(3)</b>
+        ExpressionCreatedEventType.ON_RETURN_ITEM,
+        AliasedExpression.class,
+        ensureAlias
+    )
+    .build();
+
+var userStatement = CypherParser.parse(userProvidedCypher, options); <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>This is a <code>Function</code> that receives an expressions and returns a new one. It
+checks if the provided expressions obeys to some criteria: Here being something that is aliased or not</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>We start building new options</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The callback from step one is passed as callback to the event <code>ON_RETURN_ITEM</code> and will be called for every item</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The final option instance will be applied to the parser. The statement will render to the same result as <a href="#example-using-input">the first example</a>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="preventingcertainthings"><a class="anchor" href="#preventingcertainthings"></a>5.4. Preventing certain things</h3>
+<div class="paragraph">
+<p>Callbacks can of course be used to prevent things.
+Any exception thrown will halt the parsing.
+<a href="#example-preventing-things">Listing 19</a> shows how:</p>
+</div>
+<div id="example-preventing-things" class="listingblock">
+<div class="title">Listing 19. Preventing input that deletes properties</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var userProvidedCypher = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) REMOVE this.something RETURN o</span><span class="delimiter">&quot;</span></span>;
+
+UnaryOperator&lt;<span class="predefined-type">Expression</span>&gt; preventPropertyDeletion = r -&gt; {
+    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="exception">RuntimeException</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Not allowed to remove properties!</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="1"></i><b>(1)</b>
+};
+
+var options = Options.newOptions()
+    .withCallback( <i class="conum" data-value="2"></i><b>(2)</b>
+        ExpressionCreatedEventType.ON_REMOVE_PROPERTY,
+        <span class="predefined-type">Expression</span>.class,
+        preventPropertyDeletion
+    )
+    .build();
+
+assertThatExceptionOfType(<span class="exception">RuntimeException</span>.class)
+    .isThrownBy(() -&gt; CypherParser.parse(userProvidedCypher, options)); <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a callback that just throws an unchecked exception</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Configure it for the event that should be prevented</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Parsing will not be possible</td>
+</tr>
+</table>
+</div>
+<div class="sect3">
+<h4 id="shapethereturnclausethewayyouwant"><a class="anchor" href="#shapethereturnclausethewayyouwant"></a>5.4.1. Shape the return clause the way you want</h4>
+<div class="paragraph">
+<p>The parser provides <code>ReturnDefinition</code> as value object. It contains information to be passed to the <code>Clauses</code> factory to shape
+a <code>RETURN</code> clause the way you need:</p>
+</div>
+<div id="example-example-shape-the-return-clause" class="listingblock">
+<div class="title">Listing 20. Shaping the return clause</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var userProvidedCypher = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN distinct this, o LIMIT 23</span><span class="delimiter">&quot;</span></span>;
+
+Function&lt;ReturnDefinition, Return&gt; returnClauseFactory = d -&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+    var finalExpressionsReturned = d.getExpressions().stream()
+        .filter(e -&gt; e <span class="keyword">instanceof</span> SymbolicName &amp;&amp; <span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>.equals(((SymbolicName) e).getValue()))
+        .map(e -&gt; e.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">result</span><span class="delimiter">&quot;</span></span>))
+        .collect(Collectors.&lt;<span class="predefined-type">Expression</span>&gt;toList());
+
+    <span class="keyword">return</span> Clauses.returning(
+        <span class="predefined-constant">false</span>,
+        finalExpressionsReturned,
+        <span class="predefined-type">List</span>.of(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>).property(<span class="string"><span class="delimiter">&quot;</span><span class="content">x</span><span class="delimiter">&quot;</span></span>).descending()),
+        d.getOptionalSkip(), d.getOptionalLimit()
+    );
+};
+
+var options = Options.newOptions()
+    .withReturnClauseFactory(returnClauseFactory) <i class="conum" data-value="2"></i><b>(2)</b>
+    .build();
+
+var userStatement = CypherParser.parse(userProvidedCypher, options);
+var cypher = userStatement.getCypher();
+
+assertThat(cypher) <i class="conum" data-value="3"></i><b>(3)</b>
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result ORDER BY o.x DESC LIMIT 23</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a factory method that takes in a definition and uses its information to build the <code>RETURN</code>.
+Or examples filters the attributes being returned and enforces an alias.
+It also adds some arbitrary sorting and keeps sort and limit values from the original</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>It than is parsed to the options</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The statement has the new <code>RETURN</code> clause.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="enforcinglabels"><a class="anchor" href="#enforcinglabels"></a>5.4.2. Enforcing labels</h4>
+<div class="paragraph">
+<p>The parser can enforce labels to be present or absent with filters. This can be individually achieved when parsing node patterns,
+setting or removing labels with a <code>BiFunction</code> like the following:</p>
+</div>
+<div id="a-label-enforcing-functions" class="listingblock">
+<div class="title">Listing 21. Shaping the return clause</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">final</span> BiFunction&lt;LabelParsedEventType, <span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt;, <span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt;&gt; makeSureALabelIsPresent = (e, c) -&gt; {
+
+    var finalLabels = <span class="keyword">new</span> <span class="predefined-type">LinkedHashSet</span>&lt;&gt;(c);
+    <span class="keyword">switch</span> (e) { <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="keyword">case</span> ON_NODE_PATTERN:
+            finalLabels.add(<span class="string"><span class="delimiter">&quot;</span><span class="content">ForcedLabel</span><span class="delimiter">&quot;</span></span>);
+            <span class="keyword">return</span> finalLabels;
+        <span class="keyword">case</span> ON_SET:
+            finalLabels.add(<span class="string"><span class="delimiter">&quot;</span><span class="content">Modified</span><span class="delimiter">&quot;</span></span>);
+            <span class="keyword">return</span> finalLabels;
+        <span class="keyword">case</span> ON_REMOVE:
+            finalLabels.remove(<span class="string"><span class="delimiter">&quot;</span><span class="content">ForcedLabel</span><span class="delimiter">&quot;</span></span>);
+            <span class="keyword">return</span> finalLabels;
+        <span class="keyword">default</span>:
+            <span class="keyword">return</span> c;
+    }
+};</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Decide on the event type what is supposed to happen</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Putting this function in action involves the <code>Options</code> class again:</p>
+</div>
+<div id="enforcing-on-parse" class="listingblock">
+<div class="title">Listing 22. Enforcing a label is always set on the pattern</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var options =
+    Options.newOptions().withLabelFilter(makeSureALabelIsPresent).build();
+var statement = CypherParser
+    .parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) RETURN n</span><span class="delimiter">&quot;</span></span>, options)
+    .getCypher();
+
+assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Movie`:`ForcedLabel`) RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>This can safely be used to match only nodes spotting such a label for example.</p>
+</div>
+<div id="enforcing-on-set" class="listingblock">
+<div class="title">Listing 23. Enforcing that a new collection of labels always contains a specific</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var options =
+    Options.newOptions().withLabelFilter(makeSureALabelIsPresent).build();
+var statement = CypherParser
+    .parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) SET n:`Comedy` RETURN n</span><span class="delimiter">&quot;</span></span>, options)
+    .getCypher();
+
+assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Movie`:`ForcedLabel`) SET n:`Comedy`:`Modified` RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Of course, we can prevent a label to be removed:</p>
+</div>
+<div id="enforcing-on-remove" class="listingblock">
+<div class="title">Listing 24. Preventing a specific label to be removed</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var options = Options.newOptions().withLabelFilter(makeSureALabelIsPresent).build();
+var statement = CypherParser
+    .parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) REMOVE n:`Comedy`:`ForcedLabel` RETURN n</span><span class="delimiter">&quot;</span></span>, options)
+    .getCypher();
+
+assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Movie`:`ForcedLabel`) REMOVE n:`Comedy` RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Changing relationship types via a filter is possible as well, but as relationships might only have one type, the number of
+usecases is smaller.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="driver-integration"><a class="anchor" href="#driver-integration"></a>6. Integration with the Neo4j-Java-Driver</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="introduction3"><a class="anchor" href="#introduction3"></a>6.1. Introduction</h3>
 <div class="paragraph">
 <p>The Cypher-DSL is - apart from <a href="https://github.com/apiguardian-team/apiguardian">API Guardian</a> - dependency free.
 It has however some optional dependency you can add to use more functionality.
@@ -1683,9 +2133,9 @@ This API is not required to use the driver nor is the driver required for using 
 </div>
 </div>
 <div class="sect2">
-<h3 id="addadditionaldependencies"><a class="anchor" href="#addadditionaldependencies"></a>5.2. Add additional dependencies</h3>
+<h3 id="addadditionaldependencies2"><a class="anchor" href="#addadditionaldependencies2"></a>6.2. Add additional dependencies</h3>
 <div class="listingblock">
-<div class="title">Listing 14. Neo4j-Java-Driver added via Maven</div>
+<div class="title">Listing 25. Neo4j-Java-Driver added via Maven</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j.driver<span class="tag">&lt;/groupId&gt;</span>
@@ -1706,7 +2156,7 @@ We test with 2020.0.6 of Reactor and use their BOM module imported into dependen
 version for the core module itself:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 15. Optional Project reactor dependencies.</div>
+<div class="title">Listing 26. Optional Project reactor dependencies.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependencyManagement&gt;</span>
     <span class="tag">&lt;dependency&gt;</span>
@@ -1721,13 +2171,13 @@ version for the core module itself:</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="imperative-api"><a class="anchor" href="#imperative-api"></a>5.3. Imperative (blocking) API</h3>
+<h3 id="imperative-api"><a class="anchor" href="#imperative-api"></a>6.3. Imperative (blocking) API</h3>
 <div class="paragraph">
 <p>You create an instance of the Neo4j driver.
 This instance should be a long living instance in your application:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 16. Create a driver instance</div>
+<div class="title">Listing 27. Create a driver instance</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic(<span class="string"><span class="delimiter">&quot;</span><span class="content">neo4j</span><span class="delimiter">&quot;</span></span>, neo4j.getAdminPassword()));</code></pre>
 </div>
@@ -1760,13 +2210,13 @@ The Cypher-DSL won&#8217;t close, commit or rollback anything you pass to it. Yo
 driver without adding too much cognitive overhead or introducing new types.</p>
 </div>
 <div class="sect3">
-<h4 id="executingstatements"><a class="anchor" href="#executingstatements"></a>5.3.1. Executing statements</h4>
+<h4 id="executingstatements"><a class="anchor" href="#executingstatements"></a>6.3.1. Executing statements</h4>
 <div class="paragraph">
 <p>We first have a look at statements that don&#8217;t return data, but may execute updates or call stored procedures.
 We will use <a href="#statement-without-result">the following listing</a> as example:</p>
 </div>
 <div id="statement-without-result" class="listingblock">
-<div class="title">Listing 17. Example statement that does not return any data.</div>
+<div class="title">Listing 28. Example statement that does not return any data.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 var statement = ExecutableStatement.of(Cypher.create(m)
@@ -1787,7 +2237,7 @@ The <code>executeWith</code> API on <code>Statement</code> fits this interface a
 It will always return a result summary:</p>
 </div>
 <div id="statement-without-result-tx-function" class="listingblock">
-<div class="title">Listing 18. Executing statements in a managed transaction</div>
+<div class="title">Listing 29. Executing statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
     var summary = session.writeTransaction(statement::executeWith); <i class="conum" data-value="2"></i><b>(2)</b>
@@ -1831,7 +2281,7 @@ Read more about transactional functions in the official manual: <a href="https:/
 It is your responsibility to commit or rollback and close it.</p>
 </div>
 <div id="statement-without-result-unmanaged-tx" class="listingblock">
-<div class="title">Listing 19. Executing statements in an unmanaged transaction</div>
+<div class="title">Listing 30. Executing statements in an unmanaged transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session();
     var tx = session.beginTransaction() <i class="conum" data-value="1"></i><b>(1)</b>
@@ -1871,12 +2321,12 @@ to <code>executeWith</code>.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="fetchingdata"><a class="anchor" href="#fetchingdata"></a>5.3.2. Fetching data</h4>
+<h4 id="fetchingdata"><a class="anchor" href="#fetchingdata"></a>6.3.2. Fetching data</h4>
 <div class="paragraph">
 <p>The following examples will use this statement, returning the title of movies in the Movie-Graph:</p>
 </div>
 <div id="statement-with-result" class="listingblock">
-<div class="title">Listing 20. Example statement that does return data.</div>
+<div class="title">Listing 31. Example statement that does return data.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 var statement = ExecutableStatement.of(Cypher.match(m)
@@ -1890,7 +2340,7 @@ The <a href="#reactive-api">reactive API</a> is fully non-blocking and uses a pu
 <div class="sect4">
 <h5 id="insidetransactionalfunctions2"><a class="anchor" href="#insidetransactionalfunctions2"></a>Inside transactional functions</h5>
 <div id="statement-with-result-tx-function" class="listingblock">
-<div class="title">Listing 21. Fetching statements in a managed transaction</div>
+<div class="title">Listing 32. Fetching statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
 
@@ -1932,7 +2382,7 @@ closure dealing with the stream. We do this to make it impossible to use the str
 outside the transaction. With managed transactions, it looks like this:</p>
 </div>
 <div id="statement-with-result-tx-function-stream" class="listingblock">
-<div class="title">Listing 22. Streaming statements in a managed transaction</div>
+<div class="title">Listing 33. Streaming statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
 
@@ -1976,7 +2426,7 @@ As the streaming method will always return the result summary, this will also be
 The pattern of opening a session and transaction is the same as before.</p>
 </div>
 <div id="statement-with-result-unmanaged-tx" class="listingblock">
-<div class="title">Listing 23. Listening results with an unmanaged transaction</div>
+<div class="title">Listing 34. Listening results with an unmanaged transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session();
     var tx = session.beginTransaction()) {
@@ -2008,7 +2458,7 @@ The pattern of opening a session and transaction is the same as before.</p>
 As we pass the <code>Session</code> object itself, we are using an auto-commit transaction.</p>
 </div>
 <div id="statement-with-result-auto-commit-stream" class="listingblock">
-<div class="title">Listing 24. Streaming results with an auto-commit-transaction</div>
+<div class="title">Listing 35. Streaming results with an auto-commit-transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (var session = driver.session()) {
 
@@ -2029,7 +2479,7 @@ As we pass the <code>Session</code> object itself, we are using an auto-commit t
 </div>
 </div>
 <div class="sect2">
-<h3 id="reactive-api"><a class="anchor" href="#reactive-api"></a>5.4. Reactive API</h3>
+<h3 id="reactive-api"><a class="anchor" href="#reactive-api"></a>6.4. Reactive API</h3>
 <div class="paragraph">
 <p>For the reactive API the variants inside a transactional function are focused here as they are probably the most complex
 ones to get right: You have to deal with to resources: The session itself, and the inner publisher returned from the transactional
@@ -2039,7 +2489,7 @@ function.</p>
 <p>To create a reactive, executable statement from either a <code>Statement</code> or <code>ResultStatement</code> use the factory methods from <code>ReactiveExecutableStatement</code>:</p>
 </div>
 <div id="create-statement-without-result" class="listingblock">
-<div class="title">Listing 25. Reactive Example statement that does not return any data.</div>
+<div class="title">Listing 36. Reactive Example statement that does not return any data.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 var statement = ReactiveExecutableStatement.of(Cypher.create(m)
@@ -2048,14 +2498,14 @@ var statement = ReactiveExecutableStatement.of(Cypher.create(m)
 </div>
 </div>
 <div class="sect3">
-<h4 id="executingstatements2"><a class="anchor" href="#executingstatements2"></a>5.4.1. Executing statements</h4>
+<h4 id="executingstatements2"><a class="anchor" href="#executingstatements2"></a>6.4.1. Executing statements</h4>
 <div class="paragraph">
 <p>The most important part in the following example is not necessarily our API, but the use of Reactors <code>fromDirect</code> operator when converting
 a publisher of a single element into a <code>Mono</code>: That operator trusts the user that the publisher will return zero or one element
 and doesn&#8217;t cancel after the first item being emitted and thus rolling back the transaction:</p>
 </div>
 <div id="statement-without-result-tx-function-reactive-stream" class="listingblock">
-<div class="title">Listing 26. Reactive streaming results with an managed transaction</div>
+<div class="title">Listing 37. Reactive streaming results with an managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Mono.usingWhen(
     Mono.fromSupplier(driver::rxSession), <i class="conum" data-value="1"></i><b>(1)</b>
@@ -2088,7 +2538,7 @@ and doesn&#8217;t cancel after the first item being emitted and thus rolling bac
 </div>
 </div>
 <div class="sect3">
-<h4 id="fetchingresults"><a class="anchor" href="#fetchingresults"></a>5.4.2. Fetching results</h4>
+<h4 id="fetchingresults"><a class="anchor" href="#fetchingresults"></a>6.4.2. Fetching results</h4>
 <div class="sect4">
 <h5 id="withareactivetransactionalfunction"><a class="anchor" href="#withareactivetransactionalfunction"></a>With a reactive, transactional function</h5>
 <div class="paragraph">
@@ -2096,7 +2546,7 @@ and doesn&#8217;t cancel after the first item being emitted and thus rolling bac
 As the transaction is managed by the driver, canceling the publisher via <code>take()</code> won&#8217;t rollback the transaction.</p>
 </div>
 <div id="statement-with-result-tx-function-reactive-stream" class="listingblock">
-<div class="title">Listing 27. Reactive streaming results with an managed transaction</div>
+<div class="title">Listing 38. Reactive streaming results with an managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Flux.usingWhen(
     Mono.fromSupplier(driver::rxSession),
@@ -2121,7 +2571,7 @@ In this case we use Neo4j&#8217;s <code>LOAD CSV</code> clause that basically de
 The server might or might not start streaming results after the configured periodic commit rate has been hit:</p>
 </div>
 <div id="periodic-commit-statement" class="listingblock">
-<div class="title">Listing 28. Using <code>PERIODIC COMMIT LOAD CSV</code> from a reactive auto-commit transaction:</div>
+<div class="title">Listing 39. Using <code>PERIODIC COMMIT LOAD CSV</code> from a reactive auto-commit transaction:</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">var row = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">row</span><span class="delimiter">&quot;</span></span>);
 var a = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Author</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Functions.trim(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>))).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
@@ -2149,12 +2599,12 @@ Flux.using(driver::rxSession, statement::fetchWith, RxSession::close)
 </div>
 </div>
 <div class="sect1">
-<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>6. Building a static meta model</h2>
+<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>7. Building a static meta model</h2>
 <div class="sectionbody">
 <div class="sect2">
-<h3 id="concepts"><a class="anchor" href="#concepts"></a>6.1. Concepts</h3>
+<h3 id="concepts"><a class="anchor" href="#concepts"></a>7.1. Concepts</h3>
 <div class="sect3">
-<h4 id="astaticmetamodelisoptional"><a class="anchor" href="#astaticmetamodelisoptional"></a>6.1.1. A static meta model is optional</h4>
+<h4 id="astaticmetamodelisoptional"><a class="anchor" href="#astaticmetamodelisoptional"></a>7.1.1. A static meta model is optional</h4>
 <div class="paragraph">
 <p>First let&#8217;s stress this: a static meta model is optional for the Cypher-DSL. It is completely OK to use the Cypher-DSL
 as shown in the <a href="#how-to-use-it.examples">examples in the "How to use it" part</a>:
@@ -2177,7 +2627,7 @@ Graph-QL schemes.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="static-meta-model.building-blocks"><a class="anchor" href="#static-meta-model.building-blocks"></a>6.1.2. Building blocks</h4>
+<h4 id="static-meta-model.building-blocks"><a class="anchor" href="#static-meta-model.building-blocks"></a>7.1.2. Building blocks</h4>
 <div class="paragraph">
 <p>The Cypher DSL offers the following building blocks as part of the public API:</p>
 </div>
@@ -2218,7 +2668,7 @@ declaration of the type <code>Node</code>: it just reads better.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="averysimplestaticmodel"><a class="anchor" href="#averysimplestaticmodel"></a>6.1.3. A very simple, static model</h4>
+<h4 id="averysimplestaticmodel"><a class="anchor" href="#averysimplestaticmodel"></a>7.1.3. A very simple, static model</h4>
 <div class="paragraph">
 <p>Both <code>NodeBase</code> and  <code>RelationshipBase</code> are meant to be extended to put your static model into something that is usable
 with the Cypher-DSL.</p>
@@ -2504,7 +2954,7 @@ This is stored at the owner. In this case, the <code>Person</code>:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="summary2"><a class="anchor" href="#summary2"></a>6.1.4. Summary</h4>
+<h4 id="summary2"><a class="anchor" href="#summary2"></a>7.1.4. Summary</h4>
 <div class="paragraph">
 <p>While there are possible other ways to define a static meta model with the Cypher-DSL, this is the way we create them with
 the <code>neo4j-cypher-dsl-codegen</code> models.</p>
@@ -2512,7 +2962,7 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 </div>
 </div>
 <div class="sect2">
-<h3 id="possibleusage"><a class="anchor" href="#possibleusage"></a>6.2. Possible Usage</h3>
+<h3 id="possibleusage"><a class="anchor" href="#possibleusage"></a>7.2. Possible Usage</h3>
 <div class="paragraph">
 <p>Please assume we did model the "Movie graph" (<code>:play movies</code> in Neo4j-Browser) with the following scheme:</p>
 </div>
@@ -2583,7 +3033,7 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="workwithproperties"><a class="anchor" href="#workwithproperties"></a>6.2.1. Work with properties</h4>
+<h4 id="workwithproperties"><a class="anchor" href="#workwithproperties"></a>7.2.1. Work with properties</h4>
 <div class="paragraph">
 <p>Properties can be used like normal objects:</p>
 </div>
@@ -2612,7 +3062,7 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect3">
-<h4 id="querynodesorrelationshipsbyproperties"><a class="anchor" href="#querynodesorrelationshipsbyproperties"></a>6.2.2. Query nodes or relationships by properties</h4>
+<h4 id="querynodesorrelationshipsbyproperties"><a class="anchor" href="#querynodesorrelationshipsbyproperties"></a>7.2.2. Query nodes or relationships by properties</h4>
 <div class="paragraph">
 <p>Use <code>withProperties</code> (and <code>named</code> you like) to model your queries as needed.
 Applicable to properties of nodes such as the title:</p>
@@ -2652,7 +3102,7 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect3">
-<h4 id="workwithrelationships"><a class="anchor" href="#workwithrelationships"></a>6.2.3. Work with relationships</h4>
+<h4 id="workwithrelationships"><a class="anchor" href="#workwithrelationships"></a>7.2.3. Work with relationships</h4>
 <div class="paragraph">
 <p>Relationships can be worked with like with properties:</p>
 </div>
@@ -2694,12 +3144,12 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect2">
-<h3 id="thespringdataneo4j6annotationprocessor"><a class="anchor" href="#thespringdataneo4j6annotationprocessor"></a>6.3. The Spring Data Neo4j 6 annotation processor</h3>
+<h3 id="thespringdataneo4j6annotationprocessor"><a class="anchor" href="#thespringdataneo4j6annotationprocessor"></a>7.3. The Spring Data Neo4j 6 annotation processor</h3>
 <div class="paragraph">
 <p>We provide a Java annotation processor for <a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j</a> under the following coordinates:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 29. Coordinates of the SDN 6 annotation processor</div>
+<div class="title">Listing 40. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
 <pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.4-SNAPSHOT</code></pre>
 </div>
@@ -2731,9 +3181,9 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 </table>
 </div>
 <div class="sect3">
-<h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>6.3.1. Configure your build</h4>
+<h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>7.3.1. Configure your build</h4>
 <div class="sect4">
-<h5 id="maven"><a class="anchor" href="#maven"></a>Maven</h5>
+<h5 id="maven2"><a class="anchor" href="#maven2"></a>Maven</h5>
 <div class="paragraph">
 <p>As a Maven user, please configure the build as follows:</p>
 </div>
@@ -2760,7 +3210,7 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 </div>
 </div>
 <div class="sect4">
-<h5 id="gradle"><a class="anchor" href="#gradle"></a>Gradle</h5>
+<h5 id="gradle2"><a class="anchor" href="#gradle2"></a>Gradle</h5>
 <div class="paragraph">
 <p>In a Gradle project, please add the following:</p>
 </div>
@@ -2816,7 +3266,7 @@ application like as follows to avoid dependency conflicts:</p>
 </div>
 </div>
 <div class="sect3">
-<h4 id="usage"><a class="anchor" href="#usage"></a>6.3.2. Usage</h4>
+<h4 id="usage"><a class="anchor" href="#usage"></a>7.3.2. Usage</h4>
 <div class="paragraph">
 <p>The processor supports the following arguments:</p>
 </div>
@@ -3051,7 +3501,7 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 </div>
 </div>
 <div class="sect1">
-<h2 id="appendix"><a class="anchor" href="#appendix"></a>7. Appendix</h2>
+<h2 id="appendix"><a class="anchor" href="#appendix"></a>8. Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="query-dsl-support"><a class="anchor" href="#query-dsl-support"></a>Query-DSL support</h3>
@@ -3193,7 +3643,7 @@ assertThat(statement.getCypher())
 To make use of <code>Cypher.adapt()</code>, you must add the following dependency in addition to the Cypher-DSL:</p>
 </div>
 <div class="sect4">
-<h5 id="maven2"><a class="anchor" href="#maven2"></a>Maven</h5>
+<h5 id="maven3"><a class="anchor" href="#maven3"></a>Maven</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
@@ -3206,7 +3656,7 @@ To make use of <code>Cypher.adapt()</code>, you must add the following dependenc
 </div>
 </div>
 <div class="sect4">
-<h5 id="gradle2"><a class="anchor" href="#gradle2"></a>Gradle</h5>
+<h5 id="gradle3"><a class="anchor" href="#gradle3"></a>Gradle</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
@@ -3269,7 +3719,7 @@ We use the following in our tests:</p>
 <p>The build requires a local copy of the project:</p>
 </div>
 <div id="clone-cypher-dsl" class="listingblock">
-<div class="title">Listing 30. Clone the Neo4j Cypher-DSL</div>
+<div class="title">Listing 41. Clone the Neo4j Cypher-DSL</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ git clone git@github.com:neo4j-contrib/cypher-dsl.git</code></pre>
 </div>
@@ -3282,7 +3732,7 @@ We use the following in our tests:</p>
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 31. Verify your JDK</div>
+<div class="title">Listing 42. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;11.0.10&quot; 2021-01-19
@@ -3294,7 +3744,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixe
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 32. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 43. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability           Origin
@@ -3311,7 +3761,7 @@ native-image             21.0.0              Native Image                  Early
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 33. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 44. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -3320,7 +3770,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 34. Build with default settings on Windows</div>
+<div class="title">Listing 45. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -3332,7 +3782,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 35. Skipping native tests</div>
+<div class="title">Listing 46. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -3344,7 +3794,7 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 36. Skipping native tests</div>
+<div class="title">Listing 47. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -3411,7 +3861,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 37. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 48. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -3432,7 +3882,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 38. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 49. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -3444,7 +3894,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 39. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 50. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -3469,7 +3919,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 40. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 51. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -3501,7 +3951,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 41. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 52. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -3519,7 +3969,7 @@ RETURN t, t2</code></pre>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 42. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 53. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -3533,7 +3983,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 43. Public internal API goes into a dedicated package</div>
+<div class="title">Listing 54. Public internal API goes into a dedicated package</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 MATCH (p:Package) - [:CONTAINS] -&gt; (c)
@@ -4628,7 +5078,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-05 12:15:17 UTC
+Last updated 2021-07-06 06:18:46 UTC
 </div>
 </div>
 </body>
