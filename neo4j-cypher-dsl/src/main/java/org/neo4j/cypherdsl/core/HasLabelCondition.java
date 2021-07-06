@@ -28,7 +28,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * A condition checking for the presence of labels on nodes.
+ * A condition checking for the presence of labels on nodes or types on relationships.
  *
  * @author Michael J. Simons
  * @since 1.0

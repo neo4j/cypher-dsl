@@ -1,0 +1,764 @@
+= TCK for Cypher-DSL Parser
+
+Most of the examples / test cases here use the default renderer that always escapes all names.
+This is unrelated to the actual parsing and can be turned of when rendering the Cypher-DSL-AST.
+
+== Nodes
+
+Nodes can be parsed and used in constructions of queries for example.
+They are probably one of the most useful elements.
+
+Parse them via:
+
+[source,java,indent=0,tabsize=4]
+----
+import org.neo4j.cypherdsl.parser.CypherParser;
+
+public class Demo {
+	public static void main(String...a) {
+		var node = CypherParser.parseNode("(m:Movie)");
+	}
+}
+----
+
+[[nodes-input]]
+.Input
+[source,cypher]
+----
+()
+(:`A`)
+(:A)
+(:A:B)
+(:A:`B`:C)
+(m)
+(m:Movie)
+(m {a:'b'})
+(m {a:'b', c: 'd'})
+----
+
+They will look like this when rendered with the default renderer:
+
+[[nodes-output]]
+.Output
+[source,cypher]
+----
+()
+(:`A`)
+(:`A`)
+(:`A`:`B`)
+(:`A`:`B`:`C`)
+(m)
+(m:`Movie`)
+(m {a: 'b'})
+(m {a: 'b', c: 'd'})
+----
+
+== Clauses
+
+Clauses can be parsed like this:
+
+[source,java,indent=0,tabsize=4]
+----
+import java.util.List;
+
+import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
+
+import org.neo4j.cypherdsl.parser.CypherParser;
+
+public class Demo {
+	public static void main(String... a) {
+		var clause = CypherParser.parseClause("MATCH (tom:Person {name: \"Tom Hanks\"})-[:ACTED_IN]->(tomHanksMovies)");
+		var cypher = Renderer.getDefaultRenderer().render(Statement.of(List.of(clause)));
+		System.out.println(cypher);
+	}
+}
+----
+
+These are the supported clauses:
+
+[[clauses-input]]
+.Input
+[source,cypher]
+----
+MATCH (tom {name: "Tom Hanks"})
+MATCH (tom:Person {name: "Tom Hanks"})-[:ACTED_IN]->(tomHanksMovies)
+MATCH (n:Movie), (m:Person)
+DELETE n
+DETACH DELETE n
+RETURN n
+RETURN n ORDER by n.name
+RETURN n ORDER by n.name desc
+RETURN n ORDER by n.name SKIP 5
+RETURN n ORDER by n.name SKIP 5 LIMIT 10
+RETURN n ORDER by n.name, n.firstName SKIP 5 LIMIT 10
+RETURN n.name AS name, n.firstName as vorname ORDER by n.name, n.firstName SKIP 5 LIMIT 10
+RETURN distinct n
+RETURN collect(n)
+CREATE (m:Movie)
+CREATE (m:Movie {title: "A title"})
+CREATE (a:Person) -[:ACTED_IN] -> (m:Movie {title: "A title"})
+MERGE (m:Movie)
+MERGE (m:Movie {title: "A title"})
+MERGE (a:Person) -[:ACTED_IN] -> (m:Movie {title: "A title"})
+WITH a
+WITH a WHERE a.name = 'Michael'
+WITH a ORDER by n.name, n.firstName desc SKIP 5 LIMIT 10 WHERE a.name = 'Michael'
+----
+
+[[clauses-output]]
+.Rendered output
+[source,cypher]
+----
+MATCH (tom {name: 'Tom Hanks'})
+MATCH (tom:`Person` {name: 'Tom Hanks'})-[:`ACTED_IN`]->(tomHanksMovies)
+MATCH (n:`Movie`), (m:`Person`)
+DELETE n
+DETACH DELETE n
+RETURN n
+RETURN n ORDER BY n.name ASC
+RETURN n ORDER BY n.name DESC
+RETURN n ORDER BY n.name ASC SKIP 5
+RETURN n ORDER BY n.name ASC SKIP 5 LIMIT 10
+RETURN n ORDER BY n.name ASC, n.firstName ASC SKIP 5 LIMIT 10
+RETURN n.name AS name, n.firstName AS vorname ORDER BY n.name ASC, n.firstName ASC SKIP 5 LIMIT 10
+RETURN DISTINCT n
+RETURN collect(n)
+CREATE (m:`Movie`)
+CREATE (m:`Movie` {title: 'A title'})
+CREATE (a:`Person`)-[:`ACTED_IN`]->(m:`Movie` {title: 'A title'})
+MERGE (m:`Movie`)
+MERGE (m:`Movie` {title: 'A title'})
+MERGE (a:`Person`)-[:`ACTED_IN`]->(m:`Movie` {title: 'A title'})
+WITH a
+WITH a WHERE a.name = 'Michael'
+WITH a ORDER BY n.name ASC, n.firstName DESC SKIP 5 LIMIT 10 WHERE a.name = 'Michael'
+----
+
+== Whole queries
+
+Of course, you can parse a query into a Cypher-DSL statement.
+Such a statement could be combined with another statement into `UNION` query or be used as a subquery.
+
+Statements can be parsed using `parse` or `parseStatement`.
+Like any other `parseXXX` method in the parser, additional `Options` might be supplied as well.
+
+[source,java,indent=0,tabsize=4]
+----
+import java.util.List;
+
+import org.neo4j.cypherdsl.core.Statement;
+
+import org.neo4j.cypherdsl.parser.CypherParser;
+
+public class Demo {
+	public static void main(String... a) {
+		var statement = CypherParser.parse("MATCH (movie:Movie) RETURN movie.title");
+		var cypher = statement.getCypher();
+		System.out.println(cypher);
+	}
+}
+----
+
+[[statements-input]]
+.Input
+[source,cypher,separated=true]
+----
+MATCH (n)
+RETURN n;
+MATCH (movie:Movie)
+RETURN movie.title;
+MATCH (director {name: 'Oliver Stone'})--(movie)
+RETURN movie.title;
+MATCH (wallstreet {title: 'Wall Street'})<-[:ACTED_IN|:DIRECTED]-(person)
+RETURN person.name;
+MATCH
+  (charlie:Person {name: 'Charlie Sheen'}),
+  (rob:Person {name: 'Rob Reiner'})
+CREATE (rob)-[:`TYPE INCLUDING A SPACE`]->(charlie);
+MATCH (n {name: 'Andy'})
+SET n.surname = 'Taylor'
+RETURN n.name, n.surname;
+MATCH (n {name: 'Andy'})
+SET (CASE WHEN n.age = 36 THEN n END).worksIn = 'Malmo'
+RETURN n.name, n.worksIn;
+MATCH
+  (at {name: 'Andy'}),
+  (pn {name: 'Peter'})
+SET at = pn
+RETURN at.name, at.age, at.hungry, pn.name, pn.age;
+MATCH (n)
+RETURN
+CASE
+  WHEN n.eyes = 'blue' THEN 1
+  WHEN n.age < 40      THEN 2
+  ELSE 3
+END AS result;
+MATCH (actor:Person {name: 'Charlie Sheen'})-[:ACTED_IN]->(movie:Movie)
+RETURN actor{.name, .realName, movies: collect(movie{.title, .year})};
+MATCH (actor:Person)-[:ACTED_IN]->(movie:Movie)
+WITH actor, count(movie) AS nbrOfMovies
+RETURN actor{.name, nbrOfMovies};
+MATCH (actor:Person {name: 'Charlie Sheen'})
+RETURN actor{.*, .age};
+MATCH (p {name: 'Peter'})
+SET p = {name: 'Peter Smith', position: 'Entrepreneur'}
+RETURN p.name, p.age, p.position;
+MATCH (p {name: 'Peter'})
+SET p += {age: 38, hungry: true, position: 'Entrepreneur'}
+RETURN p.name, p.age, p.hungry, p.position;
+MATCH (p {name: 'Peter'})
+SET p += {}
+RETURN p.name, p.age;
+MATCH (n {name: 'Andy'})
+SET n.position = 'Developer', n.surname = 'Taylor';
+MATCH (n {name: 'Andy'})
+SET n.surname = $surname
+RETURN n.name, n.surname;
+MATCH (n {name: 'Stefan'})
+SET n:German
+RETURN n.name, labels(n) AS labels;
+MATCH (n {name: 'George'})
+SET n:Swedish:Bossman
+RETURN n.name, labels(n) AS labels;
+MATCH (a {name: 'Andy'})
+REMOVE a.age
+RETURN a.name, a.age;
+MATCH (n {name: 'Peter'})
+REMOVE n:German
+RETURN n.name, labels(n);
+MATCH (n {name: 'Peter'})
+REMOVE n:German:Swedish
+RETURN n.name, labels(n);
+MATCH (n:Actor)
+RETURN n.name AS name
+UNION ALL
+MATCH (n:Movie)
+RETURN n.title AS name;
+MATCH (n:Actor)
+RETURN n.name AS name
+UNION
+MATCH (n:Movie)
+RETURN n.title AS name;
+UNWIND [1, 2, 3, null] AS x
+RETURN x, 'val' AS y;
+WITH [1, 1, 2, 2] AS coll
+UNWIND coll AS x
+WITH DISTINCT x
+RETURN collect(x) AS setOfVals;
+WITH
+  [1, 2] AS a,
+  [3, 4] AS b
+UNWIND (a + b) AS x
+RETURN x;
+WITH [[1, 2], [3, 4], 5] AS nested
+UNWIND nested AS x
+UNWIND x AS y
+RETURN y;
+UNWIND [] AS empty
+RETURN empty, 'literal_that_is_not_returned';
+MATCH p=(start)-[*]->(finish)
+WHERE start.name = 'A' AND finish.name = 'D'
+RETURN p;
+MATCH (person:Person) WHERE person.firstname STARTS WITH 'And' RETURN person;
+CALL db.labels();
+CALL db.labels;
+CALL dbms.procedures() YIELD name, signature
+WHERE name='dbms.listConfig'
+RETURN signature;
+CALL `db`.`labels`();
+CALL dbms.security.createUser('example_username', 'example_password', false);
+CALL dbms.security.createUser($username, $password, $requirePasswordChange);
+CALL db.labels() YIELD *;
+CALL db.labels() YIELD label
+RETURN count(label) AS numLabels;
+CALL db.labels() YIELD label
+WHERE label CONTAINS 'User'
+RETURN count(label) AS numLabels;
+CALL db.propertyKeys() YIELD propertyKey AS prop
+MATCH (n)
+WHERE n[prop] IS NOT NULL
+RETURN prop, count(n) AS numNodes;
+MERGE (keanu:Person {name: 'Keanu Reeves'})
+ON CREATE
+  SET keanu.created = timestamp()
+RETURN keanu.name, keanu.created;
+MERGE (person:Person)
+ON MATCH
+  SET person.found = true
+RETURN person.name, person.found;
+MERGE (keanu:Person {name: 'Keanu Reeves'})
+ON CREATE
+  SET keanu.created = timestamp()
+ON MATCH
+  SET keanu.lastSeen = timestamp()
+RETURN keanu.name, keanu.created, keanu.lastSeen;
+MERGE (person:Person)
+ON MATCH
+  SET
+    person.found = true,
+    person.lastAccessed = timestamp()
+RETURN person.name, person.found, person.lastAccessed;
+MERGE (person:Person)
+ON CREATE
+  SET person.created = timestamp()
+ON MATCH
+  SET
+    person.found = true,
+    person.lastAccessed = timestamp()
+RETURN person.name, person.found, person.lastAccessed;
+MATCH
+  (charlie:Person {name: 'Charlie Sheen'}),
+  (wallStreet:Movie {title: 'Wall Street'})
+MERGE (charlie)-[r:ACTED_IN]->(wallStreet)
+RETURN charlie.name, type(r), wallStreet.title;
+MATCH
+  (oliver:Person {name: 'Oliver Stone'}),
+  (reiner:Person {name: 'Rob Reiner'})
+MERGE (oliver)-[:DIRECTED]->(movie:Movie)<-[:ACTED_IN]-(reiner)
+RETURN movie;
+MATCH
+  (charlie:Person {name: 'Charlie Sheen'}),
+  (oliver:Person {name: 'Oliver Stone'})
+MERGE (charlie)-[r:KNOWS]-(oliver)
+RETURN r;
+MATCH (person:Person)
+MERGE (city:City {name: person.bornIn})
+MERGE (person)-[r:BORN_IN]->(city)
+RETURN person.name, person.bornIn, city;
+MATCH (person:Person)
+MERGE (person)-[r:HAS_CHAUFFEUR]->(chauffeur:Chauffeur {name: person.chauffeurName})
+RETURN person.name, person.chauffeurName, chauffeur;
+MATCH p = (a)-->(b)-->(c)
+WHERE a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel'
+RETURN reduce(totalAge = 0, n IN nodes(p) | totalAge + n.age) AS reduction;
+MATCH (p:Person)-[r:IS_FRIENDS_WITH]->(friend:Person)
+WHERE exists((p)-[:WORKS_FOR]->(:Company {name: 'Neo4j'}))
+RETURN p, r, friend;
+MATCH (p:Person)-[r:IS_FRIENDS_WITH]->(friend:Person)
+WHERE EXISTS {
+  MATCH (p)-[:WORKS_FOR]->(:Company {name: 'Neo4j'})
+}
+RETURN p, r, friend;
+MATCH (person:Person)-[:WORKS_FOR]->(company)
+WHERE company.name STARTS WITH "Company"
+AND EXISTS {
+  MATCH (person)-[:LIKES]->(t:Technology)
+  WHERE size((t)<-[:LIKES]-()) >= 3
+}
+RETURN person.name as person, company.name AS company;
+CALL {
+	MATCH (p:Person)-[:LIKES]->(:Technology {type: "Java"})
+	RETURN p
+
+	UNION
+
+	MATCH (p:Person)
+	WHERE size((p)-[:IS_FRIENDS_WITH]->()) > 1
+	RETURN p
+}
+RETURN p.name AS person, p.birthdate AS dob
+ORDER BY dob DESC;
+MATCH p=(start)-[*]->(finish)
+WHERE start.name = 'A' AND finish.name = 'D'
+FOREACH (n IN nodes(p) | SET n.marked = true);
+MATCH (a)
+WHERE a.name = 'Eskil'
+RETURN a.array, filter(x IN a.array WHERE size(x)= 3);
+MATCH p =(a)-->(b)-->(c)
+WHERE a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel'
+RETURN extract(n IN nodes(p)| n.age) AS extracted;
+call apoc.cypher.run("CALL apoc.cypher.run('CALL apoc.cypher.run(\"CALL apoc.cypher.run(\\'CALL apoc.cypher.run(\\\\\"RETURN true\\\\\", {}) YIELD value RETURN value\\', {}) YIELD value RETURN value\", {}) YIELD value RETURN value', {}) YIELD value RETURN value", {}) YIELD value RETURN value;
+----
+
+[[statements-output]]
+.Output
+[source,cypher]
+----
+MATCH (n) RETURN n
+MATCH (movie:`Movie`) RETURN movie.title
+MATCH (director {name: 'Oliver Stone'})--(movie) RETURN movie.title
+MATCH (wallstreet {title: 'Wall Street'})<-[:`ACTED_IN`|`DIRECTED`]-(person) RETURN person.name
+MATCH (charlie:`Person` {name: 'Charlie Sheen'}), (rob:`Person` {name: 'Rob Reiner'}) CREATE (rob)-[:`TYPE INCLUDING A SPACE`]->(charlie)
+MATCH (n {name: 'Andy'}) SET n.surname = 'Taylor' RETURN n.name, n.surname
+MATCH (n {name: 'Andy'}) SET (CASE WHEN n.age = 36 THEN n END).worksIn = 'Malmo' RETURN n.name, n.worksIn
+MATCH (at {name: 'Andy'}), (pn {name: 'Peter'}) SET at = pn RETURN at.name, at.age, at.hungry, pn.name, pn.age
+MATCH (n) RETURN CASE WHEN n.eyes = 'blue' THEN 1 WHEN n.age < 40 THEN 2 ELSE 3 END AS result
+MATCH (actor:`Person` {name: 'Charlie Sheen'})-[:`ACTED_IN`]->(movie:`Movie`) RETURN actor{.name, .realName, movies: collect(movie{.title, .year})}
+MATCH (actor:`Person`)-[:`ACTED_IN`]->(movie:`Movie`) WITH actor, count(movie) AS nbrOfMovies RETURN actor{.name, nbrOfMovies}
+MATCH (actor:`Person` {name: 'Charlie Sheen'}) RETURN actor{.*, .age}
+MATCH (p {name: 'Peter'}) SET p = {name: 'Peter Smith', position: 'Entrepreneur'} RETURN p.name, p.age, p.position
+MATCH (p {name: 'Peter'}) SET p += {age: 38, hungry: true, position: 'Entrepreneur'} RETURN p.name, p.age, p.hungry, p.position
+MATCH (p {name: 'Peter'}) SET p += {} RETURN p.name, p.age
+MATCH (n {name: 'Andy'}) SET n.position = 'Developer', n.surname = 'Taylor'
+MATCH (n {name: 'Andy'}) SET n.surname = $surname RETURN n.name, n.surname
+MATCH (n {name: 'Stefan'}) SET n:`German` RETURN n.name, labels(n) AS labels
+MATCH (n {name: 'George'}) SET n:`Swedish`:`Bossman` RETURN n.name, labels(n) AS labels
+MATCH (a {name: 'Andy'}) REMOVE a.age RETURN a.name, a.age
+MATCH (n {name: 'Peter'}) REMOVE n:`German` RETURN n.name, labels(n)
+MATCH (n {name: 'Peter'}) REMOVE n:`German`:`Swedish` RETURN n.name, labels(n)
+MATCH (n:`Actor`) RETURN n.name AS name UNION ALL MATCH (n:`Movie`) RETURN n.title AS name
+MATCH (n:`Actor`) RETURN n.name AS name UNION MATCH (n:`Movie`) RETURN n.title AS name
+UNWIND [1, 2, 3, NULL] AS x RETURN x, 'val' AS y
+WITH [1, 1, 2, 2] AS coll UNWIND coll AS x WITH DISTINCT x RETURN collect(x) AS setOfVals
+WITH [1, 2] AS a, [3, 4] AS b UNWIND (a + b) AS x RETURN x
+WITH [[1, 2], [3, 4], 5] AS nested UNWIND nested AS x UNWIND x AS y RETURN y
+UNWIND [] AS empty RETURN empty, 'literal_that_is_not_returned'
+MATCH p = (start)-[*]->(finish) WHERE (start.name = 'A' AND finish.name = 'D') RETURN p
+MATCH (person:`Person`) WHERE person.firstname STARTS WITH 'And' RETURN person
+CALL db.labels()
+CALL db.labels()
+CALL dbms.procedures() YIELD name, signature WHERE name = 'dbms.listConfig' RETURN signature
+CALL db.labels()
+CALL dbms.security.createUser('example_username', 'example_password', false)
+CALL dbms.security.createUser($username, $password, $requirePasswordChange)
+CALL db.labels() YIELD *
+CALL db.labels() YIELD label RETURN count(label) AS numLabels
+CALL db.labels() YIELD label WHERE label CONTAINS 'User' RETURN count(label) AS numLabels
+CALL db.propertyKeys() YIELD propertyKey AS prop MATCH (n) WHERE n[prop] IS NOT NULL RETURN prop, count(n) AS numNodes
+MERGE (keanu:`Person` {name: 'Keanu Reeves'}) ON CREATE SET keanu.created = timestamp() RETURN keanu.name, keanu.created
+MERGE (person:`Person`) ON MATCH SET person.found = true RETURN person.name, person.found
+MERGE (keanu:`Person` {name: 'Keanu Reeves'}) ON CREATE SET keanu.created = timestamp() ON MATCH SET keanu.lastSeen = timestamp() RETURN keanu.name, keanu.created, keanu.lastSeen
+MERGE (person:`Person`) ON MATCH SET person.found = true, person.lastAccessed = timestamp() RETURN person.name, person.found, person.lastAccessed
+MERGE (person:`Person`) ON CREATE SET person.created = timestamp() ON MATCH SET person.found = true, person.lastAccessed = timestamp() RETURN person.name, person.found, person.lastAccessed
+MATCH (charlie:`Person` {name: 'Charlie Sheen'}), (wallStreet:`Movie` {title: 'Wall Street'}) MERGE (charlie)-[r:`ACTED_IN`]->(wallStreet) RETURN charlie.name, type(r), wallStreet.title
+MATCH (oliver:`Person` {name: 'Oliver Stone'}), (reiner:`Person` {name: 'Rob Reiner'}) MERGE (oliver)-[:`DIRECTED`]->(movie:`Movie`)<-[:`ACTED_IN`]-(reiner) RETURN movie
+MATCH (charlie:`Person` {name: 'Charlie Sheen'}), (oliver:`Person` {name: 'Oliver Stone'}) MERGE (charlie)-[r:`KNOWS`]-(oliver) RETURN r
+MATCH (person:`Person`) MERGE (city:`City` {name: person.bornIn}) MERGE (person)-[r:`BORN_IN`]->(city) RETURN person.name, person.bornIn, city
+MATCH (person:`Person`) MERGE (person)-[r:`HAS_CHAUFFEUR`]->(chauffeur:`Chauffeur` {name: person.chauffeurName}) RETURN person.name, person.chauffeurName, chauffeur
+MATCH p = (a)-->(b)-->(c) WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') RETURN reduce(totalAge = 0, n IN nodes(p) | (totalAge + n.age)) AS reduction
+MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE exists((p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})) RETURN p, r, friend
+MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS {MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})} RETURN p, r, friend
+MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3}) RETURN person.name AS person, company.name AS company
+CALL {MATCH (p:`Person`)-[:`LIKES`]->(:`Technology` {type: 'Java'}) RETURN p UNION MATCH (p:`Person`) WHERE size((p)-[:`IS_FRIENDS_WITH`]->()) > 1 RETURN p} RETURN p.name AS person, p.birthdate AS dob ORDER BY dob DESC
+MATCH p = (start)-[*]->(finish) WHERE (start.name = 'A' AND finish.name = 'D') FOREACH (n IN nodes(p) | SET n.marked = true)
+MATCH (a) WHERE a.name = 'Eskil' RETURN a.array, [x IN a.array WHERE size(x) = 3 | x]
+MATCH p = (a)-->(b)-->(c) WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') RETURN [n IN nodes(p) | n.age] AS extracted
+CALL apoc.cypher.run('CALL apoc.cypher.run(\'CALL apoc.cypher.run(\"CALL apoc.cypher.run(\\\'CALL apoc.cypher.run(\\\\\"RETURN true\\\\\", {}) YIELD value RETURN value\\\', {}) YIELD value RETURN value\", {}) YIELD value RETURN value\', {}) YIELD value RETURN value', {}) YIELD value RETURN value
+----
+
+=== Hints
+
+You can also use hints:
+
+[[statements-input-hints]]
+.Output
+[source,cypher,separated=true]
+----
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411}) RETURN *;
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411})
+USING INDEX p:Pioneer(born)
+RETURN *;
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411})
+USING INDEX i:INVENTED_BY(year)
+RETURN *;
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411})
+USING INDEX s:Scientist(born)
+USING INDEX cc:Country(formed)
+RETURN *;
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411})
+USING SCAN s:Scientist
+RETURN *;
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411})
+USING SCAN i:INVENTED_BY
+RETURN *;
+MATCH (s:Scientist {born: 1850})-[:RESEARCHED]->(sc:Science)<-[i:INVENTED_BY {year: 560}]-(p:Pioneer {born: 525})-[:LIVES_IN]->(c:City)-[:PART_OF]->(cc:Country {formed: 411})
+USING INDEX s:Scientist(born)
+USING INDEX cc:Country(formed)
+USING JOIN ON p
+RETURN *;
+MATCH (s:Scientist {born: 1850})
+OPTIONAL MATCH (s)-[:RESEARCHED]->(sc:Science)
+USING JOIN ON s
+RETURN *;
+----
+
+[[statements-output-hints]]
+.Output
+[source,cypher]
+----
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) RETURN *
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) USING INDEX p:`Pioneer`(born) RETURN *
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) USING INDEX i:`INVENTED_BY`(year) RETURN *
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) USING INDEX s:`Scientist`(born) USING INDEX cc:`Country`(formed) RETURN *
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) USING SCAN s:`Scientist` RETURN *
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) USING SCAN i:`INVENTED_BY` RETURN *
+MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED_BY` {year: 560}]-(p:`Pioneer` {born: 525})-[:`LIVES_IN`]->(c:`City`)-[:`PART_OF`]->(cc:`Country` {formed: 411}) USING INDEX s:`Scientist`(born) USING INDEX cc:`Country`(formed) USING JOIN ON p RETURN *
+MATCH (s:`Scientist` {born: 1850}) OPTIONAL MATCH (s)-[:`RESEARCHED`]->(sc:`Science`) USING JOIN ON s RETURN *
+----
+
+Of course, `USING PERIODIC` is supported, too:
+
+[[statements-input-hints-periodic]]
+.Output
+[source,cypher,alwaysEscape=false,separated=true]
+----
+USING PERIODIC COMMIT LOAD CSV FROM 'file:///artists.csv' AS line
+CREATE (:Artist {name: line[1], year: toInteger(line[2])});
+USING PERIODIC COMMIT 500 LOAD CSV FROM 'file:///artists.csv' AS line
+CREATE (:Artist {name: line[1], year: toInteger(line[2])});
+LOAD CSV FROM 'file:///artists-with-escaped-char.csv' AS line
+CREATE (a:Artist {name: line[1], year: toInteger(line[2])})
+RETURN
+  a.name AS name,
+  a.year AS year,
+  size(a.name) AS size;
+LOAD CSV FROM 'file:///artists.csv' AS line
+RETURN linenumber() AS number, line;
+LOAD CSV FROM 'file:///artists.csv' AS line
+RETURN DISTINCT file() AS path;
+USING PERIODIC COMMIT 42 LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line FIELDTERMINATOR '|'
+CREATE (:`Artist` {name: line[1], year: toInteger(line[2]), source: ((file() + '@') + linenumber())});
+----
+
+[[statements-output-hints-periodic]]
+.Output
+[source,cypher,alwaysEscape=false]
+----
+USING PERIODIC COMMIT LOAD CSV FROM 'file:///artists.csv' AS line CREATE (:Artist {name: line[1], year: toInteger(line[2])})
+USING PERIODIC COMMIT 500 LOAD CSV FROM 'file:///artists.csv' AS line CREATE (:Artist {name: line[1], year: toInteger(line[2])})
+LOAD CSV FROM 'file:///artists-with-escaped-char.csv' AS line CREATE (a:Artist {name: line[1], year: toInteger(line[2])}) RETURN a.name AS name, a.year AS year, size(a.name) AS size
+LOAD CSV FROM 'file:///artists.csv' AS line RETURN linenumber() AS number, line
+LOAD CSV FROM 'file:///artists.csv' AS line RETURN DISTINCT file() AS path
+USING PERIODIC COMMIT 42 LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line FIELDTERMINATOR '|' CREATE (:Artist {name: line[1], year: toInteger(line[2]), source: ((file() + '@') + linenumber())})
+----
+
+=== Subqueries
+
+Executing subqueries requires at least Neo4j 4.0, but you can of course parse and modifiy those queries:
+
+[[statements-input-subqueries]]
+.Input
+[source,cypher,separated=true]
+----
+UNWIND [0, 1, 2] AS x
+CALL {
+  WITH x
+  RETURN x * 10 AS y
+}
+RETURN x, y;
+CALL {
+  MATCH (p:Person)
+  RETURN p
+  ORDER BY p.age ASC
+  LIMIT 1
+UNION
+  MATCH (p:Person)
+  RETURN p
+  ORDER BY p.age DESC
+  LIMIT 1
+}
+RETURN p.name, p.age
+ORDER BY p.name;
+CALL {
+  MATCH (p:Person)-[:FRIEND_OF]->(other:Person)
+  RETURN p, other
+UNION
+  MATCH (p:Child)-[:CHILD_OF]->(other:Parent)
+  RETURN p, other
+}
+RETURN DISTINCT p.name, count(other);
+MATCH (p:Person)
+CALL {
+  UNWIND range(1, 5) AS i
+  CREATE (c:Clone)
+  RETURN count(c) AS numberOfClones
+}
+RETURN p.name, numberOfClones;
+UNWIND [0, 1, 2] AS x
+CALL {
+  WITH x
+  RETURN max(x) AS xMax
+}
+RETURN x, xMax;
+----
+
+[[statements-output-subqueries]]
+.Output
+[source,cypher]
+----
+UNWIND [0, 1, 2] AS x CALL {WITH x RETURN (x * 10) AS y} RETURN x, y
+CALL {MATCH (p:`Person`) RETURN p ORDER BY p.age ASC LIMIT 1 UNION MATCH (p:`Person`) RETURN p ORDER BY p.age DESC LIMIT 1} RETURN p.name, p.age ORDER BY p.name ASC
+CALL {MATCH (p:`Person`)-[:`FRIEND_OF`]->(other:`Person`) RETURN p, other UNION MATCH (p:`Child`)-[:`CHILD_OF`]->(other:`Parent`) RETURN p, other} RETURN DISTINCT p.name, count(other)
+MATCH (p:`Person`) CALL {UNWIND range(1, 5) AS i CREATE (c:`Clone`) RETURN count(c) AS numberOfClones} RETURN p.name, numberOfClones
+UNWIND [0, 1, 2] AS x CALL {WITH x RETURN max(x) AS xMax} RETURN x, xMax
+----
+
+=== Original test suite
+
+Some statements from the original test suite
+
+[[statements-input-originally-generated]]
+.Input
+[source,cypher]
+----
+MATCH (app:`Location` {uuid: $app_uuid})<-[:`PART_OF`*0..3]-(loc_start:`Location`), (loc_start)<-[:`IN`|`IN_ANALYTICS`]-(r:`Resume`) WITH DISTINCT r, loc_start, app MATCH (r)-[:`IN_COHORT_OF`]->(o:`Offer` {is_valid: true})-[:`IN`]->(app) WITH DISTINCT r, loc_start, app, o MATCH (o)-[:`FOR`]->(start_n:`ResumeNode`) WHERE id(start_n) IN $start_ids RETURN DISTINCT r, loc_start, app, o, start_n
+MATCH (b:`Bike`) WHERE (:`Person`)-[:`OWNS`]->(b) WITH b MATCH (o:`Person`)-[r:`OWNS`]->(b) RETURN b.f, r.x
+MATCH (o:`Person`)-[r:`OWNS`]->(b:`Bike`) WHERE (o)-[r]->(b) RETURN r
+MATCH (node:`Division`) WITH DISTINCT node WHERE NOT (node)-[:`IN`]->(:`Department`)-[:`INSIDE` {rel_property: true}]->(:`Department`)-[:`EMPLOYS`]->(:`Employee`) RETURN *
+MATCH (person:`Person`) WHERE (((person)-[:`A`]->() OR (person)-[:`B`]->()) AND (((person)-[:`C`]->() OR ((person)-[:`D`]->() AND (person)-[:`E`]->())) OR (person)-[:`F`]->())) RETURN person
+MATCH (node:`Node`) WITH DISTINCT node, false AS f, CASE WHEN node.ll IS NULL THEN node.l ELSE node.ll END AS l RETURN *
+CALL db.index.fulltext.queryNodes('livesearch', '*a*') YIELD node MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) WHERE a.asset_id = node.asset_id WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata
+CALL db.index.fulltext.queryNodes('livesearch', '*a*') YIELD node AS x MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) WHERE a.asset_id = x.asset_id WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata
+WITH $p AS nameOfIndex CALL db.index.fulltext.queryNodes(nameOfIndex, '*a*') YIELD node MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) WHERE a.asset_id = node.asset_id WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata
+MATCH (n:`Node`) WITH n WITH n CALL my.procedure() YIELD x WITH n RETURN n
+MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.firstName = 'Michael', p.surname = 'Hunger' RETURN p
+MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels
+MATCH (n) WITH n CALL foo() YIELD label WITH label RETURN count(label) AS numLabels
+RETURN [p = (n)-[:`LIKES`|`OWNS`*]->() | p]
+MATCH p = (michael {name: 'Michael Douglas'})-->() RETURN p
+MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][0]}
+MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) | b.released] AS years
+MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) WHERE b:`Movie` | b.released] AS years
+MATCH (n:`Person`) RETURN n, [[(n)-[r_f1:`FOUNDED`]->(o1:`Organisation`) | [r_f1, o1]], [(n)-[r_e1:`EMPLOYED_BY`]->(o1) | [r_e1, o1]], [(n)-[r_l1:`LIVES_AT`]->(l1:`Location`) | [r_l1, l1, [[(l1)<-[r_l2:`LIVES_AT`]-(p2:`Person`) | [r_l2, p2]]]]]]
+----
+
+[[statements-output-originally-generated]]
+.Output
+[source,cypher]
+----
+MATCH (app:`Location` {uuid: $app_uuid})<-[:`PART_OF`*0..3]-(loc_start:`Location`), (loc_start)<-[:`IN`|`IN_ANALYTICS`]-(r:`Resume`) WITH DISTINCT r, loc_start, app MATCH (r)-[:`IN_COHORT_OF`]->(o:`Offer` {is_valid: true})-[:`IN`]->(app) WITH DISTINCT r, loc_start, app, o MATCH (o)-[:`FOR`]->(start_n:`ResumeNode`) WHERE id(start_n) IN $start_ids RETURN DISTINCT r, loc_start, app, o, start_n
+MATCH (b:`Bike`) WHERE (:`Person`)-[:`OWNS`]->(b) WITH b MATCH (o:`Person`)-[r:`OWNS`]->(b) RETURN b.f, r.x
+MATCH (o:`Person`)-[r:`OWNS`]->(b:`Bike`) WHERE (o)-[r]->(b) RETURN r
+MATCH (node:`Division`) WITH DISTINCT node WHERE NOT (node)-[:`IN`]->(:`Department`)-[:`INSIDE` {rel_property: true}]->(:`Department`)-[:`EMPLOYS`]->(:`Employee`) RETURN *
+MATCH (person:`Person`) WHERE (((person)-[:`A`]->() OR (person)-[:`B`]->()) AND ((person)-[:`C`]->() OR ((person)-[:`D`]->() AND (person)-[:`E`]->()) OR (person)-[:`F`]->())) RETURN person
+MATCH (node:`Node`) WITH DISTINCT node, false AS f, CASE WHEN node.ll IS NULL THEN node.l ELSE node.ll END AS l RETURN *
+CALL db.index.fulltext.queryNodes('livesearch', '*a*') YIELD node MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) WHERE a.asset_id = node.asset_id WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata
+CALL db.index.fulltext.queryNodes('livesearch', '*a*') YIELD node AS x MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) WHERE a.asset_id = x.asset_id WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata
+WITH $p AS nameOfIndex CALL db.index.fulltext.queryNodes(nameOfIndex, '*a*') YIELD node MATCH (g:`Group`)-[:`GROUPS`]->(a:`Asset`)<-[:`ON`]-(:`Deploy`)<-[:`SCHEDULED`]-(d:`Device`) WHERE a.asset_id = node.asset_id WITH DISTINCT collect(d{.sigfox_id, a}) AS assetdata RETURN assetdata
+MATCH (n:`Node`) WITH n WITH n CALL my.procedure() YIELD x WITH n RETURN n
+MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.firstName = 'Michael', p.surname = 'Hunger' RETURN p
+MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels
+MATCH (n) WITH n CALL foo() YIELD label WITH label RETURN count(label) AS numLabels
+RETURN [p = (n)-[:`LIKES`|`OWNS`*]->() | p]
+MATCH p = (michael {name: 'Michael Douglas'})-->() RETURN p
+MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][0]}
+MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) | b.released] AS years
+MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) WHERE b:`Movie` | b.released] AS years
+MATCH (n:`Person`) RETURN n, [[(n)-[r_f1:`FOUNDED`]->(o1:`Organisation`) | [r_f1, o1]], [(n)-[r_e1:`EMPLOYED_BY`]->(o1) | [r_e1, o1]], [(n)-[r_l1:`LIVES_AT`]->(l1:`Location`) | [r_l1, l1, [[(l1)<-[r_l2:`LIVES_AT`]-(p2:`Person`) | [r_l2, p2]]]]]]
+----
+
+== Expressions
+
+You can parse expressions, too.
+They can be used to enrich queries in many places, for example as conditions or properties.
+
+=== Usable datatypes
+
+[[expressions-input-datatypes]]
+.Input
+[source,cypher]
+----
+1
+-1
+0XF
+0xF
+-0xE
+010
+-010
+1.1
+3.14
+6.022E23
+6.022e+24.0
+TRUE
+true
+True
+fAlse
+FALSE
+----
+
+[[expressions-output-datatypes]]
+.Output
+[source,cypher]
+----
+1
+-1
+15
+15
+-14
+8
+-8
+1.1
+3.14
+6.022E23
+6.022E24
+true
+true
+true
+false
+false
+----
+
+=== Operators and conditions
+
+[[expressions-input-0]]
+.Input
+[source,cypher]
+----
++1
++-1
+-1
+--1
+NOT true
+2+2
+2-2
+2*2
+2/2
+2%2
+2^2
+n.f <> 1
+n.f != 1
+n.f = 1
+n.f <= 1
+n.f >= 1
+n.f < 1
+n.f > 1
+n.f =~ '.*'
+n.f ends with "foo"
+n.f starts with 'foo'
+n.f contains 'foo'
+n.f is NULL
+actor{.name, .realName, movies: collect(movie{.title, .year})}
+l[1]
+l[1..2]
+[x IN range(0,10) WHERE x % 2 = 0 | x^3 ]
+[x IN range(0,10) WHERE x % 2 = 0 ]
+[x IN range(0,10) | x^3 ]
+[(a)-->(b) WHERE b:Movie | b.released]
+----
+
+[[expressions-output-0]]
+.Rendered output
+[source,cypher]
+----
++1
++-1
+-1
+--1
+NOT (true)
+(2 + 2)
+(2 - 2)
+(2 * 2)
+(2 / 2)
+(2 % 2)
+2^2
+n.f <> 1
+n.f <> 1
+n.f = 1
+n.f <= 1
+n.f >= 1
+n.f < 1
+n.f > 1
+n.f =~ '.*'
+n.f ENDS WITH 'foo'
+n.f STARTS WITH 'foo'
+n.f CONTAINS 'foo'
+n.f IS NULL
+actor{.name, .realName, movies: collect(movie{.title, .year})}
+l[1]
+l[1..2]
+[x IN range(0, 10) WHERE (x % 2) = 0 | x^3]
+[x IN range(0, 10) WHERE (x % 2) = 0]
+[x IN range(0, 10) | x^3]
+[(a)-->(b) WHERE b:`Movie` | b.released]
+----

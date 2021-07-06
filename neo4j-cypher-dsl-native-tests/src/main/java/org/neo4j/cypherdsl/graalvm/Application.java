@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.graalvm;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+import org.neo4j.cypherdsl.parser.CypherParser;
 
 /**
  * @author Michael J. Simons
@@ -39,6 +40,7 @@ public class Application {
 		statement.getParameterNames().forEach(System.out::println);
 		System.out.println(cypherRenderer.render(statement));
 		System.out.println(cypherRenderer.render(generateComplexQuery()));
+		System.out.println(CypherParser.parse("MATCH (p:Parser) RETURN p").getCypher());
 	}
 
 	private static Statement findAllMovies() {

@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public final class Return implements Visitable {
+public final class Return implements Clause {
 
 	private final Distinct distinct;
 

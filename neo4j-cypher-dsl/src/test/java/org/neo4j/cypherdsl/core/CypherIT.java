@@ -1577,7 +1577,7 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
-					"MATCH (u:`User`) WHERE NOT (u.name IS NOT NULL) RETURN u");
+					"MATCH (u:`User`) WHERE u.name IS NULL RETURN u");
 		}
 
 		@Test

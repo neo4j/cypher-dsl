@@ -16,6 +16,21 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-dsl-codegen-core</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
+		<!-- SDN 6 annotation proc -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-neo4j</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>com.google.testing.compile</groupId>
@@ -38,21 +53,6 @@
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher-dsl-codegen-core</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
-		<!-- SDN 6 annotation proc -->
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-neo4j</artifactId>
 		</dependency>
 	</dependencies>
 

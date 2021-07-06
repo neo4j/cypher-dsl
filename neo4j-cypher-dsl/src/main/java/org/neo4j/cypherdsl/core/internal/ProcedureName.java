@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
@@ -45,6 +46,14 @@ public final class ProcedureName implements Visitable {
 		} else {
 			Namespace namespace = new Namespace(Arrays.copyOf(namespaceAndProcedure, namespaceAndProcedure.length - 1));
 			return new ProcedureName(namespace, namespaceAndProcedure[namespaceAndProcedure.length - 1]);
+		}
+	}
+
+	public static ProcedureName from(List<String> namespace, String procedure) {
+		if (namespace.isEmpty()) {
+			return new ProcedureName(procedure);
+		} else {
+			return new ProcedureName(new Namespace(namespace.toArray(new String[0])), procedure);
 		}
 	}
 

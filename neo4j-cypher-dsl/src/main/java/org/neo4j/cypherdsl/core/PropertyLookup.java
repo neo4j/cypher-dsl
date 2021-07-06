@@ -40,7 +40,16 @@ public final class PropertyLookup implements Expression {
 	/** This flag is set to true for dynamic lookups via `p['x']` notation. */
 	private final boolean dynamicLookup;
 
-	static PropertyLookup forName(String name) {
+	/**
+	 * This creates a property lookup for a given name. It is mostly usable when building an AST outside the fluent API.
+	 * If you need to create property lookup for a {@link SymbolicName symbolic name}, most likely you can just use the
+	 * symbolic name.
+	 *
+	 * @param name The name to lookup
+	 * @return A property lookup
+	 * @since 2021.3.0
+	 */
+	public static PropertyLookup forName(String name) {
 
 		Assertions.hasText(name, "The property's name is required.");
 		return new PropertyLookup(SymbolicName.unsafe(name), false);

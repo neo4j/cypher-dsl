@@ -55,10 +55,22 @@ public final class MergeAction implements Visitable {
 		ON_MATCH
 	}
 
+	/**
+	 * Creates a new merge action. Mostly useful when building the AST outside the fluent DSL.
+	 *
+	 * @param type The type of the action
+	 * @param set  The corresponding set clause
+	 * @return An immutable action
+	 * @since 2021.3.0
+	 */
+	public static MergeAction of(Type type, Set set) {
+		return new MergeAction(type, set);
+	}
+
 	private final Type type;
 	private final Set set;
 
-	MergeAction(Type type, Set set) {
+	private MergeAction(Type type, Set set) {
 		this.type = type;
 		this.set = set;
 	}

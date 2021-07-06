@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -49,7 +50,7 @@ public final class Match implements ReadingClause {
 
 	private final Where optionalWhere;
 
-	Match(boolean optional, Pattern pattern, Where optionalWhere, List<Hint> optionalHints) {
+	Match(boolean optional, Pattern pattern, @Nullable Where optionalWhere, @Nullable List<Hint> optionalHints) {
 		this.optional = optional;
 		this.pattern = pattern;
 		this.optionalWhere = optionalWhere;

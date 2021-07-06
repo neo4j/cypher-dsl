@@ -489,12 +489,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final OngoingReadingWithoutWhere call(Statement statement) {
+	public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
 
 		this.closeCurrentOngoingMatch();
 		this.closeCurrentOngoingUpdate();
 
-		this.currentSinglePartElements.add(Subquery.call(statement));
+		this.currentSinglePartElements.add(Subquery.call(statement, imports));
 
 		return this;
 	}
@@ -945,11 +945,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingWithoutWhere call(Statement statement) {
+		public OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
-				.call(statement);
+				.call(statement, imports);
 		}
 
 		@NotNull
@@ -1221,7 +1221,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 				ExpressionList expressionList = new ExpressionList(
 					prepareSetExpressions(updateType, Arrays.asList(expressions)));
-				this.mergeActions.add(new MergeAction(type, new Set(expressionList)));
+				this.mergeActions.add(MergeAction.of(type, new Set(expressionList)));
 				return this;
 			}
 		}
@@ -1463,8 +1463,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		Match buildMatch() {
-			Pattern pattern = new Pattern(this.patternList);
-			return new Match(optional, pattern, conditionBuilder.buildCondition().map(Where::new).orElse(null), hints);
+			return (Match) Clauses.match(optional, this.patternList, conditionBuilder.buildCondition().orElse(null), hints);
 		}
 	}
 
@@ -1658,8 +1657,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement) {
-			return new DefaultStatementBuilder(this.buildCall()).call(statement);
+		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
+			return new DefaultStatementBuilder(this.buildCall()).call(statement, imports);
 		}
 
 		@NotNull
@@ -1802,10 +1801,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingWithoutWhere call(Statement statement) {
+		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.call(statement);
+			return DefaultStatementBuilder.this.call(statement, imports);
 		}
 
 		@NotNull
@@ -1862,6 +1861,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected void orderBy(SortItem... sortItem) {
 			this.sortItemList.addAll(Arrays.asList(sortItem));
+		}
+
+		protected void orderBy(Collection<SortItem> sortItems) {
+			if (sortItems != null) {
+				this.sortItemList.addAll(sortItems);
+			}
 		}
 
 		protected void orderBy(Expression expression) {

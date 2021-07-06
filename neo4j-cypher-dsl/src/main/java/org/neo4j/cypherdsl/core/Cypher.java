@@ -1173,10 +1173,11 @@ public final class Cypher {
 			i = 1;
 		}
 
-		List<SingleQuery> listOfQueries = new ArrayList<>();
+		List<Statement> listOfQueries = new ArrayList<>();
 		do {
-			Assertions.isInstanceOf(SingleQuery.class, statements[i], "Can only union single queries!");
-			listOfQueries.add((SingleQuery) statements[i]);
+			Assertions.isTrue(statements[i] instanceof SingleQuery || statements[i] instanceof ClausesBasedStatement,
+				"Can only union single queries!");
+			listOfQueries.add(statements[i]);
 		} while (++i < statements.length);
 
 		if (existingUnionQuery == null) {
