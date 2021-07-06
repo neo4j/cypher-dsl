@@ -25,6 +25,7 @@ import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Functions;
 // end::using-person-repo[]
+import org.neo4j.cypherdsl.parser.CypherParser;
 import org.springframework.data.domain.Example;
 // tag::using-person-repo[]
 import org.springframework.stereotype.Service;
@@ -50,6 +51,17 @@ final class PeopleService {
 	Optional<Person> findOne(Example<Person> example) {
 		return peopleRepository.findOne(example);
 	}
+
+
+	// tag::using-parser-with-spring[]
+	Iterable<Person> findPeopleBornAfterThe70tiesAnd(String additionalConditions) {
+
+		return peopleRepository.findAll(
+			PERSON.BORN.gte(Cypher.literalOf(1980))
+				.and(CypherParser.parseExpression(additionalConditions).asCondition()) // <.>
+		);
+	}
+	// end::using-parser-with-spring[]
 
 	// tag::using-person-repo[]
 	Iterable<Person> findPeopleBornInThe70tiesOr(Optional<String> optionalName) {

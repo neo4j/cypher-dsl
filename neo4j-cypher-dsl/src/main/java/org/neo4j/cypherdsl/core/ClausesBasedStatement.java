@@ -60,7 +60,8 @@ class ClausesBasedStatement extends AbstractStatement {
 		visitor.leave(this);
 	}
 
-	boolean doesReturnOrYield() {
+	@Override
+	public boolean doesReturnOrYield() {
 		if (this.clauses.isEmpty()) {
 			return false;
 		}

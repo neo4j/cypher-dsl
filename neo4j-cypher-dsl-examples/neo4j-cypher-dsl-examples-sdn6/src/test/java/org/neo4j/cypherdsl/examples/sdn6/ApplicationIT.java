@@ -174,4 +174,16 @@ class ApplicationIT {
 		var people = exchange.getBody();
 		assertThat(people).hasSize(18);
 	}
+
+	@Test
+	@DisplayName("Using conditions pt3.")
+	void findPeopleBornAfterThe70tiesShouldWork(@Autowired TestRestTemplate restTemplate) {
+
+		var exchange = restTemplate
+			.exchange("/api/people/findPeopleBornAfterThe70ties?conditions={conditions}", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+			}, "n.name contains \"Ricci\" OR n.name ends with 'Hirsch'");
+		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
+		var people = exchange.getBody();
+		assertThat(people).hasSize(2);
+	}
 }

@@ -133,7 +133,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/te
 <.> The callback from step one is passed as callback to the event `ON_RETURN_ITEM` and will be called for every item
 <.> The final option instance will be applied to the parser. The statement will render to the same result as <<example-using-input,the first example>>.
 
-== Preventing certain things
+=== Preventing certain things
 
 Callbacks can of course be used to prevent things.
 Any exception thrown will halt the parsing.
@@ -208,3 +208,28 @@ include::../../neo4j-cypher-dsl-parser/src/test/java/org/neo4j/cypherdsl/parser/
 
 Changing relationship types via a filter is possible as well, but as relationships might only have one type, the number of
 usecases is smaller.
+
+
+=== Combining the parser with SDN's `CypherdslConditionExecutor`
+
+Spring Data Neo4j 6 provides `CypherdslConditionExecutor`. This is a fragment that adds the capability to execute
+statements with added conditions to a `Neo4jRepository`.
+
+Given the following repository:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/PeopleRepository.java[tag=additional-fragments]
+----
+<.> Allows to just add conditions to our generated queries
+<.> Provides an alternative to using @Query with strings
+
+One possible use case is presented in this service:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/PeopleService.java[tag=using-parser-with-spring]
+----
+<.> The condition that only people born later than 1980 is hard coded in the service.
+    An arbitrary String is than parsed into a condition and attached via `AND`.
+    Thus only valid cypher can go in there and with filters and callbacks, preconditions of that Cypher can be asserted.

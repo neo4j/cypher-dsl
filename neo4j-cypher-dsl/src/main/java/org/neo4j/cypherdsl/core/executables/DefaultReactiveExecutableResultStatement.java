@@ -25,7 +25,7 @@ import reactor.core.publisher.Mono;
 import java.util.function.Function;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ResultStatement;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.reactive.RxQueryRunner;
 import org.reactivestreams.Publisher;
@@ -38,7 +38,7 @@ import org.reactivestreams.Publisher;
 @API(status = INTERNAL, since = "2021.2.1")
 class DefaultReactiveExecutableResultStatement extends DefaultReactiveExecutableStatement implements ReactiveExecutableResultStatement {
 
-	DefaultReactiveExecutableResultStatement(ResultStatement delegate) {
+	DefaultReactiveExecutableResultStatement(Statement delegate) {
 		super(delegate);
 	}
 

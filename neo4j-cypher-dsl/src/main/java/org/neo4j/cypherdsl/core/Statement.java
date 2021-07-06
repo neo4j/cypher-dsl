@@ -185,4 +185,11 @@ public interface Statement extends Visitable {
 	 */
 	interface SingleQuery extends RegularQuery {
 	}
+
+	/**
+	 * @return True if this statement can be assured to return something.
+	 */
+	default boolean doesReturnOrYield() {
+		return this instanceof ResultStatement || this instanceof UnionQuery;
+	}
 }

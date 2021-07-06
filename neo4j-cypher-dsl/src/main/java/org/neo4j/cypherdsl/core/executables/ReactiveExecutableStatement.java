@@ -49,8 +49,8 @@ public interface ReactiveExecutableStatement extends ExecutableStatement {
 	 * @see #of(Statement)
 	 */
 	static ReactiveExecutableStatement makeExecutable(Statement statement) {
-		if (statement instanceof ResultStatement) {
-			return makeExecutable((ResultStatement) statement);
+		if (statement.doesReturnOrYield()) {
+			return new DefaultReactiveExecutableResultStatement(statement);
 		}
 		return new DefaultReactiveExecutableStatement(statement);
 	}

@@ -68,8 +68,8 @@ public interface ExecutableStatement {
 	 * @see #of(Statement)
 	 */
 	static ExecutableStatement makeExecutable(Statement statement) {
-		if (statement instanceof ResultStatement) {
-			return makeExecutable((ResultStatement) statement);
+		if (statement.doesReturnOrYield()) {
+			return new DefaultExecutableResultStatement(statement);
 		}
 		return new DefaultExecutableStatement(statement);
 	}

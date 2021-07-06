@@ -27,7 +27,7 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ResultStatement;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.Record;
 import org.neo4j.driver.Result;
@@ -42,7 +42,7 @@ import org.neo4j.driver.summary.ResultSummary;
 @API(status = INTERNAL, since = "2021.2.1")
 class DefaultExecutableResultStatement extends DefaultExecutableStatement implements ExecutableResultStatement {
 
-	DefaultExecutableResultStatement(ResultStatement delegate) {
+	DefaultExecutableResultStatement(Statement delegate) {
 		super(delegate);
 	}
 

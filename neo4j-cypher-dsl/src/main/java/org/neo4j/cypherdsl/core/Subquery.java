@@ -67,8 +67,7 @@ public final class Subquery implements Clause {
 	static Subquery call(Statement statement, boolean skipAssertions, IdentifiableElement... imports) {
 
 		if (!skipAssertions) {
-			boolean clausesBasedWithReturn = statement instanceof ClausesBasedStatement && ((ClausesBasedStatement) statement).doesReturnOrYield();
-			boolean validReturn = statement instanceof ResultStatement || statement instanceof UnionQuery || clausesBasedWithReturn;
+			boolean validReturn = statement.doesReturnOrYield();
 			if (!validReturn) {
 				throw new IllegalArgumentException("Only a statement that returns elements, either via RETURN or YIELD, can be used in a subquery.");
 			}

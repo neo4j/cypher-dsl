@@ -53,4 +53,10 @@ public class PeopleController {
 
 		return peopleService.findPeopleBornInThe70tiesOr(optionalName);
 	}
+
+	@GetMapping("/findPeopleBornAfterThe70ties")
+	Iterable<Person> findPeopleBornAfterThe70ties(@RequestParam(name = "conditions") String additionalConditions) {
+
+		return peopleService.findPeopleBornAfterThe70tiesAnd(additionalConditions);
+	}
 }

@@ -47,7 +47,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @since 1.0
  */
 @API(status = Status.EXPERIMENTAL, since = "1.0")
-public class SymbolicName implements Expression, IdentifiableElement {
+public final class SymbolicName implements Expression, IdentifiableElement {
 
 	private static final Map<String, SymbolicName> CACHE = Collections.synchronizedMap(new LRUCache<>(32));
 
