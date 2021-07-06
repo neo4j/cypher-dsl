@@ -80,7 +80,8 @@ public interface Statement extends Visitable {
 	 * <p>
 	 * The {@literal USING PERIODIC HINT} is only valid right before the {@literal LOAD CSV clause}.
 	 *
-	 * @param clauses A list of clauses, must not be null
+	 * @param batchSize The batch size to pass to {@literal PERIODIC COMMIT}.
+	 * @param clauses   A list of clauses, must not be null
 	 * @return A statement
 	 * @since 2021.3.0
 	 */

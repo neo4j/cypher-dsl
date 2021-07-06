@@ -82,13 +82,17 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	/**
 	 * Always creates a relationship from start to end (left to right).
 	 *
-	 * @param symbolicName an optional symbolic name
-	 * @param start        start node
-	 * @param properties   The properties for the relationship
-	 * @param end          end node
-	 * @param type         type of the relationship
+	 * @param symbolicName    an optional symbolic name
+	 * @param start           start node
+	 * @param properties      The properties for the relationship
+	 * @param end             end node
+	 * @param type            type of the relationship
+	 * @param additionalTypes Additional types to be added to the relationship, only meaningfull when the object is used
+	 *                        for querying, when used in a {@literal CREATE} or {@literal MERGE} clause the runtime will
+	 *                        throw an exception.
 	 */
-	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end, String... additionalTypes) {
+	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end,
+		String... additionalTypes) {
 
 		this(symbolicName, start, Direction.LTR, properties, end, mergeTypesIfNecessary(type, additionalTypes));
 	}

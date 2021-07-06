@@ -771,6 +771,7 @@
 						<neo4j-version>${neo4j.version}</neo4j-version>
 						<neo4j-java-driver-version>${neo4j-java-driver.version}</neo4j-java-driver-version>
 						<reactor-version>${reactor.version}</reactor-version>
+						<neo4j-cypher-dsl.version>${project.version}</neo4j-cypher-dsl.version>
 					</attributes>
 					<requires>
 						<require>asciidoctor-diagram</require>
@@ -838,7 +839,6 @@
 						<reports>
 							<report>aggregate</report>
 						</reports>
-						<configuration></configuration>
 					</reportSet>
 				</reportSets>
 			</plugin>

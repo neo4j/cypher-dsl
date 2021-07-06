@@ -234,6 +234,8 @@ public final class Conditions {
 	}
 
 	/**
+	 * @param symbolicName  Reference to the entity that should be checked for labels or types
+	 * @param labelsOrTypes the list of labels or types to check for
 	 * @return A condition that checks whether a node has a set of given labels or a relationship a set of given types.
 	 * @since 2021.3.0
 	 */

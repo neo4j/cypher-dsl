@@ -28,7 +28,7 @@ NOTE: The current version of the Cypher-DSL-Parser modules is rather big. This i
 <dependency>
     <groupId>{groupId}</groupId>
     <artifactId>neo4j-cypher-dsl-parser</artifactId>
-    <version>{neo4j-cypher-dsl.version}</version>
+    <version>{neo4j-cypher-dsl-version}</version>
 </dependency>
 ----
 
@@ -38,7 +38,7 @@ NOTE: The current version of the Cypher-DSL-Parser modules is rather big. This i
 .Gradle variant for additional dependencies
 ----
 dependencies {
-    implementation '{groupId}:neo4j-cypher-dsl-parser:{neo4j-cypher-dsl.version}'
+    implementation '{groupId}:neo4j-cypher-dsl-parser:{neo4j-cypher-dsl-version}'
 }
 ----
 
