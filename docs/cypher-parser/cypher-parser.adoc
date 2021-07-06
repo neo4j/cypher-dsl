@@ -232,4 +232,25 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main
 ----
 <.> The condition that only people born later than 1980 is hard coded in the service.
     An arbitrary String is than parsed into a condition and attached via `AND`.
-    Thus only valid cypher can go in there and with filters and callbacks, preconditions of that Cypher can be asserted.
+    Thus, only valid cypher can go in there and with filters and callbacks, preconditions of that Cypher can be asserted.
+
+The downside to the above solution is that the query fragment passed to the service and eventually the repository must
+know the root node (which is `n` in case of SDN 6) and the caller code might look like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/test/java/org/neo4j/cypherdsl/examples/sdn6/ApplicationIT.java[tag=exchange1]
+----
+
+Notice `n.name` etc.
+We could change the service method slightly and apply a callback like this:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/PeopleService.java[tag=using-parser-with-spring2]
+----
+<.> Create a function that takes the value of a variable created in the fragment and use it to look up a property on the
+    SDN root node.
+<.> Create an instance of parsing options. It's probably a good idea todo this once and store them away in an instance variable.
+    Options are thread safe.
+<.> Apply them when calling the corresponding parse method

@@ -34,6 +34,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory.NULL;
 import org.neo4j.cypher.internal.ast.factory.ParameterType;
@@ -85,7 +86,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements
-	ASTFactory<Statement, Statement, Clause, Return, Expression, SortItem, PatternElement, Node, PathDetails, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Parameter<?>, SymbolicName, Property, Expression, Clause, Statement, Clause, NULL, NULL, InputPosition> {
+	ASTFactory<Statement, Statement, Clause, Return, Expression, SortItem, PatternElement, Node, PathDetails, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Clause, NULL, NULL, InputPosition> {
 
 	private static CypherDslASTFactory DEFAULT_INSTANCE;
 
@@ -140,6 +141,16 @@ final class CypherDslASTFactory implements
 		return (T) callbacks.stream().reduce(Function.identity(), Function::andThen).apply(newExpression);
 	}
 
+	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
+
+		if (v == null) {
+			return null;
+		}
+
+		Assertions.isInstanceOf(SymbolicName.class, v,  "An invalid type has been generated where a SymbolicName was required. Generated type was " + v.getClass().getName());
+		return (SymbolicName) v;
+	}
+
 	@Override
 	public Statement newSingleQuery(List<Clause> clauses) {
 		return Statement.of(clauses);
@@ -185,8 +196,10 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression newReturnItem(InputPosition p, Expression e, SymbolicName v) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e.as(v));
+	public Expression newReturnItem(InputPosition p, Expression e, Expression v) {
+
+		var s = assertSymbolicName(v);
+		return applyCallbackFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e.as(s));
 	}
 
 	@Override
@@ -216,28 +229,29 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Hint usingIndexHint(InputPosition p, SymbolicName v, String label, List<String> properties,
+	public Hint usingIndexHint(InputPosition p, Expression v, String label, List<String> properties,
 		boolean seekOnly) {
 
 		// We build nodes here. As of now, the node isn't used anyway, but only the label
 		// will be used down further the AST.
 		// It is easier than introduce a new common abstraction of label and relationship type (probably
 		// in line with the decision made for the parser)
-		var node = Cypher.node(label).named(v);
+		var node = Cypher.node(label).named(assertSymbolicName(v));
 		return Hint.useIndexFor(seekOnly, properties.stream().map(node::property).toArray(Property[]::new));
 	}
 
 	@Override
-	public Hint usingJoin(InputPosition p, List<SymbolicName> joinVariables) {
+	public Hint usingJoin(InputPosition p, List<Expression> joinVariables) {
 
-		return Hint.useJoinOn(joinVariables.toArray(SymbolicName[]::new));
+		return Hint.useJoinOn(joinVariables.stream().map(CypherDslASTFactory::assertSymbolicName).toArray(SymbolicName[]::new));
 	}
 
 	@Override
-	public Hint usingScan(InputPosition p, SymbolicName v, String label) {
+	public Hint usingScan(InputPosition p, Expression v, String label) {
 
+		var s = assertSymbolicName(v);
 		// Same note applies as with usingIndexHint in regards of relationships
-		return Hint.useScanFor(Cypher.node(label).named(v));
+		return Hint.useScanFor(Cypher.node(label).named(s));
 	}
 
 	@Override
@@ -256,21 +270,22 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Operation setVariable(SymbolicName symbolicName, Expression value) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Operations.set(symbolicName, value));
+	public Operation setVariable(Expression v, Expression value) {
+
+		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Operations.set(v, value));
 	}
 
 	@Override
-	public Operation addAndSetVariable(SymbolicName symbolicName, Expression value) {
-		return applyCallbackFor(
-			ExpressionCreatedEventType.ON_ADD_AND_SET_VARIABLE, Operations.mutate(symbolicName, value));
+	public Operation addAndSetVariable(Expression v, Expression value) {
+		return applyCallbackFor(ExpressionCreatedEventType.ON_ADD_AND_SET_VARIABLE, Operations.mutate(v, value));
 	}
 
 	@Override
-	public Operation setLabels(SymbolicName symbolicName, List<StringPos<InputPosition>> values) {
+	public Operation setLabels(Expression v, List<StringPos<InputPosition>> values) {
 
+		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
-		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_LABELS, Operations.set(Cypher.anyNode(symbolicName), labels));
+		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_LABELS, Operations.set(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -284,10 +299,11 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression removeLabels(SymbolicName symbolicName, List<StringPos<InputPosition>> values) {
+	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values) {
 
+		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
-		return applyCallbackFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operations.remove(Cypher.anyNode(symbolicName), labels));
+		return applyCallbackFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operations.remove(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -296,8 +312,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause unwindClause(InputPosition p, Expression e, SymbolicName v) {
-		return Clauses.unwind(e, v);
+	public Clause unwindClause(InputPosition p, Expression e, Expression v) {
+		return Clauses.unwind(e, assertSymbolicName(v));
 	}
 
 	@Override
@@ -335,17 +351,17 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression callResultItem(InputPosition p, String name, SymbolicName alias) {
+	public Expression callResultItem(InputPosition p, String name, Expression alias) {
 		var finalName = Cypher.name(name);
 		if (alias != null) {
-			return finalName.as(alias);
+			return finalName.as(assertSymbolicName(alias));
 		}
 		return finalName;
 	}
 
 	@Override
-	public PatternElement namedPattern(SymbolicName v, PatternElement patternElement) {
-		return Cypher.path(v).definedBy(patternElement);
+	public PatternElement namedPattern(Expression v, PatternElement patternElement) {
+		return Cypher.path(assertSymbolicName(v)).definedBy(patternElement);
 	}
 
 	@Override
@@ -438,7 +454,7 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Node nodePattern(InputPosition p, SymbolicName v, List<StringPos<InputPosition>> labels,
+	public Node nodePattern(InputPosition p, Expression v, List<StringPos<InputPosition>> labels,
 		Expression properties) {
 
 		var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
@@ -453,7 +469,7 @@ final class CypherDslASTFactory implements
 		}
 
 		if (v != null) {
-			node = node.named(v);
+			node = node.named(assertSymbolicName(v));
 		}
 		if (properties != null) {
 			node = node.withProperties((MapExpression) properties);
@@ -462,11 +478,11 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public PathDetails relationshipPattern(InputPosition p, boolean left, boolean right, SymbolicName v,
+	public PathDetails relationshipPattern(InputPosition p, boolean left, boolean right, Expression v,
 		List<StringPos<InputPosition>> relTypes,
 		PathLength pathLength, Expression properties, boolean legacyTypeSeparator) {
 
-		return PathDetails.of(v, pathLength, left, right, computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties);
+		return PathDetails.of(assertSymbolicName(v), pathLength, left, right, computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties);
 	}
 
 	@Override
@@ -476,17 +492,17 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause loadCsvClause(InputPosition p, boolean headers, Expression source, SymbolicName v,
+	public Clause loadCsvClause(InputPosition p, boolean headers, Expression source, Expression v,
 		String fieldTerminator) {
 
 		Assertions.isInstanceOf(StringLiteral.class, source,
 			"Only string literals are supported as source for the LOAD CSV clause.");
-		return Clauses.loadCSV(headers, (StringLiteral) source, v, fieldTerminator);
+		return Clauses.loadCSV(headers, (StringLiteral) source, assertSymbolicName(v), fieldTerminator);
 	}
 
 	@Override
-	public Clause foreachClause(InputPosition p, SymbolicName v, Expression list, List<Clause> objects) {
-		return Clauses.forEach(v, list, objects);
+	public Clause foreachClause(InputPosition p, Expression v, Expression list, List<Clause> objects) {
+		return Clauses.forEach(assertSymbolicName(v), list, objects);
 	}
 
 	@Override
@@ -655,13 +671,13 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public SymbolicName newVariable(InputPosition p, String name) {
-		return Cypher.name(name);
+	public Expression newVariable(InputPosition p, String name) {
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_VARIABLE, Cypher.name(name));
 	}
 
 	@Override
-	public Parameter<?> newParameter(InputPosition p, SymbolicName v, ParameterType type) {
-		return Cypher.parameter(v.getValue());
+	public Parameter<?> newParameter(InputPosition p, Expression v, ParameterType type) {
+		return Cypher.parameter(assertSymbolicName(v).getValue());
 	}
 
 	@Override
@@ -670,7 +686,7 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Parameter<?> newSensitiveStringParameter(InputPosition p, SymbolicName v) {
+	public Parameter<?> newSensitiveStringParameter(InputPosition p, Expression v) {
 		throw new UnsupportedOperationException("The Cypher-DSL does not support sensitive parameters.");
 	}
 
@@ -680,8 +696,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression oldParameter(InputPosition p, SymbolicName v) {
-		return Cypher.parameter(v.getValue());
+	public Expression oldParameter(InputPosition p, Expression v) {
+		return Cypher.parameter(assertSymbolicName(v).getValue());
 	}
 
 	@Override
@@ -914,10 +930,10 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression listComprehension(InputPosition p, SymbolicName v, Expression list, Expression where,
+	public Expression listComprehension(InputPosition p, Expression v, Expression list, Expression where,
 		Expression projection) {
 
-		var in = Cypher.listWith(v).in(list);
+		var in = Cypher.listWith(assertSymbolicName(v)).in(list);
 		if (where != null) {
 			return in.where(where.asCondition()).returning(projection);
 		}
@@ -925,14 +941,14 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression patternComprehension(InputPosition p, SymbolicName v, PatternElement patternElement,
+	public Expression patternComprehension(InputPosition p, Expression v, PatternElement patternElement,
 		Expression where, Expression projection) {
 
 		PatternComprehension.OngoingDefinitionWithoutReturn ongoingDefinitionWithPattern;
 		if (patternElement instanceof RelationshipPattern) {
 			var relationshipPattern = (RelationshipPattern) patternElement;
 			if (v != null) {
-				ongoingDefinitionWithPattern = Cypher.listBasedOn(Cypher.path(v).definedBy(relationshipPattern));
+				ongoingDefinitionWithPattern = Cypher.listBasedOn(Cypher.path(assertSymbolicName(v)).definedBy(relationshipPattern));
 			} else {
 				ongoingDefinitionWithPattern = Cypher.listBasedOn(relationshipPattern);
 			}
@@ -951,16 +967,16 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression filterExpression(InputPosition p, SymbolicName v, Expression list, Expression where) {
+	public Expression filterExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		return extractExpression(p, v, list, where, v);
 	}
 
 	@Override
-	public Expression extractExpression(InputPosition p, SymbolicName v, Expression list, Expression where,
+	public Expression extractExpression(InputPosition p, Expression v, Expression list, Expression where,
 		Expression projection) {
 
-		var listComprehension = Cypher.listWith(v).in(list);
+		var listComprehension = Cypher.listWith(assertSymbolicName(v)).in(list);
 		if (where != null) {
 			return listComprehension.where(where.asCondition()).returning(projection);
 		}
@@ -968,42 +984,42 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression reduceExpression(InputPosition p, SymbolicName acc, Expression accExpr, SymbolicName v,
+	public Expression reduceExpression(InputPosition p, Expression acc, Expression accExpr, Expression v,
 		Expression list, Expression innerExpr) {
 
-		return Functions.reduce(v)
+		return Functions.reduce(assertSymbolicName(v))
 			.in(list)
 			.map(innerExpr)
-			.accumulateOn(acc)
+			.accumulateOn(assertSymbolicName(acc))
 			.withInitialValueOf(accExpr);
 	}
 
 	@Override
-	public Expression allExpression(InputPosition p, SymbolicName v, Expression list, Expression where) {
+	public Expression allExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		Assertions.notNull(where, "all(...) requires a WHERE predicate");
-		return Predicates.all(v).in(list).where(where.asCondition());
+		return Predicates.all(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
-	public Expression anyExpression(InputPosition p, SymbolicName v, Expression list, Expression where) {
+	public Expression anyExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		Assertions.notNull(where, "any(...) requires a WHERE predicate");
-		return Predicates.any(v).in(list).where(where.asCondition());
+		return Predicates.any(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
-	public Expression noneExpression(InputPosition p, SymbolicName v, Expression list, Expression where) {
+	public Expression noneExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		Assertions.notNull(where, "none(...) requires a WHERE predicate");
-		return Predicates.none(v).in(list).where(where.asCondition());
+		return Predicates.none(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
-	public Expression singleExpression(InputPosition p, SymbolicName v, Expression list, Expression where) {
+	public Expression singleExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		Assertions.notNull(where, "single(...) requires a WHERE predicate");
-		return Predicates.single(v).in(list).where(where.asCondition());
+		return Predicates.single(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
@@ -1032,8 +1048,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression mapProjection(InputPosition p, SymbolicName v, List<Expression> items) {
-		return MapProjection.create(v, items.toArray(new Object[0]));
+	public Expression mapProjection(InputPosition p, Expression v, List<Expression> items) {
+		return MapProjection.create(assertSymbolicName(v), items.toArray(new Object[0]));
 	}
 
 	@Override
@@ -1047,7 +1063,7 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Expression mapProjectionVariable(SymbolicName v) {
+	public Expression mapProjectionVariable(Expression v) {
 		return v;
 	}
 

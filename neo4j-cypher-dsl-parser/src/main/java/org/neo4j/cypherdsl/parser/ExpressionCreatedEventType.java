@@ -41,7 +41,8 @@ public enum ExpressionCreatedEventType {
 	ON_SET_VARIABLE(Operation.class),
 	ON_ADD_AND_SET_VARIABLE(Operation.class),
 	ON_REMOVE_PROPERTY(Expression.class),
-	ON_REMOVE_LABELS(Expression.class);
+	ON_REMOVE_LABELS(Expression.class),
+	ON_NEW_VARIABLE(Expression.class);
 
 	private final Class<? extends Expression> typeProduced;
 

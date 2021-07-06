@@ -179,9 +179,26 @@ class ApplicationIT {
 	@DisplayName("Using conditions pt3.")
 	void findPeopleBornAfterThe70tiesShouldWork(@Autowired TestRestTemplate restTemplate) {
 
+		// tag::exchange1[]
+		var exchange = restTemplate.exchange(
+			"/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}",
+			HttpMethod.GET,
+			null, new ParameterizedTypeReference<List<Person>>() { },
+			"n.name contains \"Ricci\" OR n.name ends with 'Hirsch'"
+		);
+		// end::exchange1[]
+		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
+		var people = exchange.getBody();
+		assertThat(people).hasSize(2);
+	}
+
+	@Test
+	@DisplayName("Using conditions pt4.")
+	void findPeopleBornAfterThe70tiesV2ShouldWork(@Autowired TestRestTemplate restTemplate) {
+
 		var exchange = restTemplate
-			.exchange("/api/people/findPeopleBornAfterThe70ties?conditions={conditions}", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
-			}, "n.name contains \"Ricci\" OR n.name ends with 'Hirsch'");
+			.exchange("/api/people/v2/findPeopleBornAfterThe70ties?conditions={conditions}", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+			}, "name contains \"Ricci\" OR name ends with 'Hirsch'");
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(2);

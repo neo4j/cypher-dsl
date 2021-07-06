@@ -20,14 +20,20 @@ package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 // tag::using-person-repo[]
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Functions;
 // end::using-person-repo[]
+import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.parser.CypherParser;
+import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
+import org.neo4j.cypherdsl.parser.Options;
 import org.springframework.data.domain.Example;
 // tag::using-person-repo[]
+import org.springframework.data.neo4j.core.mapping.Constants;
 import org.springframework.stereotype.Service;
 
 // end::using-person-repo[]
@@ -62,6 +68,30 @@ final class PeopleService {
 		);
 	}
 	// end::using-parser-with-spring[]
+
+	// tag::using-parser-with-spring2[]
+	Iterable<Person> findPeopleBornAfterThe70tiesAndV2(String additionalConditions) {
+
+		Function<Expression, Expression> enforceReference =
+			e -> Constants.NAME_OF_ROOT_NODE.property(((SymbolicName) e).getValue()); // <.>
+		var parserOptions = Options.newOptions()
+			.withCallback(
+				ExpressionCreatedEventType.ON_NEW_VARIABLE,
+				Expression.class,
+				enforceReference
+			) // <.>
+			.build();
+
+		return peopleRepository.findAll(
+			PERSON.BORN.gte(Cypher.literalOf(1980)).and(
+				CypherParser.parseExpression(
+					additionalConditions,
+					parserOptions // <.>
+				).asCondition()
+			)
+		);
+	}
+	// end::using-parser-with-spring2[]
 
 	// tag::using-person-repo[]
 	Iterable<Person> findPeopleBornInThe70tiesOr(Optional<String> optionalName) {

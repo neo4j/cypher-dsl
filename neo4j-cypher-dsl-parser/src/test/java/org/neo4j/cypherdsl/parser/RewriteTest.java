@@ -27,6 +27,9 @@ import java.util.Set;
 import java.util.function.BiFunction;
 
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
  * @author Michael J. Simons
@@ -104,5 +107,18 @@ class RewriteTest {
 					.build())
 			.getCypher();
 		assertThat(statement).isEqualTo("MATCH (p:`Person`)-[:`ACTED_IN`]->(n:`Movie`) RETURN n");
+	}
+
+	@Test
+	void shouldRewriteVariables() {
+
+		var p = Cypher.node("Person").named("p");
+		var parserOptions = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_NEW_VARIABLE, Expression.class, e -> p.property(((SymbolicName) e).getValue()))
+			.build();
+		var statement = Cypher
+			.match(p)
+			.where(CypherParser.parseExpression("name = 'Foobar'", parserOptions).asCondition()).returning(p).build().getCypher();
+		assertThat(statement).isEqualTo("MATCH (p:`Person`) WHERE p.name = 'Foobar' RETURN p");
 	}
 }
