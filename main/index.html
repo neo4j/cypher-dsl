@@ -561,7 +561,6 @@ table.CodeRay td.code>pre{padding:0}
 <li><a href="#introduction2">5.1. Introduction</a></li>
 <li><a href="#gettingstarted">5.2. Getting started</a></li>
 <li><a href="#examples">5.3. Examples</a></li>
-<li><a href="#preventingcertainthings">5.4. Preventing certain things</a></li>
 </ul>
 </li>
 <li><a href="#driver-integration">6. Integration with the Neo4j-Java-Driver</a>
@@ -1873,9 +1872,8 @@ checks if the provided expressions obeys to some criteria: Here being something 
 </table>
 </div>
 </div>
-</div>
-<div class="sect2">
-<h3 id="preventingcertainthings"><a class="anchor" href="#preventingcertainthings"></a>5.4. Preventing certain things</h3>
+<div class="sect3">
+<h4 id="preventingcertainthings"><a class="anchor" href="#preventingcertainthings"></a>5.3.3. Preventing certain things</h4>
 <div class="paragraph">
 <p>Callbacks can of course be used to prevent things.
 Any exception thrown will halt the parsing.
@@ -1918,8 +1916,9 @@ assertThatExceptionOfType(<span class="exception">RuntimeException</span>.class)
 </tr>
 </table>
 </div>
+</div>
 <div class="sect3">
-<h4 id="shapethereturnclausethewayyouwant"><a class="anchor" href="#shapethereturnclausethewayyouwant"></a>5.4.1. Shape the return clause the way you want</h4>
+<h4 id="shapethereturnclausethewayyouwant"><a class="anchor" href="#shapethereturnclausethewayyouwant"></a>5.3.4. Shape the return clause the way you want</h4>
 <div class="paragraph">
 <p>The parser provides <code>ReturnDefinition</code> as value object. It contains information to be passed to the <code>Clauses</code> factory to shape
 a <code>RETURN</code> clause the way you need:</p>
@@ -1974,7 +1973,7 @@ It also adds some arbitrary sorting and keeps sort and limit values from the ori
 </div>
 </div>
 <div class="sect3">
-<h4 id="enforcinglabels"><a class="anchor" href="#enforcinglabels"></a>5.4.2. Enforcing labels</h4>
+<h4 id="enforcinglabels"><a class="anchor" href="#enforcinglabels"></a>5.3.5. Enforcing labels</h4>
 <div class="paragraph">
 <p>The parser can enforce labels to be present or absent with filters. This can be individually achieved when parsing node patterns,
 setting or removing labels with a <code>BiFunction</code> like the following:</p>
@@ -2056,6 +2055,64 @@ assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&qu
 <div class="paragraph">
 <p>Changing relationship types via a filter is possible as well, but as relationships might only have one type, the number of
 usecases is smaller.</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="combiningtheparserwithsdnscypherdslconditionexecutor"><a class="anchor" href="#combiningtheparserwithsdnscypherdslconditionexecutor"></a>5.3.6. Combining the parser with SDN&#8217;s <code>CypherdslConditionExecutor</code></h4>
+<div class="paragraph">
+<p>Spring Data Neo4j 6 provides <code>CypherdslConditionExecutor</code>. This is a fragment that adds the capability to execute
+statements with added conditions to a <code>Neo4jRepository</code>.</p>
+</div>
+<div class="paragraph">
+<p>Given the following repository:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.Neo4jRepository</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslConditionExecutor</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor</span>;
+
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">PeopleRepository</span> <span class="directive">extends</span> Neo4jRepository&lt;Person, <span class="predefined-type">Long</span>&gt;,
+    CypherdslConditionExecutor&lt;Person&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+    CypherdslStatementExecutor&lt;Person&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Allows to just add conditions to our generated queries</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Provides an alternative to using @Query with strings</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>One possible use case is presented in this service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornAfterThe70tiesAnd(<span class="predefined-type">String</span> additionalConditions) {
+
+    <span class="keyword">return</span> peopleRepository.findAll(
+        PERSON.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>))
+            .and(CypherParser.parseExpression(additionalConditions).asCondition()) <i class="conum" data-value="1"></i><b>(1)</b>
+    );
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The condition that only people born later than 1980 is hard coded in the service.
+An arbitrary String is than parsed into a condition and attached via <code>AND</code>.
+Thus only valid cypher can go in there and with filters and callbacks, preconditions of that Cypher can be asserted.</td>
+</tr>
+</table>
 </div>
 </div>
 </div>
@@ -5078,7 +5135,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-06 07:23:35 UTC
+Last updated 2021-07-06 09:10:40 UTC
 </div>
 </div>
 </body>
