@@ -2110,7 +2110,68 @@ statements with added conditions to a <code>Neo4jRepository</code>.</p>
 <td><i class="conum" data-value="1"></i><b>1</b></td>
 <td>The condition that only people born later than 1980 is hard coded in the service.
 An arbitrary String is than parsed into a condition and attached via <code>AND</code>.
-Thus only valid cypher can go in there and with filters and callbacks, preconditions of that Cypher can be asserted.</td>
+Thus, only valid cypher can go in there and with filters and callbacks, preconditions of that Cypher can be asserted.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The downside to the above solution is that the query fragment passed to the service and eventually the repository must
+know the root node (which is <code>n</code> in case of SDN 6) and the caller code might look like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var exchange = restTemplate.exchange(
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}</span><span class="delimiter">&quot;</span></span>,
+    HttpMethod.GET,
+    <span class="predefined-constant">null</span>, <span class="keyword">new</span> ParameterizedTypeReference&lt;<span class="predefined-type">List</span>&lt;Person&gt;&gt;() { },
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">n.name contains </span><span class="char">\&quot;</span><span class="content">Ricci</span><span class="char">\&quot;</span><span class="content"> OR n.name ends with 'Hirsch'</span><span class="delimiter">&quot;</span></span>
+);</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Notice <code>n.name</code> etc.
+We could change the service method slightly and apply a callback like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornAfterThe70tiesAndV2(<span class="predefined-type">String</span> additionalConditions) {
+
+    Function&lt;<span class="predefined-type">Expression</span>, <span class="predefined-type">Expression</span>&gt; enforceReference =
+        e -&gt; Constants.NAME_OF_ROOT_NODE.property(((SymbolicName) e).getValue()); <i class="conum" data-value="1"></i><b>(1)</b>
+    var parserOptions = Options.newOptions()
+        .withCallback(
+            ExpressionCreatedEventType.ON_NEW_VARIABLE,
+            <span class="predefined-type">Expression</span>.class,
+            enforceReference
+        ) <i class="conum" data-value="2"></i><b>(2)</b>
+        .build();
+
+    <span class="keyword">return</span> peopleRepository.findAll(
+        PERSON.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>)).and(
+            CypherParser.parseExpression(
+                additionalConditions,
+                parserOptions <i class="conum" data-value="3"></i><b>(3)</b>
+            ).asCondition()
+        )
+    );
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>Create a function that takes the value of a variable created in the fragment and use it to look up a property on the
+SDN root node.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>Create an instance of parsing options. It&#8217;s probably a good idea todo this once and store them away in an instance variable.
+Options are thread safe.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>Apply them when calling the corresponding parse method</td>
 </tr>
 </table>
 </div>
@@ -3446,10 +3507,13 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">java.util.Optional</span>;
+<span class="keyword">import</span> <span class="include">java.util.function.Function</span>;
 
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Conditions</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Cypher</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Expression</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Functions</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.core.mapping.Constants</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.stereotype.Service</span>;
 
 <span class="annotation">@Service</span>
@@ -5135,7 +5199,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-06 09:10:40 UTC
+Last updated 2021-07-06 15:29:35 UTC
 </div>
 </div>
 </body>
