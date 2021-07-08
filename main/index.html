@@ -560,7 +560,7 @@ table.CodeRay td.code>pre{padding:0}
 <ul class="sectlevel2">
 <li><a href="#introduction2">5.1. Introduction</a></li>
 <li><a href="#gettingstarted">5.2. Getting started</a></li>
-<li><a href="#examples">5.3. Examples</a></li>
+<li><a href="#cypher-parser-examples">5.3. Examples</a></li>
 </ul>
 </li>
 <li><a href="#driver-integration">6. Integration with the Neo4j-Java-Driver</a>
@@ -598,7 +598,7 @@ table.CodeRay td.code>pre{padding:0}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2021.2.4-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.3.0.</p>
 </div>
 </blockquote>
 </div>
@@ -690,7 +690,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2021.2.4-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.3.0<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -701,7 +701,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.2.4-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.3.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -1664,7 +1664,7 @@ The current version of the Cypher-DSL-Parser modules is rather big. This is due 
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-parser<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>2021.2.4-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>2021.3.0<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -1675,7 +1675,7 @@ The current version of the Cypher-DSL-Parser modules is rather big. This is due 
 <div class="title">Listing 15. Gradle variant for additional dependencies</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:2021.2.4-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:2021.3.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -1738,7 +1738,7 @@ The current version of the Cypher-DSL-Parser modules is rather big. This is due 
 <td class="tableblock halign-left valign-top"><p class="tableblock">Parses a whole statement. The result can be rendered or used in a union or subquery call.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parses</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>parse</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">An alias for <code>parseStatement</code>.</p></td>
 </tr>
 </tbody>
@@ -1756,7 +1756,7 @@ Most of the configurable options represent ways to provide filters for labels or
 </div>
 </div>
 <div class="sect2">
-<h3 id="examples"><a class="anchor" href="#examples"></a>5.3. Examples</h3>
+<h3 id="cypher-parser-examples"><a class="anchor" href="#cypher-parser-examples"></a>5.3. Examples</h3>
 <div class="sect3">
 <h4 id="parsinguserinputandcallinasubquery"><a class="anchor" href="#parsinguserinputandcallinasubquery"></a>5.3.1. Parsing user input and call in a subquery</h4>
 <div class="paragraph">
@@ -3274,7 +3274,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="title">Listing 40. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.4-SNAPSHOT</code></pre>
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.3.0</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3340,7 +3340,7 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.2.4-SNAPSHOT</span><span class="delimiter">'</span></span>
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.3.0</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -4124,6 +4124,53 @@ RETURN c, p</code></pre>
 </div>
 <div class="sect2">
 <h3 id="changelog"><a class="anchor" href="#changelog"></a>Change log</h3>
+<div class="sect3">
+<h4 id="2021.3"><a class="anchor" href="#2021.3"></a>2021.3</h4>
+<div class="sect4">
+<h5 id="2021.3.0"><a class="anchor" href="#2021.3.0"></a>2021.3.0</h5>
+<div class="sect5">
+<h6 id="newmodulethecypher-dsl-parser"><a class="anchor" href="#newmodulethecypher-dsl-parser"></a>🚀 New module: The Cypher-DSL-Parser</h6>
+<div class="paragraph">
+<p>2021.3 builds straight upon <a href="#2021.2.3">2021.2.3</a>, with few additions to the existing API, that didn&#8217;t quite fit with a patch release,
+but belong conceptually into this release, which brings a completely new module: The <code>neo4j-cypher-dsl-parser</code>.</p>
+</div>
+<div class="paragraph">
+<p>What&#8217;s behind that name? A Cypher-Parser build on the official Neo4j 4.3 parser frontend and creating a Cypher-DSL-AST or
+single expressions usable in the context of the Cypher-DSL.</p>
+</div>
+<div class="paragraph">
+<p>The module lives under the following coordinates <code>org.neo4j:neo4j-cypher-dsl-parser</code> and requires JDK 11+ (the same version like Neo4j does).
+We created a couple of <a href="#cypher-parser-examples">examples</a>, but we are sure you will have tons of more ideas and therefore
+a looking for your feedback.</p>
+</div>
+<div class="paragraph">
+<p>Here&#8217;s a sneak preview. It shows you can add a user supplied Cypher fragment to something you are building using the DSL.</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">var userProvidedCypher
+    = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN o as result</span><span class="delimiter">&quot;</span></span>;
+var userStatement = CypherParser.parse(userProvidedCypher);
+
+var node = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Node</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>);
+var result = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">result</span><span class="delimiter">&quot;</span></span>);
+var cypher = Cypher
+    .match(node)
+    .call(
+        userStatement,
+        node.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">this</span><span class="delimiter">&quot;</span></span>)
+    )
+    .returning(result.project(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span>))
+    .build()
+    .getCypher();</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For this release a big thank you goes out to the Cypher-operations team at Neo4j, listening to our requests and ideas!</p>
+</div>
+</div>
+</div>
+</div>
 <div class="sect3">
 <h4 id="2021.2"><a class="anchor" href="#2021.2"></a>2021.2</h4>
 <div class="sect4">
@@ -5204,7 +5251,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-07-06 15:36:19 UTC
+Last updated 2021-07-08 13:14:50 UTC
 </div>
 </div>
 </body>
