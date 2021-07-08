@@ -1,0 +1,38 @@
+== 2021.3
+
+=== 2021.3.0
+
+==== 🚀 New module: The Cypher-DSL-Parser
+
+2021.3 builds straight upon <<2021.2.3>>, with few additions to the existing API, that didn't quite fit with a patch release,
+but belong conceptually into this release, which brings a completely new module: The `neo4j-cypher-dsl-parser`.
+
+What's behind that name? A Cypher-Parser build on the official Neo4j 4.3 parser frontend and creating a Cypher-DSL-AST or
+single expressions usable in the context of the Cypher-DSL.
+
+The module lives under the following coordinates `org.neo4j:neo4j-cypher-dsl-parser` and requires JDK 11+ (the same version like Neo4j does).
+We created a couple of <<cypher-parser-examples,examples>>, but we are sure you will have tons of more ideas and therefore
+a looking for your feedback.
+
+Here's a sneak preview. It shows you can add a user supplied Cypher fragment to something you are building using the DSL.
+
+[source,java]
+----
+var userProvidedCypher
+    = "MATCH (this)-[:LINK]-(o:Other) RETURN o as result";
+var userStatement = CypherParser.parse(userProvidedCypher);
+
+var node = Cypher.node("Node").named("node");
+var result = Cypher.name("result");
+var cypher = Cypher
+    .match(node)
+    .call(
+        userStatement,
+        node.as("this")
+    )
+    .returning(result.project("foo", "bar"))
+    .build()
+    .getCypher();
+----
+
+For this release a big thank you goes out to the Cypher-operations team at Neo4j, listening to our requests and ideas!

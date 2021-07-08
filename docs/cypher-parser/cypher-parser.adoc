@@ -83,7 +83,7 @@ It provides a list of static methods:
 |`parseStatement`
 |Parses a whole statement. The result can be rendered or used in a union or subquery call.
 
-|`parses`
+|`parse`
 |An alias for `parseStatement`.
 
 |===
@@ -96,6 +96,7 @@ allowing to interact with the parser. Please have a look at the JavaAPI for info
 The following examples show some ways of using it.
 Most of the configurable options represent ways to provide filters for labels or types or are callbacks when certain expressions are created.
 
+[[cypher-parser-examples]]
 == Examples
 
 === Parsing user input and call in a subquery
