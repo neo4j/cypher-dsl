@@ -717,11 +717,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(PatternComprehension patternComprehension) {
+
+		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		builder.append("[");
 	}
 
 	void leave(PatternComprehension patternComprehension) {
+
 		builder.append("]");
+		dequeOfVisitedNamed.pop();
 	}
 
 	void enter(ListComprehension listComprehension) {

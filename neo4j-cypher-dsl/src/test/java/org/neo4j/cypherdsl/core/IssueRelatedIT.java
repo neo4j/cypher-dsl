@@ -939,4 +939,20 @@ class IssueRelatedIT {
 		);
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Actor`) RETURN n.name AS name UNION ALL MATCH (n:`Movie`) RETURN n.title AS name");
 	}
+
+	@Test // GH-203
+	void patternComprehensionMustBeScoped() {
+		Node testNode = Cypher.node("Department").named("d");
+		Node user = Cypher.node("User").named("u");
+		Statement query = Cypher.match(testNode).returning(testNode.project(
+			Cypher.asterisk(),
+			"firstname",
+			Cypher.listBasedOn(testNode.relationshipTo(user)).returning(user.property("firstname")),
+			"lastname",
+			Cypher.listBasedOn(testNode.relationshipTo(user)).returning(user.property("lastname"))
+		)).build();
+
+		assertThat(query.getCypher()).isEqualTo(
+			"MATCH (d:`Department`) RETURN d{.*, firstname: [(d)-->(u:`User`) | u.firstname], lastname: [(d)-->(u:`User`) | u.lastname]}");
+	}
 }
