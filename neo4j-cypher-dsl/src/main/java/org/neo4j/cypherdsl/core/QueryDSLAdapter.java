@@ -25,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.querydsl.CypherContext;
 import org.neo4j.cypherdsl.core.querydsl.ToCypherFormatStringVisitor;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 
@@ -52,6 +53,10 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 
 		if (!(expression instanceof Predicate)) {
 			throw new IllegalArgumentException("Only Query-DSL predicates can be turned into Cypher-DSL's predicates.");
+		}
+
+		if (expression instanceof BooleanBuilder && !((BooleanBuilder) expression).hasValue()) {
+			return Conditions.noCondition();
 		}
 
 		CypherContext context = new CypherContext();

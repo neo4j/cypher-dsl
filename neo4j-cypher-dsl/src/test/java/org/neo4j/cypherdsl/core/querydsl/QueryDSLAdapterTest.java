@@ -50,6 +50,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.Statement;
@@ -461,5 +462,33 @@ class QueryDSLAdapterTest {
 
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.adapt(Expressions.TWO).asName())
 			.withMessage("Only Query-DSL paths can be turned into names.");
+	}
+
+	@Test
+	void emptyBooleanBuilder() {
+
+		Condition condition = Cypher.adapt(new BooleanBuilder()).asCondition();
+		Statement statement = Cypher.match(Cypher.anyNode().named("n"))
+			.where(condition)
+			.returning(Cypher.name("n"))
+			.build();
+
+		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getCypher())
+			.isEqualTo("MATCH (n) RETURN n");
+	}
+
+	@Test
+	void booleanBuilder() {
+
+		Condition condition = Cypher.adapt(new BooleanBuilder().and(Expressions.FALSE).and(Expressions.TRUE)).asCondition();
+		Statement statement = Cypher.match(Cypher.anyNode().named("n"))
+			.where(condition)
+			.returning(Cypher.name("n"))
+			.build();
+
+		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getCypher())
+			.isEqualTo("MATCH (n) WHERE false AND true RETURN n");
 	}
 }
