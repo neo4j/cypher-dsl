@@ -1,5 +1,16 @@
 == 2021.3
 
+=== 2021.3.1
+
+2021.3.1 is a pure bug fix release. API Guardian cannot be an optional dependency, otherwise compiling programs with `-Werror`
+will fail, as the `@API`-annotation has runtime and not class retention.
+
+==== 🐛 Bug Fixes
+
+* GH-203 - Introduce a scope for the `PatternComprehension`.
+* Revert "GH-202 - Make API Guardian an optional / provided dependency."
+* Support empty BooleanBuilder in QueryDSL adapter.
+
 === 2021.3.0
 
 ==== 🚀 New module: The Cypher-DSL-Parser
