@@ -137,8 +137,9 @@ final class CypherDslASTFactory implements
 		var callbacks = this.options.getOnNewExpressionCallbacks().getOrDefault(type, List.of());
 
 		// We checked this when creating the callbacks
-		// noinspection unchecked
-		return (T) callbacks.stream().reduce(Function.identity(), Function::andThen).apply(newExpression);
+		@SuppressWarnings("unchecked")
+		T modifiedExpression = (T) callbacks.stream().reduce(Function.identity(), Function::andThen).apply(newExpression);
+		return modifiedExpression;
 	}
 
 	private static SymbolicName assertSymbolicName(@Nullable Expression v) {

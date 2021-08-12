@@ -394,7 +394,10 @@
 					</executions>
 					<configuration>
 						<release>${java.version}</release>
-						<compilerArgument>-Xlint:unchecked</compilerArgument>
+						<compilerArgs>
+							<arg>-Xlint:all,-options,-path</arg>
+							<arg>-Werror</arg>
+						</compilerArgs>
 					</configuration>
 				</plugin>
 				<plugin>
