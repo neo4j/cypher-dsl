@@ -147,7 +147,7 @@ public interface StatementBuilder
 
 	/**
 	 * A match that exposes {@code returning} and {@code where} methods to add required information.
-	 * While the where clause is optional, an returning clause needs to be specified before the
+	 * While the where clause is optional, a returning clause needs to be specified before the
 	 * statement can be build.
 	 *
 	 * @since 1.0
@@ -215,7 +215,7 @@ public interface StatementBuilder
 	}
 
 	/**
-	 * A match that knows what to pipe to the next part of a multi part query.
+	 * A match that knows what to pipe to the next part of a multipart query.
 	 *
 	 * @since 1.0
 	 */
