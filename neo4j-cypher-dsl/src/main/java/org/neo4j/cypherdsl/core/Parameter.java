@@ -93,7 +93,7 @@ public final class Parameter<T> implements Expression {
 	 * @since 2021.0.0
 	 */
 	@API(status = EXPERIMENTAL, since = "2021.0.0")
-	public Parameter withValue(Object newValue) {
+	public Parameter<?> withValue(Object newValue) {
 		return create(name, newValue);
 	}
 
