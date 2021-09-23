@@ -1069,6 +1069,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	 * @return Ongoing builder
 	 */
 	@SafeVarargs
+	@SuppressWarnings("varargs") // WTH IDEA?
 	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(
 		UpdateType updateType, T... patternOrExpressions
 	) {

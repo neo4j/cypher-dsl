@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.LiteralBase;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -53,6 +54,7 @@ final class RawLiteral implements Expression {
 		}
 
 		@Override
+		@NotNull
 		public String asString() {
 
 			return super.getContent();
@@ -63,11 +65,11 @@ final class RawLiteral implements Expression {
 
 		Assertions.hasText(format, "Cannot create a raw literal without a format.");
 
-		Map<String, Parameter> parameters = new HashMap<>();
+		Map<String, Parameter<?>> parameters = new HashMap<>();
 		List<Object> all = new ArrayList<>();
 		for (Object mixedArg : mixedArgs) {
 			if (mixedArg instanceof Parameter) {
-				Parameter parameter = (Parameter) mixedArg;
+				Parameter<?> parameter = (Parameter<?>) mixedArg;
 				if (!parameter.isAnon()) {
 					parameters.put(parameter.getName(), parameter);
 				}
@@ -101,7 +103,7 @@ final class RawLiteral implements Expression {
 				content.add(getMixedArg(all.get(cnt++)));
 				i = m.end(2);
 			} else if (parameters.containsKey(m.group(3))) {
-				Parameter e = parameters.get(m.group(3));
+				Parameter<?> e = parameters.get(m.group(3));
 
 				content.add(new RawElement(format.substring(i, m.start(2))));
 				content.add(e);

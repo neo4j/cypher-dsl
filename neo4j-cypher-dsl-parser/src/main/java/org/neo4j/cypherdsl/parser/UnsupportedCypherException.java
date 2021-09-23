@@ -32,6 +32,8 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "2021.3.0")
 public final class UnsupportedCypherException extends UnsupportedOperationException {
 
+	private static final long serialVersionUID = 2871262762217922044L;
+
 	private final String input;
 
 	UnsupportedCypherException(String input) {

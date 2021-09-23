@@ -74,7 +74,7 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 	}
 
 	@SuppressWarnings("unused")
-	void enter(Parameter parameter) {
+	void enter(Parameter<?> parameter) {
 
 		String parameterName = statementContext.getParameterName(parameter);
 		Object newValue = parameter.getValue();

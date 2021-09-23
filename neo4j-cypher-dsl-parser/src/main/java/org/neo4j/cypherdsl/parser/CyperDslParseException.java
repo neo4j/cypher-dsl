@@ -30,6 +30,8 @@ import org.apiguardian.api.API;
 @API(status = EXPERIMENTAL, since = "2021.3.0")
 public final class CyperDslParseException extends RuntimeException {
 
+	private static final long serialVersionUID = -3188559145717360828L;
+
 	public CyperDslParseException(Throwable cause) {
 		super(cause);
 	}

@@ -136,7 +136,7 @@ class FunctionsIT {
 		throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
 
 		if (function.getMinArgs() != function.getMaxArgs()) {
-			Class[] argTypes = new Class[2];
+			Class<?>[] argTypes = new Class<?>[2];
 			argTypes[0] = Expression.class;
 			argTypes[1] = Expression[].class;
 			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
@@ -159,7 +159,7 @@ class FunctionsIT {
 			StringBuilder expected = new StringBuilder("RETURN " + function.getImplementationName() + "(");
 
 			int n = function.getMinArgs();
-			Class[] argTypes = new Class[n];
+			Class<?>[] argTypes = new Class<?>[n];
 			Expression[] args = new Expression[n];
 
 			for (int i = 0; i < n; ++i) {

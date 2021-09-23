@@ -539,7 +539,7 @@ class IssueRelatedIT {
 	@Test // GH-142
 	void pointShouldAcceptExpressionToo() {
 
-		Parameter location = Cypher.parameter("location");
+		Parameter<?> location = Cypher.parameter("location");
 		Property distance = Cypher.property(location, "distance");
 
 		Expression point = Functions.point(Cypher.property(location, "point"));
@@ -556,7 +556,7 @@ class IssueRelatedIT {
 	@Test // GH-141
 	void propertiesShouldBeExtractableFromExpressions() {
 
-		Parameter location = Cypher.parameter("location");
+		Parameter<?> location = Cypher.parameter("location");
 
 		Expression point = Cypher.call("point").withArgs(location.property("point")).asFunction();
 		Property distance = Cypher.property(location, "distance");

@@ -52,6 +52,8 @@ public interface Literal<T> extends Expression {
 	@API(status = EXPERIMENTAL, since = "2021.1.0")
 	final class UnsupportedLiteralException extends IllegalArgumentException {
 
+		private static final long serialVersionUID = 864563506445498829L;
+
 		private final Class<?> unsupportedType;
 
 		public UnsupportedLiteralException(String message, Object unsupportedObject) {
