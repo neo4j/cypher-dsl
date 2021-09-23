@@ -159,4 +159,10 @@ final class InternalPropertyImpl implements Property {
 				"A property derived from a node or a relationship needs a parent with a symbolic name.");
 		}
 	}
+
+	@Override
+	@NotNull
+	public Expression asExpression() {
+		return this;
+	}
 }

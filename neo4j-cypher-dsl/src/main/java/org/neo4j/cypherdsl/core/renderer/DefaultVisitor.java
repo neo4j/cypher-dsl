@@ -19,8 +19,6 @@
 package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.ArrayDeque;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -52,7 +50,6 @@ import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
-import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.NestedExpression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
@@ -70,7 +67,6 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
-import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
@@ -91,6 +87,7 @@ import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
+import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
@@ -128,9 +125,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private final Map<Integer, AtomicReference<String>> separatorOnLevel = new ConcurrentHashMap<>();
 
 	/**
-	 * Keeps track of named objects that have been already visited.
+	 * Keeps track of scoped, named variables.
 	 */
-	private final Deque<java.util.Set<Named>> dequeOfVisitedNamed = new ArrayDeque<>(new HashSet<>());
+	private final ScopingStrategy scopingStrategy = new ScopingStrategy();
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
@@ -179,8 +176,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	/**
 	 * Will be set to true when entering a {@link RelationshipPatternCondition}: In this case only existing symbolic names
-	 * may be used, new ones must not be introduced. We can deduce from looking at {@link #dequeOfVisitedNamed} which will
-	 * contain the list of named elements in the scope of the current subquery or with clause.
+	 * may be used, new ones must not be introduced. The {@link #scopingStrategy scoping strategy}
+	 * will contain the list of named elements in the scope of the current subquery or with clause.
 	 */
 	private boolean skipSymbolicName = false;
 
@@ -192,7 +189,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	DefaultVisitor(StatementContext statementContext, boolean alwaysEscapeNames) {
 		this.statementContext = statementContext;
-		this.dequeOfVisitedNamed.push(new HashSet<>());
 		this.alwaysEscapeNames = alwaysEscapeNames;
 	}
 
@@ -247,11 +243,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		separatorOnCurrentLevel().ifPresent(ref -> builder.append(ref.getAndSet("")));
 
-		return !skipNodeContent;
+		boolean doEnter = !skipNodeContent;
+		if (doEnter) {
+			scopingStrategy.doEnter(visitable);
+		}
+		return doEnter;
 	}
 
 	@Override
 	protected void postLeave(Visitable visitable) {
+
+		scopingStrategy.doLeave(visitable);
 
 		separatorOnCurrentLevel().ifPresent(ref -> ref.set(", "));
 
@@ -357,43 +359,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(With with) {
 		builder.append(" ");
-		clearPreviouslyVisitedNamed(with);
 	}
 
-	void leave(Statement statement) {
-
-		if (dequeOfVisitedNamed.isEmpty()) {
-			return;
-		}
-		this.dequeOfVisitedNamed.peek().clear();
-	}
-
-	private void clearPreviouslyVisitedNamed(With with) {
-
-		if (dequeOfVisitedNamed.isEmpty()) {
-			return;
-		}
-
-		// We need to clear the named cache after defining a with.
-		// Everything not taken into the next step has to go.
-		java.util.Set<Named> retain = new HashSet<>();
-		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
-		with.accept(segment -> {
-			if (segment instanceof SymbolicName) {
-				visitedNamed.stream()
-					.filter(named -> named.getRequiredSymbolicName().equals(segment))
-					.forEach(retain::add);
-			}
-		});
-		visitedNamed.retainAll(retain);
-	}
-
-	private boolean hasBeenVisited(Collection<Named> visited, Named needle) {
-
-		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
-			.map(Named::getSymbolicName)
-			.anyMatch(s -> s.equals(needle.getSymbolicName()));
-	}
 
 	void enter(Delete delete) {
 
@@ -515,12 +482,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append("(");
 
 		// This is only relevant for nodes in relationships.
-		// Otherwise all the labels would be rendered again.
-		if (!dequeOfVisitedNamed.isEmpty()) {
-			java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
-			skipNodeContent = hasBeenVisited(visitedNamed, node);
-			visitedNamed.add(node);
-		}
+		// Otherwise, all the labels would be rendered again.
+		skipNodeContent = scopingStrategy.hasVisitedBefore(node);
 
 		if (skipNodeContent) {
 			String symbolicName = node.getSymbolicName()
@@ -560,13 +523,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Relationship relationship) {
 
-		if (dequeOfVisitedNamed.isEmpty()) {
-			return;
-		}
-
-		java.util.Set<Named> visitedNamed = dequeOfVisitedNamed.peek();
-		skipRelationshipContent = hasBeenVisited(visitedNamed, relationship);
-		visitedNamed.add(relationship);
+		skipRelationshipContent = scopingStrategy.hasVisitedBefore(relationship);
 	}
 
 	void enter(Relationship.Details details) {
@@ -718,15 +675,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(PatternComprehension patternComprehension) {
-
-		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		builder.append("[");
 	}
 
 	void leave(PatternComprehension patternComprehension) {
-
 		builder.append("]");
-		dequeOfVisitedNamed.pop();
 	}
 
 	void enter(ListComprehension listComprehension) {
@@ -793,26 +746,22 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Subquery subquery) {
 
-		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		builder.append("CALL {");
 	}
 
 	void leave(Subquery subquery) {
 
 		builder.append("} ");
-		dequeOfVisitedNamed.pop();
 	}
 
 	void enter(Foreach foreach) {
 
-		dequeOfVisitedNamed.push(new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		builder.append("FOREACH (");
 	}
 
-	void leave(Foreach subquery) {
+	void leave(Foreach foreach) {
 
 		builder.setCharAt(builder.length() - 1, ')');
-		dequeOfVisitedNamed.pop();
 	}
 
 	void enter(ExistentialSubquery subquery) {

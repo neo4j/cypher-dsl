@@ -212,6 +212,12 @@ public interface StatementBuilder
 	 */
 	interface OngoingReadingAndReturn
 		extends TerminalExposesOrderBy, TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultStatement> {
+
+		/**
+		 * @return The set of identifiable expressions in the {@literal RETURN} clause. The final statement might have a different set.
+		 * @since 2021.3.2
+		 */
+		Collection<Expression> getIdentifiableExpressions();
 	}
 
 	/**
@@ -272,6 +278,12 @@ public interface StatementBuilder
 	 */
 	interface OrderableOngoingReadingAndWith
 		extends ExposesOrderBy, ExposesSkip, ExposesLimit, OngoingReadingAndWith {
+
+		/**
+		 * @return The set of identifiable expressions in the {@literal WITH} clause. The final statement might have a different set.
+		 * @since 2021.3.2
+		 */
+		Collection<Expression> getIdentifiableExpressions();
 	}
 
 	/**

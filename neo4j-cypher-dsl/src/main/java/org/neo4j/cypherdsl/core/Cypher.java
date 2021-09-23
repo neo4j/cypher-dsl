@@ -1188,6 +1188,17 @@ public final class Cypher {
 	}
 
 	/**
+	 * Tries to format this expression into something human-readable. Not all expressions are supported
+	 * @param expression An expression to format
+	 * @return A human-readable string
+	 * @throws IllegalArgumentException When the expression cannot be formatted
+	 * @since 2021.3.2
+	 */
+	public static String format(Expression expression) {
+		return Expressions.format(expression);
+	}
+
+	/**
 	 * Not to be instantiated.
 	 */
 	private Cypher() {

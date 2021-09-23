@@ -54,6 +54,8 @@ class ProcedureCallsIT {
 		String[] prodecureCallPart = {"db", "labels"};
 		Statement call = Cypher.call(Arrays.asList(prodecureCallPart)).build();
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
+
+		assertThat(call.getIdentifiableExpressions()).isEmpty();
 	}
 
 	@Test
@@ -97,6 +99,8 @@ class ProcedureCallsIT {
 		call = Cypher.call("dbms.procedures").yield(Cypher.name("name"), Cypher.name("signature"))
 			.build();
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
+
+		assertThat(call.getIdentifiableExpressions()).containsExactlyInAnyOrder(Cypher.name("name"), Cypher.name("signature"));
 	}
 
 	@Test
@@ -160,6 +164,13 @@ class ProcedureCallsIT {
 			.build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");
+
+		assertThat(call.getIdentifiableExpressions())
+			.hasSize(1)
+			.first().satisfies(i -> {
+				assertThat(i).isInstanceOf(AliasedExpression.class);
+				assertThat(((AliasedExpression) i).getAlias()).isEqualTo("numLabels");
+			});
 	}
 
 	@Test

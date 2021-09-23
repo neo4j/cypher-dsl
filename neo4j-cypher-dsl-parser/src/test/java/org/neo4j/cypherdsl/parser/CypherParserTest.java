@@ -24,13 +24,17 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Cypher;
@@ -295,5 +299,46 @@ class CypherParserTest {
 				.withCallback(ExpressionCreatedEventType.ON_SET_PROPERTY, Expression.class, e -> e).build()
 		).withMessage(
 			"The type that is produced by 'ON_SET_PROPERTY' is not compatible with interface org.neo4j.cypherdsl.core.Expression");
+	}
+
+	private static Stream<Arguments> inputAndIdentifiableExpressions() {
+		return Stream.of(
+			Arguments.of(
+				"CALL {\n"
+				+ "\tMATCH (p:Person)-[:LIKES]->(:Technology {type: \"Java\"})\n"
+				+ "\tRETURN p\n"
+				+ "\n"
+				+ "\tUNION\n"
+				+ "\n"
+				+ "\tMATCH (p:Person)\n"
+				+ "\tWHERE size((p)-[:IS_FRIENDS_WITH]->()) > 1\n"
+				+ "\tRETURN p\n"
+				+ "}\n"
+				+ "RETURN p.name AS person, p.birthdate AS dob\n"
+				+ "ORDER BY dob DESC",
+				List.of("person", "dob")
+			),
+			Arguments.of(
+				"MATCH p=(start)-[*]->(finish)\n"
+				+ "WHERE start.name = 'A' AND finish.f = 'D'\n"
+				+ "FOREACH (n IN nodes(p) | SET n.marked = true)",
+				List.of("finish", "start", "p")
+			),
+			Arguments.of(
+				"MATCH (a)\n"
+				+ "WHERE a.name = 'Eskil'\n"
+				+ "RETURN a.array, filter(x IN a.array WHERE size(x)= 3)",
+				List.of("a.array")
+			)
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource("inputAndIdentifiableExpressions")
+	void parseAndIdentifyShouldWork(String cypher, List<String> expected) {
+
+		var identifiables = CypherParser.parse(cypher).getIdentifiableExpressions();
+		assertThat(identifiables.stream().map(Cypher::format))
+			.containsExactlyInAnyOrderElementsOf(expected);
 	}
 }

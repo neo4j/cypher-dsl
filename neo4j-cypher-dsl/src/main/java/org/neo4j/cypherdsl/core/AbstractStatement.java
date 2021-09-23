@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -55,6 +56,8 @@ abstract class AbstractStatement implements Statement {
 	 */
 	private volatile String cypher;
 
+	private volatile Collection<Expression> identifiables;
+
 	@NotNull
 	@Override
 	public StatementContext getContext() {
@@ -86,6 +89,24 @@ abstract class AbstractStatement implements Statement {
 	@Override
 	public Set<String> getParameterNames() {
 		return getParameterInformation().names;
+	}
+
+	@NotNull
+	public Collection<Expression> getIdentifiableExpressions() {
+
+		Collection<Expression> result = this.identifiables;
+		if (result == null) {
+			synchronized (this) {
+				result = this.identifiables;
+				if (result == null) {
+					IdentifiableExpressionCollectingVisitor visitor = new IdentifiableExpressionCollectingVisitor();
+					this.accept(visitor);
+					this.identifiables = visitor.getResult();
+					result = this.identifiables;
+				}
+			}
+		}
+		return result;
 	}
 
 	@NotNull

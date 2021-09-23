@@ -30,12 +30,11 @@ import org.apiguardian.api.API;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = INTERNAL, since = "1.0")
-final class Expressions {
+@API(status = INTERNAL, since = "1.0") final class Expressions {
 
 	/**
 	 * @param expression Possibly named with a non-empty symbolic name.
-	 * @param <T> The type being returned
+	 * @param <T>        The type being returned
 	 * @return The name of the expression if the expression is named or the expression itself.
 	 */
 	static <T extends Expression> Expression nameOrExpression(T expression) {
@@ -56,10 +55,35 @@ final class Expressions {
 			.toArray(Expression[]::new);
 	}
 
-	private Expressions() {
+	static Expression[] createSymbolicNames(IdentifiableElement[] variables) {
+		return Arrays.stream(variables).map(IdentifiableElement::asExpression).toArray(Expression[]::new);
 	}
 
-	public static Expression[] createSymbolicNames(IdentifiableElement[] variables) {
-		return Arrays.stream(variables).map(IdentifiableElement::asExpression).toArray(Expression[]::new);
+	static String format(Expression expression) {
+
+		if (expression instanceof Named) {
+			return ((Named) expression).getRequiredSymbolicName().getValue();
+		} else if (expression instanceof AliasedExpression) {
+			return ((AliasedExpression) expression).getAlias();
+		} else if (expression instanceof SymbolicName) {
+			return ((SymbolicName) expression).getValue();
+		} else if (expression instanceof Property) {
+			StringBuilder ref = new StringBuilder();
+			expression.accept(segment -> {
+				if (segment instanceof SymbolicName) {
+					if (ref.length() > 0) {
+						ref.append(".");
+					}
+					ref.append(((SymbolicName) segment).getValue());
+
+				}
+			});
+			return ref.toString();
+		}
+
+		throw new IllegalArgumentException("Cannot format expression " + expression.toString());
+	}
+
+	private Expressions() {
 	}
 }

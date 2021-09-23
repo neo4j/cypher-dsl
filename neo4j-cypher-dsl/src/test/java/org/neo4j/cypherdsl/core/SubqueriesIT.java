@@ -44,6 +44,8 @@ class SubqueriesIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("UNWIND [0, 1, 2] AS x CALL {WITH x RETURN (x * 10) AS y} RETURN x, y");
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("x"), SymbolicName.of("y"));
 		}
 
 		@Test
@@ -113,6 +115,8 @@ class SubqueriesIT {
 				.isEqualTo(
 					"CALL dbms.components() YIELD name WITH name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} RETURN n");
 
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+
 			// Without with
 			statement = Cypher.call("dbms.components").yield("name")
 				.call(Cypher.with("name").match(Cypher.anyNode().named("n"))
@@ -138,6 +142,8 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL {WITH label MATCH (n) WHERE n.name = label RETURN n} RETURN n");
 
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+
 			// After inQueryCall without with
 			statement = Cypher
 				.match(Cypher.anyNode().named("n")).with("n")
@@ -162,6 +168,8 @@ class SubqueriesIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (p:`Person`) WITH p CALL {WITH p MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 		}
 
 		@Test

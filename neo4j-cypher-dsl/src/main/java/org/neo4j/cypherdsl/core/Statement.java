@@ -135,6 +135,13 @@ public interface Statement extends Visitable {
 	Collection<String> getParameterNames();
 
 	/**
+	 * @return The set of identifiable expressions that are available when this statement ends.
+	 * @since 2021.3.2
+	 */
+	@NotNull @Contract(pure = true)
+	Collection<Expression> getIdentifiableExpressions();
+
+	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher
 	 * will use escaped literals and correct placeholders like {@code $param} for parameters. The placeholders for
 	 * parameters can be retrieved via {@link #getParameterNames}. Bounded values for parameters can be retrieved via

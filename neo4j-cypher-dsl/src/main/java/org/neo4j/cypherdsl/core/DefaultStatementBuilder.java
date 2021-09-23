@@ -573,6 +573,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.rawReturn = rawReturn;
 		}
 
+		@Override
+		public Collection<Expression> getIdentifiableExpressions() {
+			return extractIdentifiablesFromReturnList(returnList);
+		}
+
 		@NotNull
 		@Override
 		public final OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem) {
@@ -689,6 +694,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.returnList.clear();
 			this.orderBuilder.reset();
 			return returnedWith;
+		}
+
+		@Override
+		public Collection<Expression> getIdentifiableExpressions() {
+			return extractIdentifiablesFromReturnList(returnList);
 		}
 
 		protected void addExpressions(Expression... expressions) {
@@ -1168,6 +1178,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		}
 		return propertyOperations;
+	}
+
+	@NotNull
+	private static Collection<Expression> extractIdentifiablesFromReturnList(List<Expression> returnList) {
+		return returnList.stream()
+			.filter(IdentifiableElement.class::isInstance)
+			.map(IdentifiableElement.class::cast)
+			.map(IdentifiableElement::asExpression)
+			.collect(Collectors.toSet());
 	}
 
 	/**

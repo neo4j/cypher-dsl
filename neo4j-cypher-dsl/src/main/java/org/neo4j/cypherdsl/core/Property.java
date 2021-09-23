@@ -37,7 +37,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")
-public interface Property extends Expression {
+public interface Property extends Expression, IdentifiableElement {
 
 	/**
 	 * Returns the concatenated names of the property or the external reference (See {@link #referencedAs(String)}) if set.
