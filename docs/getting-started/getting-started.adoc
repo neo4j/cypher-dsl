@@ -177,6 +177,20 @@ assertThat(cypher).isEqualTo("RETURN true AS t");
 
 This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and its parameters.
 
+==== Retrieving identifiable expressions
+
+The `Statement` as well as the intermediate build steps after defining a `WITH` or `RETURN` clause allow to retrieve identifiable expressions
+via `getIdentifiableExpressions()`. All expressions identifiable via a name such as named nodes and relationships, symbolic names or aliased
+expressions are included. In addition, properties are also available.
+
+Those information can be used when dynamically building a query to verify the presence of required expressions
+or use them for further refinement.
+
+The feature plays well with the <<driver-integratio,driver integration>> and could be directly used to define mapping functions.
+
+Statements parsed via the optional <<cypher-parser,parser module>> are also able to return their identifiable expressions.
+The use case here might be evaluating a statement defined by a user being parsed and then checked if everything required is returned.
+
 ==== Generating formatted Cypher
 
 The Cypher-DSL can also format the generated Cypher to some extend.
