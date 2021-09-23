@@ -71,7 +71,7 @@ class CypherTemplates extends Templates {
 
 		// various
 		add(Ops.EQ, "{0} = {1}", Precedence.EQUALITY);
-		add(Ops.EQ_IGNORE_CASE, UNSUPPORTED_MARKER, Precedence.EQUALITY);
+		add(Ops.EQ_IGNORE_CASE, "{0l} = {1l}", Precedence.EQUALITY);
 		add(Ops.INSTANCE_OF, UNSUPPORTED_MARKER, Precedence.COMPARISON);
 		add(Ops.NE, "{0} != {1}", Precedence.EQUALITY);
 

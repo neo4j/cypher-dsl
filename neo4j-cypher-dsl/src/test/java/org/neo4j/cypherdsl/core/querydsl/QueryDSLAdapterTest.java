@@ -53,6 +53,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
+import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -490,5 +491,41 @@ class QueryDSLAdapterTest {
 		assertThat(statement.getParameterNames()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n) WHERE false AND true RETURN n");
+	}
+
+	@Test
+	void communityExample() {
+
+		QPerson user = QPerson.person;
+
+		Predicate predicate = user.firstName.equalsIgnoreCase("dave")
+			.and(user.lastName.startsWithIgnoreCase("mathews"));
+
+		Node p = Cypher.node("Entity").named("p");
+		String cypher = Cypher
+			.match(p)
+			.where(Cypher.adapt(predicate).asCondition())
+			.returning(p)
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (p:`Entity`) WHERE toLower(person.firstName) = 'dave' AND toLower(person.lastName) STARTS WITH 'mathews' RETURN p");
+	}
+
+	@Test
+	void communityExampleWithWorkaround() {
+
+		QPerson user = QPerson.person;
+
+		Predicate predicate = user.firstName.toLowerCase().eq("dave".toLowerCase())
+			.and(user.lastName.startsWithIgnoreCase("mathews"));
+
+		Node p = Cypher.node("Entity").named("p");
+		String cypher = Cypher
+			.match(p)
+			.where(Cypher.adapt(predicate).asCondition())
+			.returning(p)
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (p:`Entity`) WHERE toLower(person.firstName) = 'dave' AND toLower(person.lastName) STARTS WITH 'mathews' RETURN p");
 	}
 }
