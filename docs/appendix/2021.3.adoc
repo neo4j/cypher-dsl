@@ -1,5 +1,20 @@
 == 2021.3
 
+=== 2021.3.2
+
+==== 🚀 Features
+
+* Add support for QueryDSL's `equalsIgnoreCase` operator
+* GH-204 - Provide access to identifiable expressions (See <<retrieving-identifiable-expressions>>)
+
+==== 🧹 Housekeeping
+
+* Fix several (compile) warnings
+* Fix several spelling errors in api docs
+* Upgrade Spring Data Neo4j to 6.1.5 (In module `org.neo4j.cypherdsl.codegen.sdn6`)
+* Upgrade Neo4j Cypher Parser to 4.3.4 (In module `neo4j-cypher-dsl-parser`).
+* Verify examples on JDK 17
+
 === 2021.3.1
 
 2021.3.1 is a pure bug fix release. API Guardian cannot be an optional dependency, otherwise compiling programs with `-Werror`

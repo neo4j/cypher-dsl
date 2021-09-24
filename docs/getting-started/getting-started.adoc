@@ -177,6 +177,7 @@ assertThat(cypher).isEqualTo("RETURN true AS t");
 
 This, together with <<retrieving-parameters, the above>>, makes the statement a complete accessor for a Cypher-statement and its parameters.
 
+[[retrieving-identifiable-expressions]]
 ==== Retrieving identifiable expressions
 
 The `Statement` as well as the intermediate build steps after defining a `WITH` or `RETURN` clause allow to retrieve identifiable expressions
