@@ -41,6 +41,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
+          # We build with 11, but down below we run with 8.
           java-version: 11
       - name: Download artifacts
         uses: actions/download-artifact@v1
@@ -85,7 +86,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '11', '16' ]
+        java: [ '11', '17' ]
     needs: build
     steps:
       - name: Determine revision
