@@ -1,5 +1,13 @@
 == 2021.2
 
+=== 2021.2.4
+
+2021.2.4 is a pure bug fix release.
+
+==== 🐛 Bug Fixes
+
+* GH-203 - Introduce a scope for the `PatternComprehension`.
+
 === 2021.2.3
 
 2021.2.3 is a rather big release as it contains many small improvements and API functionality required by our next major
