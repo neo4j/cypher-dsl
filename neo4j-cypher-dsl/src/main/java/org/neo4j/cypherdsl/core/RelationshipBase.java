@@ -33,11 +33,10 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * This is the base class for all relationships. It can be used with generics, specifying valid start and end nodes.
  * This is useful when using it as a base class for a static meta model.
  *
- *
+ * @author Michael J. Simons
  * @param <S> The type at the start of the relationship
  * @param <E> The type at the pointy end of the relationship
  * @param <SELF> The type of the persistent relationship itself
- * @author Michael J. Simons
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")

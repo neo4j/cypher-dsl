@@ -29,8 +29,8 @@ import org.apiguardian.api.API;
 /**
  * Shared interface for model builder. This interface and the concrete classes implementing it is considered to be public API.
  *
- * @param <SELF> A type representing the concrete model builder itself
  * @author Michael J. Simons
+ * @param <SELF> A type representing the concrete model builder itself
  * @soundtrack Queen - Queen Forever
  * @since 2021.1.0
  */

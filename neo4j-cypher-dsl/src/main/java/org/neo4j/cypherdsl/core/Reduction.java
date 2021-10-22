@@ -32,10 +32,10 @@ import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 /**
  * A typed subtree representing the arguments of a call to the {@code reduce()} function.
  *
- * @see Functions#reduce(SymbolicName)
  * @author Gerrit Meier
  * @author Michael J. Simons
  * @soundtrack Metallica - Metallica
+ * @see Functions#reduce(SymbolicName)
  * @since 2020.1.5
  */
 @API(status = EXPERIMENTAL, since = "2020.1.5")

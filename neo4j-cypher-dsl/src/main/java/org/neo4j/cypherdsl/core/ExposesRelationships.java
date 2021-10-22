@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * A marker interface for things that expose methods to create new relationships to other elements.
  *
- * @param <T> The type of the resulting {@link RelationshipPattern}.
  * @author Michael J. Simons
+ * @param <T> The type of the resulting {@link RelationshipPattern}.
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")

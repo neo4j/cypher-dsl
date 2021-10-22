@@ -1093,8 +1093,8 @@ public final class Cypher {
 	 * @param expression The expression that should be adapted
 	 * @param <FE> The type of the expression
 	 * @return A foreign adapter
-	 * @since 2021.1.0
 	 * @throws IllegalArgumentException in case the object cannot be adapter
+	 * @since 2021.1.0
 	 */
 	@NotNull @Contract(pure = true)
 	public static <FE> ForeignAdapter<FE> adapt(FE expression) {

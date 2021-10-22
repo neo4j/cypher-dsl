@@ -37,8 +37,8 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * This is the base class for all nodes. It can be used with generics, specifying a valid type.
  * This is useful when using it as a base class for a static meta model.
  *
- * @param <SELF> The type of this node
  * @author Michael J. Simons
+ * @param <SELF> The type of this node
  * @soundtrack Queen - The Miracle
  * @since 2021.1.0
  */

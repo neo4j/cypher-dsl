@@ -30,8 +30,8 @@ import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
 /**
  * Entrypoint for building procedure calls.
  *
- * @param <T> The type of the returned builder
  * @author Michael J. Simons
+ * @param <T> The type of the returned builder
  * @soundtrack Erik Cohen - Nostalgie für die Zukunft
  * @since 2020.0.1
  */

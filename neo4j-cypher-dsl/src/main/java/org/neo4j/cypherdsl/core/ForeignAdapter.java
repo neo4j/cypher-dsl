@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents an adapter that allows to turn foreign expressions into Cypher-DSL {@link Expression expressions}.
  *
- * @param <FE> The type of the foreign expression.
  * @author Michael J. Simons
+ * @param <FE> The type of the foreign expression.
  * @soundtrack Paul Kalkbrenner - Berlin Calling
  * @since 2021.1.0
  */

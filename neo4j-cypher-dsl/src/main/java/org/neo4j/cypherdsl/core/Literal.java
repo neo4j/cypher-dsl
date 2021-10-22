@@ -27,8 +27,8 @@ import org.jetbrains.annotations.NotNull;
 /**
  * Represents a literal with an optional content.
  *
- * @param <T> type of content
  * @author Michael J. Simons
+ * @param <T> type of content
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")

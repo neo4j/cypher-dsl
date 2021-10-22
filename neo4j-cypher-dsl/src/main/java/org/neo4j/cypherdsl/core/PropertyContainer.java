@@ -51,9 +51,9 @@ public interface PropertyContainer extends Named {
 	Property property(@NotNull String name);
 
 	/**
-	 * @see  #property(String)
 	 * @param names a list of nested property names
- 	 * @return a new {@link Property} associated with this named container
+	 * @return a new {@link Property} associated with this named container
+	 * @see  #property(String)
 	 */
 	@NotNull @Contract(pure = true)
 	Property property(String... names);

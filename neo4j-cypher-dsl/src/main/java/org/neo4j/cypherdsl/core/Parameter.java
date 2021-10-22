@@ -29,10 +29,10 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 /**
  * Represents a named parameter inside a Cypher statement.
  *
- * @param <T> The type of the parameter. Defaults to {@link Object} for a parameter without a value from which to derive
- *            the actual type.
  * @author Michael J. Simons
  * @author Andreas Berger
+ * @param <T> The type of the parameter. Defaults to {@link Object} for a parameter without a value from which to derive
+ *            the actual type.
  * @since 1.0
  */
 @API(status = EXPERIMENTAL, since = "1.0")

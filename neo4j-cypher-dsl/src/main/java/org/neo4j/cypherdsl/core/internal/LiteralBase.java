@@ -26,8 +26,8 @@ import org.neo4j.cypherdsl.core.Literal;
 /**
  * Represents a literal with an optional content.
  *
- * @param <T> type of content
  * @author Michael J. Simons
+ * @param <T> type of content
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")

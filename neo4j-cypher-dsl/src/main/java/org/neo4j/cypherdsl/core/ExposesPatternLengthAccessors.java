@@ -28,8 +28,8 @@ import org.jetbrains.annotations.NotNull;
  * This interface is used to derive new relationship patterns from existing {@link Relationship relationships} or {@link RelationshipChain chains of relationships}
  * with new lengths (min, max or unbounded) configured.
  *
- * @param <T> The type of the patterns whose lengths can be adjusted.
  * @author Michael J. Simons
+ * @param <T> The type of the patterns whose lengths can be adjusted.
  * @since 2021.2.3
  */
 @API(status = EXPERIMENTAL, since = "2021.2.3")

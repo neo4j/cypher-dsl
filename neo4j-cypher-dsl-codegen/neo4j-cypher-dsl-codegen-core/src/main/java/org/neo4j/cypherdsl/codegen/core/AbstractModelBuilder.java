@@ -56,8 +56,8 @@ import com.squareup.javapoet.TypeSpec;
  * Base class with some shared state and information for builders of {@link NodeBase} and
  * {@link RelationshipBase}.
  *
- * @param <T> Concrete type of this builder
  * @author Michael J. Simons
+ * @param <T> Concrete type of this builder
  * @soundtrack Bear McCreary - Battlestar Galactica Season 2
  * @since 2021.1.0
  */
