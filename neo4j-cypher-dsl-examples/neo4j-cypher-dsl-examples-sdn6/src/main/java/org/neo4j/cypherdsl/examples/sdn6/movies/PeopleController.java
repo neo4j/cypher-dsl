@@ -42,26 +42,26 @@ public class PeopleController {
 	}
 
 	@GetMapping("/details/{name}")
-	PersonDetails getDetails(@PathVariable String name) {
+	public PersonDetails getDetails(@PathVariable String name) {
 
 		return peopleService.findDetails(name)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 
 	@GetMapping("/findPeopleBornInThe70tiesOr")
-	Iterable<Person> findPeopleBornInThe70tiesOr(@RequestParam(name = "name") Optional<String> optionalName) {
+	public Iterable<Person> findPeopleBornInThe70tiesOr(@RequestParam(name = "name") Optional<String> optionalName) {
 
 		return peopleService.findPeopleBornInThe70tiesOr(optionalName);
 	}
 
 	@GetMapping("/v1/findPeopleBornAfterThe70ties")
-	Iterable<Person> findPeopleBornAfterThe70ties(@RequestParam(name = "conditions") String additionalConditions) {
+	public Iterable<Person> findPeopleBornAfterThe70ties(@RequestParam(name = "conditions") String additionalConditions) {
 
 		return peopleService.findPeopleBornAfterThe70tiesAnd(additionalConditions);
 	}
 
 	@GetMapping("/v2/findPeopleBornAfterThe70ties")
-	Iterable<Person> findPeopleBornAfterThe70tiesV2(@RequestParam(name = "conditions") String additionalConditions) {
+	public Iterable<Person> findPeopleBornAfterThe70tiesV2(@RequestParam(name = "conditions") String additionalConditions) {
 
 		return peopleService.findPeopleBornAfterThe70tiesAndV2(additionalConditions);
 	}

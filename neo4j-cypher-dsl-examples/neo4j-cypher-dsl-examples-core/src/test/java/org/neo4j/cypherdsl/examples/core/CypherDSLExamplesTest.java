@@ -291,8 +291,9 @@ class CypherDSLExamplesTest {
 
 		Map<String, Object> parameters = statement.getParameters();
 		assertThat(parameters).hasSize(2); // <.>
-		assertThat(parameters).containsEntry("firstName", "Thomas");
-		assertThat(parameters).containsEntry("name", "Anderson");
+		assertThat(parameters)
+			.containsEntry("firstName", "Thomas")
+			.containsEntry("name", "Anderson");
 		// end::collecting-params[]
 	}
 

@@ -678,8 +678,8 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, Expression v, ParameterType type) {
-		var value = assertSymbolicName(v).getValue();
-		return value == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(value);
+		var symbolicName = assertSymbolicName(v);
+		return symbolicName == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(symbolicName.getValue());
 	}
 
 	@Override
@@ -699,8 +699,8 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Expression oldParameter(InputPosition p, Expression v) {
-		var value = assertSymbolicName(v).getValue();
-		return value == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(value);
+		var symbolicName = assertSymbolicName(v);
+		return symbolicName == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(symbolicName.getValue());
 	}
 
 	@Override
