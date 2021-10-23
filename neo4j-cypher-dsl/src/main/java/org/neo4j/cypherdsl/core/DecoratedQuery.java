@@ -80,7 +80,7 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 	 * Only profiled queries can have a result statement.
 	 * Explained queries are only useful with {@link org.neo4j.cypherdsl.core.executables.ExecutableStatement#executeWith(org.neo4j.driver.QueryRunner)}.
 	 */
-	final static class DecoratedQueryWithResult extends DecoratedQuery implements ResultStatement {
+	static final class DecoratedQueryWithResult extends DecoratedQuery implements ResultStatement {
 
 		private DecoratedQueryWithResult(Statement target) {
 			super(target, Decoration.PROFILE);

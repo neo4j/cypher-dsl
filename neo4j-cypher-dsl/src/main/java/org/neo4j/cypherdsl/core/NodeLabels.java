@@ -41,6 +41,7 @@ final class NodeLabels implements Visitable {
 		this.values = values;
 	}
 
+	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
 		values.forEach(value -> value.accept(visitor));

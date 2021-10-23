@@ -26,7 +26,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apiguardian.api.API;
 
@@ -71,7 +71,7 @@ public final class Configuration {
 	/**
 	 * Defines decoration for generated type names, applies to both nodes and relationships.
 	 */
-	private final Function<String, String> typeNameDecorator;
+	private final UnaryOperator<String> typeNameDecorator;
 
 	/**
 	 * Defines how classes representing nodes should be named.
@@ -262,9 +262,9 @@ public final class Configuration {
 
 		public Configuration build() {
 
-			Function<String, String> typeNameDecorator;
+			UnaryOperator<String> typeNameDecorator;
 			if (prefix == null && suffix == null) {
-				typeNameDecorator = Function.identity();
+				typeNameDecorator = UnaryOperator.identity();
 			} else {
 				typeNameDecorator = s -> (prefix != null ? prefix.trim() : "") + s + (suffix != null ? suffix.trim() : "");
 			}
@@ -290,7 +290,7 @@ public final class Configuration {
 		}
 	}
 
-	private Configuration(Function<String, String> typeNameDecorator,
+	private Configuration(UnaryOperator<String> typeNameDecorator,
 		ClassNameGenerator nodeNameGenerator,
 		ClassNameGenerator relationshipNameGenerator,
 		FieldNameGenerator fieldNameGenerator,
@@ -331,7 +331,7 @@ public final class Configuration {
 		return path;
 	}
 
-	public Function<String, String> getTypeNameDecorator() {
+	public UnaryOperator<String> getTypeNameDecorator() {
 		return typeNameDecorator;
 	}
 

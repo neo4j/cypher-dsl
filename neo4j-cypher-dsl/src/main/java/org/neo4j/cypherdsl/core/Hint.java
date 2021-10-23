@@ -47,7 +47,7 @@ public final class Hint implements Visitable {
 		INDEX, INDEX_SEEK, SCAN, JOIN_ON
 	}
 
-	private final static class IndexReference implements Visitable {
+	private static final class IndexReference implements Visitable {
 
 		private final SymbolicName symbolicName;
 		private final NodeLabel optionalLabel;
@@ -75,7 +75,7 @@ public final class Hint implements Visitable {
 		}
 	}
 
-	private final static class IndexReferences extends TypedSubtree<IndexReference> {
+	private static final class IndexReferences extends TypedSubtree<IndexReference> {
 		IndexReferences(List<IndexReference> indexReferences) {
 			super(indexReferences);
 		}
@@ -84,7 +84,7 @@ public final class Hint implements Visitable {
 	/**
 	 * Internal helper class to wrap up the properties used inside an index.
 	 */
-	private final static class IndexProperties extends TypedSubtree<SymbolicName> implements ProvidesAffixes {
+	private static final class IndexProperties extends TypedSubtree<SymbolicName> implements ProvidesAffixes {
 		IndexProperties(List<SymbolicName> properties) {
 			super(properties);
 		}

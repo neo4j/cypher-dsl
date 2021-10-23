@@ -115,7 +115,7 @@ abstract class AbstractCase implements Case {
 		/**
 		 * The renderable implementation of {@link SimpleCase}.
 		 */
-		final static class EndingSimpleCase extends SimpleCaseImpl implements CaseEnding {
+		static final class EndingSimpleCase extends SimpleCaseImpl implements CaseEnding {
 
 			private EndingSimpleCase(Expression caseExpression, List<CaseWhenThen> caseWhenThens) {
 				super(caseExpression, caseWhenThens);
@@ -148,7 +148,7 @@ abstract class AbstractCase implements Case {
 		/**
 		 * The renderable implementation of {@link GenericCase}.
 		 */
-		final static class EndingGenericCase extends GenericCaseImpl implements CaseEnding {
+		static final class EndingGenericCase extends GenericCaseImpl implements CaseEnding {
 
 			private EndingGenericCase(List<CaseWhenThen> caseWhenThens) {
 				super(caseWhenThens);

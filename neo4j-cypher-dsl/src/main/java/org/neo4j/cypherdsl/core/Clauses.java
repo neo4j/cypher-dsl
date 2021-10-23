@@ -226,7 +226,7 @@ public final class Clauses {
 	 */
 	public static Clause forEach(SymbolicName v, Expression list, List<Clause> updatingClauses) {
 
-		Assertions.isTrue(updatingClauses.stream().allMatch(c -> c instanceof UpdatingClause),
+		Assertions.isTrue(updatingClauses.stream().allMatch(UpdatingClause.class::isInstance),
 			"Only updating clauses SET, REMOVE, CREATE, MERGE, DELETE, and FOREACH are allowed as clauses applied inside FOREACH.");
 		return new Foreach(v, list,
 			updatingClauses.stream().map(UpdatingClause.class::cast).collect(Collectors.toList()));

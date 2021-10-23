@@ -1862,4 +1862,7 @@ public final class Functions {
 
 		return FunctionInvocation.create(() -> "file");
 	}
+
+	private Functions() {
+	}
 }
