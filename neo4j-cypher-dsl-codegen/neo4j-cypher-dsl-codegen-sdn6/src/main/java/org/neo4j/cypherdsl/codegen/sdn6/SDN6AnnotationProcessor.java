@@ -35,9 +35,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -111,7 +111,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 	// * https://speakerdeck.com/gunnarmorling/das-annotation-processing-api-use-cases-und-best-practices
 
 	private enum FieldType {
-		P, R;
+		P, R
 	}
 
 	static {
@@ -794,7 +794,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 				declaredAnnotations.contains(targetNodeAnnotationType) || declaredAnnotations
 					.contains(compositePropertyAnnotationType);
 
-			Supplier<Boolean> simpleTypeOrCustomWriteTarget = () -> {
+			BooleanSupplier simpleTypeOrCustomWriteTarget = () -> {
 				try {
 					String className = typeMirrorOfField.accept(new SimpleTypeVisitor8<String, Void>() {
 						@Override
@@ -826,7 +826,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 				return false;
 			}
 
-			return !(isTargetNodeOrComposite || declaredAnnotations.contains(convertWithAnnotationType) || simpleTypeOrCustomWriteTarget.get());
+			return !(isTargetNodeOrComposite || declaredAnnotations.contains(convertWithAnnotationType) || simpleTypeOrCustomWriteTarget.getAsBoolean());
 		}
 	}
 

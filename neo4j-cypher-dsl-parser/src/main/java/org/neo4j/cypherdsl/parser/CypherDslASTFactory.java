@@ -323,7 +323,7 @@ final class CypherDslASTFactory implements
 		List<MergeActionType> actionTypes) {
 
 		var mergeActions = new ArrayList<MergeAction>();
-		if (setClauses != null && setClauses.size() > 0 && actionTypes != null && actionTypes.size() > 0) {
+		if (setClauses != null && !setClauses.isEmpty() && actionTypes != null && !actionTypes.isEmpty()) {
 
 			var iteratorClauses = setClauses.iterator();
 			var iteratorTypes = actionTypes.iterator();
