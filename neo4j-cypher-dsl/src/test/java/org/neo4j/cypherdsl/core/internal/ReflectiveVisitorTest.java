@@ -55,8 +55,9 @@ class ReflectiveVisitorTest {
 			}
 		};
 
+		Visitable v = new ThrowingVisitable();
 		assertThatExceptionOfType(HandlerException.class)
-			.isThrownBy(() -> visitor.enter(new ThrowingVisitable()))
+			.isThrownBy(() -> visitor.enter(v))
 			.withRootCauseInstanceOf(SomeException.class);
 	}
 }
