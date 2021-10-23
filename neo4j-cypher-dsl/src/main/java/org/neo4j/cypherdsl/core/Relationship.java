@@ -103,6 +103,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		 */
 		private final Direction direction;
 
+		@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
 		private volatile SymbolicName symbolicName;
 
 		private final RelationshipTypes types;

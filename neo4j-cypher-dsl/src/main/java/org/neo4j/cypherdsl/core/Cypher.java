@@ -749,6 +749,14 @@ public final class Cypher {
 	}
 
 	/**
+	 * @return The {@literal null} literal.
+	 */
+	@NotNull @Contract(pure = true)
+	public static Literal<Void> literalNull() {
+		return NullLiteral.INSTANCE;
+	}
+
+	/**
 	 * Creates a {@code UNION} statement from several other statements. No checks are applied for matching return types.
 	 *
 	 * @param statements the statements to union.
@@ -1082,8 +1090,10 @@ public final class Cypher {
 	}
 
 	/**
-	 * The foreign adapter factory. Can only be used when `com.querydsl:querydsl-core` is on the class path.
+	 * The foreign adapter factory. Can only be used when `com.querydsl:querydsl-core` is on the class path. The object
+	 * won't be modified after initialisation.
 	 */
+	@SuppressWarnings("squid:S3077")
 	private static volatile ForeignAdapterFactory foreignAdapterFactory;
 
 	/**
@@ -1167,7 +1177,9 @@ public final class Cypher {
 
 		int i = 0;
 		UnionQuery existingUnionQuery = null;
-		if (statements[0] instanceof UnionQuery) {
+		@SuppressWarnings("squid:S2259") // Really, we asserted it 4 lines above this one. Thank you, sonar.
+		boolean isUnionQuery = statements[0] instanceof UnionQuery;
+		if (isUnionQuery) {
 			existingUnionQuery = (UnionQuery) statements[0];
 			Assertions.isTrue(existingUnionQuery.isAll() == unionAll, "Cannot mix union and union all!");
 			i = 1;

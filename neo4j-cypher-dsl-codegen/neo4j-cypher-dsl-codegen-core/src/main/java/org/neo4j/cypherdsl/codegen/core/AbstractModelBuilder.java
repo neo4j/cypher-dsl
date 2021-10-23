@@ -71,6 +71,10 @@ abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuil
 	protected static final ClassName TYPE_NAME_STRING = ClassName.get(String.class);
 	protected static final ClassName TYPE_NAME_MAP_EXPRESSION = ClassName.get(MapExpression.class);
 
+	/**
+	 * Will be initialized with Double-checked locking into an unmodifiable {@link JavaFile}, no need to worry.
+	 */
+	@SuppressWarnings("squid:S3077")
 	private volatile JavaFile javaFile;
 
 	/**

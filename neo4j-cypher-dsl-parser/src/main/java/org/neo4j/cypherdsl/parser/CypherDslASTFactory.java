@@ -678,7 +678,8 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, Expression v, ParameterType type) {
-		return Cypher.parameter(assertSymbolicName(v).getValue());
+		var value = assertSymbolicName(v).getValue();
+		return value == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(value);
 	}
 
 	@Override
@@ -698,7 +699,8 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Expression oldParameter(InputPosition p, Expression v) {
-		return Cypher.parameter(assertSymbolicName(v).getValue());
+		var value = assertSymbolicName(v).getValue();
+		return value == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(value);
 	}
 
 	@Override
@@ -988,7 +990,11 @@ final class CypherDslASTFactory implements
 	public Expression reduceExpression(InputPosition p, Expression acc, Expression accExpr, Expression v,
 		Expression list, Expression innerExpr) {
 
-		return Functions.reduce(assertSymbolicName(v))
+		var variable = assertSymbolicName(v);
+		if (variable == null) {
+			throw new IllegalArgumentException("A variable to be reduced must be present.");
+		}
+		return Functions.reduce(variable)
 			.in(list)
 			.map(innerExpr)
 			.accumulateOn(assertSymbolicName(acc))

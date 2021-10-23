@@ -58,6 +58,14 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+
+			<plugin>
 				<groupId>org.graalvm.nativeimage</groupId>
 				<artifactId>native-image-maven-plugin</artifactId>
 				<version>${native-image-maven-plugin.version}</version>

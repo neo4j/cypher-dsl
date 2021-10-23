@@ -49,6 +49,7 @@ public final class Strings {
 
 		int leftLimit = 65; // letter 'A'
 		int rightLimit = 122; // letter 'z'
+		@SuppressWarnings("squid:S2245") // I really need only random string values, this is fine
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 
 		return random.ints(leftLimit, rightLimit + 1)
