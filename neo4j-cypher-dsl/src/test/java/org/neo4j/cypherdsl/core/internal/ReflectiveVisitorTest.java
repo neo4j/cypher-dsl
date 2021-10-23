@@ -31,9 +31,14 @@ class ReflectiveVisitorTest {
 	static class ThrowingVisitable implements Visitable {
 	}
 
+	static class SomeException extends RuntimeException {
+
+		private static final long serialVersionUID = -4170504879699181855L;
+	}
+
 	@Test
 	void visitorShouldThrowDedicatedException() {
-		RuntimeException cause = new RuntimeException();
+		SomeException cause = new SomeException();
 		ReflectiveVisitor visitor = new ReflectiveVisitor() {
 			@Override
 			protected boolean preEnter(Visitable visitable) {
@@ -52,6 +57,6 @@ class ReflectiveVisitorTest {
 
 		assertThatExceptionOfType(HandlerException.class)
 			.isThrownBy(() -> visitor.enter(new ThrowingVisitable()))
-			.withCause(cause);
+			.withRootCauseInstanceOf(SomeException.class);
 	}
 }
