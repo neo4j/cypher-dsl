@@ -49,6 +49,15 @@ class ConfigurationTest {
 		}
 
 		@Test
+		void suffixShouldBeNullable() {
+			Configuration configuration = Configuration.newConfig()
+				.withPrefix("p")
+				.withSuffix(null)
+				.build();
+			assertThat(configuration.getTypeNameDecorator().apply("v")).isEqualTo("pv");
+		}
+
+		@Test
 		void suffixShouldBeApplied() {
 			Configuration configuration = Configuration.newConfig()
 				.withSuffix("s")
