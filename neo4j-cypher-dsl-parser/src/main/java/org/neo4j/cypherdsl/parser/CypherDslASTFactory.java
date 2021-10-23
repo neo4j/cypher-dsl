@@ -34,6 +34,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory.NULL;
@@ -678,8 +679,7 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, Expression v, ParameterType type) {
-		var symbolicName = assertSymbolicName(v);
-		return symbolicName == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(symbolicName.getValue());
+		return parameterFromSymbolicName(v);
 	}
 
 	@Override
@@ -699,8 +699,15 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Expression oldParameter(InputPosition p, Expression v) {
+		return parameterFromSymbolicName(v);
+	}
+
+	@NotNull
+	static Parameter<?> parameterFromSymbolicName(Expression v) {
 		var symbolicName = assertSymbolicName(v);
-		return symbolicName == null ? Cypher.anonParameter(Cypher.literalNull()) : Cypher.parameter(symbolicName.getValue());
+		return symbolicName == null ?
+			Cypher.anonParameter(Cypher.literalNull()) :
+			Cypher.parameter(symbolicName.getValue());
 	}
 
 	@Override
