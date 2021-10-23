@@ -34,6 +34,7 @@ import com.querydsl.core.types.Operator;
 @API(status = EXPERIMENTAL, since = "2021.1.0")
 public final class UnsupportedOperatorException extends IllegalArgumentException {
 
+	private static final long serialVersionUID = 2025849674095086421L;
 	private final Operator unsupportedOperator;
 
 	public UnsupportedOperatorException(Operator unsupportedOperator) {
