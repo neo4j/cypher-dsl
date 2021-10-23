@@ -170,7 +170,6 @@
 		<reactor.version>2020.0.6</reactor.version>
 		<revision>9999</revision>
 		<sha1 />
-		<skipArchitectureTests>false</skipArchitectureTests>
 		<slf4j.version>1.7.26</slf4j.version>
 		<sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
@@ -508,7 +507,6 @@
 					</dependencies>
 					<configuration>
 						<rulesDirectory>etc/jqassistant</rulesDirectory>
-						<skip>${skipArchitectureTests}</skip>
 					</configuration>
 				</plugin>
 			</plugins>
