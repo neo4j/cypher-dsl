@@ -38,7 +38,7 @@ import org.junit.jupiter.api.Test;
 class NativeApplicationIT {
 
 	@Test
-	public void f() throws IOException, ExecutionException, InterruptedException {
+	void outputOfNativeBinaryShouldMatchExpectations() throws IOException, ExecutionException, InterruptedException {
 
 		var statements = List.of(
 			"MATCH (m:`Movie`) RETURN m",

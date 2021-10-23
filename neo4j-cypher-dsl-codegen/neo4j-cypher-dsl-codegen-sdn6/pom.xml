@@ -12,6 +12,8 @@
 	<description>Annotation processor reading SDN 6 annotations and creating a static model of them.</description>
 
 	<properties>
+		<covered-ratio-complexity>0.7</covered-ratio-complexity>
+		<covered-ratio-instructions>0.7</covered-ratio-instructions>
 		<java-module-name>org.neo4j.cypherdsl.codegen.sdn6</java-module-name>
 	</properties>
 

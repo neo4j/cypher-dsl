@@ -789,8 +789,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 		private boolean isAssociation(Set<Element> declaredAnnotations, VariableElement field) {
 
 			TypeMirror typeMirrorOfField = field.asType();
-			boolean explicitRelationship =
-				declaredAnnotations.contains(relationshipAnnotationType) || result.containsKey(typeMirrorOfField);
+			boolean explicitRelationship = declaredAnnotations.contains(relationshipAnnotationType);
 			boolean isTargetNodeOrComposite =
 				declaredAnnotations.contains(targetNodeAnnotationType) || declaredAnnotations
 					.contains(compositePropertyAnnotationType);

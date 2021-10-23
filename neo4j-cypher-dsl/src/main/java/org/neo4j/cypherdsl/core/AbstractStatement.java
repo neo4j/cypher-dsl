@@ -47,8 +47,9 @@ abstract class AbstractStatement implements Statement {
 	private final StatementContextImpl context = new StatementContextImpl();
 
 	/**
-	 * The collected parameter information (names only and names + values).
+	 * The collected parameter information (names only and names + values). Will be initialized with Double-checked locking into an unmodifiable object.
 	 */
+	@SuppressWarnings("squid:S3077")
 	private volatile ParameterInformation parameterInformation;
 
 	/**
@@ -56,6 +57,10 @@ abstract class AbstractStatement implements Statement {
 	 */
 	private volatile String cypher;
 
+	/**
+	 * Identifiable expressions. Will be initialized with Double-checked locking into an unmodifiable collection.
+	 */
+	@SuppressWarnings("squid:S3077")
 	private volatile Collection<Expression> identifiables;
 
 	@NotNull
@@ -65,7 +70,7 @@ abstract class AbstractStatement implements Statement {
 	}
 
 	@Override
-	public boolean isRenderConstantsAsParameters() {
+	public synchronized boolean isRenderConstantsAsParameters() {
 		return this.context.isRenderConstantsAsParameters();
 	}
 

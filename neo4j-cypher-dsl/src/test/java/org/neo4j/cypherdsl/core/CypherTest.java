@@ -54,6 +54,12 @@ class CypherTest {
 	}
 
 	@Test
+	void nullLiteralShouldBeSameInstance() {
+
+		assertThat(Cypher.literalNull()).isSameAs(NullLiteral.INSTANCE);
+	}
+
+	@Test
 	void shouldCreateListLiterals() {
 
 		List<Literal<?>> params = new ArrayList<>();

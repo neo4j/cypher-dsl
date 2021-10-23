@@ -104,6 +104,7 @@
 		<module>neo4j-cypher-dsl-parser</module>
 		<module>neo4j-cypher-dsl-native-tests</module>
 		<module>neo4j-cypher-dsl-examples</module>
+		<module>neo4j-cypher-dsl-test-results</module>
 	</modules>
 
 	<scm>
@@ -123,8 +124,10 @@
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.7.0</checker-qual.version>
-		<checkstyle.version>9.0</checkstyle.version>
+		<checkstyle.version>9.0.1</checkstyle.version>
 		<compile-testing.version>0.19</compile-testing.version>
+		<covered-ratio-complexity>0.75</covered-ratio-complexity>
+		<covered-ratio-instructions>0.75</covered-ratio-instructions>
 		<error_prone_annotations.version>2.4.0</error_prone_annotations.version>
 		<exec-maven-plugin.version>1.6.0</exec-maven-plugin.version>
 		<flatten-maven-plugin.version>1.2.1</flatten-maven-plugin.version>
@@ -141,7 +144,7 @@
 		<jqassistant.version>1.9.0</jqassistant.version>
 		<jsr305.version>3.0.2</jsr305.version>
 		<junit-jupiter.version>5.7.1</junit-jupiter.version>
-		<maven-checkstyle-plugin.version>3.1.1</maven-checkstyle-plugin.version>
+		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
 		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
@@ -168,7 +171,8 @@
 		<revision>9999</revision>
 		<sha1 />
 		<slf4j.version>1.7.26</slf4j.version>
-		<sortpom-maven-plugin.version>2.11.0</sortpom-maven-plugin.version>
+		<sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
+		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.1.5</spring-data-neo4j.version>
 	</properties>
 
@@ -335,6 +339,11 @@
 	<build>
 		<pluginManagement>
 			<plugins>
+				<plugin>
+					<groupId>org.sonarsource.scanner.maven</groupId>
+					<artifactId>sonar-maven-plugin</artifactId>
+					<version>${sonar-maven-plugin.version}</version>
+				</plugin>
 				<plugin>
 					<groupId>org.moditect</groupId>
 					<artifactId>moditect-maven-plugin</artifactId>
@@ -592,7 +601,7 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>prepare-agent</id>
+						<id>pre-unit-test</id>
 						<goals>
 							<goal>prepare-agent</goal>
 						</goals>
@@ -601,7 +610,7 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>prepare-agent-integration</id>
+						<id>pre-integration-test</id>
 						<goals>
 							<goal>prepare-agent-integration</goal>
 						</goals>
@@ -611,10 +620,31 @@
 						</configuration>
 					</execution>
 					<execution>
-						<id>report</id>
+						<id>report-and-check</id>
+						<phase>post-integration-test</phase>
 						<goals>
 							<goal>report</goal>
+							<goal>check</goal>
 						</goals>
+						<configuration>
+							<rules>
+								<rule>
+									<element>BUNDLE</element>
+									<limits>
+										<limit>
+											<counter>INSTRUCTION</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>${covered-ratio-instructions}</minimum>
+										</limit>
+										<limit>
+											<counter>COMPLEXITY</counter>
+											<value>COVEREDRATIO</value>
+											<minimum>${covered-ratio-complexity}</minimum>
+										</limit>
+									</limits>
+								</rule>
+							</rules>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -857,4 +887,37 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<profiles>
+		<profile>
+			<id>sonar</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.sonarsource.scanner.maven</groupId>
+						<artifactId>sonar-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>sonar</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sonar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<properties>
+				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+				<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
+				<sonar.organization>michael-simons-github</sonar.organization>
+				<sonar.projectKey>org.neo4j:neo4j-cypher-dsl-parent</sonar.projectKey>
+				<sonar.report>neo4j-cypher-dsl-test-results/target/site/jacoco-aggregate/jacoco.xml</sonar.report>
+			</properties>
+		</profile>
+	</profiles>
 </project>

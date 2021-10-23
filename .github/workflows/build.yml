@@ -18,12 +18,31 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v1
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
-          ./mvnw --no-transfer-progress clean deploy -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
+          ./mvnw --no-transfer-progress clean deploy -Psonar -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
           -DaltDeploymentRepository=releases::default::file://$GITHUB_WORKSPACE/target/repository
           -pl !org.neo4j:neo4j-cypher-dsl-native-tests
-          -pl !org.neo4j:neo4j-cypher-dsl-examples,!org.neo4j:neo4j-cypher-dsl-examples-core,!org.neo4j:neo4j-cypher-dsl-examples-sdn6
+          -pl !org.neo4j:neo4j-cypher-dsl-examples
+          -pl !org.neo4j:neo4j-cypher-dsl-examples-core
+          -pl !org.neo4j:neo4j-cypher-dsl-examples-driver
+          -pl !org.neo4j:neo4j-cypher-dsl-examples-parser
+          -pl !org.neo4j:neo4j-cypher-dsl-examples-sdn6
       - name: Archive artifacts
         uses: actions/upload-artifact@v1
         with:
@@ -105,4 +124,8 @@ jobs:
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
-          -pl org.neo4j:neo4j-cypher-dsl-examples,org.neo4j:neo4j-cypher-dsl-examples-core,org.neo4j:neo4j-cypher-dsl-examples-parser,org.neo4j:neo4j-cypher-dsl-examples-sdn6
+          -pl org.neo4j:neo4j-cypher-dsl-examples
+          -pl org.neo4j:neo4j-cypher-dsl-examples-core
+          -pl org.neo4j:neo4j-cypher-dsl-examples-driver
+          -pl org.neo4j:neo4j-cypher-dsl-examples-parser
+          -pl org.neo4j:neo4j-cypher-dsl-examples-sdn6

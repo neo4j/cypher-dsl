@@ -39,6 +39,7 @@ final class UnionQuery extends AbstractStatement implements Statement.RegularQue
 
 		Assertions.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
 
+		@SuppressWarnings("squid:S2259") // Really, we asserted it
 		List<UnionPart> unionParts = queries.stream().skip(1).map(q -> new UnionPart(unionAll, q)).collect(
 			Collectors.toList());
 		return new UnionQuery(unionAll, queries.get(0), unionParts);

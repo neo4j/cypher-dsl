@@ -122,7 +122,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 			try {
 				handle.invoke(this, onVisitable);
 			} catch (Throwable throwable) {
-				throwable.printStackTrace();
+				throw new HandlerException(throwable);
 			}
 		});
 	}

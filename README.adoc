@@ -9,7 +9,10 @@
 
 // end::properties[]
 
-image:https://img.shields.io/maven-central/v/org.neo4j/neo4j-cypher-dsl.svg[Maven Central,link=http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j%22%20AND%20a%3A%22neo4j-cypher-dsl%22]
+image:https://github.com/neo4j-contrib/cypher-dsl/workflows/build/badge.svg[link=https://github.com/neo4j-contrib/cypher-dsl/actions]
+image:https://sonarcloud.io/api/project_badges/measure?project=org.neo4j%3Aneo4j-cypher-dsl-parent&metric=coverage[link=https://sonarcloud.io/summary/new_code?id=org.neo4j%3Aneo4j-cypher-dsl-parent]
+image:https://sonarcloud.io/api/project_badges/measure?project=org.neo4j%3Aneo4j-cypher-dsl-parent&metric=alert_status[link=https://sonarcloud.io/dashboard?id=org.neo4j%3Aneo4j-cypher-dsl-parent]
+image:https://maven-badges.herokuapp.com/maven-central/org.neo4j/neo4j-cypher-dsl/badge.svg[Maven Central,link=http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22org.neo4j%22%20AND%20a%3A%22neo4j-cypher-dsl%22]
 
 [abstract]
 --

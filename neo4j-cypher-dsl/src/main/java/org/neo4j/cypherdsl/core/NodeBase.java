@@ -45,6 +45,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = EXPERIMENTAL, since = "2021.1.0")
 public abstract class NodeBase<SELF extends Node> extends AbstractNode implements Node {
 
+	@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
 	private volatile SymbolicName symbolicName;
 
 	final List<NodeLabel> labels;
