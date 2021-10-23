@@ -1012,8 +1012,9 @@ assertThat(parameterNames).containsExactlyInAnyOrder(<span class="string"><span 
 
 <span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; parameters = statement.getParameters();
 assertThat(parameters).hasSize(<span class="integer">2</span>); <i class="conum" data-value="2"></i><b>(2)</b>
-assertThat(parameters).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>);
-assertThat(parameters).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(parameters)
+    .containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>)
+    .containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -5347,7 +5348,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-10-22 21:49:52 UTC
+Last updated 2021-10-23 14:28:52 UTC
 </div>
 </div>
 </body>
