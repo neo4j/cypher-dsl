@@ -18,9 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
-import java.util.Arrays;
+import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -40,8 +41,16 @@ class ClausesTest {
 		};
 
 		assertThatIllegalArgumentException().isThrownBy(() ->
-			Clauses.forEach(SymbolicName.of("x"), Cypher.literalNull(), Arrays.asList(anonymousClause))
+			Clauses.forEach(SymbolicName.of("x"), Cypher.literalNull(), Collections.singletonList(anonymousClause))
 		).withMessage(
 			"Only updating clauses SET, REMOVE, CREATE, MERGE, DELETE, and FOREACH are allowed as clauses applied inside FOREACH.");
+	}
+
+	@Test
+	void foreachShouldWork() {
+
+		Clause foreach = Clauses.forEach(SymbolicName.of("x"), Cypher.literalNull(),
+			Collections.singletonList(new Set(new ExpressionList())));
+		assertThat(foreach).isNotNull();
 	}
 }
