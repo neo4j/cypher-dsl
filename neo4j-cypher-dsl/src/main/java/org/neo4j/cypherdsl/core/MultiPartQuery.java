@@ -62,7 +62,7 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 		remainder.accept(visitor);
 	}
 
-	final static class MultiPartQueryWithResult extends MultiPartQuery implements ResultStatement {
+	static final class MultiPartQueryWithResult extends MultiPartQuery implements ResultStatement {
 
 		private MultiPartQueryWithResult(List<MultiPartElement> parts, SinglePartQuery remainder) {
 			super(parts, remainder);

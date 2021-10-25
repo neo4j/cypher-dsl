@@ -140,7 +140,7 @@ final class RawLiteral implements Expression {
 	}
 
 	private static String unescapeEscapedPlaceholders(String content) {
-		return content.replaceAll("\\\\\\$E", "\\$E");
+		return content.replace("\\$E", "$E");
 	}
 
 	private static Expression getMixedArg(Object argument) {

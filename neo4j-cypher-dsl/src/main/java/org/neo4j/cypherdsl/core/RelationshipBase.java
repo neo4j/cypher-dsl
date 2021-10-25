@@ -115,7 +115,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 */
 	@NotNull
 	@Override
-	abstract public SELF named(SymbolicName newSymbolicName);
+	public abstract SELF named(SymbolicName newSymbolicName);
 
 	@NotNull
 	@Override
@@ -142,7 +142,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 */
 	@NotNull
 	@Override
-	abstract public SELF withProperties(MapExpression newProperties);
+	public abstract SELF withProperties(MapExpression newProperties);
 
 	@NotNull
 	@Override

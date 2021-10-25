@@ -71,6 +71,7 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 
 	@Override
 	protected void postLeave(Visitable visitable) {
+		// Nothing to track here.
 	}
 
 	@SuppressWarnings("unused")

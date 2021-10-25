@@ -106,7 +106,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 * @return A new node
 	 */
 	@Override
-	abstract public SELF withProperties(MapExpression newProperties);
+	public abstract SELF withProperties(MapExpression newProperties);
 
 	protected final Properties getProperties() {
 		return properties;

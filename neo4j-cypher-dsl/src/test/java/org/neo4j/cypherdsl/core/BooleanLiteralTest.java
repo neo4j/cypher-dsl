@@ -18,33 +18,26 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import java.util.List;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Makes a list of {@link NodeLabel node labels} visitable.
- *
  * @author Michael J. Simons
- * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-final class NodeLabels implements Visitable {
+class BooleanLiteralTest {
 
-	private final List<NodeLabel> values;
-
-	NodeLabels(List<NodeLabel> values) {
-		this.values = values;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		values.forEach(value -> value.accept(visitor));
-		visitor.leave(this);
+	@ParameterizedTest
+	@CsvSource(nullValues = "n/a", value = { "n/a,false", "false,false", "true,true" })
+	void valueOfShouldWork(Boolean input, boolean expected) {
+		Literal<Boolean> literal = BooleanLiteral.of(input);
+		assertThat(literal).isInstanceOf(BooleanLiteral.class);
+		BooleanLiteral booleanLiteral = (BooleanLiteral) literal;
+		if (expected) {
+			assertThat(booleanLiteral).isEqualTo(BooleanLiteral.TRUE);
+		} else {
+			assertThat(booleanLiteral).isEqualTo(BooleanLiteral.FALSE);
+		}
 	}
 }

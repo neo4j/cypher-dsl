@@ -80,7 +80,7 @@ public class SymbolicNameTest {
 		void toStringShouldWork() {
 
 			SymbolicName name1 = SymbolicName.of("a");
-			assertThat(name1.toString()).isEqualTo("SymbolicName{name='a'}");
+			assertThat(name1).hasToString("SymbolicName{name='a'}");
 		}
 	}
 
@@ -119,7 +119,7 @@ public class SymbolicNameTest {
 		void toStringShouldWork() {
 
 			SymbolicName name1 = SymbolicName.unresolved();
-			assertThat(name1.toString()).isEqualTo("Unresolved SymbolicName");
+			assertThat(name1).hasToString("Unresolved SymbolicName");
 		}
 	}
 }

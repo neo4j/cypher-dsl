@@ -107,7 +107,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @author Gerrit Meier
  * @since 1.0
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "squid:S1172" })
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("`");
@@ -739,9 +739,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
-	void enter(Enum<?> statement) {
+	void enter(Enum<?> anEnum) {
 
-		builder.append(statement.name().replaceAll("_", " ")).append(" ");
+		builder.append(anEnum.name().replace("_", " ")).append(" ");
 	}
 
 	void enter(Subquery subquery) {

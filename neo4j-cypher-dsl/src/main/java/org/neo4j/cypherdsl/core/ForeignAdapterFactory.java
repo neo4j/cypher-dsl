@@ -35,7 +35,7 @@ import com.querydsl.core.types.Expression;
 @API(status = INTERNAL, since = "2021.1.0")
 final class ForeignAdapterFactory {
 
-	@SuppressWarnings("unchecked") // We do check the type of {@code expression}
+	@SuppressWarnings("unchecked") // We do check the type of expression
 	<FE> ForeignAdapter<FE> getAdapterFor(FE expression) {
 
 		if (expression == null) {

@@ -18,33 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
-import java.util.List;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
-
 /**
- * Makes a list of {@link NodeLabel node labels} visitable.
- *
- * @author Michael J. Simons
- * @since 1.0
+ * A list of constant messages.
  */
-@API(status = EXPERIMENTAL, since = "1.0")
-final class NodeLabels implements Visitable {
+final class MessageKeys {
 
-	private final List<NodeLabel> values;
+	public static final String ASSERTIONS_EXPRESSION_REQUIRED = "assertions.expression-required";
+	public static final String ASSERTIONS_EXPRESSIONS_REQUIRED = "assertions.expressions-required";
+	public static final String ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED = "assertions.at-least-one-expression-required";
 
-	NodeLabels(List<NodeLabel> values) {
-		this.values = values;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		values.forEach(value -> value.accept(visitor));
-		visitor.leave(this);
+	private MessageKeys() {
 	}
 }

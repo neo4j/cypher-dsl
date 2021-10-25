@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
 import org.apiguardian.api.API;
@@ -51,6 +52,8 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Cypher {
+
+	static final ResourceBundle messages = ResourceBundle.getBundle("messages");
 
 	/**
 	 * Create a new Node representation with at least one label, the "primary" label. This is required. All other labels

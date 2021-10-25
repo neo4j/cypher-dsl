@@ -68,6 +68,8 @@ class BuiltInFunctionsTest {
 				+ "\t}"
 				+ "\n";
 
-		System.err.println(String.format(template, function.getImplementationName(), function));
+		String javaDocStub = String.format(template, function.getImplementationName(), function);
+		Assertions.assertNotNull(javaDocStub);
+		System.err.println(javaDocStub);
 	}
 }
