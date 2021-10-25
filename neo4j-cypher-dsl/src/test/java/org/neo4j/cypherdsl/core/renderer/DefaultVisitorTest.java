@@ -69,7 +69,7 @@ class DefaultVisitorTest {
 
 		DefaultVisitor visitorUnderTest = new DefaultVisitor(null);
 		visitorUnderTest.enter(testEnum);
-		assertThat(visitorUnderTest.builder.toString()).isEqualTo(testEnum.expected);
+		assertThat(visitorUnderTest.builder).hasToString(testEnum.expected);
 	}
 
 	@ParameterizedTest
