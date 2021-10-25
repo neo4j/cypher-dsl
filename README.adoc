@@ -102,3 +102,4 @@ The minimal required JDK version to build the Cypher-DSL is *JDK 11*. To build t
 
 The Cypher-DSL itself is licenced under the https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0],
 the parser module is licensed under https://www.gnu.org/licenses/gpl-3.0.html[the GNU General Public License 3].
+
