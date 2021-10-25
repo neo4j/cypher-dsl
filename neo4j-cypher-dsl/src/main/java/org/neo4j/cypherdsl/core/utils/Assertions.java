@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core.utils;
 
+import java.util.Arrays;
+import java.util.Objects;
+
 import org.apiguardian.api.API;
 
 /**
@@ -106,7 +109,7 @@ public final class Assertions {
 	}
 
 	private static boolean isEmpty(Object[] array) {
-		return array == null || array.length == 0;
+		return array == null || array.length == 0 || Arrays.stream(array).allMatch(Objects::isNull);
 	}
 
 	private Assertions() {

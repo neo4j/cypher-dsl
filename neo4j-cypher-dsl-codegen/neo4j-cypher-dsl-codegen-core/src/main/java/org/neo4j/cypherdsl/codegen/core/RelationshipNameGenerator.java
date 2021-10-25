@@ -49,10 +49,10 @@ final class RelationshipNameGenerator extends AbstractClassNameGenerator impleme
 						sb.setCharAt(last, Character.toLowerCase(sb.charAt(last)));
 					}
 				}
-				if (i != sb.length()) {
-					sb.deleteCharAt(i);
-				}
 				last = i;
+			}
+			if (i != sb.length() && sb.charAt(i) == '_') {
+				sb.deleteCharAt(i);
 			}
 			++i;
 		}

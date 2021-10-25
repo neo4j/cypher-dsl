@@ -739,9 +739,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
-	void enter(Enum<?> statement) {
+	void enter(Enum<?> enum_) {
 
-		builder.append(statement.name().replaceAll("_", " ")).append(" ");
+		builder.append(enum_.name().replace("_", " ")).append(" ");
 	}
 
 	void enter(Subquery subquery) {

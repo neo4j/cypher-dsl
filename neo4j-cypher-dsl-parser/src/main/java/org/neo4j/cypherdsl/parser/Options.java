@@ -23,7 +23,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -75,7 +75,7 @@ public final class Options {
 
 		private BiFunction<TypeParsedEventType, Collection<String>, Collection<String>> typeFilter = (e, t) -> t;
 
-		private final Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> onNewExpressionCallbacks = new HashMap<>();
+		private final Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> onNewExpressionCallbacks = new EnumMap<>(ExpressionCreatedEventType.class);
 
 		private Function<ReturnDefinition, Return> returnClauseFactory;
 
@@ -173,7 +173,7 @@ public final class Options {
 		this.labelFilter = builder.labelFilter;
 		this.typeFilter = builder.typeFilter;
 
-		Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> tmp = new HashMap<>();
+		Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> tmp = new EnumMap<>(ExpressionCreatedEventType.class);
 		builder.onNewExpressionCallbacks.forEach((k, v) -> tmp.put(k, List.copyOf(v)));
 		this.onNewExpressionCallbacks = Map.copyOf(tmp);
 

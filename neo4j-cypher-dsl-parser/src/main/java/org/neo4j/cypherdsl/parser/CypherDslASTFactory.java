@@ -945,7 +945,11 @@ final class CypherDslASTFactory implements
 
 		var in = Cypher.listWith(assertSymbolicName(v)).in(list);
 		if (where != null) {
-			return in.where(where.asCondition()).returning(projection);
+			var ongoingComprehension = in.where(where.asCondition());
+			if (projection != null) {
+				return ongoingComprehension.returning(projection);
+			}
+			return ongoingComprehension.returning();
 		}
 		return in.returning(projection);
 	}

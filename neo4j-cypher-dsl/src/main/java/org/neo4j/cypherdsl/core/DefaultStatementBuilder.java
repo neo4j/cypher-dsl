@@ -223,7 +223,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final OngoingReadingAndReturn returning(Collection<Expression> expressions) {
 
-		return returning(expressions.toArray(new Expression[] {}));
+		return returning(expressions == null ? null : expressions.toArray(new Expression[] {}));
 	}
 
 	@NotNull
@@ -292,7 +292,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
 
-		return with(expressions.toArray(new Expression[] {}));
+		return with(expressions == null ? null : expressions.toArray(new Expression[] {}));
 	}
 
 	@NotNull
@@ -655,8 +655,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected final void addExpressions(Expression... expressions) {
 
-			Assertions.notNull(expressions, "Expressions to return are required.");
-			Assertions.notEmpty(expressions, "At least one expressions to return is required.");
+			Assertions.notNull(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.notEmpty(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
@@ -703,8 +703,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected void addExpressions(Expression... expressions) {
 
-			Assertions.notNull(expressions, "Expressions to return are required.");
-			Assertions.notEmpty(expressions, "At least one expressions to return is required.");
+			Assertions.notNull(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.notEmpty(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
@@ -1265,8 +1265,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public OngoingReadingAndReturn returning(Expression... returnedExpressions) {
 
-			Assertions.notNull(returnedExpressions, "Expressions to return are required.");
-			Assertions.notEmpty(returnedExpressions, "At least one expressions to return is required.");
+			Assertions.notNull(returnedExpressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.notEmpty(returnedExpressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 
@@ -1279,7 +1279,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public OngoingReadingAndReturn returning(Collection<Expression> returnedExpressions) {
 
-			return returning(returnedExpressions.toArray(new Expression[] {}));
+			return returning(returnedExpressions == null ? null : returnedExpressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull

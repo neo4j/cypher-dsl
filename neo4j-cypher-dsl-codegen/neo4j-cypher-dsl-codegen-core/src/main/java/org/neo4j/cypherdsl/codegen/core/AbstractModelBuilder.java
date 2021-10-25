@@ -31,7 +31,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Callable;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
@@ -205,15 +205,11 @@ abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuil
 	/**
 	 * Makes sure that no Java file has been created before modifying the builder
 	 */
-	final <V> V callOnlyWithoutJavaFilePresent(Callable<V> c) {
+	final <V> V callOnlyWithoutJavaFilePresent(Supplier<V> c) {
 
 		synchronized (this) {
 			if (javaFile == null) {
-				try {
-					return c.call();
-				} catch (Exception e) {
-					throw new RuntimeException(e);
-				}
+				return c.get();
 			}
 		}
 		throw new IllegalStateException("Class has already been generated, cannot add properties.");

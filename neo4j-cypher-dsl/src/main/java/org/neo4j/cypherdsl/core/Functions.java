@@ -264,7 +264,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toLower(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TO_LOWER, expression);
 	}
 
@@ -279,7 +279,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation trim(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TRIM, expression);
 	}
 
@@ -295,7 +295,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation split(@NotNull Expression expression, @NotNull Expression delimiter) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		Assertions.notNull(delimiter, "The delimiter is required.");
 		return FunctionInvocation.create(Strings.SPLIT, expression, delimiter);
 	}
@@ -312,7 +312,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation split(@NotNull Expression expression, @NotNull String delimiter) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		Assertions.notNull(delimiter, "The delimiter is required.");
 		return split(expression, Cypher.literalOf(delimiter));
 	}
@@ -1453,7 +1453,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation abs(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ABS, expression);
 	}
 
@@ -1468,7 +1468,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation ceil(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.CEIL, expression);
 	}
 
@@ -1483,7 +1483,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation floor(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.FLOOR, expression);
 	}
 
@@ -1537,7 +1537,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sign(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIGN, expression);
 	}
 
@@ -1565,7 +1565,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation exp(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.EXP, expression);
 	}
 
@@ -1580,7 +1580,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation log(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG, expression);
 	}
 
@@ -1595,7 +1595,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation log10(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG10, expression);
 	}
 
@@ -1610,7 +1610,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sqrt(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SQRT, expression);
 	}
 
@@ -1625,7 +1625,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation acos(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ACOS, expression);
 	}
 
@@ -1640,7 +1640,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation asin(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ASIN, expression);
 	}
 
@@ -1655,7 +1655,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation atan(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ATAN, expression);
 	}
 
@@ -1687,7 +1687,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation cos(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COS, expression);
 	}
 
@@ -1702,7 +1702,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation cot(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COT, expression);
 	}
 
@@ -1717,7 +1717,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation degrees(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.DEGREES, expression);
 	}
 
@@ -1732,7 +1732,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation haversin(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.HAVERSIN, expression);
 	}
 
@@ -1760,7 +1760,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation radians(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.RADIANS, expression);
 	}
 
@@ -1775,7 +1775,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sin(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIN, expression);
 	}
 
@@ -1790,7 +1790,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation tan(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.TAN, expression);
 	}
 
@@ -1805,7 +1805,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toInteger(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_INTEGER, expression);
 	}
 
@@ -1820,7 +1820,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toFloat(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_FLOAT, expression);
 	}
 
@@ -1835,7 +1835,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toBoolean(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_BOOLEAN, expression);
 	}
 

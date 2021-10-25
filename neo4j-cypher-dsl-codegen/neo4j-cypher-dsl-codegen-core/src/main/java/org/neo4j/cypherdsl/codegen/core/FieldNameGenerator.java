@@ -32,7 +32,6 @@ interface FieldNameGenerator {
 		INSTANCE
 	}
 
-	@SuppressWarnings("InnerAssignment")
 	default String generate(String name) {
 
 		StringBuilder sb = new StringBuilder();
@@ -54,10 +53,10 @@ interface FieldNameGenerator {
 					codePoint = Character.toUpperCase(codePoint);
 				} else if (sb.length() > 0 && (
 					prevWasLower ||
-					i + 1 < name.length() && (nextIsLower = Character.isLowerCase(name.codePointAt(i + 1)))
+					i + 1 < name.length() && Character.isLowerCase(name.codePointAt(i + 1))
 				)) {
 					sb.append("_");
-					prevWasLower = true;
+					nextIsLower = true;
 				}
 				sb.append(Character.toChars(codePoint));
 			}

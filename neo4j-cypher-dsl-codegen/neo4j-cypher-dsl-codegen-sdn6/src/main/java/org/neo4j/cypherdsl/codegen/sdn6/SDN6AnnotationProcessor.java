@@ -703,6 +703,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 	/**
 	 * Pre-groups fields into properties and relationships to avoid running the association check multiple times.
 	 */
+	@SuppressWarnings("squid:S110") // Not something we need or can do anything about.
 	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<VariableElement>>, Void> {
 
 		private final Map<FieldType, List<VariableElement>> result;
@@ -717,6 +718,10 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 		void apply(Element element) {
 			element.accept(this, null);
+		}
+
+		Map<FieldType, List<VariableElement>> getResult() {
+			return result;
 		}
 
 		@Override
@@ -776,10 +781,6 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			return name == null || "org.springframework.data.neo4j.core.schema.GeneratedValue.InternalIdGenerator".equals(name);
 		}
 
-		Map<FieldType, List<VariableElement>> getResult() {
-			return result;
-		}
-
 		/**
 		 * Reassembles org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentProperty#isAssociation
 		 *
@@ -828,6 +829,17 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 			return !(isTargetNodeOrComposite || declaredAnnotations.contains(convertWithAnnotationType) || simpleTypeOrCustomWriteTarget.getAsBoolean());
 		}
+
+		private boolean describesEnum(TypeMirror typeMirror) {
+			List<? extends TypeMirror> superTypes = typeUtils.directSupertypes(typeMirror);
+			if (!(superTypes.size() == 1 && superTypes.get(0).getKind().equals(TypeKind.DECLARED))) {
+				return false;
+			}
+
+			TypeMirror tm = superTypes.get(0);
+			String name = ((DeclaredType) tm).asElement().accept(new TypeElementVisitor<>(new TypeElementNameFunction()), null);
+			return Enum.class.getName().equals(name);
+		}
 	}
 
 	/**
@@ -845,16 +857,5 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			}
 			return typeElement.getQualifiedName().toString();
 		}
-	}
-
-	private boolean describesEnum(TypeMirror typeMirror) {
-		List<? extends TypeMirror> superTypes = typeUtils.directSupertypes(typeMirror);
-		if (!(superTypes.size() == 1 && superTypes.get(0).getKind().equals(TypeKind.DECLARED))) {
-			return false;
-		}
-
-		TypeMirror tm = superTypes.get(0);
-		String name = ((DeclaredType) tm).asElement().accept(new TypeElementVisitor<>(new TypeElementNameFunction()), null);
-		return Enum.class.getName().equals(name);
 	}
 }

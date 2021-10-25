@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 
 /**
  * @author Michael J. Simons
@@ -48,6 +49,27 @@ class DefaultVisitorTest {
 	void shouldNotTryToEscapeNullNames() {
 
 		assertThat(visitor.escapeName(null)).isEmpty();
+	}
+
+	enum TestEnum {
+		NO("NO"),
+		ONE_UNDERSCORE("ONE UNDERSCORE"),
+		THOSE_ARE_MORE_UNDERSCORES("THOSE ARE MORE UNDERSCORES");
+
+		String expected;
+
+		TestEnum(String expected) {
+			this.expected = expected + " ";
+		}
+	}
+
+	@EnumSource(TestEnum.class)
+	@ParameterizedTest
+	void underscoresInEnumsShouldBeRemoved(TestEnum testEnum) {
+
+		DefaultVisitor visitorUnderTest = new DefaultVisitor(null);
+		visitorUnderTest.enter(testEnum);
+		assertThat(visitorUnderTest.builder.toString()).isEqualTo(testEnum.expected);
 	}
 
 	@ParameterizedTest
