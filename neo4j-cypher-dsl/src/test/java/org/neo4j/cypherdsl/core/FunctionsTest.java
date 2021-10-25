@@ -25,11 +25,13 @@ import static org.mockito.Mockito.mock;
 import java.lang.reflect.Method;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.platform.commons.util.ReflectionUtils;
 import org.mockito.Answers;
 
 /**
@@ -65,36 +67,35 @@ class FunctionsTest {
 	}
 
 	private static Stream<Arguments> functionsToTest() {
-		return Stream.of(
-			Arguments.of("id", Node.class),
-			Arguments.of("id", Relationship.class),
-			Arguments.of("count", Expression.class),
-			Arguments.of("collect", Expression.class),
-			Arguments.of("head", Expression.class),
-			Arguments.of("last", Expression.class),
-			Arguments.of("size", RelationshipPattern.class),
-			Arguments.of("size", Expression.class)
 
-		);
+		return ReflectionUtils
+			.findMethods(
+				Functions.class,
+				method -> method.getParameterCount() == 1 && (
+					method.getParameterTypes()[0].isAssignableFrom(Expression.class) ||
+					method.getParameterTypes()[0].isAssignableFrom(Node.class) ||
+					method.getParameterTypes()[0].isAssignableFrom(Relationship.class)
+				),
+				ReflectionUtils.HierarchyTraversalMode.TOP_DOWN
+			)
+			.stream().map(method -> Arguments.of(Named.of(method.getName(), method)));
 	}
 
-	@ParameterizedTest
+	@ParameterizedTest(name = "{index}: {0}")
 	@MethodSource("functionsToTest")
-	void preconditionsShouldBeAsserted(String functionName, Class<?> argumentType) {
-
-		Method method = TestUtils.findMethod(Functions.class, functionName, argumentType);
+	void preconditionsShouldBeAsserted(Method method) {
 		assertThatIllegalArgumentException()
 			.isThrownBy(() -> TestUtils.invokeMethod(method, null, (Expression) null))
-			.withMessageMatching("The (node|relationship|expression|pattern) for " + functionName + "\\(\\) is required.");
+			.withMessageMatching("The (expression|node|relationship|temporalAmount|temporalValue|variable|pattern) (for .* )?is required.");
 	}
 
 	@ParameterizedTest
 	@MethodSource("functionsToTest")
-	void functionInvocationsShouldBeCreated(String functionName, Class<?> argumentType) {
+	void functionInvocationsShouldBeCreated(Method method) {
 
-		Method method = TestUtils.findMethod(Functions.class, functionName, argumentType);
 		FunctionInvocation invocation = (FunctionInvocation) TestUtils
-			.invokeMethod(method, null, mock(argumentType, Answers.RETURNS_DEEP_STUBS));
-		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, functionName);
+			.invokeMethod(method, null, mock(method.getParameterTypes()[0], Answers.RETURNS_DEEP_STUBS));
+		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD,
+			method.getName().replace("Distinct", ""));
 	}
 }

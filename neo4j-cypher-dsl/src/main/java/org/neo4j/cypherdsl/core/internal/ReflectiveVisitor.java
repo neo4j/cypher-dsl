@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -135,8 +136,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 			// the loop goes from concrete to abstract, so that the most concrete visitor wins
 			for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
 				try {
-					Method method = visitorClass.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
-					method.setAccessible(true);
+					Method method = getMethodInPhaseWithActualVisitor(targetAndPhase, visitorClass, clazz);
 					return Optional.of(method);
 				} catch (NoSuchMethodException e) {
 					// We don't do anything if the method doesn't exists
@@ -147,6 +147,14 @@ public abstract class ReflectiveVisitor implements Visitor {
 		} while (visitorClass != null && visitorClass != ReflectiveVisitor.class);
 
 		return Optional.empty();
+	}
+
+	@SuppressWarnings("squid:S3011") // Very much the point of the whole thing
+	@NotNull
+	private static Method getMethodInPhaseWithActualVisitor(TargetAndPhase targetAndPhase, Class<?> visitorClass, Class<?> clazz) throws NoSuchMethodException {
+		Method method = visitorClass.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
+		method.setAccessible(true);
+		return method;
 	}
 
 	private static class TargetAndPhase {

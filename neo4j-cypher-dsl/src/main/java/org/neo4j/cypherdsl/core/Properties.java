@@ -35,7 +35,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = EXPERIMENTAL, since = "1.0")
 public final class Properties implements Visitable {
 
-	private final MapExpression properties;
+	private final MapExpression value;
 
 	/**
 	 * Wraps an expression into a {@link Properties} node.
@@ -49,15 +49,15 @@ public final class Properties implements Visitable {
 		return expression == null ? null : new Properties(expression);
 	}
 
-	private Properties(MapExpression properties) {
-		this.properties = properties;
+	private Properties(MapExpression value) {
+		this.value = value;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		this.properties.accept(visitor);
+		this.value.accept(visitor);
 		visitor.leave(this);
 	}
 }

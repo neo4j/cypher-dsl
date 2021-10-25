@@ -54,7 +54,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation id(@NotNull Node node) {
 
-		Assertions.notNull(node, "The node for id() is required.");
+		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.ID, node.getRequiredSymbolicName());
 	}
@@ -69,7 +69,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation id(@NotNull Relationship relationship) {
 
-		Assertions.notNull(relationship, "The relationship for id() is required.");
+		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.ID, relationship.getRequiredSymbolicName());
 	}
@@ -85,7 +85,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation keys(@NotNull Node node) {
 
-		Assertions.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 		return keys(node.getRequiredSymbolicName());
 	}
 
@@ -100,7 +100,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation keys(@NotNull Relationship relationship) {
 
-		Assertions.notNull(relationship, "The relationship parameter is required.");
+		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 		return keys(relationship.getRequiredSymbolicName());
 	}
 
@@ -115,7 +115,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation keys(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, "The expression parameter is required.");
+		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 
 		Expression param = expression instanceof Named ? ((Named) expression).getRequiredSymbolicName() : expression;
 		return FunctionInvocation.create(Lists.KEYS, param);
@@ -131,7 +131,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation labels(@NotNull Node node) {
 
-		Assertions.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Lists.LABELS, node.getRequiredSymbolicName());
 	}
@@ -146,7 +146,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation type(@NotNull Relationship relationship) {
 
-		Assertions.notNull(relationship, "The relationship parameter is required.");
+		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.TYPE, relationship.getRequiredSymbolicName());
 	}
@@ -159,7 +159,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation count(@NotNull Node node) {
 
-		Assertions.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Aggregates.COUNT, node.getRequiredSymbolicName());
 	}
@@ -187,7 +187,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation countDistinct(@NotNull Node node) {
 
-		Assertions.notNull(node, "The node parameter is required.");
+		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.createDistinct(Aggregates.COUNT, node.getRequiredSymbolicName());
 	}
@@ -214,6 +214,8 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(Node node) {
 
+		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+
 		return FunctionInvocation.create(Scalars.PROPERTIES, node.getRequiredSymbolicName());
 	}
 
@@ -225,6 +227,8 @@ public final class Functions {
 	 */
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(Relationship relationship) {
+
+		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.PROPERTIES, relationship.getRequiredSymbolicName());
 	}
@@ -457,7 +461,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation collect(@NotNull Named variable) {
 
-		Assertions.notNull(variable, "The variable parameter is required.");
+		Assertions.notNull(variable, Cypher.messages.getString(MessageKeys.ASSERTIONS_VARIABLE_REQUIRED));
 
 		return FunctionInvocation.create(Aggregates.COLLECT, variable.getRequiredSymbolicName());
 	}
@@ -472,7 +476,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation collectDistinct(@NotNull Named variable) {
 
-		Assertions.notNull(variable, "The variable parameter is required.");
+		Assertions.notNull(variable, Cypher.messages.getString(MessageKeys.ASSERTIONS_VARIABLE_REQUIRED));
 
 		return FunctionInvocation.createDistinct(Aggregates.COLLECT, variable.getRequiredSymbolicName());
 	}

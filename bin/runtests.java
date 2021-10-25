@@ -1,5 +1,5 @@
 ///usr/bin/env jbang "$0" "$@" ; exit $?
-//DEPS org.junit.platform:junit-platform-console-standalone:1.7.1
+//DEPS org.junit.platform:junit-platform-console-standalone:1.8.1
 //DEPS org.assertj:assertj-core:3.15.0
 //DEPS org.mockito:mockito-junit-jupiter:3.6.0
 import org.junit.platform.console.ConsoleLauncher;

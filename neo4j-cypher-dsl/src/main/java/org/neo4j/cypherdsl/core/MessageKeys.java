@@ -26,6 +26,9 @@ final class MessageKeys {
 	public static final String ASSERTIONS_EXPRESSION_REQUIRED = "assertions.expression-required";
 	public static final String ASSERTIONS_EXPRESSIONS_REQUIRED = "assertions.expressions-required";
 	public static final String ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED = "assertions.at-least-one-expression-required";
+	public static final String ASSERTIONS_NODE_REQUIRED = "assertions.node-required";
+	public static final String ASSERTIONS_RELATIONSHIP_REQUIRED = "assertions.relationship-required";
+	public static final String ASSERTIONS_VARIABLE_REQUIRED = "assertions.variable-required";
 
 	private MessageKeys() {
 	}

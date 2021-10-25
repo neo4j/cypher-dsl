@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.stream.Stream;
@@ -32,7 +31,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.platform.commons.util.ReflectionUtils;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -185,20 +183,6 @@ class FunctionsIT {
 	@MethodSource("functionsToTest")
 	void functionShouldBeRenderedAsExpected(FunctionInvocation functionInvocation, String expected) {
 		Assertions.assertThat(cypherRenderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
-	}
-
-	@Test
-	void shouldCheckForRequiredExpressions() {
-
-		List<Method> methodsTakingInExpression = ReflectionUtils.findMethods(Functions.class, method ->
-			method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Expression.class), ReflectionUtils.HierarchyTraversalMode.TOP_DOWN);
-
-		methodsTakingInExpression.forEach(method -> {
-			Assertions.assertThatExceptionOfType(InvocationTargetException.class).isThrownBy(() -> method.invoke(null,
-					(Expression) null))
-				.withRootCauseInstanceOf(IllegalArgumentException.class)
-				.withStackTraceContaining("is required.");
-		});
 	}
 
 	private static Stream<Arguments> functionsToTest() {
