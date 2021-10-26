@@ -47,7 +47,7 @@ class BuiltInFunctionsTest {
 		}
 	}
 
-	@Disabled
+	@Disabled("This test is a generator for method stubs and used when new functions are added to the list we can generate ootb.")
 	@ParameterizedTest
 	@EnumSource(BuiltInFunctions.MathematicalFunctions.class)
 	void generateStubs(FunctionInvocation.FunctionDefinition function) {
