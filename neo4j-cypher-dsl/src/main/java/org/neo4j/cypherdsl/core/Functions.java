@@ -920,9 +920,9 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation calendarDate(Integer year, Integer month, Integer day) {
 
-		Assertions.notNull(year, "The year is required.");
-		Assertions.notNull(month, "The month is required.");
-		Assertions.notNull(day, "The year is required.");
+		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
+		Assertions.notNull(month, Cypher.messages.getString(MessageKeys.ASSERTIONS_MONTH_REQUIRED));
+		Assertions.notNull(day, Cypher.messages.getString(MessageKeys.ASSERTIONS_DAY_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher
 			.mapOf("year", Cypher.literalOf(year), "month", Cypher.literalOf(month), "day", Cypher.literalOf(day)));
 	}
@@ -940,7 +940,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation weekDate(Integer year, Integer week, Integer dayOfWeek) {
 
-		Assertions.notNull(year, "The year is required.");
+		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Object[] parameters = new Object[2 + (week == null ? 0 : 2) + (dayOfWeek == null ? 0 : 2)];
 		int i = 0;
 		parameters[i++] = "year";
@@ -972,7 +972,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation quarterDate(Integer year, Integer quarter, Integer dayOfQuarter) {
 
-		Assertions.notNull(year, "The year is required.");
+		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Object[] parameters = new Object[2 + (quarter == null ? 0 : 2) + (dayOfQuarter == null ? 0 : 2)];
 		int i = 0;
 		parameters[i++] = "year";
@@ -1000,7 +1000,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation ordinalDate(Integer year, Integer ordinalDay) {
 
-		Assertions.notNull(year, "The year is required.");
+		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Object[] parameters = new Object[2 + (ordinalDay == null ? 0 : 2)];
 		int i = 0;
 		parameters[i++] = "year";
@@ -1024,7 +1024,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, "The components is required.");
+		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, components);
 	}
 
@@ -1040,7 +1040,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.literalOf(temporalValue));
 	}
 
@@ -1056,7 +1056,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, temporalValue);
 	}
 
@@ -1084,7 +1084,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, "The timezone is required.");
+		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.DATETIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1101,7 +1101,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, "The components is required.");
+		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, components);
 	}
 
@@ -1117,7 +1117,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1133,7 +1133,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, temporalValue);
 	}
 
@@ -1161,7 +1161,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, "The timezone is required.");
+		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.LOCALDATETIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1178,7 +1178,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, "The components is required.");
+		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, components);
 	}
 
@@ -1194,7 +1194,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1210,7 +1210,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, temporalValue);
 	}
 
@@ -1238,7 +1238,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, "The timezone is required.");
+		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.LOCALTIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1255,7 +1255,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, "The components is required.");
+		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, components);
 	}
 
@@ -1271,7 +1271,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1287,7 +1287,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, temporalValue);
 	}
 
@@ -1315,7 +1315,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, "The timezone is required.");
+		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1336,7 +1336,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, "The components is required.");
+		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, components);
 	}
 
@@ -1352,7 +1352,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, "The temporalValue is required.");
+		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1368,7 +1368,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, "The temporalValue is required.");
+		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, temporalValue);
 	}
 
@@ -1384,7 +1384,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation duration(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, "The components is required.");
+		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, components);
 	}
 

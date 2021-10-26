@@ -74,8 +74,9 @@ class FunctionsTest {
 				method -> method.getParameterCount() == 1 && (
 					method.getParameterTypes()[0].isAssignableFrom(Expression.class) ||
 					method.getParameterTypes()[0].isAssignableFrom(Node.class) ||
-					method.getParameterTypes()[0].isAssignableFrom(Relationship.class)
-				),
+					method.getParameterTypes()[0].isAssignableFrom(Relationship.class) ||
+					method.getParameterTypes()[0].isAssignableFrom(MapExpression.class)
+				) && (!method.getName().equals("properties") || !method.getParameterTypes()[0].isAssignableFrom(MapExpression.class)),
 				ReflectionUtils.HierarchyTraversalMode.TOP_DOWN
 			)
 			.stream().map(method -> Arguments.of(Named.of(method.getName(), method)));
@@ -86,7 +87,7 @@ class FunctionsTest {
 	void preconditionsShouldBeAsserted(Method method) {
 		assertThatIllegalArgumentException()
 			.isThrownBy(() -> TestUtils.invokeMethod(method, null, (Expression) null))
-			.withMessageMatching("The (expression|node|relationship|temporalAmount|temporalValue|variable|pattern) (for .* )?is required.");
+			.withMessageMatching("The (expression|node|relationship|temporalAmount|temporalValue|variable|pattern|components) (?:for .* )?(?:is|are) required.");
 	}
 
 	@ParameterizedTest

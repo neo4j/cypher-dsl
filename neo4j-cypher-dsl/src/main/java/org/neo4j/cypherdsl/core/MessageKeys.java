@@ -19,7 +19,9 @@
 package org.neo4j.cypherdsl.core;
 
 /**
- * A list of constant messages.
+ * The message keys available in the {@code messages}-bundle.
+ *
+ * @author Michael J. Simons
  */
 final class MessageKeys {
 
@@ -29,6 +31,12 @@ final class MessageKeys {
 	public static final String ASSERTIONS_NODE_REQUIRED = "assertions.node-required";
 	public static final String ASSERTIONS_RELATIONSHIP_REQUIRED = "assertions.relationship-required";
 	public static final String ASSERTIONS_VARIABLE_REQUIRED = "assertions.variable-required";
+	public static final String ASSERTIONS_COMPONENTS_REQUIRED = "assertions.components-required";
+	public static final String ASSERTIONS_TEMPORAL_VALUE_REQUIRED = "assertions.temporal-value-required";
+	public static final String ASSERTIONS_YEAR_REQUIRED = "assertions.year-required";
+	public static final String ASSERTIONS_MONTH_REQUIRED = "assertions.month-required";
+	public static final String ASSERTIONS_DAY_REQUIRED = "assertions.day-required";
+	public static final String ASSERTIONS_TZ_REQUIRED = "assertions.tz-required";
 
 	private MessageKeys() {
 	}
