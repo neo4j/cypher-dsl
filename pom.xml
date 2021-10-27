@@ -161,7 +161,7 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven.version>3.8.1</maven.version>
-		<mockito.version>3.9.0</mockito.version>
+		<mockito.version>4.0.0</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.RC1</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>4.2.7</neo4j-java-driver.version>
 		<neo4j.version>4.3.4</neo4j.version>
@@ -171,10 +171,10 @@
 		<reactor.version>2020.0.6</reactor.version>
 		<revision>9999</revision>
 		<sha1 />
-		<slf4j.version>1.7.26</slf4j.version>
+		<slf4j.version>1.7.32</slf4j.version>
 		<sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
-		<spring-data-neo4j.version>6.1.5</spring-data-neo4j.version>
+		<spring-data-neo4j.version>6.1.6</spring-data-neo4j.version>
 	</properties>
 
 	<dependencyManagement>
