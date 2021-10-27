@@ -1,5 +1,20 @@
 == 2021.3
 
+=== 2021.3.3
+
+2021.3.3 is a pure housekeeping release, however a release we are proud of. We do analyze this project now with https://www.sonarqube.org[SonarQube]
+vie https://sonarcloud.io[Sonarcloud] and are happy to announce that we have a quadruple A rating:
+
+image::20211027_sonarcoud.jpg[]
+
+In addition, we finally invited https://dependabot.com[Dependabot] taking care of at least creating the PRs.
+
+==== 🧹 Housekeeping
+
+* Fix reliability and security issues
+* Fix a minor amounts of remaining code smells
+* Bump several dependencies (only test and build related)
+
 === 2021.3.2
 
 ==== 🚀 Features
