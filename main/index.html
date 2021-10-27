@@ -601,7 +601,7 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2021.3.3-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2021.3.3.</p>
 </div>
 </blockquote>
 </div>
@@ -693,7 +693,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2021.3.3-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2021.3.3<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -704,7 +704,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.3.3-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2021.3.3</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -1687,7 +1687,7 @@ The current version of the Cypher-DSL-Parser modules is rather big. This is due 
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-parser<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>2021.3.3-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>2021.3.3<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -1698,7 +1698,7 @@ The current version of the Cypher-DSL-Parser modules is rather big. This is due 
 <div class="title">Listing 15. Gradle variant for additional dependencies</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:2021.3.3-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:2021.3.3</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -3297,7 +3297,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="title">Listing 40. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.3.3-SNAPSHOT</code></pre>
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.3.3</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3363,7 +3363,7 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.3.3-SNAPSHOT</span><span class="delimiter">'</span></span>
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2021.3.3</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -4150,6 +4150,37 @@ RETURN c, p</code></pre>
 <div class="sect3">
 <h4 id="2021.3"><a class="anchor" href="#2021.3"></a>2021.3</h4>
 <div class="sect4">
+<h5 id="2021.3.3"><a class="anchor" href="#2021.3.3"></a>2021.3.3</h5>
+<div class="paragraph">
+<p>2021.3.3 is a pure housekeeping release, however a release we are proud of. We do analyze this project now with <a href="https://www.sonarqube.org">SonarQube</a>
+vie <a href="https://sonarcloud.io">Sonarcloud</a> and are happy to announce that we have a quadruple A rating:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="img/20211027_sonarcoud.jpg" alt="20211027 sonarcoud">
+</div>
+</div>
+<div class="paragraph">
+<p>In addition, we finally invited <a href="https://dependabot.com">Dependabot</a> taking care of at least creating the PRs.</p>
+</div>
+<div class="sect5">
+<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Fix reliability and security issues</p>
+</li>
+<li>
+<p>Fix a minor amounts of remaining code smells</p>
+</li>
+<li>
+<p>Bump several dependencies (only test and build related)</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect4">
 <h5 id="2021.3.2"><a class="anchor" href="#2021.3.2"></a>2021.3.2</h5>
 <div class="sect5">
 <h6 id="features"><a class="anchor" href="#features"></a>🚀 Features</h6>
@@ -4165,7 +4196,7 @@ RETURN c, p</code></pre>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4346,7 +4377,7 @@ release. Those are brought in now so that they can be benefial to others without
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4425,7 +4456,7 @@ release. Those are brought in now so that they can be benefial to others without
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4491,7 +4522,7 @@ Cypher literals giving you much more flexibility in regards what to pass to the 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4630,7 +4661,7 @@ up truly immutable statements. One pattern that is mutable like the above invali
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4743,7 +4774,7 @@ after rendering).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping7"><a class="anchor" href="#housekeeping7"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4828,7 +4859,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping7"><a class="anchor" href="#housekeeping7"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping8"><a class="anchor" href="#housekeeping8"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5028,7 +5059,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping8"><a class="anchor" href="#housekeeping8"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping9"><a class="anchor" href="#housekeeping9"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5147,7 +5178,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping9"><a class="anchor" href="#housekeeping9"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping10"><a class="anchor" href="#housekeeping10"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5259,7 +5290,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping10"><a class="anchor" href="#housekeeping10"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping11"><a class="anchor" href="#housekeeping11"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5315,7 +5346,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping11"><a class="anchor" href="#housekeeping11"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping12"><a class="anchor" href="#housekeeping12"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5351,7 +5382,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-10-27 09:42:01 UTC
+Last updated 2021-10-27 09:55:12 UTC
 </div>
 </div>
 </body>
