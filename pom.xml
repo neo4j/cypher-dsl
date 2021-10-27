@@ -173,7 +173,7 @@
 		<slf4j.version>1.7.26</slf4j.version>
 		<sonar-maven-plugin.version>3.9.0.2155</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
-		<spring-data-neo4j.version>6.1.5</spring-data-neo4j.version>
+		<spring-data-neo4j.version>6.1.6</spring-data-neo4j.version>
 	</properties>
 
 	<dependencyManagement>
