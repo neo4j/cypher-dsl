@@ -31,6 +31,13 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<!-- Depends on com.google.code.findbugs:annotations and so does the neo4j-cypher-javacc-parser, which is actually used in contrast to the Spring QueryDSL integration. -->
+					<artifactId>querydsl-apt</artifactId>
+					<groupId>com.querydsl</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>

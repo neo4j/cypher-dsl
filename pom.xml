@@ -120,6 +120,7 @@
 		<asciidoctorj-diagram.version>2.0.1</asciidoctorj-diagram.version>
 		<asciidoctorj.version>2.4.2</asciidoctorj.version>
 		<assertj.version>3.15.0</assertj.version>
+		<auto-common.version>0.11</auto-common.version>
 		<awaitility.version>4.1.1</awaitility.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
@@ -147,7 +148,7 @@
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
-		<maven-enforcer-plugin.version>3.0.0-M3</maven-enforcer-plugin.version>
+		<maven-enforcer-plugin.version>3.0.0</maven-enforcer-plugin.version>
 		<maven-failsafe-plugin.version>2.22.2</maven-failsafe-plugin.version>
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
@@ -179,6 +180,12 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<!-- Testing depends on this directly, which clashes with auto-value's dependencies -->
+				<groupId>com.google.auto</groupId>
+				<artifactId>auto-common</artifactId>
+				<version>${auto-common.version}</version>
+			</dependency>
+			<dependency>
 				<!-- Only added to avoid dependency convergence errors -->
 				<groupId>com.google.code.findbugs</groupId>
 				<artifactId>jsr305</artifactId>
@@ -188,6 +195,13 @@
 				<groupId>com.querydsl</groupId>
 				<artifactId>querydsl-core</artifactId>
 				<version>${querydsl.version}</version>
+				<exclusions>
+					<exclusion>
+						<!-- See https://github.com/querydsl/querydsl/issues/3005 -->
+						<artifactId>org.springframework.roo.annotations</artifactId>
+						<groupId>org.springframework.roo</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>com.squareup</groupId>
@@ -203,6 +217,13 @@
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctorj</artifactId>
 				<version>${asciidoctorj.version}</version>
+				<exclusions>
+					<exclusion>
+						<!-- Not needed -->
+						<artifactId>test-unit</artifactId>
+						<groupId>rubygems</groupId>
+					</exclusion>
+				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.awaitility</groupId>
@@ -245,16 +266,21 @@
 						<groupId>org.neo4j</groupId>
 					</exclusion>
 					<exclusion>
-						<artifactId>spring-tx</artifactId>
-						<groupId>org.springframework</groupId>
-					</exclusion>
-					<exclusion>
 						<artifactId>spring-aop</artifactId>
 						<groupId>org.springframework</groupId>
 					</exclusion>
 					<exclusion>
 						<artifactId>spring-expression</artifactId>
 						<groupId>org.springframework</groupId>
+					</exclusion>
+					<exclusion>
+						<artifactId>spring-tx</artifactId>
+						<groupId>org.springframework</groupId>
+					</exclusion>
+					<exclusion>
+						<!-- See https://github.com/querydsl/querydsl/issues/3005 -->
+						<artifactId>org.springframework.roo.annotations</artifactId>
+						<groupId>org.springframework.roo</groupId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -485,6 +511,7 @@
 						<nrOfIndentSpace>-1</nrOfIndentSpace>
 						<sortProperties>true</sortProperties>
 						<sortDependencies>scope,groupId,artifactId</sortDependencies>
+						<sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
 						<createBackupFile>false</createBackupFile>
 						<expandEmptyElements>false</expandEmptyElements>
 					</configuration>
