@@ -117,7 +117,7 @@
 	<properties>
 		<apiguardian.version>1.1.1</apiguardian.version>
 		<asciidoctor-maven-plugin.version>1.6.0</asciidoctor-maven-plugin.version>
-		<asciidoctorj-diagram.version>2.0.1</asciidoctorj-diagram.version>
+		<asciidoctorj-diagram.version>2.2.1</asciidoctorj-diagram.version>
 		<asciidoctorj.version>2.4.2</asciidoctorj.version>
 		<assertj.version>3.15.0</assertj.version>
 		<awaitility.version>4.1.0</awaitility.version>
