@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Options;
 import org.asciidoctor.ast.Block;
 import org.asciidoctor.ast.Document;
 import org.asciidoctor.extension.Treeprocessor;
@@ -68,7 +69,7 @@ class TckTest {
 		asciidoctor.javaExtensionRegistry().treeprocessor(collector);
 
 		var content = Files.readString(Paths.get(getClass().getResource("/README.adoc").toURI()));
-		asciidoctor.load(content, Map.of());
+		asciidoctor.load(content, Options.builder().build());
 
 		testData.putAll(collector.content);
 	}
