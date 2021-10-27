@@ -1,0 +1,13 @@
+== 2021.4
+
+=== 2021.4.0
+
+2021.4.0 updates the optional dependency to https://github.com/querydsl/querydsl[Querydsl] to 5.0.0. While this is API
+not a breaking change, it can be when the Cypher-DSL is run together with Querydsl on the Java Module path. Querydsl
+maintainer finally introduced automatic module names for all their module on which we can no reliable depend. As that
+module name is however different from the generated one, it will be a breaking change on the module path. Therefore
+we bump our version, too.
+
+==== 🧹 Housekeeping
+
+* Upgrade Querydsl to 5.0.0
