@@ -385,6 +385,19 @@ public interface Expression extends Visitable {
 	}
 
 	/**
+	 * Creates a new sort item with the given direction.
+	 *
+	 * @param direction The direction to sort
+	 * @return A new sort item.
+	 * @since 2021.4.1
+	 */
+	@NotNull @Contract(pure = true)
+	default SortItem sorted(SortItem.Direction direction) {
+
+		return SortItem.create(this, direction);
+	}
+
+	/**
 	 * Assumes that this expressions refers to a container of some type allowing to reference properties from it.
 	 * Note: The expression does not track property creation and there is no possibility to enumerate all properties
 	 * that have been created for it.
