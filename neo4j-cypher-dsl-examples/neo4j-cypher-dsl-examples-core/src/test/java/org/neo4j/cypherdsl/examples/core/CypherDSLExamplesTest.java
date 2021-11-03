@@ -23,12 +23,15 @@ package org.neo4j.cypherdsl.examples.core;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
+import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Functions;
+import org.neo4j.cypherdsl.core.Predicates;
+import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
@@ -342,5 +345,54 @@ class CypherDSLExamplesTest {
 		assertThat(cypher).isEqualTo(
 			"CALL apoc.meta.schema() YIELD value WITH value UNWIND keys(value) AS key RETURN key, value[key] AS value");
 		// end::raw-cypher[]
+	}
+
+
+	@Test
+	void fromTheGeniusBar1() {
+
+		var orderBy = "some property";
+		var order = "asc";
+		var skip = "21";
+		var limit = "42";
+
+		var direction = SortItem.Direction.valueOf(order.toUpperCase(Locale.ROOT));
+
+		var m = Cypher.node("Movie").named("m");
+		var dynamicProperty = m.property(orderBy);
+
+		var statement = Cypher.match(m)
+			.where(Predicates.exists(dynamicProperty))
+			.returning(m.project(Cypher.asterisk()))
+			.orderBy(dynamicProperty.sorted(direction))
+			.skip(Integer.parseInt(skip))
+			.limit(Integer.parseInt(limit))
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (m:`Movie`) WHERE exists(m.`some property`) RETURN m{.*} ORDER BY m.`some property` ASC SKIP 21 LIMIT 42");
+	}
+
+	@Test
+	void fromTheGeniusBar2() {
+
+		var orderBy = "some property";
+		var order = "asc";
+		var skip = "21";
+		var limit = "42";
+
+		var direction = SortItem.Direction.valueOf(order.toUpperCase(Locale.ROOT));
+
+		var m = Cypher.node("Movie").named("m");
+		var dynamicProperty = m.property(Cypher.anonParameter(orderBy));
+
+		var statement = Cypher.match(m)
+			.where(Predicates.exists(dynamicProperty))
+			.returning(m.project(Cypher.asterisk()))
+			.orderBy(dynamicProperty.sorted(direction))
+			.skip(Cypher.anonParameter(Integer.parseInt(skip)))
+			.limit(Cypher.anonParameter(Integer.parseInt(limit)))
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (m:`Movie`) WHERE exists(m[$pcdsl01]) RETURN m{.*} ORDER BY m[$pcdsl01] ASC SKIP $pcdsl02 LIMIT $pcdsl03");
+		assertThat(statement.getParameters())
+			.containsAllEntriesOf(Map.of("pcdsl01", "some property", "pcdsl02", 21, "pcdsl03", 42));
 	}
 }
