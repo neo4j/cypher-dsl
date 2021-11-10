@@ -153,7 +153,7 @@
 		<maven-install-plugin.version>3.0.0-M1</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.2.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.3.1</maven-javadoc-plugin.version>
-		<maven-pmd-plugin.version>3.15.0</maven-pmd-plugin.version>
+		<maven-pmd-plugin.version>3.11.0</maven-pmd-plugin.version>
 		<maven-resources-plugin.version>3.2.0</maven-resources-plugin.version>
 		<maven-scm-plugin.version>1.12.0</maven-scm-plugin.version>
 		<maven-shade-plugin.version>3.2.4</maven-shade-plugin.version>
