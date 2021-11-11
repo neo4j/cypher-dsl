@@ -1,5 +1,17 @@
 == 2021.4
 
+=== 2021.4.1
+
+==== 🚀 Features
+
+GH-230 - Add a way for a programmatic sort definition on expressions.
+
+==== 🧹 Housekeeping
+
+* Tons of dependency upgrades in test scope
+* Upgrade to Neo4j-Java-Driver 4.4.1. (a provided dependency)
+* The parser module now uses the Neo4j 4.3.6 parser
+
 === 2021.4.0
 
 2021.4.0 updates the optional dependency to https://github.com/querydsl/querydsl[Querydsl] to 5.0.0. While this is API
