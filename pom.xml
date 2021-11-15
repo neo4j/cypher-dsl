@@ -115,7 +115,7 @@
 	</scm>
 
 	<properties>
-		<apiguardian.version>1.1.1</apiguardian.version>
+		<apiguardian.version>1.1.2</apiguardian.version>
 		<asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.2.1</asciidoctorj-diagram.version>
 		<asciidoctorj.version>2.5.2</asciidoctorj.version>
