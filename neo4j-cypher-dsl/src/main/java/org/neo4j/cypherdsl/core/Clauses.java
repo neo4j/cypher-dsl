@@ -44,6 +44,25 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class Clauses {
 
 	/**
+	 * @param optional        Should this be an optional match?
+	 * @param patternElements The pattern elements to match
+	 * @param optionalWhere   An optional where sub-clause
+	 * @param optionalHints   Optional hints to be used
+	 * @return an immutable match clause
+	 * @see #match(boolean, List, Where, List)
+	 * @since 2021.3.0
+	 * @deprecated since 2022.0.0
+	 */
+	@NotNull
+	@Deprecated
+	public static Clause match(boolean optional, List<PatternElement> patternElements,
+		@Nullable Expression optionalWhere,
+		@Nullable List<Hint> optionalHints) {
+
+		return match(optional, patternElements, Where.from(optionalWhere), optionalHints);
+	}
+
+	/**
 	 * Builds a {@code MATCH} clause.
 	 *
 	 * @param optional        Should this be an optional match?
@@ -51,14 +70,14 @@ public final class Clauses {
 	 * @param optionalWhere   An optional where sub-clause
 	 * @param optionalHints   Optional hints to be used
 	 * @return an immutable match clause
+	 * @since 2022.0.0
 	 */
 	@NotNull
 	public static Clause match(boolean optional, List<PatternElement> patternElements,
-		@Nullable Expression optionalWhere,
+		@Nullable Where optionalWhere,
 		@Nullable List<Hint> optionalHints) {
 
-		return new Match(optional, new Pattern(patternElements),
-			optionalWhere == null ? null : new Where(optionalWhere.asCondition()), optionalHints);
+		return new Match(optional, new Pattern(patternElements), optionalWhere, optionalHints);
 	}
 
 	/**
@@ -122,16 +141,31 @@ public final class Clauses {
 	}
 
 	/**
+	 * @param returnClause  The return clause that defines the fields, order and limit of what the with clause should return
+	 * @param optionalWhere An optional expression to define a where clause.
+	 * @return an immutable with clause
+	 * @see #with(Return, Where)
+	 * @since 2021.3.0
+	 * @deprecated since 2022.0.0
+	 */
+	@Deprecated
+	public static Clause with(Return returnClause, @Nullable Expression optionalWhere) {
+
+		return with(returnClause, Where.from(optionalWhere));
+	}
+
+	/**
 	 * Retrofits an existing {@link Return return clause} into an equivalent {@link With with clause}, optionally adding a
 	 * {@link Where where}.
 	 *
 	 * @param returnClause  The return clause that defines the fields, order and limit of what the with clause should return
-	 * @param optionalWhere An optional expression to define a where clause.
+	 * @param optionalWhere An optional {@literal WHERE }expression to define a where clause.
 	 * @return an immutable with clause
+	 * @since 2022.0.0
 	 */
-	public static Clause with(Return returnClause, @Nullable Expression optionalWhere) {
+	public static Clause with(Return returnClause, @Nullable Where optionalWhere) {
 
-		return new With(returnClause, optionalWhere == null ? null : new Where(optionalWhere.asCondition()));
+		return new With(returnClause, optionalWhere);
 	}
 
 	/**
@@ -185,6 +219,25 @@ public final class Clauses {
 	}
 
 	/**
+	 * @param namespace     An optional namespace, maybe empty
+	 * @param name          The name of the stored procedure to call
+	 * @param arguments     the arguments, maybe null or empty
+	 * @param resultItems   the result items, maybe null or empty
+	 * @param optionalWhere an optional where
+	 * @return An immutable clause
+	 * @see #callClause(List, String, List, List, Where)
+	 * @since 2021.3.0
+	 * @deprecated since 2022.0.0
+	 */
+	@NotNull
+	@Deprecated
+	public static Clause callClause(List<String> namespace, String name, @Nullable List<Expression> arguments,
+		@Nullable List<Expression> resultItems, @Nullable Expression optionalWhere) {
+
+		return Clauses.callClause(namespace, name, arguments, resultItems, Where.from(optionalWhere));
+	}
+
+	/**
 	 * Creates a {@literal CALL} clause.
 	 *
 	 * @param namespace     An optional namespace, maybe empty
@@ -193,14 +246,15 @@ public final class Clauses {
 	 * @param resultItems   the result items, maybe null or empty
 	 * @param optionalWhere an optional where
 	 * @return An immutable clause
+	 * @since 2022.0.0
 	 */
 	public static Clause callClause(List<String> namespace, String name, @Nullable List<Expression> arguments,
-		@Nullable List<Expression> resultItems, @Nullable Expression optionalWhere) {
+		@Nullable List<Expression> resultItems, @Nullable Where optionalWhere) {
 
 		return ProcedureCallImpl.create(ProcedureName.from(namespace, name),
 			new Arguments(arguments == null ? new Expression[0] : arguments.toArray(new Expression[0])),
 			resultItems == null ? null : YieldItems.yieldAllOf(resultItems.toArray(new Expression[0])),
-			optionalWhere == null ? null : new Where(optionalWhere.asCondition())
+			optionalWhere
 		);
 	}
 

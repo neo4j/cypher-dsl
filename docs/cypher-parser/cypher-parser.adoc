@@ -9,13 +9,6 @@ The parser itself is based on Neo4j's official Cypher-Parser, thus supporting th
 However, while we could theoretically parse all expressions that Neo4j {neo4j-version} supports, we might cannot translate all of them
 into elements of the Cypher-DSL. In such cases an `UnsupportedOperationException` will be thrown.
 
-NOTE: The current version of the Cypher-DSL-Parser modules is rather big. This is due to the fact that we must shade the
-      Scala-Lang library. Neo4j's parsers depends on it. This is likely to change in the future. Until then, we rather not
-      try to shade only the few required classes and risk a `ClassNotFoundException`, but include the whole library.
-      +
-      The decision for shading has been made for compatibility reasons: People may have a different Scala version in place
-      or might even use this library embedded. So it's safer to shade what we support and not depend on it.
-
 == Getting started
 
 === Add additional dependencies

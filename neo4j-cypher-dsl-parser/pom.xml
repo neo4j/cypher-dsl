@@ -34,6 +34,7 @@
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.parser</java-module-name>
 		<java.version>11</java.version>
+		<covered-ratio-complexity>0.68</covered-ratio-complexity>
 	</properties>
 
 	<dependencies>
@@ -99,7 +100,6 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>org.scala-lang:scala-library</include>
 									<include>org.neo4j:cypher-ast-factory</include>
 									<include>org.neo4j:neo4j-cypher-javacc-parser</include>
 								</includes>
@@ -108,10 +108,6 @@
 								<relocation>
 									<pattern>org.neo4j.cypher.internal</pattern>
 									<shadedPattern>org.neo4j.cypherdsl.parser.internal</shadedPattern>
-								</relocation>
-								<relocation>
-									<pattern>scala</pattern>
-									<shadedPattern>org.neo4j.cypherdsl.parser.internal.scala</shadedPattern>
 								</relocation>
 							</relocations>
 							<createSourcesJar>true</createSourcesJar>
@@ -155,7 +151,6 @@
 									// Those are shaded
 									// requires org.neo4j.cypher.internal.ast.factory;
 									// requires org.neo4j.cypher.internal.parser.javacc;
-									// requires scala.library;
 
 									exports org.neo4j.cypherdsl.parser;
 									}</moduleInfoSource>

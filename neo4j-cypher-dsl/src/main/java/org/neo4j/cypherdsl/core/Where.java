@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -34,6 +35,18 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class Where implements Visitable {
 
 	private final Condition condition;
+
+	/**
+	 * Creates a new {@literal WHERE}
+	 *
+	 * @param optionalWhere An optional expression that must be usable {@link Expression#asCondition() "as condition"}.
+	 * @return A {@literal WHERE} expression or null when {@code optionalWhere} has been {@literal NULL}
+	 * @since 2022.0.0
+	 */
+	@Nullable
+	public static Where from(@Nullable Expression optionalWhere) {
+		return optionalWhere == null ? null : new Where(optionalWhere.asCondition());
+	}
 
 	Where(Condition condition) {
 		this.condition = condition;

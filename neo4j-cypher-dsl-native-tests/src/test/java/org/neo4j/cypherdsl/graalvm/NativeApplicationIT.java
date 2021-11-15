@@ -18,15 +18,17 @@
  */
 package org.neo4j.cypherdsl.graalvm;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -42,15 +44,16 @@ class NativeApplicationIT {
 
 		var statements = List.of(
 			"MATCH (m:`Movie`) RETURN m",
-			"MATCH (m:`Movie`) WHERE (m.title = $title OR m.title = $pTitle OR m.title = $pcdsl01) RETURN m",
 			"pTitle=someTitle",
 			"pcdsl01=someOtherTitle",
 			"pTitle",
 			"pcdsl01",
 			"title",
+			"MATCH (m:`Movie`) WHERE (m.title = $title OR m.title = $pTitle OR m.title = $pcdsl01) RETURN m",
 			"MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}",
 			"MATCH (p:`Parser`) RETURN p",
-			"At least one expressions to return is required."
+			"At least one expressions to return is required.",
+			"MATCH (p:`Person`)-[:`ACTED_IN`]->(n:`Movie`) RETURN n"
 		);
 
 		var p = new ProcessBuilder(Paths.get(".", "target", "application").toAbsolutePath().normalize().toString())
@@ -58,9 +61,8 @@ class NativeApplicationIT {
 
 		p.onExit().thenAccept(done -> {
 			try (var in = new BufferedReader(new InputStreamReader(done.getInputStream()))) {
-				var generatedStatements = in.lines().collect(Collectors.toSet());
-				generatedStatements.forEach(System.out::println);
-				Assertions.assertTrue(generatedStatements.containsAll(statements));
+				var generatedStatements = in.lines().collect(Collectors.toCollection(LinkedHashSet::new));
+				assertThat(generatedStatements).containsExactlyElementsOf(statements);
 			} catch (IOException e) {
 			}
 		}).get();
