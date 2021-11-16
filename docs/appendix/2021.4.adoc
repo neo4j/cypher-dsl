@@ -1,5 +1,13 @@
 == 2021.4
 
+=== 2021.4.2
+
+==== 🐛 Bug Fixes
+
+* GH-252 - Use a namespace for the message bundle.
+
+Thanks to @Andy2003 for spotting this.
+
 === 2021.4.1
 
 ==== 🚀 Features
