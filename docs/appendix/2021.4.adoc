@@ -8,6 +8,12 @@
 
 Thanks to @Andy2003 for spotting this.
 
+==== 🧹 Housekeeping
+
+* Tons of dependency upgrades in test scope
+* The parser module now uses the Neo4j 4.3.7 parser
+* Bump apiguardian-api from 1.1.1 to 1.1.2 (#250)
+
 === 2021.4.1
 
 ==== 🚀 Features
