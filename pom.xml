@@ -119,6 +119,7 @@
 		<asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.2.1</asciidoctorj-diagram.version>
 		<asciidoctorj.version>2.5.2</asciidoctorj.version>
+		<asm.version>9.2</asm.version>
 		<assertj.version>3.21.0</assertj.version>
 		<auto-common.version>0.11</auto-common.version>
 		<awaitility.version>4.1.1</awaitility.version>
@@ -238,6 +239,11 @@
 				<groupId>org.neo4j.driver</groupId>
 				<artifactId>neo4j-java-driver</artifactId>
 				<version>${neo4j-java-driver.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.ow2.asm</groupId>
+				<artifactId>asm</artifactId>
+				<version>${asm.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
@@ -389,6 +395,13 @@
 							</goals>
 						</execution>
 					</executions>
+					<dependencies>
+						<dependency>
+							<groupId>org.ow2.asm</groupId>
+							<artifactId>asm</artifactId>
+							<version>${asm.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
