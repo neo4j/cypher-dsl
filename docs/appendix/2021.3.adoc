@@ -1,5 +1,13 @@
 == 2021.3
 
+=== 2021.3.4
+
+2021.3.4 is a pure bug fix release.
+
+==== 🐛 Bug Fixes
+
+* GH-252 - Use a namespace for the message bundle.
+
 === 2021.3.3
 
 2021.3.3 is a pure housekeeping release, however a release we are proud of. We do analyze this project now with https://www.sonarqube.org[SonarQube]
