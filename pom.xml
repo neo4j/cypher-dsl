@@ -561,7 +561,7 @@
 							<arguments>
 								<argument>-i</argument>
 								<argument>.bak</argument>
-								<argument>s/\(:neo4j-cypher-dsl-version:\) \(.*\)/\1 ${revision}${sha1}${changelist}/g</argument>
+								<argument>s/\(:neo4j-cypher-dsl-version-latest:\) \(.*\)/\1 ${revision}${sha1}${changelist}/g</argument>
 								<argument>README.adoc</argument>
 							</arguments>
 						</configuration>
