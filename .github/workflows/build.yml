@@ -23,7 +23,6 @@ jobs:
         with:
           java-version: 11
       - name: Determine revision
-        id: version_step
         run: |
           REVISION=$(./bin/extract-snapshot-version.sh)
           echo "REVISION=$REVISION" >> $GITHUB_ENV
@@ -65,7 +64,7 @@ jobs:
     needs: build
     steps:
       - name: Determine revision
-        run: echo "REVISION=${{ jobs.build.steps.version_step.outputs.revision }} >> $GITHUB_ENV
+        run: echo "REVISION=${{ needs.build.outputs.revision }} >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -96,7 +95,7 @@ jobs:
       - name: setup native-image
         run: fc-cache -f -v && gu install native-image
       - name: Determine revision
-        run: echo "REVISION=${{ jobs.build.steps.version_step.outputs.revision }} >> $GITHUB_ENV
+        run: echo "REVISION=${{ needs.build.outputs.revision }} >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
@@ -119,7 +118,7 @@ jobs:
     needs: build
     steps:
       - name: Determine revision
-        run: echo "REVISION=${{ jobs.build.steps.version_step.outputs.revision }} >> $GITHUB_ENV
+        run: echo "REVISION=${{ needs.build.outputs.revision }} >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
