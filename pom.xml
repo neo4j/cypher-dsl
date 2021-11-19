@@ -176,6 +176,7 @@
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.2.0</spring-data-neo4j.version>
+		<cypher-dsl.version.next />
 	</properties>
 
 	<dependencyManagement>
@@ -552,52 +553,16 @@
 				<version>${exec-maven-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>update_readme</id>
+						<id>prepare-release</id>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>sed</executable>
+							<executable>bin/prepare-release.sh</executable>
 							<arguments>
-								<argument>-i</argument>
-								<argument>.bak</argument>
-								<argument>s/\(:neo4j-cypher-dsl-version-latest:\) \(.*\)/\1 ${revision}${sha1}${changelist}/g</argument>
-								<argument>README.adoc</argument>
+								<argument>${revision}${sha1}${changelist}</argument>
+								<argument>${cypher-dsl.version.next}</argument>
 							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>delete_readme_backup</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>rm</executable>
-							<arguments>
-								<argument>README.adoc.bak</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-				<inherited>false</inherited>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>${maven-scm-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>prepare_release</id>
-						<configuration>
-							<message>[maven-scm-plugin] Prepare release.</message>
-							<includes>README.adoc</includes>
-						</configuration>
-					</execution>
-					<execution>
-						<id>after_release</id>
-						<configuration>
-							<message>[maven-scm-plugin] After release cleanup.</message>
-							<includes>README.adoc</includes>
 						</configuration>
 					</execution>
 				</executions>
