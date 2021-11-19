@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
@@ -33,7 +33,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @soundtrack Rammstein - RAMMSTEIN
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class KeyValueMapEntry implements Expression {
 
 	private final String key;
@@ -50,7 +50,7 @@ public final class KeyValueMapEntry implements Expression {
 	 * @since 2021.2.3
 	 */
 	@NotNull
-	@API(status = EXPERIMENTAL, since = "2021.2.3")
+	@API(status = STABLE, since = "2021.2.3")
 	public static KeyValueMapEntry create(@NotNull String key, @NotNull Expression value) {
 
 		Assertions.notNull(key, "Key is required.");

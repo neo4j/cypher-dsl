@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Objects;
@@ -35,7 +35,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *            the actual type.
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class Parameter<T> implements Expression {
 
 	static final Object NO_VALUE = new Object();
@@ -75,7 +75,7 @@ public final class Parameter<T> implements Expression {
 	 * @return True if this is an anonymous parameter
 	 * @since 2021.1.0
 	 */
-	@API(status = EXPERIMENTAL, since = "2021.0.0")
+	@API(status = STABLE, since = "2021.0.0")
 	public boolean isAnon() {
 		return this.name == null || this.name.trim().isEmpty();
 	}
@@ -92,7 +92,7 @@ public final class Parameter<T> implements Expression {
 	 * @return A new parameter with a bound value
 	 * @since 2021.0.0
 	 */
-	@API(status = EXPERIMENTAL, since = "2021.0.0")
+	@API(status = STABLE, since = "2021.0.0")
 	public Parameter<?> withValue(Object newValue) {
 		return create(name, newValue);
 	}

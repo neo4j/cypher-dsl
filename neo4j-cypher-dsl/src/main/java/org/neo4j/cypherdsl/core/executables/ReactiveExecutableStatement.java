@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core.executables;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ResultStatement;
@@ -38,7 +38,7 @@ import org.reactivestreams.Publisher;
  * @soundtrack Swiss + Die Andern - Randalieren für die Liebe
  * @since 2021.2.1
  */
-@API(status = EXPERIMENTAL, since = "2021.2.1")
+@API(status = STABLE, since = "2021.2.1")
 public interface ReactiveExecutableStatement extends ExecutableStatement {
 
 	/**

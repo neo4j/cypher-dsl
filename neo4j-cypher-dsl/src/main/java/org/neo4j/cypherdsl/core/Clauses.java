@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.net.URI;
 import java.util.Collections;
@@ -40,7 +40,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Michael J. Simons
  * @since 2021.3.0
  */
-@API(status = EXPERIMENTAL, since = "2021.3.0")
+@API(status = STABLE, since = "2021.3.0")
 public final class Clauses {
 
 	/**

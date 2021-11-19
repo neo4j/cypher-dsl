@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @soundtrack Queen - The Miracle
  * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "2021.1.0")
+@API(status = STABLE, since = "2021.1.0")
 public abstract class NodeBase<SELF extends Node> extends AbstractNode implements Node {
 
 	@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable

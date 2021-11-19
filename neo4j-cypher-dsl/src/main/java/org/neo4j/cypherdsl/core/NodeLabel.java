@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @soundtrack Richard Gibbs - Battlestar Galactica OST
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class NodeLabel implements Visitable {
 
 	private final String value;

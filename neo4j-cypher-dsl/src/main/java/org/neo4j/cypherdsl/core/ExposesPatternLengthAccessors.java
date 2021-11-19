@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> The type of the patterns whose lengths can be adjusted.
  * @since 2021.2.3
  */
-@API(status = EXPERIMENTAL, since = "2021.2.3")
+@API(status = STABLE, since = "2021.2.3")
 public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 
 	/**

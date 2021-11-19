@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core.querydsl;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 
@@ -31,7 +31,7 @@ import com.querydsl.core.types.Operator;
  * @soundtrack Fritz Kalkbrenner - Drown
  * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "2021.1.0")
+@API(status = STABLE, since = "2021.1.0")
 public final class UnsupportedOperatorException extends IllegalArgumentException {
 
 	private static final long serialVersionUID = 2025849674095086421L;

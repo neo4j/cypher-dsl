@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
  * @soundtrack Corrosion Of Conformity - America's Volume Dealer
  * @since 1.0.1
  */
-@API(status = EXPERIMENTAL, since = "1.0.1")
+@API(status = STABLE, since = "1.0.1")
 public final class ListComprehension implements Expression {
 
 	// Modelling from the FilterExpression: https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/FilterExpression.html */

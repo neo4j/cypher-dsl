@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
  * @param <T> type of content
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public interface Literal<T> extends Expression {
 
 	/**
@@ -49,7 +49,7 @@ public interface Literal<T> extends Expression {
 	 *
 	 * @since 2021.1.0
 	 */
-	@API(status = EXPERIMENTAL, since = "2021.1.0")
+	@API(status = STABLE, since = "2021.1.0")
 	final class UnsupportedLiteralException extends IllegalArgumentException {
 
 		private static final long serialVersionUID = 864563506445498829L;

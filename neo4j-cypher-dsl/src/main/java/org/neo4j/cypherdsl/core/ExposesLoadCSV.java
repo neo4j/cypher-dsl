@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.net.URI;
 
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Michael J. Simons
  * @since 2020.2.1
  */
-@API(status = EXPERIMENTAL, since = "2020.2.1")
+@API(status = STABLE, since = "2020.2.1")
 public interface ExposesLoadCSV {
 
 	/**

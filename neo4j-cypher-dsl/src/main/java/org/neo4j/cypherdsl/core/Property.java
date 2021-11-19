@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.List;
 
@@ -36,7 +36,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public interface Property extends Expression, IdentifiableElement {
 
 	/**
@@ -44,7 +44,7 @@ public interface Property extends Expression, IdentifiableElement {
 	 *
 	 * @return A name to reference the property under in an external application
 	 */
-	@API(status = EXPERIMENTAL, since = "2021.1.0")
+	@API(status = STABLE, since = "2021.1.0")
 	@NotNull @Contract(pure = true)
 	String getName();
 
@@ -63,7 +63,7 @@ public interface Property extends Expression, IdentifiableElement {
 	 * @param newReference An arbitrary, external reference
 	 * @return A new property
 	 */
-	@API(status = EXPERIMENTAL, since = "2021.1.0")
+	@API(status = STABLE, since = "2021.1.0")
 	@NotNull @Contract(pure = true)
 	Property referencedAs(String newReference);
 

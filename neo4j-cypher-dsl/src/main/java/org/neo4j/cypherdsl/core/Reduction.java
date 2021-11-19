@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -38,7 +38,7 @@ import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
  * @see Functions#reduce(SymbolicName)
  * @since 2020.1.5
  */
-@API(status = EXPERIMENTAL, since = "2020.1.5")
+@API(status = STABLE, since = "2020.1.5")
 public final class Reduction extends TypedSubtree<Visitable> {
 
 	/**

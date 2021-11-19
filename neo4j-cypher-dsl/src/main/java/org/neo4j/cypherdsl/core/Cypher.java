@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.lang.reflect.Array;
 import java.net.URI;
@@ -50,7 +50,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Andreas Berger
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class Cypher {
 
 	static final ResourceBundle messages = ResourceBundle.getBundle("org.neo4j.cypherdsl.core.messages");

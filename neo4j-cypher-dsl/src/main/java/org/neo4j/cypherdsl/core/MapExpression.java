@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -41,7 +41,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @soundtrack Rammstein - RAMMSTEIN
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class MapExpression extends TypedSubtree<Expression> implements Expression {
 
 	static MapExpression create(Map<String, Object> map) {

@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
@@ -42,7 +42,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Philipp Tölle
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public interface Relationship extends RelationshipPattern, PropertyContainer, ExposesProperties<Relationship>,
 	ExposesPatternLengthAccessors<Relationship> {
 
@@ -95,7 +95,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	/**
 	 * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html">RelationshipDetail</a>.
 	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
+	@API(status = STABLE, since = "1.0")
 	final class Details implements Visitable {
 
 		/**

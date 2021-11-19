@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.Operation;
  * @soundtrack Swiss + Die Andern - Linksradikaler Schlager
  * @since 2021.3.0
  */
-@API(status = EXPERIMENTAL, since = "2021.3.0")
+@API(status = STABLE, since = "2021.3.0")
 public enum ExpressionCreatedEventType {
 
 	ON_RETURN_ITEM(Expression.class),

@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -39,7 +39,7 @@ import org.apiguardian.api.API;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.TYPE })
 @Documented
-@API(status = EXPERIMENTAL, since = "2020.1.2")
+@API(status = STABLE, since = "2020.1.2")
 public @interface Neo4jVersion {
 
 	/**

@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Optional;
 
@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class SortItem implements Visitable {
 
 	private final Expression expression;
@@ -87,7 +87,7 @@ public final class SortItem implements Visitable {
 	 * Sort direction.
 	 * @since 1.0
 	 */
-	@API(status = EXPERIMENTAL)
+	@API(status = STABLE)
 	public enum Direction implements Visitable {
 		/** Undefined direction. */
 		UNDEFINED(""),

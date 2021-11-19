@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -30,6 +30,6 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @soundtrack Chingon - Mexican Spaghetti Western
  * @since 2021.3.0
  */
-@API(status = EXPERIMENTAL, since = "2021.3.0")
+@API(status = STABLE, since = "2021.3.0")
 public interface Clause extends Visitable {
 }
