@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.internal.LiteralBase;
  * @soundtrack Bad Religion - Age Of Unreason
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class BooleanLiteral extends LiteralBase<Boolean> {
 
 	static final BooleanLiteral TRUE = new BooleanLiteral(true);

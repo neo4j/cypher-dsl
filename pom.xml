@@ -130,11 +130,14 @@
 		<compile-testing.version>0.19</compile-testing.version>
 		<covered-ratio-complexity>0.75</covered-ratio-complexity>
 		<covered-ratio-instructions>0.75</covered-ratio-instructions>
+		<cypher-dsl.version.next />
+		<cypher-dsl.version.old>2021.4.2</cypher-dsl.version.old>
 		<error_prone_annotations.version>2.4.0</error_prone_annotations.version>
 		<exec-maven-plugin.version>3.0.0</exec-maven-plugin.version>
 		<flatten-maven-plugin.version>1.2.7</flatten-maven-plugin.version>
 		<guava.version>31.0.1-jre</guava.version>
 		<jacoco-maven-plugin.version>0.8.7</jacoco-maven-plugin.version>
+		<japicmp-maven-plugin.version>0.15.4</japicmp-maven-plugin.version>
 		<java-module-name />
 		<java.version>8</java.version>
 		<javapoet.version>1.13.0</javapoet.version>
@@ -542,6 +545,41 @@
 						<rulesDirectory>etc/jqassistant</rulesDirectory>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>com.github.siom79.japicmp</groupId>
+					<artifactId>japicmp-maven-plugin</artifactId>
+					<version>${japicmp-maven-plugin.version}</version>
+					<executions>
+						<!--
+						Release will always set a -Drevision=XXXX and use `deploy` phase, which in turn will depend
+						on verify, regardless if tests are skipped or not.
+						-->
+						<execution>
+							<phase>verify</phase>
+							<goals>
+								<goal>cmp</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<oldVersion>
+							<dependency>
+								<groupId>${project.groupId}</groupId>
+								<artifactId>${project.artifactId}</artifactId>
+								<version>${cypher-dsl.version.old}</version>
+								<type>jar</type>
+							</dependency>
+						</oldVersion>
+						<newVersion>
+							<file>
+								<path>${project.build.directory}/${project.artifactId}-${project.version}.${project.packaging}</path>
+							</file>
+						</newVersion>
+						<parameter>
+							<breakBuildBasedOnSemanticVersioning>true</breakBuildBasedOnSemanticVersioning>
+						</parameter>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -552,52 +590,16 @@
 				<version>${exec-maven-plugin.version}</version>
 				<executions>
 					<execution>
-						<id>update_readme</id>
+						<id>prepare-release</id>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<executable>sed</executable>
+							<executable>bin/prepare-release.sh</executable>
 							<arguments>
-								<argument>-i</argument>
-								<argument>.bak</argument>
-								<argument>s/\(:neo4j-cypher-dsl-version:\) \(.*\)/\1 ${revision}${sha1}${changelist}/g</argument>
-								<argument>README.adoc</argument>
+								<argument>${revision}${sha1}${changelist}</argument>
+								<argument>${cypher-dsl.version.next}</argument>
 							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>delete_readme_backup</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>rm</executable>
-							<arguments>
-								<argument>README.adoc.bak</argument>
-							</arguments>
-						</configuration>
-					</execution>
-				</executions>
-				<inherited>false</inherited>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-scm-plugin</artifactId>
-				<version>${maven-scm-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>prepare_release</id>
-						<configuration>
-							<message>[maven-scm-plugin] Prepare release.</message>
-							<includes>README.adoc</includes>
-						</configuration>
-					</execution>
-					<execution>
-						<id>after_release</id>
-						<configuration>
-							<message>[maven-scm-plugin] After release cleanup.</message>
-							<includes>README.adoc</includes>
 						</configuration>
 					</execution>
 				</executions>

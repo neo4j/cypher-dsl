@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Optional;
 
@@ -42,7 +42,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @soundtrack Freddie Mercury - Never Boring
  * @since 1.1
  */
-@API(status = EXPERIMENTAL, since = "1.1")
+@API(status = STABLE, since = "1.1")
 public final class NamedPath implements PatternElement, Named {
 
 	/**

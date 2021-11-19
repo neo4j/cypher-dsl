@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.internal.LiteralBase;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class StringLiteral extends LiteralBase<CharSequence> {
 
 	private static final Pattern RESERVED_CHARS = Pattern.compile("([" + Pattern.quote("\\'\"") + "])");

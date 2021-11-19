@@ -87,6 +87,17 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<configuration combine.self="append">
+					<parameter>
+						<ignoreMissingClassesByRegularExpressions>
+							<ignoreMissingClassesByRegularExpression>com\.querydsl\.core\..*</ignoreMissingClassesByRegularExpression>
+						</ignoreMissingClassesByRegularExpressions>
+					</parameter>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<executions>

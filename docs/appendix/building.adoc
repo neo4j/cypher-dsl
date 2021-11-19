@@ -91,3 +91,14 @@ The core module can be build on plain JDK 11 with:
 ----
 $ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl
 ----
+
+=== Releasing
+
+Prepare a release with:
+
+[source,console,subs="verbatim,attributes"]
+----
+./mvnw exec:exec@prepare-release -pl :neo4j-cypher-dsl-parent -Drevision=2020.0.1 -Dchangelist= -Dcypher-dsl.version.next=2020.0.2-SNAPSHOT
+----
+
+and then let do Teamcity the rest, but chose the same version number there, too.

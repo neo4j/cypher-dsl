@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public interface Case extends Expression, ProvidesAffixes {
 
 	/**
@@ -49,14 +49,14 @@ public interface Case extends Expression, ProvidesAffixes {
 	/**
 	 * Extension the {@link Case} interface to support simple case with an initial expression / condition.
 	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
+	@API(status = STABLE, since = "1.0")
 	interface SimpleCase extends Case {
 	}
 
 	/**
 	 * Extension of the {@link Case} interface to support generic case.
 	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
+	@API(status = STABLE, since = "1.0")
 	interface GenericCase extends Case {
 	}
 
@@ -67,7 +67,7 @@ public interface Case extends Expression, ProvidesAffixes {
 	/**
 	 * Specification for a renderable, complete CASE statement
 	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
+	@API(status = STABLE, since = "1.0")
 	interface CaseEnding extends Case {
 
 		/**
@@ -92,7 +92,7 @@ public interface Case extends Expression, ProvidesAffixes {
 	/**
 	 * Helper class to collect `when` expressions and create {@link CaseWhenThen} instances when the `then` is provided.
 	 */
-	@API(status = EXPERIMENTAL, since = "1.0")
+	@API(status = STABLE, since = "1.0")
 	interface OngoingWhenThen {
 
 		/**

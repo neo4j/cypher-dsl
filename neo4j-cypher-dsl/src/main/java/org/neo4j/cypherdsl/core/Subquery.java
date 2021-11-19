@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
-@API(status = EXPERIMENTAL, since = "2020.1.2")
+@API(status = STABLE, since = "2020.1.2")
 @Neo4jVersion(minimum = "4.0.0")
 public final class Subquery implements Clause {
 

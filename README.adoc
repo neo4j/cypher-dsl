@@ -5,7 +5,10 @@
 :groupId: org.neo4j
 :artifactId: neo4j-cypher-dsl
 
+// This will be next version and also the one that will be put into the manual for the main branch
 :neo4j-cypher-dsl-version: 2022.0.0-SNAPSHOT
+// This is the latest released version, used only in the readme
+:neo4j-cypher-dsl-version-latest: 2021.4.2
 
 // end::properties[]
 
@@ -50,7 +53,7 @@ First, include the dependency to the Neo4j Cypher-DSL under the following coordi
 <dependency>
 	<groupId>{groupId}</groupId>
 	<artifactId>{artifactId}</artifactId>
-	<version>{neo4j-cypher-dsl-version}</version>
+	<version>{neo4j-cypher-dsl-version-latest}</version>
 </dependency>
 ----
 
@@ -60,7 +63,7 @@ First, include the dependency to the Neo4j Cypher-DSL under the following coordi
 .Inclusion of the Neo4j Cypher-DSL in a Gradle project
 ----
 dependencies {
-    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version}'
+    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version-latest}'
 }
 ----
 

@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 
@@ -31,6 +31,6 @@ import org.apiguardian.api.API;
  * @soundtrack Motörhead - Live At Brixton Academy
  * @since 2021.2.1
  */
-@API(status = EXPERIMENTAL, since = "2021.2.1")
+@API(status = STABLE, since = "2021.2.1")
 public interface ResultStatement extends Statement {
 }

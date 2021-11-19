@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
 
@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
  * @soundtrack Pearl Jam - Vitalogy
  * @since 2021.0.0
  */
-@API(status = EXPERIMENTAL, since = "2021.0.0")
+@API(status = STABLE, since = "2021.0.0")
 public interface ExposesHints {
 
 	/**

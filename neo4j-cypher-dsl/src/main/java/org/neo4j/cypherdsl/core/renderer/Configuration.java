@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Objects;
 
@@ -33,7 +33,7 @@ import org.apiguardian.api.API;
  * @soundtrack Slayer - Undisputed Attitude
  * @since 2021.0.1
  */
-@API(status = EXPERIMENTAL, since = "2021.0.1")
+@API(status = STABLE, since = "2021.0.1")
 public final class Configuration {
 
 	private static final Configuration DEFAULT_CONFIG = newConfig().build();

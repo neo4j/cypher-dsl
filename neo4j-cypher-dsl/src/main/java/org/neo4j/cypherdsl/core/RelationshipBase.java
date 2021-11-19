@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Map;
 import java.util.Optional;
@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @param <SELF> The type of the persistent relationship itself
  * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "2021.1.0")
+@API(status = STABLE, since = "2021.1.0")
 public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase<?>, SELF extends RelationshipBase<S, E, SELF>>
 		extends AbstractPropertyContainer implements Relationship {
 

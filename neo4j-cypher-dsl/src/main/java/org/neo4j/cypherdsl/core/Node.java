@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.List;
 
@@ -32,7 +32,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public interface Node extends PatternElement, PropertyContainer, ExposesProperties<Node>, ExposesRelationships<Relationship> {
 
 	@NotNull @Contract(pure = true)

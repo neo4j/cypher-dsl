@@ -19,7 +19,7 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.List;
 
@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.Statement;
  * @author Michael J. Simons
  * @since 2021.3.0
  */
-@API(status = EXPERIMENTAL, since = "2021.3.0")
+@API(status = STABLE, since = "2021.3.0")
 public final class CypherParser {
 
 	/**

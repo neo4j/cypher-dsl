@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
@@ -37,13 +37,13 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = EXPERIMENTAL, since = "1.0")
+@API(status = STABLE, since = "1.0")
 public final class FunctionInvocation implements Expression {
 
 	/**
 	 * Defines metadata for a function.
 	 */
-	@API(status = EXPERIMENTAL, since = "2020.1.0")
+	@API(status = STABLE, since = "2020.1.0")
 	public interface FunctionDefinition {
 
 		String getImplementationName();

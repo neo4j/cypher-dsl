@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.internal.LiteralBase;
  * @soundtrack Fritz Kalkbrenner - Drown
  * @since 2021.1.0
  */
-@API(status = EXPERIMENTAL, since = "2021.1.0")
+@API(status = STABLE, since = "2021.1.0")
 public final class TemporalLiteral extends LiteralBase<TemporalAccessor> {
 
 	private final String value;

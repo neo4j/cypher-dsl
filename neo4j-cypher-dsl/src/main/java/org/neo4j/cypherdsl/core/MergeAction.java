@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
@@ -38,7 +38,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @soundtrack System Of A Down - Protect The Land &amp; Genocidal Humanoidz
  * @since 2020.1.2
  */
-@API(status = EXPERIMENTAL, since = "2020.1.2")
+@API(status = STABLE, since = "2020.1.2")
 public final class MergeAction implements Visitable {
 
 	/**

@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 
@@ -29,6 +29,6 @@ import org.apiguardian.api.API;
  * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
-@API(status = EXPERIMENTAL, since = "2020.0.1")
+@API(status = STABLE, since = "2020.0.1")
 public interface ProcedureCall extends Statement, Clause {
 }

@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Michael J. Simons
  * @since 2021.0.0
  */
-@API(status = EXPERIMENTAL, since = "2021.0.0")
+@API(status = STABLE, since = "2021.0.0")
 public final class ConflictingParametersException extends RuntimeException {
 
 	private static final long serialVersionUID = -45456411835790492L;

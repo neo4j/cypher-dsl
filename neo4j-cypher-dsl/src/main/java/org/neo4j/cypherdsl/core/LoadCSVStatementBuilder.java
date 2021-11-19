@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.net.URI;
 
@@ -33,7 +33,7 @@ import org.neo4j.cypherdsl.core.DefaultLoadCSVStatementBuilder.PrepareLoadCSVSta
  * @soundtrack Thees Uhlmann - #2
  * @since 2021.2.1
  */
-@API(status = EXPERIMENTAL, since = "2021.2.1")
+@API(status = STABLE, since = "2021.2.1")
 public interface LoadCSVStatementBuilder extends StatementBuilder {
 
 	/**
