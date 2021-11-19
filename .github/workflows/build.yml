@@ -10,6 +10,8 @@ jobs:
   build:
     name: Neo4j Cypher-DSL
     runs-on: ubuntu-latest
+    outputs:
+      revision: ${{ steps.revision_step.outputs.revision }}
     steps:
       - name: Enable Sonar for local PRs not from Dependabot
         if:  ${{ github.event.sender.login != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
@@ -65,7 +67,7 @@ jobs:
     needs: build
     steps:
       - name: Determine revision
-        run: echo "REVISION=${{ needs.build.revision_step.outputs.revision }}" >> $GITHUB_ENV
+        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Set up JDK
         uses: actions/setup-java@v1
@@ -96,7 +98,7 @@ jobs:
       - name: setup native-image
         run: fc-cache -f -v && gu install native-image
       - name: Determine revision
-        run: echo "REVISION=${{ needs.build.revision_step.outputs.revision }}" >> $GITHUB_ENV
+        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
@@ -119,7 +121,7 @@ jobs:
     needs: build
     steps:
       - name: Determine revision
-        run: echo "REVISION=${{ needs.build.revision_step.outputs.revision }}" >> $GITHUB_ENV
+        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v1
       - name: Download artifacts
         uses: actions/download-artifact@v1
