@@ -3952,6 +3952,20 @@ native-image             21.0.0              Native Image                  Early
 </div>
 </div>
 </div>
+<div class="sect3">
+<h4 id="releasing"><a class="anchor" href="#releasing"></a>Releasing</h4>
+<div class="paragraph">
+<p>Prepare a release with:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">./mvnw exec:exec@prepare-release -pl :neo4j-cypher-dsl-parent -Drevision=2020.0.1 -Dchangelist= -Dcypher-dsl.version.next=2020.0.2-SNAPSHOT</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>and then let do Teamcity the rest, but chose the same version number there, too.</p>
+</div>
+</div>
 </div>
 <div class="sect2 group">
 <h3 id="arch-rules"><a class="anchor" href="#arch-rules"></a>Architecture</h3>
@@ -5481,7 +5495,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-11-16 10:04:55 UTC
+Last updated 2021-11-19 13:47:39 UTC
 </div>
 </div>
 </body>
