@@ -4648,6 +4648,35 @@ class CypherIT {
 		}
 
 		@Test
+		void multipleSubQueries() {
+			Node a = Cypher.node("A").named("a");
+			Node b = Cypher.node("B").named("b");
+			SymbolicName c = Cypher.name("c");
+
+			Statement mergeStatement = Cypher
+				.call(Cypher.create(a).returning(a).build())
+				.call(Cypher.create(b).returning(b).build())
+				.unwind(Cypher.listOf(a.getRequiredSymbolicName(), b.getRequiredSymbolicName())).as(c)
+				.returning(c.project("name")).build();
+
+			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(mergeStatement))
+				.isEqualTo(
+					"CALL {\n"
+					+ "  CREATE (a:A)\n"
+					+ "  RETURN a\n"
+					+ "}\n"
+					+ "CALL {\n"
+					+ "  CREATE (b:B)\n"
+					+ "  RETURN b\n"
+					+ "}\n"
+					+ "UNWIND [a, b] AS c\n"
+					+ "RETURN c {\n"
+					+ "  .name\n"
+					+ "}"
+				);
+		}
+
+		@Test
 		void prettyPrintingQueryStartingWithSubquery() {
 			String rawQuery = "MATCH (node) RETURN node";
 			SymbolicName node = Cypher.name("node");
