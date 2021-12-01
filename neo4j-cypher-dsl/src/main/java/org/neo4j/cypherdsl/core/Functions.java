@@ -54,7 +54,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation id(@NotNull Node node) {
 
-		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.ID, node.getRequiredSymbolicName());
 	}
@@ -69,7 +69,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation id(@NotNull Relationship relationship) {
 
-		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
+		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.ID, relationship.getRequiredSymbolicName());
 	}
@@ -85,7 +85,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation keys(@NotNull Node node) {
 
-		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 		return keys(node.getRequiredSymbolicName());
 	}
 
@@ -100,7 +100,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation keys(@NotNull Relationship relationship) {
 
-		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
+		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 		return keys(relationship.getRequiredSymbolicName());
 	}
 
@@ -115,7 +115,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation keys(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 
 		Expression param = expression instanceof Named ? ((Named) expression).getRequiredSymbolicName() : expression;
 		return FunctionInvocation.create(Lists.KEYS, param);
@@ -131,7 +131,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation labels(@NotNull Node node) {
 
-		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Lists.LABELS, node.getRequiredSymbolicName());
 	}
@@ -146,7 +146,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation type(@NotNull Relationship relationship) {
 
-		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
+		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.TYPE, relationship.getRequiredSymbolicName());
 	}
@@ -159,7 +159,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation count(@NotNull Node node) {
 
-		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Aggregates.COUNT, node.getRequiredSymbolicName());
 	}
@@ -187,7 +187,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation countDistinct(@NotNull Node node) {
 
-		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.createDistinct(Aggregates.COUNT, node.getRequiredSymbolicName());
 	}
@@ -214,7 +214,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(Node node) {
 
-		Assertions.notNull(node, Cypher.messages.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.PROPERTIES, node.getRequiredSymbolicName());
 	}
@@ -228,7 +228,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation properties(Relationship relationship) {
 
-		Assertions.notNull(relationship, Cypher.messages.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
+		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
 		return FunctionInvocation.create(Scalars.PROPERTIES, relationship.getRequiredSymbolicName());
 	}
@@ -268,7 +268,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toLower(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TO_LOWER, expression);
 	}
 
@@ -283,7 +283,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation trim(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TRIM, expression);
 	}
 
@@ -299,7 +299,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation split(@NotNull Expression expression, @NotNull Expression delimiter) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		Assertions.notNull(delimiter, "The delimiter is required.");
 		return FunctionInvocation.create(Strings.SPLIT, expression, delimiter);
 	}
@@ -316,7 +316,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation split(@NotNull Expression expression, @NotNull String delimiter) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		Assertions.notNull(delimiter, "The delimiter is required.");
 		return split(expression, Cypher.literalOf(delimiter));
 	}
@@ -461,7 +461,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation collect(@NotNull Named variable) {
 
-		Assertions.notNull(variable, Cypher.messages.getString(MessageKeys.ASSERTIONS_VARIABLE_REQUIRED));
+		Assertions.notNull(variable, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_VARIABLE_REQUIRED));
 
 		return FunctionInvocation.create(Aggregates.COLLECT, variable.getRequiredSymbolicName());
 	}
@@ -476,7 +476,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation collectDistinct(@NotNull Named variable) {
 
-		Assertions.notNull(variable, Cypher.messages.getString(MessageKeys.ASSERTIONS_VARIABLE_REQUIRED));
+		Assertions.notNull(variable, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_VARIABLE_REQUIRED));
 
 		return FunctionInvocation.createDistinct(Aggregates.COLLECT, variable.getRequiredSymbolicName());
 	}
@@ -920,9 +920,9 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation calendarDate(Integer year, Integer month, Integer day) {
 
-		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
-		Assertions.notNull(month, Cypher.messages.getString(MessageKeys.ASSERTIONS_MONTH_REQUIRED));
-		Assertions.notNull(day, Cypher.messages.getString(MessageKeys.ASSERTIONS_DAY_REQUIRED));
+		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
+		Assertions.notNull(month, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_MONTH_REQUIRED));
+		Assertions.notNull(day, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_DAY_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher
 			.mapOf("year", Cypher.literalOf(year), "month", Cypher.literalOf(month), "day", Cypher.literalOf(day)));
 	}
@@ -940,7 +940,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation weekDate(Integer year, Integer week, Integer dayOfWeek) {
 
-		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
+		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Object[] parameters = new Object[2 + (week == null ? 0 : 2) + (dayOfWeek == null ? 0 : 2)];
 		int i = 0;
 		parameters[i++] = "year";
@@ -972,7 +972,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation quarterDate(Integer year, Integer quarter, Integer dayOfQuarter) {
 
-		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
+		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Object[] parameters = new Object[2 + (quarter == null ? 0 : 2) + (dayOfQuarter == null ? 0 : 2)];
 		int i = 0;
 		parameters[i++] = "year";
@@ -1000,7 +1000,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation ordinalDate(Integer year, Integer ordinalDay) {
 
-		Assertions.notNull(year, Cypher.messages.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
+		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Object[] parameters = new Object[2 + (ordinalDay == null ? 0 : 2)];
 		int i = 0;
 		parameters[i++] = "year";
@@ -1024,7 +1024,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
+		Assertions.notNull(components, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, components);
 	}
 
@@ -1040,7 +1040,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.hasText(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.literalOf(temporalValue));
 	}
 
@@ -1056,7 +1056,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation date(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.notNull(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, temporalValue);
 	}
 
@@ -1084,7 +1084,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
+		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.DATETIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1101,7 +1101,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
+		Assertions.notNull(components, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, components);
 	}
 
@@ -1117,7 +1117,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.hasText(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1133,7 +1133,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation datetime(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.notNull(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, temporalValue);
 	}
 
@@ -1161,7 +1161,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
+		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.LOCALDATETIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1178,7 +1178,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
+		Assertions.notNull(components, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, components);
 	}
 
@@ -1194,7 +1194,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.hasText(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1210,7 +1210,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localdatetime(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.notNull(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, temporalValue);
 	}
 
@@ -1238,7 +1238,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
+		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.LOCALTIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1255,7 +1255,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
+		Assertions.notNull(components, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, components);
 	}
 
@@ -1271,7 +1271,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.hasText(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1287,7 +1287,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation localtime(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.notNull(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, temporalValue);
 	}
 
@@ -1315,7 +1315,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull TimeZone timeZone) {
 
-		Assertions.notNull(timeZone, Cypher.messages.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
+		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
 		return FunctionInvocation
 			.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
 	}
@@ -1336,7 +1336,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
+		Assertions.notNull(components, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, components);
 	}
 
@@ -1352,7 +1352,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull String temporalValue) {
 
-		Assertions.hasText(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.hasText(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, Cypher.literalOf(temporalValue));
 	}
 
@@ -1368,7 +1368,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation time(@NotNull Expression temporalValue) {
 
-		Assertions.notNull(temporalValue, Cypher.messages.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
+		Assertions.notNull(temporalValue, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TEMPORAL_VALUE_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, temporalValue);
 	}
 
@@ -1384,7 +1384,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation duration(@NotNull MapExpression components) {
 
-		Assertions.notNull(components, Cypher.messages.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
+		Assertions.notNull(components, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_COMPONENTS_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.Temporals.DURATION, components);
 	}
 
@@ -1457,7 +1457,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation abs(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ABS, expression);
 	}
 
@@ -1472,7 +1472,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation ceil(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.CEIL, expression);
 	}
 
@@ -1487,7 +1487,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation floor(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.FLOOR, expression);
 	}
 
@@ -1541,7 +1541,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sign(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIGN, expression);
 	}
 
@@ -1569,7 +1569,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation exp(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.EXP, expression);
 	}
 
@@ -1584,7 +1584,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation log(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG, expression);
 	}
 
@@ -1599,7 +1599,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation log10(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.LOG10, expression);
 	}
 
@@ -1614,7 +1614,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sqrt(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SQRT, expression);
 	}
 
@@ -1629,7 +1629,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation acos(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ACOS, expression);
 	}
 
@@ -1644,7 +1644,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation asin(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ASIN, expression);
 	}
 
@@ -1659,7 +1659,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation atan(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ATAN, expression);
 	}
 
@@ -1691,7 +1691,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation cos(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COS, expression);
 	}
 
@@ -1706,7 +1706,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation cot(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.COT, expression);
 	}
 
@@ -1721,7 +1721,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation degrees(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.DEGREES, expression);
 	}
 
@@ -1736,7 +1736,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation haversin(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.HAVERSIN, expression);
 	}
 
@@ -1764,7 +1764,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation radians(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.RADIANS, expression);
 	}
 
@@ -1779,7 +1779,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation sin(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.SIN, expression);
 	}
 
@@ -1794,7 +1794,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation tan(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.TAN, expression);
 	}
 
@@ -1809,7 +1809,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toInteger(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_INTEGER, expression);
 	}
 
@@ -1824,7 +1824,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toFloat(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_FLOAT, expression);
 	}
 
@@ -1839,7 +1839,7 @@ public final class Functions {
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation toBoolean(@NotNull Expression expression) {
 
-		Assertions.notNull(expression, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_BOOLEAN, expression);
 	}
 

@@ -53,7 +53,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = STABLE, since = "1.0")
 public final class Cypher {
 
-	static final ResourceBundle messages = ResourceBundle.getBundle("org.neo4j.cypherdsl.core.messages");
+	static final ResourceBundle MESSAGES = ResourceBundle.getBundle("org.neo4j.cypherdsl.core.messages");
 
 	/**
 	 * Create a new Node representation with at least one label, the "primary" label. This is required. All other labels

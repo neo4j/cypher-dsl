@@ -655,8 +655,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected final void addExpressions(Expression... expressions) {
 
-			Assertions.notNull(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.notEmpty(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.notEmpty(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
@@ -703,8 +703,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		protected void addExpressions(Expression... expressions) {
 
-			Assertions.notNull(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.notEmpty(expressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.notEmpty(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			this.returnList.addAll(Arrays.asList(expressions));
 		}
@@ -1265,8 +1265,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public OngoingReadingAndReturn returning(Expression... returnedExpressions) {
 
-			Assertions.notNull(returnedExpressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.notEmpty(returnedExpressions, Cypher.messages.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+			Assertions.notNull(returnedExpressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.notEmpty(returnedExpressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 
