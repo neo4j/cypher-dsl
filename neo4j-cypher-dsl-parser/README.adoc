@@ -725,6 +725,7 @@ l[1..2]
 [x IN range(0,10) WHERE x % 2 = 0 ]
 [x IN range(0,10) | x^3 ]
 [(a)-->(b) WHERE b:Movie | b.released]
+a xor b
 ----
 
 [[expressions-output-0]]
@@ -761,6 +762,7 @@ l[1..2]
 [x IN range(0, 10) WHERE (x % 2) = 0]
 [x IN range(0, 10) | x^3]
 [(a)-->(b) WHERE b:`Movie` | b.released]
+(a XOR b)
 ----
 
 === Unsupported operations
@@ -778,9 +780,6 @@ UNWIND range(1, 10) AS i
       UNWIND [1, 2] AS j
       CREATE (n:N {i: i, j: j})
     } IN TRANSACTIONS;
-SHOW DATABASES;
-CREATE DATABASE d01;
-SHOW DATABASE d01 YIELD serverID, databaseID, lastCommittedTxn, replicationLag;
 CREATE INDEX node_index_name FOR (n:Person) ON (n.surname);
 CREATE INDEX rel_index_name FOR ()-[r:KNOWS]-() ON (r.since);
 CREATE INDEX ON :Person(firstname)
@@ -793,4 +792,29 @@ SHOW CONSTRAINTS;
 DROP CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE;
 DROP INDEX ON :Person(firstname);
 REVOKE GRANT TRAVERSE ON HOME GRAPH NODES Post FROM regularUsers;
+SHOW FUNCTIONS;
+CREATE ROLE myrole;
+RENAME ROLE mysecondrole TO mythirdrole;
+SHOW ROLES;
+GRANT ROLE myrole TO bob;
+REVOKE ROLE myrole FROM bob;
+DROP ROLE mythirdrole;
+SHOW CURRENT USER;
+SHOW USERS;
+CREATE USER jake SET PASSWORD 'abc' CHANGE REQUIRED SET STATUS SUSPENDED SET HOME DATABASE anotherDb;
+RENAME USER jake TO bob;
+ALTER USER bob SET PASSWORD 'abc123' CHANGE NOT REQUIRED SET STATUS ACTIVE;
+ALTER CURRENT USER SET PASSWORD FROM 'abc123' TO '123xyz';
+SHOW DATABASES;
+CREATE DATABASE customers;
+ALTER DATABASE customers SET ACCESS READ ONLY;
+STOP DATABASE customers;
+START DATABASE customers;
+DROP DATABASE customers;
+CREATE DATABASE slow WAIT 5 SECONDS;
+CREATE ALIAS `northwind` FOR DATABASE `northwind-graph-2020`;
+ALTER ALIAS `northwind` SET DATABASE TARGET `northwind-graph-2021`;
+DROP ALIAS `northwind` FOR DATABASE;
+CREATE DATABASE d01;
+SHOW DATABASE d01 YIELD serverID, databaseID, lastCommittedTxn, replicationLag;
 ----
