@@ -95,27 +95,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements
-	ASTFactory<Statement, Statement, Clause,
-		Return,
-		Expression, //  RETURN_ITEMS
-		List<Expression>,
-		SortItem, PatternElement, Node, PathDetails, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Parameter<?>, Expression, Property, Expression,
-		Clause, //   USE_GRAPH extends CLAUSE
-		Statement, //         STATEMENT_WITH_GRAPH extends STATEMENT,
-		Statement, // ADMINISTRATION_COMMAND extends STATEMENT
-		Statement, //         SCHEMA_COMMAND extends STATEMENT_WITH_GRAPH,
-		Clause, // YIELD extends CLAUSE,
-		Where, // WHERE
-		NULL, // DATABASE_SCOPE
-		NULL, // WAIT_CLAUSE
-		NULL, // ADMINISTRATION_ACTION,
-		NULL, // GRAPH_SCOPE,
-		NULL, // PRIVILEGE_TYPE,
-		NULL, // PRIVILEGE_RESOURCE,
-		NULL, // PRIVILEGE_QUALIFIER,
-		NULL, // SUBQUERY_IN_TRANSACTIONS_PARAMETERS,
-		InputPosition> {
-
+	ASTFactory<Statement, Statement, Clause, Return, Expression, List<Expression>, SortItem, PatternElement, Node, PathDetails, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Statement, Statement, Clause, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition> {
 	private static CypherDslASTFactory DEFAULT_INSTANCE;
 
 	static CypherDslASTFactory getInstance(Options options) {
