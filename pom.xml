@@ -115,6 +115,7 @@
 	</scm>
 
 	<properties>
+		<aggregate.report.dir>neo4j-cypher-dsl-test-results/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 		<apiguardian.version>1.1.2</apiguardian.version>
 		<asciidoctor-maven-plugin.version>2.2.1</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.2.1</asciidoctorj-diagram.version>
@@ -168,7 +169,7 @@
 		<mockito.version>4.1.0</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.RC2</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>4.4.1</neo4j-java-driver.version>
-		<neo4j.version>4.3.7</neo4j.version>
+		<neo4j.version>4.4.0</neo4j.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>5.0.0</querydsl.version>
@@ -951,7 +952,6 @@
 				<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
 				<sonar.organization>michael-simons-github</sonar.organization>
 				<sonar.projectKey>org.neo4j:neo4j-cypher-dsl-parent</sonar.projectKey>
-				<sonar.report>neo4j-cypher-dsl-test-results/target/site/jacoco-aggregate/jacoco.xml</sonar.report>
 			</properties>
 		</profile>
 	</profiles>

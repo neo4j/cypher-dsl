@@ -18,11 +18,14 @@
  */
 package org.neo4j.cypherdsl.graalvm;
 
+import java.util.Set;
+
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 import org.neo4j.cypherdsl.parser.CypherParser;
+import org.neo4j.cypherdsl.parser.Options;
 
 /**
  * @author Michael J. Simons
@@ -47,6 +50,7 @@ public class Application {
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
+		System.out.println(useParserForRewrite());
 	}
 
 	private static Statement findAllMovies() {
@@ -84,5 +88,15 @@ public class Application {
 					)
 				)
 			).build();
+	}
+
+	private static String useParserForRewrite() {
+
+		return CypherParser
+			.parseStatement("MATCH (p:Person) -[:HAT_GESPIELT_IN] -> (n:Movie) RETURN n",
+				Options.newOptions()
+					.withTypeFilter((e, t) -> t.size() == 1 && t.contains("HAT_GESPIELT_IN") ? Set.of("ACTED_IN") : t)
+					.build())
+			.getCypher();
 	}
 }

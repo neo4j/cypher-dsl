@@ -51,14 +51,14 @@ public final class Clauses {
 	 * @param optionalWhere   An optional where sub-clause
 	 * @param optionalHints   Optional hints to be used
 	 * @return an immutable match clause
+	 * @since 2022.0.0
 	 */
 	@NotNull
 	public static Clause match(boolean optional, List<PatternElement> patternElements,
-		@Nullable Expression optionalWhere,
+		@Nullable Where optionalWhere,
 		@Nullable List<Hint> optionalHints) {
 
-		return new Match(optional, new Pattern(patternElements),
-			optionalWhere == null ? null : new Where(optionalWhere.asCondition()), optionalHints);
+		return new Match(optional, new Pattern(patternElements), optionalWhere, optionalHints);
 	}
 
 	/**
@@ -126,12 +126,13 @@ public final class Clauses {
 	 * {@link Where where}.
 	 *
 	 * @param returnClause  The return clause that defines the fields, order and limit of what the with clause should return
-	 * @param optionalWhere An optional expression to define a where clause.
+	 * @param optionalWhere An optional {@literal WHERE }expression to define a where clause.
 	 * @return an immutable with clause
+	 * @since 2022.0.0
 	 */
-	public static Clause with(Return returnClause, @Nullable Expression optionalWhere) {
+	public static Clause with(Return returnClause, @Nullable Where optionalWhere) {
 
-		return new With(returnClause, optionalWhere == null ? null : new Where(optionalWhere.asCondition()));
+		return new With(returnClause, optionalWhere);
 	}
 
 	/**
@@ -193,14 +194,15 @@ public final class Clauses {
 	 * @param resultItems   the result items, maybe null or empty
 	 * @param optionalWhere an optional where
 	 * @return An immutable clause
+	 * @since 2022.0.0
 	 */
 	public static Clause callClause(List<String> namespace, String name, @Nullable List<Expression> arguments,
-		@Nullable List<Expression> resultItems, @Nullable Expression optionalWhere) {
+		@Nullable List<Expression> resultItems, @Nullable Where optionalWhere) {
 
 		return ProcedureCallImpl.create(ProcedureName.from(namespace, name),
 			new Arguments(arguments == null ? new Expression[0] : arguments.toArray(new Expression[0])),
 			resultItems == null ? null : YieldItems.yieldAllOf(resultItems.toArray(new Expression[0])),
-			optionalWhere == null ? null : new Where(optionalWhere.asCondition())
+			optionalWhere
 		);
 	}
 

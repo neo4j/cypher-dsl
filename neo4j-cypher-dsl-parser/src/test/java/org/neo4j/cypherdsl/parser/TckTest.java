@@ -20,6 +20,7 @@
 package org.neo4j.cypherdsl.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -32,6 +33,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.asciidoctor.Asciidoctor;
@@ -140,6 +143,14 @@ class TckTest {
 		assertThat(cypher).isEqualTo(expected);
 	}
 
+	@SuppressWarnings("unused")
+	void unsupportedShouldWork(Renderer renderer, String input, String expected) {
+
+		assertThatExceptionOfType(UnsupportedCypherException.class).isThrownBy(() -> CypherParser.parse(input))
+			.withMessageStartingWith("You used one Cypher construct not yet supported by the Cypher-DSL")
+			.withMessageContaining(input);
+	}
+
 	private static class TestDataExtractor extends Treeprocessor {
 
 		private final Map<String, TestData> content = new HashMap<>();
@@ -190,11 +201,15 @@ class TckTest {
 		}
 
 		Stream<Map.Entry<String, String>> asArguments() {
-			var result = Stream.<Map.Entry<String, String>>builder();
-			for (int i = 0; i < input.size(); i++) {
-				result.add(new AbstractMap.SimpleImmutableEntry<>(input.get(i).trim(), expected.get(i).trim()));
+			if (input.size() == expected.size()) {
+				var result = Stream.<Map.Entry<String, String>>builder();
+				for (int i = 0; i < input.size(); i++) {
+					result.add(new AbstractMap.SimpleImmutableEntry<>(input.get(i).trim(), expected.get(i).trim()));
+				}
+				return result.build();
+			} else {
+				return input.stream().collect(Collectors.toMap(Function.identity(), k -> "")).entrySet().stream();
 			}
-			return result.build();
 		}
 	}
 }
