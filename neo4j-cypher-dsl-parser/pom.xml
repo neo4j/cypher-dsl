@@ -32,9 +32,10 @@
 	</licenses>
 
 	<properties>
+		<covered-ratio-complexity>0.68</covered-ratio-complexity>
 		<java-module-name>org.neo4j.cypherdsl.parser</java-module-name>
 		<java.version>11</java.version>
-		<covered-ratio-complexity>0.68</covered-ratio-complexity>
+		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<dependencies>
