@@ -762,3 +762,35 @@ l[1..2]
 [x IN range(0, 10) | x^3]
 [(a)-->(b) WHERE b:`Movie` | b.released]
 ----
+
+=== Unsupported operations
+
+The following operations are unsupported:
+
+[[unsupported-input-f]]
+.Input
+[source,cypher,separated=true]
+----
+GRANT ROLE poolImpersonation TO pool;
+SHOW TRANSACTION YIELD *;
+UNWIND range(1, 10) AS i
+    CALL { WITH i
+      UNWIND [1, 2] AS j
+      CREATE (n:N {i: i, j: j})
+    } IN TRANSACTIONS;
+SHOW DATABASES;
+CREATE DATABASE d01;
+SHOW DATABASE d01 YIELD serverID, databaseID, lastCommittedTxn, replicationLag;
+CREATE INDEX node_index_name FOR (n:Person) ON (n.surname);
+CREATE INDEX rel_index_name FOR ()-[r:KNOWS]-() ON (r.since);
+CREATE INDEX ON :Person(firstname)
+CREATE CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE
+CREATE INDEX node_index_name IF NOT EXISTS FOR (n:Person) ON (n.surname);
+SHOW INDEXES;
+CREATE CONSTRAINT constraint_name ON (book:Book) ASSERT book.isbn IS UNIQUE;
+DROP CONSTRAINT constraint_name;
+SHOW CONSTRAINTS;
+DROP CONSTRAINT ON (book:Book) ASSERT book.isbn IS UNIQUE;
+DROP INDEX ON :Person(firstname);
+REVOKE GRANT TRAVERSE ON HOME GRAPH NODES Post FROM regularUsers;
+----
