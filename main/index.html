@@ -1657,25 +1657,8 @@ It allows sanitizing user input, add additional filters for labels and types to 
 </div>
 <div class="paragraph">
 <p>The parser itself is based on Neo4j&#8217;s official Cypher-Parser, thus supporting the same constructs as Neo4j itself.
-However, while we could theoretically parse all expressions that Neo4j 4.3.7 supports, we might cannot translate all of them
+However, while we could theoretically parse all expressions that Neo4j 4.4.0 supports, we might cannot translate all of them
 into elements of the Cypher-DSL. In such cases an <code>UnsupportedOperationException</code> will be thrown.</p>
-</div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-The current version of the Cypher-DSL-Parser modules is rather big. This is due to the fact that we must shade the
-      Scala-Lang library. Neo4j&#8217;s parsers depends on it. This is likely to change in the future. Until then, we rather not
-      try to shade only the few required classes and risk a <code>ClassNotFoundException</code>, but include the whole library.
-     <br>
-      The decision for shading has been made for compatibility reasons: People may have a different Scala version in place
-      or might even use this library embedded. So it&#8217;s safer to shade what we support and not depend on it.
-</td>
-</tr>
-</table>
 </div>
 </div>
 <div class="sect2">
@@ -1710,7 +1693,7 @@ The current version of the Cypher-DSL-Parser modules is rather big. This is due 
 <div class="sect3">
 <h4 id="minimumjdkversion"><a class="anchor" href="#minimumjdkversion"></a>5.2.2. Minimum JDK version</h4>
 <div class="paragraph">
-<p>The Cypher-Parser requires JDK 11 to run which is the same version that Neo4j 4.3.7 requires.</p>
+<p>The Cypher-Parser requires JDK 11 to run which is the same version that Neo4j 4.4.0 requires.</p>
 </div>
 </div>
 <div class="sect3">
@@ -5495,7 +5478,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-12-01 11:32:48 UTC
+Last updated 2021-12-02 12:49:48 UTC
 </div>
 </div>
 </body>
