@@ -149,7 +149,7 @@
 		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
 		<jqassistant.version>1.9.0</jqassistant.version>
 		<jsr305.version>3.0.2</jsr305.version>
-		<junit-jupiter.version>5.8.1</junit-jupiter.version>
+		<junit-jupiter.version>5.8.2</junit-jupiter.version>
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0-M1</maven-deploy-plugin.version>
