@@ -2103,7 +2103,7 @@ statements with added conditions to a <code>Neo4jRepository</code>.</p>
 <pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornAfterThe70tiesAnd(<span class="predefined-type">String</span> additionalConditions) {
 
     <span class="keyword">return</span> peopleRepository.findAll(
-        PERSON.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>))
+        person.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>))
             .and(CypherParser.parseExpression(additionalConditions).asCondition()) <i class="conum" data-value="1"></i><b>(1)</b>
     );
 }</code></pre>
@@ -2129,7 +2129,7 @@ know the root node (which is <code>n</code> in case of SDN 6) and the caller cod
     <span class="string"><span class="delimiter">&quot;</span><span class="content">/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}</span><span class="delimiter">&quot;</span></span>,
     HttpMethod.GET,
     <span class="predefined-constant">null</span>, <span class="keyword">new</span> ParameterizedTypeReference&lt;<span class="predefined-type">List</span>&lt;Person&gt;&gt;() { },
-    <span class="string"><span class="delimiter">&quot;</span><span class="content">n.name contains </span><span class="char">\&quot;</span><span class="content">Ricci</span><span class="char">\&quot;</span><span class="content"> OR n.name ends with 'Hirsch'</span><span class="delimiter">&quot;</span></span>
+    <span class="string"><span class="delimiter">&quot;</span><span class="content">person.name contains </span><span class="char">\&quot;</span><span class="content">Ricci</span><span class="char">\&quot;</span><span class="content"> OR person.name ends with 'Hirsch'</span><span class="delimiter">&quot;</span></span>
 );</code></pre>
 </div>
 </div>
@@ -2142,7 +2142,7 @@ We could change the service method slightly and apply a callback like this:</p>
 <pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornAfterThe70tiesAndV2(<span class="predefined-type">String</span> additionalConditions) {
 
     Function&lt;<span class="predefined-type">Expression</span>, <span class="predefined-type">Expression</span>&gt; enforceReference =
-        e -&gt; Constants.NAME_OF_ROOT_NODE.property(((SymbolicName) e).getValue()); <i class="conum" data-value="1"></i><b>(1)</b>
+        e -&gt; personRootName.property(((SymbolicName) e).getValue()); <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="type">var</span> parserOptions = Options.newOptions()
         .withCallback(
             ExpressionCreatedEventType.ON_NEW_VARIABLE,
@@ -2152,7 +2152,7 @@ We could change the service method slightly and apply a callback like this:</p>
         .build();
 
     <span class="keyword">return</span> peopleRepository.findAll(
-        PERSON.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>)).and(
+        person.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>)).and(
             CypherParser.parseExpression(
                 additionalConditions,
                 parserOptions <i class="conum" data-value="3"></i><b>(3)</b>
@@ -3524,25 +3524,30 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Expression</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Functions</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.core.mapping.Constants</span>;
+<span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.core.mapping.Neo4jMappingContext</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.stereotype.Service</span>;
 
 <span class="annotation">@Service</span>
 <span class="directive">final</span> <span class="type">class</span> <span class="class">PeopleService</span> {
 
-    <span class="directive">static</span> <span class="directive">final</span> Person_ PERSON = Person_.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
+    <span class="directive">private</span> <span class="directive">final</span> Person_ person;
+    <span class="directive">private</span> <span class="directive">final</span> SymbolicName personRootName;
 
     <span class="directive">private</span> <span class="directive">final</span> PeopleRepository peopleRepository;
 
-    PeopleService(PeopleRepository peopleRepository) {
+    PeopleService(PeopleRepository peopleRepository, Neo4jMappingContext mappingContext) {
         <span class="local-variable">this</span>.peopleRepository = peopleRepository;
+        <span class="local-variable">this</span>.personRootName = Constants.NAME_OF_TYPED_ROOT_NODE.apply(
+            mappingContext.getRequiredPersistentEntity(Person.class));
+        <span class="local-variable">this</span>.person = Person_.PERSON.named(personRootName);
     }
 
     <span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornInThe70tiesOr(Optional&lt;<span class="predefined-type">String</span>&gt; optionalName) {
 
         <span class="keyword">return</span> peopleRepository.findAll(
-            PERSON.BORN.gte(Cypher.literalOf(<span class="integer">1970</span>)).and(PERSON.BORN.lt(Cypher.literalOf(<span class="integer">1980</span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+            person.BORN.gte(Cypher.literalOf(<span class="integer">1970</span>)).and(person.BORN.lt(Cypher.literalOf(<span class="integer">1980</span>))) <i class="conum" data-value="1"></i><b>(1)</b>
                 .or(optionalName
-                    .map(name -&gt; PERSON.NAME.isEqualTo(Cypher.anonParameter(name))) <i class="conum" data-value="2"></i><b>(2)</b>
+                    .map(name -&gt; person.NAME.isEqualTo(Cypher.anonParameter(name))) <i class="conum" data-value="2"></i><b>(2)</b>
                     .orElseGet(Conditions::noCondition)) <i class="conum" data-value="3"></i><b>(3)</b>
         );
     }
@@ -5474,7 +5479,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-12-11 21:23:20 UTC
+Last updated 2021-12-11 21:58:18 UTC
 </div>
 </div>
 </body>
