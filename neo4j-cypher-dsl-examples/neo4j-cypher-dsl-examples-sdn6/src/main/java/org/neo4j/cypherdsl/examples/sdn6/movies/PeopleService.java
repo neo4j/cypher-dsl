@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 // tag::using-person-repo[]
+
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -26,14 +27,13 @@ import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Functions;
-// end::using-person-repo[]
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.Options;
 import org.springframework.data.domain.Example;
-// tag::using-person-repo[]
 import org.springframework.data.neo4j.core.mapping.Constants;
+import org.springframework.data.neo4j.core.mapping.Neo4jMappingContext;
 import org.springframework.stereotype.Service;
 
 // end::using-person-repo[]
@@ -45,12 +45,16 @@ import org.springframework.stereotype.Service;
 @Service
 final class PeopleService {
 
-	static final Person_ PERSON = Person_.PERSON.named("n");
+	private final Person_ person;
+	private final SymbolicName personRootName;
 
 	private final PeopleRepository peopleRepository;
 
-	PeopleService(PeopleRepository peopleRepository) {
+	PeopleService(PeopleRepository peopleRepository, Neo4jMappingContext mappingContext) {
 		this.peopleRepository = peopleRepository;
+		this.personRootName = Constants.NAME_OF_TYPED_ROOT_NODE.apply(
+			mappingContext.getRequiredPersistentEntity(Person.class));
+		this.person = Person_.PERSON.named(personRootName);
 	}
 
 	// end::using-person-repo[]
@@ -63,7 +67,7 @@ final class PeopleService {
 	Iterable<Person> findPeopleBornAfterThe70tiesAnd(String additionalConditions) {
 
 		return peopleRepository.findAll(
-			PERSON.BORN.gte(Cypher.literalOf(1980))
+			person.BORN.gte(Cypher.literalOf(1980))
 				.and(CypherParser.parseExpression(additionalConditions).asCondition()) // <.>
 		);
 	}
@@ -73,7 +77,7 @@ final class PeopleService {
 	Iterable<Person> findPeopleBornAfterThe70tiesAndV2(String additionalConditions) {
 
 		Function<Expression, Expression> enforceReference =
-			e -> Constants.NAME_OF_ROOT_NODE.property(((SymbolicName) e).getValue()); // <.>
+			e -> personRootName.property(((SymbolicName) e).getValue()); // <.>
 		var parserOptions = Options.newOptions()
 			.withCallback(
 				ExpressionCreatedEventType.ON_NEW_VARIABLE,
@@ -83,7 +87,7 @@ final class PeopleService {
 			.build();
 
 		return peopleRepository.findAll(
-			PERSON.BORN.gte(Cypher.literalOf(1980)).and(
+			person.BORN.gte(Cypher.literalOf(1980)).and(
 				CypherParser.parseExpression(
 					additionalConditions,
 					parserOptions // <.>
@@ -97,9 +101,9 @@ final class PeopleService {
 	Iterable<Person> findPeopleBornInThe70tiesOr(Optional<String> optionalName) {
 
 		return peopleRepository.findAll(
-			PERSON.BORN.gte(Cypher.literalOf(1970)).and(PERSON.BORN.lt(Cypher.literalOf(1980))) // <.>
+			person.BORN.gte(Cypher.literalOf(1970)).and(person.BORN.lt(Cypher.literalOf(1980))) // <.>
 				.or(optionalName
-					.map(name -> PERSON.NAME.isEqualTo(Cypher.anonParameter(name))) // <.>
+					.map(name -> person.NAME.isEqualTo(Cypher.anonParameter(name))) // <.>
 					.orElseGet(Conditions::noCondition)) // <.>
 		);
 	}

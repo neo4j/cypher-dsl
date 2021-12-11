@@ -184,7 +184,7 @@ class ApplicationIT {
 			"/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}",
 			HttpMethod.GET,
 			null, new ParameterizedTypeReference<List<Person>>() { },
-			"n.name contains \"Ricci\" OR n.name ends with 'Hirsch'"
+			"person.name contains \"Ricci\" OR person.name ends with 'Hirsch'"
 		);
 		// end::exchange1[]
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
