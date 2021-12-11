@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 // tag::using-person-repo[]
-
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -27,11 +26,13 @@ import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Functions;
+// end::using-person-repo[]
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.Options;
 import org.springframework.data.domain.Example;
+// tag::using-person-repo[]
 import org.springframework.data.neo4j.core.mapping.Constants;
 import org.springframework.data.neo4j.core.mapping.Neo4jMappingContext;
 import org.springframework.stereotype.Service;
