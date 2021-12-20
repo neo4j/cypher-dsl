@@ -1,0 +1,36 @@
+== 2022.0
+
+=== 2022.0.0
+
+Starting with the 2022 release line, all current experimental warnings have been removed, and we consider our API stable.
+
+==== Noteworthy
+
+As we have marked the API as stable we do enforce semantic versioning in our builds now.
+The parser module `neo4j-cypher-dsl-parser` has been updated to the Neo4j 4.4 parser and therefore doesn't bring in Scala dependencies anymore.
+And last but not least, we added the _Contributor Covenant Code of Conduct_.
+
+==== 🚀 Features
+
+* Indent `CREATE` in subqueries. (#254)
+
+==== 🐛 Bug Fixes
+
+* Fix broken asciidoc includes.
+* Give messages constant a better name (The bundle name we used might clash with other bundle names).
+
+==== 🧹 Housekeeping
+
+* Tons of dependency upgrades:
+** Bump reactor-bom from 2020.0.13 to 2020.0.14 (#265)
+** Bump checker-qual from 3.20.0 to 3.21.0 (#264)
+** Bump mockito.version from 4.1.0 to 4.2.0 (#263)
+** Bump neo4j-cypher-javacc-parser from 4.4.0 to 4.4.2 (#262)
+** Bump checker-qual from 3.19.0 to 3.20.0 (#261)
+** Bump neo4j-java-driver from 4.4.1 to 4.4.2 (#260)
+** Bump spring-boot-starter-parent from 2.5.6 to 2.6.1 (#259)
+** Bump checkstyle from 9.1 to 9.2 (#256)
+** Bump junit-bom from 5.8.1 to 5.8.2 (#257)
+** Bump mockito.version from 4.0.0 to 4.1.0 (#255)
+
+Thanks again to https://github.com/Andy2003[Andy] for his contributions and feedback.
