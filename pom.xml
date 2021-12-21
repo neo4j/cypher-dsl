@@ -578,6 +578,27 @@
 						</newVersion>
 						<parameter>
 							<breakBuildBasedOnSemanticVersioning>true</breakBuildBasedOnSemanticVersioning>
+							<!--
+							 | See this helpful discussion: https://github.com/siom79/japicmp/issues/201
+							 | The interfaces we have are generally not be implemented by our users, but are just part
+							 | of the DSL contract. So it rather safe to assume compatibility.
+							 | Further reading:
+							 | https://docs.oracle.com/javase/specs/jls/se11/html/jls-13.html#jls-13.5.3
+							 -->
+							<overrideCompatibilityChangeParameters>
+								<overrideCompatibilityChangeParameter>
+									<compatibilityChange>METHOD_NEW_DEFAULT</compatibilityChange>
+									<binaryCompatible>true</binaryCompatible>
+									<sourceCompatible>true</sourceCompatible>
+									<!-- To make it tick with METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE below, we must wind this down from MAJOR to MINOR. -->
+									<semanticVersionLevel>MINOR</semanticVersionLevel>
+								</overrideCompatibilityChangeParameter>
+								<overrideCompatibilityChangeParameter>
+									<compatibilityChange>METHOD_DEFAULT_ADDED_IN_IMPLEMENTED_INTERFACE</compatibilityChange>
+									<binaryCompatible>true</binaryCompatible>
+									<sourceCompatible>true</sourceCompatible>
+								</overrideCompatibilityChangeParameter>
+							</overrideCompatibilityChangeParameters>
 						</parameter>
 					</configuration>
 				</plugin>
