@@ -165,7 +165,7 @@
 		<maven-site-plugin.version>3.9.1</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-		<maven.version>3.8.1</maven.version>
+		<maven.version>3.8.4</maven.version>
 		<mockito.version>4.2.0</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.RC2</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>4.4.2</neo4j-java-driver.version>
