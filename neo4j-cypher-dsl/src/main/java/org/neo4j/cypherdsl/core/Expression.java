@@ -49,6 +49,38 @@ public interface Expression extends Visitable {
 	}
 
 	/**
+	 * This creates a {@literal size(e)} expression from this expression. The Cypher output will semantically only be valid
+	 * when this refers to a list
+	 * (see <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size">size(list)</a>
+	 * or when the expression is a string
+	 * (see <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-string">size() applied to string</a>).
+	 * <p>
+	 * Any other expression will produce Cypher that is either deprecated in Neo4j >= 4.4 or not supported at all.
+	 *
+	 * @return The size of this expression (Either the number of items in a list or the number of characters in a string expression).
+	 * @since 2022.0.1
+	 */
+	@NotNull @Contract(pure = true)
+	default Expression size() {
+
+		return Functions.size(this);
+	}
+
+	/**
+	 * Takes the {@link #size()} expresssions and compares it for equality with the parameter {@code expectedSize}. The
+	 * same restrictions as with {@link #size()} apply.
+ 	 * @param expectedSize The expected size
+	 * @return A condition
+	 * @see #size()
+	 * @since 2022.0.1
+	 */
+	@NotNull @Contract(pure = true)
+	default Condition hasSize(Expression expectedSize) {
+
+		return Functions.size(this).isEqualTo(expectedSize);
+	}
+
+	/**
 	 * Reuse an existing symbolic name to alias this expression
 	 *
 	 * @param alias A symbolic name

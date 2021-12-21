@@ -39,6 +39,22 @@ class IssueRelatedIT {
 	private final Node person = Cypher.node("Person").named("person");
 
 	@Test
+	void gh266SizeShouldBeSupported() {
+
+		Node node = Cypher.node("Node").named("node");
+		String cypher = Cypher.match(node).returning(node.property("thing").size()).build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (node:`Node`) RETURN size(node.thing)");
+	}
+
+	@Test
+	void gh266HasSizeUtilityShouldWork() {
+
+		Node node = Cypher.node("Node").named("node");
+		String cypher = Cypher.match(node).where(node.property("thing").hasSize(Cypher.literalOf(0))).returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (node:`Node`) WHERE size(node.thing) = 0 RETURN *");
+	}
+
+	@Test
 	void gh115() {
 		Node nodes = Cypher.node("Node").named("node").withProperties("id", Cypher.literalOf("node_42"));
 		StatementBuilder.OngoingReadingWithoutWhere matchNodes = Cypher.match(nodes);
