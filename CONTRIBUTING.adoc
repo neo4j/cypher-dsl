@@ -121,7 +121,7 @@ If you need to create a specific version you can specify the revision, the chang
 $ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT
 ----
 
-=== Releasing (Only relevant for the current maintainers):
+=== Releasing (Only relevant for the current maintainers)
 
 Prepare a release with:
 
