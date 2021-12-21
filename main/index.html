@@ -1063,7 +1063,7 @@ expressions are included. In addition, properties are also available.</p>
 or use them for further refinement.</p>
 </div>
 <div class="paragraph">
-<p>The feature plays well with the <a href="#driver-integratio">driver integration</a> and could be directly used to define mapping functions.</p>
+<p>The feature plays well with the <a href="#driver-integration">driver integration</a> and could be directly used to define mapping functions.</p>
 </div>
 <div class="paragraph">
 <p>Statements parsed via the optional <a href="#cypher-parser">parser module</a> are also able to return their identifiable expressions.
@@ -3849,7 +3849,8 @@ We use the following in our tests:</p>
 </ul>
 </div>
 <div class="paragraph">
-<p>Maven 3.6.3 is our build tool of choice. We provide the Maven wrapper, see <code>mvnw</code> respectively <code>mvnw.cmd</code> in the project root; the wrapper downloads the appropriate Maven version automatically.</p>
+<p>Maven 3.8.4 is our build tool of choice. We provide the Maven wrapper, see <code>mvnw</code> respectively <code>mvnw.cmd</code> in the project root;
+the wrapper downloads the appropriate Maven version automatically.</p>
 </div>
 <div class="paragraph">
 <p>The build requires a local copy of the project:</p>
@@ -3930,14 +3931,27 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 47. Skipping native tests</div>
+<div class="title">Listing 47. Build only the core module</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
 </div>
 </div>
 <div class="sect3">
-<h4 id="releasing"><a class="anchor" href="#releasing"></a>Releasing</h4>
+<h4 id="ci-friendlyversionnumbers"><a class="anchor" href="#ci-friendlyversionnumbers"></a>CI-friendly version numbers</h4>
+<div class="paragraph">
+<p>We use CI-friendly version numbers, the current build will always identify itself as 9999-SNAPSHOT.
+If you need to create a specific version you can specify the revision, the changelist and an optional hash like this:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 48. Specifying revision and changelist</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="releasingonlyrelevantforthecurrentmaintainers"><a class="anchor" href="#releasingonlyrelevantforthecurrentmaintainers"></a>Releasing (Only relevant for the current maintainers):</h4>
 <div class="paragraph">
 <p>Prepare a release with:</p>
 </div>
@@ -4011,7 +4025,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 48. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 49. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -4032,7 +4046,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 49. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 50. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -4044,7 +4058,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 50. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 51. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -4069,7 +4083,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 51. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 52. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -4101,7 +4115,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 52. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 53. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -4119,7 +4133,7 @@ RETURN t, t2</code></pre>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 53. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 54. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -4133,7 +4147,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 54. Public internal API goes into a dedicated package</div>
+<div class="title">Listing 55. Public internal API goes into a dedicated package</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 MATCH (p:Package) - [:CONTAINS] -&gt; (c)
@@ -5566,7 +5580,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2021-12-21 12:01:00 UTC
+Last updated 2021-12-21 14:24:18 UTC
 </div>
 </div>
 </body>
