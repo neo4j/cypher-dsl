@@ -55,7 +55,7 @@ public interface Expression extends Visitable {
 	 * or when the expression is a string
 	 * (see <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-string">size() applied to string</a>).
 	 * <p>
-	 * Any other expression will produce Cypher that is either deprecated in Neo4j >= 4.4 or not supported at all.
+	 * Any other expression will produce Cypher that is either deprecated in Neo4j &ge; 4.4 or not supported at all.
 	 *
 	 * @return The size of this expression (Either the number of items in a list or the number of characters in a string expression).
 	 * @since 2022.0.1
