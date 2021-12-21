@@ -11,9 +11,131 @@ There's an active https://community.neo4j.com/[Neo4j Online Community]
 where we work directly with the community. If you're not already a
 member, sign up!
 
-We love our community and wouldn't be where we are without you.
+We love our community and wouldn't be where we are without you. Please remember:
+Many things are contributions, among them issues, code, documentation and examples.
 
-== Need to raise an issue?
+== Building and compiling the Neo4j-Cypher-DSL
+
+// tag::building-manual[]
+=== Requirements
+
+For the full project, including examples and native tests:
+
+* GraalVM based on JDK 11: https://www.graalvm.org/downloads/
+
+For the project, including examples but skipping native tests
+
+* JDK 11+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
+
+Maven 3.8.4 is our build tool of choice. We provide the Maven wrapper, see `mvnw` respectively `mvnw.cmd` in the project root;
+the wrapper downloads the appropriate Maven version automatically.
+
+The build requires a local copy of the project:
+
+[source,console,subs="verbatim,attributes"]
+[[clone-cypher-dsl]]
+.Clone the Neo4j Cypher-DSL
+----
+$ git clone git@github.com:neo4j-contrib/cypher-dsl.git
+----
+
+=== Full build (including examples and native tests)
+
+Before you proceed, verify your locally installed JDK version.
+The output should be similar:
+
+[source,console,subs="verbatim,attributes"]
+[[verify-jdk]]
+.Verify your JDK
+----
+$ java -version
+openjdk version "11.0.10" 2021-01-19
+OpenJDK Runtime Environment GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06)
+OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixed mode, sharing)
+----
+
+Check whether GraalVM `native-image` is present with:
+
+[source,console,subs="verbatim,attributes"]
+[[verify-native-image]]
+.Check for the present of `native-image`
+----
+$ gu list
+ComponentId              Version             Component name                Stability           Origin
+--------------------------------------------------------------------------------------------------------
+js                       21.0.0              Graal.js                      -
+graalvm                  21.0.0              GraalVM Core                  -
+native-image             21.0.0              Native Image                  Early adopter       github.com
+----
+
+You should see `native-image` in the list. If not, install it via `gu install native-image`.
+
+After that, use `./mvnw` on a Unix-like operating system to build the Cypher-DSL:
+
+[source,console,subs="verbatim,attributes"]
+[[build-default-bash]]
+.Build with default settings on Linux / macOS
+----
+$ ./mvnw clean verify
+----
+
+On a Windows machine, use
+
+[source,console,subs="verbatim,attributes"]
+[[build-default-windows]]
+.Build with default settings on Windows
+----
+$ mvnw.cmd clean verify
+----
+
+=== Skipping native tests
+
+On a plain JDK 11 or higher, run the following to skip the native tests:
+
+[source,console,subs="verbatim,attributes"]
+[[build-skip-native-bash]]
+.Skipping native tests
+----
+$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests
+----
+
+=== Build only the core module
+
+The core module can be build on plain JDK 11 with:
+
+[source,console,subs="verbatim,attributes"]
+[[build-only-core-bash]]
+.Build only the core module
+----
+$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl
+----
+
+=== CI-friendly version numbers
+
+We use CI-friendly version numbers, the current build will always identify itself as 9999-SNAPSHOT.
+If you need to create a specific version you can specify the revision, the changelist and an optional hash like this:
+
+[source,console,subs="verbatim,attributes"]
+.Specifying revision and changelist
+----
+$ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT
+----
+
+=== Releasing (Only relevant for the current maintainers):
+
+Prepare a release with:
+
+[source,console,subs="verbatim,attributes"]
+----
+./mvnw exec:exec@prepare-release -pl :neo4j-cypher-dsl-parent -Drevision=2020.0.1 -Dchangelist= -Dcypher-dsl.version.next=2020.0.2-SNAPSHOT
+----
+
+and then let do Teamcity the rest, but chose the same version number there, too.
+// end::building-manual[]
+
+== General considerations
+
+=== Need to raise an issue?
 
 Where you raise an issue depends largely on the nature of the problem.
 
@@ -45,8 +167,7 @@ with?
 
 === Want to contribute?
 
-If you want to contribute a pull request, we have a little bit of
-process you'll need to follow:
+It's easier for all of us if you try to follow these steps before creating a pull request:
 
 * Do all your work in a personal fork of the original repository
 * https://github.com/edx/edx-platform/wiki/How-to-Rebase-a-Pull-Request[Rebase],
@@ -56,14 +177,24 @@ don't merge (we prefer to keep our history clean)
 varies by language so ask if you're in doubt)
 * Include unit tests if appropriate (obviously not necessary for
 documentation changes)
-* Take a moment to read and sign our http://neo4j.com/developer/cla[CLA]
+
+NOTE: Small things that doesn't change the public API or documented behaviour and of course bug fixes usually
+      go in quickly. If you want to add new features with public API changes or additions or want to customize or
+      change a feature, please do reach out to us on one of the available channels, preferable by creating a
+      https://github.com/neo4j-contrib/cypher-dsl/issues/new[new issue] first in which we can discuss the proposed changes.
 
 We can't guarantee that we'll accept pull requests and may ask you to
 make some changes before they go in. Occasionally, we might also have
-logistical, commercial, or legal reasons why we can't accept your work
+logistical, commercial, or legal reasons why we can't accept your work,
 but we'll try to find an alternative way for you to contribute in that
 case. Remember that many community members have become regular
 contributors and some are now even Neo employees!
+
+=== Further reading
+
+If you want to find out more about how you can contribute, head over to
+our website for http://neo4j.com/developer/contributing-code/[more
+information].
 
 == Got an idea for a new project?
 
@@ -72,9 +203,3 @@ people in the community. Chances are that someone has a similar idea or
 may have already started working on it. The best software comes from
 getting like minds together to solve a problem. And we'll do our best to
 help you promote and co-ordinate your Neo ecosystem projects.
-
-== Further reading
-
-If you want to find out more about how you can contribute, head over to
-our website for http://neo4j.com/developer/contributing-code/[more
-information].

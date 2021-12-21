@@ -187,7 +187,7 @@ expressions are included. In addition, properties are also available.
 Those information can be used when dynamically building a query to verify the presence of required expressions
 or use them for further refinement.
 
-The feature plays well with the <<driver-integratio,driver integration>> and could be directly used to define mapping functions.
+The feature plays well with the <<driver-integration,driver integration>> and could be directly used to define mapping functions.
 
 Statements parsed via the optional <<cypher-parser,parser module>> are also able to return their identifiable expressions.
 The use case here might be evaluating a statement defined by a user being parsed and then checked if everything required is returned.
