@@ -58,7 +58,7 @@ public interface Expression extends Visitable {
 	 * Any other expression will produce Cypher that is either deprecated in Neo4j &ge; 4.4 or not supported at all.
 	 *
 	 * @return The size of this expression (Either the number of items in a list or the number of characters in a string expression).
-	 * @since 2022.0.1
+	 * @since 2022.1.0
 	 */
 	@NotNull @Contract(pure = true)
 	default Expression size() {
@@ -72,7 +72,7 @@ public interface Expression extends Visitable {
  	 * @param expectedSize The expected size
 	 * @return A condition
 	 * @see #size()
-	 * @since 2022.0.1
+	 * @since 2022.1.0
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition hasSize(Expression expectedSize) {
