@@ -93,11 +93,13 @@ jobs:
     name: Verify compilation on GraalVM native
     runs-on: ubuntu-latest
     needs: build
-    container:
-      image: ghcr.io/graalvm/graalvm-ce:java11-21.1.0
     steps:
-      - name: setup native-image
-        run: fc-cache -f -v && gu install native-image
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          version: '21.3.0'
+          java-version: '11'
+          components: 'native-image'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v1
@@ -107,7 +109,7 @@ jobs:
           name: artifacts
           path: repository
       - name: Install dependencies
-        run: "mkdir -p /root/.m2 && mv $GITHUB_WORKSPACE/repository /root/.m2"
+        run: "mkdir -p ~/.m2 && mv $GITHUB_WORKSPACE/repository ~/.m2"
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
