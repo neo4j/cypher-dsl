@@ -66,10 +66,6 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Set up JDK 8 for test
-        uses: actions/setup-java@v1
-        with:
-          java-version: 8
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - name: Restore Maven cache
@@ -81,11 +77,11 @@ jobs:
       - name: Recreate test classes
         run: ./mvnw --no-transfer-progress test-compile -pl org.neo4j:neo4j-cypher-dsl
       - name: Run tests
-        uses: jbangdev/jbang-action@v0.86.0
-        with:
-          jbangargs: --java 8 --cp ~/.m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar --cp neo4j-cypher-dsl/target/test-classes
-          script: bin/runtests.java
-          scriptargs: --select-package=org.neo4j.cypherdsl --include-classname=\.\*Test --include-classname=\.\*IT
+        run: >
+          docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action:0.86.0 --java 8 bin/runtests.java
+          -cp .m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
+          -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
+          --include-classname=\.\*Test --include-classname=\.\*IT
 
   test_native:
     name: Verify compilation on GraalVM native
