@@ -78,8 +78,8 @@ jobs:
         run: ./mvnw --no-transfer-progress test-compile -pl org.neo4j:neo4j-cypher-dsl
       - name: Run tests
         run: >
-          docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action:0.86.0 --java 8 bin/runtests.java
-          -cp .m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
+          docker run -v `pwd`:/ws -v ~/.m2:/m2 --workdir=/ws jbangdev/jbang-action:0.86.0 --java 8 bin/runtests.java
+          -cp /m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
           -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
           --include-classname=\.\*Test --include-classname=\.\*IT
 
