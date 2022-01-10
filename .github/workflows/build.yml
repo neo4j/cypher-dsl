@@ -13,17 +13,19 @@ jobs:
     outputs:
       revision: ${{ steps.revision_step.outputs.revision }}
     steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Required for JQAssistant
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
       - name: Enable Sonar for local PRs not from Dependabot
         if:  ${{ github.event.sender.login != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
         run: echo "USE_SONAR=sonar" >> $GITHUB_ENV
       - name: Disable Sonar for foreign PRs or from Dependabot
         if:  ${{ github.event.sender.login == 'dependabot[bot]' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
         run: echo "USE_SONAR=-sonar" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
-      - name: Set up JDK
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
       - name: Determine revision
         id: revision_step
         run: |
@@ -32,60 +34,52 @@ jobs:
           echo "OLD_VERSION=$(./bin/extract-version.sh latest)" >> $GITHUB_ENV
           echo "::set-output name=revision::$REVISION"
       - name: Cache SonarCloud packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
       - name: Run Maven build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
-          ./mvnw --no-transfer-progress clean deploy -P$USE_SONAR -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist= -Dcypher-dsl.version.old=$OLD_VERSION
-          -DaltDeploymentRepository=releases::default::file://$GITHUB_WORKSPACE/target/repository
+          ./mvnw --no-transfer-progress clean install -P$USE_SONAR -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist= -Dcypher-dsl.version.old=$OLD_VERSION
           -pl !org.neo4j:neo4j-cypher-dsl-native-tests
           -pl !org.neo4j:neo4j-cypher-dsl-examples
           -pl !org.neo4j:neo4j-cypher-dsl-examples-core
           -pl !org.neo4j:neo4j-cypher-dsl-examples-driver
           -pl !org.neo4j:neo4j-cypher-dsl-examples-parser
           -pl !org.neo4j:neo4j-cypher-dsl-examples-sdn6
-      - name: Archive artifacts
-        uses: actions/upload-artifact@v1
-        with:
-          name: artifacts
-          path: target/repository
 
   test_on_jdk8:
     name: Verify tests on JDK 8
     runs-on: ubuntu-latest
     needs: build
     steps:
-      - name: Determine revision
-        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
-      - name: Set up JDK
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11 for build
         uses: actions/setup-java@v1
         with:
-          # We build with 11, but down below we run with 8.
           java-version: 11
-      - name: Download artifacts
-        uses: actions/download-artifact@v1
+      - name: Determine revision
+        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
+      - name: Restore Maven cache
+        uses: actions/cache@v2
         with:
-          name: artifacts
-          path: binaries
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Recreate test classes
         run: ./mvnw --no-transfer-progress test-compile -pl org.neo4j:neo4j-cypher-dsl
       - name: Run tests
         run: >
-          docker run -v `pwd`:/ws --workdir=/ws jbangdev/jbang-action:0.83.0 --java 8 bin/runtests.java
-          -cp binaries/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
+          docker run -v `pwd`:/ws -v ~/.m2:/m2 --workdir=/ws jbangdev/jbang-action:0.86.0 --java 8 bin/runtests.java
+          -cp /m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar
           -cp neo4j-cypher-dsl/target/test-classes --select-package=org.neo4j.cypherdsl
           --include-classname=\.\*Test --include-classname=\.\*IT
 
@@ -94,6 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     steps:
+      - uses: actions/checkout@v2
       - uses: graalvm/setup-graalvm@v1
         with:
           version: '21.3.0'
@@ -102,14 +97,12 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
-      - name: Download artifacts
-        uses: actions/download-artifact@v1
+      - name: Restore Maven cache
+        uses: actions/cache@v2
         with:
-          name: artifacts
-          path: repository
-      - name: Install dependencies
-        run: "mkdir -p ~/.m2 && mv $GITHUB_WORKSPACE/repository ~/.m2"
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
@@ -123,19 +116,18 @@ jobs:
         java: [ '11', '17' ]
     needs: build
     steps:
-      - name: Determine revision
-        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
-      - name: Download artifacts
-        uses: actions/download-artifact@v1
-        with:
-          name: artifacts
-          path: repository
-      - name: Install dependencies
-        run: "mkdir -p $HOME/.m2 && mv $GITHUB_WORKSPACE/repository $HOME/.m2/"
+      - uses: actions/checkout@v2
       - uses: actions/setup-java@v1
         with:
           java-version: ${{ matrix.java }}
+      - name: Determine revision
+        run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
+      - name: Restore Maven cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
