@@ -64,11 +64,14 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v2
-      - name: Set up JDK
+      - name: Set up JDK 11 for build
         uses: actions/setup-java@v1
         with:
-          # We build with 11, but down below we run with 8.
           java-version: 11
+      - name: Set up JDK 8 for test
+        uses: actions/setup-java@v1
+        with:
+          java-version: 8
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - name: Cache Maven packages
@@ -82,7 +85,7 @@ jobs:
       - name: Run tests
         uses: jbangdev/jbang-action@v0.86.0
         with:
-          jbangargs: --java 8 -cp ~/.m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar -cp neo4j-cypher-dsl/target/test-classes
+          jbangargs: --java 8 --cp ~/.m2/repository/org/neo4j/neo4j-cypher-dsl/$REVISION-$GITHUB_SHA/neo4j-cypher-dsl-$REVISION-$GITHUB_SHA.jar --cp neo4j-cypher-dsl/target/test-classes
           script: bin/runtests.java
           scriptargs: --select-package=org.neo4j.cypherdsl --include-classname=\.\*Test --include-classname=\.\*IT
 
