@@ -43,8 +43,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-
+          key: ${{ runner.os }}-m2-$GITHUB_SHA-${{ hashFiles('**/pom.xml') }}
       - name: Run Maven build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -74,12 +73,11 @@ jobs:
           java-version: 8
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - name: Cache Maven packages
+      - name: Restore Maven cache
         uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-
+          restore-keys: ${{ runner.os }}-m2
       - name: Recreate test classes
         run: ./mvnw --no-transfer-progress test-compile -pl org.neo4j:neo4j-cypher-dsl
       - name: Run tests
@@ -103,12 +101,11 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - name: Cache Maven packages
+      - name: Restore Maven cache
         uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-
+          restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
@@ -128,12 +125,11 @@ jobs:
           java-version: ${{ matrix.java }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - name: Cache Maven packages
+      - name: Restore Maven cache
         uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: ${{ runner.os }}-m2-
+          restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
         run: >
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
