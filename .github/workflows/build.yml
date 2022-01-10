@@ -38,12 +38,11 @@ jobs:
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
-          restore-keys: ${{ runner.os }}-sonar
       - name: Cache Maven packages
         uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-${{ github.sha }}-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
       - name: Run Maven build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,6 +76,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
           restore-keys: ${{ runner.os }}-m2
       - name: Recreate test classes
         run: ./mvnw --no-transfer-progress test-compile -pl org.neo4j:neo4j-cypher-dsl
@@ -105,6 +105,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
           restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
         run: >
@@ -129,6 +130,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}-${{ github.sha }}
           restore-keys: ${{ runner.os }}-m2
       - name: Run Maven build
         run: >
