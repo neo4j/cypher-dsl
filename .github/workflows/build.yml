@@ -69,11 +69,6 @@ jobs:
         with:
           # We build with 11, but down below we run with 8.
           java-version: 11
-      - name: Download artifacts
-        uses: actions/download-artifact@v1
-        with:
-          name: artifacts
-          path: binaries
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
