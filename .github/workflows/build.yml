@@ -19,7 +19,7 @@ jobs:
       - name: Disable Sonar for foreign PRs or from Dependabot
         if:  ${{ github.event.sender.login == 'dependabot[bot]' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository) }}
         run: echo "USE_SONAR=-sonar" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -63,7 +63,7 @@ jobs:
     steps:
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
@@ -102,7 +102,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
@@ -124,7 +124,7 @@ jobs:
     steps:
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v1
       - name: Cache Maven packages
         uses: actions/cache@v1
         with:
