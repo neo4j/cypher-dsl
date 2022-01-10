@@ -43,7 +43,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.m2
-          key: ${{ runner.os }}-m2-$GITHUB_SHA-${{ hashFiles('**/pom.xml') }}
+          key: ${{ runner.os }}-m2-${{ GITHUB_SHA }}-${{ hashFiles('**/pom.xml') }}
       - name: Run Maven build
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
