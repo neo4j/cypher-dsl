@@ -176,7 +176,7 @@
 		<reactor.version>2020.0.14</reactor.version>
 		<revision>9999</revision>
 		<sha1 />
-		<slf4j.version>1.7.32</slf4j.version>
+		<slf4j.version>1.7.33</slf4j.version>
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.2.0</spring-data-neo4j.version>
