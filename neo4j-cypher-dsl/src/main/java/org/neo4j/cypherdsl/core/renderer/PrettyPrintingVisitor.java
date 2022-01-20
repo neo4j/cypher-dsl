@@ -81,7 +81,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Where where) {
-		if (currentVisitedElements.stream().noneMatch(visitable -> visitable instanceof Return)) {
+		if (currentVisitedElements.stream().noneMatch(Return.class::isInstance)) {
 			builder.append("\n");
 			indent(indentationLevel);
 			builder.append("WHERE ");
@@ -116,7 +116,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Set set) {
-		if (currentVisitedElements.stream().noneMatch(visitable -> visitable instanceof MergeAction)) {
+		if (currentVisitedElements.stream().noneMatch(MergeAction.class::isInstance)) {
 			trimNewline();
 			indent(indentationLevel);
 		}
@@ -146,7 +146,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(PropertyLookup propertyLookup) {
 		if (currentVisitedElements.stream().skip(1).limit(1)
-				.anyMatch(visitable -> visitable instanceof MapExpression)) {
+				.anyMatch(MapExpression.class::isInstance)) {
 			trimNewline();
 			indent(indentationLevel);
 		}

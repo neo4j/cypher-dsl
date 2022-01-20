@@ -37,6 +37,10 @@ final class MessageKeys {
 	public static final String ASSERTIONS_MONTH_REQUIRED = "assertions.month-required";
 	public static final String ASSERTIONS_DAY_REQUIRED = "assertions.day-required";
 	public static final String ASSERTIONS_TZ_REQUIRED = "assertions.tz-required";
+	public static final String ASSERTIONS_RANGE_TARGET_REQUIRED = "assertions.range-target-required";
+	public static final String ASSERTIONS_RANGE_INDEX_REQUIRED = "assertions.range-index-required";
+	public static final String ASSERTIONS_RANGE_START_REQUIRED = "assertions.range-start-required";
+	public static final String ASSERTIONS_RANGE_END_REQUIRED = "assertions.range-end-required";
 
 	private MessageKeys() {
 	}

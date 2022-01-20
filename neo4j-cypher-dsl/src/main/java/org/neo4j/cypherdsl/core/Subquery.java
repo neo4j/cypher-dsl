@@ -89,7 +89,7 @@ public final class Subquery implements Clause {
 			optionalImports = new With(false, returnItems, null, null, null, null);
 
 			returnItems = new ExpressionList(Arrays.stream(imports)
-				.filter(i -> i instanceof AliasedExpression)
+				.filter(AliasedExpression.class::isInstance)
 				.map(AliasedExpression.class::cast)
 				.collect(Collectors.toList()));
 

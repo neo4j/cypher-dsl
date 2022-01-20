@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -128,6 +129,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 				org.slf4j.event.Level.DEBUG
 			);
 		} catch (Exception e) {
+			// There's nothing we can do or should do in case there is no logback.
 		}
 	}
 
@@ -710,7 +712,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 		GroupPropertiesAndRelationships() {
 
-			final Map<FieldType, List<VariableElement>> hlp = new HashMap<>(2);
+			final Map<FieldType, List<VariableElement>> hlp = new EnumMap<>(FieldType.class);
 			hlp.put(FieldType.R, new ArrayList<>());
 			hlp.put(FieldType.P, new ArrayList<>());
 			this.result = Collections.unmodifiableMap(hlp);

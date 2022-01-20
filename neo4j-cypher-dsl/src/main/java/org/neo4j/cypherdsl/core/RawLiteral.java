@@ -50,7 +50,7 @@ final class RawLiteral implements Expression {
 	static class RawElement extends LiteralBase<String> {
 
 		RawElement(String content) {
-			super(RawLiteral.unescapeEscapedPlaceholders(content));
+			super(unescapeEscapedPlaceholders(content));
 		}
 
 		@Override
@@ -58,6 +58,10 @@ final class RawLiteral implements Expression {
 		public String asString() {
 
 			return super.getContent();
+		}
+
+		private static String unescapeEscapedPlaceholders(String content) {
+			return content.replace("\\$E", "$E");
 		}
 	}
 
@@ -137,10 +141,6 @@ final class RawLiteral implements Expression {
 		visitor.enter(this);
 		content.forEach(expression -> expression.accept(visitor));
 		visitor.leave(this);
-	}
-
-	private static String unescapeEscapedPlaceholders(String content) {
-		return content.replace("\\$E", "$E");
 	}
 
 	private static Expression getMixedArg(Object argument) {

@@ -68,16 +68,18 @@ class CypherIT {
 		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
 			.set(bikeNode.property("x").to(Cypher.literalTrue()))
 			.build();
-		assertThat(statement).isNotInstanceOf(ResultStatement.class);
-		assertThat(statement).isInstanceOf(Statement.SingleQuery.class);
+		assertThat(statement)
+			.isNotInstanceOf(ResultStatement.class)
+			.isInstanceOf(Statement.SingleQuery.class);
 
 		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
 			.set(bikeNode.property("x").to(Cypher.literalTrue()))
 			.with(bikeNode)
 			.returning(bikeNode)
 			.build();
-		assertThat(statement).isInstanceOf(ResultStatement.class);
-		assertThat(statement).isInstanceOf(MultiPartQuery.class);
+		assertThat(statement)
+			.isInstanceOf(ResultStatement.class)
+			.isInstanceOf(MultiPartQuery.class);
 	}
 
 	@Nested

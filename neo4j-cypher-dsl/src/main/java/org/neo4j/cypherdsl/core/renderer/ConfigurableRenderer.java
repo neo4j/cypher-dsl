@@ -37,7 +37,8 @@ import org.neo4j.cypherdsl.core.internal.StatementContext;
  */
 class ConfigurableRenderer implements Renderer {
 
-	private final static Map<Configuration, ConfigurableRenderer> CONFIGURATIONS = new ConcurrentHashMap<>(8);
+	private static final Map<Configuration, ConfigurableRenderer> CONFIGURATIONS = new ConcurrentHashMap<>(8);
+	private static final int STATEMENT_CACHE_SIZE = 128;
 
 	/**
 	 * Creates a new instance of the configurable renderer or uses an existing one matching the  given configuration
@@ -49,7 +50,6 @@ class ConfigurableRenderer implements Renderer {
 		return CONFIGURATIONS.computeIfAbsent(configuration, ConfigurableRenderer::new);
 	}
 
-	private final int STATEMENT_CACHE_SIZE = 128;
 	private final LinkedHashMap<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();

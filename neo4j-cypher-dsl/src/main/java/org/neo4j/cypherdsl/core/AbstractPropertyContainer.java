@@ -37,7 +37,7 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 	@NotNull
 	@Override
 	public final Property property(@NotNull String name) {
-		return property(new String[]{name});
+		return InternalPropertyImpl.create(this, name);
 	}
 
 	@NotNull

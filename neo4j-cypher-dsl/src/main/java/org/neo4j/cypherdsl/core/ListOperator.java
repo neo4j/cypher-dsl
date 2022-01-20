@@ -116,9 +116,9 @@ public final class ListOperator implements Expression {
 	 */
 	static ListOperator subList(Expression targetExpression, Expression start, Expression end) {
 
-		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
-		Assertions.notNull(start, "The start of the range must not be null.");
-		Assertions.notNull(end, "The end of the range must not be null.");
+		Assertions.notNull(targetExpression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_TARGET_REQUIRED));
+		Assertions.notNull(start, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_START_REQUIRED));
+		Assertions.notNull(end, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_END_REQUIRED));
 
 		return new ListOperator(targetExpression, start, DOTS, end);
 	}
@@ -132,8 +132,8 @@ public final class ListOperator implements Expression {
 	 */
 	static ListOperator subListFrom(Expression targetExpression, Expression start) {
 
-		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
-		Assertions.notNull(start, "The start of the range must not be null.");
+		Assertions.notNull(targetExpression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_TARGET_REQUIRED));
+		Assertions.notNull(start, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_START_REQUIRED));
 
 		return new ListOperator(targetExpression, start, DOTS, null);
 	}
@@ -147,8 +147,8 @@ public final class ListOperator implements Expression {
 	 */
 	static ListOperator subListUntil(Expression targetExpression, Expression end) {
 
-		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
-		Assertions.notNull(end, "The end of the range must not be null.");
+		Assertions.notNull(targetExpression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_TARGET_REQUIRED));
+		Assertions.notNull(end, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_END_REQUIRED));
 
 		return new ListOperator(targetExpression, null, DOTS, end);
 	}
@@ -162,8 +162,8 @@ public final class ListOperator implements Expression {
 	 */
 	static ListOperator valueAt(Expression targetExpression, Expression index) {
 
-		Assertions.notNull(targetExpression, "The range's target expression must not be null.");
-		Assertions.notNull(index, "The index of the range must not be null.");
+		Assertions.notNull(targetExpression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_TARGET_REQUIRED));
+		Assertions.notNull(index, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RANGE_INDEX_REQUIRED));
 
 		return new ListOperator(targetExpression, index, null, null);
 	}

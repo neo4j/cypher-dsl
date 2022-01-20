@@ -34,7 +34,6 @@ import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 
 import com.querydsl.core.types.Operator;
 import com.querydsl.core.types.Template;
-import com.querydsl.core.types.Templates;
 
 /**
  * @author Michael J. Simons
@@ -44,11 +43,10 @@ import com.querydsl.core.types.Templates;
 @API(status = INTERNAL, since = "2021.1.0")
 public final class CypherContext {
 
-	private final Templates templates = CypherTemplates.DEFAULT;
+	@SuppressWarnings("FieldCanBeLocal")
+	private static final String TO_STRING_VALUE_OF_UNSUPPORTED = "'" + CypherTemplates.UNSUPPORTED_MARKER + "'";
 
 	private final List<Expression> expressions = new ArrayList<>();
-	@SuppressWarnings("FieldCanBeLocal")
-	private final String TO_STRING_VALUE_OF_UNSUPPORTED = "'" + CypherTemplates.UNSUPPORTED_MARKER + "'";
 
 	private final Map<Object, Parameter<?>> parameters = new IdentityHashMap<>();
 
@@ -62,7 +60,7 @@ public final class CypherContext {
 
 	Template getTemplate(Operator op) {
 
-		Template template = templates.getTemplate(op);
+		Template template = CypherTemplates.DEFAULT.getTemplate(op);
 		if (template != null) {
 			for (Template.Element element : template.getElements()) {
 				if (TO_STRING_VALUE_OF_UNSUPPORTED.equals(element.toString())) {
@@ -74,7 +72,7 @@ public final class CypherContext {
 	}
 
 	int getPrecedence(Operator op) {
-		return templates.getPrecedence(op);
+		return CypherTemplates.DEFAULT.getPrecedence(op);
 	}
 
 	Parameter<?> getOrCreateParameterFor(Object object) {

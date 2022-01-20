@@ -72,6 +72,14 @@
 			</testResource>
 		</testResources>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration combine.self="append">
+					<argLine>--add-opens  jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED</argLine>
+				</configuration>
+			</plugin>
+
 			<!--
 			| Disable processors, otherwise Javac would already find our processors while compiling them and end up with
 			| "Bad service configuration file, or exception thrown while constructing Processor object: javax.annotation.processing.Processor: Provider org.neo4j.cypherdsl.codegen.neo4j.SDN6AnnotationProcessor not found"

@@ -45,7 +45,7 @@ public final class ConflictingParametersException extends RuntimeException {
 
 	private static final long serialVersionUID = -45456411835790492L;
 
-	private final Map<String, Set<Object>> erroneousParameters;
+	private final transient Map<String, Set<Object>> erroneousParameters;
 
 	public ConflictingParametersException(Map<String, Set<Object>> erroneousParameters) {
 		super(createMessage(erroneousParameters));
