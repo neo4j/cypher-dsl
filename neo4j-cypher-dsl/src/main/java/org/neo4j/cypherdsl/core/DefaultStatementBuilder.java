@@ -1867,73 +1867,73 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	static final class OrderBuilder {
-		protected final List<SortItem> sortItemList = new ArrayList<>();
-		protected SortItem lastSortItem;
-		protected Skip skip;
-		protected Limit limit;
+		final List<SortItem> sortItemList = new ArrayList<>();
+		SortItem lastSortItem;
+		Skip skip;
+		Limit limit;
 
-		protected void reset() {
+		void reset() {
 			this.sortItemList.clear();
 			this.lastSortItem = null;
 			this.skip = null;
 			this.limit = null;
 		}
 
-		protected void orderBy(SortItem... sortItem) {
+		void orderBy(SortItem... sortItem) {
 			this.sortItemList.addAll(Arrays.asList(sortItem));
 		}
 
-		protected void orderBy(Collection<SortItem> sortItems) {
+		void orderBy(Collection<SortItem> sortItems) {
 			if (sortItems != null) {
 				this.sortItemList.addAll(sortItems);
 			}
 		}
 
-		protected void orderBy(Expression expression) {
+		void orderBy(Expression expression) {
 			this.lastSortItem = Cypher.sort(expression);
 		}
 
-		protected void and(Expression expression) {
+		void and(Expression expression) {
 			orderBy(expression);
 		}
 
-		protected void descending() {
+		void descending() {
 			this.sortItemList.add(this.lastSortItem.descending());
 			this.lastSortItem = null;
 		}
 
-		protected void ascending() {
+		void ascending() {
 			this.sortItemList.add(this.lastSortItem.ascending());
 			this.lastSortItem = null;
 		}
 
-		protected void skip(Expression expression) {
+		void skip(Expression expression) {
 			if (expression != null) {
 				skip = Skip.create(expression);
 			}
 		}
 
-		protected void limit(Expression expression) {
+		void limit(Expression expression) {
 			if (expression != null) {
 				limit = Limit.create(expression);
 			}
 		}
 
-		protected Optional<Order> buildOrder() {
+		Optional<Order> buildOrder() {
 			if (lastSortItem != null) {
 				sortItemList.add(lastSortItem);
 			}
-			Optional<Order> result = sortItemList.size() > 0 ? Optional.of(new Order(sortItemList)) : Optional.empty();
+			Optional<Order> result = sortItemList.isEmpty() ? Optional.empty() : Optional.of(new Order(sortItemList));
 			sortItemList.clear();
 			lastSortItem = null;
 			return result;
 		}
 
-		protected Skip getSkip() {
+		Skip getSkip() {
 			return skip;
 		}
 
-		protected Limit getLimit() {
+		Limit getLimit() {
 			return limit;
 		}
 	}

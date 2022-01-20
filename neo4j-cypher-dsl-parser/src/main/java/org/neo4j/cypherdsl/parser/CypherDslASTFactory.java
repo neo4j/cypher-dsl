@@ -96,7 +96,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements
 	ASTFactory<Statement, Statement, Clause, Return, Expression, List<Expression>, SortItem, PatternElement, Node, PathDetails, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Statement, Statement, Clause, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition> {
-	private static CypherDslASTFactory DEFAULT_INSTANCE;
+	private static CypherDslASTFactory instanceFromDefaultOptions;
 
 	static CypherDslASTFactory getInstance(Options options) {
 
@@ -105,13 +105,13 @@ final class CypherDslASTFactory implements
 		if (options != null && !options.areDefault()) {
 			instance = new CypherDslASTFactory(options);
 		} else {
-			instance = DEFAULT_INSTANCE;
+			instance = instanceFromDefaultOptions;
 			if (instance == null) {
 				synchronized (CypherDslASTFactory.class) {
-					instance = DEFAULT_INSTANCE;
+					instance = instanceFromDefaultOptions;
 					if (instance == null) {
-						DEFAULT_INSTANCE = new CypherDslASTFactory(Optional.ofNullable(options).orElseGet(Options::defaultOptions));
-						instance = DEFAULT_INSTANCE;
+						instanceFromDefaultOptions = new CypherDslASTFactory(Optional.ofNullable(options).orElseGet(Options::defaultOptions));
+						instance = instanceFromDefaultOptions;
 					}
 				}
 			}
