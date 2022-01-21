@@ -18,9 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -39,6 +40,13 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = STABLE, since = "1.0")
 public final class FunctionInvocation implements Expression {
+
+	private final static MessageFormat MESSAGE_FMT_EXP_REQUIRED = new MessageFormat(
+		Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_FOR_FUNCTION_REQUIRED));
+	private final static MessageFormat MESSAGE_FMT_PATTERN_REQUIRED = new MessageFormat(
+		Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_PATTERN_FOR_FUNCTION_REQUIRED));
+	private final static MessageFormat MESSAGE_FMT_ARG_REQUIRED = new MessageFormat(
+		Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_ARG_REQUIRED));
 
 	/**
 	 * Defines metadata for a function.
@@ -70,14 +78,14 @@ public final class FunctionInvocation implements Expression {
 	/**
 	 * Creates a {@link FunctionInvocation} based on a simple definition with arguments.
 	 *
-	 * @param definition The definition of a function
+	 * @param definition  The definition of a function
 	 * @param expressions The arguments to the function
 	 * @return The invocation (a valid expression)
 	 * @since 2021.2.3
 	 */
 	public static FunctionInvocation create(FunctionDefinition definition, Expression... expressions) {
 
-		String message = "The expression for " + definition.getImplementationName() + "() is required.";
+		String message = MESSAGE_FMT_EXP_REQUIRED.format(new Object[] { definition.getImplementationName() });
 
 		Assertions.notEmpty(expressions, message);
 		Assertions.notNull(expressions[0], message);
@@ -88,8 +96,8 @@ public final class FunctionInvocation implements Expression {
 	/**
 	 * Creates a {@link FunctionInvocation} based on a simple definition with arguments and adds the {@code distinct}
 	 * operator to it. This is only supported with {@link FunctionDefinition#isAggregate()} returning {@literal true}.
- 	 *
-	 * @param definition The definition of a function
+	 *
+	 * @param definition  The definition of a function
 	 * @param expressions The arguments to the function
 	 * @return The invocation (a valid expression)
 	 * @since 2021.2.3
@@ -97,9 +105,9 @@ public final class FunctionInvocation implements Expression {
 	public static FunctionInvocation createDistinct(FunctionDefinition definition, Expression... expressions) {
 
 		Assertions
-			.isTrue(definition.isAggregate(), "The distinct operator can only be applied within aggregate functions.");
+			.isTrue(definition.isAggregate(), Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_CORRECT_USAGE_OF_DISTINCT));
 
-		String message = "The expression for " + definition.getImplementationName() + "() is required.";
+		String message = MESSAGE_FMT_EXP_REQUIRED.format(new Object[] { definition.getImplementationName() });
 
 		Assertions.notEmpty(expressions, message);
 		Assertions.notNull(expressions[0], message);
@@ -115,13 +123,14 @@ public final class FunctionInvocation implements Expression {
 	 * Creates a new function invocation for a pattern element.
 	 *
 	 * @param definition The definition of the function
-	 * @param pattern The argument to the function
+	 * @param pattern    The argument to the function
 	 * @return A function invocation
 	 * @since 2021.2.3
 	 */
 	public static FunctionInvocation create(FunctionDefinition definition, PatternElement pattern) {
 
-		Assertions.notNull(pattern, "The pattern for " + definition.getImplementationName() + "() is required.");
+		String message = MESSAGE_FMT_PATTERN_REQUIRED.format(new Object[] { definition.getImplementationName() });
+		Assertions.notNull(pattern, message);
 
 		return new FunctionInvocation(definition.getImplementationName(),
 			new Pattern(Collections.singletonList(pattern)));
@@ -129,7 +138,8 @@ public final class FunctionInvocation implements Expression {
 
 	static FunctionInvocation create(FunctionDefinition definition, TypedSubtree<?> arguments) {
 
-		Assertions.notNull(arguments, definition.getImplementationName() + "() requires at least one argument.");
+		Assertions.notNull(arguments,
+			MESSAGE_FMT_ARG_REQUIRED.format(new Object[] { definition.getImplementationName() }));
 
 		return new FunctionInvocation(definition.getImplementationName(), arguments);
 	}

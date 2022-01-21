@@ -57,6 +57,7 @@ class RewriteTest {
 	// end::enforcing-labels-function[]
 
 	@Test
+	@SuppressWarnings("squid:S5976") // About making it a parameterized test. Used in the docs.
 	void shouldRewriteLabelsOnParseNode() {
 
 		// tag::enforcing-on-parse[]
@@ -71,6 +72,7 @@ class RewriteTest {
 	}
 
 	@Test
+	@SuppressWarnings("squid:S5976") // Used in the docs
 	void shouldRewriteLabelsOnSetLabels() {
 
 		// tag::enforcing-on-set[]
@@ -85,6 +87,7 @@ class RewriteTest {
 	}
 
 	@Test
+	@SuppressWarnings("squid:S5976") // Used in the docs
 	void shouldRewriteLabelsOnRemoveLabels() {
 
 		// tag::enforcing-on-remove[]

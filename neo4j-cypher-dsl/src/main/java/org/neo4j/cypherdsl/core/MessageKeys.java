@@ -41,6 +41,10 @@ final class MessageKeys {
 	public static final String ASSERTIONS_RANGE_INDEX_REQUIRED = "assertions.range-index-required";
 	public static final String ASSERTIONS_RANGE_START_REQUIRED = "assertions.range-start-required";
 	public static final String ASSERTIONS_RANGE_END_REQUIRED = "assertions.range-end-required";
+	public static final String ASSERTIONS_EXPRESSION_FOR_FUNCTION_REQUIRED = "assertions.expression-for-function-required";
+	public static final String ASSERTIONS_PATTERN_FOR_FUNCTION_REQUIRED = "assertions.pattern-for-function-required";
+	public static final String ASSERTIONS_AT_LEAST_ONE_ARG_REQUIRED = "assertions.at-least-one-arg-required";
+	public static final String ASSERTIONS_CORRECT_USAGE_OF_DISTINCT = "assertions.correct-usage-of-distinct";
 
 	private MessageKeys() {
 	}

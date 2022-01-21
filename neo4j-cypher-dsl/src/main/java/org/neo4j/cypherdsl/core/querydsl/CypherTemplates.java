@@ -34,6 +34,8 @@ class CypherTemplates extends Templates {
 	private CypherTemplates() {
 		super('\\');
 
+		final String sizeOfOneElement = "size({0})";
+
 		// boolean
 		add(Ops.AND, "{0} AND {1}", Precedence.AND);
 		add(Ops.NOT, "NOT {0}", Precedence.NOT_HIGH);
@@ -43,10 +45,10 @@ class CypherTemplates extends Templates {
 
 		// collection
 		add(Ops.COL_IS_EMPTY, "size({0}) = 0");
-		add(Ops.COL_SIZE, "size({0})");
+		add(Ops.COL_SIZE, sizeOfOneElement);
 
 		// array
-		add(Ops.ARRAY_SIZE, "size({0})");
+		add(Ops.ARRAY_SIZE, sizeOfOneElement);
 
 		// map
 		add(Ops.MAP_SIZE, "size(keys({0}))");
@@ -100,7 +102,7 @@ class CypherTemplates extends Templates {
 		add(Ops.STRING_CONTAINS, "{0} CONTAINS {1}");
 		add(Ops.STRING_CONTAINS_IC, "{0l} CONTAINS {1l}");
 		add(Ops.CHAR_AT, "substring({0}, {1}, 1)");
-		add(Ops.STRING_LENGTH, "size({0})");
+		add(Ops.STRING_LENGTH, sizeOfOneElement);
 		add(Ops.INDEX_OF, UNSUPPORTED_MARKER);
 		add(Ops.INDEX_OF_2ARGS, UNSUPPORTED_MARKER);
 		add(Ops.STRING_IS_EMPTY, "size({0}) = 0 ");

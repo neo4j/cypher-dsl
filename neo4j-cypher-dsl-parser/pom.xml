@@ -11,7 +11,7 @@
 	<artifactId>neo4j-cypher-dsl-parser</artifactId>
 
 	<name>Neo4j Cypher DSL (Parser)</name>
-	<description>Building on top of the Neo4j 4.3 JavaCC parsers it provides a way from Cypher to Cypher-DSL Ast.</description>
+	<description>Building on top of the Neo4j 4.4 JavaCC parsers it provides a way from Cypher to Cypher-DSL Ast.</description>
 
 	<licenses>
 		<license>
