@@ -41,11 +41,11 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = STABLE, since = "1.0")
 public final class FunctionInvocation implements Expression {
 
-	private final static MessageFormat MESSAGE_FMT_EXP_REQUIRED = new MessageFormat(
+	private static final MessageFormat MESSAGE_FMT_EXP_REQUIRED = new MessageFormat(
 		Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_FOR_FUNCTION_REQUIRED));
-	private final static MessageFormat MESSAGE_FMT_PATTERN_REQUIRED = new MessageFormat(
+	private static final MessageFormat MESSAGE_FMT_PATTERN_REQUIRED = new MessageFormat(
 		Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_PATTERN_FOR_FUNCTION_REQUIRED));
-	private final static MessageFormat MESSAGE_FMT_ARG_REQUIRED = new MessageFormat(
+	private static final MessageFormat MESSAGE_FMT_ARG_REQUIRED = new MessageFormat(
 		Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_ARG_REQUIRED));
 
 	/**
