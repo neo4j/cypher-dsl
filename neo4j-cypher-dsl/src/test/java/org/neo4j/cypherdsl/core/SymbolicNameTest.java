@@ -39,8 +39,9 @@ public class SymbolicNameTest {
 			SymbolicName name2 = name1;
 			SymbolicName name3 = SymbolicName.of("a");
 
-			assertThat(name1).isEqualTo(name2);
-			assertThat(name1).isEqualTo(name3);
+			assertThat(name1)
+				.isEqualTo(name2)
+				.isEqualTo(name3);
 		}
 
 		@Test
@@ -94,8 +95,9 @@ public class SymbolicNameTest {
 			SymbolicName name2 = name1;
 			SymbolicName name3 = SymbolicName.unresolved();
 
-			assertThat(name1).isEqualTo(name2);
-			assertThat(name1).isNotEqualTo(name3);
+			assertThat(name1)
+				.isEqualTo(name2)
+				.isNotEqualTo(name3);
 			assertThat(name2).isNotEqualTo(name3);
 		}
 

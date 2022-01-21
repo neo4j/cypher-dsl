@@ -62,8 +62,9 @@ class CypherIT {
 	void shouldGenerateStatementsOfCorrectType() {
 
 		Statement statement = Cypher.returning(Cypher.literalTrue().as("t")).build();
-		assertThat(statement).isInstanceOf(ResultStatement.class);
-		assertThat(statement).isInstanceOf(Statement.SingleQuery.class);
+		assertThat(statement)
+			.isInstanceOf(ResultStatement.class)
+			.isInstanceOf(Statement.SingleQuery.class);
 
 		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
 			.set(bikeNode.property("x").to(Cypher.literalTrue()))

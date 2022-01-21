@@ -29,6 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -82,9 +83,12 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 * @return A new node
 	 */
 	@Override
-	abstract public SELF named(SymbolicName newSymbolicName);
+	@NotNull
+	@SuppressWarnings("squid:S3038") // This is overriden to make sure we allow a covariant return type
+	public abstract SELF named(SymbolicName newSymbolicName);
 
 	@Override
+	@NotNull
 	public final SELF withProperties(Object... keysAndValues) {
 
 		MapExpression newProperties = null;
@@ -95,6 +99,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	}
 
 	@Override
+	@NotNull
 	public final SELF withProperties(Map<String, Object> newProperties) {
 
 		return withProperties(MapExpression.create(newProperties));
@@ -106,6 +111,8 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 * @return A new node
 	 */
 	@Override
+	@SuppressWarnings("squid:S3038") // This is overriden to make sure we allow a covariant return type
+	@NotNull
 	public abstract SELF withProperties(MapExpression newProperties);
 
 	protected final Properties getProperties() {
@@ -113,16 +120,19 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	}
 
 	@Override
+	@NotNull
 	public final List<NodeLabel> getLabels() {
 		return Collections.unmodifiableList(labels);
 	}
 
 	@Override
+	@NotNull
 	public final Optional<SymbolicName> getSymbolicName() {
 		return Optional.ofNullable(symbolicName);
 	}
 
 	@Override
+	@NotNull
 	public final SymbolicName getRequiredSymbolicName() {
 
 		SymbolicName requiredSymbolicName = this.symbolicName;
