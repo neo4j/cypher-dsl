@@ -1,0 +1,42 @@
+== 2022.1
+
+=== 2022.1.0
+
+*No breaking changes*. The minor version has been incremented to notify about new default methods in our interfaces. Those
+shouldn't concern you as a user though, as they are not meant to be implemented by you.
+
+==== Noteworthy
+
+Our integration tests on GitHub now uses the official GraalVM action: https://github.com/marketplace/actions/github-action-for-graalvm.
+Thanks, https://github.com/meistermeier[Gerrit], for integrating it.
+
+==== 🚀 Features
+
+* Add `size` and `hasSize` on expressions. (#267)
+
+==== 🧹 Housekeeping
+
+* Some polishing (mainly working on getting a "warning free" build in all the tools)
+* Tons of dependency upgrades:
+** Bump testcontainers.version from 1.16.2 to 1.16.3 (#289)
+** Bump spring-boot-starter-parent from 2.6.2 to 2.6.3 (#290)
+** Bump mockito.version from 4.2.0 to 4.3.1 (#291)
+** Bump slf4j.version from 1.7.33 to 1.7.35 (#292)
+** Bump japicmp-maven-plugin from 0.15.4 to 0.15.6 (#293)
+** Bump neo4j-java-driver from 4.4.2 to 4.4.3 (#294)
+** Bump checkstyle from 9.2.1 to 9.3 (#295)
+** Bump asciidoctor-maven-plugin from 2.2.1 to 2.2.2 (#296)
+** Bump asciidoctorj from 2.5.2 to 2.5.3 (#285)
+** Bump maven-jar-plugin from 3.2.1 to 3.2.2 (#284)
+** Bump spring-data-neo4j from 6.2.0 to 6.2.1 (#283)
+** Bump reactor-bom from 2020.0.14 to 2020.0.15 (#282)
+** Bump slf4j.version from 1.7.32 to 1.7.33 (#281)
+** Bump neo4j-cypher-javacc-parser from 4.4.2 to 4.4.3 (#280)
+** Bump maven-jar-plugin from 3.2.0 to 3.2.1 (#277)
+** Bump checker-qual from 3.21.0 to 3.21.1 (#276)
+** Bump assertj-core from 3.21.0 to 3.22.0 (#272)
+** Bump maven-site-plugin from 3.9.1 to 3.10.0 (#270)
+** Bump maven-deploy-plugin from 3.0.0-M1 to 3.0.0-M2 (#271)
+** Bump checkstyle from 9.2 to 9.2.1 (#269)
+** Bump spring-boot-starter-parent from 2.6.1 to 2.6.2 (#268)
+** Bump Maven to 3.8.4.
