@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.examples.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -32,9 +34,13 @@ import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.NodeLabel;
+import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.SymbolicName;
 // tag::main-entry-point[]
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.parser.CypherParser;
 // end::main-entry-point[]
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
@@ -75,6 +81,40 @@ class CypherDSLParserExamplesTest {
 			+ "} "
 			+ "RETURN result{.foo, .bar}");
 		// end::example-using-input[]
+	}
+
+	@Test
+	void extractLabels() {
+
+		var cypher = "MATCH (n) SET n:Foo REMOVE n:Bar RETURN n";
+
+		class LabelCollector implements Function<Expression, Operation> {
+
+			List<String> labelsSeen = new ArrayList<>();
+
+			@Override
+			public Operation apply(Expression expression) {
+				Operation op = (Operation) expression;
+				op.accept(segment -> {
+					if(segment instanceof NodeLabel) {
+						labelsSeen.add(((NodeLabel) segment).getValue());
+					}
+				});
+				return op;
+			}
+		}
+
+		var labelsAdded = new LabelCollector();
+		var labelsRemoved = new LabelCollector();
+
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS,  Operation.class, labelsAdded)
+			.withCallback(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operation.class, labelsRemoved)
+			.build();
+
+		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
+		assertThat(labelsAdded.labelsSeen).containsExactly("Foo");
+		assertThat(labelsRemoved.labelsSeen).containsExactly("Bar");
 	}
 
 	@Test
