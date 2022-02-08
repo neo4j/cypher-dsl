@@ -256,6 +256,7 @@ final class CypherDslASTFactory implements
 			return patternElements;
 		}
 
+		@SuppressWarnings("squid:S4276") // The function is needed due to the assigment below
 		var transformer = Function.<PatternElement>identity();
 		for (UnaryOperator<PatternElement> callback : callbacks) {
 			transformer = transformer.andThen(callback);
