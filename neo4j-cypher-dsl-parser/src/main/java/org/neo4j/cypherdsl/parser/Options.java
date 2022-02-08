@@ -153,8 +153,8 @@ public final class Options {
 		 *
 		 * @param patternElementCreatedEventType The type of the event
 		 * @param callback                   A callback
-		 * @return This builde
-		 * @since 2022.1.1
+		 * @return This builder
+		 * @since 2022.2.0
 		 */
 		public Builder withCallback(PatternElementCreatedEventType patternElementCreatedEventType, UnaryOperator<PatternElement> callback) {
 

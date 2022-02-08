@@ -28,7 +28,7 @@ import org.apiguardian.api.API;
  * @soundtrack Black Sabbath - The End: Live in Birmingham
  * @since 2022.1.1
  */
-@API(status = STABLE, since = "2022.1.1")
+@API(status = STABLE, since = "2022.2.0")
 public enum PatternElementCreatedEventType {
 
 	/**
