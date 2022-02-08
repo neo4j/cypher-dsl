@@ -24,7 +24,9 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -34,17 +36,18 @@ import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Operation;
+import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.SymbolicName;
 // tag::main-entry-point[]
-import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.parser.CypherParser;
 // end::main-entry-point[]
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.Options;
+import org.neo4j.cypherdsl.parser.PatternElementCreatedEventType;
 import org.neo4j.cypherdsl.parser.ReturnDefinition;
 
 /**
@@ -86,7 +89,7 @@ class CypherDSLParserExamplesTest {
 	@Test
 	void extractLabels() {
 
-		var cypher = "MATCH (n) SET n:Foo REMOVE n:Bar RETURN n";
+		var cypher = "OPTIONAL MATCH (m) SET m:Foo REMOVE m:Bar WITH m CREATE (m:Person) SET n.name = 'John' RETURN n, m";
 
 		class LabelCollector implements Function<Expression, Operation> {
 
@@ -110,11 +113,115 @@ class CypherDSLParserExamplesTest {
 		var options = Options.newOptions()
 			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS,  Operation.class, labelsAdded)
 			.withCallback(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operation.class, labelsRemoved)
+
 			.build();
 
 		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
 		assertThat(labelsAdded.labelsSeen).containsExactly("Foo");
 		assertThat(labelsRemoved.labelsSeen).containsExactly("Bar");
+	}
+
+	@Test // GH-299
+	void extractLabelsWithFilters() {
+
+		var cypher = "OPTIONAL MATCH (m:Bazbar) SET m:Foo REMOVE m:Bar WITH m CREATE (m:Person) SET n.name = 'John' RETURN n, m";
+		var labelsSeen = new HashSet<String>();
+		var options = Options.newOptions()
+			.withLabelFilter((labelParsedEventType, strings) -> {
+
+				// The event type could be used to distinguish the call site at which labels where needed
+				switch (labelParsedEventType) {
+					case ON_REMOVE:
+						break;
+					case ON_SET:
+						break;
+					case ON_NODE_PATTERN:
+						break;
+				}
+				labelsSeen.addAll(strings);
+				return strings;
+			})
+			.build();
+
+		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
+		assertThat(labelsSeen).containsExactlyInAnyOrder("Bazbar", "Foo", "Bar", "Person");
+	}
+
+	@Test // GH-299
+	void extractLabelsInMatchOrCreate() {
+
+		var cypher = "OPTIONAL MATCH (m:Bazbar) SET m:Foo REMOVE m:Bar WITH m CREATE (m:Person) SET n.name = 'John' RETURN n, m";
+
+		class LabelCollector implements UnaryOperator<PatternElement> {
+
+			Set<String> labelsSeen = new HashSet<>();
+
+			@Override
+			public PatternElement apply(PatternElement patternElement) {
+				if(patternElement instanceof Node) {
+					((Node) patternElement).getLabels().forEach(l -> labelsSeen.add(l.getValue()));
+				}
+				return patternElement;
+			}
+		}
+
+		var labelsOnNodesCreated = new LabelCollector();
+		var labelsOnNodesMatched = new LabelCollector();
+
+		var options = Options.newOptions()
+			.withCallback(PatternElementCreatedEventType.ON_CREATE, labelsOnNodesCreated)
+			.withCallback(PatternElementCreatedEventType.ON_MATCH, labelsOnNodesMatched)
+			.build();
+
+		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
+		assertThat(labelsOnNodesCreated.labelsSeen).containsExactly("Person");
+		assertThat(labelsOnNodesMatched.labelsSeen).containsExactly("Bazbar");
+	}
+
+	@Test // GH-299
+	void allLabelsSeen() {
+
+		var cypher = "OPTIONAL MATCH (m:Bazbar) SET m:Foo REMOVE m:Bar WITH m CREATE (m:Person) SET n.name = 'John' RETURN n, m";
+
+		Set<String> labelsSeen = new HashSet<>();
+
+		class LabelsInsideExpressions implements Function<Expression, Operation> {
+
+			@Override
+			public Operation apply(Expression expression) {
+				Operation op = (Operation) expression;
+				op.accept(segment -> {
+					if(segment instanceof NodeLabel) {
+						labelsSeen.add(((NodeLabel) segment).getValue());
+					}
+				});
+				return op;
+			}
+		}
+
+		class LabelsInsidePatterns implements UnaryOperator<PatternElement> {
+
+			@Override
+			public PatternElement apply(PatternElement patternElement) {
+				if(patternElement instanceof Node) {
+					((Node) patternElement).getLabels().forEach(l -> labelsSeen.add(l.getValue()));
+				}
+				return patternElement;
+			}
+		}
+
+		var labelsInsideExpressions = new LabelsInsideExpressions();
+		var labelsInsidePatterns = new LabelsInsidePatterns();
+
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS,  Operation.class, labelsInsideExpressions)
+			.withCallback(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operation.class, labelsInsideExpressions)
+			.withCallback(PatternElementCreatedEventType.ON_CREATE, labelsInsidePatterns)
+			.withCallback(PatternElementCreatedEventType.ON_MATCH, labelsInsidePatterns)
+			.build();
+
+		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
+		assertThat(labelsSeen).containsExactlyInAnyOrder("Foo", "Bar", "Bazbar", "Person");
 	}
 
 	@Test

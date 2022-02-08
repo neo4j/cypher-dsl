@@ -28,11 +28,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -75,7 +77,11 @@ public final class Options {
 
 		private BiFunction<TypeParsedEventType, Collection<String>, Collection<String>> typeFilter = (e, t) -> t;
 
-		private final Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> onNewExpressionCallbacks = new EnumMap<>(ExpressionCreatedEventType.class);
+		private final Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> onNewExpressionCallbacks
+			= new EnumMap<>(ExpressionCreatedEventType.class);
+
+		private final Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> onNewPatternElementCallbacks
+			= new EnumMap<>(PatternElementCreatedEventType.class);
 
 		private Function<ReturnDefinition, Return> returnClauseFactory;
 
@@ -139,6 +145,26 @@ public final class Options {
 		}
 
 		/**
+		 * Adds a callback for when a {@link PatternElement} is created during one of the phases described by {@link PatternElementCreatedEventType}.
+		 * For one type of event one or more callbacks can be declared which will be called in order in which they have been declared.
+		 * Callbacks can just collect or actually visit the elements created or they are free to create new ones, effectively rewriting the query.
+		 * <p>
+		 * Parsing will be aborted when a callback throws a {@link RuntimeException}.
+		 *
+		 * @param patternElementCreatedEventType The type of the event
+		 * @param callback                   A callback
+		 * @return This builder
+		 * @since 2022.2.0
+		 */
+		public Builder withCallback(PatternElementCreatedEventType patternElementCreatedEventType, UnaryOperator<PatternElement> callback) {
+
+			var callbacks = this.onNewPatternElementCallbacks
+				.computeIfAbsent(patternElementCreatedEventType, k -> new ArrayList<>());
+			callbacks.add(callback);
+			return this;
+		}
+
+		/**
 		 * Configures the factory for return clauses. The idea here is that you might intercept what is being returned
 		 * or how it is sorted, limited and the like. The {@link ReturnDefinition definition} passed to the factory contains
 		 * all necessary information for delegating to the {@link org.neo4j.cypherdsl.core.Clauses#returning(boolean, List, List, Expression, Expression)}
@@ -166,6 +192,8 @@ public final class Options {
 
 	private final Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> onNewExpressionCallbacks;
 
+	private final Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> onNewPatternElementCallbacks;
+
 	private final Function<ReturnDefinition, Return> returnClauseFactory;
 
 	private Options(Builder builder) {
@@ -176,6 +204,10 @@ public final class Options {
 		Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> tmp = new EnumMap<>(ExpressionCreatedEventType.class);
 		builder.onNewExpressionCallbacks.forEach((k, v) -> tmp.put(k, List.copyOf(v)));
 		this.onNewExpressionCallbacks = Map.copyOf(tmp);
+
+		Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> tmp2 = new EnumMap<>(PatternElementCreatedEventType.class);
+		builder.onNewPatternElementCallbacks.forEach((k, v) -> tmp2.put(k, List.copyOf(v)));
+		this.onNewPatternElementCallbacks = Map.copyOf(tmp2);
 
 		this.returnClauseFactory = builder.returnClauseFactory != null ?
 			builder.returnClauseFactory :
@@ -195,6 +227,10 @@ public final class Options {
 
 	Map<ExpressionCreatedEventType, List<Function<Expression, ? extends Expression>>> getOnNewExpressionCallbacks() {
 		return onNewExpressionCallbacks;
+	}
+
+	Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> getOnNewPatternElementCallbacks() {
+		return onNewPatternElementCallbacks;
 	}
 
 	Function<ReturnDefinition, Return> getReturnClauseFactory() {

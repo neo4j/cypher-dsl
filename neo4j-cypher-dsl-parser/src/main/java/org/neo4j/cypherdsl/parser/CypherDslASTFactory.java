@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
@@ -143,6 +144,9 @@ final class CypherDslASTFactory implements
 	private <T extends Expression> T applyCallbackFor(ExpressionCreatedEventType type, T newExpression) {
 
 		var callbacks = this.options.getOnNewExpressionCallbacks().getOrDefault(type, List.of());
+		if (callbacks.isEmpty()) {
+			return newExpression;
+		}
 
 		// We checked this when creating the callbacks
 		@SuppressWarnings("unchecked")
@@ -240,9 +244,24 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints,
-		Where where) {
-		return Clauses.match(optional, patternElements, where, hints);
+	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where where) {
+
+		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
+		return Clauses.match(optional, transformIfPossible(callbacks, patternElements), where, hints);
+	}
+
+	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
+		List<PatternElement> patternElements) {
+		if (callbacks.isEmpty()) {
+			return patternElements;
+		}
+
+		@SuppressWarnings("squid:S4276") // The function is needed due to the assigment below
+		var transformer = Function.<PatternElement>identity();
+		for (UnaryOperator<PatternElement> callback : callbacks) {
+			transformer = transformer.andThen(callback);
+		}
+		return patternElements.stream().map(transformer).collect(Collectors.toList());
 	}
 
 	@Override
@@ -273,7 +292,9 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Clause createClause(InputPosition p, List<PatternElement> patternElements) {
-		return Clauses.create(patternElements);
+
+		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_CREATE, List.of());
+		return Clauses.create(transformIfPossible(callbacks, patternElements));
 	}
 
 	@Override
