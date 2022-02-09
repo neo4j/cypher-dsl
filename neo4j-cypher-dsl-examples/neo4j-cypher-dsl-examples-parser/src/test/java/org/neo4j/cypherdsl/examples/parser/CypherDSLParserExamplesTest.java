@@ -40,11 +40,13 @@ import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.PatternElement;
+import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Return;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
-// tag::main-entry-point[]
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 import org.neo4j.cypherdsl.parser.CypherParser;
-// end::main-entry-point[]
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.Options;
 import org.neo4j.cypherdsl.parser.PatternElementCreatedEventType;
@@ -176,6 +178,44 @@ class CypherDSLParserExamplesTest {
 		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
 		assertThat(labelsOnNodesCreated.labelsSeen).containsExactly("Person");
 		assertThat(labelsOnNodesMatched.labelsSeen).containsExactly("Bazbar");
+	}
+
+	@Test
+	void rewriteQuery() {
+
+		var cypher = "MATCH (n:Phone)-[:CALLED]->(o:Phone) RETURN *";
+
+		class LabelCollector implements UnaryOperator<PatternElement> {
+
+			@Override
+			public PatternElement apply(PatternElement patternElement) {
+
+				if (patternElement instanceof Relationship) {
+					Relationship relationship = (Relationship) patternElement;
+					if (relationship.getDetails().getTypes().getValues().contains("CALLED")) {
+
+						var call = Cypher.node("Call").named("c");
+						var left = relationship.getLeft();
+						var right = relationship.getRight();
+						return left.relationshipTo(call, "CALL").relationshipFrom(right, "CALL");
+					}
+				}
+				return patternElement;
+			}
+		}
+
+		var labelsOnNodesCreated = new LabelCollector();
+		var labelsOnNodesMatched = new LabelCollector();
+
+		var options = Options.newOptions()
+			.withCallback(PatternElementCreatedEventType.ON_CREATE, labelsOnNodesCreated)
+			.withCallback(PatternElementCreatedEventType.ON_MATCH, labelsOnNodesMatched)
+			.build();
+		var statement = CypherParser.parse(cypher, options);
+		var rewritten = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
+		assertThat(rewritten).isEqualTo(
+			"MATCH (n:Phone)-[:CALL]->(c:Call)<-[:CALL]-(o:Phone)\n"
+			+ "RETURN *");
 	}
 
 	@Test // GH-299

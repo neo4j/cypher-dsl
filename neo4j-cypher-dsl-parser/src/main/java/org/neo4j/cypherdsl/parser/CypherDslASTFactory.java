@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
@@ -261,7 +262,9 @@ final class CypherDslASTFactory implements
 		for (UnaryOperator<PatternElement> callback : callbacks) {
 			transformer = transformer.andThen(callback);
 		}
-		return patternElements.stream().map(transformer).collect(Collectors.toList());
+		return patternElements.stream().map(transformer)
+			.filter(Objects::nonNull)
+			.collect(Collectors.toList());
 	}
 
 	@Override
