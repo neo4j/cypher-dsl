@@ -3864,13 +3864,43 @@ the wrapper downloads the appropriate Maven version automatically.</p>
 </div>
 </div>
 <div class="sect3">
+<h4 id="fastbuild"><a class="anchor" href="#fastbuild"></a>Fast build</h4>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+This is useful if you want to just have an install of a snapshot version. No tests are run, no verification is done.
+</td>
+</tr>
+</table>
+</div>
+<div id="build-default-bash" class="listingblock">
+<div class="title">Listing 42. Fast build (only compiling and producing packages)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">$  ./mvnw -Dfast package</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>For a local install - maybe to try out a future release - you can also specify the version number:</p>
+</div>
+<div id="build-default-bash" class="listingblock">
+<div class="title">Listing 43. Fast build (locally installed, with an artificial version number)</div>
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">$  ./mvnw -Dfast package</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="fullbuildincludingexamplesandnativetests"><a class="anchor" href="#fullbuildincludingexamplesandnativetests"></a>Full build (including examples and native tests)</h4>
 <div class="paragraph">
 <p>Before you proceed, verify your locally installed JDK version.
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 42. Verify your JDK</div>
+<div class="title">Listing 44. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;11.0.10&quot; 2021-01-19
@@ -3882,7 +3912,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixe
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 43. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 45. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability           Origin
@@ -3899,7 +3929,7 @@ native-image             21.0.0              Native Image                  Early
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 44. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 46. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -3908,7 +3938,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 45. Build with default settings on Windows</div>
+<div class="title">Listing 47. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -3920,7 +3950,7 @@ native-image             21.0.0              Native Image                  Early
 <p>On a plain JDK 11 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 46. Skipping native tests</div>
+<div class="title">Listing 48. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -3932,7 +3962,7 @@ native-image             21.0.0              Native Image                  Early
 <p>The core module can be build on plain JDK 11 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 47. Build only the core module</div>
+<div class="title">Listing 49. Build only the core module</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -3945,7 +3975,7 @@ native-image             21.0.0              Native Image                  Early
 If you need to create a specific version you can specify the revision, the changelist and an optional hash like this:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 48. Specifying revision and changelist</div>
+<div class="title">Listing 50. Specifying revision and changelist</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT</code></pre>
 </div>
@@ -4026,7 +4056,7 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
-<div class="title">Listing 49. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 51. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH
   (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
@@ -4047,7 +4077,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
-<div class="title">Listing 50. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 52. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (p)-[:DECLARES]-&gt;(c)
@@ -4059,7 +4089,7 @@ RETURN p.fqn, c.name</code></pre>
 <p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
 </div>
 <div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 51. Define which Java artifacts are part of internal or public API</div>
+<div class="title">Listing 53. Define which Java artifacts are part of internal or public API</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
       (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
@@ -4084,7 +4114,7 @@ we want to make sure that no-one can coincidentally inherit from internal classe
 package visibility:</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 52. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 54. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 WHERE c.visibility = 'public'
@@ -4116,7 +4146,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 53. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 55. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
@@ -4134,7 +4164,7 @@ RETURN t, t2</code></pre>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 54. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 56. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
 MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
@@ -4148,7 +4178,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 55. Public internal API goes into a dedicated package</div>
+<div class="title">Listing 57. Public internal API goes into a dedicated package</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
 MATCH (p:Package) - [:CONTAINS] -&gt; (c)
@@ -5691,7 +5721,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-02-09 10:54:16 UTC
+Last updated 2022-02-09 11:22:40 UTC
 </div>
 </div>
 </body>
