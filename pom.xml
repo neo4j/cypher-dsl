@@ -441,6 +441,7 @@
 						<release>${java.version}</release>
 						<compilerArgs>
 							<arg>-Xlint:all,-options,-path</arg>
+							<arg>-Werror</arg>
 						</compilerArgs>
 					</configuration>
 				</plugin>

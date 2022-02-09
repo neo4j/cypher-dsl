@@ -381,7 +381,8 @@ final class CypherDslASTFactory implements
 			}
 		}
 
-		return Clauses.merge(List.of(patternElement), mergeActions);
+		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MERGE, List.of());
+		return Clauses.merge(transformIfPossible(callbacks, List.of(patternElement)), mergeActions);
 	}
 
 	@Override

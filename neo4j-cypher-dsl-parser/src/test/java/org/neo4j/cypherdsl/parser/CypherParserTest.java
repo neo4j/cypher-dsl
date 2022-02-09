@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -291,29 +292,34 @@ class CypherParserTest {
 		assertThat(statement.getCypher()).isEqualTo("RETURN 1 AS foo");
 	}
 
-	@Test // GH-299
-	void patternElementCallBacksShouldBeApplied() {
+	@ParameterizedTest
+	@ValueSource(strings = { "CREATE", "MERGE", "MATCH" })
+	void patternElementCallBacksShouldBeApplied(String clause) {
 
-		var builder = Options.newOptions()
-			.withCallback(PatternElementCreatedEventType.ON_CREATE, patternElement -> {
-				if (patternElement instanceof Node) {
-					var existing = ((Node) patternElement).getLabels().get(0).getValue();
-					return Cypher.node(existing, "FirstLabelAdded");
-				}
-				return patternElement;
-			})
-			.withCallback(PatternElementCreatedEventType.ON_CREATE, patternElement -> {
-				if (patternElement instanceof Node) {
-					var l1 = ((Node) patternElement).getLabels().get(0).getValue();
-					var l2 = ((Node) patternElement).getLabels().get(1).getValue();
-					return Cypher.node(l1, l2, "SecondLabelAdded");
-				}
-				return patternElement;
-			});
+		var builder = Options.newOptions();
+		EnumSet.allOf(PatternElementCreatedEventType.class)
+			.forEach(et ->
+				builder.withCallback(et, patternElement -> {
+						if (patternElement instanceof Node) {
+							var existing = ((Node) patternElement).getLabels().get(0).getValue();
+							return Cypher.node(existing, "FirstLabelAdded");
+						}
+						return patternElement;
+					})
+					.withCallback(et, patternElement -> {
+						if (patternElement instanceof Node) {
+							var l1 = ((Node) patternElement).getLabels().get(0).getValue();
+							var l2 = ((Node) patternElement).getLabels().get(1).getValue();
+							return Cypher.node(l1, l2, "SecondLabelAdded");
+						}
+						return patternElement;
+					})
+			);
 
 		var options = builder.build();
-		var statement = CypherParser.parseStatement("CREATE (n:Movie) RETURN n", options);
-		assertThat(statement.getCypher()).isEqualTo("CREATE (:`Movie`:`FirstLabelAdded`:`SecondLabelAdded`) RETURN n");
+		var statement = CypherParser.parseStatement(clause + " (n:Movie) RETURN n", options);
+		assertThat(statement.getCypher()).isEqualTo(
+			clause + " (:`Movie`:`FirstLabelAdded`:`SecondLabelAdded`) RETURN n");
 	}
 
 	@Test

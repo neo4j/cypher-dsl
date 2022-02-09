@@ -32,11 +32,15 @@ import org.apiguardian.api.API;
 public enum PatternElementCreatedEventType {
 
 	/**
-	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is create during the creation of a {@code MATCH} clause.
+	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of a {@code MATCH} clause.
 	 */
 	ON_MATCH,
 	/**
-	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is create during the creation of a {@code CREATE} clause.
+	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of a {@code CREATE} clause.
 	 */
-	ON_CREATE
+	ON_CREATE,
+	/**
+	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of a {@code MERGE} clause.
+	 */
+	ON_MERGE,
 }
