@@ -450,12 +450,10 @@
 					<artifactId>maven-javadoc-plugin</artifactId>
 					<version>${maven-javadoc-plugin.version}</version>
 					<configuration>
+						<quiet>true</quiet>
 						<detectOfflineLinks>false</detectOfflineLinks>
 						<detectJavaApiLink>true</detectJavaApiLink>
-						<release>8</release>
-						<additionalOptions>
-							<additionalOption>--release ${java.version}</additionalOption>
-						</additionalOptions>
+						<release>${java.version}</release>
 						<tags>
 							<tag>
 								<name>soundtrack</name>
