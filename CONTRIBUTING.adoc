@@ -39,6 +39,27 @@ The build requires a local copy of the project:
 $ git clone git@github.com:neo4j-contrib/cypher-dsl.git
 ----
 
+=== Fast build
+
+NOTE: This is useful if you want to just have an install of a snapshot version. No tests are run, no verification is done.
+
+[source,console,subs="verbatim,attributes"]
+[[build-default-bash]]
+.Fast build (only compiling and producing packages)
+----
+$ ./mvnw -Dfast package
+----
+
+For a local install - maybe to try out a future release - you can also specify the version number:
+
+[source,console,subs="verbatim,attributes"]
+[[build-default-bash]]
+.Fast build (locally installed, with an artificial version number)
+----
+$ ./mvnw -Dfast -Drevision=1337 -Dchangelist= install
+----
+
+
 === Full build (including examples and native tests)
 
 Before you proceed, verify your locally installed JDK version.
