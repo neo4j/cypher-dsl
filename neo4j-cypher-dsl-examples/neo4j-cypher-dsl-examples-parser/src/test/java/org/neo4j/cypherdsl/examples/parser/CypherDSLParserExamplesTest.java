@@ -24,9 +24,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -36,14 +38,16 @@ import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.PatternElement;
+import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Return;
-import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 import org.neo4j.cypherdsl.parser.CypherParser;
@@ -101,7 +105,7 @@ class CypherDSLParserExamplesTest {
 			public Operation apply(Expression expression) {
 				Operation op = (Operation) expression;
 				op.accept(segment -> {
-					if(segment instanceof NodeLabel) {
+					if (segment instanceof NodeLabel) {
 						labelsSeen.add(((NodeLabel) segment).getValue());
 					}
 				});
@@ -113,7 +117,7 @@ class CypherDSLParserExamplesTest {
 		var labelsRemoved = new LabelCollector();
 
 		var options = Options.newOptions()
-			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS,  Operation.class, labelsAdded)
+			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS, Operation.class, labelsAdded)
 			.withCallback(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operation.class, labelsRemoved)
 
 			.build();
@@ -156,11 +160,11 @@ class CypherDSLParserExamplesTest {
 
 		class LabelCollector implements UnaryOperator<PatternElement> {
 
-			Set<String> labelsSeen = new HashSet<>();
+			final Set<String> labelsSeen = new HashSet<>();
 
 			@Override
 			public PatternElement apply(PatternElement patternElement) {
-				if(patternElement instanceof Node) {
+				if (patternElement instanceof Node) {
 					((Node) patternElement).getLabels().forEach(l -> labelsSeen.add(l.getValue()));
 				}
 				return patternElement;
@@ -231,7 +235,7 @@ class CypherDSLParserExamplesTest {
 			public Operation apply(Expression expression) {
 				Operation op = (Operation) expression;
 				op.accept(segment -> {
-					if(segment instanceof NodeLabel) {
+					if (segment instanceof NodeLabel) {
 						labelsSeen.add(((NodeLabel) segment).getValue());
 					}
 				});
@@ -243,7 +247,7 @@ class CypherDSLParserExamplesTest {
 
 			@Override
 			public PatternElement apply(PatternElement patternElement) {
-				if(patternElement instanceof Node) {
+				if (patternElement instanceof Node) {
 					((Node) patternElement).getLabels().forEach(l -> labelsSeen.add(l.getValue()));
 				}
 				return patternElement;
@@ -254,7 +258,7 @@ class CypherDSLParserExamplesTest {
 		var labelsInsidePatterns = new LabelsInsidePatterns();
 
 		var options = Options.newOptions()
-			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS,  Operation.class, labelsInsideExpressions)
+			.withCallback(ExpressionCreatedEventType.ON_SET_LABELS, Operation.class, labelsInsideExpressions)
 			.withCallback(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operation.class, labelsInsideExpressions)
 			.withCallback(PatternElementCreatedEventType.ON_CREATE, labelsInsidePatterns)
 			.withCallback(PatternElementCreatedEventType.ON_MATCH, labelsInsidePatterns)
@@ -262,6 +266,101 @@ class CypherDSLParserExamplesTest {
 
 		assertThatNoException().isThrownBy(() -> CypherParser.parse(cypher, options));
 		assertThat(labelsSeen).containsExactlyInAnyOrder("Foo", "Bar", "Bazbar", "Person");
+	}
+
+	@Test // GH-302
+	void trackChangedPropertiesToNodes() {
+
+		var nodes = new HashMap<String, Node>();
+		UnaryOperator<PatternElement> nodesCollector = patternElement -> {
+			patternElement.accept(segment -> {
+				if (segment instanceof Node) {
+					Node node = (Node) segment;
+					node.getSymbolicName().map(SymbolicName::getValue).ifPresent(n -> nodes.put(n, node));
+				}
+			});
+			return patternElement;
+		};
+
+		class PropertyRecord {
+			String reference;
+			String name;
+		}
+
+		var removedProperties = new HashSet<PropertyRecord>();
+		Function<Expression, Expression> removedPropertiesCollector = expression -> {
+			var property = (Property) expression;
+			property.accept(segment -> {
+				if (segment instanceof SymbolicName) {
+					var value = ((SymbolicName) segment).getValue();
+					if (nodes.containsKey(value)) {
+						var propertyRecord = new PropertyRecord();
+						propertyRecord.reference = ((SymbolicName) segment).getValue();
+						propertyRecord.name = property.getName();
+						removedProperties.add(propertyRecord);
+					}
+				}
+			});
+			return expression;
+		};
+
+		var setProperties = new HashSet<PropertyRecord>();
+		Function<Expression, Operation> setPropertiesCollector = expression -> {
+			var op = (Operation) expression;
+			var property = new AtomicReference<String>();
+			var name = new AtomicReference<String>();
+			op.accept(segment -> {
+				if (segment instanceof SymbolicName) {
+					// First symbolic name will be the property reference
+					var value = ((SymbolicName) segment).getValue();
+					if (!property.compareAndSet(null, value)) {
+						// Second will be the name
+						name.compareAndSet(null, value);
+					}
+				}
+			});
+			if (nodes.containsKey(property.get())) {
+				var propertyRecord = new PropertyRecord();
+				propertyRecord.reference = property.get();
+				propertyRecord.name = name.get();
+				setProperties.add(propertyRecord);
+			}
+			return op;
+		};
+
+		var options = Options.newOptions()
+			.withCallback(PatternElementCreatedEventType.ON_CREATE, nodesCollector)
+			.withCallback(PatternElementCreatedEventType.ON_MATCH, nodesCollector)
+			.withCallback(ExpressionCreatedEventType.ON_REMOVE_PROPERTY, Expression.class, removedPropertiesCollector)
+			.withCallback(ExpressionCreatedEventType.ON_SET_PROPERTY, Operation.class, setPropertiesCollector)
+			.build();
+
+		CypherParser.parse("MATCH (c:Person {uuid: $uuid})-[:WORKS_AT]->(p:Company) REMOVE c.name SET c.thing = 1",
+			options);
+		assertThat(removedProperties).hasSize(1)
+			.first()
+			.satisfies(p -> {
+				assertThat(p.name).isEqualTo("name");
+				assertThat(p.reference).isEqualTo("c");
+			});
+		assertThat(setProperties).hasSize(1)
+			.first()
+			.satisfies(p -> {
+				assertThat(p.name).isEqualTo("thing");
+				assertThat(p.reference).isEqualTo("c");
+			});
+		assertThat(nodes).containsKey("c")
+			.hasEntrySatisfying("c", n -> {
+				var selectingProperty = new AtomicReference<String>();
+				Visitor propExtractor = segment -> {
+					if (segment instanceof KeyValueMapEntry) {
+						var entry = (KeyValueMapEntry) segment;
+						selectingProperty.compareAndSet(null, entry.getKey());
+					}
+				};
+				n.accept(propExtractor);
+				assertThat(selectingProperty).hasValue("uuid");
+			});
 	}
 
 	@Test
