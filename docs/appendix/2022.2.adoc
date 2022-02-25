@@ -1,0 +1,37 @@
+== 2022.2
+
+=== 2022.2.0
+
+*No breaking changes*. The minor version has been incremented to notify about a couple of new methods in the parser module, allowing for more and different types of parsing events to be emitted.
+
+Thanks to @ikwattro for his input and feedback in this release.
+
+==== 🚀 Features
+
+* Emit pattern created event on merge clauses.
+* Add callbacks for a "pattern element created event". (#303)
+
+==== 📝 Documentation
+
+* Add an example how to track changed properties to nodes.
+* Add rewrite example.
+* Add examples how to extract modified labels for the Cypher parser.
+
+==== 🛠 Build
+
+* Fix surefire settings.
+* Add a 'fast' profile.
+* Reorder module-info.java creation before shading so that javadoc wont fail on vanilla JDK.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump maven-site-plugin from 3.10.0 to 3.11.0 (#311)
+** Bump native-maven-plugin from 0.9.9 to 0.9.10 (#310)
+** Bump maven-pmd-plugin from 3.15.0 to 3.16.0 (#309)
+** Bump spring-data-neo4j from 6.2.1 to 6.2.2 (#308)
+** Bump reactor-bom from 2020.0.15 to 2020.0.16 (#307)
+** Bump slf4j.version from 1.7.35 to 1.7.36 (#306)
+** Bump maven-javadoc-plugin from 3.3.1 to 3.3.2 (#305)
+** Bump neo4j-cypher-javacc-parser from 4.4.3 to 4.4.4 (#304)
+** Bump checker-qual from 3.21.1 to 3.21.2 (#298)
