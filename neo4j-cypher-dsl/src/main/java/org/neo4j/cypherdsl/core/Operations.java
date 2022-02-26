@@ -37,7 +37,8 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class Operations {
 
 	private static final java.util.Set<Class<? extends Expression>> VALID_MUTATORS =
-		Collections.unmodifiableSet(new HashSet<>(Arrays.asList(MapExpression.class, Parameter.class)));
+		Collections.unmodifiableSet(new HashSet<>(Arrays.asList(MapExpression.class, Parameter.class, MapProjection.class, SymbolicName.class,
+				FunctionInvocation.class)));
 
 	/**
 	 * Creates an unary minus operation.

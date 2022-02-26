@@ -2059,6 +2059,51 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("CREATE (u:`User`) SET u += {e: 'F'} RETURN u");
 		}
+
+
+		@Test
+		void mergeMutateWithMapProjection() {
+			Statement statement;
+			SymbolicName map = Cypher.name("map");
+
+			statement =
+				Cypher.with(Cypher.mapOf("p", Cypher.literalOf("Hello, Welt"), "i", Cypher.literalOf(1)).as(map))
+					.merge(userNode)
+					.mutate(userNode, map.project(Cypher.asterisk()))
+					.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"WITH {p: 'Hello, Welt', i: 1} AS map MERGE (u:`User`) SET u += map{.*}");
+		}
+
+		@Test
+		void mergeMutateWithSymbolicName() {
+			Statement statement;
+			SymbolicName map = Cypher.name("map");
+
+			statement =
+				Cypher.with(Cypher.mapOf("p", Cypher.literalOf("Hello, Welt"), "i", Cypher.literalOf(1)).as(map))
+					.merge(userNode)
+					.mutate(userNode, map)
+					.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"WITH {p: 'Hello, Welt', i: 1} AS map MERGE (u:`User`) SET u += map");
+		}
+		
+		@Test
+		void mergeMutateWithFunctionCall() {
+			Statement statement;
+			statement = Cypher.merge(userNode)
+				.mutate(userNode, Cypher.call("returns.map").asFunction())
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"MERGE (u:`User`) SET u += returns.map()");
+		}
 	}
 
 	@Nested
