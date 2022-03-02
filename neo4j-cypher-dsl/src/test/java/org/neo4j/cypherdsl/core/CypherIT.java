@@ -2092,7 +2092,7 @@ class CypherIT {
 				.isEqualTo(
 					"WITH {p: 'Hello, Welt', i: 1} AS map MERGE (u:`User`) SET u += map");
 		}
-		
+
 		@Test
 		void mergeMutateWithFunctionCall() {
 			Statement statement;
