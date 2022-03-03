@@ -2981,7 +2981,7 @@ class CypherIT {
 				Clauses.merge(Arrays.asList(n), Arrays.asList(
 					MergeAction.of(
 						MergeAction.Type.ON_CREATE,
-						(Set)Clauses.set(Arrays.asList(Cypher.name("n").property("prop").to(Cypher.literalOf(1))))
+						(Set) Clauses.set(Arrays.asList(Cypher.name("n").property("prop").to(Cypher.literalOf(1))))
 					)
 				)))
 			);
@@ -3001,7 +3001,7 @@ class CypherIT {
 					Clauses.merge(Arrays.asList(n), Arrays.asList(
 						MergeAction.of(
 							MergeAction.Type.ON_CREATE,
-							(Set)Clauses.set(Arrays.asList(Cypher.name("n").property("prop").to(Cypher.literalOf(1))))
+							(Set) Clauses.set(Arrays.asList(Cypher.name("n").property("prop").to(Cypher.literalOf(1))))
 						)
 					)))
 				)
