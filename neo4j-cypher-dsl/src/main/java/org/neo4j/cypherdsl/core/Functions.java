@@ -1867,6 +1867,16 @@ public final class Functions {
 		return FunctionInvocation.create(() -> "file");
 	}
 
+	/**
+	 * Creates a function invocation for {@code randomUUID({})}. Only applicable inside an {@code LOAD CSV} clause.
+	 *
+	 * @return A function call for {@code randomUUID({})}.
+	 * @since 2022.2.1
+	 */
+	public static FunctionInvocation randomUUID() {
+		return FunctionInvocation.create(() -> "randomUUID");
+	}
+
 	private Functions() {
 	}
 }
