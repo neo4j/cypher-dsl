@@ -30,6 +30,10 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
+import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.Functions;
+import org.neo4j.cypherdsl.examples.sdn6.movies.GenreRepository;
+import org.neo4j.cypherdsl.examples.sdn6.movies.Genre_;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Movie;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Person;
 import org.neo4j.cypherdsl.examples.sdn6.movies.PersonDetails;
@@ -202,5 +206,22 @@ class ApplicationIT {
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(2);
+	}
+
+	@Test // GH-315
+	void usingCypherDSLExecutor(@Autowired GenreRepository genreRepository) {
+
+		var genreModel = Genre_.GENRE
+			.withProperties(Genre_.GENRE.NAME, Cypher.literalOf("Comedy"));
+		var byStatment = Cypher.merge(genreModel)
+			.onCreate()
+			.set(genreModel.ID.to(Functions.randomUUID()))
+			.returning(genreModel)
+			.build();
+		var newGenre = genreRepository.findOne(byStatment);
+		assertThat(newGenre).hasValueSatisfying(genre -> {
+			assertThat(genre.getId()).isNotNull();
+			assertThat(genre.getName()).isEqualTo("Comedy");
+		});
 	}
 }
