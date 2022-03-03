@@ -133,7 +133,7 @@ class SDN6AnnotationProcessorTest {
 	}
 
 	@CsvSource({
-		"ids, 'InternalGeneratedId, InternalGeneratedIdWithSpringId, ExternalGeneratedId',",
+		"ids, 'InternalGeneratedId, InternalGeneratedIdWithSpringId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
 		"simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
 		"labels, 'LabelOnNode1, LabelOnNode2, LabelOnNode3, MultipleLabels1, MultipleLabels2, MultipleLabels3', nodeswithdifferentlabelannotations",
 		"same_properties_for_rel_type, 'Person, Movie, Play, ActedIn', ",

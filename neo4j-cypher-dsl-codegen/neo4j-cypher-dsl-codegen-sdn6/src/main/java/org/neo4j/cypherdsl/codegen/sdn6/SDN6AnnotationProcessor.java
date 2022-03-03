@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -106,6 +107,8 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 	static final String NODE_ANNOTATION = "org.springframework.data.neo4j.core.schema.Node";
 	static final String RELATIONSHIP_PROPERTIES_ANNOTATION = "org.springframework.data.neo4j.core.schema.RelationshipProperties";
 	static final String PROPERTY_CUSTOM_CONVERTER_CLASSES = "org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes";
+	static final Set<String> VALID_GENERATED_ID_TYPES = Collections.unmodifiableSet(
+		new HashSet<>(Arrays.asList(Long.class.getName(), long.class.getName())));
 
 	// Resources
 	// * http://hannesdorfmann.com/annotation-processing/annotationprocessing101/
@@ -780,7 +783,8 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			}
 
 			// The defaults will not be materialized
-			return name == null || "org.springframework.data.neo4j.core.schema.GeneratedValue.InternalIdGenerator".equals(name);
+			return (name == null || "org.springframework.data.neo4j.core.schema.GeneratedValue.InternalIdGenerator".equals(name))
+				&& VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
 		}
 
 		/**
