@@ -761,7 +761,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(Foreach foreach) {
 
-		builder.setCharAt(builder.length() - 1, ')');
+		builder.setCharAt(builder.length() - 1, ')'); // replace trailing space with ')'
+		builder.append(" ");
 	}
 
 	void enter(ExistentialSubquery subquery) {
