@@ -2972,6 +2972,49 @@ class CypherIT {
 	}
 
 	@Nested
+	class ForeachClause {
+		@Test
+		void shouldRenderForeach() {
+			Node n = Cypher.anyNode("n");
+
+			Clause clause = Clauses.forEach(Cypher.name("a"), Cypher.listOf(), Arrays.asList(
+				Clauses.merge(Arrays.asList(n), Arrays.asList(
+					MergeAction.of(
+						MergeAction.Type.ON_CREATE,
+						(Set) Clauses.set(Arrays.asList(Cypher.name("n").property("prop").to(Cypher.literalOf(1))))
+					)
+				)))
+			);
+
+			assertThat(cypherRenderer.render(Statement.of(Arrays.asList(clause))))
+				.isEqualTo(
+					"FOREACH (a IN [] | MERGE (n) ON CREATE SET n.prop = 1)");
+
+		}
+
+		@Test
+		void shouldRenderNestedForeach() {
+			Node n = Cypher.anyNode("n");
+
+			Clause clause = Clauses.forEach(Cypher.name("a"), Cypher.listOf(), Arrays.asList(
+				Clauses.forEach(Cypher.name("a"), Cypher.listOf(), Arrays.asList(
+					Clauses.merge(Arrays.asList(n), Arrays.asList(
+						MergeAction.of(
+							MergeAction.Type.ON_CREATE,
+							(Set) Clauses.set(Arrays.asList(Cypher.name("n").property("prop").to(Cypher.literalOf(1))))
+						)
+					)))
+				)
+			));
+
+			assertThat(cypherRenderer.render(Statement.of(Arrays.asList(clause))))
+				.isEqualTo(
+					"FOREACH (a IN [] | FOREACH (a IN [] | MERGE (n) ON CREATE SET n.prop = 1))");
+
+		}
+	}
+
+	@Nested
 	class Expressions {
 		@Test
 		void shouldRenderParameters() {
