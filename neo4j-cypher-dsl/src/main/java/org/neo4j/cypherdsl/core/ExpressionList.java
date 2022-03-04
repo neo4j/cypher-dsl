@@ -46,4 +46,8 @@ class ExpressionList extends TypedSubtree<Expression> {
 	protected Visitable prepareVisit(Expression child) {
 		return Expressions.nameOrExpression(child);
 	}
+
+	boolean isEmpty() {
+		return super.children.isEmpty();
+	}
 }

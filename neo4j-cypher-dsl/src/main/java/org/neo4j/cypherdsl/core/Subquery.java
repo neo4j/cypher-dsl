@@ -86,14 +86,14 @@ public final class Subquery implements Clause {
 				})
 				.collect(Collectors.toList()));
 
-			optionalImports = new With(false, returnItems, null, null, null, null);
+			optionalImports = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
 
 			returnItems = new ExpressionList(Arrays.stream(imports)
 				.filter(AliasedExpression.class::isInstance)
 				.map(AliasedExpression.class::cast)
 				.collect(Collectors.toList()));
 
-			optionalRenames = new With(false, returnItems, null, null, null, null);
+			optionalRenames = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
 		}
 
 		return new Subquery(optionalImports, optionalRenames, statement);

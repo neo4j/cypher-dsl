@@ -971,4 +971,54 @@ class IssueRelatedIT {
 		assertThat(query.getCypher()).isEqualTo(
 			"MATCH (d:`Department`) RETURN d{.*, firstname: [(d)-->(u:`User`) | u.firstname], lastname: [(d)-->(u:`User`) | u.lastname]}");
 	}
+
+	@Test // GH-319
+	void communitySite20220304() {
+
+		SymbolicName nodes = Cypher.name("nodes");
+		SymbolicName relations = Cypher.name("relations");
+		SymbolicName second_nodes = Cypher.name("second_nodes");
+		SymbolicName second_relations = Cypher.name("second_relations");
+
+		NamedPath first_path = Cypher.path("p")
+			.definedBy(
+				Cypher.node("lookingType").relationshipFrom(Cypher.anyNode(), "specifiedRelation")
+			);
+		NamedPath second_path = Cypher.path("second_p")
+			.definedBy(
+				Cypher.anyNode("n")
+					.relationshipTo(Cypher.anyNode().named(second_nodes), "otherRelation")
+					.named(second_relations)
+			);
+
+		Statement inner = Cypher.unwind(nodes).as("n").with("n")
+				.match(second_path)
+				.returning(second_nodes, second_relations)
+				.build();
+
+		Statement completeStatement =
+			Cypher
+				.match(first_path)
+				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
+				.call(inner, nodes)
+				.returning(nodes, relations, Functions.collect(second_nodes), Functions.collect(second_relations))
+			.build();
+
+		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		String cypher = renderer
+				.render(completeStatement);
+
+		String expected = ""
+			+ "MATCH p = (:lookingType)<-[:specifiedRelation]-()\n"
+			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
+			+ "CALL {\n"
+			+ "  WITH nodes\n"
+			+ "  UNWIND nodes AS n\n"
+			+ "  WITH n\n"
+			+ "  MATCH second_p = (n)-[second_relations:otherRelation]->(second_nodes)\n"
+			+ "  RETURN second_nodes, second_relations\n"
+			+ "}\n"
+			+ "RETURN nodes, relations, collect(second_nodes), collect(second_relations)";
+		assertThat(cypher).isEqualTo(expected);
+	}
 }
