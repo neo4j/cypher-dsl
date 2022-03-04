@@ -1068,7 +1068,7 @@ class IssueRelatedIT {
 			Cypher
 				.match(first_path)
 				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
-				.call(Cypher.returning(Cypher.name("x")).build())
+				.call(Cypher.returning(Cypher.literalOf(1)).build())
 				.returning(Cypher.literalTrue())
 				.build();
 
@@ -1078,9 +1078,9 @@ class IssueRelatedIT {
 			+ "MATCH p = (:Target)<-[:REL]-()\n"
 			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
 			+ "CALL {\n"
-			+ "  RETURN true\n"
+			+ "  RETURN 1\n"
 			+ "}\n"
-			+ "RETURN *";
+			+ "RETURN true";
 		assertThat(cypher).isEqualTo(expected);
 	}
 }
