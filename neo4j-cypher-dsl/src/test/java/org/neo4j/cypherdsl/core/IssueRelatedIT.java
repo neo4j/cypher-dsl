@@ -1005,9 +1005,7 @@ class IssueRelatedIT {
 			.build();
 
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
-		String cypher = renderer
-				.render(completeStatement);
-
+		String cypher = renderer.render(completeStatement);
 		String expected = ""
 			+ "MATCH p = (:lookingType)<-[:specifiedRelation]-()\n"
 			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
@@ -1019,6 +1017,70 @@ class IssueRelatedIT {
 			+ "  RETURN second_nodes, second_relations\n"
 			+ "}\n"
 			+ "RETURN nodes, relations, collect(second_nodes), collect(second_relations)";
+		assertThat(cypher).isEqualTo(expected);
+	}
+
+	@Test // GH-319
+	void subqueryWithRename() {
+
+		SymbolicName nodes = Cypher.name("nodes");
+		SymbolicName relations = Cypher.name("relations");
+
+		NamedPath first_path = Cypher.path("p")
+			.definedBy(
+				Cypher.node("Target").relationshipFrom(Cypher.anyNode(), "REL")
+			);
+
+		Statement completeStatement =
+			Cypher
+				.match(first_path)
+				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
+				.call(Cypher.returning(Cypher.name("x")).build(), nodes.as("x"))
+				.returning(Cypher.asterisk())
+				.build();
+
+		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		String cypher = renderer.render(completeStatement);
+		String expected = ""
+						  + "MATCH p = (:Target)<-[:REL]-()\n"
+						  + "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
+						  + "CALL {\n"
+						  + "  WITH nodes\n"
+						  + "  WITH nodes AS x\n"
+						  + "  RETURN x\n"
+						  + "}\n"
+						  + "RETURN *";
+		assertThat(cypher).isEqualTo(expected);
+	}
+
+	@Test // GH-319
+	void subqueryWithoutImport() {
+
+		SymbolicName nodes = Cypher.name("nodes");
+		SymbolicName relations = Cypher.name("relations");
+
+		NamedPath first_path = Cypher.path("p")
+			.definedBy(
+				Cypher.node("Target").relationshipFrom(Cypher.anyNode(), "REL")
+			);
+
+		Statement completeStatement =
+			Cypher
+				.match(first_path)
+				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
+				.call(Cypher.returning(Cypher.name("x")).build())
+				.returning(Cypher.literalTrue())
+				.build();
+
+		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		String cypher = renderer.render(completeStatement);
+		String expected = ""
+						  + "MATCH p = (:Target)<-[:REL]-()\n"
+						  + "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
+						  + "CALL {\n"
+						  + "  RETURN true\n"
+						  + "}\n"
+						  + "RETURN *";
 		assertThat(cypher).isEqualTo(expected);
 	}
 }
