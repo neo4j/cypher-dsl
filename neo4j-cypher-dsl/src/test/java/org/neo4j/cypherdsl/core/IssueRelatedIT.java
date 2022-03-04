@@ -1042,14 +1042,14 @@ class IssueRelatedIT {
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
 		String cypher = renderer.render(completeStatement);
 		String expected = ""
-						  + "MATCH p = (:Target)<-[:REL]-()\n"
-						  + "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
-						  + "CALL {\n"
-						  + "  WITH nodes\n"
-						  + "  WITH nodes AS x\n"
-						  + "  RETURN x\n"
-						  + "}\n"
-						  + "RETURN *";
+			+ "MATCH p = (:Target)<-[:REL]-()\n"
+			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
+			+ "CALL {\n"
+			+ "  WITH nodes\n"
+			+ "  WITH nodes AS x\n"
+			+ "  RETURN x\n"
+			+ "}\n"
+			+ "RETURN *";
 		assertThat(cypher).isEqualTo(expected);
 	}
 
@@ -1075,12 +1075,12 @@ class IssueRelatedIT {
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
 		String cypher = renderer.render(completeStatement);
 		String expected = ""
-						  + "MATCH p = (:Target)<-[:REL]-()\n"
-						  + "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
-						  + "CALL {\n"
-						  + "  RETURN true\n"
-						  + "}\n"
-						  + "RETURN *";
+			+ "MATCH p = (:Target)<-[:REL]-()\n"
+			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
+			+ "CALL {\n"
+			+ "  RETURN true\n"
+			+ "}\n"
+			+ "RETURN *";
 		assertThat(cypher).isEqualTo(expected);
 	}
 }
