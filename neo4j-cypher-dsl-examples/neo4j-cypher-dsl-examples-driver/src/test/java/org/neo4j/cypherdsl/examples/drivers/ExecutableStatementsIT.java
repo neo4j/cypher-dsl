@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.examples.drivers;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.awaitility.Awaitility.await;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,6 +29,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -322,11 +322,13 @@ class ExecutableStatementsIT {
 		var session = driver.asyncSession();
 
 		var futureResultSummary = statement.executeWith(session);
-		await().until(futureResultSummary::isDone);
-		assertThat(futureResultSummary).isCompletedWithValueMatching(r -> r.counters().nodesCreated() == 1);
+		assertThat(futureResultSummary)
+			.succeedsWithin(Duration.ofSeconds(3))
+			.matches(r -> r.counters().nodesCreated() == 1);
 
 		var closingSession = session.closeAsync().toCompletableFuture();
-		await().until(closingSession::isDone);
+		assertThat(closingSession)
+			.succeedsWithin(Duration.ofSeconds(3));
 	}
 
 	@Test
@@ -339,11 +341,13 @@ class ExecutableStatementsIT {
 		var session = driver.asyncSession();
 
 		var futureResultSummary = statement.fetchWith(session);
-		await().until(futureResultSummary::isDone);
-		assertThat(futureResultSummary).isCompletedWithValueMatching(r -> r.size() == 38);
+		assertThat(futureResultSummary)
+			.succeedsWithin(Duration.ofSeconds(3))
+			.matches(r -> r.size() == 38);
 
 		var closingSession = session.closeAsync().toCompletableFuture();
-		await().until(closingSession::isDone);
+		assertThat(closingSession)
+			.succeedsWithin(Duration.ofSeconds(3));
 	}
 
 	void assertMovieTitleList(List<String> movieTitles) {

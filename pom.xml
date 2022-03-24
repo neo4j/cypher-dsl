@@ -123,7 +123,6 @@
 		<asm.version>9.2</asm.version>
 		<assertj.version>3.22.0</assertj.version>
 		<auto-common.version>0.11</auto-common.version>
-		<awaitility.version>4.2.0</awaitility.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.21.3</checker-qual.version>
@@ -222,11 +221,6 @@
 						<groupId>rubygems</groupId>
 					</exclusion>
 				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.awaitility</groupId>
-				<artifactId>awaitility</artifactId>
-				<version>${awaitility.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.neo4j</groupId>
