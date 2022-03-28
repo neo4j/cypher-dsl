@@ -1,5 +1,44 @@
 == 2022.2
 
+=== 2022.2.1
+
+*No breaking changes*.
+
+==== 🚀 Features
+
+* Add randomUUID to predefined functions.
+* Support additional mutate expression types. (#312)
+
+==== 🐛 Bug Fixes
+
+* Don't create empty `WITH` clause without renames. (#320)
+* Fix rendering of nested FOREACH statements. (#318)
+* Check for field type too when computing internalId usage.
+
+==== 📝 Documentation
+
+* Add example how to merge-find things via Springs `CypherdslStatementExecutor`.
+
+==== 🧹 Housekeeping
+
+* Remove Awaitility test-dependency.
+* Dependency upgrades:
+** Bump spring-data-neo4j from 6.2.2 to 6.2.3 (#332)
+** Bump neo4j-cypher-javacc-parser from 4.4.4 to 4.4.5 (#330)
+** Bump checkstyle from 10.0 to 10.1 (#329)
+** Bump jna from 5.10.0 to 5.11.0 (#331)
+** Bump spring-boot-starter-parent from 2.6.4 to 2.6.5 (#333)
+** Bump native-maven-plugin from 0.9.10 to 0.9.11 (#334)
+** Bump neo4j-java-driver from 4.4.3 to 4.4.5 (#328)
+** Bump reactor-bom from 2020.0.16 to 2020.0.17 (#327)
+** Bump mockito.version from 4.3.1 to 4.4.0 (#325)
+** Bump checkstyle from 9.3 to 10.0 (#323)
+** Bump guava from 31.0.1-jre to 31.1-jre (#324)
+** Bump checker-qual from 3.21.2 to 3.21.3 (#322)
+** Bump awaitility from 4.1.1 to 4.2.0 (#321)
+** Bump japicmp-maven-plugin from 0.15.6 to 0.15.7 (#313)
+** Bump spring-boot-starter-parent from 2.6.3 to 2.6.4 (#314)
+
 === 2022.2.0
 
 *No breaking changes*. The minor version has been incremented to notify about a couple of new methods in the parser module, allowing for more and different types of parsing events to be emitted.
