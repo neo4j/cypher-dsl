@@ -142,6 +142,7 @@
 		<java.version>8</java.version>
 		<javapoet.version>1.13.0</javapoet.version>
 		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
+		<jaxb.version>2.3.1</jaxb.version>
 		<jetbrains-annotations.version>23.0.0</jetbrains-annotations.version>
 		<jqassistant-dashboard-plugin.version>1.10.0</jqassistant-dashboard-plugin.version>
 		<jqassistant.plugin.git.version>1.8.0</jqassistant.plugin.git.version>
@@ -178,7 +179,7 @@
 		<slf4j.version>1.7.36</slf4j.version>
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
-		<spring-data-neo4j.version>6.2.2</spring-data-neo4j.version>
+		<spring-data-neo4j.version>6.2.3</spring-data-neo4j.version>
 	</properties>
 
 	<dependencyManagement>
@@ -204,6 +205,11 @@
 				<groupId>com.squareup</groupId>
 				<artifactId>javapoet</artifactId>
 				<version>${javapoet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>javax.xml.bind</groupId>
+				<artifactId>jaxb-api</artifactId>
+				<version>${jaxb.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.apiguardian</groupId>
