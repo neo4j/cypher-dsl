@@ -35,6 +35,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.lang.NonNull;
 
 import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
@@ -88,13 +89,14 @@ class SDN6AnnotationProcessorTest {
 	/**
 	 * A test converter spotting a non-default constructor, so that it cannot be instantiated
 	 */
+	@SuppressWarnings("unused")
 	static class SomeConverter implements Converter<String, String> {
 
 		SomeConverter(@SuppressWarnings("unused") boolean ignoreMe) {
 		}
 
 		@Override
-		public String convert(String source) {
+		public String convert(@NonNull String source) {
 			return new StringBuilder(source).reverse().toString();
 		}
 	}
@@ -145,7 +147,8 @@ class SDN6AnnotationProcessorTest {
 		"abstract_rels, 'Person, Movie, Directed',",
 		"primitives, 'Connector', ",
 		"enums_and_inner_classes, 'ConnectorTransport', ",
-		"related_classes_not_on_cp_like_in_reallife, 'Movie, Person', "
+		"related_classes_not_on_cp_like_in_reallife, 'Movie, Person', ",
+		"self_referential, 'Example', "
 	})
 	@ParameterizedTest
 	void validSourceFiles(String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,

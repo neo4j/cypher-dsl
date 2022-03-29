@@ -21,8 +21,6 @@ public final class Person_ extends NodeBase<Person_> {
 
 	public final Property BORN = this.property("born");
 
-	public final Follows_ FOLLOWS = new Follows_(this, Person_.PERSON);
-
 	public final Produced_ PRODUCED = new Produced_(this, Movie_.MOVIE);
 
 	public Person_() {
@@ -41,5 +39,9 @@ public final class Person_ extends NodeBase<Person_> {
 	@Override
 	public Person_ withProperties(MapExpression newProperties) {
 		return new Person_(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
+	}
+
+	public Follows_ withFollows(Person_ follows) {
+		return new Follows_(this, follows);
 	}
 }

@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -34,6 +35,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
+import org.neo4j.cypherdsl.core.utils.Strings;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -163,6 +165,14 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			.build();
 	}
 
+	private static boolean isSelfReferential(RelationshipPropertyDefinition rpd) {
+		return rpd.getStart() == rpd.getEnd();
+	}
+
+	private static boolean isNotSelfReferential(RelationshipPropertyDefinition rpd) {
+		return !isSelfReferential(rpd);
+	}
+
 	private List<FieldSpec> buildFields() {
 
 		FieldSpec defaultInstance = FieldSpec
@@ -172,11 +182,11 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 
 		Stream<FieldSpec> properties = generateFieldSpecsFromProperties();
 
-		Stream<FieldSpec> relationships = relationshipDefinitions.stream().map(p -> {
+		Stream<FieldSpec> relationships = relationshipDefinitions.stream().filter(NodeImplBuilder::isNotSelfReferential).map(p -> {
 
-			String fieldName = p.getNameInDomain() == null ? p.getType() : p.getNameInDomain();
+			String fieldName = fieldNameGenerator.generate(p.getNameInDomain() == null ? p.getType() : p.getNameInDomain());
 			ClassName relationshipClassName = extractClassName(p.getRelationshipBuilder());
-			FieldSpec.Builder builder = FieldSpec.builder(relationshipClassName, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC, Modifier.FINAL);
+			FieldSpec.Builder builder = FieldSpec.builder(relationshipClassName, fieldName, Modifier.PUBLIC, Modifier.FINAL);
 			if (this == p.getStart()) {
 				builder.initializer("new $T(this, $T.$N)", relationshipClassName, extractClassName(p.getEnd()), p.getEnd().getFieldName());
 			} else {
@@ -189,6 +199,23 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			.collect(Collectors.toList());
 	}
 
+	static String capitalize(String str) {
+
+		if (!Strings.hasText(str)) {
+			return str;
+		} else {
+			char baseChar = str.charAt(0);
+			char updatedChar = Character.toUpperCase(baseChar);
+			if (baseChar == updatedChar) {
+				return str;
+			} else {
+				char[] chars = str.toCharArray();
+				chars[0] = updatedChar;
+				return new String(chars);
+			}
+		}
+	}
+
 	@Override
 	protected JavaFile buildJavaFile() {
 
@@ -196,16 +223,33 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			throw new IllegalStateException("Cannot build NodeImpl without labels!");
 		}
 
-		TypeSpec newType = addGenerated(TypeSpec.classBuilder(className))
+		TypeSpec.Builder builder = addGenerated(TypeSpec.classBuilder(className))
 			.superclass(ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, className))
 			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 			.addFields(buildFields())
 			.addMethod(buildDefaultConstructor())
 			.addMethod(buildCopyConstructor())
 			.addMethod(buildNamedMethod())
-			.addMethod(buildWithPropertiesMethod())
+			.addMethod(buildWithPropertiesMethod());
+
+		relationshipDefinitions.stream().filter(NodeImplBuilder::isSelfReferential).map(buildSelfReferentialAccessor()).forEach(builder::addMethod);
+
+		TypeSpec newType = builder
 			.build();
 
 		return prepareFileBuilder(newType).build();
+	}
+
+	private Function<RelationshipPropertyDefinition, MethodSpec> buildSelfReferentialAccessor() {
+		return p -> {
+			ClassName relationshipClassName = extractClassName(p.getRelationshipBuilder());
+			ParameterSpec end = ParameterSpec.builder(className, p.getNameInDomain()).build();
+			return MethodSpec.methodBuilder("with" + capitalize(p.getNameInDomain()))
+				.addModifiers(Modifier.PUBLIC)
+				.returns(relationshipClassName)
+				.addParameter(end)
+				.addStatement("return new $T(this, $N)", relationshipClassName, end)
+				.build();
+		};
 	}
 }
