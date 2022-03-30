@@ -749,7 +749,7 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, Expression v, ParameterType type) {
-		return parameterFromSymbolicName(v);
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(v));
 	}
 
 	@Override
