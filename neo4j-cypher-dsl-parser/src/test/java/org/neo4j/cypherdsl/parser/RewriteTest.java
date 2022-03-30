@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
 
 import org.junit.jupiter.api.Test;
@@ -123,5 +124,15 @@ class RewriteTest {
 			.match(p)
 			.where(CypherParser.parseExpression("name = 'Foobar'", parserOptions).asCondition()).returning(p).build().getCypher();
 		assertThat(statement).isEqualTo("MATCH (p:`Person`) WHERE p.name = 'Foobar' RETURN p");
+	}
+
+	@Test
+	void shouldRewriteParameters() {
+		var counter = new AtomicInteger(1);
+		var parserOptions = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Expression.class, e -> Cypher.parameter(String.format("%d", counter.getAndIncrement())))
+			.build();
+		var statement = CypherParser.parse("CREATE (p:Person {name: $name, height: $height, birthDate: $birthDate, templateEmail: 'Welcome $name!'})", parserOptions).getCypher();
+		assertThat(statement).isEqualTo("CREATE (p:`Person` {name: $1, height: $2, birthDate: $3, templateEmail: 'Welcome $name!'})");
 	}
 }
