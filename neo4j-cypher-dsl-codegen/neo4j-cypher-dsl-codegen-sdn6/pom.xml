@@ -15,7 +15,7 @@
 		<covered-ratio-complexity>0.7</covered-ratio-complexity>
 		<covered-ratio-instructions>0.7</covered-ratio-instructions>
 		<java-module-name>org.neo4j.cypherdsl.codegen.sdn6</java-module-name>
-		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<dependencies>

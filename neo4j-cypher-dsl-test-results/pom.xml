@@ -14,7 +14,6 @@
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.test_results</java-module-name>
-		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
 	<dependencies>
@@ -60,10 +59,10 @@
 					</execution>
 					<execution>
 						<id>report-aggregate</id>
-						<phase>verify</phase>
 						<goals>
 							<goal>report-aggregate</goal>
 						</goals>
+						<phase>verify</phase>
 						<configuration>
 							<dataFileIncludes>
 								<dataFileInclude>**/jacoco.exec</dataFileInclude>
