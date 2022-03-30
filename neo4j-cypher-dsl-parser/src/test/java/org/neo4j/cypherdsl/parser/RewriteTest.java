@@ -132,7 +132,7 @@ class RewriteTest {
 		var parserOptions = Options.newOptions()
 			.withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Expression.class, e -> Cypher.parameter(String.format("%d", counter.getAndIncrement())))
 			.build();
-		var statement = CypherParser.parse("CREATE (p:Person {name: $name, height: $height, birthDate: $birthDate})", parserOptions).getCypher();
-		assertThat(statement).isEqualTo("CREATE (p:`Person` {name: $1, height: $2, birthDate: $3})");
+		var statement = CypherParser.parse("CREATE (p:Person {name: $name, height: $height, birthDate: $birthDate, templateEmail: 'Welcome $name!'})", parserOptions).getCypher();
+		assertThat(statement).isEqualTo("CREATE (p:`Person` {name: $1, height: $2, birthDate: $3, templateEmail: 'Welcome $name!'})");
 	}
 }
