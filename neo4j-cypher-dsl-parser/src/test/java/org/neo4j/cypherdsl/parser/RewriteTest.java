@@ -128,7 +128,7 @@ class RewriteTest {
 
 	@Test
 	void shouldRewriteParameters() {
-		AtomicInteger counter = new AtomicInteger(1);
+		var counter = new AtomicInteger(1);
 		var parserOptions = Options.newOptions()
 			.withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Expression.class, e -> Cypher.parameter(String.format("%d", counter.getAndIncrement())))
 			.build();
