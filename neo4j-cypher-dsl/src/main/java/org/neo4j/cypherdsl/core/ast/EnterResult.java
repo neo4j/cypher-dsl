@@ -16,35 +16,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.internal;
+package org.neo4j.cypherdsl.core.ast;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
-import org.neo4j.cypherdsl.core.Neo4jVersion;
-import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
- * A visitable representing a {@code USING PERIODIC COMMIT} clause. Not meant to be used outside the Cypher-DSL directly.
- * Will be changed without further notice.
+ * Result of entering a {@link Visitable}. Visitables are not required to check the result and can enter their child elements
+ * nevertheless.
  *
  * @author Michael J. Simons
- * @since 2021.2.1
+ * @since TBA
  */
-@API(status = INTERNAL, since = "2021.2.1")
-@Neo4jVersion(minimum = "3.5", last = "4.4")
-public final class UsingPeriodicCommit implements Visitable {
+@API(status = STABLE, since = "TBA")
+public enum EnterResult {
 
-	@Nullable
-	private final Integer rate;
+	/**
+	 * Continue with all child elements
+	 */
+	CONTINUE,
 
-	public UsingPeriodicCommit(@Nullable Integer rate) {
-		this.rate = rate;
-	}
-
-	@Nullable
-	public Integer getRate() {
-		return rate;
-	}
+	/**
+	 * Skip child elements
+	 */
+	SKIP_CHILDREN
 }

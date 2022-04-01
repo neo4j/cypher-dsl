@@ -22,7 +22,11 @@ import java.util.Set;
 
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Functions;
+import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.Options;
@@ -51,6 +55,7 @@ public class Application {
 			System.out.println(e.getMessage());
 		}
 		System.out.println(useParserForRewrite());
+		System.out.println(generateDialectBasedQuery());
 	}
 
 	private static Statement findAllMovies() {
@@ -98,5 +103,13 @@ public class Application {
 					.withTypeFilter((e, t) -> t.size() == 1 && t.contains("HAT_GESPIELT_IN") ? Set.of("ACTED_IN") : t)
 					.build())
 			.getCypher();
+	}
+
+	private static String generateDialectBasedQuery() {
+
+		Node n = Cypher.anyNode("n");
+		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
+		return renderer.render(
+			Cypher.match(n).returning(Functions.distance(n.property("a"), n.property("b"))).build());
 	}
 }

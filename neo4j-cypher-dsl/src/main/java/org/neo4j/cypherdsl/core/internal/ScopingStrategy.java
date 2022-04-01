@@ -43,6 +43,7 @@ import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -184,6 +185,7 @@ public final class ScopingStrategy {
 					})
 					.forEach(retain::add);
 			}
+			return EnterResult.CONTINUE;
 		});
 
 		if (visitedNamed != null) {
@@ -203,20 +205,20 @@ public final class ScopingStrategy {
 			int level = 0;
 
 			@Override
-			public void enter(Visitable segment) {
+			public EnterResult enter(Visitable segment) {
 				if (!in && segment instanceof TypedSubtree) {
 					in = true;
-					return;
-				}
+				} else {
+					if (in) {
+						++level;
+					}
 
-				if (in) {
-					++level;
+					// Only collect things exactly one level into the list of returned items
+					if (level == 1 && segment instanceof IdentifiableElement) {
+						retain.add((IdentifiableElement) segment);
+					}
 				}
-
-				// Only collect things exactly one level into the list of returned items
-				if (level == 1 && segment instanceof IdentifiableElement) {
-					retain.add((IdentifiableElement) segment);
-				}
+				return EnterResult.CONTINUE;
 			}
 
 			@Override

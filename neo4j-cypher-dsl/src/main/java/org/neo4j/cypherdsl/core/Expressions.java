@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Arrays;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.EnterResult;
 
 /**
  * Utility methods for dealing with expressions.
@@ -77,6 +78,7 @@ import org.apiguardian.api.API;
 					ref.append(((SymbolicName) segment).getValue());
 
 				}
+				return EnterResult.CONTINUE;
 			});
 			return ref.toString();
 		}

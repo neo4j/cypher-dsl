@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -33,6 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -68,6 +71,50 @@ public abstract class ReflectiveVisitor implements Visitor {
 	}
 
 	/**
+	 * This class is an indicator of what should happen after a new visitable has been identified.
+	 */
+	public static final class PreEnterResult {
+
+		private static final PreEnterResult DO_ENTER = new PreEnterResult(null);
+		private static final PreEnterResult SKIP = new PreEnterResult(null);
+
+		/**
+		 * Do enter and treat as usual.
+		 *
+		 * @return the result
+		 */
+		public static PreEnterResult doEnter() {
+			return DO_ENTER;
+		}
+
+		/**
+		 * Skip the element completely.
+		 *
+		 * @return the result
+		 */
+		public static PreEnterResult skip() {
+			return SKIP;
+		}
+
+		/**
+		 * Enter to visit but delegate the visitation
+		 *
+		 * @param handler The delegate
+		 * @return the result
+		 */
+		public static PreEnterResult delegateTo(Visitor handler) {
+			return new PreEnterResult(handler);
+		}
+
+		@Nullable
+		private final Visitor delegate;
+
+		private PreEnterResult(@Nullable Visitor delegate) {
+			this.delegate = delegate;
+		}
+	}
+
+	/**
 	 * A shared cache of unbound methods for entering and leaving phases.
 	 * The key is the concrete class of the visitor as well as the hierarchy of the visitable.
 	 */
@@ -76,7 +123,12 @@ public abstract class ReflectiveVisitor implements Visitor {
 	/**
 	 * Keeps track of the ASTs current level.
 	 */
-	protected Deque<Visitable> currentVisitedElements = new LinkedList<>();
+	protected final Deque<Visitable> currentVisitedElements = new LinkedList<>();
+
+	/**
+	 * If theres any special delegate for a dialect or similar for a given visitable, it will be tracked here.
+	 */
+	protected final Map<Visitable, Visitor> visitablesAndDelegates = new HashMap<>();
 
 	/**
 	 * This is a hook that is called with the uncasted, raw visitable just before entering a visitable.
@@ -88,6 +140,10 @@ public abstract class ReflectiveVisitor implements Visitor {
 	 */
 	protected abstract boolean preEnter(Visitable visitable);
 
+	protected PreEnterResult getPreEnterResult(Visitable visitable) {
+		return preEnter(visitable) ? PreEnterResult.doEnter() : PreEnterResult.skip();
+	}
+
 	/**
 	 * This is a hook that is called with the uncasted, raw visitable just after leaving the visitable.
 	 * <p>
@@ -98,19 +154,31 @@ public abstract class ReflectiveVisitor implements Visitor {
 	protected abstract void postLeave(Visitable visitable);
 
 	@Override
-	public final void enter(Visitable visitable) {
+	public final EnterResult enter(Visitable visitable) {
 
-		if (preEnter(visitable)) {
+		PreEnterResult preEnterResult = getPreEnterResult(visitable);
+		if (preEnterResult != PreEnterResult.skip()) {
 			currentVisitedElements.push(visitable);
-			executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.ENTER), visitable);
+			if (preEnterResult.delegate != null) {
+				visitablesAndDelegates.put(visitable, preEnterResult.delegate);
+				return preEnterResult.delegate.enter(visitable);
+			} else {
+				executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.ENTER), visitable);
+			}
 		}
+		return EnterResult.CONTINUE;
 	}
 
 	@Override
 	public final void leave(Visitable visitable) {
 
 		if (visitable != null && currentVisitedElements.peek() == visitable) {
-			executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.LEAVE), visitable);
+			if (visitablesAndDelegates.containsKey(visitable)) {
+				Visitor delegate = visitablesAndDelegates.remove(visitable);
+				delegate.leave(visitable);
+			} else {
+				executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.LEAVE), visitable);
+			}
 			postLeave(visitable);
 			currentVisitedElements.pop();
 		}

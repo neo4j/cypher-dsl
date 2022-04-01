@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.nio.file.Paths;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -32,7 +33,7 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 
 /**
- * This test is run via fail safe after GraalVM native image has build the application.
+ * This test is run via failsafe after GraalVM native image has build the application.
  *
  * @author Michael J. Simons
  * @soundtrack Bad Religion - Faith Alone 2020
@@ -53,7 +54,8 @@ class NativeApplicationIT {
 			"MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}",
 			"MATCH (p:`Parser`) RETURN p",
 			"At least one expressions to return is required.",
-			"MATCH (p:`Person`)-[:`ACTED_IN`]->(n:`Movie`) RETURN n"
+			"MATCH (p:`Person`)-[:`ACTED_IN`]->(n:`Movie`) RETURN n",
+			"MATCH (n) RETURN point.distance(n.a, n.b)"
 		);
 
 		var p = new ProcessBuilder(Paths.get(".", "target", "application").toAbsolutePath().normalize().toString())
@@ -64,6 +66,7 @@ class NativeApplicationIT {
 				var generatedStatements = in.lines().collect(Collectors.toCollection(LinkedHashSet::new));
 				assertThat(generatedStatements).containsExactlyElementsOf(statements);
 			} catch (IOException e) {
+				throw new UncheckedIOException(e);
 			}
 		}).get();
 	}

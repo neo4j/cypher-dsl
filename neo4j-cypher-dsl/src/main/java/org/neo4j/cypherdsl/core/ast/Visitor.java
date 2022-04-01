@@ -26,11 +26,12 @@ package org.neo4j.cypherdsl.core.ast;
 public interface Visitor {
 
 	/**
-	 * Enter a {@link Visitable}.
+	 * Enter a {@link Visitable}. Not all visitables will obey to the result
 	 *
 	 * @param segment the segment to visit.
+	 * @return A result indicating whether visitation of child elements should continue or not.
 	 */
-	void enter(Visitable segment);
+	EnterResult enter(Visitable segment);
 
 	/**
 	 * Leave a {@link Visitable}.
