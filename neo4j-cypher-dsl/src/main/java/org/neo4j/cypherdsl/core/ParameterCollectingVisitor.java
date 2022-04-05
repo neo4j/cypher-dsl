@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.neo4j.cypherdsl.build.RegisterForReflection;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
@@ -42,6 +43,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @author Michael J. Simons
  * @since 2021.0.0
  */
+@RegisterForReflection
 final class ParameterCollectingVisitor extends ReflectiveVisitor {
 
 	static class ParameterInformation {

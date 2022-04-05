@@ -99,6 +99,7 @@
 	</developers>
 
 	<modules>
+		<module>neo4j-cypher-dsl-build</module>
 		<module>neo4j-cypher-dsl</module>
 		<module>neo4j-cypher-dsl-codegen</module>
 		<module>neo4j-cypher-dsl-parser</module>
@@ -180,6 +181,7 @@
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>6.2.3</spring-data-neo4j.version>
+		<jackson.version>2.13.2</jackson.version>
 	</properties>
 
 	<dependencyManagement>
@@ -307,6 +309,13 @@
 				<version>${junit-jupiter.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
+				<version>${jackson.version}</version>
+				<scope>import</scope>
+				<type>pom</type>
 			</dependency>
 			<dependency>
 				<groupId>cglib</groupId>
@@ -440,7 +449,7 @@
 					<configuration>
 						<release>${java.version}</release>
 						<compilerArgs>
-							<arg>-Xlint:all,-options,-path</arg>
+							<arg>-Xlint:all,-options,-path,-processing</arg>
 							<arg>-Werror</arg>
 						</compilerArgs>
 					</configuration>

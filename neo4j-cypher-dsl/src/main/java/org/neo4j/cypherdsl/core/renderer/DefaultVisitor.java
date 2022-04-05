@@ -31,6 +31,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.neo4j.cypherdsl.build.RegisterForReflection;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Condition;
@@ -108,6 +109,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @since 1.0
  */
 @SuppressWarnings({ "unused", "squid:S1172" })
+@RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("`");
