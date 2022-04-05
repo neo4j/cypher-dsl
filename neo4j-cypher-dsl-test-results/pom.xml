@@ -59,10 +59,10 @@
 					</execution>
 					<execution>
 						<id>report-aggregate</id>
+						<phase>verify</phase>
 						<goals>
 							<goal>report-aggregate</goal>
 						</goals>
-						<phase>verify</phase>
 						<configuration>
 							<dataFileIncludes>
 								<dataFileInclude>**/jacoco.exec</dataFileInclude>
