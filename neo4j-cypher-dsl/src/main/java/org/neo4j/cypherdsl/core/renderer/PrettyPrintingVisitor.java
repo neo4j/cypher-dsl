@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.function.BiConsumer;
 
+import org.neo4j.cypherdsl.build.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
@@ -47,6 +48,7 @@ import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
  * @author Michael J. Simons
  */
 @SuppressWarnings("unused")
+@RegisterForReflection
 class PrettyPrintingVisitor extends DefaultVisitor {
 
 	private final BiConsumer<StringBuilder, Integer> indentionProvider;

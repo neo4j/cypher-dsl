@@ -132,7 +132,7 @@ The core module can be build on plain JDK 11 with:
 [[build-only-core-bash]]
 .Build only the core module
 ----
-$ ./mvnw clean verify -pl org.neo4j:neo4j-cypher-dsl
+$ ./mvnw clean verify -am -pl org.neo4j:neo4j-cypher-dsl
 ----
 
 === CI-friendly version numbers
