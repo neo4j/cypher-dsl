@@ -23,6 +23,10 @@ For the full project, including examples and native tests:
 
 * GraalVM based on JDK 11: https://www.graalvm.org/downloads/
 
+NOTE: At least GraalVM *21.3.0* is required due to restrictions in `org.graalvm.buildtools:native-maven-plugin`.
+      The rationale behind that is explained https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#long_classpath_and_shading_support[here]
+      and we don't do apply any of the suggested workarounds as the releases are done with GraalVM 21.3.0 anyway.
+
 For the project, including examples but skipping native tests
 
 * JDK 11+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
