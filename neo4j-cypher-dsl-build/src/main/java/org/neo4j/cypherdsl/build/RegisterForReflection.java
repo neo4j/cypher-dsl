@@ -40,7 +40,7 @@ import java.lang.annotation.Target;
  * </ul>
  *
  * @author Michael J. Simons
- * @soundtrack Ben Foster - Torchwood
+ * @soundtrack Ben Foster - Torchwood (Original Television Soundtrack)
  * @since 2022.2.2
  */
 @Retention(RetentionPolicy.CLASS)

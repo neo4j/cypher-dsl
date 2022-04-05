@@ -40,15 +40,15 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 /**
  * @author Michael J. Simons
- * @soundtrack Ben Foster - Torchwood
+ * @soundtrack Ben Foster - Torchwood (Original Television Soundtrack)
  * @since 2022.2.2
  */
 @SupportedAnnotationTypes("org.neo4j.cypherdsl.build.RegisterForReflection")
 @SupportedOptions(RegisterForReflectionProcessor.NATIVE_IMAGE_SUBDIR_OPTION)
 public final class RegisterForReflectionProcessor extends AbstractProcessor {
 
-	private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-	final static String NATIVE_IMAGE_SUBDIR_OPTION = "org.neo4j.cypherdsl.build.native_config_dir";
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+	static final String NATIVE_IMAGE_SUBDIR_OPTION = "org.neo4j.cypherdsl.build.native_config_dir";
 	private final Collection<Entry> entries = new TreeSet<>(Comparator.comparing(Entry::getName));
 
 	@Override
