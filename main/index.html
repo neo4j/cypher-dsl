@@ -3839,6 +3839,20 @@ We use the following in our tests:</p>
 </li>
 </ul>
 </div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+At least GraalVM <strong>21.3.0</strong> is required due to restrictions in <code>org.graalvm.buildtools:native-maven-plugin</code>.
+      The rationale behind that is explained <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#long_classpath_and_shading_support">here</a>
+      and we don&#8217;t do apply any of the suggested workarounds as the releases are done with GraalVM 21.3.0 anyway.
+</td>
+</tr>
+</table>
+</div>
 <div class="paragraph">
 <p>For the project, including examples but skipping native tests</p>
 </div>
@@ -5926,7 +5940,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-04-05 07:10:56 UTC
+Last updated 2022-04-05 11:19:57 UTC
 </div>
 </div>
 </body>
