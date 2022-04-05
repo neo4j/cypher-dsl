@@ -59,7 +59,7 @@ class RegisterForReflectionProcessorTest {
 
 	@Test
 	void shouldOnlyGenerateReflectionConfigWithContentWhenClassesArePresent() {
-		JavaFileObject[] resources = IntStream.range(0, 3)
+		JavaFileObject[] resources = IntStream.range(0, 4)
 			.mapToObj(this::getTestClassN)
 			.toArray(JavaFileObject[]::new);
 
@@ -82,6 +82,9 @@ class RegisterForReflectionProcessorTest {
 			.hasValue("[ {\n"
 				+ "  \"name\" : \"org.neo4j.cypherdsl.build.test.Class0\",\n"
 				+ "  \"allDeclaredMethods\" : true\n"
+				+ "}, {\n"
+				+ "  \"name\" : \"org.neo4j.cypherdsl.build.test.Class3\",\n"
+				+ "  \"allDeclaredConstructors\" : true\n"
 				+ "} ]"
 			);
 	}

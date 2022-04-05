@@ -51,4 +51,9 @@ public @interface RegisterForReflection {
 	 * @return true if all declared methods should be marked for inclusion in a native image.
 	 */
 	boolean allDeclaredMethods() default true;
+
+	/**
+	 * @return true if all declared constructors should be marked for inclusions in a native image.
+	 */
+	boolean allDeclaredConstructors() default false;
 }

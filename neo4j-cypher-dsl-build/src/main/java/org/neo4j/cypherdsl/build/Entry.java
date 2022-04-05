@@ -35,6 +35,8 @@ final class Entry {
 
 	private boolean allDeclaredMethods;
 
+	private boolean allDeclaredConstructors;
+
 	Entry(String name) {
 		this.name = name;
 	}
@@ -50,5 +52,14 @@ final class Entry {
 
 	void setAllDeclaredMethods(boolean allDeclaredMethods) {
 		this.allDeclaredMethods = allDeclaredMethods;
+	}
+
+	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	boolean isAllDeclaredConstructors() {
+		return allDeclaredConstructors;
+	}
+
+	void setAllDeclaredConstructors(boolean allDeclaredConstructors) {
+		this.allDeclaredConstructors = allDeclaredConstructors;
 	}
 }

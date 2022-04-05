@@ -82,6 +82,7 @@ public final class RegisterForReflectionProcessor extends AbstractProcessor {
 					RegisterForReflection registerForReflection = e.getAnnotation(RegisterForReflection.class);
 					Entry entry = new Entry(e.getQualifiedName().toString());
 					entry.setAllDeclaredMethods(registerForReflection.allDeclaredMethods());
+					entry.setAllDeclaredConstructors(registerForReflection.allDeclaredConstructors());
 					return entry;
 				})
 				.forEach(entries::add);
@@ -91,6 +92,6 @@ public final class RegisterForReflectionProcessor extends AbstractProcessor {
 	}
 
 	static boolean registersElements(RegisterForReflection registerForReflection) {
-		return registerForReflection.allDeclaredMethods();
+		return registerForReflection.allDeclaredMethods() || registerForReflection.allDeclaredConstructors();
 	}
 }
