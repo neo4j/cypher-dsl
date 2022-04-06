@@ -50,7 +50,9 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
-import org.neo4j.cypherdsl.parser.CypherParser;
+// tag::main-entry-point[]
+ import org.neo4j.cypherdsl.parser.CypherParser;
+ // end::main-entry-point[]
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.Options;
 import org.neo4j.cypherdsl.parser.PatternElementCreatedEventType;
