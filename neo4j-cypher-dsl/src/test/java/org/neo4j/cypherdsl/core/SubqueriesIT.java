@@ -178,6 +178,21 @@ class SubqueriesIT {
 		}
 
 		@Test
+		void afterRegularWithManualImport() {
+
+			Statement statement = Cypher.match(Cypher.node("Person").named("p")).with("p")
+				.call(Cypher.match(Cypher.anyNode().named("n"))
+					.where(Cypher.property("n", "name").isEqualTo(Cypher.property("p", "name"))).returning("n").build(), "p")
+				.returning("n")
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (p:`Person`) WITH p CALL {WITH p MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+		}
+
+		@Test
 		void callsCallingCalls() {
 
 			Statement someStatement = Cypher.match(Cypher.anyNode().named("n")).returning("n").build();

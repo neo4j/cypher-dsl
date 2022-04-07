@@ -83,7 +83,7 @@ public interface ExposesSubqueryCall {
 	 */
 	@NotNull @CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, String... imports) {
-		return call(statement, (IdentifiableElement[]) Expressions.createSymbolicNames(imports));
+		return call(statement, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
 
 	/**
