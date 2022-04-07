@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
@@ -113,5 +114,15 @@ public final class Subquery implements Clause {
 		Visitable.visitIfNotNull(this.renames, visitor);
 		statement.accept(visitor);
 		visitor.leave(this);
+	}
+
+	@API(status = INTERNAL)
+	InTransactions inTransactionsOf(Integer rows) {
+		return new InTransactions(this, rows);
+	}
+
+	@API(status = INTERNAL)
+	public boolean doesReturnOrYield() {
+		return statement.doesReturnOrYield();
 	}
 }

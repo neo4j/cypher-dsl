@@ -20,8 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.net.URI;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -45,7 +49,8 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("UNWIND [0, 1, 2] AS x CALL {WITH x RETURN (x * 10) AS y} RETURN x, y");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("x"), SymbolicName.of("y"));
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("x"),
+				SymbolicName.of("y"));
 		}
 
 		@Test
@@ -198,11 +203,14 @@ class SubqueriesIT {
 
 			Relationship r = p.relationshipTo(friend, "IS_FRIENDS_WITH").named("r");
 			Statement statement = Cypher.match(r)
-				.where(Cypher.match(p.relationshipTo(Cypher.node("Company").withProperties("name", Cypher.literalOf("Neo4j")), "WORKS_FOR")).asCondition())
+				.where(Cypher.match(
+					p.relationshipTo(Cypher.node("Company").withProperties("name", Cypher.literalOf("Neo4j")),
+						"WORKS_FOR")).asCondition())
 				.returning(p, r, friend)
 				.build();
 
-			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS {MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})} RETURN p, r, friend");
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+				"MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS {MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})} RETURN p, r, friend");
 		}
 
 		@Test
@@ -214,29 +222,196 @@ class SubqueriesIT {
 
 			Statement statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(company.property("name").startsWith(Cypher.literalOf("Company")))
-				.and(Cypher.match(p.relationshipTo(t, "LIKES")).where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3))).asCondition())
+				.and(Cypher.match(p.relationshipTo(t, "LIKES"))
+					.where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
+					.asCondition())
 				.returning(p.property("name").as("person"), company.property("name").as("company"))
 				.build();
 
-			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3}) RETURN person.name AS person, company.name AS company");
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3}) RETURN person.name AS person, company.name AS company");
 
 			statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
-				.where(Cypher.match(p.relationshipTo(t, "LIKES")).where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3))).asCondition())
+				.where(Cypher.match(p.relationshipTo(t, "LIKES"))
+					.where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
+					.asCondition())
 				.and(company.property("name").startsWith(Cypher.literalOf("Company")))
 				.returning(p.property("name").as("person"), company.property("name").as("company"))
 				.build();
 
-			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3} AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3} AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
 
 			statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(
-					Cypher.match(p.relationshipTo(t, "LIKES")).where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
+					Cypher.match(p.relationshipTo(t, "LIKES"))
+						.where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
 						.asCondition().and(company.property("name").startsWith(Cypher.literalOf("Company")))
 				)
 				.returning(p.property("name").as("person"), company.property("name").as("company"))
 				.build();
 
-			assertThat(cypherRenderer.render(statement)).isEqualTo("MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3} AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3} AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
+		}
+	}
+
+	@Nested
+	class InTransactions {
+
+		@Test
+		void docs44_7() {
+
+			SymbolicName line = Cypher.name("line");
+			Statement statement = Cypher.loadCSV(URI.create("file:///friends.csv")).as("line")
+				.callInTransactions(Cypher.with("line").create(Cypher.node("Person")
+					.withProperties(
+						"name", Cypher.valueAt(line, 1),
+						"age", Functions.toInteger(Cypher.valueAt(line, 2))
+					)).build()
+				)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"LOAD CSV FROM 'file:///friends.csv' AS line CALL {WITH line CREATE (:`Person` {name: line[1], age: toInteger(line[2])})} IN TRANSACTIONS");
+		}
+
+		@Test
+		void docs44_7_1a() {
+
+			SymbolicName line = Cypher.name("line");
+			Statement statement = Cypher.loadCSV(URI.create("file:///friends.csv")).as("line")
+				.callInTransactions(Cypher.with("line").create(Cypher.node("Person")
+					.withProperties(
+						"name", Cypher.valueAt(line, 1),
+						"age", Functions.toInteger(Cypher.valueAt(line, 2))
+					)).build(), 2
+				)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"LOAD CSV FROM 'file:///friends.csv' AS line CALL {WITH line CREATE (:`Person` {name: line[1], age: toInteger(line[2])})} IN TRANSACTIONS OF 2 ROWS");
+		}
+
+		@Test
+		void docs44_7_1b() {
+
+			Statement statement = Cypher.match(Cypher.anyNode("n"))
+				.callInTransactions(Cypher.with("n").detachDelete("n").build(), 2)
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (n) CALL {WITH n DETACH DELETE n} IN TRANSACTIONS OF 2 ROWS");
+		}
+
+		@ParameterizedTest
+		@ValueSource(ints = { -1, 23 })
+		void afterRegularWith(int numRows) {
+
+			ResultStatement subquery = Cypher.create(
+					Cypher.anyNode("p").relationshipTo(Cypher.node("User").named("u"), "IS"))
+				.returning(Cypher.name("u"))
+				.build();
+
+			StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with = Cypher.match(
+				Cypher.node("Person").named("p")).with("p");
+			Statement statement = (numRows < 0 ?
+				with.callInTransactions(subquery, "p") :
+				with.callInTransactions(subquery, numRows, "p"))
+				.returning("u")
+				.build();
+
+			String expected = "MATCH (p:`Person`) WITH p CALL {WITH p CREATE (p)-[:`IS`]->(u:`User`) RETURN u} IN TRANSACTIONS";
+			if (numRows > 0) {
+				expected += " OF " + numRows + " ROWS";
+			}
+			expected += " RETURN u";
+			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("u"));
+		}
+
+		@ParameterizedTest
+		@ValueSource(ints = { -1, 23 })
+		void afterRegularWithSymNameImport(int numRows) {
+
+			SymbolicName p = Cypher.name("p");
+			ResultStatement subquery = Cypher.create(
+					Cypher.anyNode(p).relationshipTo(Cypher.node("User").named("u"), "IS"))
+				.returning(Cypher.name("u"))
+				.build();
+
+			StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with = Cypher.match(
+				Cypher.node("Person").named(p)).with(p);
+			Statement statement = (numRows < 0 ?
+				with.callInTransactions(subquery, p) :
+				with.callInTransactions(subquery, numRows, p))
+				.returning("u")
+				.build();
+
+			String expected = "MATCH (p:`Person`) WITH p CALL {WITH p CREATE (p)-[:`IS`]->(u:`User`) RETURN u} IN TRANSACTIONS";
+			if (numRows > 0) {
+				expected += " OF " + numRows + " ROWS";
+			}
+			expected += " RETURN u";
+			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("u"));
+		}
+
+		@Test
+		void nestedAfterProcedureCall() {
+
+			// With with
+			Statement statement = Cypher.call("dbms.components").yield("name").with("name")
+				.callInTransactions(Cypher.with("name").match(Cypher.anyNode().named("n"))
+					.where(Cypher.property("n", "name").isEqualTo(Cypher.name("name"))).returning("n").build())
+				.returning("n")
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CALL dbms.components() YIELD name WITH name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+
+			// Without with
+			statement = Cypher.call("dbms.components").yield("name")
+				.callInTransactions(Cypher.with("name").match(Cypher.anyNode().named("n"))
+					.where(Cypher.property("n", "name").isEqualTo(Cypher.name("name"))).returning("n").build())
+				.returning("n")
+				.build();
+
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					"CALL dbms.components() YIELD name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
+
+			// After inQueryCall with with
+			SymbolicName label = Cypher.name("label");
+			statement = Cypher
+				.match(Cypher.anyNode().named("n")).with("n")
+				.call("db.labels")
+				.yield(label)
+				.with(label)
+				.callInTransactions(Cypher.with(label).match(Cypher.anyNode().named("n"))
+					.where(Cypher.property("n", "name").isEqualTo(label)).returning("n").build())
+				.returning("n")
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL {WITH label MATCH (n) WHERE n.name = label RETURN n} IN TRANSACTIONS RETURN n");
+
+			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+
+			// After inQueryCall without with
+			statement = Cypher
+				.match(Cypher.anyNode().named("n")).with("n")
+				.call("db.labels")
+				.yield(label)
+				.callInTransactions(Cypher.with(label).match(Cypher.anyNode().named("n2"))
+					.where(Cypher.property("n2", "name").isEqualTo(label)).returning("n2").build())
+				.returning("n2")
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label CALL {WITH label MATCH (n2) WHERE n2.name = label RETURN n2} IN TRANSACTIONS RETURN n2");
 		}
 	}
 }
