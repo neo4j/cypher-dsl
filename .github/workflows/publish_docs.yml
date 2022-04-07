@@ -31,8 +31,8 @@ jobs:
           java-version: 11
       - name: Run docs generation
         run: >
-          ./mvnw asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} &&
-          ./mvnw site -pl org.neo4j:neo4j-cypher-dsl &&
+          ./mvnw --no-transfer-progress asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} &&
+          ./mvnw --no-transfer-progress site -pl org.neo4j:neo4j-cypher-dsl -am &&
           rm -rf target/gh-pages/${refName}/project-info &&
           mv neo4j-cypher-dsl/target/site target/gh-pages/${refName}/project-info
       - name: Create symlink
