@@ -41,6 +41,7 @@ import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
+import org.neo4j.cypherdsl.core.InTransactions;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
@@ -753,7 +754,24 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(Subquery subquery) {
 
-		builder.append("} ");
+		int l = builder.length() - 1;
+		if (builder.charAt(l) == ' ' && !subquery.doesReturnOrYield()) {
+			builder.replace(l, builder.length(), "}");
+		} else {
+			builder.append("} ");
+		}
+	}
+
+	void leave(InTransactions inTransactions) {
+
+		int l = builder.length() - 1;
+		if (builder.charAt(l) != ' ') {
+			builder.append(" ");
+		}
+		builder.append("IN TRANSACTIONS ");
+		if (inTransactions.getRows() != null) {
+			builder.append("OF ").append(inTransactions.getRows()).append(" ROWS ");
+		}
 	}
 
 	void enter(Foreach foreach) {

@@ -54,7 +54,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 class DefaultStatementBuilder implements StatementBuilder,
 	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
 	BuildableMatchAndUpdate,
-	BuildableOngoingMergeAction {
+	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery {
 
 	/**
 	 * Current list of reading or update clauses to be generated.
@@ -495,6 +495,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.closeCurrentOngoingUpdate();
 
 		this.currentSinglePartElements.add(Subquery.call(statement, imports));
+
+		return this;
+	}
+
+	@NotNull
+	@Override
+	public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
+
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingUpdate();
+
+		this.currentSinglePartElements.add(Subquery.call(statement, true, imports).inTransactionsOf(rows));
 
 		return this;
 	}
@@ -960,6 +972,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.call(statement, imports);
+		}
+
+		@NotNull
+		@Override
+		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.callInTransactions(statement, rows, imports);
 		}
 
 		@NotNull
@@ -1683,6 +1703,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
+			return new DefaultStatementBuilder(this.buildCall()).callInTransactions(statement, rows, imports);
+		}
+
+		@NotNull
+		@Override
 		public ResultStatement build() {
 
 			return (ResultStatement) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
@@ -1699,7 +1725,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return new DefaultStatementBuilder(this.buildCall()).match(optional, pattern);
 		}
 	}
-
 
 	private final class InQueryCallBuilder extends AbstractCallBuilder implements
 
@@ -1825,6 +1850,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.call(statement, imports);
+		}
+
+		@NotNull
+		@Override
+		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.callInTransactions(statement, rows, imports);
 		}
 
 		@NotNull
