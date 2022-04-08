@@ -1814,6 +1814,21 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for {@code toString({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-tostring">toString</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code toString({})}.
+	 * @since 2022.3.0
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation toString(@NotNull Expression expression) {
+
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
+		return FunctionInvocation.create(Scalars.TO_STRING, expression);
+	}
+
+	/**
 	 * Creates a function invocation for {@code toFloat({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tofloat">toFloat</a>.
 	 *
