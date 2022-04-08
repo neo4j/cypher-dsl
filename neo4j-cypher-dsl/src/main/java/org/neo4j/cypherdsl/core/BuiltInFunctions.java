@@ -67,6 +67,7 @@ final class BuiltInFunctions {
 		START_NODE("startNode"),
 		TYPE("type"),
 
+		TO_STRING("toString"),
 		TO_INTEGER("toInteger"),
 		TO_FLOAT("toFloat"),
 		TO_BOOLEAN("toBoolean");
