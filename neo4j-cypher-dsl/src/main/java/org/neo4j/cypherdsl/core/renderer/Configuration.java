@@ -74,6 +74,11 @@ public final class Configuration {
 	private final boolean alwaysEscapeNames;
 
 	/**
+	 * The dialect to use when rendering a statement. The default dialect works well with Neo4j 4.4 and prior.
+	 */
+	private final Dialect dialect;
+
+	/**
 	 * Cypher is not pretty printed by default. No indentation settings apply.
 	 *
 	 * @return the default config
@@ -105,6 +110,7 @@ public final class Configuration {
 		private IndentStyle indentStyle = IndentStyle.SPACE;
 		private int indentSize = 2;
 		private boolean alwaysEscapeNames = true;
+		private Dialect dialect = Dialect.DEFAULT;
 
 		private Builder() {
 		}
@@ -140,6 +146,19 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * Use a configuration with a dialect fitting your target database if the {@link Dialect#DEFAULT default dialect}
+		 * leads to incompatible results with your version of Neo4j.
+		 *
+		 * @param dialect The new dialect
+		 * @return This builder. You can both use the original or this instance.
+		 * @since TBA
+		 */
+		public Builder withDialect(Dialect dialect) {
+			this.dialect = dialect;
+			return this;
+		}
+
 		public Configuration build() {
 			return new Configuration(this);
 		}
@@ -150,6 +169,7 @@ public final class Configuration {
 		this.alwaysEscapeNames = builder.alwaysEscapeNames;
 		this.indentStyle = builder.indentStyle;
 		this.indentSize = builder.indentSize;
+		this.dialect = builder.dialect == null ? Dialect.DEFAULT : builder.dialect;
 	}
 
 	public boolean isPrettyPrint() {
@@ -168,6 +188,10 @@ public final class Configuration {
 		return alwaysEscapeNames;
 	}
 
+	public Dialect getDialect() {
+		return dialect;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -177,12 +201,12 @@ public final class Configuration {
 			return false;
 		}
 		Configuration that = (Configuration) o;
-		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle && alwaysEscapeNames == that.alwaysEscapeNames;
+		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle && alwaysEscapeNames == that.alwaysEscapeNames && dialect == that.dialect;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames);
+		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect);
 	}
 
 	@Override

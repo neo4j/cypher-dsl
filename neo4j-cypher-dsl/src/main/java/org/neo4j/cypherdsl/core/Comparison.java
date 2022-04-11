@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -77,13 +78,15 @@ public final class Comparison implements Condition {
 	@Override
 	public void accept(Visitor visitor) {
 
-		visitor.enter(this);
-		if (left != null) {
-			Expressions.nameOrExpression(left).accept(visitor);
-		}
-		comparator.accept(visitor);
-		if (right != null) {
-			Expressions.nameOrExpression(right).accept(visitor);
+		EnterResult result = visitor.enterWithResult(this);
+		if (result == EnterResult.CONTINUE) {
+			if (left != null) {
+				Expressions.nameOrExpression(left).accept(visitor);
+			}
+			comparator.accept(visitor);
+			if (right != null) {
+				Expressions.nameOrExpression(right).accept(visitor);
+			}
 		}
 		visitor.leave(this);
 	}

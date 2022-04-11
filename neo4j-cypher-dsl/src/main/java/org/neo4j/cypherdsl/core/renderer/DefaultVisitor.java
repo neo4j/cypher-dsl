@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -78,6 +80,7 @@ import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.CaseElse;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
@@ -155,6 +158,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private final Map<SymbolicName, String> resolvedSymbolicNames = new ConcurrentHashMap<>();
 
+	/**
+	 * A cache of delegates, avoiding unnecessary object creation.
+	 */
+	private final Map<Class<? extends Visitor>, Visitor> delegateCache = new ConcurrentHashMap<>();
+
 	protected final StatementContext statementContext;
 
 	/**
@@ -186,13 +194,16 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private final boolean alwaysEscapeNames;
 
+	private final Dialect dialect;
+
 	DefaultVisitor(StatementContext statementContext) {
-		this(statementContext, true);
+		this(statementContext, Configuration.newConfig().alwaysEscapeNames(true).build());
 	}
 
-	DefaultVisitor(StatementContext statementContext, boolean alwaysEscapeNames) {
+	DefaultVisitor(StatementContext statementContext, Configuration configuration) {
 		this.statementContext = statementContext;
-		this.alwaysEscapeNames = alwaysEscapeNames;
+		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
+		this.dialect = configuration.getDialect();
 	}
 
 	private void enableSeparator(int level, boolean on) {
@@ -251,6 +262,31 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			scopingStrategy.doEnter(visitable);
 		}
 		return doEnter;
+	}
+
+	@Override
+	protected final PreEnterResult getPreEnterResult(Visitable visitable) {
+		boolean doEnter = preEnter(visitable);
+		if (!doEnter) {
+			return PreEnterResult.skip();
+		}
+
+		Class<? extends Visitor> handlerType = dialect.getHandler(visitable);
+		if (handlerType != null) {
+			Visitor handler = this.delegateCache.computeIfAbsent(handlerType, this::newHandler);
+			return PreEnterResult.delegateTo(handler);
+		}
+		return PreEnterResult.doEnter();
+	}
+
+	private Visitor newHandler(Class<? extends Visitor> handlerType) {
+		try {
+			Constructor<? extends Visitor> ctor = handlerType.getDeclaredConstructor(DefaultVisitor.class);
+			return ctor.newInstance(this);
+		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			throw new IllegalArgumentException(
+				dialect.name() + " has defined an illegal handler not providing a constructor accepting a delegate.");
+		}
 	}
 
 	@Override

@@ -21,36 +21,34 @@ package org.neo4j.cypherdsl.core.renderer;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * @author Andreas Berger
  * @author Michael J. Simons
+ * @soundtrack Red Hot Chili Peppers - Unlimited Love
  */
-class PrettyPrintingVisitorTest {
+class ConfigurationTest {
 
-	private final PrettyPrintingVisitor prettyPrintingVisitor = new PrettyPrintingVisitor(null,
-		Configuration.newConfig().alwaysEscapeNames(false).withIndentStyle(Configuration.IndentStyle.TAB).withIndentSize(4).build());
+	@Test
+	void dialectShouldBeIncludedInEquals() {
 
-	@ParameterizedTest
-	@CsvSource({
-		"ALabel, ALabel",
-		"A Label, `A Label`",
-		"A `Label, `A ``Label`",
-		"`A `Label, ```A ``Label`",
-		"Spring Data Neo4j⚡️RX, `Spring Data Neo4j⚡️RX`"
-	})
-	void shouldCorrectlyEscapeNames(String name, String expectedEscapedName) {
+		Configuration cfg0 = Configuration.newConfig().build();
+		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.DEFAULT).build();
+		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
 
-		assertThat(prettyPrintingVisitor.escapeName(name))
-			.hasValue(expectedEscapedName);
+		assertThat(cfg0)
+			.isEqualTo(cfg1)
+			.isNotEqualTo(cfg2);
 	}
 
 	@Test
-	void shouldNotTryToEscapeNullNames() {
+	void dialectShouldBeIncludedInHash() {
 
-		assertThat(prettyPrintingVisitor.escapeName(null)).isEmpty();
+		Configuration cfg0 = Configuration.newConfig().build();
+		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.DEFAULT).build();
+		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
+
+		assertThat(cfg0)
+			.hasSameHashCodeAs(cfg1)
+			.doesNotHaveSameHashCodeAs(cfg2);
 	}
-
 }

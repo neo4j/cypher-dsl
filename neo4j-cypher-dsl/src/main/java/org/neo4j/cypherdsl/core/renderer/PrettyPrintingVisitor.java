@@ -59,8 +59,11 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private int indentationLevel;
 	private boolean passedFirstReadingOrUpdatingClause;
 
-	PrettyPrintingVisitor(StatementContext statementContext, boolean alwaysEscapeNames, IndentStyle indentStyle, int indentSize) {
-		super(statementContext, alwaysEscapeNames);
+	PrettyPrintingVisitor(StatementContext statementContext, Configuration configuration) {
+		super(statementContext, configuration);
+
+		IndentStyle indentStyle = configuration.getIndentStyle();
+		int indentSize = configuration.getIndentSize();
 
 		if (indentStyle == IndentStyle.TAB) {
 			indentionProvider = (builder, width) -> {

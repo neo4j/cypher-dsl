@@ -55,7 +55,7 @@ import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
- * This tests reads and parses the README.adoc and verify the defined content.
+ * This tests reads and parses the README.adoc and verifies the defined content.
  *
  * @author Michael J. Simons
  */
