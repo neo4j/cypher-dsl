@@ -38,6 +38,7 @@ import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
  * This is a convenience class implementing a {@link Visitor} and it takes care of choosing the right methods
@@ -54,7 +55,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-public abstract class ReflectiveVisitor implements Visitor {
+public abstract class ReflectiveVisitor extends VisitorWithResult {
 
 	/**
 	 * Private enum to specify a visiting phase.
@@ -123,7 +124,7 @@ public abstract class ReflectiveVisitor implements Visitor {
 	/**
 	 * Keeps track of the ASTs current level.
 	 */
-	protected final Deque<Visitable> currentVisitedElements = new LinkedList<>();
+	protected Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
 	/**
 	 * If theres any special delegate for a dialect or similar for a given visitable, it will be tracked here.
@@ -154,14 +155,14 @@ public abstract class ReflectiveVisitor implements Visitor {
 	protected abstract void postLeave(Visitable visitable);
 
 	@Override
-	public final EnterResult enter(Visitable visitable) {
+	public final EnterResult enterWithResult(Visitable visitable) {
 
 		PreEnterResult preEnterResult = getPreEnterResult(visitable);
 		if (preEnterResult != PreEnterResult.skip()) {
 			currentVisitedElements.push(visitable);
 			if (preEnterResult.delegate != null) {
 				visitablesAndDelegates.put(visitable, preEnterResult.delegate);
-				return preEnterResult.delegate.enter(visitable);
+				return preEnterResult.delegate.enterWithResult(visitable);
 			} else {
 				executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.ENTER), visitable);
 			}

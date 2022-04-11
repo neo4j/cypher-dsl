@@ -27,6 +27,7 @@ import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
  * Some logic to rewrite a couple of functions for Neo4j 5, among them:
@@ -39,8 +40,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @soundtrack Red Hot Chili Peppers - Unlimited Love
  * @since TBA
  */
-@RegisterForReflection(allDeclaredConstructors = true)
-final class Neo4j5FunctionInvocationVisitor implements Visitor {
+@RegisterForReflection(allDeclaredConstructors = true) final class Neo4j5FunctionInvocationVisitor implements Visitor {
 
 	private final DefaultVisitor delegate;
 
@@ -49,7 +49,7 @@ final class Neo4j5FunctionInvocationVisitor implements Visitor {
 	}
 
 	@Override
-	public EnterResult enter(Visitable visitable) {
+	public void enter(Visitable visitable) {
 
 		boolean doDelegate = true;
 		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
@@ -63,7 +63,6 @@ final class Neo4j5FunctionInvocationVisitor implements Visitor {
 		if (doDelegate) {
 			delegate.enter(functionInvocation);
 		}
-		return EnterResult.CONTINUE;
 	}
 
 	@Override
@@ -82,11 +81,14 @@ final class Neo4j5FunctionInvocationVisitor implements Visitor {
 
 		if (visitable instanceof NestedExpression) {
 			AtomicReference<Visitable> capture = new AtomicReference<>();
-			visitable.accept(segment -> {
-				if (segment instanceof NestedExpression) { // The same object
-					return EnterResult.CONTINUE;
+			visitable.accept(new VisitorWithResult() {
+				@Override
+				public EnterResult enterWithResult(Visitable segment) {
+					if (segment instanceof NestedExpression) { // The same object
+						return EnterResult.CONTINUE;
+					}
+					return capture.compareAndSet(null, segment) ? EnterResult.SKIP_CHILDREN : EnterResult.CONTINUE;
 				}
-				return capture.compareAndSet(null, segment) ? EnterResult.SKIP_CHILDREN : EnterResult.CONTINUE;
 			});
 			visitable = capture.get();
 		}
@@ -104,7 +106,7 @@ final class Neo4j5FunctionInvocationVisitor implements Visitor {
 		return false;
 	}
 
-	static class SingleArgExtractor<T> implements Visitor {
+	static class SingleArgExtractor<T> extends VisitorWithResult {
 
 		final Class<T> expectedType;
 
@@ -118,7 +120,7 @@ final class Neo4j5FunctionInvocationVisitor implements Visitor {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public EnterResult enter(Visitable segment) {
+		public EnterResult enterWithResult(Visitable segment) {
 			if (segment instanceof NestedExpression) {
 				return EnterResult.CONTINUE;
 			}

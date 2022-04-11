@@ -47,7 +47,6 @@ import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.SymbolicName;
-import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -102,7 +101,7 @@ class CypherDSLParserExamplesTest {
 
 		class LabelCollector implements Function<Expression, Operation> {
 
-			final List<String> labelsSeen = new ArrayList<>();
+			List<String> labelsSeen = new ArrayList<>();
 
 			@Override
 			public Operation apply(Expression expression) {
@@ -111,7 +110,6 @@ class CypherDSLParserExamplesTest {
 					if (segment instanceof NodeLabel) {
 						labelsSeen.add(((NodeLabel) segment).getValue());
 					}
-					return EnterResult.CONTINUE;
 				});
 				return op;
 			}
@@ -242,7 +240,6 @@ class CypherDSLParserExamplesTest {
 					if (segment instanceof NodeLabel) {
 						labelsSeen.add(((NodeLabel) segment).getValue());
 					}
-					return EnterResult.CONTINUE;
 				});
 				return op;
 			}
@@ -283,7 +280,6 @@ class CypherDSLParserExamplesTest {
 					Node node = (Node) segment;
 					node.getSymbolicName().map(SymbolicName::getValue).ifPresent(n -> nodes.put(n, node));
 				}
-				return EnterResult.CONTINUE;
 			});
 			return patternElement;
 		};
@@ -306,7 +302,6 @@ class CypherDSLParserExamplesTest {
 						removedProperties.add(propertyRecord);
 					}
 				}
-				return EnterResult.CONTINUE;
 			});
 			return expression;
 		};
@@ -325,7 +320,6 @@ class CypherDSLParserExamplesTest {
 						name.compareAndSet(null, value);
 					}
 				}
-				return EnterResult.CONTINUE;
 			});
 			if (nodes.containsKey(property.get())) {
 				var propertyRecord = new PropertyRecord();
@@ -365,7 +359,6 @@ class CypherDSLParserExamplesTest {
 						var entry = (KeyValueMapEntry) segment;
 						selectingProperty.compareAndSet(null, entry.getKey());
 					}
-					return EnterResult.CONTINUE;
 				};
 				n.accept(propExtractor);
 				assertThat(selectingProperty).hasValue("uuid");

@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypherdsl.core.ast.EnterResult;
 
 /**
  * @author Michael J. Simons
@@ -44,7 +43,6 @@ class CypherTest {
 			if (segment instanceof SortItem.Direction) {
 				assertThat(segment).extracting("name").isEqualTo("ASC");
 			}
-			return EnterResult.CONTINUE;
 		});
 	}
 
@@ -103,7 +101,6 @@ class CypherTest {
 				default:
 					fail("Unexpected segment: " + segment.getClass());
 			}
-			return EnterResult.CONTINUE;
 		});
 	}
 
@@ -129,7 +126,6 @@ class CypherTest {
 				default:
 					fail("Unexpected segment: " + segment.getClass());
 			}
-			return EnterResult.CONTINUE;
 		});
 	}
 

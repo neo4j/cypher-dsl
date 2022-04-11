@@ -34,7 +34,6 @@ import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -69,11 +68,15 @@ class InternalNodeImplTest {
 
 		Node node = new InternalNodeImpl("primary", "secondary");
 		List<String> labels = new ArrayList<>();
-		node.accept(segment -> {
-			if (segment instanceof NodeLabel) {
-				labels.add(((NodeLabel) segment).getValue());
+		node.accept(new Visitor() {
+			@Override
+			public void enter(Visitable segment) {
+
+				if (segment instanceof NodeLabel) {
+					labels.add(((NodeLabel) segment).getValue());
+				}
+
 			}
-			return EnterResult.CONTINUE;
 		});
 		assertThat(labels).contains("primary", "secondary");
 	}
@@ -98,7 +101,7 @@ class InternalNodeImplTest {
 				Class<?> expectedTypeOfNextSegment = null;
 
 				@Override
-				public EnterResult enter(Visitable segment) {
+				public void enter(Visitable segment) {
 					if (segment instanceof SymbolicName) {
 						assertThat(((SymbolicName) segment).getValue()).isEqualTo("n");
 					} else if (segment instanceof NodeLabel) {
@@ -110,7 +113,6 @@ class InternalNodeImplTest {
 						assertThat(segment).isInstanceOf(expectedTypeOfNextSegment);
 						failTest.getAndSet(false);
 					}
-					return EnterResult.CONTINUE;
 				}
 			});
 			assertThat(failTest).isFalse();
@@ -127,10 +129,7 @@ class InternalNodeImplTest {
 			expected.add(node.getRequiredSymbolicName());
 			expected.add(property);
 
-			property.accept(p -> {
-				expected.remove(p);
-				return EnterResult.CONTINUE;
-			});
+			property.accept(expected::remove);
 
 			assertThat(expected).isEmpty();
 		}

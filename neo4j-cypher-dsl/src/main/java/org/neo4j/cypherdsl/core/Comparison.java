@@ -78,7 +78,7 @@ public final class Comparison implements Condition {
 	@Override
 	public void accept(Visitor visitor) {
 
-		EnterResult result = visitor.enter(this);
+		EnterResult result = visitor.enterWithResult(this);
 		if (result == EnterResult.CONTINUE) {
 			if (left != null) {
 				Expressions.nameOrExpression(left).accept(visitor);

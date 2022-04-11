@@ -27,7 +27,7 @@ import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 import org.neo4j.cypherdsl.core.renderer.Neo4j5FunctionInvocationVisitor.SingleArgExtractor;
 
 /**
@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.renderer.Neo4j5FunctionInvocationVisitor.SingleA
  * @author Michael J. Simons
  */
 @RegisterForReflection(allDeclaredConstructors = true)
-final class Neo4j5ComparisonVisitor implements Visitor {
+final class Neo4j5ComparisonVisitor extends VisitorWithResult {
 
 	private final DefaultVisitor delegate;
 
@@ -48,14 +48,15 @@ final class Neo4j5ComparisonVisitor implements Visitor {
 	}
 
 	@Override
-	public EnterResult enter(Visitable segment) {
+	public EnterResult enterWithResult(Visitable segment) {
 
 		Comparison comparison = (Comparison) segment;
 		AtomicReference<Operator> capture = new AtomicReference<>();
 		AtomicInteger level = new AtomicInteger(0);
 		AtomicReference<Visitable> nPropExists = new AtomicReference<>();
-		comparison.accept(new Visitor() {
-			@Override public EnterResult enter(Visitable visitable) {
+		comparison.accept(new VisitorWithResult() {
+			@Override
+			public EnterResult enterWithResult(Visitable visitable) {
 				boolean isOneLevelBelow = level.getAndIncrement() == 1;
 				if (isOneLevelBelow) {
 					if (visitable instanceof Operator) {

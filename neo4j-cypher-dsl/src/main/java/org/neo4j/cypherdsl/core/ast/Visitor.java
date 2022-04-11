@@ -29,9 +29,22 @@ public interface Visitor {
 	 * Enter a {@link Visitable}. Not all visitables will obey to the result
 	 *
 	 * @param segment the segment to visit.
-	 * @return A result indicating whether visitation of child elements should continue or not.
 	 */
-	EnterResult enter(Visitable segment);
+	void enter(Visitable segment);
+
+	/**
+	 * A method that is used to pass control to some extend from the visitor to the {@link Visitable}. Not all visitables
+	 * react to this and we don't give any guarantees about which will. This method has been mainly introduced in parallel
+	 * to {@link #enter(Visitable)} so that existing external implementations of {@link Visitor visitors} won't break.
+	 *
+	 * @param segment the segment to visit.
+	 * @return A result indicating whether visitation of child elements should continue or not.
+	 * @since TBA
+	 */
+	default EnterResult enterWithResult(Visitable segment) {
+		enter(segment);
+		return EnterResult.CONTINUE;
+	}
 
 	/**
 	 * Leave a {@link Visitable}.
