@@ -1,0 +1,44 @@
+== 2022.3
+
+=== 2022.3.0
+
+*No breaking changes*. The minor version has been incremented due to the following changes:
+
+* Changes in the `ExposesSubqueryCall` (new methods to expose `callInTransactions`, but that interface is not meant for
+  external implementations anyway)
+* Added a new type `Dialect` and a new default method `enterWithResult` on the `Visitor` interface (have a look at the JavaDoc
+  for the rationale behind it).
+
+==== 🚀 Features
+
+* Add support for dialects.
+* Add support for toString(Expression). (#344)
+* Support `CALL {} IN TRANSACTIONS`.
+* Add parameter callbacks to the parser. (#336)
+
+==== 🐛 Bug Fixes
+
+* Prevent `ClassCastException` when using `String` arguments to import variables into a subquery.
+* Make generated static model usable with self referential associations. (#337, Thanks to @ChristophB for his input on #335).
+* Fix tag of CypherParser entry point. (docs)
+
+==== 📝 Documentation
+
+* Add information about GraalVM 21.3.0 and `org.graalvm.buildtools:native-maven-plugin` to CONTRIBUTING.adoc.
+
+==== 🛠 Build
+
+* Fix publish_docs workflow.
+* Add support for registering `allDeclaredConstructors`. (#342)
+* Add `RegisterForReflection` and processor replacing static reflection-config.json. (#341)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump jackson-bom from 2.13.2 to 2.13.2.20220328 (#346)
+** Bump asm from 9.2 to 9.3 (#347)
+** Bump jacoco-maven-plugin from 0.8.7 to 0.8.8 (#345)
+** Update managed version of error_prone_annotations to 2.12.1, avoiding compilation issues in IDEA.
+** Bump spring-boot-starter-parent from 2.6.5 to 2.6.6 (#340)
+** Bump checker-qual from 3.21.3 to 3.21.4 (#339)
+** Bump maven-shade-plugin from 3.2.4 to 3.3.0 (#338)
