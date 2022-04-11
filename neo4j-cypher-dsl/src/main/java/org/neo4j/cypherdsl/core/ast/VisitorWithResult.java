@@ -34,7 +34,4 @@ public abstract class VisitorWithResult implements Visitor {
 	public final void enter(Visitable segment) {
 		enterWithResult(segment);
 	}
-
-	@Override
-	public abstract EnterResult enterWithResult(Visitable segment);
 }

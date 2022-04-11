@@ -284,7 +284,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			Constructor<? extends Visitor> ctor = handlerType.getDeclaredConstructor(DefaultVisitor.class);
 			return ctor.newInstance(this);
 		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			throw new RuntimeException(e);
+			throw new IllegalArgumentException(
+				dialect.name() + " has defined an illegal handler not providing a constructor accepting a delegate.");
 		}
 	}
 

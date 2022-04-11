@@ -47,7 +47,7 @@ public enum Dialect {
 	 */
 	NEO4J_5 {
 		@Override
-		@Nullable <T extends Visitor> Class<? extends Visitor> getHandler(Visitable visitable) {
+		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
 			if (visitable instanceof FunctionInvocation) {
 				return Neo4j5FunctionInvocationVisitor.class;
 			} else if (visitable instanceof Comparison) {
@@ -57,7 +57,7 @@ public enum Dialect {
 		}
 	};
 
-	@Nullable <T extends Visitor> Class<? extends Visitor> getHandler(Visitable visitable) {
+	@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
 		return null;
 	}
 }
