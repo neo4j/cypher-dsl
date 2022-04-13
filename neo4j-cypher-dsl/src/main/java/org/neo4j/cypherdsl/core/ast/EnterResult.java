@@ -27,9 +27,9 @@ import org.apiguardian.api.API;
  * nevertheless.
  *
  * @author Michael J. Simons
- * @since TBA
+ * @since 2022.3.0
  */
-@API(status = STABLE, since = "TBA")
+@API(status = STABLE, since = "2022.3.0")
 public enum EnterResult {
 
 	/**

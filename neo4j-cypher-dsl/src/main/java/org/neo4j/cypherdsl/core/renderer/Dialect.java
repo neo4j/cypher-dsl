@@ -32,9 +32,9 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  *
  * @author Michael J. Simons
  * @soundtrack Red Hot Chili Peppers - Unlimited Love
- * @since TBA
+ * @since 2022.3.0
  */
-@API(status = STABLE, since = "TBA")
+@API(status = STABLE, since = "2022.3.0")
 public enum Dialect {
 
 	/**

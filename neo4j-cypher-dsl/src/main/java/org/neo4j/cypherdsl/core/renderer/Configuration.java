@@ -152,7 +152,7 @@ public final class Configuration {
 		 *
 		 * @param dialect The new dialect
 		 * @return This builder. You can both use the original or this instance.
-		 * @since TBA
+		 * @since 2022.3.0
 		 */
 		public Builder withDialect(Dialect dialect) {
 			this.dialect = dialect;

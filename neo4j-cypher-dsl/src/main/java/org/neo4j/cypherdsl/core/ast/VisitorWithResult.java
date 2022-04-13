@@ -26,7 +26,7 @@ package org.neo4j.cypherdsl.core.ast;
  *
  * @author Michael J. Simons
  * @soundtrack Metallica - Ride The Lightning
- * @since TBA
+ * @since 2022.3.0
  */
 public abstract class VisitorWithResult implements Visitor {
 

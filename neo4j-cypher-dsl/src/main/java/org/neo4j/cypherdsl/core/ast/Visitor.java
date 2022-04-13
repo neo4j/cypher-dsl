@@ -39,7 +39,7 @@ public interface Visitor {
 	 *
 	 * @param segment the segment to visit.
 	 * @return A result indicating whether visitation of child elements should continue or not.
-	 * @since TBA
+	 * @since 2022.3.0
 	 */
 	default EnterResult enterWithResult(Visitable segment) {
 		enter(segment);

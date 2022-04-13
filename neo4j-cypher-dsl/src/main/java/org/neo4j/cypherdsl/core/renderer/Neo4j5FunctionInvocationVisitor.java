@@ -38,7 +38,7 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
  *
  * @author Michael J. Simons
  * @soundtrack Red Hot Chili Peppers - Unlimited Love
- * @since TBA
+ * @since 2022.3.0
  */
 @RegisterForReflection(allDeclaredConstructors = true) final class Neo4j5FunctionInvocationVisitor implements Visitor {
 
