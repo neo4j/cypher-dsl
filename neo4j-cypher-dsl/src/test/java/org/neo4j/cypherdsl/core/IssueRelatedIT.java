@@ -1083,4 +1083,25 @@ class IssueRelatedIT {
 			+ "RETURN true";
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+	@Test // GH-349
+	void allowProcedureCallWithoutResult() {
+		Node n = Cypher.anyNode("n");
+		ResultStatement statement = Cypher.match(n)
+			.call("apoc.util.validate")
+				.withArgs(Predicates.exists(n.property("foo")), Cypher.literalOf("Error"), Cypher.listOf())
+			.returning(n)
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) CALL apoc.util.validate(exists(n.foo), 'Error', []) RETURN n");
+	}
+
+	@Test // GH-349
+	void allowProcedureCallWithoutResultAndArguments() {
+		Node n = Cypher.anyNode("n");
+		ResultStatement statement = Cypher.match(n)
+			.call("apoc.util.validate")
+			.returning(n)
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) CALL apoc.util.validate() RETURN n");
+	}
 }

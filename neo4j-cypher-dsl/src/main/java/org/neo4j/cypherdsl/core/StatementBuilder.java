@@ -1128,14 +1128,16 @@ public interface StatementBuilder
 	 */
 	interface OngoingInQueryCallWithoutArguments extends
 		ExposesCall.ExposesWithArgs<OngoingInQueryCallWithArguments>,
-		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
+		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields>,
+		ExposesReturning {
 	}
 
 	/**
 	 * The union of an in-query call exposing yields.
 	 */
 	interface OngoingInQueryCallWithArguments extends
-		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
+		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields>,
+		ExposesReturning {
 	}
 
 	/**
