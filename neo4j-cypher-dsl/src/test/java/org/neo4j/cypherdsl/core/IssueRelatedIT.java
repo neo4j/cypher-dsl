@@ -1104,4 +1104,25 @@ class IssueRelatedIT {
 			.build();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n) CALL apoc.util.validate() RETURN n");
 	}
+
+	@Test // GH-362
+	void nodeNeedsToBeRenderedTwiceWithPatternsInCondition() {
+
+		Node n = Cypher.node("Node").named("n");
+		Node p = Cypher.anyNode("p");
+		SymbolicName x = Cypher.name("x");
+		Condition cond1 = Predicates.none(p.getRequiredSymbolicName()).in(x)
+			.where(
+				p.relationshipTo(Cypher.anyNode(), "Y").asCondition()
+					.or(p.relationshipTo(Cypher.anyNode(), "Z").asCondition())
+			);
+		Condition cond2 = Predicates.any(p.getRequiredSymbolicName()).in(x)
+			.where(p.property("bar").eq(Cypher.literalTrue()));
+		Statement s = Cypher.match(n)
+			.with(Functions.collect(n).as(x))
+			.where(cond1.and(cond2))
+			.returning(Functions.count(n))
+			.build();
+		assertThat(s.getCypher()).isEqualTo("MATCH (n:`Node`) WITH collect(n) AS x WHERE (none(p IN x WHERE ((p)-[:`Y`]->() OR (p)-[:`Z`]->())) AND any(p IN x WHERE p.bar = true)) RETURN count(n)");
+	}
 }
