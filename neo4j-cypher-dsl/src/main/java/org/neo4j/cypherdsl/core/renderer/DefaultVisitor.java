@@ -553,11 +553,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(SymbolicName symbolicName) {
 
-		if (skipSymbolicName) {
-			return;
+		if (inRelationshipCondition) {
+			String value = symbolicName.getValue();
+			if (Strings.hasText(value) && resolvedSymbolicNames.containsKey(symbolicName)) {
+				builder.append(escapeIfNecessary(symbolicName.getValue()));
+			}
+		} else {
+			builder.append(resolve(symbolicName));
 		}
-
-		builder.append(resolve(symbolicName));
 	}
 
 	void enter(Relationship relationship) {
