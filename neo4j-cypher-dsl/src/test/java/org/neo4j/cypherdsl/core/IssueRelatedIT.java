@@ -89,7 +89,7 @@ class IssueRelatedIT {
 
 		assertThat(cypherRenderer.render(statement))
 			.matches(
-				"MATCH \\([a-zA-Z]*\\d{3}:`Fruit` \\{kind: 'strawberry'\\}\\) SET [a-zA-Z]*\\d{3}\\.color = 'red'");
+				"MATCH \\([a-zA-Z]*\\d{3}:`Fruit` \\{kind: 'strawberry'}\\) SET [a-zA-Z]*\\d{3}\\.color = 'red'");
 	}
 
 	@Test
@@ -1090,6 +1090,7 @@ class IssueRelatedIT {
 		ResultStatement statement = Cypher.match(n)
 			.call("apoc.util.validate")
 				.withArgs(Predicates.exists(n.property("foo")), Cypher.literalOf("Error"), Cypher.listOf())
+			.withoutResults()
 			.returning(n)
 			.build();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n) CALL apoc.util.validate(exists(n.foo), 'Error', []) RETURN n");
@@ -1100,9 +1101,65 @@ class IssueRelatedIT {
 		Node n = Cypher.anyNode("n");
 		ResultStatement statement = Cypher.match(n)
 			.call("apoc.util.validate")
+			.withoutResults()
 			.returning(n)
 			.build();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n) CALL apoc.util.validate() RETURN n");
+	}
+
+	@Test // GH-349
+	void wildValidate() {
+
+		Node this0 = Cypher.node("Movie").named("this0");
+
+		Condition validationCondition = Predicates.any("r")
+			.in(Cypher.listOf(Cypher.literalOf("admin")))
+			.where(Predicates.any("rr").in(Cypher.parameter("$auth.roles")).where(SymbolicName.of("r").eq(SymbolicName.of("rr"))));
+
+		Node g = Cypher.node("Genre").named("this0_genres_connectOrCreate0")
+			.withProperties(Cypher.mapOf("name", Cypher.parameter("this0_genres_connectOrCreate0_node_name")));
+
+
+		Statement innerSubquery = Cypher
+			.call("apoc.util.validate")
+			.withArgs(validationCondition.not(), Cypher.literalOf("@neo4j/graphql/FORBIDDEN"), Cypher.listOf(Cypher.literalOf(0)))
+			.withoutResults()
+			.merge(g)
+			.onCreate().set(g.property("name").to(Cypher.parameter("this0_genres_connectOrCreate0_on_create_name")))
+			.merge(this0.relationshipTo(g, "IN_GENRE").named("this0_relationship_this0_genres_connectOrCreate0"))
+			.returning(Functions.count(Cypher.asterisk()))
+			.build();
+
+		Statement subquery = Cypher.create(this0)
+			.set(this0.property("title").to(Cypher.parameter("this0_title")))
+			.with(this0)
+			.call(innerSubquery, this0)
+			.returning(this0)
+			.build();
+
+		Statement statement = Cypher
+			.call(subquery)
+			.returning(Cypher.listOf(MapProjection.create(this0.getRequiredSymbolicName(), "title")).as("data"))
+			.build();
+		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
+		assertThat(renderer.render(statement))
+			.isEqualTo(""
+				+ "CALL {"
+				+ "CREATE (this0:Movie)"
+				+ " SET this0.title = $this0_title"
+				+ " WITH this0"
+				+ " CALL {"
+				+ "WITH this0"
+				+ " CALL apoc.util.validate(NOT (any(r IN ['admin'] WHERE any(rr IN $auth.roles WHERE r = rr))), '@neo4j/graphql/FORBIDDEN', [0])"
+				+ " MERGE (this0_genres_connectOrCreate0:Genre {name: $this0_genres_connectOrCreate0_node_name})"
+				+ " ON CREATE"
+				+ " SET this0_genres_connectOrCreate0.name = $this0_genres_connectOrCreate0_on_create_name"
+				+ " MERGE (this0)-[this0_relationship_this0_genres_connectOrCreate0:IN_GENRE]->(this0_genres_connectOrCreate0)"
+				+ " RETURN count(*)"
+				+ "}"
+				+ " RETURN this0"
+				+ "}"
+				+ " RETURN [this0{.title}] AS data");
 	}
 
 	@Test // GH-362

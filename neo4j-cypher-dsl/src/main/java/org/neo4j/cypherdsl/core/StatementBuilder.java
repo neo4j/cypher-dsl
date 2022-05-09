@@ -20,14 +20,14 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.Collection;
+
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
-
-import java.util.Collection;
 
 /**
  * @author Michael J. Simons
@@ -1105,6 +1105,14 @@ public interface StatementBuilder
 	interface OngoingStandaloneCallWithoutArguments extends
 		StatementBuilder.BuildableStatement<Statement>, ExposesCall.ExposesWithArgs<OngoingStandaloneCallWithArguments>,
 		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
+
+		/**
+		 * Turn this call into a void call to continue with querying
+		 *
+		 * @return the call, continue with a normal query from here.
+		 * @since 2022.4.0
+		 */
+		VoidCall withoutResults();
 	}
 
 	/**
@@ -1113,6 +1121,14 @@ public interface StatementBuilder
 	interface OngoingStandaloneCallWithArguments extends
 		StatementBuilder.BuildableStatement<Statement>,
 		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
+
+		/**
+		 * Turn this call into a void call to continue with querying
+		 *
+		 * @return the call, continue with a normal query from here.
+		 * @since 2022.4.0
+		 */
+		VoidCall withoutResults();
 	}
 
 	/**
@@ -1128,16 +1144,39 @@ public interface StatementBuilder
 	 */
 	interface OngoingInQueryCallWithoutArguments extends
 		ExposesCall.ExposesWithArgs<OngoingInQueryCallWithArguments>,
-		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields>,
-		ExposesReturning {
+		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
+
+		/**
+		 * Turn this call into a void call to continue with querying
+		 *
+		 * @return the call, continue with a normal query from here.
+		 * @since 2022.4.0
+		 */
+		VoidCall withoutResults();
 	}
 
 	/**
 	 * The union of an in-query call exposing yields.
 	 */
 	interface OngoingInQueryCallWithArguments extends
-		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields>,
-		ExposesReturning {
+		ExposesCall.ExposesYield<OngoingInQueryCallWithReturnFields> {
+
+		/**
+		 * Turn this call into a void call to continue with querying
+		 *
+		 * @return the call, continue with a normal query from here.
+		 * @since 2022.4.0
+		 */
+		VoidCall withoutResults();
+	}
+
+	/**
+	 * The result of a call to a stored procedure not having any results. It is possible to continue with "normal"
+	 * querying after the execution of such a procedure.
+	 *
+	 * @since 2022.4.0
+	 */
+	interface VoidCall extends OngoingReading {
 	}
 
 	/**
