@@ -1125,4 +1125,19 @@ class IssueRelatedIT {
 			.build();
 		assertThat(s.getCypher()).isEqualTo("MATCH (n:`Node`) WITH collect(n) AS x WHERE (none(p IN x WHERE ((p)-[:`Y`]->() OR (p)-[:`Z`]->())) AND any(p IN x WHERE p.bar = true)) RETURN count(n)");
 	}
+
+	@Test // GH-350
+	void compoundConditionShouldBeImmutableAsStatedInTheDocs() {
+		Node n = Cypher.anyNode("n");
+		Condition a = org.neo4j.cypherdsl.core.Conditions.noCondition();
+		a = a.and(n.property("b").eq(Cypher.literalOf(1)));
+		Condition temp = a;
+		a = a.and(n.property("c").eq(Cypher.literalOf(2)));
+		ResultStatement statement = Cypher
+			.match(n)
+			.where(temp)
+			.returning(n)
+			.build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE n.b = 1 RETURN n");
+	}
 }

@@ -61,6 +61,13 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			.add(operator, right);
 	}
 
+	static CompoundCondition copyOf(CompoundCondition other) {
+
+		CompoundCondition result = new CompoundCondition(other.operator);
+		result.conditions.addAll(other.conditions);
+		return result;
+	}
+
 	static CompoundCondition empty() {
 
 		return EMPTY_CONDITION;
@@ -109,7 +116,7 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			CompoundCondition compoundCondition = (CompoundCondition) condition;
 			CompoundCondition target;
 			if (this.operator == chainingOperator && chainingOperator == compoundCondition.operator) {
-				target = this;
+				target = CompoundCondition.copyOf(this);
 			} else {
 				CompoundCondition inner = new CompoundCondition(chainingOperator);
 				if (this.hasConditions()) {
@@ -127,8 +134,9 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 		}
 
 		if (this.operator == chainingOperator) {
-			conditions.add(condition);
-			return this;
+			CompoundCondition target = CompoundCondition.copyOf(this);
+			target.conditions.add(condition);
+			return target;
 		}
 
 		return CompoundCondition.create(this, chainingOperator, condition);
