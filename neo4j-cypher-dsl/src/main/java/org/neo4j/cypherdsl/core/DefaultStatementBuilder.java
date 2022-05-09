@@ -54,7 +54,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 class DefaultStatementBuilder implements StatementBuilder,
 	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
 	BuildableMatchAndUpdate,
-	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery {
+	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall {
 
 	/**
 	 * Current list of reading or update clauses to be generated.
@@ -1605,6 +1605,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		}
 
+		@Override
+		public VoidCall withoutResults() {
+			return new DefaultStatementBuilder(this.build());
+		}
+
 		@NotNull
 		@Override
 		public ProcedureCall build() {
@@ -1867,6 +1872,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.match(optional, pattern);
+		}
+
+		@Override
+		public VoidCall withoutResults() {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this;
 		}
 	}
 

@@ -37,6 +37,7 @@ import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.PatternComprehension;
+import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Statement;
@@ -111,7 +112,11 @@ public final class ScopingStrategy {
 			} else {
 				this.afterStatement = new HashSet<>(lastScope);
 			}
-			lastScope.clear();
+
+			// A procedure call doesn't change scope.
+			if (!(visitable instanceof ProcedureCall)) {
+				lastScope.clear();
+			}
 		} else if (hasLocalScope(visitable)) {
 			this.dequeOfVisitedNamed.pop();
 		} else {
