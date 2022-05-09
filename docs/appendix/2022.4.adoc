@@ -1,0 +1,38 @@
+== 2022.4
+
+=== 2022.4.0
+
+* Added `withoutResults` to both in-statement and standalone call-builders so that one can use procedures without results
+  inside a pipeline. This won't break anything, as the corresponding interface is not meant to implemented by downstream
+  libraries
+* Compound conditions are now correctly immutable (as stated by the contract and its JavaDoc).
+  This might break things if you have them changed inflight.
+
+Thanks to @Andy2003 for his input on this release.
+
+==== 🚀 Features
+
+* Allow procedure calls without results after a match clause. (#361)
+
+==== 🐛 Bug Fixes
+
+* Make `CompoundCondition` immutable obliging the interfaces contract. (#365)
+* Don't skip symbolic names if present and already in scope. (#363)
+
+==== 🛠 Build
+
+* Update github-push-action to 0.6.0.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump testcontainers.version from 1.16.3 to 1.17.1 (#352)
+** Bump reactor-bom from 2020.0.17 to 2020.0.18 (#353)
+** Bump mockito.version from 4.4.0 to 4.5.1 (#354)
+** Bump checkstyle from 10.1 to 10.2 (#355)
+** Bump spring-boot-starter-parent from 2.6.6 to 2.6.7 (#356)
+** Bump maven-javadoc-plugin from 3.3.2 to 3.4.0 (#357)
+** Bump maven-site-plugin from 3.11.0 to 3.12.0 (#358)
+** Bump spring-data-neo4j from 6.2.3 to 6.2.4 (#359)
+** Bump neo4j-cypher-javacc-parser from 4.4.5 to 4.4.6 (#360)
+** Bump checker-qual from 3.21.4 to 3.22.0 (#364)
