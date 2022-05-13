@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -200,6 +201,11 @@ final class CypherDslASTFactory implements
 
 	public List<Expression> newReturnItems(InputPosition p, boolean returnAll, List<Expression> returnItems) {
 		var finalReturnItems = returnItems;
+
+		if (returnAll) {
+			finalReturnItems = Stream.concat(Stream.of(Cypher.asterisk()), finalReturnItems.stream()).collect(Collectors.toList());
+		}
+
 		if (finalReturnItems.isEmpty()) {
 			if (!returnAll) {
 				throw new IllegalArgumentException("Cannot return nothing.");

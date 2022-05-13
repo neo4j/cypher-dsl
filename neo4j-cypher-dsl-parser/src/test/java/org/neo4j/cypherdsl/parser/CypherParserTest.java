@@ -292,6 +292,15 @@ class CypherParserTest {
 		assertThat(statement.getCypher()).isEqualTo("RETURN 1 AS foo");
 	}
 
+	@Test
+	void shouldParseReturnAll() {
+		var statement1 = CypherParser.parseStatement("WITH 1 AS foo WITH *, 2 AS bar RETURN *");
+		assertThat(statement1.getCypher()).isEqualTo("WITH 1 AS foo WITH *, 2 AS bar RETURN *");
+
+		var statement2 = CypherParser.parseStatement("WITH 1 AS foo WITH *, 2 AS bar RETURN foo");
+		assertThat(statement2.getCypher()).isEqualTo("WITH 1 AS foo WITH *, 2 AS bar RETURN foo");
+	}
+
 	@ParameterizedTest
 	@ValueSource(strings = { "CREATE", "MERGE", "MATCH" })
 	void patternElementCallBacksShouldBeApplied(String clause) {
