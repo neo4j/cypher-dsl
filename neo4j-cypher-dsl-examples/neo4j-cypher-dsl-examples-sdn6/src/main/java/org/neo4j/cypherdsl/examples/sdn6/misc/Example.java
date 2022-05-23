@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.examples.sdn6.misc;
 
-import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
@@ -35,7 +35,7 @@ public class Example {
 	@Relationship(type = "BELONGS_TO")
 	private Example parent;
 
-	@PersistenceConstructor
+	@PersistenceCreator
 	public Example(long id) {
 		this.id = id;
 	}

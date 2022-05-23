@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
@@ -61,7 +61,7 @@ public final class Movie {
 	}
 
 	@JsonCreator
-	@PersistenceConstructor
+	@PersistenceCreator
 	public Movie(@JsonProperty("title") String title,
 		@JsonProperty("description") String description,
 		@JsonProperty("actors") List<Actor> actors,

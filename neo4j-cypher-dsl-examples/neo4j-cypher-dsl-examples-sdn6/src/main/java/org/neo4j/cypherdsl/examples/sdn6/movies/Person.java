@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
-import org.springframework.data.annotation.PersistenceConstructor;
+import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -39,7 +39,7 @@ public final class Person {
 
 	private Integer born;
 
-	@PersistenceConstructor
+	@PersistenceCreator
 	private Person(Long id, String name, Integer born) {
 		this.id = id;
 		this.born = born;
