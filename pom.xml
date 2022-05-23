@@ -610,12 +610,7 @@
 								<!--
 								 | Those are shaded classes from Neo4j and we work around their changes.
 								 -->
-								<exclude>org.neo4j.cypherdsl.parser.internal.ast.factory.ASTExceptionFactory</exclude>
-								<exclude>org.neo4j.cypherdsl.parser.internal.ast.factory.ASTFactory</exclude>
-								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher$AlterAlias</exclude>
-								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher$CreateAlias</exclude>
-								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher.AlterAlias</exclude>
-								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher.CreateAlias</exclude>
+								<exclude>org.neo4j.cypherdsl.parser.internal</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
