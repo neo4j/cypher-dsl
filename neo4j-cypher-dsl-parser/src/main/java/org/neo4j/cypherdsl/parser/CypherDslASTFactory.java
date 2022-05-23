@@ -733,7 +733,7 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Statement showAliases(InputPosition inputPosition, Clause clause, Return aReturn, Where where) {
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
