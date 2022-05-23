@@ -606,6 +606,13 @@
 									<sourceCompatible>true</sourceCompatible>
 								</overrideCompatibilityChangeParameter>
 							</overrideCompatibilityChangeParameters>
+							<excludes>
+								<!--
+								 | Those are shaded classes from Neo4j and we work around their changes.
+								 -->
+								<exclude>org.neo4j.cypherdsl.parser.internal.ast.factory.ASTExceptionFactory</exclude>
+								<exclude>org.neo4j.cypherdsl.parser.internal.ast.factory.ASTFactory</exclude>
+							</excludes>
 						</parameter>
 					</configuration>
 				</plugin>
