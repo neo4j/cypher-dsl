@@ -727,24 +727,45 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Statement createDatabaseAlias(InputPosition p, boolean replace, SimpleEither<String, Parameter<?>> aliasName,
-		SimpleEither<String, Parameter<?>> targetName, boolean ifNotExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Statement alterDatabaseAlias(InputPosition p, SimpleEither<String, Parameter<?>> aliasName,
-		SimpleEither<String, Parameter<?>> targetName, boolean ifExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public Statement dropAlias(InputPosition p, SimpleEither<String, Parameter<?>> aliasName, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
+	public Statement showAliases(InputPosition inputPosition, Clause clause, Return aReturn, Where where) {
+		return null;
+	}
+
+	@Override
 	public NULL wait(boolean wait, long seconds) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement createLocalDatabaseAlias(InputPosition inputPosition, boolean b,
+		SimpleEither<String, Parameter<?>> simpleEither, SimpleEither<String, Parameter<?>> simpleEither1, boolean b1) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement createRemoteDatabaseAlias(InputPosition inputPosition, boolean b,
+		SimpleEither<String, Parameter<?>> simpleEither, SimpleEither<String, Parameter<?>> simpleEither1, boolean b1,
+		SimpleEither<String, Parameter<?>> simpleEither2, SimpleEither<String, Parameter<?>> simpleEither3,
+		Expression expression, SimpleEither<Map<String, Expression>, Parameter<?>> simpleEither4) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement alterLocalDatabaseAlias(InputPosition inputPosition,
+		SimpleEither<String, Parameter<?>> simpleEither, SimpleEither<String, Parameter<?>> simpleEither1, boolean b) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement alterRemoteDatabaseAlias(InputPosition inputPosition,
+		SimpleEither<String, Parameter<?>> simpleEither, SimpleEither<String, Parameter<?>> simpleEither1, boolean b,
+		SimpleEither<String, Parameter<?>> simpleEither2, SimpleEither<String, Parameter<?>> simpleEither3,
+		Expression expression, SimpleEither<Map<String, Expression>, Parameter<?>> simpleEither4) {
 		throw new UnsupportedOperationException();
 	}
 
