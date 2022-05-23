@@ -614,6 +614,8 @@
 								<exclude>org.neo4j.cypherdsl.parser.internal.ast.factory.ASTFactory</exclude>
 								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher$AlterAlias</exclude>
 								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher$CreateAlias</exclude>
+								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher.AlterAlias</exclude>
+								<exclude>org.neo4j.cypherdsl.parser.internal.parser.javacc.Cypher.CreateAlias</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
