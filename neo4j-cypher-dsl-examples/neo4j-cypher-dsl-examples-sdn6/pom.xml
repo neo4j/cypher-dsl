@@ -41,7 +41,7 @@
 		<java.version>11</java.version>
 		<maven-checkstyle-plugin.version>3.1.2</maven-checkstyle-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
-		<testcontainers.version>1.17.1</testcontainers.version>
+		<testcontainers.version>1.17.2</testcontainers.version>
 	</properties>
 
 	<dependencies>
