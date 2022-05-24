@@ -41,9 +41,16 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 
 	private static final Pattern RESERVED_CHARS = Pattern.compile("([" + Pattern.quote("\\'\"") + "])");
 	private static final String QUOTED_LITERAL_FORMAT = "'%s'";
+	private final boolean escapeQuotes;
 
 	StringLiteral(CharSequence content) {
 		super(content);
+		this.escapeQuotes = false;
+	}
+
+	StringLiteral(CharSequence content, boolean escapeQuotes) {
+		super(content);
+		this.escapeQuotes = escapeQuotes;
 	}
 
 	@NotNull
@@ -51,7 +58,7 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 	public String asString() {
 
 		final Optional<String> escapedContent = escapeString(getContent());
-		return String.format(Locale.ENGLISH, QUOTED_LITERAL_FORMAT, escapedContent.orElse(""));
+		return escapeQuotes ? escapedContent.orElse("") : String.format(Locale.ENGLISH, QUOTED_LITERAL_FORMAT, escapedContent.orElse(""));
 	}
 
 	/**

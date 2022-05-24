@@ -36,6 +36,28 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public interface Expression extends Visitable {
 
 	/**
+	 * Creates a condition that checks whether this {@code expression} includes elements of that {@code expression}.
+	 *
+	 * @param expression The expression to match against. Must evaluate into a list during runtime.
+	 * @return A new condition.
+	 */
+	@NotNull @Contract(pure = true)
+	default Condition includes(Expression expression) {
+		return Conditions.includes(this, expression);
+	}
+
+	/**
+	 * Creates a condition that checks whether this {@code expression} includes elements of that {@code expression}.
+	 *
+	 * @param expression The expression to match against. Must evaluate into a list during runtime.
+	 * @return A new condition.
+	 */
+	@NotNull @Contract(pure = true)
+	default Condition notIncludes(Expression expression) {
+		return Conditions.notIncludes(this, expression);
+	}
+
+	/**
 	 * Creates an expression with an alias. This expression does not track which or how many aliases have been created.
 	 *
 	 * @param alias The alias to use
@@ -69,7 +91,7 @@ public interface Expression extends Visitable {
 	/**
 	 * Takes the {@link #size()} expresssions and compares it for equality with the parameter {@code expectedSize}. The
 	 * same restrictions as with {@link #size()} apply.
- 	 * @param expectedSize The expected size
+	 * @param expectedSize The expected size
 	 * @return A condition
 	 * @see #size()
 	 * @since 2022.1.0

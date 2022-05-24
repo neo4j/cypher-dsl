@@ -37,6 +37,26 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class Conditions {
 
 	/**
+	 * Creates a condition that checks whether the {@code lhs} includes elements present in {@code rhs}.
+	 * @param lhs Argument in which elements need to be checked
+	 * @param rhs Argument of which elements will be checked
+	 * @return An "includes" comparison
+	 */
+	static Condition includes(Expression lhs, Expression rhs) {
+		return IncludesCondition.create(lhs, Operator.INCLUDES, rhs);
+	}
+
+	/**
+	 * Creates a condition that checks whether the {@code lhs} includes elements present in {@code rhs}.
+	 * @param lhs Argument in which elements need to be checked
+	 * @param rhs Argument of which elements will be checked
+	 * @return A "not_includes" comparison
+	 */
+	static Condition notIncludes(Expression lhs, Expression rhs) {
+		return IncludesCondition.create(lhs, Operator.NOT_INCLUDES, rhs);
+	}
+
+	/**
 	 * Creates a condition that matches if the right hand side is a regular expression that matches the the left hand side via
 	 * {@code =~}.
 	 *
