@@ -70,7 +70,7 @@ class RegisterForReflectionProcessorTest {
 
 		assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
 		assertThat(compilation.warnings()).isEmpty();
-		assertThat(compilation.generatedFile(StandardLocation.CLASS_OUTPUT,
+		assertThat(compilation.generatedFile(StandardLocation.SOURCE_OUTPUT,
 			"META-INF/native-image/foo/bar/reflection-config.json"))
 			.map(f -> {
 				try {
@@ -97,7 +97,7 @@ class RegisterForReflectionProcessorTest {
 
 		assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
 		assertThat(compilation.warnings()).isEmpty();
-		assertThat(compilation.generatedFile(StandardLocation.CLASS_OUTPUT, "META-INF/native-image/reflection-config.json"))
+		assertThat(compilation.generatedFile(StandardLocation.SOURCE_OUTPUT, "META-INF/native-image/reflection-config.json"))
 			.isPresent();
 	}
 
@@ -109,7 +109,7 @@ class RegisterForReflectionProcessorTest {
 
 		assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
 		assertThat(compilation.warnings()).isEmpty();
-		assertThat(compilation.generatedFile(StandardLocation.CLASS_OUTPUT, "META-INF/native-image/foo/reflection-config.json"))
+		assertThat(compilation.generatedFile(StandardLocation.SOURCE_OUTPUT, "META-INF/native-image/foo/reflection-config.json"))
 			.isPresent();
 	}
 
@@ -126,7 +126,7 @@ class RegisterForReflectionProcessorTest {
 
 		assertThat(compilation.status()).isEqualTo(Compilation.Status.SUCCESS);
 		assertThat(compilation.warnings()).isEmpty();
-		assertThat(compilation.generatedFile(StandardLocation.CLASS_OUTPUT,
+		assertThat(compilation.generatedFile(StandardLocation.SOURCE_OUTPUT,
 			"META-INF/native-image/foo/bar/reflection-config.json")).isEmpty();
 	}
 

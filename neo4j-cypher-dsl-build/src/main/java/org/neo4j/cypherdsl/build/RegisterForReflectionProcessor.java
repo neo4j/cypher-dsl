@@ -66,7 +66,7 @@ public final class RegisterForReflectionProcessor extends AbstractProcessor {
 					subDir += "/";
 				}
 				String reflectionConfigPath = String.format("META-INF/native-image/%sreflection-config.json", subDir);
-				FileObject fileObject = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", reflectionConfigPath);
+				FileObject fileObject = processingEnv.getFiler().createResource(StandardLocation.SOURCE_OUTPUT, "", reflectionConfigPath);
 				try (OutputStream oos = fileObject.openOutputStream()) {
 					OBJECT_MAPPER.writeValue(oos, entries);
 				}
