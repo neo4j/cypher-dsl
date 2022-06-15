@@ -42,8 +42,10 @@ public interface StatementContext {
 	String getParameterName(Parameter<?> parameter);
 
 	/**
-	 * Some constants may be rendered as parameters.
-	 * @return True if literal parameters hav
+	 * Some parameters may be rendered as constants.
+	 *
+	 * @return {@literal true} if objects passed via the QueryDSL context as parameters should be rendered as Cypher-String
+	 * constants rather than actual Cypher parameters.
 	 */
 	boolean isRenderConstantsAsParameters();
 }
