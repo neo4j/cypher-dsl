@@ -1220,4 +1220,85 @@ class IssueRelatedIT {
 			"timezone", Cypher.literalOf(value.getZone().toString())
 		);
 	}
+
+	@Test // GH-388
+	void shouldRenderSetOpOnNodeWithMap() {
+		Node node = Cypher.node("CordraObject").named("existingNode")
+			.withProperties("_id", Cypher.literalOf("test/55de0539eb1e14f26a04"));
+
+		Statement statement = Cypher.merge(node)
+			.set(node, Cypher.mapOf(
+				"_id", Cypher.literalOf("test/55de0539eb1e14f26a04"),
+				"_type", Cypher.literalOf("Movie"),
+				"title", Cypher.literalOf("Top Gun"),
+				"released", Cypher.literalOf(1986)
+			))
+			.returning(node)
+			.build();
+
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
+			.isEqualTo(""
+				+ "MERGE (existingNode:CordraObject  {\n"
+				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
+				+ "})\n"
+				+ "SET existingNode =  {\n"
+				+ "  _id: 'test/55de0539eb1e14f26a04',\n"
+				+ "  _type: 'Movie',\n"
+				+ "  title: 'Top Gun',\n"
+				+ "  released: 1986\n"
+				+ "}\n"
+				+ "RETURN existingNode");
+	}
+
+	@Test // GH-388
+	void shouldProvideSetOperations() {
+		Node node = Cypher.node("CordraObject").named("existingNode")
+			.withProperties("_id", Cypher.literalOf("test/55de0539eb1e14f26a04"));
+
+		Operation thisChangesEverything = node.set(Cypher.mapOf(
+				"_id", Cypher.literalOf("test/55de0539eb1e14f26a04"),
+				"_type", Cypher.literalOf("Movie"),
+				"title", Cypher.literalOf("Top Gun"),
+				"released", Cypher.literalOf(1986)
+			));
+
+		Statement statement = Cypher.merge(node)
+			.set(thisChangesEverything)
+			.returning(node)
+			.build();
+
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
+			.isEqualTo(""
+				+ "MERGE (existingNode:CordraObject  {\n"
+				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
+				+ "})\n"
+				+ "SET existingNode =  {\n"
+				+ "  _id: 'test/55de0539eb1e14f26a04',\n"
+				+ "  _type: 'Movie',\n"
+				+ "  title: 'Top Gun',\n"
+				+ "  released: 1986\n"
+				+ "}\n"
+				+ "RETURN existingNode");
+	}
+
+	@Test // GH-388
+	void shouldProvideSetOperationsForParameter() {
+		Node node = Cypher.node("CordraObject").named("existingNode")
+			.withProperties("_id", Cypher.literalOf("test/55de0539eb1e14f26a04"));
+
+		Operation thisChangesEverything = node.set(Cypher.parameter("aNewMap"));
+
+		Statement statement = Cypher.merge(node)
+			.set(thisChangesEverything)
+			.returning(node)
+			.build();
+
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
+			.isEqualTo(""
+				+ "MERGE (existingNode:CordraObject  {\n"
+				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
+				+ "})\n"
+				+ "SET existingNode = $aNewMap\n"
+				+ "RETURN existingNode");
+	}
 }

@@ -70,6 +70,22 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 
 	@NotNull
 	@Override
+	public final Operation set(Parameter<?> parameter) {
+		return Operations.set(this.getSymbolicName()
+				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
+			parameter);
+	}
+
+	@NotNull
+	@Override
+	public final Operation set(MapExpression properties) {
+		return Operations.set(this.getSymbolicName()
+				.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
+			properties);
+	}
+
+	@NotNull
+	@Override
 	public final MapProjection project(List<Object> entries) {
 		return project(entries.toArray());
 	}
