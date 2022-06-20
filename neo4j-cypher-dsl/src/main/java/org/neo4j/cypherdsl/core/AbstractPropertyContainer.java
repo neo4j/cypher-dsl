@@ -52,20 +52,32 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 		return InternalPropertyImpl.create(this, lookup);
 	}
 
+	static IllegalStateException noNameException() {
+		return new IllegalStateException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_REQUIRES_NAME_FOR_MUTATION));
+	}
+
 	@NotNull
 	@Override
 	public final Operation mutate(Parameter<?> parameter) {
-		return Operations.mutate(this.getSymbolicName()
-						.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
-				parameter);
+		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), parameter);
 	}
 
 	@NotNull
 	@Override
 	public final Operation mutate(MapExpression properties) {
-		return Operations.mutate(this.getSymbolicName()
-						.orElseThrow(() -> new IllegalStateException("A property container must be named to be mutated.")),
-				properties);
+		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), properties);
+	}
+
+	@NotNull
+	@Override
+	public final Operation set(Parameter<?> parameter) {
+		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), parameter);
+	}
+
+	@NotNull
+	@Override
+	public final Operation set(MapExpression properties) {
+		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), properties);
 	}
 
 	@NotNull

@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatIllegalStateException;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,6 +53,46 @@ class InternalNodeImplTest {
 		assertThatIllegalArgumentException().isThrownBy(() -> new InternalNodeImpl(" \t")).withMessage(expectedMessage);
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node("")).withMessage(expectedMessage);
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.node(" \t")).withMessage(expectedMessage);
+	}
+
+	@Nested
+	class MutationsAndSetShouldRequireName {
+
+		@Test
+		void mutationWithParameter() {
+
+			Node node = Cypher.anyNode();
+			Parameter<?> parameter = Cypher.parameter("x");
+			assertThatIllegalStateException().isThrownBy(() -> node.mutate(parameter))
+				.withMessage("A property container must be named to be mutated.");
+		}
+
+		@Test
+		void mutationWithMap() {
+
+			Node node = Cypher.anyNode();
+			MapExpression mapExpression = Cypher.mapOf("a", Cypher.literalTrue());
+			assertThatIllegalStateException().isThrownBy(() -> node.mutate(mapExpression))
+				.withMessage("A property container must be named to be mutated.");
+		}
+
+		@Test
+		void setWithParameter() {
+
+			Node node = Cypher.anyNode();
+			Parameter<?> parameter = Cypher.parameter("x");
+			assertThatIllegalStateException().isThrownBy(() -> node.set(parameter))
+				.withMessage("A property container must be named to be mutated.");
+		}
+
+		@Test
+		void setWithMap() {
+
+			Node node = Cypher.anyNode();
+			MapExpression mapExpression = Cypher.mapOf("a", Cypher.literalTrue());
+			assertThatIllegalStateException().isThrownBy(() -> node.set(mapExpression))
+				.withMessage("A property container must be named to be mutated.");
+		}
 	}
 
 	@Test

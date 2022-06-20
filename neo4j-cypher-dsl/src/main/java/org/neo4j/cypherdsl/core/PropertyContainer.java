@@ -99,6 +99,28 @@ public interface PropertyContainer extends Named {
 	Operation mutate(MapExpression properties);
 
 	/**
+	 * Creates an {@link Operation SET operation} setting the properties of this container to a new value. The container does not
+	 * track the operations created with this method.
+	 *
+	 * @param parameter the new properties
+	 * @return A new operation.
+	 * @since 2022.5.0
+	 */
+	@NotNull @Contract(pure = true)
+	Operation set(Parameter<?> parameter);
+
+	/**
+	 * Creates an {@link Operation SET operation} setting the properties of this container to a new value. The container does not
+	 * track the operations created with this method.
+	 *
+	 * @param properties the new properties
+	 * @return A new operation.
+	 * @since 2022.5.0
+	 */
+	@NotNull @Contract(pure = true)
+	Operation set(MapExpression properties);
+
+	/**
 	 * Unwraps the list of entries into an array before creating a projection out of it.
 	 *
 	 * @param entries A list of entries for the projection
