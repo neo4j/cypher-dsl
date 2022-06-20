@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
- * Thrown when a QueryDSL operator cannot be used with the Cypher-DSL predicate converter.
+ * A literal representing a temporal value to be formatted in a way that Neo4j's Cypher understands it.
  *
  * @author Michael J. Simons
  * @soundtrack Fritz Kalkbrenner - Drown

@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.stream.Stream;
 
@@ -1196,5 +1197,27 @@ class IssueRelatedIT {
 			.returning(n)
 			.build();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE n.b = 1 RETURN n");
+	}
+
+	@Test // GH-389
+	void shouldRenderCorrectDateTimeCall() {
+
+		Expression datetime = Functions
+			.datetime(toMap(ZonedDateTime.parse("2022-06-19T15:47:38.590917308Z[UTC]")));
+		assertThat(Cypher.returning(datetime).build().getCypher()).isEqualTo(
+			"RETURN datetime({year: 2022, month: 6, day: 19, hour: 15, minute: 47, second: 38, nanosecond: 590917308, timezone: 'UTC'})");
+	}
+
+	static MapExpression toMap(ZonedDateTime value) {
+		return Cypher.mapOf(
+			"year", Cypher.literalOf(value.getYear()),
+			"month", Cypher.literalOf(value.getMonthValue()),
+			"day", Cypher.literalOf(value.getDayOfMonth()),
+			"hour", Cypher.literalOf(value.getHour()),
+			"minute", Cypher.literalOf(value.getMinute()),
+			"second", Cypher.literalOf(value.getSecond()),
+			"nanosecond", Cypher.literalOf(value.getNano()),
+			"timezone", Cypher.literalOf(value.getZone().toString())
+		);
 	}
 }
