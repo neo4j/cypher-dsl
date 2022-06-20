@@ -126,7 +126,7 @@
 		<auto-common.version>0.11</auto-common.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
-		<checker-qual.version>3.22.1</checker-qual.version>
+		<checker-qual.version>3.22.2</checker-qual.version>
 		<checkstyle.version>10.3</checkstyle.version>
 		<compile-testing.version>0.19</compile-testing.version>
 		<covered-ratio-complexity>0.75</covered-ratio-complexity>
