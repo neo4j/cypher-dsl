@@ -161,3 +161,27 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main
 <.> Here we use an anonymous parameter to store the `name` value
 
 The full example is in `neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6`.
+
+An example of using a mixture of anonymous and named parameters is shown in the following listing:
+
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6/src/main/java/org/neo4j/cypherdsl/examples/sdn6/movies/PeopleService.java[tag=using-temporals]
+----
+<.> An anonymous parameter with a simple `String`-value
+<.> A named parameter with an `Integer` value extracted from a complex datatype
+<.> An anonymous parameter again, but one that holds a complex datatype. Such datatype
+    can be anything that is understood by the Neo4j-Java-Driver, such as in this case, a temporal
+    but also maps and lists. It will always be passed as a value, never as a literal.
+
+The statement above will be rendered like this:
+
+[source,console]
+----
+[http-nio-auto-1-exec-1] 2022-06-21 11:40:57,732 DEBUG    org.springframework.data.neo4j.cypher: 313 - Executing:
+MERGE (p:`Person` {name: $pcdsl01}) ON CREATE SET p.born = $arbitraryName, p.dob = $pcdsl02 RETURN p
+[http-nio-auto-1-exec-1] 2022-06-21 11:40:57,735 TRACE    org.springframework.data.neo4j.cypher: 334 - with parameters:
+:param arbitraryName => 1990
+:param pcdsl01 => 'Liv Lisa Fries'
+:param pcdsl02 => 1990-10-31T22:42Z[UTC]
+----

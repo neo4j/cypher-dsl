@@ -23,6 +23,8 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -64,5 +66,12 @@ public class PeopleController {
 	public Iterable<Person> findPeopleBornAfterThe70tiesV2(@RequestParam(name = "conditions") String additionalConditions) {
 
 		return peopleService.findPeopleBornAfterThe70tiesAndV2(additionalConditions);
+	}
+
+	@PostMapping("/createNewPerson")
+	public Person createNewPerson(@RequestBody NewPersonCmd newPersonCmd) {
+
+		return peopleService.createNewPerson(newPersonCmd)
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 }
