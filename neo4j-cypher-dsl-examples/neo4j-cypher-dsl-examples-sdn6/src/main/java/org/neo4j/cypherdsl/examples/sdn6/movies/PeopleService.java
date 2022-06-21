@@ -129,19 +129,21 @@ final class PeopleService {
 	}
 	// end::using-person-repo[]
 
+	// tag::using-temporals[]
 	Optional<Person> createNewPerson(NewPersonCmd newPersonCmd) {
 		var p = Person_.PERSON.withProperties(
-			Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName())
+			Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName()) // <.>
 		).named("p");
 
 		var statement = Cypher.merge(p)
 			.onCreate().set(
 				p.BORN, Cypher.parameter("arbitraryName")
-					.withValue(newPersonCmd.getDob().getYear()),
-				p.DOB, Cypher.anonParameter(newPersonCmd.getDob())
+					.withValue(newPersonCmd.getDob().getYear()), // <.>
+				p.DOB, Cypher.anonParameter(newPersonCmd.getDob()) // <.>
 			).returning(p).build();
 		return peopleRepository.findOne(statement);
 	}
+	// end::using-temporals[]
 
 	// tag::using-person-repo[]
 }

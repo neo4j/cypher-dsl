@@ -38,6 +38,8 @@ final class Person extends NodeBase<Person> {
 
 	public final Property BORN = this.property("born");
 
+	public final Property DOB = this.property("dob");
+
 	public Person() {
 		super("Person");
 	}
