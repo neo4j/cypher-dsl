@@ -22,6 +22,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -37,6 +39,7 @@ import org.neo4j.cypherdsl.examples.sdn6.movies.Genre_;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Movie;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Person;
 import org.neo4j.cypherdsl.examples.sdn6.movies.PersonDetails;
+import org.neo4j.cypherdsl.examples.sdn6.movies.NewPersonCmd;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -206,6 +209,19 @@ class ApplicationIT {
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(2);
+	}
+
+	@Test
+	@DisplayName("Using parameters")
+	void usingTemporalsAsParameterShouldWork(@Autowired TestRestTemplate restTemplate) {
+
+		var dob = ZonedDateTime.of(1990, 10, 31, 23, 42, 0, 0, ZoneId.of("Europe/Berlin"));
+		var result = restTemplate.postForObject("/api/people/createNewPerson", new NewPersonCmd(
+			"Liv Lisa Fries", dob),
+			Person.class);
+
+		assertThat(result.getBorn()).isEqualTo(1990);
+		assertThat(result.getDob()).isEqualTo(dob);
 	}
 
 	@Test // GH-315

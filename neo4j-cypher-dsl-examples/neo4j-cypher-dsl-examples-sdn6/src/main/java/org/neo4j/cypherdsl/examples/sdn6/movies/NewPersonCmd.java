@@ -20,62 +20,27 @@ package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 import java.time.ZonedDateTime;
 
-import org.springframework.data.annotation.PersistenceCreator;
-import org.springframework.data.neo4j.core.schema.GeneratedValue;
-import org.springframework.data.neo4j.core.schema.Id;
-import org.springframework.data.neo4j.core.schema.Node;
-
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
+ * DTO for creating new people.
+ *
  * @author Michael J. Simons
  */
-@Node
-public final class Person {
-
-	@Id @GeneratedValue
-	private final Long id;
+public final class NewPersonCmd {
 
 	private final String name;
 
-	private Integer born;
+	private final ZonedDateTime dob;
 
-	private ZonedDateTime dob;
-
-	@PersistenceCreator
-	private Person(Long id, String name, Integer born) {
-		this.id = id;
-		this.born = born;
+	public NewPersonCmd(String name, ZonedDateTime dob) {
 		this.name = name;
-	}
-
-	@JsonCreator
-	public Person(@JsonProperty("name") String name, @JsonProperty("born") Integer born) {
-		this(null, name, born);
-	}
-
-	public Long getId() {
-		return id;
+		this.dob = dob;
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public Integer getBorn() {
-		return born;
-	}
-
-	public void setBorn(Integer born) {
-		this.born = born;
-	}
-
 	public ZonedDateTime getDob() {
 		return dob;
-	}
-
-	public void setDob(ZonedDateTime dob) {
-		this.dob = dob;
 	}
 }
