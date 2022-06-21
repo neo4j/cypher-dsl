@@ -3135,6 +3135,8 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 
     <span class="directive">public</span> <span class="directive">final</span> Property BORN = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>);
 
+    <span class="directive">public</span> <span class="directive">final</span> Property DOB = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">dob</span><span class="delimiter">&quot;</span></span>);
+
     <span class="directive">public</span> Person() {
         <span class="local-variable">super</span>(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>);
     }
@@ -3632,6 +3634,57 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 </div>
 <div class="paragraph">
 <p>The full example is in <code>neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-sdn6</code>.</p>
+</div>
+<div class="paragraph">
+<p>An example of using a mixture of anonymous and named parameters is shown in the following listing:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java">Optional&lt;Person&gt; createNewPerson(NewPersonCmd newPersonCmd) {
+    <span class="type">var</span> p = Person_.PERSON.withProperties(
+        Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName()) <i class="conum" data-value="1"></i><b>(1)</b>
+    ).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
+
+    <span class="type">var</span> statement = Cypher.merge(p)
+        .onCreate().set(
+            p.BORN, Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">arbitraryName</span><span class="delimiter">&quot;</span></span>)
+                .withValue(newPersonCmd.getDob().getYear()), <i class="conum" data-value="2"></i><b>(2)</b>
+            p.DOB, Cypher.anonParameter(newPersonCmd.getDob()) <i class="conum" data-value="3"></i><b>(3)</b>
+        ).returning(p).build();
+    <span class="keyword">return</span> peopleRepository.findOne(statement);
+}</code></pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>An anonymous parameter with a simple <code>String</code>-value</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>A named parameter with an <code>Integer</code> value extracted from a complex datatype</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>An anonymous parameter again, but one that holds a complex datatype. Such datatype
+can be anything that is understood by the Neo4j-Java-Driver, such as in this case, a temporal
+but also maps and lists. It will always be passed as a value, never as a literal.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>The statement above will be rendered like this:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="console">[http-nio-auto-1-exec-1] 2022-06-21 11:40:57,732 DEBUG    org.springframework.data.neo4j.cypher: 313 - Executing:
+MERGE (p:`Person` {name: $pcdsl01}) ON CREATE SET p.born = $arbitraryName, p.dob = $pcdsl02 RETURN p
+[http-nio-auto-1-exec-1] 2022-06-21 11:40:57,735 TRACE    org.springframework.data.neo4j.cypher: 334 - with parameters:
+:param arbitraryName =&gt; 1990
+:param pcdsl01 =&gt; 'Liv Lisa Fries'
+:param pcdsl02 =&gt; 1990-10-31T22:42Z[UTC]</code></pre>
+</div>
 </div>
 </div>
 </div>
@@ -6156,7 +6209,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-06-20 14:50:47 UTC
+Last updated 2022-06-21 11:52:19 UTC
 </div>
 </div>
 </body>
