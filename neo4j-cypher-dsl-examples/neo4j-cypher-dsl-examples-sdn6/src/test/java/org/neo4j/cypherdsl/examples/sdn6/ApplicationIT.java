@@ -67,7 +67,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class ApplicationIT {
 
 	@Container
-	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.2").withReuse(true);
+	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.4").withReuse(true);
 
 	@SuppressWarnings("unused") // It is used via {@code @EnableIf}
 	static boolean is606OrHigher() {

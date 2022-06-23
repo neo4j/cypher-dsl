@@ -58,7 +58,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class ExecutableStatementsIT {
 
 	@Container
-	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.2")
+	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.4")
 		.withClasspathResourceMapping("/books.csv", "/import/books.csv", BindMode.READ_ONLY)
 		.withReuse(true);
 
