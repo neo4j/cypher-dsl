@@ -207,6 +207,15 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(MapExpression map) {
 		indentationLevel++;
+		int cnt = 0;
+		for (int i = builder.length() - 1; i >= 0; --i) {
+			if (Character.isWhitespace(builder.charAt(i))) {
+				++cnt;
+			} else {
+				break;
+			}
+		}
+		builder.setLength(builder.length() - cnt);
 		builder.append(" ");
 		super.enter(map);
 	}
