@@ -1,0 +1,55 @@
+== 2022.5
+
+=== 2022.5.0
+
+*No breaking changes*, the minor version has been bumped due to new default methods of internal interfaces.
+This release is - again - a safe drop-in replacement for the prior (2022.4.0) one.
+
+Thanks to @hindog, @bhspencer, @Hardu2203 and @irene221b for their input on this release.
+
+==== 🚀 Features
+
+* Add explicit `set` operation to `PropertyContainer`. (#394)
+* Support "WITH *, <expr>" by handling the 'returnAll' flag received from parser (#367)
+
+==== 🔄️ Refactorings
+
+* refactor: Remove superfluous whitespaces before `MapExpression` in pretty printer. (#401)
+
+==== 📝 Documentation
+
+* Add an example how to use Cypher parameters with`CypherdslStatementExecutor`. (#395)
+* Improve JavaDoc of `TemporalLiteral`.
+* Add correction method description.
+
+==== 🛠 Build
+
+* Use latest Neo4j 4.4 for integration tests.
+* Add a CODEOWNERS declaration.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump jna from 5.11.0 to 5.12.0 (#399)
+** Bump spring-boot-starter-parent from 2.7.0 to 2.7.1 (#398)
+** Bump spring-data-neo4j from 6.3.0 to 6.3.1 (#397)
+** Bump native-maven-plugin from 0.9.11 to 0.9.12 (#396)
+** Bump reactor-bom from 2020.0.19 to 2020.0.20 (#392)
+** Bump checker-qual from 3.22.1 to 3.22.2 (#390)
+** Bump neo4j-cypher-javacc-parser from 4.4.7 to 4.4.8 (#391)
+** Bump maven-enforcer-plugin from 3.0.0 to 3.1.0 (#386)
+** Bump joda-time from 2.10.10 to 2.10.14 (#387)
+** Bump asciidoctorj from 2.5.3 to 2.5.4 (#380)
+** Bump assertj-core from 3.22.0 to 3.23.1 (#383)
+** Bump checker-qual from 3.22.0 to 3.22.1 (#382)
+** Bump mockito.version from 4.6.0 to 4.6.1 (#381)
+** Bump neo4j-java-driver from 4.4.5 to 4.4.6 (#379)
+** Bump maven-pmd-plugin from 3.16.0 to 3.17.0 (#378)
+** Bump asciidoctorj-diagram from 2.2.1 to 2.2.3 (#377)
+** Bump mockito.version from 4.5.1 to 4.6.0 (#376)
+** Bump checkstyle from 10.2 to 10.3 (#375)
+** Bump neo4j-cypher-javacc-parser from 4.4.6 to 4.4.7 (#373)
+** Bump testcontainers.version from 1.17.1 to 1.17.2 (#371)
+** Bump spring-data-neo4j from 6.2.4 to 6.3.0 (#368)
+** Bump jackson-bom from 2.13.2.20220328 to 2.13.3 (#370)
+** Bump reactor-bom from 2020.0.18 to 2020.0.19 (#369)
