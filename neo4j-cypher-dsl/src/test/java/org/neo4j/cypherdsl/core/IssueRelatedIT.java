@@ -908,7 +908,7 @@ class IssueRelatedIT {
 			.isEqualTo(
 				"MATCH (node:Division)\n" +
 				"WITH DISTINCT node\n" +
-				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE  {\n" +
+				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {\n" +
 				"  rel_property: true\n" +
 				"}]->(:Department)-[:EMPLOYS]->(:Employee)\n" +
 				"RETURN *"
@@ -938,7 +938,7 @@ class IssueRelatedIT {
 			.isEqualTo(
 				"MATCH (node:Division)\n" +
 				"WITH DISTINCT node\n" +
-				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE  {\n" +
+				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {\n" +
 				"  rel_property: true\n" +
 				"}]->(:Department)-[:EMPLOYS]->(:Employee)\n" +
 				"RETURN *"
@@ -1238,10 +1238,10 @@ class IssueRelatedIT {
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
 			.isEqualTo(""
-				+ "MERGE (existingNode:CordraObject  {\n"
+				+ "MERGE (existingNode:CordraObject {\n"
 				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
 				+ "})\n"
-				+ "SET existingNode =  {\n"
+				+ "SET existingNode = {\n"
 				+ "  _id: 'test/55de0539eb1e14f26a04',\n"
 				+ "  _type: 'Movie',\n"
 				+ "  title: 'Top Gun',\n"
@@ -1269,10 +1269,10 @@ class IssueRelatedIT {
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
 			.isEqualTo(""
-				+ "MERGE (existingNode:CordraObject  {\n"
+				+ "MERGE (existingNode:CordraObject {\n"
 				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
 				+ "})\n"
-				+ "SET existingNode =  {\n"
+				+ "SET existingNode = {\n"
 				+ "  _id: 'test/55de0539eb1e14f26a04',\n"
 				+ "  _type: 'Movie',\n"
 				+ "  title: 'Top Gun',\n"
@@ -1295,7 +1295,7 @@ class IssueRelatedIT {
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
 			.isEqualTo(""
-				+ "MERGE (existingNode:CordraObject  {\n"
+				+ "MERGE (existingNode:CordraObject {\n"
 				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
 				+ "})\n"
 				+ "SET existingNode = $aNewMap\n"
