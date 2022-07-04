@@ -471,8 +471,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(FunctionInvocation functionInvocation) {
+		String functionName = functionInvocation.getFunctionName();
+		if ("elementId".equals(functionName)) {
+			functionName = "id";
+		}
 		builder
-			.append(functionInvocation.getFunctionName())
+			.append(functionName)
 			.append("(");
 	}
 

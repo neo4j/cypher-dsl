@@ -51,16 +51,12 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 	@Override
 	public void enter(Visitable visitable) {
 
-		boolean doDelegate = true;
 		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
-		if (isNPropExists(visitable)) {
-			doDelegate = false;
-		} else if ("distance".equals(functionInvocation.getFunctionName())) {
+		if ("distance".equals(functionInvocation.getFunctionName())) {
 			delegate.builder.append("point.distance(");
-			doDelegate = false;
-		}
-
-		if (doDelegate) {
+		} else if ("elementId".equals(functionInvocation.getFunctionName())) {
+			delegate.builder.append("elementId(");
+		} else if (!isNPropExists(visitable)) {
 			delegate.enter(functionInvocation);
 		}
 	}
