@@ -31,6 +31,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -185,6 +187,24 @@ class FunctionsIT {
 		Assertions.assertThat(cypherRenderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
 	}
 
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("neo5jSpecificFunctions")
+	void neo5jSpecificFunctionsShouldWork(FunctionInvocation functionInvocation, String expected) {
+		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
+		Assertions.assertThat(renderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
+	}
+
+	private static Stream<Arguments> neo5jSpecificFunctions() {
+		Node n = Cypher.node("Node").named("n");
+		Node m = Cypher.node("Node2").named("m");
+		Relationship r = n.relationshipTo(m).named("r");
+
+		return Stream.of(
+			Arguments.of(Functions.elementId(n), "RETURN elementId(n)"),
+			Arguments.of(Functions.elementId(r), "RETURN elementId(r)")
+		);
+	}
+
 	private static Stream<Arguments> functionsToTest() {
 		Node n = Cypher.node("Node").named("n");
 		Node m = Cypher.node("Node2").named("m");
@@ -200,8 +220,8 @@ class FunctionsIT {
 		return Stream.of(
 			Arguments.of(Functions.id(n), "RETURN id(n)"),
 			Arguments.of(Functions.id(r), "RETURN id(r)"),
-			Arguments.of(Functions.elementId(n), "RETURN elementId(n)"),
-			Arguments.of(Functions.elementId(r), "RETURN elementId(r)"),
+			Arguments.of(Functions.elementId(n), "RETURN id(n)"),
+			Arguments.of(Functions.elementId(r), "RETURN id(r)"),
 			Arguments.of(Functions.keys(n), "RETURN keys(n)"),
 			Arguments.of(Functions.keys(r), "RETURN keys(r)"),
 			Arguments.of(Functions.keys(e1), "RETURN keys(e1)"),
