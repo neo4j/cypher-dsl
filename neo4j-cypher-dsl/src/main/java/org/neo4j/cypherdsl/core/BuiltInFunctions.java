@@ -58,6 +58,7 @@ final class BuiltInFunctions {
 		END_NODE("endNode"),
 		HEAD("head"),
 		ID("id"),
+		ELEMENT_ID("elementId"),
 		LAST("last"),
 
 		PROPERTIES("properties"),
