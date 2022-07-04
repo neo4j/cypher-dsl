@@ -75,6 +75,36 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for {@code elementId{}}.
+	 *
+	 * @param node The node for which the element id should be retrieved
+	 * @return A function call for {@code elementId()} on a node.
+	 */
+	@NotNull @Contract(pure = true)
+	@Neo4jVersion(minimum = "5.0.0")
+	public static FunctionInvocation elementId(@NotNull Node node) {
+
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+
+		return FunctionInvocation.create(Scalars.ELEMENT_ID, node.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a function invocation for {@code elementId{}}.
+	 *
+	 * @param relationship The relationship for which the element id should be retrieved
+	 * @return A function call for {@code elementId()} on a relationship.
+	 */
+	@NotNull @Contract(pure = true)
+	@Neo4jVersion(minimum = "5.0.0")
+	public static FunctionInvocation elementId(@NotNull Relationship relationship) {
+
+		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
+
+		return FunctionInvocation.create(Scalars.ELEMENT_ID, relationship.getRequiredSymbolicName());
+	}
+
+	/**
 	 * Creates a function invocation for {@code keys{}}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
 	 *

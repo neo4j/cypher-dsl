@@ -200,6 +200,8 @@ class FunctionsIT {
 		return Stream.of(
 			Arguments.of(Functions.id(n), "RETURN id(n)"),
 			Arguments.of(Functions.id(r), "RETURN id(r)"),
+			Arguments.of(Functions.elementId(n), "RETURN elementId(n)"),
+			Arguments.of(Functions.elementId(r), "RETURN elementId(r)"),
 			Arguments.of(Functions.keys(n), "RETURN keys(n)"),
 			Arguments.of(Functions.keys(r), "RETURN keys(r)"),
 			Arguments.of(Functions.keys(e1), "RETURN keys(e1)"),
