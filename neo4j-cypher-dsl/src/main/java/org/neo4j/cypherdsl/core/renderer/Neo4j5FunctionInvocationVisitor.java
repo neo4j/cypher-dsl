@@ -67,10 +67,11 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
 		if (isNPropExists(visitable)) {
 			delegate.builder.append(" IS NOT NULL");
-			return;
+		} else if ("elementId".equals(functionInvocation.getFunctionName())) {
+			delegate.builder.append(")");
+		} else {
+			delegate.leave(functionInvocation);
 		}
-
-		delegate.leave(functionInvocation);
 	}
 
 	static boolean isNPropExists(Visitable visitable) {

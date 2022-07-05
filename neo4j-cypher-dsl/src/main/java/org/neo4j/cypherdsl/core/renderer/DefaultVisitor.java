@@ -473,7 +473,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(FunctionInvocation functionInvocation) {
 		String functionName = functionInvocation.getFunctionName();
 		if ("elementId".equals(functionName)) {
-			functionName = "id";
+			functionName = "toString(id";
 		}
 		builder
 			.append(functionName)
@@ -481,8 +481,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void leave(FunctionInvocation functionInvocation) {
-		builder
-			.append(")");
+		String functionName = functionInvocation.getFunctionName();
+		if ("elementId".equals(functionName)) {
+			builder.append(")");
+		}
+		builder.append(")");
 	}
 
 	void enter(Operation operation) {
