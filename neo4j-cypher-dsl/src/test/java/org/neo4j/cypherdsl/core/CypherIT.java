@@ -821,6 +821,7 @@ class CypherIT {
 		}
 
 		@Test
+		@SuppressWarnings("deprecation")
 		void multiWhereMultiConditions() {
 			Statement statement = Cypher
 				.match(bikeNode)
@@ -992,6 +993,7 @@ class CypherIT {
 	}
 
 	@Nested
+	@SuppressWarnings("deprecation")
 	class FunctionRendering {
 
 		@Test
@@ -2939,6 +2941,7 @@ class CypherIT {
 		}
 
 		@Test
+		@SuppressWarnings("deprecation")
 		void shouldRenderNodeDelete() {
 			Node n = Cypher.anyNode("n");
 			Relationship r = n.relationshipBetween(Cypher.anyNode()).named("r0");
@@ -2954,6 +2957,7 @@ class CypherIT {
 		}
 
 		@Test
+		@SuppressWarnings("deprecation")
 		void shouldRenderChainedDeletes() {
 			Node n = Cypher.anyNode("n");
 			Relationship r = n.relationshipBetween(Cypher.anyNode()).named("r0");
@@ -3375,6 +3379,7 @@ class CypherIT {
 	class UnwindRendering {
 
 		@Test
+		@SuppressWarnings("deprecation")
 		void unwindWithoutWith() {
 
 			final Node rootNode = Cypher.anyNode("n");

@@ -126,9 +126,19 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 
 	/**
 	 * @return A new function invocation returning the internal id of this node.
+	 * @deprecated Use {@link #elementId}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated
 	FunctionInvocation internalId();
+
+	/**
+	 * @return A new function invocation returning the element id of this node.
+	 */
+	@NotNull @Contract(pure = true)
+	default FunctionInvocation elementId() {
+		return Functions.elementId(this);
+	}
 
 	/**
 	 * @return A new function invocation returning the labels of this node.

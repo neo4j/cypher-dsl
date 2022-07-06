@@ -75,4 +75,24 @@ class DialectIT {
 			Cypher.match(n).returning(Functions.distance(n.property("a"), n.property("b"))).build());
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+
+	static Stream<Arguments> elementId() {
+		return Stream.of(
+			Arguments.of(Dialect.DEFAULT, "MATCH (n) RETURN toString(id(n))"),
+			Arguments.of(Dialect.NEO4J_5, "MATCH (n) RETURN elementId(n)")
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void elementId(Dialect dialect, String expected) {
+
+		Node n = Cypher.anyNode("n");
+
+		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+		String cypher = renderer.render(
+			Cypher.match(n).returning(n.elementId()).build());
+		assertThat(cypher).isEqualTo(expected);
+	}
 }
