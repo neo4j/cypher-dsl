@@ -134,6 +134,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 
 	/**
 	 * @return A new function invocation returning the element id of this node.
+	 * @since 2022.6.0
 	 */
 	@NotNull @Contract(pure = true)
 	default FunctionInvocation elementId() {
