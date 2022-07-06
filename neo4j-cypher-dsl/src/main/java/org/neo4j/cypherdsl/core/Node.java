@@ -126,9 +126,21 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 
 	/**
 	 * @return A new function invocation returning the internal id of this node.
+	 * @deprecated Use {@link #elementId}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated
+	@SuppressWarnings({ "DeprecatedIsStillUsed", "squid:S1133" }) // The deprecation warning on any client code calling this is actually the point.
 	FunctionInvocation internalId();
+
+	/**
+	 * @return A new function invocation returning the element id of this node.
+	 * @since 2022.6.0
+	 */
+	@NotNull @Contract(pure = true)
+	default FunctionInvocation elementId() {
+		return Functions.elementId(this);
+	}
 
 	/**
 	 * @return A new function invocation returning the labels of this node.

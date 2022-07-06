@@ -151,6 +151,7 @@ class ParameterIT {
 				});
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	void shouldFailOnDifferentBoundValuesWhenSameValueIsUsedTwice() {
 		Statement statement = Cypher

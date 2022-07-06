@@ -60,6 +60,7 @@ class IssuesExamplesTest {
 				"MATCH (n) WHERE (n.foobar CONTAINS 'baz' OR n.foobar STARTS WITH 'a' OR n.foobar ENDS WITH 'b') RETURN n");
 	}
 
+	@SuppressWarnings("deprecation")
 	@Test
 	void gh59() {
 		var change = Cypher.node("Change").named("change");
