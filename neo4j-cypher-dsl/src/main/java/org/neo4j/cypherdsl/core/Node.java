@@ -130,6 +130,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated
+	@SuppressWarnings({ "DeprecatedIsStillUsed", "squid:S1133" }) // The deprecation warning on any client code calling this is actually the point.
 	FunctionInvocation internalId();
 
 	/**
