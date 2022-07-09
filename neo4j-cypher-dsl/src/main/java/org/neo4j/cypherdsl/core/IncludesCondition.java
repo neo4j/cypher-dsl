@@ -4,16 +4,16 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * A condition checking for the list property.
+ * An includes condition checking for the list property.
  *
  * @author AakashSorathiya
  */
 public final class IncludesCondition implements Condition {
 
     private final Expression left;
-    private final StringLiteral leftStringLiteral;
-    private final StringLiteral middleStringLiteral;
-    private final StringLiteral rightStringLiteral;
+    private final EscapeQuoteStringLiteral leftStringLiteral;
+    private final EscapeQuoteStringLiteral middleStringLiteral;
+    private final EscapeQuoteStringLiteral rightStringLiteral;
     private final Expression right;
 
     static IncludesCondition create(Expression lhs, Operator operator, Expression rhs) {
@@ -21,14 +21,14 @@ public final class IncludesCondition implements Condition {
         Assertions.notNull(rhs, "Right expression must not be null.");
 
         String[] allLiterals = operator.getRepresentation().split("\\{0}|\\{1}");
-        StringLiteral leftStringLiteral = new StringLiteral(allLiterals[0], true);
-        StringLiteral middleStringLiteral = new StringLiteral(allLiterals[1], true);
-        StringLiteral rightStringLiteral = new StringLiteral(allLiterals[2], true);
+        EscapeQuoteStringLiteral leftStringLiteral = new EscapeQuoteStringLiteral(allLiterals[0]);
+        EscapeQuoteStringLiteral middleStringLiteral = new EscapeQuoteStringLiteral(allLiterals[1]);
+        EscapeQuoteStringLiteral rightStringLiteral = new EscapeQuoteStringLiteral(allLiterals[2]);
 
         return new IncludesCondition(lhs, leftStringLiteral, middleStringLiteral, rightStringLiteral, rhs);
     }
 
-    public IncludesCondition(Expression left, StringLiteral leftStringLiteral, StringLiteral middleStringLiteral, StringLiteral rightStringLiteral, Expression right) {
+    public IncludesCondition(Expression left, EscapeQuoteStringLiteral leftStringLiteral, EscapeQuoteStringLiteral middleStringLiteral, EscapeQuoteStringLiteral rightStringLiteral, Expression right) {
         this.left = left;
         this.leftStringLiteral = leftStringLiteral;
         this.middleStringLiteral = middleStringLiteral;

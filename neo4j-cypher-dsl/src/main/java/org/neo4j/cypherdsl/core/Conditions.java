@@ -37,23 +37,23 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class Conditions {
 
 	/**
-	 * Creates a condition that checks whether the {@code lhs} includes elements present in {@code rhs}.
+	 * Creates a condition that checks whether the {@code lhs} includes all elements present in {@code rhs}.
 	 * @param lhs Argument in which elements need to be checked
 	 * @param rhs Argument of which elements will be checked
-	 * @return An "includes" comparison
+	 * @return An "includesAll" comparison
 	 */
-	static Condition includes(Expression lhs, Expression rhs) {
-		return IncludesCondition.create(lhs, Operator.INCLUDES, rhs);
+	static Condition includesAll(Expression lhs, Expression rhs) {
+		return IncludesCondition.create(lhs, Operator.INCLUDES_ALL, rhs);
 	}
 
 	/**
-	 * Creates a condition that checks whether the {@code lhs} includes elements present in {@code rhs}.
+	 * Creates a condition that checks whether the {@code lhs} includes any element present in {@code rhs}.
 	 * @param lhs Argument in which elements need to be checked
 	 * @param rhs Argument of which elements will be checked
 	 * @return A "not_includes" comparison
 	 */
-	static Condition notIncludes(Expression lhs, Expression rhs) {
-		return IncludesCondition.create(lhs, Operator.NOT_INCLUDES, rhs);
+	static Condition includesAny(Expression lhs, Expression rhs) {
+		return IncludesCondition.create(lhs, Operator.INCLUDES_ANY, rhs);
 	}
 
 	/**

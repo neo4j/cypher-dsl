@@ -148,13 +148,13 @@ public enum Operator implements Visitable {
 	 */
 	IN("IN"),
 	/**
-	 * The list operator for {@code INCLUDES}
+	 * The list operator for {@code INCLUDES_ALL}
 	 */
-	INCLUDES("ALL ( x IN {1} WHERE x in {0} )", Type.INFIX),
+	INCLUDES_ALL("ALL ( x IN {1} WHERE x in {0} )", Type.INFIX),
 	/**
-	 * The list operator for {@code NOT_INCLUDES}
+	 * The list operator for {@code INCLUDES_ANY}
 	 */
-	NOT_INCLUDES("NOT ANY ( x IN {1} WHERE x in {0} )", Type.INFIX),
+	INCLUDES_ANY("ANY ( x IN {1} WHERE x in {0} )", Type.INFIX),
 
 	// Property operators
 	/**

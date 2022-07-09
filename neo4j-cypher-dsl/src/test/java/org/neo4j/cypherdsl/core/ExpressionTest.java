@@ -95,6 +95,42 @@ class ExpressionTest {
 		assertThat(counter.get()).isEqualTo(4);
 	}
 
+	@ParameterizedTest
+	@MethodSource("listOperators")
+	void correctListOperatorsShouldBeUsed(Visitable visitable, Operator expectedOperator) {
+
+		AtomicInteger counter = new AtomicInteger(0);
+
+		visitable.accept(segment -> {
+			int i = counter.getAndIncrement();
+			System.out.println(segment);
+			switch (i) {
+				case 0:
+					break;
+				case 1:
+					assertThat(segment)
+							.isInstanceOfSatisfying(EscapeQuoteStringLiteral.class, v -> assertThat(v.getContent()).containsPattern(Pattern.compile("(ANY|ALL) \\( x IN ")));
+					break;
+				case 2:
+				case 4:
+					assertThat(segment)
+							.isInstanceOfSatisfying(ListLiteral.class, Assertions::assertThat);
+					break;
+				case 3:
+					assertThat(segment)
+							.isInstanceOfSatisfying(EscapeQuoteStringLiteral.class, v -> assertThat(v.getContent()).isEqualTo(" WHERE x in "));
+					break;
+				case 5:
+					assertThat(segment)
+							.isInstanceOfSatisfying(EscapeQuoteStringLiteral.class, v -> assertThat(v.getContent()).isEqualTo(" )"));
+					break;
+				default:
+					throw new IllegalArgumentException("Too many segments to visit.");
+			}
+		});
+		assertThat(counter.get()).isEqualTo(6);
+	}
+
 	@SuppressWarnings("unused")
 	private static Stream<Arguments> mathematicalOperators() {
 		return Stream.of(
@@ -112,6 +148,14 @@ class ExpressionTest {
 		return Stream.of(
 			Arguments.of(Cypher.literalOf("a").concat(Cypher.literalOf("b")), Operator.CONCAT),
 			Arguments.of(Cypher.literalOf("a").matches(Cypher.literalOf("b")), Operator.MATCHES)
+		);
+	}
+
+	@SuppressWarnings("unused")
+	private static Stream<Arguments> listOperators() {
+		return Stream.of(
+				Arguments.of(Cypher.literalOf(new String[]{"A", "B"}).includesAll(Cypher.literalOf(new String[]{"A", "C"})), Operator.INCLUDES_ALL),
+				Arguments.of(Cypher.literalOf(new String[]{"A", "B"}).includesAny(Cypher.literalOf(new String[]{"A", "C"})), Operator.INCLUDES_ANY)
 		);
 	}
 }
