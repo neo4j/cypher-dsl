@@ -1,0 +1,23 @@
+== 2022.6
+
+=== 2022.6.0
+
+`Functions.internalId()` has been deprecated to accomodate for Neo4j 5 later this year.
+We are unsure if we will do this to `id()`, too (The method with the same name will be deprecated in Neo4j 5 and eventually
+be replaced by `elementId()`).
+
+==== 🚀 Features
+
+* Add fallback from `elementId` to `id` on older Neo4j versions. (#407)
+* Add calls for `elementId()`. (#406)
+
+==== 🔄️ Refactorings
+
+* Deprecate `internalId` in favor of `elementId` on nodes. (#408)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump testcontainers.version from 1.17.2 to 1.17.3 (#403)
+** Bump checkstyle from 10.3 to 10.3.1 (#404)
+** Bump jna from 5.12.0 to 5.12.1 (#405)
