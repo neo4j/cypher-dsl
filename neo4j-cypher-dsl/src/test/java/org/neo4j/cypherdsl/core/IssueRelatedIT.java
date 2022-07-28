@@ -1301,4 +1301,41 @@ class IssueRelatedIT {
 				+ "SET existingNode = $aNewMap\n"
 				+ "RETURN existingNode");
 	}
+
+	@Test // GH-419
+	void aliasedElementsShouldBeCarriedForwardWithWithToo() {
+
+		Node objectInstanceNode = Cypher.node("ObjectInstance").named("oi");
+		Node attributeTypeNode = Cypher.node("AttributeType").named("att");
+		Node attributeNode = Cypher.node("Attribute").named("at");
+		SymbolicName attributeTypeAndValue = Cypher.name("attributeTypeAndValue");
+		SymbolicName collection = Cypher.name("collection");
+
+		SymbolicName oi = objectInstanceNode.getRequiredSymbolicName();
+		Statement statement = Cypher.match(objectInstanceNode)
+			.with(Cypher.mapOf(oi.getValue(), oi).as(collection))
+			.unwind(Cypher.parameter("attributes")).as(attributeTypeAndValue)
+			.with(attributeTypeAndValue, collection)
+			.match(attributeTypeNode.withProperties("name", attributeTypeAndValue.property("name")).relationshipFrom(attributeNode, "OF_TYPE"))
+			.with(attributeNode, collection.property("oi").as(oi))
+			.match(objectInstanceNode.relationshipTo(attributeNode, "IS_IDENTIFIED_BY"))
+			.returning(attributeNode)
+			.build();
+
+		String cypher = Renderer.getRenderer(
+			Configuration.newConfig().withPrettyPrint(true).alwaysEscapeNames(true).build()).render(statement);
+		assertThat(cypher)
+			.isEqualTo("MATCH (oi:`ObjectInstance`)\n"
+				+ "WITH {\n"
+				+ "  oi: oi\n"
+				+ "} AS collection\n"
+				+ "UNWIND $attributes AS attributeTypeAndValue\n"
+				+ "WITH attributeTypeAndValue, collection\n"
+				+ "MATCH (att:`AttributeType` {\n"
+				+ "  name: attributeTypeAndValue.name\n"
+				+ "})<-[:`OF_TYPE`]-(at:`Attribute`)\n"
+				+ "WITH at, collection.oi AS oi\n"
+				+ "MATCH (oi)-[:`IS_IDENTIFIED_BY`]->(at)\n"
+				+ "RETURN at");
+	}
 }

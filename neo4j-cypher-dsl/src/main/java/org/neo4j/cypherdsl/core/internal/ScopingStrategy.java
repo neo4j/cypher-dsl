@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
@@ -150,11 +151,18 @@ public final class ScopingStrategy {
 
 	private boolean hasVisitedInScope(Collection<IdentifiableElement> visited, Named needle) {
 
+		Predicate<IdentifiableElement> hasAName = Named.class::isInstance;
+		hasAName = hasAName.or(AliasedExpression.class::isInstance);
 		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
-			.filter(Named.class::isInstance)
-			.map(Named.class::cast)
-			.map(Named::getSymbolicName)
-			.anyMatch(s -> s.equals(needle.getSymbolicName()));
+			.filter(hasAName)
+			.anyMatch(i -> {
+				if (i instanceof Named) {
+					return ((Named) i).getSymbolicName().equals(needle.getSymbolicName());
+				} else if (i instanceof AliasedExpression) {
+					return ((AliasedExpression) i).getAlias().equals(needle.getRequiredSymbolicName().getValue());
+				}
+				return false;
+			});
 	}
 
 	private static boolean hasLocalScope(Visitable visitable) {
@@ -184,6 +192,8 @@ public final class ScopingStrategy {
 					.filter(element -> {
 						if (element instanceof Named) {
 							return ((Named) element).getRequiredSymbolicName().equals(segment);
+						} else if (element instanceof AliasedExpression) {
+							return ((AliasedExpression) element).getAlias().equals(((SymbolicName) segment).getValue());
 						}
 						return false;
 					})
