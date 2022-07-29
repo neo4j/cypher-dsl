@@ -1,0 +1,29 @@
+== 2022.7
+
+=== 2022.7.0
+
+*No breaking changes*, the minor version has been bumped due to new default methods of internal interfaces.
+This release is - again - a safe drop-in replacement for the prior (2022.6.1) one.
+
+Thanks to https://github.com/AakashSorathiya[@AakashSorathiya] for their input on this release.
+
+==== 🚀 Features
+
+* Add support for `includesAll` and `includesAny` operations on expressions for list properties
+
+==== 🔄️ Refactorings
+
+TBA
+
+==== 📝 Documentation
+
+TBA
+
+==== 🛠 Build
+
+TBA
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** TBA
