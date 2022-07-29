@@ -30,6 +30,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * An expression can be used in many places, i.e. in return statements, pattern elements etc.
  *
  * @author Michael J. Simons
+ * @author Aakash Sorathiya
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")

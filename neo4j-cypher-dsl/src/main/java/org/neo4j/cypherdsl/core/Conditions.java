@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *
  * @author Michael J. Simons
  * @author Gerrit Meier
- * @author AakashSorathiya
+ * @author Aakash Sorathiya
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -42,6 +42,7 @@ public final class Conditions {
 	 * @param lhs Argument that is tested whether it contains all values in {@code rhs} or not
 	 * @param rhs The reference collection
 	 * @return An "includesAll" comparison
+	 * @since 2022.6.1
 	 */
 	static Condition includesAll(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
@@ -53,6 +54,7 @@ public final class Conditions {
 	 * @param lhs Argument that is tested whether it contains any values in {@code rhs} or not
  	 * @param rhs The reference collection
 	 * @return A "not_includes" comparison
+	 * @since 2022.6.1
 	 */
 	static Condition includesAny(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
