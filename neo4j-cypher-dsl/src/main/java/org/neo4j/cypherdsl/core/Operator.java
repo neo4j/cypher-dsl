@@ -147,14 +147,6 @@ public enum Operator implements Visitable {
 	 * {@code IN} operator.
 	 */
 	IN("IN"),
-	/**
-	 * The list operator for {@code INCLUDES_ALL}
-	 */
-	INCLUDES_ALL("ALL ( x IN {1} WHERE x in {0} )", Type.INFIX),
-	/**
-	 * The list operator for {@code INCLUDES_ANY}
-	 */
-	INCLUDES_ANY("ANY ( x IN {1} WHERE x in {0} )", Type.INFIX),
 
 	// Property operators
 	/**
@@ -251,10 +243,6 @@ public enum Operator implements Visitable {
 		/**
 		 * The binary operator modifying labels of nodes.
 		 */
-		LABEL,
-		/**
-		 *  Describes a unary infix operator
-		 */
-		INFIX
+		LABEL
 	}
 }

@@ -36,25 +36,27 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public interface Expression extends Visitable {
 
 	/**
-	 * Creates a condition that checks whether this {@code expression} includes all elements of that {@code expression}.
+	 * Creates a condition that checks whether this {@code expression} includes all elements of {@code rhs}.
 	 *
-	 * @param expression The expression to match against. Must evaluate into a list during runtime.
-	 * @return A new condition.
+	 * @param rhs The other collection to compare to, must evaluate into a list during runtime.
+	 * @return A new condition
+	 * @since 2022.6.1
 	 */
 	@NotNull @Contract(pure = true)
-	default Condition includesAll(Expression expression) {
-		return Conditions.includesAll(this, expression);
+	default Condition includesAll(Expression rhs) {
+		return Conditions.includesAll(this, rhs);
 	}
 
 	/**
-	 * Creates a condition that checks whether this {@code expression} includes any element of that {@code expression}.
+	 * Creates a condition that checks whether this {@code expression} includes any element of {@code rhs}.
 	 *
-	 * @param expression The expression to match against. Must evaluate into a list during runtime.
-	 * @return A new condition.
+	 * @param rhs The other collection to compare to, must evaluate into a list during runtime.
+	 * @return A new condition
+	 * @since 2022.6.1
 	 */
 	@NotNull @Contract(pure = true)
-	default Condition includesAny(Expression expression) {
-		return Conditions.includesAny(this, expression);
+	default Condition includesAny(Expression rhs) {
+		return Conditions.includesAny(this, rhs);
 	}
 
 	/**
