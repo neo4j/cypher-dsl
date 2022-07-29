@@ -1,5 +1,24 @@
 == 2022.6
 
+=== 2022.6.1
+
+==== 🐛 Bug Fixes
+
+* Include aliased expression in local scopes. (#420)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j-cypher-javacc-parser from 4.4.8 to 4.4.9 (#418)
+** Bump maven-install-plugin from 3.0.0-M1 to 3.0.1 (#417)
+** Bump spring-boot-starter-parent from 2.7.1 to 2.7.2 (#416)
+** Bump maven-deploy-plugin from 3.0.0-M2 to 3.0.0 (#415)
+** Bump exec-maven-plugin from 3.0.0 to 3.1.0 (#414)
+** Bump native-maven-plugin from 0.9.12 to 0.9.13 (#413)
+** Bump spring-data-neo4j from 6.3.1 to 6.3.2 (#412)
+** Bump reactor-bom from 2020.0.20 to 2020.0.21 (#411)
+** Bump checker-qual from 3.22.2 to 3.23.0 (#410)
+
 === 2022.6.0
 
 `Functions.internalId()` has been deprecated to accomodate for Neo4j 5 later this year.
