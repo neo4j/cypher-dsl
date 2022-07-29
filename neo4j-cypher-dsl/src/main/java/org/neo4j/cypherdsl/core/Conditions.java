@@ -42,7 +42,7 @@ public final class Conditions {
 	 * @param lhs Argument that is tested whether it contains all values in {@code rhs} or not
 	 * @param rhs The reference collection
 	 * @return An "includesAll" comparison
-	 * @since 2022.6.1
+	 * @since 2022.7.0
 	 */
 	static Condition includesAll(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
@@ -54,7 +54,7 @@ public final class Conditions {
 	 * @param lhs Argument that is tested whether it contains any values in {@code rhs} or not
  	 * @param rhs The reference collection
 	 * @return A "not_includes" comparison
-	 * @since 2022.6.1
+	 * @since 2022.7.0
 	 */
 	static Condition includesAny(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");

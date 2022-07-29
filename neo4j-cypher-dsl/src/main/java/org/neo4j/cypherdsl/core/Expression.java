@@ -41,7 +41,7 @@ public interface Expression extends Visitable {
 	 *
 	 * @param rhs The other collection to compare to, must evaluate into a list during runtime.
 	 * @return A new condition
-	 * @since 2022.6.1
+	 * @since 2022.7.0
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition includesAll(Expression rhs) {
@@ -53,7 +53,7 @@ public interface Expression extends Visitable {
 	 *
 	 * @param rhs The other collection to compare to, must evaluate into a list during runtime.
 	 * @return A new condition
-	 * @since 2022.6.1
+	 * @since 2022.7.0
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition includesAny(Expression rhs) {
