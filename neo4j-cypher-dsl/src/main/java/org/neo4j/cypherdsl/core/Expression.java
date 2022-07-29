@@ -30,10 +30,35 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * An expression can be used in many places, i.e. in return statements, pattern elements etc.
  *
  * @author Michael J. Simons
+ * @author Aakash Sorathiya
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
 public interface Expression extends Visitable {
+
+	/**
+	 * Creates a condition that checks whether this {@code expression} includes all elements of {@code rhs}.
+	 *
+	 * @param rhs The other collection to compare to, must evaluate into a list during runtime.
+	 * @return A new condition
+	 * @since 2022.7.0
+	 */
+	@NotNull @Contract(pure = true)
+	default Condition includesAll(Expression rhs) {
+		return Conditions.includesAll(this, rhs);
+	}
+
+	/**
+	 * Creates a condition that checks whether this {@code expression} includes any element of {@code rhs}.
+	 *
+	 * @param rhs The other collection to compare to, must evaluate into a list during runtime.
+	 * @return A new condition
+	 * @since 2022.7.0
+	 */
+	@NotNull @Contract(pure = true)
+	default Condition includesAny(Expression rhs) {
+		return Conditions.includesAny(this, rhs);
+	}
 
 	/**
 	 * Creates an expression with an alias. This expression does not track which or how many aliases have been created.
@@ -69,7 +94,7 @@ public interface Expression extends Visitable {
 	/**
 	 * Takes the {@link #size()} expresssions and compares it for equality with the parameter {@code expectedSize}. The
 	 * same restrictions as with {@link #size()} apply.
- 	 * @param expectedSize The expected size
+	 * @param expectedSize The expected size
 	 * @return A condition
 	 * @see #size()
 	 * @since 2022.1.0

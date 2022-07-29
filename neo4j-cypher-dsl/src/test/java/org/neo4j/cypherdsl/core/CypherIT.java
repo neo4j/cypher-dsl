@@ -1153,6 +1153,48 @@ class CypherIT {
 		}
 
 		@Test
+		void includesAllShouldWork() {
+
+			Node node = Cypher.anyNode().named("n");
+			Statement statement = Cypher.match(node)
+				.where(org.neo4j.cypherdsl.core.Conditions.includesAll(
+					node.property("l"), Cypher.literalOf(new String[] { "A", "B" })
+				))
+				.returning(node)
+				.build();
+
+			Statement statement2 = Cypher.match(node)
+				.where(node.property("l").includesAll(Cypher.literalOf(new String[] { "A", "B" })))
+				.returning(node)
+				.build();
+
+
+			assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE all(x IN n.l WHERE x IN ['A', 'B']) RETURN n");
+			assertThat(statement2.getCypher()).isEqualTo(statement.getCypher());
+		}
+
+		@Test
+		void includesAnyShouldWork() {
+
+			Node node = Cypher.anyNode().named("n");
+			Statement statement = Cypher.match(node)
+				.where(org.neo4j.cypherdsl.core.Conditions.includesAny(
+					node.property("l"), Cypher.literalOf(new String[] { "A", "B" })
+				))
+				.returning(node)
+				.build();
+
+			Statement statement2 = Cypher.match(node)
+				.where(node.property("l").includesAny(Cypher.literalOf(new String[] { "A", "B" })))
+				.returning(node)
+				.build();
+
+
+			assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE any(x IN n.l WHERE x IN ['A', 'B']) RETURN n");
+			assertThat(statement2.getCypher()).isEqualTo(statement.getCypher());
+		}
+
+		@Test
 		void nestedConditions() {
 			Statement statement;
 

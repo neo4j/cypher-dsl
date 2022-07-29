@@ -31,10 +31,35 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *
  * @author Michael J. Simons
  * @author Gerrit Meier
+ * @author Aakash Sorathiya
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
 public final class Conditions {
+
+	/**
+	 * Creates a condition that checks whether the {@code lhs} includes all elements present in {@code rhs}.
+	 * @param lhs Argument that is tested whether it contains all values in {@code rhs} or not
+	 * @param rhs The reference collection
+	 * @return An "includesAll" comparison
+	 * @since 2022.7.0
+	 */
+	static Condition includesAll(Expression lhs, Expression rhs) {
+		SymbolicName x = SymbolicName.of("x");
+		return Predicates.all(x).in(lhs).where(x.in(rhs));
+	}
+
+	/**
+	 * Creates a condition that checks whether the {@code lhs} includes any element present in {@code rhs}.
+	 * @param lhs Argument that is tested whether it contains any values in {@code rhs} or not
+ 	 * @param rhs The reference collection
+	 * @return A "not_includes" comparison
+	 * @since 2022.7.0
+	 */
+	static Condition includesAny(Expression lhs, Expression rhs) {
+		SymbolicName x = SymbolicName.of("x");
+		return Predicates.any(x).in(lhs).where(x.in(rhs));
+	}
 
 	/**
 	 * Creates a condition that matches if the right hand side is a regular expression that matches the the left hand side via
