@@ -369,6 +369,7 @@ MATCH p =(a)-->(b)-->(c)
 WHERE a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel'
 RETURN extract(n IN nodes(p)| n.age) AS extracted;
 call apoc.cypher.run("CALL apoc.cypher.run('CALL apoc.cypher.run(\"CALL apoc.cypher.run(\\'CALL apoc.cypher.run(\\\\\"RETURN true\\\\\", {}) YIELD value RETURN value\\', {}) YIELD value RETURN value\", {}) YIELD value RETURN value', {}) YIELD value RETURN value", {}) YIELD value RETURN value;
+WITH 1 as year WHERE 2010 <= year <= 2020 RETURN *;
 ----
 
 [[statements-output]]
@@ -435,6 +436,7 @@ MATCH p = (start)-[*]->(finish) WHERE (start.name = 'A' AND finish.name = 'D') F
 MATCH (a) WHERE a.name = 'Eskil' RETURN a.array, [x IN a.array WHERE size(x) = 3 | x]
 MATCH p = (a)-->(b)-->(c) WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') RETURN [n IN nodes(p) | n.age] AS extracted
 CALL apoc.cypher.run('CALL apoc.cypher.run(\'CALL apoc.cypher.run(\"CALL apoc.cypher.run(\\\'CALL apoc.cypher.run(\\\\\"RETURN true\\\\\", {}) YIELD value RETURN value\\\', {}) YIELD value RETURN value\", {}) YIELD value RETURN value\', {}) YIELD value RETURN value', {}) YIELD value RETURN value
+WITH 1 AS year WHERE (2010 <= year AND year <= 2020) RETURN *
 ----
 
 === Hints
