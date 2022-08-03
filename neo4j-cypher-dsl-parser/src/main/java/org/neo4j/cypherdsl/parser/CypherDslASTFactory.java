@@ -892,7 +892,7 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Expression ands(List<Expression> exprs) {
-		throw new UnsupportedOperationException();
+		return exprs.stream().reduce(Conditions.noCondition(), (l, r) -> l.asCondition().and(r.asCondition()));
 	}
 
 	@Override
