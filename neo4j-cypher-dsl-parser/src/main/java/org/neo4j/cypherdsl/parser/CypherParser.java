@@ -189,7 +189,7 @@ public final class CypherParser {
 		} catch (IllegalArgumentException e) {
 			throw e;
 		} catch (UnsupportedOperationException e) {
-			throw new UnsupportedCypherException(input);
+			throw new UnsupportedCypherException(input, e);
 		} catch (Exception e) {
 			throw new RuntimeException("Unexpected exception", e);
 		}
