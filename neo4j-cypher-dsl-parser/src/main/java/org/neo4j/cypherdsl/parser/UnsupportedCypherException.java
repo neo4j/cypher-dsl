@@ -36,10 +36,10 @@ public final class UnsupportedCypherException extends UnsupportedOperationExcept
 
 	private final String input;
 
-	UnsupportedCypherException(String input) {
+	UnsupportedCypherException(String input, UnsupportedOperationException cause) {
 		super(String.format("You used one Cypher construct not yet supported by the Cypher-DSL:%n%n\t%s%n%n" +
 							"Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new",
-			input));
+			input), cause);
 		this.input = input;
 	}
 
