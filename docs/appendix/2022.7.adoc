@@ -5,25 +5,27 @@
 *No breaking changes*, the minor version has been bumped due to new default methods of internal interfaces.
 This release is - again - a safe drop-in replacement for the prior (2022.6.1) one.
 
-Thanks to https://github.com/AakashSorathiya[@AakashSorathiya] for their input on this release.
+Thanks to https://github.com/AakashSorathiya[@AakashSorathiya] and https://github.com/nmervaillie[Nicolas Mervaillie] for their input on this release.
 
 ==== 🚀 Features
 
 * Add support for `includesAll` and `includesAny` operations on expressions for list properties
+* Support `org.neo4j.cypher.internal.ast.factory.ASTExpressionFactory#ands`
 
 ==== 🔄️ Refactorings
 
-TBA
-
-==== 📝 Documentation
-
-TBA
+* Add cause to unsupported to `UnsupportedCypherException`.
 
 ==== 🛠 Build
 
-TBA
+* Use current JBang action to verify on JDK 8. (#421)
 
 ==== 🧹 Housekeeping
 
 * Dependency upgrades:
-** TBA
+** Bump maven-site-plugin from 3.12.0 to 3.12.1 (#428)
+** Bump checker-qual from 3.23.0 to 3.24.0 (#429)
+** Bump checkstyle from 10.3.1 to 10.3.2 (#425)
+** Bump junit-bom from 5.8.2 to 5.9.0 (#424)
+** Bump maven-resources-plugin from 3.2.0 to 3.3.0 (#423)
+** Bump asciidoctorj from 2.5.4 to 2.5.5 (#422)
