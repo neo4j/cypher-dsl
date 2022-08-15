@@ -116,7 +116,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
-	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("`");
+	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("(?<!`)`(?!`)");
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
