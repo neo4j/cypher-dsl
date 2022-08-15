@@ -74,6 +74,10 @@ class DefaultVisitorTest {
 
 	@ParameterizedTest
 	@CsvSource({
+		"ABC, ABC",
+		"A C, `A C`",
+		"A` C, `A`` C`",
+		"A`` C, `A`` C`",
 		"ALabel, ALabel",
 		"A Label, `A Label`",
 		"A `Label, `A ``Label`",
