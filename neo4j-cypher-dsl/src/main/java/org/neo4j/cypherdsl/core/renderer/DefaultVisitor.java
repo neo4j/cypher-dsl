@@ -118,7 +118,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private static final String BACKTICK_OR_UC = "[`\\\\\u0060]";
 
-	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile(String.format("(?<!%1$s)%1$s(?!%1$s)", BACKTICK_OR_UC));
+	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile(String.format("(?<!%1$s)%1$s(?:%1$s{2})*(?!%1$s)", BACKTICK_OR_UC));
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
