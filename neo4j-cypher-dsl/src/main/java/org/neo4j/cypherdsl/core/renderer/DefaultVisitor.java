@@ -116,7 +116,9 @@ import org.neo4j.cypherdsl.core.utils.Strings;
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
-	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("(?<!`)`(?!`)");
+	private static final String BACKTICK_OR_UC = "[`\\\\\u0060]";
+
+	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile(String.format("(?<!%1$s)%1$s(?!%1$s)", BACKTICK_OR_UC));
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
@@ -908,6 +910,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(potentiallyNonIdentifier);
-		return String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``"));
+		return String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("`$0"));
 	}
 }
