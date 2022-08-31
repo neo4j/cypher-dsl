@@ -24,12 +24,10 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -97,6 +95,7 @@ import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Strings;
+import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
 
 /**
  * This is a simple (some would call it naive) implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -116,9 +115,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
-	private static final String BACKTICK_OR_UC = "[`\\\\\u0060]";
-
-	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile(String.format("(?<!%1$s)%1$s(?:%1$s{2})*(?!%1$s)", BACKTICK_OR_UC));
+	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("\\\\u0060|(?<!`)`(?:`{2})*(?!`)");
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
@@ -891,25 +888,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	protected final Optional<String> escapeName(String unescapedName) {
 
-		if (unescapedName == null) {
-			return Optional.empty();
-		}
-
-		if (alwaysEscapeNames) {
-			Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(unescapedName);
-			return Optional.of(String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("``")));
-		} else {
-			return Optional.of(escapeIfNecessary(unescapedName));
-		}
+		return SchemaNames.sanitize(unescapedName, alwaysEscapeNames);
 	}
 
 	protected final String escapeIfNecessary(String potentiallyNonIdentifier) {
 
-		if (potentiallyNonIdentifier == null || Strings.isIdentifier(potentiallyNonIdentifier) || potentiallyNonIdentifier.trim().isEmpty()) {
-			return potentiallyNonIdentifier;
-		}
-
-		Matcher matcher = LABEL_AND_TYPE_QUOTATION.matcher(potentiallyNonIdentifier);
-		return String.format(Locale.ENGLISH, "`%s`", matcher.replaceAll("`$0"));
+		return SchemaNames.sanitize(potentiallyNonIdentifier, false).orElse(null);
 	}
 }

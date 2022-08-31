@@ -36,6 +36,7 @@ import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
 // end::cypher-dsl-imports[]
 
 /**
@@ -55,7 +56,7 @@ class CypherDSLExamplesTest {
 		// tag::escaping[]
 		var relationship = Cypher.node("Person").named("a")
 			.relationshipTo(Cypher.node("Movie").named("m"), "ACTED_IN").named("r");
-
+		SchemaNames.sanitize("");
 		var statement = Cypher.match(relationship).returning(relationship).build();
 
 		var defaultRenderer = Renderer.getDefaultRenderer();

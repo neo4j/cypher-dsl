@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.LRUCache;
-import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
  * A symbolic name to identify nodes, relationships and aliased items.
@@ -54,7 +53,6 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 	static SymbolicName of(String name) {
 
 		Assertions.hasText(name, "Name must not be empty.");
-		Assertions.isTrue(Strings.isIdentifier(name), "Name must be a valid identifier.");
 		return CACHE.computeIfAbsent(name, SymbolicName::new);
 	}
 

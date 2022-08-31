@@ -38,6 +38,11 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-dsl-schema-name-support</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>org.apiguardian</groupId>
 			<artifactId>apiguardian-api</artifactId>
 		</dependency>
@@ -136,6 +141,40 @@
 									<version>${javax.annotation-api.version}</version>
 								</annotationProcessorPath>
 							</annotationProcessorPaths>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>org.neo4j:neo4j-cypher-dsl-schema-name-support</include>
+								</includes>
+							</artifactSet>
+							<relocations>
+								<relocation>
+									<pattern>org.neo4j.cypherdsl.support.schema_name</pattern>
+									<shadedPattern>org.neo4j.cypherdsl.core.internal</shadedPattern>
+								</relocation>
+							</relocations>
+							<createSourcesJar>true</createSourcesJar>
+							<filters>
+								<filter>
+									<artifact>org.neo4j:neo4j-cypher-dsl-schema-name-support</artifact>
+									<includes>
+										<include>**/SchemaNames*class</include>
+									</includes>
+								</filter>
+							</filters>
 						</configuration>
 					</execution>
 				</executions>

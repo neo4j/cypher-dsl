@@ -16,20 +16,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.utils;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import org.junit.jupiter.api.RepeatedTest;
+package org.neo4j.cypherdsl.codegen.core;
 
 /**
+ * Utilities for dealing with identifiers.
+ *
  * @author Michael J. Simons
- * @soundtrack Genesis - We Can't Dance
  */
-class StringsTest {
+final class Identifiers {
 
-	@RepeatedTest(8)
-	void shouldGeneratedValidSymbolicNames() {
-		assertThat(Strings.isIdentifier(Strings.randomIdentifier(32))).isTrue();
+	/**
+	 * A convenience method to decide whether a given {@code codePoint} is a valid Java identifier at the given position {@code p}.
+	 *
+	 * @param p         Position on which the {@code codePoint} is supposed to be used as identifier
+	 * @param codePoint A codepoint
+	 * @return True if the codePoint could be used as part of an identifier at the given position
+	 */
+	static boolean isValidAt(int p, int codePoint) {
+		return p == 0 && Character.isJavaIdentifierStart(codePoint) || p > 0 && Character.isJavaIdentifierPart(
+			codePoint);
+	}
+
+	private Identifiers() {
 	}
 }

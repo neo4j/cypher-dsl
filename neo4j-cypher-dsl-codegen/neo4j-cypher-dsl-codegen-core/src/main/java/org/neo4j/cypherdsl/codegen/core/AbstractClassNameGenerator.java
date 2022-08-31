@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.codegen.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
  * Shared type name generator for the default naming strategies for generated node and relationship implementations.
@@ -47,7 +46,7 @@ abstract class AbstractClassNameGenerator {
 		int i = 0;
 		while (i < suggestedName.length()) {
 			codePoint = suggestedName.codePointAt(i);
-			if (Strings.isValidJavaIdentifierPartAt(i, codePoint)) {
+			if (Identifiers.isValidAt(i, codePoint)) {
 				if (sb.length() == 0) {
 					codePoint = Character.toUpperCase(codePoint);
 				}
