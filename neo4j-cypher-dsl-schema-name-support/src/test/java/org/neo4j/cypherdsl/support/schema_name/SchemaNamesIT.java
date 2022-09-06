@@ -23,8 +23,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.AfterAll;
@@ -50,60 +52,93 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 class SchemaNamesIT {
 
 	private static final Config DRIVER_CONFIG = Config.builder().withMaxConnectionPoolSize(1).build();
-	private static Map<Neo4jContainer<?>, Driver> CACHED_CONNECTIONS = Collections.synchronizedMap(new HashMap<>());
-	private static String LATEST_VERSION = "4.4";
+	private static final Map<Neo4jContainer<?>, Driver> CACHED_CONNECTIONS = Collections.synchronizedMap(
+		new HashMap<>());
+	private static final String LATEST_VERSION = "4.4";
+	private static final Map<String, String> CATEGORIES = new HashMap<String, String>() {
+		private static final long serialVersionUID = -5617035309491104978L;
 
-	String[][] TEST_DATA = new String[][] {
-		{ "ABC", "ABC" },
-		{ "A C", "A C" },
-		{ "A` C", "A` C" },
-		{ "A`` C", "A` C" },
-		{ "ALabel", "ALabel" },
-		{ "A Label", "A Label" },
-		{ "A `Label", "A `Label" },
-		{ "`A `Label", "`A `Label" },
-		{ "Spring Data Neo4j⚡️RX", "Spring Data Neo4j⚡️RX" },
-		{ "`", "`" },
-		{ "\u0060", "`" },
-		{ "```", "``" },
-		{ "\u0060\u0060\u0060", "``" },
-		{ "\\u0060\\u0060\\u0060", "``" },
-		{ "Hello`", "Hello`" },
-		{ "Hi````there", "Hi``there" },
-		{ "Hi`````there", "Hi```there" },
-		{ "`a`b`c`", "`a`b`c`" },
-		{ "\u0060a`b`c\u0060d\u0060", "`a`b`c`d`" },
-		{ "\\u0060a`b`c\\u0060d\\u0060", "`a`b`c`d`" },
-		{ "Foo\\\\`bar", "Foo\\`bar" },
-		// Escape the unicode literal for java
-		{ "admin\\user", "admin\\user" },
-		// Escape the unicode literal for cypher
-		{ "admin\\\\user", "admin\\user" },
-		// The unicode escaped
-		{ "\\u0075\\u1456", "uᑖ" },
-		// Not supported, "Potential additional rules mentioned in the GQL standard that would be potentially worth considering could take over:"
-		// new TestInput("\\u000151", "ő", "ő"),
-		{ "\u1456", "ᑖ" },
-		{ "something\\u005C\\u00751456", "something\\u1456" },
-		// Similar to the above, but creating backtick
-		// First is literal unicode backslash, than u0060, will turn into \\u00160, turned into a backtick and quoted
-		{ "\u005C\\u0060", "`"},
-		// First is escaped unicode backslash, than u0060 but the CIP says only one iteration of resolving
-		{ "\\u005Cu0060", "\\u0060"},
-		// Escaped literals for the backslash and the backtick following each other
-		{ "\\u005C\\u0060", "\\`"},
-		{ "x\\y", "x\\y" },
-		// Already escaped backslash
-		{ "x\\\\y", "x\\y" },
-		// Escaped backticks
-		{ "x\\`y", "x`y" },
-		{ "x\\```y", "x``y" },
-		{ "x`\\```y", "x```y" },
-		// This is the backtick itself in the string
-		{ "Foo \u0060", "Foo `" },
-		// This is the backtick unicode escaped so that without further processing `foo \u0060` would end up at Cypher,
-		{ "Foo \\u0060", "Foo `" },
+		{
+			put("Q", "Quoting");
+			put("U", "Unicode");
+			put("B", "Backslashes");
+			put("E", "Escaping");
+		}
 	};
+
+	static class TestItem {
+
+		private final String category;
+
+		private final String description;
+
+		private final String input;
+
+		private final String expected;
+
+		TestItem(String category, String description, String input, String expected) {
+			this.category = category;
+			this.description = description;
+			this.input = input;
+			this.expected = expected;
+		}
+
+		public String category() {
+			return category;
+		}
+
+		public String description() {
+			return description;
+		}
+
+		public String input() {
+			return input;
+		}
+
+		public String expected() {
+			return expected;
+		}
+	}
+
+	List<TestItem> TEST_DATA = Arrays.asList(
+		new TestItem("Q", "Simple label", "ABC", "ABC"),
+		new TestItem("Q", "Simple label with non identifiers", "A Label", "A Label"),
+		new TestItem("Q", "Simple label with backticks", "A` C", "A` C"),
+		new TestItem("Q", "Escaped quotes", "A`` C", "A` C"),
+		new TestItem("Q", "Backticks after blank ", "A `Label", "A `Label"),
+		new TestItem("Q", "Non consecutive backticks", "`A `Label", "`A `Label"),
+		new TestItem("U", "Single unicode, no quoting needed", "ᑖ", "ᑖ"),
+		new TestItem("U", "Single multibyte unicode, quoting needed", "⚡️", "⚡️"),
+		new TestItem("U", "Unicode pair inside label", "Spring Data Neo4j⚡️RX", "Spring Data Neo4j⚡️RX"),
+		new TestItem("Q", "Single backtick", "`", "`"),
+		new TestItem("Q", "Single unicode literal backtick", "\u0060", "`"),
+		new TestItem("Q", "One escaped, one unescaped backtick", "```", "``"),
+		new TestItem("Q", "One escaped, one unescaped unicode literal backtick", "\u0060\u0060\u0060", "``"),
+		new TestItem("U", "One escaped, one unescaped Cypher unicode literal backtick", "\\u0060\\u0060\\u0060", "``"),
+		new TestItem("Q", "Backtick at end", "Hello`", "Hello`"),
+		new TestItem("Q", "Escaped backticks", "Hi````there", "Hi``there"),
+		new TestItem("Q", "Mixed escaped and non escaped backticks", "Hi`````there", "Hi```there"),
+		new TestItem("Q", "Even number of scattered backticks", "`a`b`c`", "`a`b`c`"),
+		new TestItem("Q", "Even number of scattered backticks (unicode literals)", "\u0060a`b`c\u0060d\u0060", "`a`b`c`d`"),
+		new TestItem("Q", "Even number of scattered backticks (Cypher unicode literals)", "\\u0060a`b`c\\u0060d\\u0060", "`a`b`c`d`"),
+		new TestItem("B", "Escaped backslash followed by backtick", "Foo\\\\`bar", "Foo\\`bar"),
+		new TestItem("U", "Escaped (invalid) unicode literal", "admin\\user", "admin\\user"),
+		new TestItem("U", "Escaped (invalid) Cypher unicode literal", "admin\\\\user", "admin\\user"),
+		new TestItem("U", "Cypher unicode literals", "\\u0075\\u1456", "uᑖ"),
+		new TestItem("U", "Unicode literal", "\u1456", "ᑖ"),
+		new TestItem("U", "Non recursive Cypher unicode literals", "something\\u005C\\u00751456", "something\\u1456"),
+		new TestItem("U", "Unicode literals creating a backtick unicode", "\u005C\\u0060", "`"),
+		new TestItem("U", "Unicode literals creating only the literal text of a a unicode literal", "\\u005Cu0060", "\\u0060"),
+		new TestItem("U", "Cypher unicode literals creating unicode backtick literal", "\\u005C\\u0060", "\\`"),
+		new TestItem("B", "Single backslash", "x\\y", "x\\y"),
+		new TestItem("B", "Escaped single backslash", "x\\\\y", "x\\y"),
+		new TestItem("B", "Escaped multiple backslash", "x\\\\\\\\y", "x\\\\y"),
+		new TestItem("E", "Escaped backticks (Future Neo4j)", "x\\`y", "x`y"),
+		new TestItem("E", "Escaped backticks (Future Neo4j)", "x\\```y", "x``y"),
+		new TestItem("E", "Escaped backticks (Future Neo4j)", "x`\\```y", "x```y"),
+		new TestItem("Q", "Unicode literal backtick at end", "Foo \u0060", "Foo `"),
+		new TestItem("Q", "Cypher unicode literal backtick at end", "Foo \\u0060", "Foo `")
+	);
 
 	@TestFactory
 	Stream<DynamicNode> shouldHaveConsistentResultsOnAllSupportedVersions() {
@@ -113,33 +148,40 @@ class SchemaNamesIT {
 				Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:" + version).withReuse(true);
 				neo4j.start();
 
-				Stream<DynamicTest> dynamicTestStream = Arrays.stream(TEST_DATA)
-					.map(v -> {
-						String[] majorMinor = version.split("\\.");
-						int major = -1;
-						int minor = -1;
-						// Latest supported must work without config
-						if (!LATEST_VERSION.equals(version)) {
-							major = Integer.parseInt(majorMinor[0]);
-							minor = Integer.parseInt(majorMinor[1]);
-						}
-						String schemaName = SchemaNames.sanitize(v[0], false, major, minor).orElseThrow(NoSuchElementException::new);
-						return DynamicTest.dynamicTest(schemaName, () -> {
-								Driver driver = CACHED_CONNECTIONS.computeIfAbsent(neo4j,
-									server -> GraphDatabase.driver(server.getBoltUrl(),
-										AuthTokens.basic("neo4j", neo4j.getAdminPassword()), DRIVER_CONFIG));
+				String[] majorMinor = version.split("\\.");
+				int major;
+				int minor;
+				// Latest supported must work without config
+				if (LATEST_VERSION.equals(version)) {
+					major = -1;
+					minor = -1;
+				} else {
+					major = Integer.parseInt(majorMinor[0]);
+					minor = Integer.parseInt(majorMinor[1]);
+				}
+
+				Stream<DynamicNode> categories = TEST_DATA.stream().collect(Collectors.groupingBy(TestItem::category))
+					.entrySet().stream().map(entry -> {
+						Stream<DynamicTest> nested = entry.getValue().stream().map(item ->
+							DynamicTest.dynamicTest(item.description() + " (" + item.input + ")", () -> {
+								String schemaName = SchemaNames.sanitize(item.input(), false, major, minor).orElseThrow(NoSuchElementException::new);
+								Driver driver = CACHED_CONNECTIONS.computeIfAbsent(neo4j, SchemaNamesIT::newDriverInstance);
 								try (Session session = driver.session();) {
 									Result result = session.run(String.format("CREATE (n:%s) RETURN n", schemaName));
 									Node node = result.single().get(0).asNode();
-									assertThat(node.labels()).containsExactly(v[1]);
+									assertThat(node.labels()).containsExactly(item.expected());
 									ResultSummary summary = result.consume();
 									assertThat(summary.counters().nodesCreated()).isOne();
 								}
-							}
-						);
+							}));
+						return DynamicContainer.dynamicContainer(CATEGORIES.getOrDefault(entry.getKey(), "Misc"), nested);
 					});
-				return DynamicContainer.dynamicContainer(version, dynamicTestStream);
+				return DynamicContainer.dynamicContainer(version, categories);
 			});
+	}
+
+	private static Driver newDriverInstance(Neo4jContainer<?> server) {
+		return GraphDatabase.driver(server.getBoltUrl(), AuthTokens.basic("neo4j", server.getAdminPassword()), DRIVER_CONFIG);
 	}
 
 	@AfterAll
