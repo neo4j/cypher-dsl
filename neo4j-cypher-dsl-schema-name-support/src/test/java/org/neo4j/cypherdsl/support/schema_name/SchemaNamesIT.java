@@ -85,6 +85,13 @@ class SchemaNamesIT {
 		// new TestInput("\\u000151", "ő", "ő"),
 		{ "\u1456", "ᑖ" },
 		{ "something\\u005C\\u00751456", "something\\u1456" },
+		// Similar to the above, but creating backtick
+		// First is literal unicode backslash, than u0060, will turn into \\u00160, turned into a backtick and quoted
+		{ "\u005C\\u0060", "`"},
+		// First is escaped unicode backslash, than u0060 but the CIP says only one iteration of resolving
+		{ "\\u005Cu0060", "\\u0060"},
+		// Escaped literals for the backslash and the backtick following each other
+		{ "\\u005C\\u0060", "\\`"},
 		{ "x\\y", "x\\y" },
 		// Already escaped backslash
 		{ "x\\\\y", "x\\y" },
