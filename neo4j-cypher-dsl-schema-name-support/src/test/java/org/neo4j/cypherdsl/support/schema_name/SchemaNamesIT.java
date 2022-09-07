@@ -55,20 +55,23 @@ class SchemaNamesIT {
 	private static final Map<Neo4jContainer<?>, Driver> CACHED_CONNECTIONS = Collections.synchronizedMap(
 		new HashMap<>());
 	private static final String LATEST_VERSION = "4.4";
-	private static final Map<String, String> CATEGORIES = new HashMap<String, String>() {
-		private static final long serialVersionUID = -5617035309491104978L;
 
-		{
-			put("Q", "Quoting");
-			put("U", "Unicode");
-			put("B", "Backslashes");
-			put("E", "Escaping");
+	enum Category {
+		Q("Quoting"),
+		U("Unicode"),
+		B("Backslashes"),
+		E("Escaping");
+
+		private final String value;
+
+		Category(String value) {
+			this.value = value;
 		}
-	};
+	}
 
 	static class TestItem {
 
-		private final String category;
+		private final Category category;
 
 		private final String description;
 
@@ -76,14 +79,14 @@ class SchemaNamesIT {
 
 		private final String expected;
 
-		TestItem(String category, String description, String input, String expected) {
+		TestItem(Category category, String description, String input, String expected) {
 			this.category = category;
 			this.description = description;
 			this.input = input;
 			this.expected = expected;
 		}
 
-		public String category() {
+		public Category category() {
 			return category;
 		}
 
@@ -101,43 +104,43 @@ class SchemaNamesIT {
 	}
 
 	List<TestItem> TEST_DATA = Arrays.asList(
-		new TestItem("Q", "Simple label", "ABC", "ABC"),
-		new TestItem("Q", "Simple label with non identifiers", "A Label", "A Label"),
-		new TestItem("Q", "Simple label with backticks", "A` C", "A` C"),
-		new TestItem("Q", "Escaped quotes", "A`` C", "A` C"),
-		new TestItem("Q", "Backticks after blank ", "A `Label", "A `Label"),
-		new TestItem("Q", "Non consecutive backticks", "`A `Label", "`A `Label"),
-		new TestItem("U", "Single unicode, no quoting needed", "ᑖ", "ᑖ"),
-		new TestItem("U", "Single multibyte unicode, quoting needed", "⚡️", "⚡️"),
-		new TestItem("U", "Unicode pair inside label", "Spring Data Neo4j⚡️RX", "Spring Data Neo4j⚡️RX"),
-		new TestItem("Q", "Single backtick", "`", "`"),
-		new TestItem("Q", "Single unicode literal backtick", "\u0060", "`"),
-		new TestItem("Q", "One escaped, one unescaped backtick", "```", "``"),
-		new TestItem("Q", "One escaped, one unescaped unicode literal backtick", "\u0060\u0060\u0060", "``"),
-		new TestItem("U", "One escaped, one unescaped Cypher unicode literal backtick", "\\u0060\\u0060\\u0060", "``"),
-		new TestItem("Q", "Backtick at end", "Hello`", "Hello`"),
-		new TestItem("Q", "Escaped backticks", "Hi````there", "Hi``there"),
-		new TestItem("Q", "Mixed escaped and non escaped backticks", "Hi`````there", "Hi```there"),
-		new TestItem("Q", "Even number of scattered backticks", "`a`b`c`", "`a`b`c`"),
-		new TestItem("Q", "Even number of scattered backticks (unicode literals)", "\u0060a`b`c\u0060d\u0060", "`a`b`c`d`"),
-		new TestItem("Q", "Even number of scattered backticks (Cypher unicode literals)", "\\u0060a`b`c\\u0060d\\u0060", "`a`b`c`d`"),
-		new TestItem("B", "Escaped backslash followed by backtick", "Foo\\\\`bar", "Foo\\`bar"),
-		new TestItem("U", "Escaped (invalid) unicode literal", "admin\\user", "admin\\user"),
-		new TestItem("U", "Escaped (invalid) Cypher unicode literal", "admin\\\\user", "admin\\user"),
-		new TestItem("U", "Cypher unicode literals", "\\u0075\\u1456", "uᑖ"),
-		new TestItem("U", "Unicode literal", "\u1456", "ᑖ"),
-		new TestItem("U", "Non recursive Cypher unicode literals", "something\\u005C\\u00751456", "something\\u1456"),
-		new TestItem("U", "Unicode literals creating a backtick unicode", "\u005C\\u0060", "`"),
-		new TestItem("U", "Unicode literals creating only the literal text of a a unicode literal", "\\u005Cu0060", "\\u0060"),
-		new TestItem("U", "Cypher unicode literals creating unicode backtick literal", "\\u005C\\u0060", "\\`"),
-		new TestItem("B", "Single backslash", "x\\y", "x\\y"),
-		new TestItem("B", "Escaped single backslash", "x\\\\y", "x\\y"),
-		new TestItem("B", "Escaped multiple backslash", "x\\\\\\\\y", "x\\\\y"),
-		new TestItem("E", "Escaped backticks (Future Neo4j)", "x\\`y", "x`y"),
-		new TestItem("E", "Escaped backticks (Future Neo4j)", "x\\```y", "x``y"),
-		new TestItem("E", "Escaped backticks (Future Neo4j)", "x`\\```y", "x```y"),
-		new TestItem("Q", "Unicode literal backtick at end", "Foo \u0060", "Foo `"),
-		new TestItem("Q", "Cypher unicode literal backtick at end", "Foo \\u0060", "Foo `")
+		new TestItem(Category.Q, "Simple label", "ABC", "ABC"),
+		new TestItem(Category.Q, "Simple label with non identifiers", "A Label", "A Label"),
+		new TestItem(Category.Q, "Simple label with backticks", "A` C", "A` C"),
+		new TestItem(Category.Q, "Escaped quotes", "A`` C", "A` C"),
+		new TestItem(Category.Q, "Backticks after blank ", "A `Label", "A `Label"),
+		new TestItem(Category.Q, "Non consecutive backticks", "`A `Label", "`A `Label"),
+		new TestItem(Category.U, "Single unicode, no quoting needed", "ᑖ", "ᑖ"),
+		new TestItem(Category.U, "Single multibyte unicode, quoting needed", "⚡️", "⚡️"),
+		new TestItem(Category.U, "Unicode pair inside label", "Spring Data Neo4j⚡️RX", "Spring Data Neo4j⚡️RX"),
+		new TestItem(Category.Q, "Single backtick", "`", "`"),
+		new TestItem(Category.Q, "Single unicode literal backtick", "\u0060", "`"),
+		new TestItem(Category.Q, "One escaped, one unescaped backtick", "```", "``"),
+		new TestItem(Category.Q, "One escaped, one unescaped unicode literal backtick", "\u0060\u0060\u0060", "``"),
+		new TestItem(Category.U, "One escaped, one unescaped Cypher unicode literal backtick", "\\u0060\\u0060\\u0060", "``"),
+		new TestItem(Category.Q, "Backtick at end", "Hello`", "Hello`"),
+		new TestItem(Category.Q, "Escaped backticks", "Hi````there", "Hi``there"),
+		new TestItem(Category.Q, "Mixed escaped and non escaped backticks", "Hi`````there", "Hi```there"),
+		new TestItem(Category.Q, "Even number of scattered backticks", "`a`b`c`", "`a`b`c`"),
+		new TestItem(Category.Q, "Even number of scattered backticks (unicode literals)", "\u0060a`b`c\u0060d\u0060", "`a`b`c`d`"),
+		new TestItem(Category.Q, "Even number of scattered backticks (Cypher unicode literals)", "\\u0060a`b`c\\u0060d\\u0060", "`a`b`c`d`"),
+		new TestItem(Category.B, "Escaped backslash followed by backtick", "Foo\\\\`bar", "Foo\\`bar"),
+		new TestItem(Category.U, "Escaped (invalid) unicode literal", "admin\\user", "admin\\user"),
+		new TestItem(Category.U, "Escaped (invalid) Cypher unicode literal", "admin\\\\user", "admin\\user"),
+		new TestItem(Category.U, "Cypher unicode literals", "\\u0075\\u1456", "uᑖ"),
+		new TestItem(Category.U, "Unicode literal", "\u1456", "ᑖ"),
+		new TestItem(Category.U, "Non recursive Cypher unicode literals", "something\\u005C\\u00751456", "something\\u1456"),
+		new TestItem(Category.U, "Unicode literals creating a backtick unicode", "\u005C\\u0060", "`"),
+		new TestItem(Category.U, "Unicode literals creating only the literal text of a a unicode literal", "\\u005Cu0060", "\\u0060"),
+		new TestItem(Category.U, "Cypher unicode literals creating unicode backtick literal", "\\u005C\\u0060", "\\`"),
+		new TestItem(Category.B, "Single backslash", "x\\y", "x\\y"),
+		new TestItem(Category.B, "Escaped single backslash", "x\\\\y", "x\\y"),
+		new TestItem(Category.B, "Escaped multiple backslash", "x\\\\\\\\y", "x\\\\y"),
+		new TestItem(Category.E, "Escaped backticks (Future Neo4j)", "x\\`y", "x`y"),
+		new TestItem(Category.E, "Escaped backticks (Future Neo4j)", "x\\```y", "x``y"),
+		new TestItem(Category.E, "Escaped backticks (Future Neo4j)", "x`\\```y", "x```y"),
+		new TestItem(Category.Q, "Unicode literal backtick at end", "Foo \u0060", "Foo `"),
+		new TestItem(Category.Q, "Cypher unicode literal backtick at end", "Foo \\u0060", "Foo `")
 	);
 
 	@TestFactory
@@ -174,7 +177,7 @@ class SchemaNamesIT {
 									assertThat(summary.counters().nodesCreated()).isOne();
 								}
 							}));
-						return DynamicContainer.dynamicContainer(CATEGORIES.getOrDefault(entry.getKey(), "Misc"), nested);
+						return DynamicContainer.dynamicContainer(entry.getKey().value, nested);
 					});
 				return DynamicContainer.dynamicContainer(version, categories);
 			});
