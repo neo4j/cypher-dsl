@@ -34,7 +34,6 @@
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.examples.driver</java-module-name>
 		<java.version>11</java.version>
-		<testcontainers.version>1.17.3</testcontainers.version>
 	</properties>
 
 	<dependencyManagement>
@@ -90,14 +89,12 @@
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.testcontainers</groupId>
 			<artifactId>neo4j</artifactId>
-			<version>${testcontainers.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

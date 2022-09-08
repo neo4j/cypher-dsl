@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import org.neo4j.cypherdsl.core.utils.Strings;
-
 /**
  * A generator for constant field names.
  *
@@ -43,7 +41,7 @@ interface FieldNameGenerator {
 		int i = 0;
 		while (i < name.length()) {
 			codePoint = name.codePointAt(i);
-			if (Strings.isValidJavaIdentifierPartAt(i, codePoint)) {
+			if (Identifiers.isValidAt(i, codePoint)) {
 				if (nextIsLower || Character.isLowerCase(codePoint)) {
 					prevWasLower = true;
 					nextIsLower = false;

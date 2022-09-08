@@ -1,0 +1,3 @@
+= Schema Name support
+
+This module consists of only one class, `SchemaNames`, that allows sanitization and quotation of possible schema names, making them safe to use in string concatenated queries for dynamic manipulation of types and labels. The project is safe to be shaded, it has no dependencies and does not restrict access to its class apart on the package level.
