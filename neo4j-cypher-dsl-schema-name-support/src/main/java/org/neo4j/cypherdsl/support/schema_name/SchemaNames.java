@@ -30,22 +30,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M18/railroad/SchemaName.html">SchemaName</a> can appear according to the OpenCypher-Spec
- * all the following places:
+ * A <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M18/railroad/SchemaName.html">SchemaName</a> can appear
+ * according to the OpenCypher-Spec all the following places:
+ *
  * <ul>
  *     <li>NodePattern aka Label</li>
  *     <li>RelationshipPattern aka Type</li>
  *     <li>PropertyLookup</li>
  * </ul>
- * Some papers refer to a schema name as symbolic names, too. A symbolic name in the context of the Cypher-DSL is usually used
- * to describe variables inside a statement, so we stick with the term schema name here.
- * <p>
+ *
+ * Some papers refer to a schema name as symbolic names, too. A symbolic name in the context of the Cypher-DSL is usually
+ * used to describe variables inside a statement, so we stick with the term schema name here.<p>
+ *
  * A schema name must be escaped in statements with backticks - also known as grave accents - ({@code `}) when it contains
- * content that is not a valid identifier or if the name is a reserved word.
- * <p>
+ * content that is not a valid identifier or if the name is a reserved word.<p>
+ *
  * Backticks themselves must be escaped with a backtick itself: {@code ``}.
- * <p>
- * This utility can be used standalone, the distributed module does not have any dependencies.
+ * <strong>We always treat two consecutive backticks as escaped backticks.</strong> An odd number of backticks will
+ * always lead to another backtick being inserted so that the single one will be escaped proper. As a concrete example
+ * this means an input like {@code ```} will be sanitised and quoted as {@code ``````}. These are one leading and one
+ * closing backtick as this schema name needs to be quoted plus one more to escape the outlier. When used as a label or
+ * type, the resulting label will be {@code ``}.<p>
+ *
+ * This utility can be used standalone, the distributed module does not have any dependencies. Shading is ok as well,
+ * there is no encapsulation to break.
  *
  * @author Michael J. Simons
  * @since 2022.8.0
