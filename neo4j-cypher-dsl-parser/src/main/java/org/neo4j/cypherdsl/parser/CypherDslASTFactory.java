@@ -156,7 +156,7 @@ final class CypherDslASTFactory implements
 		}
 
 		var chainedCallbacks = callbacks.stream().reduce(Function.identity(), Function::andThen);
-		return expressions.stream().map(e -> ((T) chainedCallbacks.apply(e))).collect(Collectors.toList());
+		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).collect(Collectors.toList());
 	}
 
 	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
