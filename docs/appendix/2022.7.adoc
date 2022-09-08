@@ -1,5 +1,31 @@
 == 2022.7
 
+=== 2022.7.2
+
+*No breaking changes*. This adds a new module - `neo4j-cypher-dsl-schema-name-support` - that contains only one class, dedicated to sanitise and quote names that are meant to be used as labels and types. We are using it internally for all our quoting needs and if you have the need in your application to create dynamic queries that deal with the modification of labels and types, you might want to have a look at that module. It is dependency free and safe to shade. The background to do label and type manipulation is this: Cypher does not support them as parameters, you need to concatenate your query for this. In all other cases, please use proper parameter, but especially for string values.
+
+Thanks to @AzuObs @AlexNeo4J and @robsdedude for their feedback on this work and also to @harshitp-fens for their inspiration of the `ON_DELETE_ITEM` parser callback.
+
+==== 🚀 Features
+
+* feat: Provide `ON_DELETE_ITEM` event type. (#449)
+* feat: Introduce standalone schema-name support module. (#445)
+
+==== 🛠 Build
+
+* Fix the build on a restricted TeamCity instance. (#450)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump checker-qual from 3.24.0 to 3.25.0 (#448)
+** Bump japicmp-maven-plugin from 0.15.7 to 0.16.0 (#447)
+** Bump jackson-bom from 2.13.3 to 2.13.4 (#446)
+** Bump checkstyle from 10.3.2 to 10.3.3 (#444)
+** Bump maven-checkstyle-plugin from 3.1.2 to 3.2.0 (#443)
+** Bump maven-pmd-plugin from 3.17.0 to 3.18.0 (#442)
+** Bump joda-time from 2.11.0 to 2.11.1 (#441)
+
 === 2022.7.1
 
 *No breaking changes*. This is an important bug-fix release and a safe drop-in replacement for 2022.7.0 and all 2022.6 releases. If you can life with some deprecation warnings, it can be used as a drop-in for the 2022.5 and 2022.4 series, too.
