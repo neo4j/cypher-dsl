@@ -43,7 +43,11 @@ public enum ExpressionCreatedEventType {
 	ON_REMOVE_PROPERTY(Expression.class),
 	ON_REMOVE_LABELS(Expression.class),
 	ON_NEW_VARIABLE(Expression.class),
-	ON_NEW_PARAMETER(Expression.class);
+	ON_NEW_PARAMETER(Expression.class),
+	/**
+	 * Fired when preparing a {@code DELETE x, y, z} clause.
+	 */
+	ON_DELETE_ITEM(Expression.class);
 
 	private final Class<? extends Expression> typeProduced;
 

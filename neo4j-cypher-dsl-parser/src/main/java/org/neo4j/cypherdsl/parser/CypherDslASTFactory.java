@@ -144,16 +144,19 @@ final class CypherDslASTFactory implements
 	}
 
 	private <T extends Expression> T applyCallbackFor(ExpressionCreatedEventType type, T newExpression) {
+		return applyCallbackFor(type, List.of(newExpression)).get(0);
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Expression> List<T> applyCallbackFor(ExpressionCreatedEventType type, List<T> expressions) {
 
 		var callbacks = this.options.getOnNewExpressionCallbacks().getOrDefault(type, List.of());
 		if (callbacks.isEmpty()) {
-			return newExpression;
+			return expressions;
 		}
 
-		// We checked this when creating the callbacks
-		@SuppressWarnings("unchecked")
-		T modifiedExpression = (T) callbacks.stream().reduce(Function.identity(), Function::andThen).apply(newExpression);
-		return modifiedExpression;
+		var chainedCallbacks = callbacks.stream().reduce(Function.identity(), Function::andThen);
+		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).collect(Collectors.toList());
 	}
 
 	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
@@ -355,7 +358,7 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Clause deleteClause(InputPosition p, boolean detach, List<Expression> expressions) {
-		return Clauses.delete(detach, expressions);
+		return Clauses.delete(detach, applyCallbackFor(ExpressionCreatedEventType.ON_DELETE_ITEM, expressions));
 	}
 
 	@Override
