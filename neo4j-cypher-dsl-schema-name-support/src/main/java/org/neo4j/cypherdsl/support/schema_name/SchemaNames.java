@@ -217,11 +217,11 @@ public final class SchemaNames {
 	}
 
 	/**
-	 * True if the start of an escaped unicode literal {@code \\u} should be obsfuscated by two escaped literals for {@code \} and {@code u}.
+	 * True if the start of an escaped unicode literal {@code \\u} should be obfuscated by two escaped literals for {@code \} and {@code u}.
 	 *
 	 * @param major neo4j Major version
 	 * @param minor Neo4j minor version
-	 * @return {@literal true} if the beginning of an escaped unicude literal needs special treatment
+	 * @return {@literal true} if the beginning of an escaped unicode literal needs special treatment
 	 */
 	private static boolean substituteRemainingEscapedUnicodeLiteral(int major, int minor) {
 		if (major == -1) {

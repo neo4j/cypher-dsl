@@ -145,7 +145,13 @@ class SchemaNamesIT {
 
 	@TestFactory
 	Stream<DynamicNode> shouldHaveConsistentResultsOnAllSupportedVersions() {
-		return Stream.of("3.5", "4.0", "4.1", "4.2", "4.3", "4.4")
+		Stream<String> versions;
+		if (Boolean.getBoolean("SCHEMA_NAMES_TEST_ALL_VERSIONS")) {
+			versions = Stream.of("3.5", "4.0", "4.1", "4.2", "4.3", LATEST_VERSION);
+		} else {
+			versions = Stream.of(LATEST_VERSION);
+		}
+		return versions
 			.map(version -> {
 				@SuppressWarnings("resource")
 				Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:" + version).withReuse(true);
@@ -155,7 +161,7 @@ class SchemaNamesIT {
 				int major;
 				int minor;
 				// Latest supported must work without config
-				if (LATEST_VERSION.equals(version)) {
+				if (SchemaNamesIT.LATEST_VERSION.equals(version)) {
 					major = -1;
 					minor = -1;
 				} else {

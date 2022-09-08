@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.lang.reflect.Field;
 import java.util.Map;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 
@@ -56,7 +57,7 @@ class SchemaNamesTest {
 	}
 
 	@Test
-	void shouldBeAbleToForceQUotes() {
+	void shouldBeAbleToForceQuotes() {
 		assertThat(SchemaNames.sanitize("a", true, -1, -1)).hasValue("`a`");
 	}
 
@@ -75,7 +76,42 @@ class SchemaNamesTest {
 		assertThatNoException().isThrownBy(() -> SchemaNames.sanitize("a"));
 		assertThatNoException().isThrownBy(() -> SchemaNames.sanitize("b"));
 		assertThatNoException().isThrownBy(() -> SchemaNames.sanitize("a"));
+		assertThatNoException().isThrownBy(() -> SchemaNames.sanitize("a", false, -23, -42));
 
 		assertThat(cache).hasSize(2);
+	}
+
+	@Test
+	void shouldOnlyObfuscateUnicodeWhenRequired() {
+		String plain = "`administrator\\user`";
+		String obfuscated = "`administrator\\u005C\\u0075ser`";
+
+		Optional<String> v = SchemaNames.sanitize("administrator\\user", false, 3, -1);
+		assertThat(v).hasValue(plain);
+
+		v = SchemaNames.sanitize("administrator\\user", false, 4, 0);
+		assertThat(v).hasValue(plain);
+
+		v = SchemaNames.sanitize("administrator\\user", false, 4, -1);
+		assertThat(v).hasValue(obfuscated);
+
+		v = SchemaNames.sanitize("administrator\\user", false, 4, 2);
+		assertThat(v).hasValue(obfuscated);
+	}
+
+	@Test
+	void shouldHandleEscapedBackslashes() {
+
+		for (String input : new String[] {"x\\y", "x\\\\y"}) {
+			Optional<String> v = SchemaNames.sanitize(input, false, 4, -1);
+			String expected = "`x\\y`";
+			assertThat(v).hasValue(expected);
+
+			v = SchemaNames.sanitize("x\\\\y", false, 4, -1);
+			assertThat(v).hasValue(expected);
+		}
+
+		Optional<String> v = SchemaNames.sanitize("x\\\\y", false, 6, -1);
+		assertThat(v).hasValue("`x\\\\y`");
 	}
 }
