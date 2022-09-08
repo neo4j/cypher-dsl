@@ -426,6 +426,29 @@ class CypherDSLParserExamplesTest {
 	}
 
 	@Test
+	void preventDeleteClause() {
+
+		var userProvidedCypher = "MATCH (this)-[:LINK]-(o:Other) DELETE this, o";
+
+		UnaryOperator<Expression> preventDelete = r -> {
+			throw new RuntimeException("Not allowed to delete things!");
+		};
+
+		var options = Options.newOptions()
+			.withCallback( // <.>
+				ExpressionCreatedEventType.ON_DELETE_ITEM,
+				Expression.class,
+				preventDelete
+			)
+			.build();
+
+		assertThatExceptionOfType(RuntimeException.class)
+			.isThrownBy(() -> CypherParser.parse(userProvidedCypher, options))
+			.havingCause()
+			.withMessage("Not allowed to delete things!");
+	}
+
+	@Test
 	void modifyReturnClause() {
 
 		// tag::example-shape-the-return-clause[]
