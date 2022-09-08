@@ -35,6 +35,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = INTERNAL, since = "1.0")
 final class UnionQuery extends AbstractStatement implements Statement.RegularQuery {
 
+	@SuppressWarnings("squid:S6416") // This is about the assertion, Sonar suddenly things this is an issue: Idk. We want the exception.
 	static UnionQuery create(boolean unionAll, List<Statement> queries) {
 
 		Assertions.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
