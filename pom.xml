@@ -165,7 +165,7 @@
 		<maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
 		<maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
 		<maven-scm-plugin.version>1.12.0</maven-scm-plugin.version>
-		<maven-shade-plugin.version>3.3.0</maven-shade-plugin.version>
+		<maven-shade-plugin.version>3.4.0</maven-shade-plugin.version>
 		<maven-site-plugin.version>3.12.1</maven-site-plugin.version>
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
