@@ -153,7 +153,7 @@
 		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
 		<jqassistant.version>1.9.0</jqassistant.version>
 		<jsr305.version>3.0.2</jsr305.version>
-		<junit-jupiter.version>5.9.0</junit-jupiter.version>
+		<junit-jupiter.version>5.9.1</junit-jupiter.version>
 		<maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
 		<maven-deploy-plugin.version>3.0.0</maven-deploy-plugin.version>
@@ -170,10 +170,10 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven.version>3.8.4</maven.version>
-		<mockito.version>4.7.0</mockito.version>
+		<mockito.version>4.8.0</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.RC2</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>4.4.6</neo4j-java-driver.version>
-		<neo4j.version>4.4.10</neo4j.version>
+		<neo4j.version>4.4.11</neo4j.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>5.0.0</querydsl.version>
