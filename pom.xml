@@ -149,7 +149,7 @@
 		<jetbrains-annotations.version>23.0.0</jetbrains-annotations.version>
 		<joda-time.version>2.11.1</joda-time.version>
 		<jqassistant-dashboard-plugin.version>1.10.0</jqassistant-dashboard-plugin.version>
-		<jqassistant.plugin.git.version>1.8.0</jqassistant.plugin.git.version>
+		<jqassistant.plugin.git.version>1.9.0</jqassistant.plugin.git.version>
 		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
 		<jqassistant.version>1.9.0</jqassistant.version>
 		<jsr305.version>3.0.2</jsr305.version>
