@@ -1,0 +1,34 @@
+[[arch-rules.api]]
+[role=group,includesConstraints="arch-rules.api:*"]
+
+==== API
+
+===== General considerations
+
+We use https://github.com/apiguardian-team/apiguardian[@API Guardian] to keep track of what we expose as public or internal API.
+To keep things both clear and concise, we restrict the usage of those annotations to interfaces, classes (only public methods and constructors:
+and annotations.
+
+[[arch-rules.api:api-guardian-usage]]
+[source,java,indent=0,tabsize=4]
+.@API Guardian annotations must not be used on fields
+----
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTest.java[tag=arch-rules.structure:core-must-not-depend-on-renderer]
+----
+
+===== Internal API
+
+While we are pretty clear about the intended use of our classes (being experimental, public API or strictly internal),
+we want to make sure that no-one can coincidentally inherit from internal classes that we couldn't restrict to default
+package visibility.
+
+There should not be any internal, public API inside the core package.
+Everything that needs to be public for reasons (like being used in the renderer), must go into the `internal` package.
+This package won't be exported via `module-info.java`.
+
+[[arch-rules.api:internal]]
+[source,java,indent=0,tabsize=4]
+.Non abstract, public classes that are only part of internal API must be final
+----
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTest.java[tag=arch-rules.api:internal]
+----

@@ -119,6 +119,7 @@
 	<properties>
 		<aggregate.report.dir>neo4j-cypher-dsl-test-results/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 		<apiguardian.version>1.1.2</apiguardian.version>
+		<archunit.version>0.23.1</archunit.version>
 		<asciidoctor-maven-plugin.version>2.2.2</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.2.3</asciidoctorj-diagram.version>
 		<asciidoctorj.version>2.5.5</asciidoctorj.version>
@@ -148,10 +149,6 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<jetbrains-annotations.version>23.0.0</jetbrains-annotations.version>
 		<joda-time.version>2.11.1</joda-time.version>
-		<jqassistant-dashboard-plugin.version>1.10.0</jqassistant-dashboard-plugin.version>
-		<jqassistant.plugin.git.version>1.9.0</jqassistant.plugin.git.version>
-		<jqassistant.plugin.version>${jqassistant.version}</jqassistant.plugin.version>
-		<jqassistant.version>1.9.0</jqassistant.version>
 		<jsr305.version>3.0.2</jsr305.version>
 		<junit-jupiter.version>5.9.0</junit-jupiter.version>
 		<maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
@@ -210,6 +207,11 @@
 				<groupId>com.squareup</groupId>
 				<artifactId>javapoet</artifactId>
 				<version>${javapoet.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.tngtech.archunit</groupId>
+				<artifactId>archunit</artifactId>
+				<version>${archunit.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
@@ -299,6 +301,16 @@
 				</exclusions>
 			</dependency>
 			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>junit-jupiter</artifactId>
+				<version>${testcontainers.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.testcontainers</groupId>
+				<artifactId>neo4j</artifactId>
+				<version>${testcontainers.version}</version>
+			</dependency>
+			<dependency>
 				<groupId>org.jetbrains</groupId>
 				<artifactId>annotations</artifactId>
 				<version>${jetbrains-annotations.version}</version>
@@ -379,16 +391,6 @@
 				<artifactId>mockito-junit-jupiter</artifactId>
 				<version>${mockito.version}</version>
 				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>junit-jupiter</artifactId>
-				<version>${testcontainers.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.testcontainers</groupId>
-				<artifactId>neo4j</artifactId>
-				<version>${testcontainers.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -550,26 +552,6 @@
 						<sortDependencyExclusions>groupId,artifactId</sortDependencyExclusions>
 						<createBackupFile>false</createBackupFile>
 						<expandEmptyElements>false</expandEmptyElements>
-					</configuration>
-				</plugin>
-				<plugin>
-					<groupId>com.buschmais.jqassistant</groupId>
-					<artifactId>jqassistant-maven-plugin</artifactId>
-					<version>${jqassistant.version}</version>
-					<dependencies>
-						<dependency>
-							<groupId>de.kontext-e.jqassistant.plugin</groupId>
-							<artifactId>jqassistant.plugin.git</artifactId>
-							<version>${jqassistant.plugin.git.version}</version>
-						</dependency>
-						<dependency>
-							<groupId>org.jqassistant.contrib.plugin</groupId>
-							<artifactId>jqassistant-dashboard-plugin</artifactId>
-							<version>${jqassistant-dashboard-plugin.version}</version>
-						</dependency>
-					</dependencies>
-					<configuration>
-						<rulesDirectory>etc/jqassistant</rulesDirectory>
 					</configuration>
 				</plugin>
 				<plugin>
@@ -908,45 +890,6 @@
 					<outputDirectory>${project.build.docs}</outputDirectory>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>com.buschmais.jqassistant</groupId>
-				<artifactId>jqassistant-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>jqassistant-scan</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>scan</goal>
-						</goals>
-						<configuration>
-							<scanProperties>
-								<jqassistant.plugin.jacoco.filename>jacoco.xml</jqassistant.plugin.jacoco.filename>
-							</scanProperties>
-							<scanIncludes>
-								<scanInclude>
-									<path>${project.basedir}/.git</path>
-								</scanInclude>
-								<scanInclude>
-									<path>${project.reporting.outputDirectory}/jacoco</path>
-								</scanInclude>
-							</scanIncludes>
-						</configuration>
-					</execution>
-					<execution>
-						<id>jqassistant-analyze</id>
-						<goals>
-							<goal>analyze</goal>
-						</goals>
-						<configuration>
-							<failOnSeverity>MINOR</failOnSeverity>
-							<groups>
-								<group>arch-rules</group>
-								<group>jqassistant-dashboard:Default</group>
-							</groups>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
 
@@ -997,7 +940,6 @@
 				<asciidoctor.skip>true</asciidoctor.skip>
 				<checkstyle.skip>true</checkstyle.skip>
 				<jacoco.skip>true</jacoco.skip>
-				<jqassistant.skip>true</jqassistant.skip>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 				<pmd.skip>true</pmd.skip>
 				<skipITs>true</skipITs>
