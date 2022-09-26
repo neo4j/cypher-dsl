@@ -4075,45 +4075,7 @@ The rendering feature is part of the core module.</p>
 Therefore, there is little to know API to do so with the AST visitor being the exception.</p>
 </div>
 <div class="paragraph">
-<p>We document our rules structure with <a href="https://jqassistant.org">jQAssistant</a>,
-a Neo4j based tool for software analysis. jQAssistant is integrated in our build.</p>
-</div>
-<div class="paragraph">
-<p>To run the analysis standalone, you have to compile and build the project first. As you can skip both examples and
-native tests, JDK 8 is sufficient todo so:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">java --version <i class="conum" data-value="1"></i><b>(1)</b>
-./mvnw clean verify \
-  -pl \!org.neo4j:neo4j-cypher-dsl-examples,\!org.neo4j:neo4j-cypher-dsl-native-tests <i class="conum" data-value="2"></i><b>(2)</b>
-./mvnw jqassistant:server <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
-</div>
-</div>
-<div class="colist arabic">
-<table>
-<tr>
-<td><i class="conum" data-value="1"></i><b>1</b></td>
-<td>Must be at least Java 8</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Build and verify all modules except the examples and the native tests, which includes all scannes</td>
-</tr>
-<tr>
-<td><i class="conum" data-value="3"></i><b>3</b></td>
-<td>Start a local Neo4j server, reachable at <a href="http://localhost:7474/browser/" class="bare">http://localhost:7474/browser/</a>. The instance contains a dedicated jQAssistant
-dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class="bare">http://localhost:7474/jqassistant/dashboard/</a></td>
-</tr>
-</table>
-</div>
-<div class="paragraph">
-<p>If you want to change the default Neo4j HTTP- and Bolt-ports, start the server like this:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="bash">./mvnw jqassistant:server -Djqassistant.embedded.httpPort=4711 -Djqassistant.embedded.boltPort=9999</code></pre>
-</div>
+<p>We document our rules structure with <a href="https://www.archunit.org">ArchUnit</a> within a single unittest named <code>org.neo4j.cypherdsl.core.PackageAndAPIStructureTest</code>.</p>
 </div>
 <div class="sect3">
 <h4 id="codingrules"><a class="anchor" href="#codingrules"></a>Coding rules</h4>
@@ -4122,15 +4084,15 @@ dashboard as well: <a href="http://localhost:7474/jqassistant/dashboard/" class=
 <div class="paragraph">
 <p>The following naming conventions are used throughout the project:</p>
 </div>
-<div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock constraint">
+<div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock">
 <div class="title">Listing 51. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH
-  (project:Maven:Project)-[:CREATES]-&gt;(:Artifact)-[:CONTAINS]-&gt;(type:Type)
-WHERE NOT type.fqn starts with 'org.neo4j.cypherdsl'
-  AND type.fqn &lt;&gt; 'module-info'
-RETURN
-  project as Project, collect(type) as TypeWithWrongName</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@BeforeAll</span>
+<span class="type">void</span> importCorePackage() {
+    coreClasses = <span class="keyword">new</span> ClassFileImporter()
+        .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+        .importPackages(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.neo4j.cypherdsl.core..</span><span class="delimiter">&quot;</span></span>);
+}</code></pre>
 </div>
 </div>
 </div>
@@ -4143,33 +4105,17 @@ RETURN
 To keep things both clear and concise, we restrict the usage of those annotations to interfaces, classes (only public methods and constructors:
 and annotations.</p>
 </div>
-<div id="arch-rules.api:api-guardian-usage" class="listingblock constraint">
+<div id="arch-rules.api:api-guardian-usage" class="listingblock">
 <div class="title">Listing 52. @API Guardian annotations must not be used on fields</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
-      (p)-[:DECLARES]-&gt;(c)
-WHERE c:Member AND NOT (c:Constructor OR c:Method)
-RETURN p.fqn, c.name</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>Public interfaces, classes or annotations are either part of internal or public API and therefore must have a status:</p>
-</div>
-<div id="arch-rules.api:api-guardian-api-concept" class="listingblock concept">
-<div class="title">Listing 53. Define which Java artifacts are part of internal or public API</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Java)-[:ANNOTATED_BY]-&gt;(a)-[:OF_TYPE]-&gt;(t:Type {fqn: 'org.apiguardian.api.API'}),
-      (a)-[:HAS]-&gt;({name: 'status'})-[:IS]-&gt;(s)
-WHERE ANY (label IN labels(c) WHERE label in ['Interface', 'Class', 'Annotation'])
-WITH  c, trim(split(s.signature, ' ')[1]) AS status
-WITH  c, status,
-      CASE status
-        WHEN 'INTERNAL' THEN 'Internal'
-        ELSE 'Public'
-      END AS type
-MERGE (a:Api {type: type, status: status})
-MERGE (c)-[:IS_PART_OF]-&gt;(a)
-RETURN c,a</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
+<span class="type">void</span> coreMostNotDependOnRendering() {
+    ArchRule rule = noClasses().that()
+        .resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core</span><span class="delimiter">&quot;</span></span>)
+        .and(not(simpleName(<span class="string"><span class="delimiter">&quot;</span><span class="content">AbstractStatement</span><span class="delimiter">&quot;</span></span>)))
+        .should().dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..renderer..</span><span class="delimiter">&quot;</span></span>));
+    rule.check(coreClasses);
+}</code></pre>
 </div>
 </div>
 </div>
@@ -4178,16 +4124,34 @@ RETURN c,a</code></pre>
 <div class="paragraph">
 <p>While we are pretty clear about the intended use of our classes (being experimental, public API or strictly internal),
 we want to make sure that no-one can coincidentally inherit from internal classes that we couldn&#8217;t restrict to default
-package visibility:</p>
+package visibility.</p>
 </div>
-<div id="arch-rules.api:internal" class="listingblock constraint">
-<div class="title">Listing 54. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="paragraph">
+<p>There should not be any internal, public API inside the core package.
+Everything that needs to be public for reasons (like being used in the renderer), must go into the <code>internal</code> package.
+This package won&#8217;t be exported via <code>module-info.java</code>.</p>
+</div>
+<div id="arch-rules.api:internal" class="listingblock">
+<div class="title">Listing 53. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
-WHERE c.visibility = 'public'
-  AND coalesce(c.abstract, false) = false
-  AND NOT exists(c.final)
-RETURN c.name</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
+<span class="type">void</span> internalPublicClassesMustBeFinal() {
+    ArchRule rule = classes().that()
+        .areAnnotatedWith(API.class)
+        .and().arePublic()
+        .and().areTopLevelClasses()
+        .and(not(modifier(JavaModifier.ABSTRACT)))
+        .and(<span class="keyword">new</span> DescribedPredicate&lt;JavaClass&gt;(<span class="string"><span class="delimiter">&quot;</span><span class="content">Is internal API</span><span class="delimiter">&quot;</span></span>) {
+            <span class="annotation">@Override</span>
+            <span class="directive">public</span> <span class="type">boolean</span> apply(JavaClass input) {
+                API.Status status = input.getAnnotationOfType(API.class).status();
+                <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">INTERNAL</span><span class="delimiter">&quot;</span></span>.equals(status.name());
+            }
+        })
+        .should().haveModifier(JavaModifier.FINAL)
+        .andShould(ArchConditions.not(ArchConditions.resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core</span><span class="delimiter">&quot;</span></span>)));
+    rule.check(coreClasses);
+}</code></pre>
 </div>
 </div>
 </div>
@@ -4212,47 +4176,36 @@ JDK module name should reflect exactly one package.</p>
 <code>renderer</code> package apart from one exception: The <code>AbstractStatement</code> class can be used to invoke the rendering process without
 explicitly specifying a renderer:</p>
 </div>
-<div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock constraint">
-<div class="title">Listing 55. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock">
+<div class="title">Listing 54. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
-MATCH (a)-[:CONTAINS]-&gt;(p1:Package)
-WHERE p1.fqn in ['org.neo4j.cypherdsl.core']
-WITH p1, a
-MATCH (p1)-[:CONTAINS]-&gt;(t:Type)
-MATCH (t)-[:DEPENDS_ON]-&gt;(t2:Type)&lt;-[:CONTAINS]-(p2:Package)&lt;-[:CONTAINS]-(a)
-WHERE p2.fqn = 'org.neo4j.cypherdsl.core.renderer'
-  AND t.fqn &lt;&gt; 'org.neo4j.cypherdsl.core.AbstractStatement'
-RETURN t, t2</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
+<span class="type">void</span> coreMostNotDependOnRendering() {
+    ArchRule rule = noClasses().that()
+        .resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core</span><span class="delimiter">&quot;</span></span>)
+        .and(not(simpleName(<span class="string"><span class="delimiter">&quot;</span><span class="content">AbstractStatement</span><span class="delimiter">&quot;</span></span>)))
+        .should().dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..renderer..</span><span class="delimiter">&quot;</span></span>));
+    rule.check(coreClasses);
+}</code></pre>
 </div>
 </div>
 <div class="paragraph">
 <p>The <code>renderer</code> package is not only free to use the whole <code>core</code>, it must do so to fulfill its purpose.
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
-<div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock constraint">
-<div class="title">Listing 56. Supporting packages must not depend on anything from the outside</div>
+<div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock">
+<div class="title">Listing 55. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (a:Main:Artifact)
-MATCH (a)-[:CONTAINS]-&gt;(p1:Package)-[:DEPENDS_ON]-&gt;(p2:Package)&lt;-[:CONTAINS]-(a)
-WHERE p1.fqn IN ['org.neo4j.cypherdsl.core.ast', 'org.neo4j.cypherdsl.core.utils']
-RETURN p1,p2;</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>There should not be any internal, public API inside the core package.
-Everything that needs to be public for reasons (like being used in the renderer), must go into the <code>internal</code> package.
-This package won&#8217;t be exported via <code>module-info.java</code>.</p>
-</div>
-<div id="arch-rules.structure:public-internal-api-is-in-internal-package" class="listingblock constraint">
-<div class="title">Listing 57. Public internal API goes into a dedicated package</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="cypher">MATCH (c:Class)-[:IS_PART_OF]-&gt;(:Api {type: 'Internal'})
-MATCH (p:Package) - [:CONTAINS] -&gt; (c)
-WHERE c.visibility = 'public'
-AND coalesce(c.abstract, false) = false
-AND p.fqn = 'org.neo4j.cypherdsl.core'
-RETURN c, p</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ParameterizedTest</span>
+<span class="annotation">@ValueSource</span>(strings = { <span class="string"><span class="delimiter">&quot;</span><span class="content">..core.ast</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">..core.utils</span><span class="delimiter">&quot;</span></span> })
+<span class="type">void</span> independentSupportPackages(<span class="predefined-type">String</span> supportPackage) {
+    ArchRule rule = noClasses().that()
+        .resideInAPackage(supportPackage)
+        .should().dependOnClassesThat(
+            resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core..</span><span class="delimiter">&quot;</span></span>).and(not(resideInAPackage(supportPackage)))
+        );
+    rule.check(coreClasses);
+}</code></pre>
 </div>
 </div>
 </div>
@@ -6674,7 +6627,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-09-26 08:26:07 UTC
+Last updated 2022-09-26 10:47:52 UTC
 </div>
 </div>
 </body>
