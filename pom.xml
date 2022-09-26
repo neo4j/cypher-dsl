@@ -128,7 +128,7 @@
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.25.0</checker-qual.version>
-		<checkstyle.version>10.3.3</checkstyle.version>
+		<checkstyle.version>10.3.4</checkstyle.version>
 		<compile-testing.version>0.19</compile-testing.version>
 		<covered-ratio-complexity>0.75</covered-ratio-complexity>
 		<covered-ratio-instructions>0.75</covered-ratio-instructions>
@@ -170,10 +170,10 @@
 		<maven-source-plugin.version>3.2.1</maven-source-plugin.version>
 		<maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
 		<maven.version>3.8.4</maven.version>
-		<mockito.version>4.7.0</mockito.version>
+		<mockito.version>4.8.0</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.RC2</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>4.4.6</neo4j-java-driver.version>
-		<neo4j.version>4.4.10</neo4j.version>
+		<neo4j.version>4.4.11</neo4j.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>5.0.0</querydsl.version>
