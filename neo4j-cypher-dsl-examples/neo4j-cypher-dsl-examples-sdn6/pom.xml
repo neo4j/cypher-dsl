@@ -224,7 +224,6 @@
 				<asciidoctor.skip>true</asciidoctor.skip>
 				<checkstyle.skip>true</checkstyle.skip>
 				<jacoco.skip>true</jacoco.skip>
-				<jqassistant.skip>true</jqassistant.skip>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
 				<pmd.skip>true</pmd.skip>
 				<skipITs>true</skipITs>

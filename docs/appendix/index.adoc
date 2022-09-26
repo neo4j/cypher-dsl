@@ -7,6 +7,6 @@ include::query-dsl-support.adoc[]
 
 include::building.adoc[]
 
-include::../../etc/jqassistant/index.adoc[]
+include::../../etc/architecture/index.adoc[]
 
 include::changes.adoc[]

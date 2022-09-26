@@ -58,8 +58,23 @@
         <!-- Imports -->
         <module name="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStarImportCheck" />
         <module name="com.puppycrawl.tools.checkstyle.checks.imports.AvoidStaticImportCheck">
-            <property name="excludes"
-                      value="org.apiguardian.api.API.Status.*, org.assertj.core.api.Assertions.*, org.junit.Assert.*, org.junit.Assume.*, org.junit.internal.matchers.ThrowableMessageMatcher.*, org.hamcrest.CoreMatchers.*, org.hamcrest.Matchers.*, org.mockito.Mockito.*, org.awaitility.Awaitility.*" />
+            <property
+                name="excludes"
+                value="
+                    org.apiguardian.api.API.Status.*,
+                    org.assertj.core.api.Assertions.*,
+                    org.assertj.core.api.Assumptions.*,
+                    org.junit.internal.matchers.ThrowableMessageMatcher.*,
+                    org.mockito.Mockito.*,
+                    org.mockito.ArgumentMatchers.*,
+                    org.hamcrest.Matchers.*,
+                    com.github.stefanbirkner.systemlambda.SystemLambda.*,
+                    com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*,
+                    com.tngtech.archunit.base.DescribedPredicate.*,
+                    com.tngtech.archunit.core.domain.JavaClass.Predicates.*,
+                    com.tngtech.archunit.core.domain.properties.HasModifiers.Predicates.*
+                "
+            />
         </module>
         <module name="com.puppycrawl.tools.checkstyle.checks.imports.IllegalImportCheck">
             <property name="regexp" value="true" />
