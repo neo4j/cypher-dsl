@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.build.RegisterForReflection;
@@ -114,8 +113,6 @@ import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
 @SuppressWarnings({ "unused", "squid:S1172" })
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
-
-	private static final Pattern LABEL_AND_TYPE_QUOTATION = Pattern.compile("\\\\u0060|(?<!`)`(?:`{2})*(?!`)");
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
