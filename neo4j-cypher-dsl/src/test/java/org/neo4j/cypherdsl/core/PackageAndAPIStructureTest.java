@@ -80,7 +80,7 @@ class PackageAndAPIStructureTest {
 			.and(not(modifier(JavaModifier.ABSTRACT)))
 			.and(new DescribedPredicate<JavaClass>("Is internal API") {
 				@Override
-				public boolean apply(JavaClass input) {
+				public boolean test(JavaClass input) {
 					API.Status status = input.getAnnotationOfType(API.class).status();
 					return "INTERNAL".equals(status.name());
 				}
