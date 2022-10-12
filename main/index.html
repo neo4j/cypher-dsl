@@ -4143,7 +4143,7 @@ This package won&#8217;t be exported via <code>module-info.java</code>.</p>
         .and(not(modifier(JavaModifier.ABSTRACT)))
         .and(<span class="keyword">new</span> DescribedPredicate&lt;JavaClass&gt;(<span class="string"><span class="delimiter">&quot;</span><span class="content">Is internal API</span><span class="delimiter">&quot;</span></span>) {
             <span class="annotation">@Override</span>
-            <span class="directive">public</span> <span class="type">boolean</span> apply(JavaClass input) {
+            <span class="directive">public</span> <span class="type">boolean</span> test(JavaClass input) {
                 API.Status status = input.getAnnotationOfType(API.class).status();
                 <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">INTERNAL</span><span class="delimiter">&quot;</span></span>.equals(status.name());
             }
@@ -6627,7 +6627,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-10-12 10:00:55 UTC
+Last updated 2022-10-12 10:19:05 UTC
 </div>
 </div>
 </body>
