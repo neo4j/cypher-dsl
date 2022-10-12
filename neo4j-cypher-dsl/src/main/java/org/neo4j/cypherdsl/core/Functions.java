@@ -448,11 +448,53 @@ public final class Functions {
 	 *
 	 * @param parameter A parameter referencing a {@code point()}
 	 * @return A function call for {@code point()}
+	 * @since 2022.7.3
 	 */
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation point(Parameter<?> parameter) {
 
 		return FunctionInvocation.create(Spatials.POINT, parameter);
+	}
+
+	/**
+	 * Convenience method for creating a 2d cartesian point
+	 * @param x The x coordinate
+	 * @param y The y coordinate
+	 * @return A function call for {@code point()}
+	 * @since 2022.7.3
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation cartesian(double x, double y) {
+
+		return point(Cypher.mapOf("x", Cypher.literalOf(x), "y", Cypher.literalOf(y)));
+	}
+
+	/**
+	 * Convenience method for creating a 2d coordinate in the WGS 84 coordinate system
+	 * @param longitude The longitude
+	 * @param latitude The latitude
+	 * @return A function call for {@code point()}
+	 * @since 2022.7.3
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation coordinate(double longitude, double latitude) {
+
+		return point(Cypher.mapOf("longitude", Cypher.literalOf(longitude), "latitude", Cypher.literalOf(latitude)));
+	}
+
+	/**
+	 * Creates a function invocation for the {@code point.withinBBox} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-withinBBox">point.withinBBox</a>.
+	 *
+	 * @param point The point to check
+	 * @param lowerLeft The lower left point of the bounding box (south-west coordinate)
+	 * @param upperRight The upper right point of the bounding box (north-east coordinate)
+	 * @return A function call for {@code point.withinBBox}
+	 * @since 2022.7.3
+	 */
+	public static FunctionInvocation withinBBox(Expression point, Expression lowerLeft, Expression upperRight) {
+
+		return FunctionInvocation.create(() -> "point.withinBBox", point, lowerLeft, upperRight);
 	}
 
 	/**

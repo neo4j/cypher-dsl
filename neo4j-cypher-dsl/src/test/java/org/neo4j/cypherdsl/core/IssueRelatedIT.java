@@ -1338,4 +1338,35 @@ class IssueRelatedIT {
 				+ "MATCH (oi)-[:`IS_IDENTIFIED_BY`]->(at)\n"
 				+ "RETURN at");
 	}
+
+	@Test
+	void bbBoxManual() {
+
+		Node location = Cypher.node("Location").named("loc");
+		Expression sw = Functions.point(Cypher.mapOf("longitude", Cypher.literalOf(2.592773), "latitude", Cypher.literalOf(46.346928)));
+		Expression ne = Functions.point(Cypher.mapOf("longitude", Cypher.literalOf(18.654785), "latitude", Cypher.literalOf(55.714735)));
+		Expression withinBBox = Cypher.call("point.withinBBox")
+			.withArgs(location.property("coordinates"), sw, ne).asFunction();
+
+		Condition conditions = Conditions.noCondition();
+		conditions = conditions.and(withinBBox.asCondition());
+
+		String stmt = Cypher.match(location).where(conditions).returning(location).build().getCypher();
+		assertThat(stmt).isEqualTo("MATCH (loc:`Location`) WHERE point.withinBBox(loc.coordinates, point({longitude: 2.592773, latitude: 46.346928}), point({longitude: 18.654785, latitude: 55.714735})) RETURN loc");
+	}
+
+	@Test
+	void bbBox() {
+
+		Node location = Cypher.node("Location").named("loc");
+		Expression sw = Functions.coordinate(2.592773, 46.346928);
+		Expression ne = Functions.coordinate(18.654785, 55.714735);
+		Expression withinBBox = Functions.withinBBox(location.property("coordinates"), sw, ne);
+
+		Condition conditions = Conditions.noCondition();
+		conditions = conditions.and(withinBBox.asCondition());
+
+		String stmt = Cypher.match(location).where(conditions).returning(location).build().getCypher();
+		assertThat(stmt).isEqualTo("MATCH (loc:`Location`) WHERE point.withinBBox(loc.coordinates, point({longitude: 2.592773, latitude: 46.346928}), point({longitude: 18.654785, latitude: 55.714735})) RETURN loc");
+	}
 }
