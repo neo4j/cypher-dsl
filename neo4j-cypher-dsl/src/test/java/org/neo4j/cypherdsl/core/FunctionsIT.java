@@ -353,7 +353,9 @@ class FunctionsIT {
 			Arguments.of(Functions.toString(Cypher.literalOf(23)), "RETURN toString(23)"),
 			Arguments.of(Functions.toFloat(Cypher.literalOf("23.42")), "RETURN toFloat('23.42')"),
 			Arguments.of(Functions.toBoolean(Cypher.literalOf("false")), "RETURN toBoolean('false')"),
-			Arguments.of(Functions.randomUUID(), "RETURN randomUUID()")
+			Arguments.of(Functions.randomUUID(), "RETURN randomUUID()"),
+			Arguments.of(Functions.cartesian(2.3, 4.5), "RETURN point({x: 2.3, y: 4.5})"),
+			Arguments.of(Functions.coordinate(56.7, 12.78), "RETURN point({longitude: 56.7, latitude: 12.78})")
 		);
 	}
 }
