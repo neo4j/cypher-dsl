@@ -1,5 +1,46 @@
 == 2022.7
 
+=== 2022.7.3
+
+==== 🚀 Features
+
+* Add `point.withinBBox` and convenience methods for cartesian points and coordinates. (#475)
+
+==== 🔄️ Refactorings
+
+* Remove superfluous field.
+
+==== 🛠 Build
+
+* Replace jQAssistant with easier to maintain Archunit test. (#466)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump jackson-bom from 2.13.4 to 2.13.4.20221013 (#479)
+** Bump neo4j-cypher-javacc-parser from 4.4.11 to 4.4.12 (#478)
+** Bump reactor-bom from 2020.0.23 to 2020.0.24 (#477)
+** Bump joda-time from 2.11.2 to 2.12.0 (#476)
+** Bump archunit from 0.23.1 to 1.0.0 (#471)
+** Bump neo4j-java-driver from 4.4.6 to 4.4.9 (#474)
+** Bump testcontainers.version from 1.17.3 to 1.17.5 (#470)
+** Bump checker-qual from 3.25.0 to 3.26.0 (#472)
+** Bump asm from 9.3 to 9.4 (#468)
+** Bump joda-time from 2.11.1 to 2.11.2 (#465)
+** Bump spring-boot-starter-parent from 2.7.3 to 2.7.4 (#464)
+** Bump junit-bom from 5.9.0 to 5.9.1 (#463)
+** Bump asciidoctorj from 2.5.5 to 2.5.6 (#462)
+** Bump checkstyle from 10.3.3 to 10.3.4 (#461)
+** Bump native-maven-plugin from 0.9.13 to 0.9.14 (#460)
+** Bump spring-data-neo4j from 6.3.2 to 6.3.3 (#459)
+** Bump jqassistant.plugin.git from 1.8.0 to 1.9.0 (#458)
+** Bump maven-jar-plugin from 3.2.2 to 3.3.0 (#457)
+** Bump reactor-bom from 2020.0.22 to 2020.0.23 (#456)
+** Bump maven-shade-plugin from 3.3.0 to 3.4.0 (#455)
+** Bump maven-pmd-plugin from 3.18.0 to 3.19.0 (#454)
+** Bump neo4j-cypher-javacc-parser from 4.4.10 to 4.4.11 (#452)
+** Bump mockito.version from 4.7.0 to 4.8.0 (#451)
+
 === 2022.7.2
 
 *No breaking changes*. This adds a new module - `neo4j-cypher-dsl-schema-name-support` - that contains only one class, dedicated to sanitise and quote names that are meant to be used as labels and types. We are using it internally for all our quoting needs and if you have the need in your application to create dynamic queries that deal with the modification of labels and types, you might want to have a look at that module. It is dependency free and safe to shade. The background to do label and type manipulation is this: Cypher does not support them as parameters, you need to concatenate your query for this. In all other cases, please use proper parameter, but especially for string values.
@@ -8,8 +49,8 @@ Thanks to @AzuObs @AlexNeo4J and @robsdedude for their feedback on this work and
 
 ==== 🚀 Features
 
-* feat: Provide `ON_DELETE_ITEM` event type. (#449)
-* feat: Introduce standalone schema-name support module. (#445)
+* Provide `ON_DELETE_ITEM` event type. (#449)
+* Introduce standalone schema-name support module. (#445)
 
 ==== 🛠 Build
 
