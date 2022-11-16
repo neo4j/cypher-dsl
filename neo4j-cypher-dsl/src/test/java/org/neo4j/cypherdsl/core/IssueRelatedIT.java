@@ -1369,4 +1369,10 @@ class IssueRelatedIT {
 		String stmt = Cypher.match(location).where(conditions).returning(location).build().getCypher();
 		assertThat(stmt).isEqualTo("MATCH (loc:`Location`) WHERE point.withinBBox(loc.coordinates, point({longitude: 2.592773, latitude: 46.346928}), point({longitude: 18.654785, latitude: 55.714735})) RETURN loc");
 	}
+
+	@Test // GH-490
+	void shouldAllowAsteriskInYield() {
+		ResultStatement yield = Cypher.call("db.info").yield(Cypher.asterisk()).build();
+		assertThat(Renderer.getDefaultRenderer().render(yield)).isEqualTo("CALL db.info() YIELD *");
+	}
 }

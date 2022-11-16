@@ -1113,6 +1113,26 @@ public interface StatementBuilder
 		 * @since 2022.4.0
 		 */
 		VoidCall withoutResults();
+
+		/**
+		 * Mostly a helper method to indicate the overload as {@link org.neo4j.cypherdsl.core.ExposesCall.ExposesYield}
+		 * uses vargs for all overloads, and that would not work nicely without arguments on this one here.
+		 *
+		 * Allows to use a {@literal *} in this standalone call.
+		 * @param asterisk The actual * ;)
+		 * @return The ongoing standalone call to be configured.
+		 * @since 2022.8.0
+		 */
+		OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk);
+
+		/**
+		 * Convenience method to yield all items of this standalon call.
+		 * @return The ongoing standalone call to be configured.
+		 * @since 2022.8.0
+		 */
+		default OngoingStandaloneCallWithReturnFields yieldStar() {
+			return this.yield(Cypher.asterisk());
+		}
 	}
 
 	/**
