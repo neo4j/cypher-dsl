@@ -158,7 +158,7 @@ public final class SchemaNames {
 	 * @param value The value to sanitize
 	 * @param enforceQuotes If quotation should be enforced, even when not necessary
 	 * @param major Neo4j major version, use a value &lt; 0 to assume the latest major version
-	 * @param minor Neo4j minor version, use a value &lt; to assume any minor version
+	 * @param minor Neo4j minor version, use a value &lt; 0 to assume any minor version
 	 * @return A value that is safe to be used in string concatenation, an empty optional indicates a value that cannot be safely quoted
 	 */
 	public static Optional<String> sanitize(String value, boolean enforceQuotes, int major, int minor) {
