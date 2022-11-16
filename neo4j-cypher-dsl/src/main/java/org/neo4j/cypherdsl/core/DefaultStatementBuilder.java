@@ -1578,6 +1578,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@NotNull
+		public OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk) {
+
+			return new YieldingStandaloneCallBuilder(procedureName, arguments, asterisk);
+		}
+
+		@NotNull
 		@Override
 		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(SymbolicName... resultFields) {
 
@@ -1627,6 +1633,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, SymbolicName... resultFields) {
 			super(procedureName, arguments);
 			this.yieldItems = YieldItems.yieldAllOf(resultFields);
+		}
+
+		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, Asterisk asterisk) {
+			super(procedureName, arguments);
+			this.yieldItems = YieldItems.yieldAllOf(asterisk);
 		}
 
 		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, AliasedExpression... aliasedResultFields) {
