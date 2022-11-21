@@ -1,0 +1,30 @@
+== 2022.8
+
+=== 2022.8.0
+
+==== 🚀 Features
+
+* Add `yield *` for standalone calls. (#497)
+
+==== 📝 Documentation
+
+* Add missing value to `sanitize` JavaDoc. (#496)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump testcontainers.version from 1.17.5 to 1.17.6 (#502)
+** Bump maven-install-plugin from 3.0.1 to 3.1.0 (#501)
+** Bump japicmp-maven-plugin from 0.16.0 to 0.17.1 (#499)
+** Bump mockito.version from 4.8.1 to 4.9.0 (#498)
+** Bump jackson-bom from 2.13.4.20221013 to 2.14.0 (#492)
+** Bump checker-qual from 3.26.0 to 3.27.0 (#493)
+** Bump reactor-bom from 2020.0.24 to 2022.0.0 (#495)
+** Bump native-maven-plugin from 0.9.16 to 0.9.17 (#491)
+** Bump maven-shade-plugin from 3.4.0 to 3.4.1 (#487)
+** Bump checkstyle from 10.3.4 to 10.4 (#488)
+** Bump joda-time from 2.12.0 to 2.12.1 (#486)
+** Bump spring-boot-starter-parent from 2.7.4 to 2.7.5 (#485)
+** Bump asciidoctorj from 2.5.6 to 2.5.7 (#483)
+** Bump native-maven-plugin from 0.9.14 to 0.9.16 (#482)
+** Bump mockito.version from 4.8.0 to 4.8.1 (#481)
