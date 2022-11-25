@@ -348,8 +348,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final BuildableMatchAndUpdate set(Expression... expressions) {
 
+		DefaultStatementWithUpdateBuilder result = new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
 		this.closeCurrentOngoingUpdate();
-		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, expressions);
+		return result;
 	}
 
 	@NotNull
@@ -377,8 +378,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
+		DefaultStatementWithUpdateBuilder result = new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
 		this.closeCurrentOngoingUpdate();
-		return new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
+		return result;
 	}
 
 	@NotNull
@@ -1197,6 +1199,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 				}
 			}
 		}
+
+		if (propertyOperations.stream().anyMatch(e -> e instanceof Operation && ((Operation) e).getOperator() == Operator.REMOVE_LABEL)) {
+			throw new IllegalArgumentException("REMOVE operations are not supported in a SET clause");
+		}
 		return propertyOperations;
 	}
 
@@ -1368,8 +1374,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public BuildableMatchAndUpdate set(Expression... keyValuePairs) {
 
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
+			return result;
 		}
 
 		@NotNull
@@ -1383,9 +1390,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
 				UpdateType.SET, Operations.set(node, labels));
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return result;
 		}
 
 		@NotNull
@@ -1399,18 +1407,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
 				UpdateType.MUTATE, Operations.mutate(target, properties));
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return result;
 		}
 
 		@NotNull
 		@Override
 		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
 				Operations.set(node, labels));
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return result;
 		}
 
 		@NotNull
@@ -1424,8 +1434,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
+			return result;
 		}
 
 		@NotNull
