@@ -19,9 +19,11 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -1374,5 +1376,36 @@ class IssueRelatedIT {
 	void shouldAllowAsteriskInYield() {
 		ResultStatement yield = Cypher.call("db.info").yield(Cypher.asterisk()).build();
 		assertThat(Renderer.getDefaultRenderer().render(yield)).isEqualTo("CALL db.info() YIELD *");
+	}
+
+	@Test // GH-505
+	void testLabelRemoval() {
+		Node node = Cypher.node("Wine").named("n");
+
+		Operation removeOp = Operations.remove(node, "Drink");
+		List<Expression> propertyExpressions = Collections.singletonList(removeOp);
+		StatementBuilder.OngoingReadingWithWhere ongoingReadingWithWhere = Cypher.match(node)
+			.where(Functions.id(node).isEqualTo(Cypher.literalOf(1)));
+
+		String expectedMessage = "REMOVE operations are not supported in a SET clause";
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> ongoingReadingWithWhere.set(propertyExpressions))
+			.withMessage(expectedMessage);
+
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> ongoingReadingWithWhere.set(removeOp))
+			.withMessage(expectedMessage);
+
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> Cypher.match(node).set(removeOp))
+			.withMessage(expectedMessage);
+
+		String correctQuery = ongoingReadingWithWhere
+			.remove(node, "Drink")
+			.returning(Functions.id(node).as("id"))
+			.build()
+			.getCypher();
+
+		assertThat(correctQuery).isEqualTo("MATCH (n:`Wine`) WHERE id(n) = 1 REMOVE n:`Drink` RETURN id(n) AS id");
 	}
 }
