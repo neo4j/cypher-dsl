@@ -64,7 +64,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher-dsl-build</artifactId>
+			<artifactId>neo4j-cypher-dsl-build-annotations</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 			<optional>true</optional>
@@ -109,6 +109,14 @@
 
 	<build>
 		<plugins>
+			<!-- Configuration for surefire added because the stuff is not able to deal with the optional required module and in turn, JUnit 5 falls over during test discovering -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration combine.self="append">
+					<argLine>@{argLine} -Xverify:all --add-modules com.querydsl.core --add-reads org.neo4j.cypherdsl.core=com.querydsl.core</argLine>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>com.github.siom79.japicmp</groupId>
 				<artifactId>japicmp-maven-plugin</artifactId>
@@ -149,6 +157,11 @@
 									<groupId>javax.annotation</groupId>
 									<artifactId>javax.annotation-api</artifactId>
 									<version>${javax.annotation-api.version}</version>
+								</annotationProcessorPath>
+								<annotationProcessorPath>
+									<groupId>org.neo4j</groupId>
+									<artifactId>neo4j-cypher-dsl-build-proc</artifactId>
+									<version>${project.version}</version>
 								</annotationProcessorPath>
 							</annotationProcessorPaths>
 						</configuration>

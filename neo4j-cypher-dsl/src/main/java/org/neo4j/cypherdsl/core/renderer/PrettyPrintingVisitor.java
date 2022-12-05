@@ -20,7 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.function.BiConsumer;
 
-import org.neo4j.cypherdsl.build.RegisterForReflection;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;

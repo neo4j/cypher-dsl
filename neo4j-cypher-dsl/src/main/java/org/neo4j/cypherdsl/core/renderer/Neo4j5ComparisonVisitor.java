@@ -21,7 +21,7 @@ package org.neo4j.cypherdsl.core.renderer;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.neo4j.cypherdsl.build.RegisterForReflection;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Property;

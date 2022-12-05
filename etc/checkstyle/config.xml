@@ -23,6 +23,11 @@
     <module name="NewlineAtEndOfFile"/>
     <module name="SuppressWarningsFilter" />
 
+    <module name="SuppressWithPlainTextCommentFilter">
+        <property name="offCommentFormat" value='(=\s+|\()"""'/>
+        <property name="onCommentFormat" value='^\s+.*""";'/>
+    </module>
+
     <module name="com.puppycrawl.tools.checkstyle.TreeWalker">
         <module name="SuppressWarningsHolder" />
 

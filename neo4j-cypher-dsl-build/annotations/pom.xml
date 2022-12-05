@@ -22,20 +22,18 @@
 
 	<parent>
 		<groupId>org.neo4j</groupId>
-		<artifactId>neo4j-cypher-dsl-parent</artifactId>
+		<artifactId>neo4j-cypher-dsl-build</artifactId>
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 
-	<artifactId>neo4j-cypher-dsl-build</artifactId>
-	<packaging>pom</packaging>
+	<artifactId>neo4j-cypher-dsl-build-annotations</artifactId>
 
-	<name>Neo4j Cypher DSL (Build Utils)</name>
-	<description>Annotations and processors for minimum GraalVM support.</description>
+	<name>Neo4j Cypher DSL (Build Utils: Annotations)</name>
+	<description>Annotations for minimum GraalVM support.</description>
 
-	<modules>
-		<module>annotations</module>
-		<module>processor</module>
-	</modules>
+	<properties>
+		<java-module-name>org.neo4j.cypherdsl.build.annotations</java-module-name>
+	</properties>
 
 	<build>
 		<plugins>
@@ -58,6 +56,13 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<configuration>
 					<skip>true</skip>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration combine.self="append">
+					<compilerArgument>-proc:none</compilerArgument>
 				</configuration>
 			</plugin>
 		</plugins>
