@@ -123,8 +123,11 @@
 					<execution>
 						<id>default-compile</id>
 						<configuration combine.self="append">
+							<forceJavacCompilerUse>true</forceJavacCompilerUse>
 							<compilerArgs>
 								<arg>-Aorg.neo4j.cypherdsl.build.native_config_dir=${project.groupId}/${project.artifactId}</arg>
+								<arg>-Xlint:all,-options,-path,-processing</arg>
+								<arg>-Werror</arg>
 							</compilerArgs>
 							<annotationProcessorPaths>
 								<annotationProcessorPath>

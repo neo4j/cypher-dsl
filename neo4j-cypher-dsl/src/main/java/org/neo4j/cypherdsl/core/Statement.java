@@ -32,7 +32,6 @@ import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArg
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 

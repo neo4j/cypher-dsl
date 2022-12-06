@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.

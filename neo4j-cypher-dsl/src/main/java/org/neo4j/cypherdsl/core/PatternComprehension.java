@@ -27,7 +27,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/PatternComprehension.html">PatternComprehension</a>

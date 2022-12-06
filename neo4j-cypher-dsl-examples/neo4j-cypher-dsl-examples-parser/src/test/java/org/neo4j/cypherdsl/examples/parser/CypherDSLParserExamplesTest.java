@@ -198,7 +198,7 @@ class CypherDSLParserExamplesTest {
 
 				if (patternElement instanceof Relationship) {
 					Relationship relationship = (Relationship) patternElement;
-					if (relationship.getDetails().getTypes().getValues().contains("CALLED")) {
+					if (relationship.getDetails().getTypes().contains("CALLED")) {
 
 						var call = Cypher.node("Call").named("c");
 						var left = relationship.getLeft();

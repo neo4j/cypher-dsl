@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;

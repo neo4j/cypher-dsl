@@ -127,9 +127,9 @@ public final class Hint implements Visitable {
 				Assertions.isTrue(labels.size() == 1, "Exactly one label is required to define the index.");
 				label = labels.get(0);
 			} else if (container instanceof Relationship) {
-				RelationshipTypes types = ((Relationship) container).getDetails().getTypes();
-				Assertions.isTrue(types.getValues().size() == 1, "Exactly one type is required to define the index.");
-				label = new NodeLabel(types.getValues().get(0));
+				List<String> types = ((Relationship) container).getDetails().getTypes();
+				Assertions.isTrue(types.size() == 1, "Exactly one type is required to define the index.");
+				label = new NodeLabel(types.get(0));
 			} else {
 				throw new IllegalArgumentException("A property index can only be used for Nodes or Relationships.");
 			}

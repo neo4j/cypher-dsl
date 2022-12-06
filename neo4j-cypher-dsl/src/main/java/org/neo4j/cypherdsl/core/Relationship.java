@@ -230,8 +230,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		 * @return The relationship types being matched.
 		 */
 		@API(status = INTERNAL)
-		public RelationshipTypes getTypes() {
-			return types;
+		public List<String> getTypes() {
+			return List.copyOf(types.getValues());
 		}
 
 		/**

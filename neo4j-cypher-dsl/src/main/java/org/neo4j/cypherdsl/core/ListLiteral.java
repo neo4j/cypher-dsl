@@ -25,7 +25,6 @@ import java.util.stream.StreamSupport;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
  * A list of literals.

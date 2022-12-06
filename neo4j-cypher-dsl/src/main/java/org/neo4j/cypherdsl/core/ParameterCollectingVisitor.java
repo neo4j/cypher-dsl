@@ -28,7 +28,6 @@ import java.util.TreeSet;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 

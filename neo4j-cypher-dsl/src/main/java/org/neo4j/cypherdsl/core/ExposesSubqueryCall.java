@@ -26,7 +26,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableStatement;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * This exposes a call method taking in a statement that represents a valid, correlated subquery.

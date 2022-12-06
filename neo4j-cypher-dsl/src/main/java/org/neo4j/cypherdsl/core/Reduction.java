@@ -27,7 +27,7 @@ import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * A typed subtree representing the arguments of a call to the {@code reduce()} function.

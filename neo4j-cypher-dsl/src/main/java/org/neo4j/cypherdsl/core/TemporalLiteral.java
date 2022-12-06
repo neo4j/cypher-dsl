@@ -30,7 +30,6 @@ import java.time.temporal.TemporalAccessor;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
  * A literal representing a temporal value to be formatted in a way that Neo4j's Cypher understands it.

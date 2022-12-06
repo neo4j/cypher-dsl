@@ -25,7 +25,7 @@ import java.util.Arrays;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * A step exposing a several {@code using} methods that are provide entry points of adding advanced query hints.

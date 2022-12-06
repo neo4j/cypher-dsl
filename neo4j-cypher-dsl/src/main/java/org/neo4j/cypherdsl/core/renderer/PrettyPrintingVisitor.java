@@ -40,7 +40,7 @@ import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 
 /**

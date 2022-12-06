@@ -90,7 +90,7 @@ import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Strings;

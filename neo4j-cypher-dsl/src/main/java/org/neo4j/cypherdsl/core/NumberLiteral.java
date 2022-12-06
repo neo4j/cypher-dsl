@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
  * @author Gerrit Meier

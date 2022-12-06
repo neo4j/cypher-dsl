@@ -21,23 +21,25 @@
  * @author Michael J. Simons
  * @since 2023.0.0
  */
+@SuppressWarnings({"requires-automatic", "requires-transitive-automatic"})
 module org.neo4j.cypherdsl.core {
 
 	requires static com.querydsl.core;
 	requires static java.sql;
-	requires static org.jetbrains.annotations;
+	requires static transitive org.jetbrains.annotations;
 	requires static org.neo4j.cypherdsl.build.annotations;
-	requires static org.neo4j.driver;
-	requires static org.reactivestreams;
+	requires static transitive org.neo4j.driver;
+	requires static transitive org.reactivestreams;
 	requires static reactor.core;
 
-	requires org.apiguardian.api;
+	requires transitive org.apiguardian.api;
 	requires org.neo4j.cypherdsl.support.schema_name;
 
 	exports org.neo4j.cypherdsl.core;
 	exports org.neo4j.cypherdsl.core.ast;
 	exports org.neo4j.cypherdsl.core.executables;
 	exports org.neo4j.cypherdsl.core.renderer;
+	exports org.neo4j.cypherdsl.core.annotations;
 
 	exports org.neo4j.cypherdsl.core.utils to org.neo4j.cypherdsl.codegen.core, org.neo4j.cypherdsl.parser;
 	exports org.neo4j.cypherdsl.core.internal to org.neo4j.cypherdsl.parser;

@@ -16,36 +16,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.internal;
+package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.Literal;
 
 /**
- * Context for while rendering a statement.
+ * Represents a literal with an optional content.
  *
  * @author Michael J. Simons
- * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
+ * @param <T> type of content
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
-public interface StatementContext {
+abstract class LiteralBase<T> implements Literal<T> {
 
 	/**
-	 * Gets or creates the name of a parameter
-	 *
-	 * @param parameter The parameter who's name should be retrieved
-	 * @return The name of the parameter or a generated name
+	 * The content of this literal.
 	 */
-	String getParameterName(Parameter<?> parameter);
+	private final T content;
 
 	/**
-	 * Some parameters may be rendered as constants.
-	 *
-	 * @return {@literal true} if objects passed via the QueryDSL context as parameters should be rendered as Cypher-String
-	 * constants rather than actual Cypher parameters.
+	 * Creates a new literal from the given content
+	 * @param content The content of the new literal
 	 */
-	boolean isRenderConstantsAsParameters();
+	protected LiteralBase(T content) {
+		this.content = content;
+	}
+
+	/**
+	 * @return The content of this literal, may be {@literal null}
+	 */
+	public final T getContent() {
+		return content;
+	}
 }
+
