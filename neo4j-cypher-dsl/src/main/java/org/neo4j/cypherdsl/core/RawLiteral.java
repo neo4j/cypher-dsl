@@ -143,8 +143,8 @@ final class RawLiteral implements Expression {
 	}
 
 	private static Expression getMixedArg(Object argument) {
-		if (argument instanceof Expression) {
-			return (Expression) argument;
+		if (argument instanceof Expression expression) {
+			return expression;
 		}
 		return Cypher.literalOf(argument);
 	}

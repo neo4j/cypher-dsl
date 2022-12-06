@@ -127,7 +127,7 @@ public interface Expression extends Visitable {
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition asCondition() {
-		return this instanceof Condition ? (Condition) this : new ExpressionCondition(this);
+		return this instanceof Condition condition ? condition : new ExpressionCondition(this);
 	}
 
 	/**

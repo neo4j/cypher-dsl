@@ -476,8 +476,8 @@ final class CypherDslASTFactory implements
 			};
 
 			if (pathDetails.getName() != null) {
-				if (relationshipPattern instanceof Relationship) {
-					relationshipPattern = ((Relationship) relationshipPattern).named(pathDetails.getName());
+				if (relationshipPattern instanceof Relationship relationship) {
+					relationshipPattern = relationship.named(pathDetails.getName());
 				} else {
 					relationshipPattern = ((RelationshipChain) relationshipPattern).named(pathDetails.getName());
 				}
@@ -1072,8 +1072,8 @@ final class CypherDslASTFactory implements
 			} else {
 				ongoingDefinitionWithPattern = Cypher.listBasedOn(relationshipPattern);
 			}
-		} else if (patternElement instanceof NamedPath) {
-			ongoingDefinitionWithPattern = Cypher.listBasedOn((NamedPath) patternElement);
+		} else if (patternElement instanceof NamedPath namedPath) {
+			ongoingDefinitionWithPattern = Cypher.listBasedOn(namedPath);
 		} else {
 			throw new IllegalArgumentException(
 				"Cannot build a pattern comprehension around " + patternElement.getClass().getSimpleName());
@@ -1149,12 +1149,12 @@ final class CypherDslASTFactory implements
 	@Override
 	public Expression patternExpression(InputPosition p, PatternElement patternElement) {
 
-		if (patternElement instanceof ExpressionAsPatternElementWrapper) {
-			return ((ExpressionAsPatternElementWrapper) patternElement).getExpression();
+		if (patternElement instanceof ExpressionAsPatternElementWrapper wrapper) {
+			return wrapper.getExpression();
 		}
 
-		if (patternElement instanceof RelationshipPattern) {
-			return new PatternElementAsExpressionWrapper((RelationshipPattern) patternElement);
+		if (patternElement instanceof RelationshipPattern relationshipPattern) {
+			return new PatternElementAsExpressionWrapper(relationshipPattern);
 		}
 
 		throw new UnsupportedOperationException();

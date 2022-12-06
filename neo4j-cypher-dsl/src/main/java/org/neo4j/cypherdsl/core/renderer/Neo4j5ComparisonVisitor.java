@@ -59,8 +59,8 @@ final class Neo4j5ComparisonVisitor extends VisitorWithResult {
 			public EnterResult enterWithResult(Visitable visitable) {
 				boolean isOneLevelBelow = level.getAndIncrement() == 1;
 				if (isOneLevelBelow) {
-					if (visitable instanceof Operator) {
-						capture.compareAndSet(null, (Operator) visitable);
+					if (visitable instanceof Operator operator) {
+						capture.compareAndSet(null, operator);
 					} else if (Neo4j5FunctionInvocationVisitor.isNPropExists(visitable)) {
 						nPropExists.compareAndSet(null, visitable);
 					}

@@ -234,12 +234,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return false;
 		}
 
-		if (visitable instanceof ProvidesAffixes) {
-			((ProvidesAffixes) visitable).getPrefix().ifPresent(this::doWithPrefix);
+		if (visitable instanceof ProvidesAffixes providesAffixes) {
+			providesAffixes.getPrefix().ifPresent(this::doWithPrefix);
 		}
 
-		if (visitable instanceof AliasedExpression) {
-			currentAliasedElements.push((AliasedExpression) visitable);
+		if (visitable instanceof AliasedExpression aliasedExpression) {
+			currentAliasedElements.push(aliasedExpression);
 		}
 
 		if (visitable instanceof MapProjection) {
@@ -292,8 +292,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		separatorOnCurrentLevel().ifPresent(ref -> ref.set(", "));
 
-		if (visitable instanceof ProvidesAffixes) {
-			((ProvidesAffixes) visitable).getSuffix().ifPresent(this::doWithSuffix);
+		if (visitable instanceof ProvidesAffixes providesAffixes) {
+			providesAffixes.getSuffix().ifPresent(this::doWithSuffix);
 		}
 
 		if (visitable instanceof TypedSubtree) {
@@ -644,8 +644,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
-		if (value instanceof ConstantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
-			builder.append(((ConstantParameterHolder) value).asString());
+		if (value instanceof ConstantParameterHolder constantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
+			builder.append(constantParameterHolder.asString());
 		} else {
 			renderParameter(parameter);
 		}

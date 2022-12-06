@@ -1184,8 +1184,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 					Expression rhs = listOfExpressions.get(i + 1);
 					if (rhs instanceof Parameter) {
 						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), rhs));
-					} else if (rhs instanceof MapExpression) {
-						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), (MapExpression) rhs));
+					} else if (rhs instanceof MapExpression mapExpression) {
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), mapExpression));
 					} else {
 						throw new IllegalArgumentException(
 							"A mutating SET operation can only be used with a named parameter or a map expression.");
@@ -1194,7 +1194,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		}
 
-		if (propertyOperations.stream().anyMatch(e -> e instanceof Operation && ((Operation) e).getOperator() == Operator.REMOVE_LABEL)) {
+		if (propertyOperations.stream().anyMatch(e -> e instanceof Operation op && op.getOperator() == Operator.REMOVE_LABEL)) {
 			throw new IllegalArgumentException("REMOVE operations are not supported in a SET clause");
 		}
 		return propertyOperations;
@@ -1917,8 +1917,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		private boolean hasCondition() {
-			return this.condition != null && (!(this.condition instanceof CompoundCondition)
-					|| ((CompoundCondition) this.condition).hasConditions());
+			return this.condition != null && (!(this.condition instanceof CompoundCondition compoundCondition)
+					|| compoundCondition.hasConditions());
 		}
 
 		Optional<Condition> buildCondition() {

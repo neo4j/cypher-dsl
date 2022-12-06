@@ -283,8 +283,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
-		if (value instanceof ConstantParameterHolder) {
-			builder.append(((ConstantParameterHolder) value).asString());
+		if (value instanceof ConstantParameterHolder constantParameterHolder) {
+			builder.append(constantParameterHolder.asString());
 		} else {
 			renderParameter(parameter);
 		}

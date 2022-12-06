@@ -78,8 +78,8 @@ public final class Subquery implements Clause {
 		if (imports.length > 0) {
 			ExpressionList returnItems = new ExpressionList(Arrays.stream(imports)
 				.map(i -> {
-					if (i instanceof AliasedExpression) {
-						return ((AliasedExpression) i).getDelegate();
+					if (i instanceof AliasedExpression aliasedExpression) {
+						return aliasedExpression.getDelegate();
 					} else {
 						return i.asExpression();
 					}

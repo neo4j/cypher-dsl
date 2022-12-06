@@ -120,12 +120,12 @@ public final class Hint implements Visitable {
 				"One single property is required. Nested properties are not supported.");
 
 			NodeLabel label;
-			if (container instanceof Node) {
-				List<NodeLabel> labels = ((Node) container).getLabels();
+			if (container instanceof Node node) {
+				List<NodeLabel> labels = node.getLabels();
 				Assertions.isTrue(labels.size() == 1, "Exactly one label is required to define the index.");
 				label = labels.get(0);
-			} else if (container instanceof Relationship) {
-				List<String> types = ((Relationship) container).getDetails().getTypes();
+			} else if (container instanceof Relationship relationship) {
+				List<String> types = relationship.getDetails().getTypes();
 				Assertions.isTrue(types.size() == 1, "Exactly one type is required to define the index.");
 				label = new NodeLabel(types.get(0));
 			} else {
