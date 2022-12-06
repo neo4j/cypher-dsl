@@ -126,6 +126,13 @@
 							<compilerArgs>
 								<arg>-Aorg.neo4j.cypherdsl.build.native_config_dir=${project.groupId}/${project.artifactId}</arg>
 							</compilerArgs>
+							<annotationProcessorPaths>
+								<annotationProcessorPath>
+									<groupId>org.neo4j</groupId>
+									<artifactId>neo4j-cypher-dsl-build-proc</artifactId>
+									<version>${project.version}</version>
+								</annotationProcessorPath>
+							</annotationProcessorPaths>
 						</configuration>
 					</execution>
 					<execution>
@@ -145,11 +152,6 @@
 									<groupId>javax.annotation</groupId>
 									<artifactId>javax.annotation-api</artifactId>
 									<version>${javax.annotation-api.version}</version>
-								</annotationProcessorPath>
-								<annotationProcessorPath>
-									<groupId>org.neo4j</groupId>
-									<artifactId>neo4j-cypher-dsl-build-proc</artifactId>
-									<version>${project.version}</version>
 								</annotationProcessorPath>
 							</annotationProcessorPaths>
 						</configuration>
