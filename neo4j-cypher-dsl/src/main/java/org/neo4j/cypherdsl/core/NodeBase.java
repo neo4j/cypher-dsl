@@ -58,11 +58,24 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	// Non-final methods are ok to be overwritten.
 	// ------------------------------------------------------------------------
 
+	/**
+	 * Creates a new base object from a set of labels.
+	 *
+	 * @param primaryLabel The primary label
+	 * @param additionalLabels An optional list of additional ones.
+	 */
 	protected NodeBase(String primaryLabel, String... additionalLabels) {
 
 		this(null, primaryLabel, null, additionalLabels);
 	}
 
+	/**
+	 * Creates a new base object from a {@link SymbolicName} name, a list of labels and a set of properties
+	 *
+	 * @param symbolicName The symbolic name for this node object
+	 * @param labels The list of labels, no primary is given
+	 * @param properties A seto f properties
+	 */
 	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
 
 		this.symbolicName = symbolicName;
@@ -84,7 +97,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 */
 	@Override
 	@NotNull
-	@SuppressWarnings("squid:S3038") // This is overriden to make sure we allow a covariant return type
+	@SuppressWarnings("squid:S3038") // This is overridden to make sure we allow a covariant return type
 	public abstract SELF named(SymbolicName newSymbolicName);
 
 	@Override
@@ -98,6 +111,12 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 		return withProperties(newProperties);
 	}
 
+	/**
+	 * A new object with a new set of properties
+	 *
+	 * @param newProperties A map with the new properties
+	 * @return A new object
+	 */
 	@Override
 	@NotNull
 	public final SELF withProperties(Map<String, Object> newProperties) {
@@ -111,10 +130,13 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 * @return A new node
 	 */
 	@Override
-	@SuppressWarnings("squid:S3038") // This is overriden to make sure we allow a covariant return type
+	@SuppressWarnings("squid:S3038") // This is overridden to make sure we allow a covariant return type
 	@NotNull
 	public abstract SELF withProperties(MapExpression newProperties);
 
+	/**
+	 * @return Set of properties for this node
+	 */
 	protected final Properties getProperties() {
 		return properties;
 	}

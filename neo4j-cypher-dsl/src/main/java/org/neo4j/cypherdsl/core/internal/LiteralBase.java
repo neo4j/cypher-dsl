@@ -38,6 +38,10 @@ public abstract class LiteralBase<T> implements Literal<T> {
 	 */
 	private final T content;
 
+	/**
+	 * Creates a new literal from the given content
+	 * @param content The content of the new literal
+	 */
 	protected LiteralBase(T content) {
 		this.content = content;
 	}

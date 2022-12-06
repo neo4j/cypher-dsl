@@ -39,6 +39,9 @@ public final class LRUCache<K, V> extends LinkedHashMap<K, V> {
 
 	private static final long serialVersionUID = -6819899594092598277L;
 
+	/**
+	 * Cache size. When current size reaches that values, the eldest entries will be removed.
+	 */
 	private final int cacheSize;
 
 	/**

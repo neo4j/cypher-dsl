@@ -104,6 +104,11 @@ public interface ExposesSubqueryCall {
 	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports);
 
+	/**
+	 * Starts building a new sub-query from a {@code CALL ... IN TRANSACTIONS} clause
+	 * @param statement The sub-query to be called in transactions
+	 * @return Ongoing sub-query definition
+	 */
 	@NotNull @CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement) {
 		return callInTransactions(statement, null, new IdentifiableElement[0]);

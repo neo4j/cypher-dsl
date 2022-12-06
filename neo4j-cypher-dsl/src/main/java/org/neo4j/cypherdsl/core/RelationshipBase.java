@@ -96,7 +96,16 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		this(symbolicName, start, Direction.LTR, properties, end, mergeTypesIfNecessary(type, additionalTypes));
 	}
 
-	protected RelationshipBase(SymbolicName symbolicName, String type,  Node start, Properties properties, Node end) {
+	/**
+	 * Always creates a relationship from start to end (left to right).
+	 *
+	 * @param symbolicName an optional symbolic name
+	 * @param start        start node
+	 * @param properties   The properties for the relationship
+	 * @param end          end node
+	 * @param type         type of the relationship
+	 */
+	protected RelationshipBase(SymbolicName symbolicName, String type, Node start, Properties properties, Node end) {
 		this(symbolicName, start, Direction.LTR, properties, end, type);
 	}
 

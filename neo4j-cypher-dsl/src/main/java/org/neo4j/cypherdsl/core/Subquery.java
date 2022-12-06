@@ -121,6 +121,9 @@ public final class Subquery implements Clause {
 		return new InTransactions(this, rows);
 	}
 
+	/**
+	 * @return {@literal true} if this subquery yields any items
+	 */
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
 		return statement.doesReturnOrYield();

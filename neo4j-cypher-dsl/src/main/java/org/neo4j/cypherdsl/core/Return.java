@@ -79,6 +79,9 @@ public final class Return implements Clause {
 		visitor.leave(this);
 	}
 
+	/**
+	 * @return {@literal true} if this clause has been created with proper, literal Cypher in place
+	 */
 	@API(status = INTERNAL)
 	public boolean isRaw() {
 		return raw;

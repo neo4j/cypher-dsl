@@ -35,6 +35,9 @@ import org.jetbrains.annotations.NotNull;
 @API(status = STABLE, since = "1.0")
 public interface Node extends PatternElement, PropertyContainer, ExposesProperties<Node>, ExposesRelationships<Relationship> {
 
+	/**
+	 * @return The labels associated with this {@link Node}
+	 */
 	@NotNull @Contract(pure = true)
 	List<NodeLabel> getLabels();
 

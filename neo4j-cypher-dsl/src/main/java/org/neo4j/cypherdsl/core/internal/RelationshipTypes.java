@@ -38,6 +38,12 @@ public final class RelationshipTypes implements Visitable {
 
 	private final List<String> values;
 
+	/**
+	 * Creates a new holder for relationship types from a set of raw strings
+	 *
+	 * @param types The types to be included in this value holder
+	 * @return A new value holder
+	 */
 	public static RelationshipTypes of(String... types) {
 
 		List<String> listOfTypes = Arrays.stream(types)

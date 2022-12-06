@@ -37,10 +37,22 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = INTERNAL, since = "1.0")
 public final class RelationshipPatternCondition implements Condition {
 
+	/**
+	 * Creates a new {@link Condition} matching the given pattern.
+	 *
+	 * @param pathPattern The pattern to be matched
+	 * @return A new condition
+	 */
 	public static RelationshipPatternCondition of(RelationshipPattern pathPattern) {
 		return new RelationshipPatternCondition(false, pathPattern);
 	}
 
+	/**
+	 * Creates a new {@link Condition} that evaluates to {@literal true} when the pattern does not match.
+	 *
+	 * @param pathPattern The pattern to be matched
+	 * @return A new condition
+	 */
 	public static RelationshipPatternCondition not(RelationshipPattern pathPattern) {
 		return new RelationshipPatternCondition(true, pathPattern);
 	}

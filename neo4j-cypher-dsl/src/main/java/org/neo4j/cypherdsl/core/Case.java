@@ -60,6 +60,11 @@ public interface Case extends Expression, ProvidesAffixes {
 	interface GenericCase extends Case {
 	}
 
+	/**
+	 * Creates a new {@link Case} {@link Expression}
+	 * @param expression starting expression for the simple case
+	 * @return The new expression
+	 */
 	static Case create(@Nullable Expression expression) {
 		return expression == null ? new AbstractCase.GenericCaseImpl() : new AbstractCase.SimpleCaseImpl(expression);
 	}

@@ -17,6 +17,10 @@
  * limitations under the License.
  */
 
+/**
+ * @author Michael J. Simons
+ * @since 2023.0.0
+ */
 module org.neo4j.cypherdsl.core {
 
 	requires static com.querydsl.core;

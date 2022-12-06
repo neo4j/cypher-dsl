@@ -54,18 +54,24 @@ public interface Literal<T> extends Expression {
 
 		private static final long serialVersionUID = 864563506445498829L;
 
+		/**
+		 * Value holding the unsupported type.
+		 */
 		private final Class<?> unsupportedType;
 
-		public UnsupportedLiteralException(String message, Object unsupportedObject) {
+		UnsupportedLiteralException(String message, Object unsupportedObject) {
 			super(message);
 			this.unsupportedType = unsupportedObject.getClass();
 		}
 
-		public UnsupportedLiteralException(Object unsupportedObject) {
+		UnsupportedLiteralException(Object unsupportedObject) {
 			super("Unsupported literal type: " + unsupportedObject.getClass());
 			this.unsupportedType = unsupportedObject.getClass();
 		}
 
+		/**
+		 * @return the type that wasn't supported as literal
+		 */
 		public Class<?> getUnsupportedType() {
 			return unsupportedType;
 		}

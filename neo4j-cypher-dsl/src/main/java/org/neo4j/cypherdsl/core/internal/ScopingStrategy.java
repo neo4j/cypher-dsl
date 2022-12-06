@@ -60,6 +60,13 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class ScopingStrategy {
 
 	/**
+	 * @return an empty scoping strategy, for internal use only.
+	 */
+	public static ScopingStrategy create() {
+		return new ScopingStrategy();
+	}
+
+	/**
 	 * Keeps track of named objects that have been already visited.
 	 */
 	private final Deque<Set<IdentifiableElement>> dequeOfVisitedNamed = new ArrayDeque<>(new HashSet<>());
@@ -72,10 +79,15 @@ public final class ScopingStrategy {
 
 	private boolean inProperty = false;
 
-	public ScopingStrategy() {
+	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
 	}
 
+	/**
+	 * Called when visiting a {@link Visitable}
+	 *
+	 * @param visitable Element to be checked for new scope
+	 */
 	public void doEnter(Visitable visitable) {
 
 		// We don't want the identifiable in an order clause to be retained
@@ -93,6 +105,25 @@ public final class ScopingStrategy {
 		}
 	}
 
+	/**
+	 * @param namedItem An item that might have been visited in the current scope
+	 * @return {@literal true} if the named item has been visited in the current scope before
+	 */
+	public boolean hasVisitedBefore(Named namedItem) {
+
+		if (!hasScope()) {
+			return false;
+		}
+
+		Set<IdentifiableElement> scope = dequeOfVisitedNamed.peek();
+		return hasVisitedInScope(scope, namedItem);
+	}
+
+	/**
+	 * Called when leaving a {@link Visitable}
+	 *
+	 * @param visitable Element to be checked for a scope to be closed
+	 */
 	public void doLeave(Visitable visitable) {
 
 		if (!hasScope()) {
@@ -133,16 +164,6 @@ public final class ScopingStrategy {
 		}
 
 		previous = visitable;
-	}
-
-	public boolean hasVisitedBefore(Named namedItem) {
-
-		if (!hasScope()) {
-			return false;
-		}
-
-		Set<IdentifiableElement> scope = dequeOfVisitedNamed.peek();
-		return hasVisitedInScope(scope, namedItem);
 	}
 
 	private boolean hasScope() {
@@ -251,6 +272,9 @@ public final class ScopingStrategy {
 		}
 	}
 
+	/**
+	 * @return An unmodifiable collections with identifiables in the current scope
+	 */
 	public Collection<Expression> getIdentifiables() {
 
 		if (!hasScope()) {

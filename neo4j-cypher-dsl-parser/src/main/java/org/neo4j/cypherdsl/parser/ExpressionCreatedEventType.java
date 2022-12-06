@@ -35,14 +35,41 @@ import org.neo4j.cypherdsl.core.Operation;
 @API(status = STABLE, since = "2021.3.0")
 public enum ExpressionCreatedEventType {
 
+	/**
+	 * Fired for every new return item.
+	 */
 	ON_RETURN_ITEM(Expression.class),
+	/**
+	 * Fired when a property is set.
+	 */
 	ON_SET_PROPERTY(Operation.class),
+	/**
+	 * Fired when a label is defined.
+	 */
 	ON_SET_LABELS(Operation.class),
+	/**
+	 * Fired when a variable is defined.
+	 */
 	ON_SET_VARIABLE(Operation.class),
+	/**
+	 * Fired when a variable is added or redefined (set).
+	 */
 	ON_ADD_AND_SET_VARIABLE(Operation.class),
+	/**
+	 * Fired when parsing a property removal expression.
+	 */
 	ON_REMOVE_PROPERTY(Expression.class),
+	/**
+	 * Fired when parsing a label removing expression.
+	 */
 	ON_REMOVE_LABELS(Expression.class),
+	/**
+	 * Fired when parsing a new variable expression.
+	 */
 	ON_NEW_VARIABLE(Expression.class),
+	/**
+	 * Fired when parsing a new parameter expression.
+	 */
 	ON_NEW_PARAMETER(Expression.class),
 	/**
 	 * Fired when preparing a {@code DELETE x, y, z} clause.

@@ -17,6 +17,10 @@
  * limitations under the License.
  */
 
+/**
+ * @author Michael J. Simons
+ * @since 2023.0.0
+ */
 @SuppressWarnings( {"requires-automatic"}) // Neo4j Cypher Parser
 module org.neo4j.cypherdsl.parser {
 

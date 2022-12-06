@@ -79,6 +79,9 @@ public final class PropertyLookup implements Expression {
 		return (SymbolicName) propertyKeyName;
 	}
 
+	/**
+	 * @return {@literal true} if this is a dynamic property
+	 */
 	@API(status = INTERNAL)
 	public boolean isDynamicLookup() {
 		return dynamicLookup;

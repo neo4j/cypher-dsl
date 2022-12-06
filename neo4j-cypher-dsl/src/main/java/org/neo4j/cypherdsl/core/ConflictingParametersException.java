@@ -47,12 +47,15 @@ public final class ConflictingParametersException extends RuntimeException {
 
 	private final transient Map<String, Set<Object>> erroneousParameters;
 
-	public ConflictingParametersException(Map<String, Set<Object>> erroneousParameters) {
+	ConflictingParametersException(Map<String, Set<Object>> erroneousParameters) {
 		super(createMessage(erroneousParameters));
 		this.erroneousParameters = new HashMap<>(erroneousParameters.size());
 		erroneousParameters.forEach((k, v) -> this.erroneousParameters.put(k, new HashSet<>(v)));
 	}
 
+	/**
+	 * @return the conflicting parameters
+	 */
 	@NotNull @Contract(pure = true)
 	public Map<String, Set<Object>> getErroneousParameters() {
 		return Collections.unmodifiableMap(erroneousParameters);

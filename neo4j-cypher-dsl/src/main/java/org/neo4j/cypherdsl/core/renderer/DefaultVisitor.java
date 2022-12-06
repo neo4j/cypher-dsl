@@ -129,7 +129,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	/**
 	 * Keeps track of scoped, named variables.
 	 */
-	private final ScopingStrategy scopingStrategy = new ScopingStrategy();
+	private final ScopingStrategy scopingStrategy = ScopingStrategy.create();
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following

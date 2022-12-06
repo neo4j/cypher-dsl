@@ -254,16 +254,22 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		}
 	}
 
+	/**
+	 * @return the left-hand side of this relationship
+	 */
 	Node getLeft();
 
 	/**
-	 * The details contains the types, properties and cardinality.
+	 * The details containing the types, properties and cardinality.
 	 *
 	 * @return A wrapper around the details of this relationship.
 	 */
 	@NotNull @Contract(pure = true)
 	Details getDetails();
 
+	/**
+	 * @return the right-hand side of this relationship
+	 */
 	@NotNull @Contract(pure = true)
 	Node getRight();
 

@@ -39,10 +39,18 @@ public final class UsingPeriodicCommit implements Visitable {
 	@Nullable
 	private final Integer rate;
 
+	/**
+	 * Creates a new using periodic commit clause
+	 *
+	 * @param rate The rate to be applied
+	 */
 	public UsingPeriodicCommit(@Nullable Integer rate) {
 		this.rate = rate;
 	}
 
+	/**
+	 * @return the rate for periodic commit
+	 */
 	@Nullable
 	public Integer getRate() {
 		return rate;
