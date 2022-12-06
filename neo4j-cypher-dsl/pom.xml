@@ -32,7 +32,6 @@
 	<description>The core module of the Cypher DSL, including all supported elements and the default renderer.</description>
 
 	<properties>
-		<java-module-name>org.neo4j.cypherdsl.core</java-module-name>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
@@ -118,17 +117,6 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>com.github.siom79.japicmp</groupId>
-				<artifactId>japicmp-maven-plugin</artifactId>
-				<configuration combine.self="append">
-					<parameter>
-						<ignoreMissingClassesByRegularExpressions>
-							<ignoreMissingClassesByRegularExpression>com\.querydsl\.core\..*</ignoreMissingClassesByRegularExpression>
-						</ignoreMissingClassesByRegularExpressions>
-					</parameter>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<executions>
@@ -201,6 +189,36 @@
 						</configuration>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-module-infos</id>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+						<phase>package</phase>
+						<configuration>
+							<overwriteExistingFiles>true</overwriteExistingFiles>
+							<module>
+								<moduleInfoFile>src/main/java/module-info.java</moduleInfoFile>
+							</module>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>com.github.siom79.japicmp</groupId>
+				<artifactId>japicmp-maven-plugin</artifactId>
+				<configuration combine.self="append">
+					<parameter>
+						<ignoreMissingClassesByRegularExpressions>
+							<ignoreMissingClassesByRegularExpression>com\.querydsl\.core\..*</ignoreMissingClassesByRegularExpression>
+						</ignoreMissingClassesByRegularExpressions>
+					</parameter>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

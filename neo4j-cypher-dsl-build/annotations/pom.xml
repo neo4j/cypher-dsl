@@ -31,10 +31,6 @@
 	<name>Neo4j Cypher DSL (Build Utils: Annotations)</name>
 	<description>Annotations for minimum GraalVM support.</description>
 
-	<properties>
-		<java-module-name>org.neo4j.cypherdsl.build.annotations</java-module-name>
-	</properties>
-
 	<build>
 		<plugins>
 			<plugin>

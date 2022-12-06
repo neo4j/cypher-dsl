@@ -16,12 +16,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@SuppressWarnings( {"requires-automatic"}) // javapoet
 module org.neo4j.cypherdsl.codegen.core {
 
 	requires java.compiler;
 
 	requires com.squareup.javapoet;
-	requires org.apiguardian.api;
+	requires transitive org.apiguardian.api;
 	requires transitive org.neo4j.cypherdsl.core;
 
 	exports org.neo4j.cypherdsl.codegen.core;

@@ -32,7 +32,6 @@
 	<description>Utilities for quoting schema names to be safely used in string concatenations.</description>
 
 	<properties>
-		<java-module-name>org.neo4j.cypherdsl.support.schema_name</java-module-name>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 

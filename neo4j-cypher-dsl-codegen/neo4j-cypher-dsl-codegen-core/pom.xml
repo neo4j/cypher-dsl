@@ -47,7 +47,11 @@
 			<artifactId>neo4j-cypher-dsl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		<dependency>
+			<!-- This is in provided scope of core. If not present here, the compiler will spit out warnings as it won't find all annotations -->
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>

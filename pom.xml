@@ -773,13 +773,10 @@
 				<configuration>
 					<archive>
 						<manifest>
+							<addDefaultEntries>true</addDefaultEntries>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 							<addBuildEnvironmentEntries>true</addBuildEnvironmentEntries>
 						</manifest>
-						<manifestEntries>
-							<Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
-							<Multi-Release>true</Multi-Release>
-						</manifestEntries>
 					</archive>
 				</configuration>
 			</plugin>
