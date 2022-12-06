@@ -26,6 +26,9 @@ package org.neo4j.cypherdsl.codegen.core;
  */
 public interface FieldNameGenerator {
 
+	/**
+	 * Single instance of the default {@link FieldNameGenerator}.
+	 */
 	enum Default implements FieldNameGenerator {
 		INSTANCE
 	}
