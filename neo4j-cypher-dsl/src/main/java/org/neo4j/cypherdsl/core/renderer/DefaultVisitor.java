@@ -860,8 +860,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(UsingPeriodicCommit usingPeriodicCommit) {
 
 		builder.append("USING PERIODIC COMMIT ");
-		if (usingPeriodicCommit.getRate() != null) {
-			builder.append(usingPeriodicCommit.getRate()).append(" ");
+		if (usingPeriodicCommit.rate() != null) {
+			builder.append(usingPeriodicCommit.rate()).append(" ");
 		}
 	}
 

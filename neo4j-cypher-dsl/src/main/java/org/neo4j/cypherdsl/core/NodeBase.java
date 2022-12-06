@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -206,7 +205,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 		List<NodeLabel> labels = new ArrayList<>();
 		labels.add(new NodeLabel(primaryLabel));
-		labels.addAll(Arrays.stream(additionalLabels).map(NodeLabel::new).collect(Collectors.toList()));
+		labels.addAll(Arrays.stream(additionalLabels).map(NodeLabel::new).toList());
 
 		return labels;
 	}

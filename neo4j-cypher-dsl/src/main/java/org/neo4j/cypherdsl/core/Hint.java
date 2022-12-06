@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
@@ -176,7 +175,7 @@ public final class Hint implements Visitable {
 	public static Hint useJoinOn(SymbolicName... name) {
 
 		Assertions.notEmpty(name, "At least one name is required to define a JOIN hint.");
-		return new Hint(Type.JOIN_ON, Arrays.stream(name).map(IndexReference::new).collect(Collectors.toList()), null);
+		return new Hint(Type.JOIN_ON, Arrays.stream(name).map(IndexReference::new).toList(), null);
 	}
 
 	private final Type type;

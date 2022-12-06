@@ -132,7 +132,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @deprecated Use {@link #elementId}
 	 */
 	@NotNull @Contract(pure = true)
-	@Deprecated
+	@Deprecated(since = "2022.6.0")
 	@SuppressWarnings({ "DeprecatedIsStillUsed", "squid:S1133" }) // The deprecation warning on any client code calling this is actually the point.
 	FunctionInvocation internalId();
 

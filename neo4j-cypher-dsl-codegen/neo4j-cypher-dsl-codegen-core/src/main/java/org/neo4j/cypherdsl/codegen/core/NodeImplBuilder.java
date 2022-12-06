@@ -26,7 +26,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
@@ -112,8 +111,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 	private MethodSpec buildDefaultConstructor() {
 
 		CodeBlock.Builder superCallBuilder = CodeBlock.builder().add("super(");
-		superCallBuilder.add(
-			CodeBlock.join(this.labels.stream().map(l -> CodeBlock.of("$S", l)).collect(Collectors.toList()), ", "));
+		superCallBuilder.add(CodeBlock.join(this.labels.stream().map(l -> CodeBlock.of("$S", l)).toList(), ", "));
 		superCallBuilder.add(")");
 
 		return MethodSpec.constructorBuilder()
@@ -194,8 +192,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			return builder.build();
 		});
 
-		return Stream.concat(Stream.of(defaultInstance), Stream.concat(properties, relationships))
-			.collect(Collectors.toList());
+		return Stream.concat(Stream.of(defaultInstance), Stream.concat(properties, relationships)).toList();
 	}
 
 	static String capitalize(String str) {

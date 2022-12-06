@@ -1115,7 +1115,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		if (mergeOrCreate) {
 			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions)
-				.map(PatternElement.class::cast).collect(Collectors.toList());
+				.map(PatternElement.class::cast).toList();
 			if (updateType == UpdateType.CREATE) {
 				return new AbstractUpdatingClauseBuilder.CreateBuilder(patternElements);
 			} else {
@@ -1123,7 +1123,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		} else {
 			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast)
-				.collect(Collectors.toList());
+				.toList();
 			ExpressionList expressionList = new ExpressionList(
 				SET.contains(updateType) ? prepareSetExpressions(updateType, expressions) : expressions);
 			return switch (updateType) {

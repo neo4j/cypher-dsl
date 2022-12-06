@@ -24,7 +24,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -115,8 +114,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		static Details create(Direction direction, SymbolicName symbolicName, String... types) {
 
 			List<String> listOfTypes = Arrays.stream(types)
-				.filter(type -> !(type == null || type.isEmpty()))
-				.collect(Collectors.toList());
+				.filter(type -> !(type == null || type.isEmpty())).toList();
 
 			return create(direction, symbolicName, 	listOfTypes.isEmpty()  ? null : RelationshipTypes.of(types));
 		}

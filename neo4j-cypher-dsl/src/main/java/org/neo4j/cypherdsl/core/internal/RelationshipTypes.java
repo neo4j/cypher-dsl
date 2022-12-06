@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -48,7 +47,7 @@ public final class RelationshipTypes implements Visitable {
 
 		List<String> listOfTypes = Arrays.stream(types)
 			.filter(type -> !(type == null || type.isEmpty()))
-			.collect(Collectors.toList());
+			.toList();
 
 		return new RelationshipTypes(listOfTypes);
 	}

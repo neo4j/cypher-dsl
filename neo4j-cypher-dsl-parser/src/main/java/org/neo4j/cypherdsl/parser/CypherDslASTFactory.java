@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
@@ -170,7 +169,7 @@ final class CypherDslASTFactory implements
 		}
 
 		var chainedCallbacks = callbacks.stream().reduce(Function.identity(), Function::andThen);
-		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).collect(Collectors.toList());
+		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).toList();
 	}
 
 	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
@@ -220,7 +219,7 @@ final class CypherDslASTFactory implements
 		var finalReturnItems = returnItems;
 
 		if (returnAll) {
-			finalReturnItems = Stream.concat(Stream.of(Cypher.asterisk()), finalReturnItems.stream()).collect(Collectors.toList());
+			finalReturnItems = Stream.concat(Stream.of(Cypher.asterisk()), finalReturnItems.stream()).toList();
 		}
 
 		if (finalReturnItems.isEmpty()) {
@@ -287,7 +286,7 @@ final class CypherDslASTFactory implements
 		}
 		return patternElements.stream().map(transformer)
 			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	@Override
@@ -519,7 +518,7 @@ final class CypherDslASTFactory implements
 			node = Cypher.anyNode();
 		} else {
 			var primaryLabel = finalLabels[0];
-			var additionalLabels = Arrays.stream(finalLabels).skip(1).collect(Collectors.toList());
+			var additionalLabels = Arrays.stream(finalLabels).skip(1).toList();
 			node = Cypher.node(primaryLabel, additionalLabels);
 		}
 
