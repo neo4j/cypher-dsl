@@ -90,11 +90,10 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 			visitable = capture.get();
 		}
 
-		if (!(visitable instanceof FunctionInvocation)) {
+		if (!(visitable instanceof FunctionInvocation functionInvocation)) {
 			return false;
 		}
 
-		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
 		if ("exists".equals(functionInvocation.getFunctionName())) {
 			SingleArgExtractor<Property> singleArgExtractor = new SingleArgExtractor<>(Property.class);
 			functionInvocation.accept(singleArgExtractor);

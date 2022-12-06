@@ -66,17 +66,9 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		int indentSize = configuration.getIndentSize();
 
 		if (indentStyle == IndentStyle.TAB) {
-			indentionProvider = (builder, width) -> {
-				for (int i = 0; i < width; i++) {
-					builder.append("\t");
-				}
-			};
+			indentionProvider = (builder, width) -> builder.append("\t".repeat(Math.max(0, width)));
 		} else {
-			indentionProvider = (builder, width) -> {
-				for (int i = 0; i < width * indentSize; i++) {
-					builder.append(" ");
-				}
-			};
+			indentionProvider = (builder, width) -> builder.append(" ".repeat(Math.max(0, width * indentSize)));
 		}
 	}
 

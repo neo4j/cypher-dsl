@@ -28,7 +28,7 @@ jobs:
       - name: Set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 17
       - name: Run docs generation
         run: >
           ./mvnw --no-transfer-progress asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} &&

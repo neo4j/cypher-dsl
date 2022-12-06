@@ -308,8 +308,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			this.skipAliasing = false;
 		}
 
-		if (visitable instanceof AliasedExpression) {
-			AliasedExpression aliasedExpression = (AliasedExpression) visitable;
+		if (visitable instanceof AliasedExpression aliasedExpression) {
 			visitableToAliased.add(aliasedExpression);
 		}
 
@@ -360,12 +359,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(MergeAction onCreateOrMatchEvent) {
 		switch (onCreateOrMatchEvent.getType()) {
-			case ON_CREATE:
-				builder.append("ON CREATE");
-				break;
-			case ON_MATCH:
-				builder.append("ON MATCH");
-				break;
+			case ON_CREATE -> builder.append("ON CREATE");
+			case ON_MATCH -> builder.append("ON MATCH");
 		}
 		builder.append(" ");
 	}

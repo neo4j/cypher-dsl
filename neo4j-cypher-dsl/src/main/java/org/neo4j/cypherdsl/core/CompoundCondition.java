@@ -112,8 +112,7 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			return this;
 		}
 
-		if (condition instanceof CompoundCondition) {
-			CompoundCondition compoundCondition = (CompoundCondition) condition;
+		if (condition instanceof CompoundCondition compoundCondition) {
 			CompoundCondition target;
 			if (this.operator == chainingOperator && chainingOperator == compoundCondition.operator) {
 				target = CompoundCondition.copyOf(this);

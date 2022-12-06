@@ -57,7 +57,15 @@
 		<dependency>
 			<groupId>io.projectreactor</groupId>
 			<artifactId>reactor-core</artifactId>
-			<scope>test</scope>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+
+		<dependency>
+			<groupId>org.neo4j.driver</groupId>
+			<artifactId>neo4j-java-driver</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
 		</dependency>
 
 		<dependency>
@@ -75,12 +83,6 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.reactivestreams</groupId>
-			<artifactId>reactive-streams</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -179,9 +181,7 @@
 						<configuration>
 							<overwriteExistingFiles>true</overwriteExistingFiles>
 							<module>
-								<moduleInfoSource>
-									<![CDATA[
-									module org.neo4j.cypherdsl.parser {
+								<moduleInfoSource><![CDATA[module org.neo4j.cypherdsl.parser {
 
 										requires static org.jetbrains.annotations;
 
@@ -193,9 +193,7 @@
 										// requires org.neo4j.cypher.internal.ast.factory;
 
 										exports org.neo4j.cypherdsl.parser;
-									}
-									]]>
-								</moduleInfoSource>
+									}]]></moduleInfoSource>
 							</module>
 						</configuration>
 					</execution>

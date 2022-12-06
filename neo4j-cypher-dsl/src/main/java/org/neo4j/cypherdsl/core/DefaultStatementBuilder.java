@@ -1126,19 +1126,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.collect(Collectors.toList());
 			ExpressionList expressionList = new ExpressionList(
 				SET.contains(updateType) ? prepareSetExpressions(updateType, expressions) : expressions);
-			switch (updateType) {
-				case DETACH_DELETE:
-					return () -> new Delete(expressionList, true);
-				case DELETE:
-					return () -> new Delete(expressionList, false);
-				case SET:
-				case MUTATE:
-					return () -> new Set(expressionList);
-				case REMOVE:
-					return () -> new Remove(expressionList);
-				default:
-					throw new IllegalArgumentException("Unsupported update type " + updateType);
-			}
+			return switch (updateType) {
+				case DETACH_DELETE -> () -> new Delete(expressionList, true);
+				case DELETE -> () -> new Delete(expressionList, false);
+				case SET, MUTATE -> () -> new Set(expressionList);
+				case REMOVE -> () -> new Remove(expressionList);
+				default -> throw new IllegalArgumentException("Unsupported update type " + updateType);
+			};
 		}
 	}
 

@@ -35,7 +35,6 @@ import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Return;
-import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Provides arguments to the {@link CypherParser cypher parser}. The options itself are thread safe and can be reused.
@@ -99,7 +98,9 @@ public final class Options {
 		 */
 		public Builder withLabelFilter(BiFunction<LabelParsedEventType, Collection<String>, Collection<String>> labelFilter) {
 
-			Assertions.notNull(labelFilter, "Label filter may not be null.");
+			if (labelFilter == null) {
+				throw new IllegalArgumentException("Label filter may not be null.");
+			}
 			this.labelFilter = labelFilter;
 			return this;
 		}
@@ -112,7 +113,9 @@ public final class Options {
 		 */
 		public Builder withTypeFilter(BiFunction<TypeParsedEventType, Collection<String>, Collection<String>> typeFilter) {
 
-			Assertions.notNull(typeFilter, "Type filter may not be null.");
+			if (typeFilter == null) {
+				throw new IllegalArgumentException("Type filter may not be null.");
+			}
 			this.typeFilter = typeFilter;
 			return this;
 		}

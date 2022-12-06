@@ -35,7 +35,6 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.utils.Strings;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -201,7 +200,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 
 	static String capitalize(String str) {
 
-		if (!Strings.hasText(str)) {
+		if (str == null || str.isBlank()) {
 			return str;
 		} else {
 			char baseChar = str.charAt(0);

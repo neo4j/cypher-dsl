@@ -18,11 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.Parameter;
 
 /**
  * Context for while rendering a statement.

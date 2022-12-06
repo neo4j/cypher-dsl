@@ -24,7 +24,7 @@ import org.apiguardian.api.API;
 
 /**
  * The usual, static class with helper methods centered around missing functionality in {@link String}.
- * Not supported for external use in anyway.
+ * Not supported for external use in any way.
  *
  * @author Michael J. Simons
  * @soundtrack Genesis - We Can't Dance
@@ -38,7 +38,7 @@ public final class Strings {
 	 * @return True, if the string is neither null nor empty nor blank.
 	 */
 	public static boolean hasText(String str) {
-		return str != null && !str.isEmpty() && containsText(str);
+		return str != null && !str.isBlank();
 	}
 
 	/**
@@ -57,16 +57,6 @@ public final class Strings {
 			.limit(length)
 			.collect(StringBuilder::new, StringBuilder::appendCodePoint, StringBuilder::append)
 			.toString();
-	}
-
-	private static boolean containsText(CharSequence str) {
-		int strLen = str.length();
-		for (int i = 0; i < strLen; i++) {
-			if (!Character.isWhitespace(str.charAt(i))) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private Strings() {

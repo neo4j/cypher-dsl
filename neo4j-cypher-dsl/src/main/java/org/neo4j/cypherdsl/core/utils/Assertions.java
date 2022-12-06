@@ -26,7 +26,7 @@ import org.apiguardian.api.API;
 /**
  * Assertions used throughout the Cypher-DSL. Mostly copied over from {@literal org.springframework.util.Assert}. Thanks
  * to the original authors: Keith Donald, Juergen Hoeller, Sam Brannen, Colin Sampaleanu and Rob Harrop.
- * Not supported for external use in anyway.
+ * Not supported for external use in any way.
  *
  * @since 2020.0.0
  */

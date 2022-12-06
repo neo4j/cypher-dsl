@@ -221,6 +221,8 @@
 					<parameter>
 						<ignoreMissingClassesByRegularExpressions>
 							<ignoreMissingClassesByRegularExpression>com\.querydsl\.core\..*</ignoreMissingClassesByRegularExpression>
+							<ignoreMissingClassesByRegularExpression>org\.neo4j\.cypherdsl\.core\.internal\.LiteralBase</ignoreMissingClassesByRegularExpression>
+							<ignoreMissingClassesByRegularExpression>org\.neo4j\.cypherdsl\.core\.internal\.StatementContext</ignoreMissingClassesByRegularExpression>
 						</ignoreMissingClassesByRegularExpressions>
 					</parameter>
 				</configuration>

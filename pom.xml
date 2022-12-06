@@ -159,8 +159,6 @@
 		<maven-install-plugin.version>3.1.0</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.4.1</maven-javadoc-plugin.version>
-		<maven-jxr-plugin.version>3.3.0</maven-jxr-plugin.version>
-		<maven-pmd-plugin.version>3.19.0</maven-pmd-plugin.version>
 		<maven-resources-plugin.version>3.3.0</maven-resources-plugin.version>
 		<maven-scm-plugin.version>1.12.0</maven-scm-plugin.version>
 		<maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
@@ -424,25 +422,6 @@
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-pmd-plugin</artifactId>
-					<version>${maven-pmd-plugin.version}</version>
-					<executions>
-						<execution>
-							<goals>
-								<goal>check</goal>
-							</goals>
-						</execution>
-					</executions>
-					<dependencies>
-						<dependency>
-							<groupId>org.ow2.asm</groupId>
-							<artifactId>asm</artifactId>
-							<version>${asm.version}</version>
-						</dependency>
-					</dependencies>
-				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>${maven-install-plugin.version}</version>
 				</plugin>
@@ -647,19 +626,6 @@
 						<phase>verify</phase>
 						<goals>
 							<goal>sort</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-pmd-plugin</artifactId>
-				<version>${maven-pmd-plugin.version}</version>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>pmd</goal>
 						</goals>
 					</execution>
 				</executions>
@@ -886,11 +852,6 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jxr-plugin</artifactId>
-				<version>${maven-jxr-plugin.version}</version>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>${maven-javadoc-plugin.version}</version>
 				<reportSets>
@@ -935,7 +896,6 @@
 				<checkstyle.skip>true</checkstyle.skip>
 				<jacoco.skip>true</jacoco.skip>
 				<maven.javadoc.skip>true</maven.javadoc.skip>
-				<pmd.skip>true</pmd.skip>
 				<skipITs>true</skipITs>
 				<skipNativeBuild>true</skipNativeBuild>
 				<skipTests>true</skipTests>
