@@ -57,12 +57,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-core</artifactId>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.asciidoctor</groupId>
 			<artifactId>asciidoctorj</artifactId>
 			<scope>test</scope>
@@ -79,48 +73,39 @@
 			<artifactId>junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>org.reactivestreams</groupId>
-			<artifactId>reactive-streams</artifactId>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.moditect</groupId>
-				<artifactId>moditect-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-checkstyle-plugin</artifactId>
+				<configuration combine.self="append">
+					<headerLocation>../etc/checkstyle/java-header-gpl.txt</headerLocation>
+				</configuration>
+			</plugin>
+			<!--
+			Don't change the order of maven-javadoc-plugin, maven-shade-plugin, moditect-maven-plugin:
+			- JavaDoc can't live with a module-info.java that requires automatic modules and mess up class- and module path
+			  (JavaCC Cypher parser and dependencies are only automatic ones)
+			- Even if we would have one, the shade plugin would nuke it without an option to say "yes, this is ok, we know what we are doing"
+			- Therefor, we must add it "manually" with moditect
+			- That must however happen after javadoc plugin did his work. The resulting javadoc could be better, because right now
+			  it is based on the non-modular source version, whereas a proper one would be perfectly possible if the plugin
+			  just would allow to specify class- and module-path manually and independent.
+			-->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>add-module-infos</id>
-						<phase>package</phase>
+						<id>attach-javadocs</id>
 						<goals>
-							<goal>add-module-info</goal>
+							<goal>jar</goal>
 						</goals>
-						<configuration>
-							<overwriteExistingFiles>true</overwriteExistingFiles>
-							<module>
-								<moduleInfoSource>module org.neo4j.cypherdsl.parser {
-
-									requires static org.jetbrains.annotations;
-
-									requires org.apiguardian.api;
-
-									requires org.neo4j.cypherdsl.core;
-									// Those are shaded
-									// requires org.neo4j.cypher.internal.ast.factory;
-									// requires org.neo4j.cypher.internal.parser.javacc;
-
-									exports org.neo4j.cypherdsl.parser;
-									}</moduleInfoSource>
-							</module>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -171,15 +156,41 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<configuration combine.self="append">
-					<headerLocation>../etc/checkstyle/java-header-gpl.txt</headerLocation>
-				</configuration>
-			</plugin>
+				<groupId>org.moditect</groupId>
+				<artifactId>moditect-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>add-module-infos</id>
+						<phase>package</phase>
+						<goals>
+							<goal>add-module-info</goal>
+						</goals>
+						<configuration>
+							<overwriteExistingFiles>true</overwriteExistingFiles>
+							<module>
+								<moduleInfoSource>
+									<![CDATA[
+									module org.neo4j.cypherdsl.parser {
 
+										requires static org.jetbrains.annotations;
+
+										requires transitive org.apiguardian.api;
+										requires transitive org.neo4j.cypherdsl.core;
+
+										// Those are shaded
+										// requires org.neo4j.cypher.internal.parser.javacc;
+										// requires org.neo4j.cypher.internal.ast.factory;
+
+										exports org.neo4j.cypherdsl.parser;
+									}
+									]]>
+								</moduleInfoSource>
+							</module>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>

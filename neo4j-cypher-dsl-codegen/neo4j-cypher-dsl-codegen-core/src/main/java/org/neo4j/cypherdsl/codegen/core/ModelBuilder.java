@@ -35,7 +35,7 @@ import org.apiguardian.api.API;
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")
-public interface ModelBuilder<SELF extends ModelBuilder> {
+public interface ModelBuilder<SELF extends ModelBuilder<?>> {
 
 	/**
 	 * Adds a single new property to this model.

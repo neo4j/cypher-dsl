@@ -740,10 +740,13 @@
 						</goals>
 						<configuration>
 							<rules>
-								<DependencyConvergence />
+								<requireJavaVersion>
+									<version>11</version>
+								</requireJavaVersion>
 								<requireMavenVersion>
 									<version>${maven.version}</version>
 								</requireMavenVersion>
+								<DependencyConvergence />
 							</rules>
 						</configuration>
 					</execution>

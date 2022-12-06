@@ -24,8 +24,11 @@ package org.neo4j.cypherdsl.codegen.core;
  * @author Michael J. Simons
  * @since 2021.1.0
  */
-interface FieldNameGenerator {
+public interface FieldNameGenerator {
 
+	/**
+	 * Single instance of the default {@link FieldNameGenerator}.
+	 */
 	enum Default implements FieldNameGenerator {
 		INSTANCE
 	}

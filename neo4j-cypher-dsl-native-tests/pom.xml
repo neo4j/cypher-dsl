@@ -76,6 +76,7 @@
 							<goal>build</goal>
 						</goals>
 						<configuration>
+							<requiredVersion>21.3</requiredVersion>
 							<mainClass>org.neo4j.cypherdsl.graalvm.Application</mainClass>
 							<imageName>application</imageName>
 							<buildArgs>--no-fallback -H:+ReportExceptionStackTraces</buildArgs>

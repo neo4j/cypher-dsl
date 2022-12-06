@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.RelationshipBase;
  */
 @API(status = INTERNAL, since = "2021.1.0")
 @FunctionalInterface
-interface ClassNameGenerator {
+public interface ClassNameGenerator {
 
 	/**
 	 * Generates a valid Java class based on a suggestion.  Most of the time the suggestion will either be a simple string,

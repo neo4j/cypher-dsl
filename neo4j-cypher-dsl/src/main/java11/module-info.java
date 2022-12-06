@@ -16,15 +16,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@SuppressWarnings({"requires-automatic"})
 module org.neo4j.cypherdsl.core {
 
-	requires static org.neo4j.driver;
-	requires static org.jetbrains.annotations;
-	requires static org.reactivestreams;
 	requires static com.querydsl.core;
+	requires static java.sql;
+	requires static org.jetbrains.annotations;
+	requires static org.neo4j.cypherdsl.build;
+	requires static org.neo4j.driver;
+	requires static org.reactivestreams;
 	requires static reactor.core;
 
 	requires org.apiguardian.api;
+	requires org.neo4j.cypherdsl.support.schema_name;
 
 	exports org.neo4j.cypherdsl.core;
 	exports org.neo4j.cypherdsl.core.ast;

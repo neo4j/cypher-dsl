@@ -62,7 +62,7 @@ import com.squareup.javapoet.TypeSpec;
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
-abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuilder<T> {
+abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelBuilder<T> {
 
 	protected static final ClassName TYPE_NAME_NODE = ClassName.get(Node.class);
 	protected static final ClassName TYPE_NAME_NODE_BASE = ClassName.get(NodeBase.class);
