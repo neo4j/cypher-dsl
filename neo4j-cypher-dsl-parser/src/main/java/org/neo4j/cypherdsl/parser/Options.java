@@ -31,7 +31,6 @@ import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.PatternElement;
@@ -173,7 +172,7 @@ public final class Options {
 		 * @param returnClauseFactory The factory producing return classes that should be used.
 		 * @return This builder
 		 */
-		public Builder withReturnClauseFactory(@Nullable Function<ReturnDefinition, Return> returnClauseFactory) {
+		public Builder withReturnClauseFactory(Function<ReturnDefinition, Return> returnClauseFactory) {
 			this.returnClauseFactory = returnClauseFactory;
 			return this;
 		}

@@ -17,14 +17,16 @@
  * limitations under the License.
  */
 
-@SuppressWarnings( {"requires-automatic"}) // javapoet
-module org.neo4j.cypherdsl.codegen.core {
+@SuppressWarnings( {"requires-automatic"}) // Neo4j Cypher Parser
+module org.neo4j.cypherdsl.parser {
 
-	requires java.compiler;
+	requires static org.jetbrains.annotations;
 
-	requires com.squareup.javapoet;
 	requires transitive org.apiguardian.api;
 	requires transitive org.neo4j.cypherdsl.core;
 
-	exports org.neo4j.cypherdsl.codegen.core;
+	requires org.neo4j.cypher.internal.parser.javacc;
+	requires org.neo4j.cypher.internal.ast.factory;
+
+	exports org.neo4j.cypherdsl.parser;
 }
