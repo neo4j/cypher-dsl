@@ -94,7 +94,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ '19' ]
+        java: [ '17', '19' ]
     needs: build
     steps:
       - name: Determine revision
