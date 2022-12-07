@@ -18,7 +18,6 @@
  */
 package org.neo4j.cypherdsl.support.schema_name;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -65,14 +64,14 @@ public final class SchemaNames {
 	private static final Pattern PATTERN_ESCAPED_4DIGIT_UNICODE = Pattern.compile("\\\\u+(\\p{XDigit}{4})");
 	private static final Pattern PATTERN_LABEL_AND_TYPE_QUOTATION = Pattern.compile("(?<!`)`(?:`{2})*(?!`)");
 
-	private static final List<String[]> SUPPORTED_ESCAPE_CHARS = Collections.unmodifiableList(Arrays.asList(
+	private static final List<String[]> SUPPORTED_ESCAPE_CHARS = List.of(
 		new String[] { "\\b", "\b" },
 		new String[] { "\\f", "\f" },
 		new String[] { "\\n", "\n" },
 		new String[] { "\\r", "\r" },
 		new String[] { "\\t", "\t" },
 		new String[] { "\\`", "``" }
-	));
+	);
 
 	private static final int CACHE_SIZE = 128;
 
@@ -106,23 +105,14 @@ public final class SchemaNames {
 		}
 	}
 
-	private static class SchemaName {
-
-		private final String value;
-
-		private final boolean needsQuotation;
-
-		SchemaName(String value, boolean needsQuotation) {
-			this.value = value;
-			this.needsQuotation = needsQuotation;
-		}
+	private record SchemaName(String value, boolean needsQuotation) {
 	}
 
 	/**
 	 * Cypher-DSL has a concrete implementation of such a simple cache, but it should be in this module itself.
 	 */
 	private static final Map<CacheKey, SchemaName> CACHE = Collections.synchronizedMap(
-		new LinkedHashMap<CacheKey, SchemaName>(CACHE_SIZE / 4, 0.75f, true) {
+		new LinkedHashMap<>(CACHE_SIZE / 4, 0.75f, true) {
 			private static final long serialVersionUID = -8109893585632797360L;
 
 			@Override

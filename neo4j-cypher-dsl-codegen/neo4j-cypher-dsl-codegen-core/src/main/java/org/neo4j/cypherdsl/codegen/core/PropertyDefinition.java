@@ -63,10 +63,16 @@ public final class PropertyDefinition {
 		this.nameInDomain = nameInDomain;
 	}
 
+	/**
+	 * @return The name as defined in the future graph
+	 */
 	public String getNameInGraph() {
 		return nameInGraph;
 	}
 
+	/**
+	 * @return The name as defined in the domain object (most likely the field name)
+	 */
 	public String getNameInDomain() {
 		return nameInDomain;
 	}

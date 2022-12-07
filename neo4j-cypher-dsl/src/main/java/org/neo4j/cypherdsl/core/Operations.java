@@ -20,9 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -37,8 +35,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class Operations {
 
 	private static final java.util.Set<Class<? extends Expression>> VALID_MUTATORS =
-		Collections.unmodifiableSet(new HashSet<>(Arrays.asList(MapExpression.class, Parameter.class, MapProjection.class, SymbolicName.class,
-				FunctionInvocation.class)));
+		Set.of(MapExpression.class, Parameter.class, MapProjection.class, SymbolicName.class, FunctionInvocation.class);
 
 	/**
 	 * Creates an unary minus operation.
