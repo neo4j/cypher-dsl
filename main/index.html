@@ -2269,12 +2269,12 @@ This API is not required to use the driver nor is the driver required for using 
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j.driver<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-java-driver<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;artifactId&gt;</span>4.4.9<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>5.3.0<span class="tag">&lt;/artifactId&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>Any 4.x version of the Driver will work, we currently test against 4.4.9.
+<p>Any 4.x version of the Driver will work, we currently test against 5.3.0.
 In case you want to use our integration with reactive sessions, you will have to add <a href="https://projectreactor.io">Project Reactor</a>.
 To the outside world we expose - much like the driver - the vendor agnostic <a href="https://www.reactive-streams.org">Reactive Streams spec</a>.</p>
 </div>
@@ -2369,7 +2369,7 @@ It will always return a result summary:</p>
 <div class="title">Listing 29. Executing statements in a managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="type">var</span> summary = session.writeTransaction(statement::executeWith); <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="type">var</span> summary = session.executeWrite(statement::executeWith); <i class="conum" data-value="2"></i><b>(2)</b>
     assertThat(summary.counters().nodesCreated()).isEqualTo(<span class="integer">1</span>); <i class="conum" data-value="3"></i><b>(3)</b>
 }</code></pre>
 </div>
@@ -2473,7 +2473,7 @@ The <a href="#reactive-api">reactive API</a> is fully non-blocking and uses a pu
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
 
-    <span class="type">var</span> moviesTitles = session.readTransaction(statement::fetchWith) <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="type">var</span> moviesTitles = session.executeRead(statement::fetchWith) <i class="conum" data-value="2"></i><b>(2)</b>
         .stream() <i class="conum" data-value="3"></i><b>(3)</b>
         .map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
         .collect(Collectors.toList());
@@ -2515,7 +2515,7 @@ outside the transaction. With managed transactions, it looks like this:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
 
-    <span class="type">var</span> summary = session.readTransaction(tx -&gt; <i class="conum" data-value="2"></i><b>(2)</b>
+    <span class="type">var</span> summary = session.executeRead(tx -&gt; <i class="conum" data-value="2"></i><b>(2)</b>
         statement.streamWith(tx, s -&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
             <span class="type">var</span> moviesTitles = s.map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
                 .collect(Collectors.toList()); <i class="conum" data-value="4"></i><b>(4)</b>
@@ -2637,9 +2637,9 @@ and doesn&#8217;t cancel after the first item being emitted and thus rolling bac
 <div class="title">Listing 37. Reactive streaming results with an managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Mono.usingWhen(
-    Mono.fromSupplier(driver::rxSession), <i class="conum" data-value="1"></i><b>(1)</b>
-    s -&gt; Mono.fromDirect(s.writeTransaction(statement::executeWith)), <i class="conum" data-value="2"></i><b>(2)</b>
-    RxSession::close <i class="conum" data-value="3"></i><b>(3)</b>
+    Mono.fromSupplier(() -&gt; driver.session(ReactiveSession.class)), <i class="conum" data-value="1"></i><b>(1)</b>
+    s -&gt; Mono.fromDirect(s.executeWrite(statement::executeWith)), <i class="conum" data-value="2"></i><b>(2)</b>
+    ReactiveSession::close <i class="conum" data-value="3"></i><b>(3)</b>
 ).as(StepVerifier::create)
     .expectNextMatches(r -&gt; r.counters().nodesCreated() == <span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
     .verifyComplete();</code></pre>
@@ -2678,9 +2678,9 @@ As the transaction is managed by the driver, canceling the publisher via <code>t
 <div class="title">Listing 38. Reactive streaming results with an managed transaction</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Flux.usingWhen(
-    Mono.fromSupplier(driver::rxSession),
-    s -&gt; s.readTransaction(statement::fetchWith),
-    RxSession::close
+    Mono.fromSupplier(() -&gt; driver.session(ReactiveSession.class)),
+    s -&gt; s.executeRead(statement::fetchWith),
+    ReactiveSession::close
 )
     .skip(<span class="integer">2</span>)
     .take(<span class="integer">30</span>)
@@ -2716,7 +2716,7 @@ The server might or might not start streaming results after the configured perio
     .returningDistinct(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
     .build());
 
-Flux.using(driver::rxSession, statement::fetchWith, RxSession::close)
+Flux.using(() -&gt; driver.session(ReactiveSession.class), statement::fetchWith, ReactiveSession::close)
     .as(StepVerifier::create)
     .expectNextCount(<span class="integer">50</span>)
     .verifyComplete();</code></pre>
@@ -6828,7 +6828,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2022-12-07 08:17:49 UTC
+Last updated 2022-12-07 09:59:39 UTC
 </div>
 </div>
 </body>
