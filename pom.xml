@@ -171,7 +171,7 @@
 		<maven.version>3.8.4</maven.version>
 		<mockito.version>4.9.0</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.RC2</moditect-maven-plugin.version>
-		<neo4j-java-driver.version>4.4.9</neo4j-java-driver.version>
+		<neo4j-java-driver.version>5.3.0</neo4j-java-driver.version>
 		<neo4j.version>4.4.12</neo4j.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -182,7 +182,7 @@
 		<slf4j.version>1.7.36</slf4j.version>
 		<sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
-		<spring-data-neo4j.version>6.3.5</spring-data-neo4j.version>
+		<spring-data-neo4j.version>7.0.0</spring-data-neo4j.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
 	</properties>
 

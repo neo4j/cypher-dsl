@@ -21,7 +21,7 @@ package org.neo4j.cypherdsl.core.executables;
 import java.util.function.Function;
 
 import org.neo4j.driver.Record;
-import org.neo4j.driver.reactive.RxQueryRunner;
+import org.neo4j.driver.reactivestreams.ReactiveQueryRunner;
 import org.reactivestreams.Publisher;
 
 /**
@@ -45,7 +45,7 @@ public interface ReactiveExecutableResultStatement extends ReactiveExecutableSta
 	 * @param <T>             The type of the returned objects
 	 * @return A publisher of objects.
 	 */
-	<T> Publisher<T> fetchWith(RxQueryRunner queryRunner, Function<Record, T> mappingFunction);
+	<T> Publisher<T> fetchWith(ReactiveQueryRunner queryRunner, Function<Record, T> mappingFunction);
 
 	/**
 	 * Fetches a publisher of records from a database via the given {@code queryRunner} in a reactive fashion.
@@ -53,7 +53,7 @@ public interface ReactiveExecutableResultStatement extends ReactiveExecutableSta
 	 * @param queryRunner Any type of reactive query runner. Neither sessions nor transactions will be closed.
 	 * @return A publisher of records.
 	 */
-	default Publisher<Record> fetchWith(RxQueryRunner queryRunner) {
+	default Publisher<Record> fetchWith(ReactiveQueryRunner queryRunner) {
 		return fetchWith(queryRunner, Function.identity());
 	}
 }

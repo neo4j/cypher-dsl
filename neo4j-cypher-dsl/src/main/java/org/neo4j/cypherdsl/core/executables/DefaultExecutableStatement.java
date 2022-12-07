@@ -28,7 +28,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.driver.Query;
-import org.neo4j.driver.QueryRunner;
+import org.neo4j.driver.SimpleQueryRunner;
 import org.neo4j.driver.async.AsyncQueryRunner;
 import org.neo4j.driver.async.ResultCursor;
 import org.neo4j.driver.summary.ResultSummary;
@@ -66,7 +66,7 @@ class DefaultExecutableStatement implements ExecutableStatement {
 	}
 
 	@Override
-	public final ResultSummary executeWith(QueryRunner queryRunner) {
+	public final ResultSummary executeWith(SimpleQueryRunner queryRunner) {
 
 		return queryRunner.run(createQuery()).consume();
 	}

@@ -54,9 +54,7 @@ jobs:
           ./mvnw --no-transfer-progress clean deploy -DSCHEMA_NAMES_TEST_ALL_VERSIONS=true -P$USE_SONAR -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist= -Dcypher-dsl.version.old=$OLD_VERSION
           -DaltDeploymentRepository=releases::default::file://$GITHUB_WORKSPACE/target/repository
           -pl !org.neo4j:neo4j-cypher-dsl-native-tests
-          -pl !org.neo4j:neo4j-cypher-dsl-examples
           -pl !org.neo4j:neo4j-cypher-dsl-examples-core
-          -pl !org.neo4j:neo4j-cypher-dsl-examples-driver
           -pl !org.neo4j:neo4j-cypher-dsl-examples-parser
           -pl !org.neo4j:neo4j-cypher-dsl-examples-sdn6
       - name: Archive artifacts

@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterAll;
@@ -44,7 +45,8 @@ import org.neo4j.cypherdsl.core.executables.ReactiveExecutableStatement;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.GraphDatabase;
-import org.neo4j.driver.reactive.RxSession;
+import org.neo4j.driver.async.AsyncSession;
+import org.neo4j.driver.reactivestreams.ReactiveSession;
 import org.testcontainers.containers.BindMode;
 import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -74,6 +76,8 @@ class ExecutableStatementsIT {
 			var movies = Files.readString(Path.of(ExecutableStatementsIT.class.getResource("/movies.cypher").toURI()));
 			session.run(movies);
 		}
+
+		Objects.requireNonNull(Placeholder.class);
 	}
 
 	@AfterAll
@@ -113,7 +117,7 @@ class ExecutableStatementsIT {
 
 		// tag::statement-without-result-tx-function[]
 		try (var session = driver.session()) { // <.>
-			var summary = session.writeTransaction(statement::executeWith); // <.>
+			var summary = session.executeWrite(statement::executeWith); // <.>
 			assertThat(summary.counters().nodesCreated()).isEqualTo(1); // <.>
 		}
 		// end::statement-without-result-tx-function[]
@@ -152,7 +156,7 @@ class ExecutableStatementsIT {
 		// tag::statement-with-result-tx-function[]
 		try (var session = driver.session()) { // <.>
 
-			var moviesTitles = session.readTransaction(statement::fetchWith) // <.>
+			var moviesTitles = session.executeRead(statement::fetchWith) // <.>
 				.stream() // <.>
 				.map(r -> r.get("title").asString())
 				.collect(Collectors.toList());
@@ -193,7 +197,7 @@ class ExecutableStatementsIT {
 		// tag::statement-with-result-tx-function-stream[]
 		try (var session = driver.session()) { // <.>
 
-			var summary = session.readTransaction(tx -> // <.>
+			var summary = session.executeRead(tx -> // <.>
 				statement.streamWith(tx, s -> { // <.>
 					var moviesTitles = s.map(r -> r.get("title").asString())
 						.collect(Collectors.toList()); // <.>
@@ -234,9 +238,9 @@ class ExecutableStatementsIT {
 
 		// tag::statement-without-result-tx-function-reactive-stream[]
 		Mono.usingWhen(
-			Mono.fromSupplier(driver::rxSession), // <.>
-			s -> Mono.fromDirect(s.writeTransaction(statement::executeWith)), // <.>
-			RxSession::close // <.>
+			Mono.fromSupplier(() -> driver.session(ReactiveSession.class)), // <.>
+			s -> Mono.fromDirect(s.executeWrite(statement::executeWith)), // <.>
+			ReactiveSession::close // <.>
 		).as(StepVerifier::create)
 			.expectNextMatches(r -> r.counters().nodesCreated() == 1) // <.>
 			.verifyComplete();
@@ -250,7 +254,7 @@ class ExecutableStatementsIT {
 		var statement = ReactiveExecutableStatement.of(Cypher.match(m)
 			.returning(m.property("title").as("title")).build());
 
-		Flux.usingWhen(Mono.fromSupplier(driver::rxSession), statement::fetchWith, RxSession::close)
+		Flux.usingWhen(Mono.fromSupplier(() -> driver.session(ReactiveSession.class)), statement::fetchWith, ReactiveSession::close)
 			.as(StepVerifier::create)
 			.expectNextCount(38)
 			.verifyComplete();
@@ -265,9 +269,9 @@ class ExecutableStatementsIT {
 
 		// tag::statement-with-result-tx-function-reactive-stream[]
 		Flux.usingWhen(
-			Mono.fromSupplier(driver::rxSession),
-			s -> s.readTransaction(statement::fetchWith),
-			RxSession::close
+			Mono.fromSupplier(() -> driver.session(ReactiveSession.class)),
+			s -> s.executeRead(statement::fetchWith),
+			ReactiveSession::close
 		)
 			.skip(2)
 			.take(30)
@@ -295,7 +299,7 @@ class ExecutableStatementsIT {
 			.returningDistinct(m.property("name").as("name"))
 			.build());
 
-		Flux.using(driver::rxSession, statement::fetchWith, RxSession::close)
+		Flux.using(() -> driver.session(ReactiveSession.class), statement::fetchWith, ReactiveSession::close)
 			.as(StepVerifier::create)
 			.expectNextCount(50)
 			.verifyComplete();
@@ -319,7 +323,7 @@ class ExecutableStatementsIT {
 			.set(m.property("name").to(Cypher.anonParameter("statementWithoutResult")))
 			.build());
 
-		var session = driver.asyncSession();
+		var session = driver.session(AsyncSession.class);
 
 		var futureResultSummary = statement.executeWith(session);
 		assertThat(futureResultSummary)
@@ -338,7 +342,7 @@ class ExecutableStatementsIT {
 		var statement = ExecutableStatement.of(Cypher.match(m)
 			.returning(m.property("title").as("title")).build());
 
-		var session = driver.asyncSession();
+		var session = driver.session(AsyncSession.class);
 
 		var futureResultSummary = statement.fetchWith(session);
 		assertThat(futureResultSummary)

@@ -23,12 +23,12 @@ import static org.apiguardian.api.API.Status.STABLE;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ResultStatement;
 import org.neo4j.cypherdsl.core.Statement;
-import org.neo4j.driver.reactive.RxQueryRunner;
+import org.neo4j.driver.reactivestreams.ReactiveQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 import org.reactivestreams.Publisher;
 
 /**
- * This is an extended version of the {@link ExecutableStatement}, spotting an additional {@link #executeWith(RxQueryRunner)}
+ * This is an extended version of the {@link ExecutableStatement}, spotting an additional {@link #executeWith(ReactiveQueryRunner)}
  * that runs a statement in a reactive fashion.
  * <p>
  * The usage of this interface require Project Reactor on the class path with {@code org.reactivestreams} and
@@ -89,7 +89,7 @@ public interface ReactiveExecutableStatement extends ExecutableStatement {
 	}
 
 	/**
-	 * If the Neo4j Java Driver is on the classpath, this method can be used to pass a {@link RxQueryRunner} to the statement,
+	 * If the Neo4j Java Driver is on the classpath, this method can be used to pass a {@link ReactiveQueryRunner} to the statement,
 	 * execute it and retrieve a result summary in a reactive fashion.
 	 * This method also requires Project Reactor to be available.
 	 * <p>
@@ -105,5 +105,5 @@ public interface ReactiveExecutableStatement extends ExecutableStatement {
 	 * @return A publisher of a result summary (including server information, counters etc).
 	 * @since 2021.2.1
 	 */
-	Publisher<ResultSummary> executeWith(RxQueryRunner queryRunner);
+	Publisher<ResultSummary> executeWith(ReactiveQueryRunner queryRunner);
 }
