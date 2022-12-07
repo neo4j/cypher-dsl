@@ -31,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.AfterAll;
@@ -75,6 +76,8 @@ class ExecutableStatementsIT {
 			var movies = Files.readString(Path.of(ExecutableStatementsIT.class.getResource("/movies.cypher").toURI()));
 			session.run(movies);
 		}
+
+		Objects.requireNonNull(Placeholder.class);
 	}
 
 	@AfterAll
