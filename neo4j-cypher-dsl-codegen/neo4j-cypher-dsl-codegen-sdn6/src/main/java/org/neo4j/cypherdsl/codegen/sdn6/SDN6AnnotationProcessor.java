@@ -436,7 +436,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 			Map<FieldType, List<VariableElement>> fields = groupPropertiesAndRelationships.getResult();
 
 			nodeImplBuilder.addProperties(
-				fields.get(FieldType.P).stream().map(this::asPropertyDefinition).collect(Collectors.toList())
+				fields.get(FieldType.P).stream().map(this::asPropertyDefinition).toList()
 			);
 
 			relationshipFields.put(nodeImplBuilder, fields.get(FieldType.R));
@@ -542,8 +542,8 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 						result.put(type, Collections.unmodifiableList(newBuilders));
 					}
 				} else if (owners.size() > 1) {
-					List<NodeModelBuilder> startNodes = definitions.stream().map(d -> d.getValue().getStart()).distinct().collect(Collectors.toList());
-					List<NodeModelBuilder> endNodes = definitions.stream().map(d -> d.getValue().getStart()).distinct().collect(Collectors.toList());
+					List<NodeModelBuilder> startNodes = definitions.stream().map(d -> d.getValue().getStart()).distinct().toList();
+					List<NodeModelBuilder> endNodes = definitions.stream().map(d -> d.getValue().getStart()).distinct().toList();
 
 					relationshipBuilder = RelationshipModelBuilder.create(configuration, owners.stream().findFirst().get().getPackageName(), type);
 					if (startNodes.size() == 1) {
