@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Statement;
-import org.neo4j.driver.reactive.RxQueryRunner;
+import org.neo4j.driver.reactivestreams.ReactiveQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 import org.reactivestreams.Publisher;
 
@@ -41,9 +41,10 @@ class DefaultReactiveExecutableStatement extends DefaultExecutableStatement impl
 	}
 
 	@Override
-	public final Publisher<ResultSummary> executeWith(RxQueryRunner queryRunner) {
+	public final Publisher<ResultSummary> executeWith(ReactiveQueryRunner queryRunner) {
 
 		return Mono.fromCallable(this::createQuery)
-			.flatMap(q -> Mono.from(queryRunner.run(q).consume()));
+			.flatMap(q -> Mono.fromDirect(queryRunner.run(q)))
+			.flatMap(r -> Mono.fromDirect(r.consume()));
 	}
 }
