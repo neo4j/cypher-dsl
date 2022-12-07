@@ -489,16 +489,12 @@ MATCH (s:`Scientist` {born: 1850})-[:`RESEARCHED`]->(sc:`Science`)<-[i:`INVENTED
 MATCH (s:`Scientist` {born: 1850}) OPTIONAL MATCH (s)-[:`RESEARCHED`]->(sc:`Science`) USING JOIN ON s RETURN *
 ----
 
-Of course, `USING PERIODIC` is supported, too:
+`USING PERIODIC` is not supported anymore since Neo4j 5 and Cypher-DSL switched to the 5.x parser starting with 2023.0.0. However, you can still use `LOAD CSV`:
 
 [[statements-input-hints-periodic]]
 .Output
 [source,cypher,alwaysEscape=false,separated=true]
 ----
-USING PERIODIC COMMIT LOAD CSV FROM 'file:///artists.csv' AS line
-CREATE (:Artist {name: line[1], year: toInteger(line[2])});
-USING PERIODIC COMMIT 500 LOAD CSV FROM 'file:///artists.csv' AS line
-CREATE (:Artist {name: line[1], year: toInteger(line[2])});
 LOAD CSV FROM 'file:///artists-with-escaped-char.csv' AS line
 CREATE (a:Artist {name: line[1], year: toInteger(line[2])})
 RETURN
@@ -509,20 +505,15 @@ LOAD CSV FROM 'file:///artists.csv' AS line
 RETURN linenumber() AS number, line;
 LOAD CSV FROM 'file:///artists.csv' AS line
 RETURN DISTINCT file() AS path;
-USING PERIODIC COMMIT 42 LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line FIELDTERMINATOR '|'
-CREATE (:`Artist` {name: line[1], year: toInteger(line[2]), source: ((file() + '@') + linenumber())});
 ----
 
 [[statements-output-hints-periodic]]
 .Output
 [source,cypher,alwaysEscape=false]
 ----
-USING PERIODIC COMMIT LOAD CSV FROM 'file:///artists.csv' AS line CREATE (:Artist {name: line[1], year: toInteger(line[2])})
-USING PERIODIC COMMIT 500 LOAD CSV FROM 'file:///artists.csv' AS line CREATE (:Artist {name: line[1], year: toInteger(line[2])})
 LOAD CSV FROM 'file:///artists-with-escaped-char.csv' AS line CREATE (a:Artist {name: line[1], year: toInteger(line[2])}) RETURN a.name AS name, a.year AS year, size(a.name) AS size
 LOAD CSV FROM 'file:///artists.csv' AS line RETURN linenumber() AS number, line
 LOAD CSV FROM 'file:///artists.csv' AS line RETURN DISTINCT file() AS path
-USING PERIODIC COMMIT 42 LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line FIELDTERMINATOR '|' CREATE (:Artist {name: line[1], year: toInteger(line[2]), source: ((file() + '@') + linenumber())})
 ----
 
 === Subqueries
