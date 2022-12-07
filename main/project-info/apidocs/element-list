@@ -1,7 +1,6 @@
+module:org.neo4j.cypherdsl.core
 org.neo4j.cypherdsl.core
+org.neo4j.cypherdsl.core.annotations
 org.neo4j.cypherdsl.core.ast
 org.neo4j.cypherdsl.core.executables
-org.neo4j.cypherdsl.core.internal
-org.neo4j.cypherdsl.core.querydsl
 org.neo4j.cypherdsl.core.renderer
-org.neo4j.cypherdsl.core.utils
