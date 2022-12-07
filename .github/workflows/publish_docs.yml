@@ -17,18 +17,19 @@ jobs:
         run: >
           echo "refName=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Checkout relevant branch
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: ${{ env.refName }}
       - name: Checkout gh-pages
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           ref: gh-pages
           path: target/gh-pages
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
           java-version: 11
+          distribution: zulu
       - name: Run docs generation
         run: >
           ./mvnw --no-transfer-progress asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} &&
