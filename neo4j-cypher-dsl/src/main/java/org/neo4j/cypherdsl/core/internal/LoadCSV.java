@@ -49,6 +49,13 @@ public final class LoadCSV implements Clause {
 
 	private final String fieldTerminator;
 
+	/**
+	 * Constructs a new {@link LoadCSV} clause.
+	 *
+	 * @param uri Required uri
+	 * @param withHeaders With or without headers
+	 * @param alias The alias per row
+	 */
 	public LoadCSV(URI uri, boolean withHeaders, String alias) {
 		this(uri, withHeaders, alias, null);
 	}
@@ -60,23 +67,40 @@ public final class LoadCSV implements Clause {
 		this.fieldTerminator = fieldTerminator;
 	}
 
+	/**
+	 * @return The uri of the csv file.
+	 */
 	public URI getUri() {
 		return uri;
 	}
 
+	/**
+	 * @return {@literal true} if headers are to be evaluated
+	 */
 	public boolean isWithHeaders() {
 		return withHeaders;
 	}
 
+	/**
+	 * @return The field terminator to use
+	 */
 	@Nullable
 	public String getFieldTerminator() {
 		return fieldTerminator;
 	}
 
+	/**
+	 * @return The alias for one row in the csv file
+	 */
 	public String getAlias() {
 		return alias;
 	}
 
+	/**
+	 * Creates a new {@link LoadCSV LOAD CSV clause} with the given field terminator
+	 * @param newFieldTerminator the new field terminator
+	 * @return A new instance or this instance if the terminator hasn't changed
+	 */
 	@NotNull @Contract(pure = true)
 	public LoadCSV withFieldTerminator(@Nullable final String newFieldTerminator) {
 

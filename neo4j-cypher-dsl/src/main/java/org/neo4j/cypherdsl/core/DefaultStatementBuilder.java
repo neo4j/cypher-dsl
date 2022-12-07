@@ -1115,7 +1115,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		if (mergeOrCreate) {
 			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions)
-				.map(PatternElement.class::cast).collect(Collectors.toList());
+				.map(PatternElement.class::cast).toList();
 			if (updateType == UpdateType.CREATE) {
 				return new AbstractUpdatingClauseBuilder.CreateBuilder(patternElements);
 			} else {
@@ -1123,22 +1123,16 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		} else {
 			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast)
-				.collect(Collectors.toList());
+				.toList();
 			ExpressionList expressionList = new ExpressionList(
 				SET.contains(updateType) ? prepareSetExpressions(updateType, expressions) : expressions);
-			switch (updateType) {
-				case DETACH_DELETE:
-					return () -> new Delete(expressionList, true);
-				case DELETE:
-					return () -> new Delete(expressionList, false);
-				case SET:
-				case MUTATE:
-					return () -> new Set(expressionList);
-				case REMOVE:
-					return () -> new Remove(expressionList);
-				default:
-					throw new IllegalArgumentException("Unsupported update type " + updateType);
-			}
+			return switch (updateType) {
+				case DETACH_DELETE -> () -> new Delete(expressionList, true);
+				case DELETE -> () -> new Delete(expressionList, false);
+				case SET, MUTATE -> () -> new Set(expressionList);
+				case REMOVE -> () -> new Remove(expressionList);
+				default -> throw new IllegalArgumentException("Unsupported update type " + updateType);
+			};
 		}
 	}
 
@@ -1190,8 +1184,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 					Expression rhs = listOfExpressions.get(i + 1);
 					if (rhs instanceof Parameter) {
 						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), rhs));
-					} else if (rhs instanceof MapExpression) {
-						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), (MapExpression) rhs));
+					} else if (rhs instanceof MapExpression mapExpression) {
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), mapExpression));
 					} else {
 						throw new IllegalArgumentException(
 							"A mutating SET operation can only be used with a named parameter or a map expression.");
@@ -1200,7 +1194,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		}
 
-		if (propertyOperations.stream().anyMatch(e -> e instanceof Operation && ((Operation) e).getOperator() == Operator.REMOVE_LABEL)) {
+		if (propertyOperations.stream().anyMatch(e -> e instanceof Operation op && op.getOperator() == Operator.REMOVE_LABEL)) {
 			throw new IllegalArgumentException("REMOVE operations are not supported in a SET clause");
 		}
 		return propertyOperations;
@@ -1923,8 +1917,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		private boolean hasCondition() {
-			return this.condition != null && (!(this.condition instanceof CompoundCondition)
-					|| ((CompoundCondition) this.condition).hasConditions());
+			return this.condition != null && (!(this.condition instanceof CompoundCondition compoundCondition)
+					|| compoundCondition.hasConditions());
 		}
 
 		Optional<Condition> buildCondition() {

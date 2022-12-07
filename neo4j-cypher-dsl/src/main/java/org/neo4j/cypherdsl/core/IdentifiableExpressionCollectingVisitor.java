@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
  */
 final class IdentifiableExpressionCollectingVisitor extends ReflectiveVisitor {
 
-	private final ScopingStrategy scopingStrategy = new ScopingStrategy();
+	private final ScopingStrategy scopingStrategy = ScopingStrategy.create();
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {

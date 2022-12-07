@@ -30,7 +30,6 @@ import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -144,8 +143,8 @@ final class RawLiteral implements Expression {
 	}
 
 	private static Expression getMixedArg(Object argument) {
-		if (argument instanceof Expression) {
-			return (Expression) argument;
+		if (argument instanceof Expression expression) {
+			return expression;
 		}
 		return Cypher.literalOf(argument);
 	}

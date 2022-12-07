@@ -47,6 +47,9 @@ public final class InTransactions implements Visitable {
 		this.rows = rows;
 	}
 
+	/**
+	 * @return number of rows in this transaction
+	 */
 	@API(status = INTERNAL)
 	@Nullable
 	public Integer getRows() {

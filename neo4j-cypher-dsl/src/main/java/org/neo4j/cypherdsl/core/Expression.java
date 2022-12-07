@@ -76,7 +76,7 @@ public interface Expression extends Visitable {
 	/**
 	 * This creates a {@literal size(e)} expression from this expression. The Cypher output will semantically only be valid
 	 * when this refers to a list
-	 * (see <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size">size(list)</a>
+	 * (see <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size">size(list)</a>)
 	 * or when the expression is a string
 	 * (see <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-string">size() applied to string</a>).
 	 * <p>
@@ -127,7 +127,7 @@ public interface Expression extends Visitable {
 	 */
 	@NotNull @Contract(pure = true)
 	default Condition asCondition() {
-		return this instanceof Condition ? (Condition) this : new ExpressionCondition(this);
+		return this instanceof Condition condition ? condition : new ExpressionCondition(this);
 	}
 
 	/**

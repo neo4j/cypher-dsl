@@ -141,6 +141,10 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 	 */
 	protected abstract boolean preEnter(Visitable visitable);
 
+	/**
+	 * @param visitable The visitable prior to entering it
+	 * @return An indicator whether the visitable can be skipped or must be visited
+	 */
 	protected PreEnterResult getPreEnterResult(Visitable visitable) {
 		return preEnter(visitable) ? PreEnterResult.doEnter() : PreEnterResult.skip();
 	}

@@ -32,7 +32,6 @@
 	<properties>
 		<covered-ratio-complexity>0.1</covered-ratio-complexity>
 		<covered-ratio-instructions>0.1</covered-ratio-instructions>
-		<java-module-name>org.neo4j.cypherdsl.codegen.core</java-module-name>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
@@ -43,11 +42,27 @@
 			<artifactId>javapoet</artifactId>
 		</dependency>
 		<dependency>
+			<!-- This is in provided scope of core. If not present here, the compiler will spit out warnings as it won't find all annotations -->
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-core</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j.driver</groupId>
+			<artifactId>neo4j-java-driver</artifactId>
+			<scope>provided</scope>
+			<optional>true</optional>
+		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>

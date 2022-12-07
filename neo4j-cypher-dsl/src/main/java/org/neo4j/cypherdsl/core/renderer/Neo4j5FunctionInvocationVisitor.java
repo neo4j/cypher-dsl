@@ -20,7 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.neo4j.cypherdsl.build.RegisterForReflection;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.NestedExpression;
 import org.neo4j.cypherdsl.core.Property;
@@ -90,11 +90,10 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 			visitable = capture.get();
 		}
 
-		if (!(visitable instanceof FunctionInvocation)) {
+		if (!(visitable instanceof FunctionInvocation functionInvocation)) {
 			return false;
 		}
 
-		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
 		if ("exists".equals(functionInvocation.getFunctionName())) {
 			SingleArgExtractor<Property> singleArgExtractor = new SingleArgExtractor<>(Property.class);
 			functionInvocation.accept(singleArgExtractor);

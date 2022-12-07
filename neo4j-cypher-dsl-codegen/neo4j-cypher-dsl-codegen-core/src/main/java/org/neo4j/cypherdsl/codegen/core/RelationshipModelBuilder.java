@@ -35,11 +35,28 @@ import org.neo4j.cypherdsl.core.RelationshipBase;
 @API(status = EXPERIMENTAL, since = "2021.1.0")
 public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModelBuilder> {
 
+	/**
+	 * Start building a new {@link RelationshipModelBuilder}.
+	 *
+	 * @param configuration    Configuration of the generator
+	 * @param packageName      The package name into the model should be generated
+	 * @param relationshipType The type of the relationship
+	 * @return The new builder
+	 */
 	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType) {
 
 		return create(configuration, packageName, relationshipType, null);
 	}
 
+	/**
+	 * Start building a new {@link RelationshipModelBuilder}, including alternate name suggestions.
+	 *
+	 * @param configuration                Configuration of the generator
+	 * @param packageName                  The package name into the model should be generated
+	 * @param relationshipType             The type of the relationship
+	 * @param alternateClassNameSuggestion An alternative suggestion for the class name
+	 * @return The new builder
+	 */
 	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType, String alternateClassNameSuggestion) {
 
 		return RelationshipImplBuilder.create(configuration, packageName, relationshipType, alternateClassNameSuggestion);

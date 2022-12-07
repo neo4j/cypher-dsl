@@ -96,6 +96,9 @@ public final class Configuration {
 		return PRETTY_PRINTING;
 	}
 
+	/**
+	 * {@return a new builder} for creating a new configuration from scratch
+	 */
 	public static Builder newConfig() {
 		return Builder.newConfig();
 	}
@@ -119,6 +122,11 @@ public final class Configuration {
 			return new Builder();
 		}
 
+		/**
+		 * Enables or disables pretty printing
+		 * @param prettyPrint use {@literal true} for enabling pretty printing
+		 * @return this builder
+		 */
 		public Builder withPrettyPrint(boolean prettyPrint) {
 			this.prettyPrint = prettyPrint;
 			if (this.prettyPrint) {
@@ -127,6 +135,10 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * @param indentStyle The new indentation style
+		 * @return this builder
+		 */
 		public Builder withIndentStyle(IndentStyle indentStyle) {
 
 			if (indentStyle == null) {
@@ -136,11 +148,21 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * @param indentSize The new indentation size
+		 * @return this builder
+		 */
 		public Builder withIndentSize(int indentSize) {
 			this.indentSize = indentSize;
 			return this;
 		}
 
+		/**
+		 * Configure whether names should be always escaped.
+		 *
+		 * @param alwaysEscapeNames use {@literal true} to always escape names
+		 * @return this builder
+		 */
 		public Builder alwaysEscapeNames(boolean alwaysEscapeNames) {
 			this.alwaysEscapeNames = alwaysEscapeNames;
 			return this;
@@ -159,6 +181,9 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * @return a new immutable configuration
+		 */
 		public Configuration build() {
 			return new Configuration(this);
 		}
@@ -172,22 +197,37 @@ public final class Configuration {
 		this.dialect = builder.dialect == null ? Dialect.DEFAULT : builder.dialect;
 	}
 
+	/**
+	 * @return {@literal true} if this configuration uses pretty printing
+	 */
 	public boolean isPrettyPrint() {
 		return prettyPrint;
 	}
 
+	/**
+	 * {@return the indentation style} whether to use tabs or spaces to indent things
+	 */
 	public IndentStyle getIndentStyle() {
 		return indentStyle;
 	}
 
+	/**
+	 * @return width of one indentation
+	 */
 	public int getIndentSize() {
 		return indentSize;
 	}
 
+	/**
+	 * @return {@literal true} when names should be always escaped
+	 */
 	public boolean isAlwaysEscapeNames() {
 		return alwaysEscapeNames;
 	}
 
+	/**
+	 * @return the target dialect
+	 */
 	public Dialect getDialect() {
 		return dialect;
 	}

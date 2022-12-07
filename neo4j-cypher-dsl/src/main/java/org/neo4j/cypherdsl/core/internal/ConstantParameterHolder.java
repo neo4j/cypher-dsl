@@ -35,15 +35,26 @@ public final class ConstantParameterHolder {
 
 	private final String literalValue;
 
+	/**
+	 * New instance for a reference to a constant parameter. An additional literal for the paramter will be generated.
+	 *
+	 * @param value the value of the constant parameter
+	 */
 	public ConstantParameterHolder(Object value) {
 		this.value = value;
 		this.literalValue = Cypher.literalOf(value).asString();
 	}
 
+	/**
+	 * @return the original value
+	 */
 	public Object getValue() {
 		return value;
 	}
 
+	/**
+	 * @return the value, but as a Cypher literal
+	 */
 	public String asString() {
 		return literalValue;
 	}

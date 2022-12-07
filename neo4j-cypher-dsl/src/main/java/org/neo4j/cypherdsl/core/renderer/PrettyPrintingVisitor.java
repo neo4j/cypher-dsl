@@ -20,7 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.function.BiConsumer;
 
-import org.neo4j.cypherdsl.build.RegisterForReflection;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
@@ -40,7 +40,7 @@ import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 
 /**
@@ -66,17 +66,9 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		int indentSize = configuration.getIndentSize();
 
 		if (indentStyle == IndentStyle.TAB) {
-			indentionProvider = (builder, width) -> {
-				for (int i = 0; i < width; i++) {
-					builder.append("\t");
-				}
-			};
+			indentionProvider = (builder, width) -> builder.append("\t".repeat(Math.max(0, width)));
 		} else {
-			indentionProvider = (builder, width) -> {
-				for (int i = 0; i < width * indentSize; i++) {
-					builder.append(" ");
-				}
-			};
+			indentionProvider = (builder, width) -> builder.append(" ".repeat(Math.max(0, width * indentSize)));
 		}
 	}
 
@@ -291,8 +283,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
-		if (value instanceof ConstantParameterHolder) {
-			builder.append(((ConstantParameterHolder) value).asString());
+		if (value instanceof ConstantParameterHolder constantParameterHolder) {
+			builder.append(constantParameterHolder.asString());
 		} else {
 			renderParameter(parameter);
 		}

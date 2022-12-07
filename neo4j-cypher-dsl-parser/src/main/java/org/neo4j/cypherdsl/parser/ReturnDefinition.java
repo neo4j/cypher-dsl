@@ -56,22 +56,37 @@ public final class ReturnDefinition {
 		this.optionalLimit = optionalLimit;
 	}
 
+	/**
+	 * @return {@literal true} to indicate this return clause should return only distinct elements
+	 */
 	public boolean isDistinct() {
 		return distinct;
 	}
 
+	/**
+	 * @return List of expressions to be returned.
+	 */
 	public List<Expression> getExpressions() {
 		return expressions;
 	}
 
+	/**
+	 * @return List of expressions to sort the result by.
+	 */
 	public List<SortItem> getOptionalSortItems() {
 		return optionalSortItems;
 	}
 
+	/**
+	 * @return Numerical expression how many items to skip
+	 */
 	public Expression getOptionalSkip() {
 		return optionalSkip;
 	}
 
+	/**
+	 * @return Numerical expression how many items to return
+	 */
 	public Expression getOptionalLimit() {
 		return optionalLimit;
 	}

@@ -30,21 +30,10 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * Will be changed without further notice.
  *
  * @author Michael J. Simons
+ * @param rate The rate to be applied
  * @since 2021.2.1
  */
 @API(status = INTERNAL, since = "2021.2.1")
 @Neo4jVersion(minimum = "3.5", last = "4.4")
-public final class UsingPeriodicCommit implements Visitable {
-
-	@Nullable
-	private final Integer rate;
-
-	public UsingPeriodicCommit(@Nullable Integer rate) {
-		this.rate = rate;
-	}
-
-	@Nullable
-	public Integer getRate() {
-		return rate;
-	}
+public record UsingPeriodicCommit(@Nullable Integer rate) implements Visitable {
 }

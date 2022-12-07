@@ -62,13 +62,12 @@ import com.squareup.javapoet.TypeSpec;
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
-abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuilder<T> {
+abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelBuilder<T> {
 
 	protected static final ClassName TYPE_NAME_NODE = ClassName.get(Node.class);
 	protected static final ClassName TYPE_NAME_NODE_BASE = ClassName.get(NodeBase.class);
 	protected static final ClassName TYPE_NAME_SYMBOLIC_NAME = ClassName.get(SymbolicName.class);
 	protected static final ClassName TYPE_NAME_LIST = ClassName.get(List.class);
-	protected static final ClassName TYPE_NAME_STRING = ClassName.get(String.class);
 	protected static final ClassName TYPE_NAME_MAP_EXPRESSION = ClassName.get(MapExpression.class);
 
 	/**
@@ -299,10 +298,10 @@ abstract class AbstractModelBuilder<T extends ModelBuilder> implements ModelBuil
 
 		if (optionalSource == null) {
 			return null;
-		} else if (optionalSource instanceof NodeImplBuilder) {
-			return ((NodeImplBuilder) optionalSource).getClassName();
-		} else if (optionalSource instanceof RelationshipImplBuilder) {
-			return ((RelationshipImplBuilder) optionalSource).getClassName();
+		} else if (optionalSource instanceof NodeImplBuilder builder) {
+			return builder.getClassName();
+		} else if (optionalSource instanceof RelationshipImplBuilder builder) {
+			return builder.getClassName();
 		} else {
 			return ClassName.bestGuess(optionalSource.getCanonicalClassName());
 		}

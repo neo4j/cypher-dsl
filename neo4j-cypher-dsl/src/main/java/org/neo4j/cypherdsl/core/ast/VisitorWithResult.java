@@ -19,8 +19,8 @@
 package org.neo4j.cypherdsl.core.ast;
 
 /**
- * Sometimes it will  be necessary - for example in dialects - to change the flow of elements visted. Some {@link Visitable vistables}
- * will react on {@link Visitor#enterWithResult(Visitable)} and change course (not all and we don't give any guarantees on any behaviour).
+ * Sometimes it will  be necessary - for example in dialects - to change the flow of elements visited. Some {@link Visitable vistables}
+ * will react on {@link Visitor#enterWithResult(Visitable)} and change course (not all, and we don't give any guarantees on any behaviour).
  * This class has been introduced for visitors providing such a behaviour so that an implementation doesn't need to deal
  * with an empty {@link Visitor#enter(Visitable)} method.
  *
@@ -28,6 +28,7 @@ package org.neo4j.cypherdsl.core.ast;
  * @soundtrack Metallica - Ride The Lightning
  * @since 2022.3.0
  */
+@SuppressWarnings("missing-explicit-ctor")
 public abstract class VisitorWithResult implements Visitor {
 
 	@Override

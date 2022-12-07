@@ -108,12 +108,11 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			return new CompoundCondition(chainingOperator).add(chainingOperator, condition);
 		}
 
-		if (condition instanceof CompoundCondition && !((CompoundCondition) condition).hasConditions()) {
+		if (condition instanceof CompoundCondition compoundCondition && !compoundCondition.hasConditions()) {
 			return this;
 		}
 
-		if (condition instanceof CompoundCondition) {
-			CompoundCondition compoundCondition = (CompoundCondition) condition;
+		if (condition instanceof CompoundCondition compoundCondition) {
 			CompoundCondition target;
 			if (this.operator == chainingOperator && chainingOperator == compoundCondition.operator) {
 				target = CompoundCondition.copyOf(this);
@@ -156,7 +155,7 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			return false;
 		}
 		for (Condition c : this.conditions) {
-			if (c instanceof CompoundCondition && ((CompoundCondition) c).operator != operatorBefore) {
+			if (c instanceof CompoundCondition compoundCondition && compoundCondition.operator != operatorBefore) {
 				return false;
 			}
 		}

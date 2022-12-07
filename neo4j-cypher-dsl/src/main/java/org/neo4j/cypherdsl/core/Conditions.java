@@ -62,6 +62,14 @@ public final class Conditions {
 	}
 
 	/**
+	 * @param relationshipPattern The pattern being evaluated in a condition
+	 * @return A new condition matching the given pattern
+	 */
+	public static Condition matching(RelationshipPattern relationshipPattern) {
+		return RelationshipPatternCondition.of(relationshipPattern);
+	}
+
+	/**
 	 * Creates a condition that matches if the right hand side is a regular expression that matches the the left hand side via
 	 * {@code =~}.
 	 *

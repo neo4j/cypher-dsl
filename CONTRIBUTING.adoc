@@ -21,15 +21,15 @@ Many things are contributions, among them issues, code, documentation and exampl
 
 For the full project, including examples and native tests:
 
-* GraalVM based on JDK 11: https://www.graalvm.org/downloads/
+* GraalVM based on JDK 17: https://www.graalvm.org/downloads/
 
-NOTE: At least GraalVM *21.3.0* is required due to restrictions in `org.graalvm.buildtools:native-maven-plugin`.
+NOTE: At least GraalVM *22.3.0* is required due to restrictions in `org.graalvm.buildtools:native-maven-plugin`.
       The rationale behind that is explained https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#long_classpath_and_shading_support[here]
-      and we don't do apply any of the suggested workarounds as the releases are done with GraalVM 21.3.0 anyway.
+      and we don't do apply any of the suggested workarounds as the releases are done with GraalVM 22.3.0 anyway.
 
 For the project, including examples but skipping native tests
 
-* JDK 11+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
+* JDK 17+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
 
 Maven 3.8.4 is our build tool of choice. We provide the Maven wrapper, see `mvnw` respectively `mvnw.cmd` in the project root;
 the wrapper downloads the appropriate Maven version automatically.
@@ -45,7 +45,7 @@ $ git clone git@github.com:neo4j-contrib/cypher-dsl.git
 
 === Fast build
 
-NOTE: This is useful if you want to just have an install of a snapshot version. No tests are run, no verification is done.
+NOTE: This is useful if you want to just have an installation of a snapshot version. No tests are run, no verification is done.
 
 [source,console,subs="verbatim,attributes"]
 [[build-fast-bash]]
@@ -74,9 +74,9 @@ The output should be similar:
 .Verify your JDK
 ----
 $ java -version
-openjdk version "11.0.10" 2021-01-19
-OpenJDK Runtime Environment GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06)
-OpenJDK 64-Bit Server VM GraalVM CE 21.0.0 (build 11.0.10+8-jvmci-21.0-b06, mixed mode, sharing)
+openjdk version "17.0.5" 2022-10-18
+OpenJDK Runtime Environment GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08)
+OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed mode, sharing)
 ----
 
 Check whether GraalVM `native-image` is present with:
@@ -86,11 +86,11 @@ Check whether GraalVM `native-image` is present with:
 .Check for the present of `native-image`
 ----
 $ gu list
-ComponentId              Version             Component name                Stability           Origin
---------------------------------------------------------------------------------------------------------
-js                       21.0.0              Graal.js                      -
-graalvm                  21.0.0              GraalVM Core                  -
-native-image             21.0.0              Native Image                  Early adopter       github.com
+ComponentId              Version             Component name                Stability                     Origin
+-------------------------------------------------------------------------------------------------------------------
+graalvm                  22.3.0              GraalVM Core                  Experimental
+js                       22.3.0              Graal.js                      Experimental                  github.com
+native-image             22.3.0              Native Image                  Experimental                  github.com
 ----
 
 You should see `native-image` in the list. If not, install it via `gu install native-image`.
@@ -115,7 +115,7 @@ $ mvnw.cmd clean verify
 
 === Skipping native tests
 
-On a plain JDK 11 or higher, run the following to skip the native tests:
+On a plain JDK 17 or higher, run the following to skip the native tests:
 
 [source,console,subs="verbatim,attributes"]
 [[build-skip-native-bash]]
@@ -126,7 +126,7 @@ $ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests
 
 === Build only the core module
 
-The core module can be build on plain JDK 11 with:
+The core module can be build on plain JDK 17 with:
 
 [source,console,subs="verbatim,attributes"]
 [[build-only-core-bash]]

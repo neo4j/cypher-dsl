@@ -37,6 +37,10 @@ public final class CaseWhenThen implements Visitable {
 	private final Expression whenExpression;
 	private final Expression thenExpression;
 
+	/**
+	 * @param whenExpression intermediate when part
+	 * @param thenExpression the then part to happen after matching when above
+	 */
 	public CaseWhenThen(Expression whenExpression, Expression thenExpression) {
 
 		this.whenExpression = whenExpression;

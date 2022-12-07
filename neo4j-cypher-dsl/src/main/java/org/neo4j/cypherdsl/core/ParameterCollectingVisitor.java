@@ -26,9 +26,8 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.neo4j.cypherdsl.build.RegisterForReflection;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
@@ -81,11 +80,11 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 
 		String parameterName = statementContext.getParameterName(parameter);
 		Object newValue = parameter.getValue();
-		if (newValue instanceof ConstantParameterHolder) {
+		if (newValue instanceof ConstantParameterHolder constantParameterHolder) {
 			if (!statementContext.isRenderConstantsAsParameters()) {
 				return;
 			}
-			newValue = ((ConstantParameterHolder) newValue).getValue();
+			newValue = constantParameterHolder.getValue();
 		}
 		boolean knownParameterName = !this.names.add(parameterName);
 

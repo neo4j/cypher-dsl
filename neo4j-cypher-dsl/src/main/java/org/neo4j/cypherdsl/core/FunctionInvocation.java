@@ -54,8 +54,14 @@ public final class FunctionInvocation implements Expression {
 	@API(status = STABLE, since = "2020.1.0")
 	public interface FunctionDefinition {
 
+		/**
+		 * @return the Cypher implementation name
+		 */
 		String getImplementationName();
 
+		/**
+		 * @return {@literal true} if this is an aggregating function
+		 */
 		default boolean isAggregate() {
 			return Arrays.stream(BuiltInFunctions.Aggregates.values())
 				.map(BuiltInFunctions.Aggregates::getImplementationName)

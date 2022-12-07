@@ -55,7 +55,7 @@ public final class Return implements Clause {
 			String message = "A raw return must consist of exactly one raw expression.";
 			Assertions.isTrue(returnList.size() == 1, message);
 			Expression firstExpression = returnList.get(0);
-			Assertions.isTrue(firstExpression instanceof RawLiteral || firstExpression instanceof AliasedExpression && ((AliasedExpression) firstExpression).getDelegate() instanceof RawLiteral, message);
+			Assertions.isTrue(firstExpression instanceof RawLiteral || firstExpression instanceof AliasedExpression ae && ae.getDelegate() instanceof RawLiteral, message);
 		}
 
 		ExpressionList returnItems = new ExpressionList(returnList);
@@ -79,6 +79,9 @@ public final class Return implements Clause {
 		visitor.leave(this);
 	}
 
+	/**
+	 * @return {@literal true} if this clause has been created with proper, literal Cypher in place
+	 */
 	@API(status = INTERNAL)
 	public boolean isRaw() {
 		return raw;

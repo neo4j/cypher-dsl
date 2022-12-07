@@ -25,7 +25,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
 
 /**
  * @author Michael J. Simons

@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
@@ -87,7 +86,6 @@ import org.neo4j.cypherdsl.core.StatementBuilder;
 import org.neo4j.cypherdsl.core.StringLiteral;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
-import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * An implementation of Neo4j's {@link ASTFactory} that creates Cypher-DSL AST elements that can be used for creating
@@ -132,15 +130,30 @@ final class CypherDslASTFactory implements
 	private String[] computeFinalLabelList(LabelParsedEventType event, List<StringPos<InputPosition>> inputLabels) {
 
 		return this.options.getLabelFilter()
-			.apply(event, inputLabels.stream().map(l -> l.string).collect(Collectors.toUnmodifiableList()))
+			.apply(event, inputLabels.stream().map(l -> l.string).toList())
 			.toArray(new String[0]);
 	}
 
 	private String[] computeFinalTypeList(TypeParsedEventType event, List<StringPos<InputPosition>> inputTypes) {
 
 		return this.options.getTypeFilter()
-			.apply(event, inputTypes.stream().map(l -> l.string).collect(Collectors.toUnmodifiableList()))
+			.apply(event, inputTypes.stream().map(l -> l.string).toList())
 			.toArray(new String[0]);
+	}
+
+	private static void isInstanceOf(Class<?> type, Object obj, String message) {
+		if (type == null) {
+			throw new IllegalArgumentException("Type to check against must not be null");
+		}
+		if (!type.isInstance(obj)) {
+			throw new IllegalArgumentException(message);
+		}
+	}
+
+	private static void notNull(Object object, String message) {
+		if (object == null) {
+			throw new IllegalArgumentException(message);
+		}
 	}
 
 	private <T extends Expression> T applyCallbackFor(ExpressionCreatedEventType type, T newExpression) {
@@ -156,7 +169,7 @@ final class CypherDslASTFactory implements
 		}
 
 		var chainedCallbacks = callbacks.stream().reduce(Function.identity(), Function::andThen);
-		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).collect(Collectors.toList());
+		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).toList();
 	}
 
 	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
@@ -165,7 +178,7 @@ final class CypherDslASTFactory implements
 			return null;
 		}
 
-		Assertions.isInstanceOf(SymbolicName.class, v,  "An invalid type has been generated where a SymbolicName was required. Generated type was " + v.getClass().getName());
+		isInstanceOf(SymbolicName.class, v,  "An invalid type has been generated where a SymbolicName was required. Generated type was " + v.getClass().getName());
 		return (SymbolicName) v;
 	}
 
@@ -206,7 +219,7 @@ final class CypherDslASTFactory implements
 		var finalReturnItems = returnItems;
 
 		if (returnAll) {
-			finalReturnItems = Stream.concat(Stream.of(Cypher.asterisk()), finalReturnItems.stream()).collect(Collectors.toList());
+			finalReturnItems = Stream.concat(Stream.of(Cypher.asterisk()), finalReturnItems.stream()).toList();
 		}
 
 		if (finalReturnItems.isEmpty()) {
@@ -273,7 +286,7 @@ final class CypherDslASTFactory implements
 		}
 		return patternElements.stream().map(transformer)
 			.filter(Objects::nonNull)
-			.collect(Collectors.toList());
+			.toList();
 	}
 
 	@Override
@@ -378,14 +391,11 @@ final class CypherDslASTFactory implements
 			while (iteratorClauses.hasNext() && iteratorTypes.hasNext()) {
 				var type = iteratorTypes.next();
 				switch (type) {
-					case OnCreate:
+					case OnCreate ->
 						mergeActions.add(MergeAction.of(MergeAction.Type.ON_CREATE, (Set) iteratorClauses.next()));
-						break;
-					case OnMatch:
+					case OnMatch ->
 						mergeActions.add(MergeAction.of(MergeAction.Type.ON_MATCH, (Set) iteratorClauses.next()));
-						break;
-					default:
-						throw new IllegalArgumentException("Unsupported MergeActionType: " + type);
+					default -> throw new IllegalArgumentException("Unsupported MergeActionType: " + type);
 				}
 			}
 		}
@@ -419,7 +429,7 @@ final class CypherDslASTFactory implements
 	@Override
 	public PatternElement shortestPathPattern(InputPosition p, PatternElement patternElement) {
 
-		Assertions.isInstanceOf(RelationshipPattern.class, patternElement,
+		isInstanceOf(RelationshipPattern.class, patternElement,
 			"Only relationship patterns are supported for the shortestPath function.");
 
 		return new ExpressionAsPatternElementWrapper(
@@ -429,7 +439,7 @@ final class CypherDslASTFactory implements
 	@Override
 	public PatternElement allShortestPathsPattern(InputPosition p, PatternElement patternElement) {
 
-		Assertions.isInstanceOf(RelationshipPattern.class, patternElement,
+		isInstanceOf(RelationshipPattern.class, patternElement,
 			"Only relationship patterns are supported for the allShortestPaths function.");
 
 		return new ExpressionAsPatternElementWrapper(
@@ -459,23 +469,15 @@ final class CypherDslASTFactory implements
 			PathDetails pathDetails = relationships.get(i - 1);
 			PathLength length = pathDetails.getLength();
 
-			switch (pathDetails.getDirection()) {
-				case LTR:
-					relationshipPattern = relationshipPattern.relationshipTo(nodes.get(i), pathDetails.getTypes());
-					break;
-				case RTL:
-					relationshipPattern = relationshipPattern.relationshipFrom(nodes.get(i), pathDetails.getTypes());
-					break;
-				case UNI:
-					relationshipPattern = relationshipPattern.relationshipBetween(nodes.get(i), pathDetails.getTypes());
-					break;
-				default:
-					throw new IllegalArgumentException("Unknown direction type: " + pathDetails.getDirection());
-			}
+			relationshipPattern = switch (pathDetails.getDirection()) {
+				case LTR -> relationshipPattern.relationshipTo(nodes.get(i), pathDetails.getTypes());
+				case RTL -> relationshipPattern.relationshipFrom(nodes.get(i), pathDetails.getTypes());
+				case UNI -> relationshipPattern.relationshipBetween(nodes.get(i), pathDetails.getTypes());
+			};
 
 			if (pathDetails.getName() != null) {
-				if (relationshipPattern instanceof Relationship) {
-					relationshipPattern = ((Relationship) relationshipPattern).named(pathDetails.getName());
+				if (relationshipPattern instanceof Relationship relationship) {
+					relationshipPattern = relationship.named(pathDetails.getName());
 				} else {
 					relationshipPattern = ((RelationshipChain) relationshipPattern).named(pathDetails.getName());
 				}
@@ -516,7 +518,7 @@ final class CypherDslASTFactory implements
 			node = Cypher.anyNode();
 		} else {
 			var primaryLabel = finalLabels[0];
-			var additionalLabels = Arrays.stream(finalLabels).skip(1).collect(Collectors.toList());
+			var additionalLabels = Arrays.stream(finalLabels).skip(1).toList();
 			node = Cypher.node(primaryLabel, additionalLabels);
 		}
 
@@ -547,7 +549,7 @@ final class CypherDslASTFactory implements
 	public Clause loadCsvClause(InputPosition p, boolean headers, Expression source, Expression v,
 		String fieldTerminator) {
 
-		Assertions.isInstanceOf(StringLiteral.class, source,
+		isInstanceOf(StringLiteral.class, source,
 			"Only string literals are supported as source for the LOAD CSV clause.");
 		return Clauses.loadCSV(headers, (StringLiteral) source, assertSymbolicName(v), fieldTerminator);
 	}
@@ -868,7 +870,7 @@ final class CypherDslASTFactory implements
 	@Override
 	public Expression hasLabelsOrTypes(Expression subject, List<StringPos<InputPosition>> labels) {
 
-		Assertions.isInstanceOf(SymbolicName.class, subject, "Can only check for labels or types on symbolic names.");
+		isInstanceOf(SymbolicName.class, subject, "Can only check for labels or types on symbolic names.");
 		return Conditions
 			.hasLabelsOrType((SymbolicName) subject, labels.stream().map(v -> v.string).toArray(String[]::new));
 	}
@@ -1064,15 +1066,14 @@ final class CypherDslASTFactory implements
 		Expression where, Expression projection) {
 
 		PatternComprehension.OngoingDefinitionWithoutReturn ongoingDefinitionWithPattern;
-		if (patternElement instanceof RelationshipPattern) {
-			var relationshipPattern = (RelationshipPattern) patternElement;
+		if (patternElement instanceof RelationshipPattern relationshipPattern) {
 			if (v != null) {
 				ongoingDefinitionWithPattern = Cypher.listBasedOn(Cypher.path(assertSymbolicName(v)).definedBy(relationshipPattern));
 			} else {
 				ongoingDefinitionWithPattern = Cypher.listBasedOn(relationshipPattern);
 			}
-		} else if (patternElement instanceof NamedPath) {
-			ongoingDefinitionWithPattern = Cypher.listBasedOn((NamedPath) patternElement);
+		} else if (patternElement instanceof NamedPath namedPath) {
+			ongoingDefinitionWithPattern = Cypher.listBasedOn(namedPath);
 		} else {
 			throw new IllegalArgumentException(
 				"Cannot build a pattern comprehension around " + patternElement.getClass().getSimpleName());
@@ -1120,40 +1121,40 @@ final class CypherDslASTFactory implements
 	@Override
 	public Expression allExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
-		Assertions.notNull(where, "all(...) requires a WHERE predicate");
+		notNull(where, "all(...) requires a WHERE predicate");
 		return Predicates.all(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression anyExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
-		Assertions.notNull(where, "any(...) requires a WHERE predicate");
+		notNull(where, "any(...) requires a WHERE predicate");
 		return Predicates.any(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression noneExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
-		Assertions.notNull(where, "none(...) requires a WHERE predicate");
+		notNull(where, "none(...) requires a WHERE predicate");
 		return Predicates.none(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression singleExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
-		Assertions.notNull(where, "single(...) requires a WHERE predicate");
+		notNull(where, "single(...) requires a WHERE predicate");
 		return Predicates.single(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression patternExpression(InputPosition p, PatternElement patternElement) {
 
-		if (patternElement instanceof ExpressionAsPatternElementWrapper) {
-			return ((ExpressionAsPatternElementWrapper) patternElement).getExpression();
+		if (patternElement instanceof ExpressionAsPatternElementWrapper wrapper) {
+			return wrapper.getExpression();
 		}
 
-		if (patternElement instanceof RelationshipPattern) {
-			return new PatternElementAsExpressionWrapper((RelationshipPattern) patternElement);
+		if (patternElement instanceof RelationshipPattern relationshipPattern) {
+			return new PatternElementAsExpressionWrapper(relationshipPattern);
 		}
 
 		throw new UnsupportedOperationException();

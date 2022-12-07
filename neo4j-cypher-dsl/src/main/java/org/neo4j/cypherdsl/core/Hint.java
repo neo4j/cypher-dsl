@@ -24,13 +24,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -122,14 +120,14 @@ public final class Hint implements Visitable {
 				"One single property is required. Nested properties are not supported.");
 
 			NodeLabel label;
-			if (container instanceof Node) {
-				List<NodeLabel> labels = ((Node) container).getLabels();
+			if (container instanceof Node node) {
+				List<NodeLabel> labels = node.getLabels();
 				Assertions.isTrue(labels.size() == 1, "Exactly one label is required to define the index.");
 				label = labels.get(0);
-			} else if (container instanceof Relationship) {
-				RelationshipTypes types = ((Relationship) container).getDetails().getTypes();
-				Assertions.isTrue(types.getValues().size() == 1, "Exactly one type is required to define the index.");
-				label = new NodeLabel(types.getValues().get(0));
+			} else if (container instanceof Relationship relationship) {
+				List<String> types = relationship.getDetails().getTypes();
+				Assertions.isTrue(types.size() == 1, "Exactly one type is required to define the index.");
+				label = new NodeLabel(types.get(0));
 			} else {
 				throw new IllegalArgumentException("A property index can only be used for Nodes or Relationships.");
 			}
@@ -177,7 +175,7 @@ public final class Hint implements Visitable {
 	public static Hint useJoinOn(SymbolicName... name) {
 
 		Assertions.notEmpty(name, "At least one name is required to define a JOIN hint.");
-		return new Hint(Type.JOIN_ON, Arrays.stream(name).map(IndexReference::new).collect(Collectors.toList()), null);
+		return new Hint(Type.JOIN_ON, Arrays.stream(name).map(IndexReference::new).toList(), null);
 	}
 
 	private final Type type;

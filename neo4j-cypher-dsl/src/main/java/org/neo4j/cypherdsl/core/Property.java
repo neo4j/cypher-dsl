@@ -54,6 +54,9 @@ public interface Property extends Expression, IdentifiableElement {
 	@NotNull @Contract(pure = true)
 	List<PropertyLookup> getNames();
 
+	/**
+	 * @return The container "owning" this property.
+	 */
 	@NotNull @Contract(pure = true)
 	Named getContainer();
 

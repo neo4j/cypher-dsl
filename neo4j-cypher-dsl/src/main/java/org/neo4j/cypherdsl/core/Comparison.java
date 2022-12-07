@@ -41,14 +41,11 @@ public final class Comparison implements Condition {
 		Assertions.isTrue(operator.isUnary(), "Operator must be unary.");
 		Assertions.notNull(expression, "Expression must not be null.");
 
-		switch (operator.getType()) {
-			case PREFIX:
-				return new Comparison(null, operator, expression);
-			case POSTFIX:
-				return new Comparison(expression, operator, null);
-			default:
-				throw new IllegalArgumentException("Invalid operator type " + operator.getType());
-		}
+		return switch (operator.getType()) {
+			case PREFIX -> new Comparison(null, operator, expression);
+			case POSTFIX -> new Comparison(expression, operator, null);
+			default -> throw new IllegalArgumentException("Invalid operator type " + operator.getType());
+		};
 	}
 
 	static Comparison create(Expression lhs, Operator operator, Expression rhs) {

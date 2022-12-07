@@ -28,7 +28,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.utils.LRUCache;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.StatementContext;
 
 /**
  * @author Michael J. Simons

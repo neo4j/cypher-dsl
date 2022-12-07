@@ -26,7 +26,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableStatement;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * This exposes a call method taking in a statement that represents a valid, correlated subquery.
@@ -104,6 +104,11 @@ public interface ExposesSubqueryCall {
 	@NotNull @CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports);
 
+	/**
+	 * Starts building a new sub-query from a {@code CALL ... IN TRANSACTIONS} clause
+	 * @param statement The sub-query to be called in transactions
+	 * @return Ongoing sub-query definition
+	 */
 	@NotNull @CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement) {
 		return callInTransactions(statement, null, new IdentifiableElement[0]);

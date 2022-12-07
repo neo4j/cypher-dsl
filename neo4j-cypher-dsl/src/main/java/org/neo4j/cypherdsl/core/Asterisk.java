@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.internal.LiteralBase;
 
 /**
  * The {@code *}.

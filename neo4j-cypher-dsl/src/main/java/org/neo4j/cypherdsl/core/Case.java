@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
@@ -60,6 +60,11 @@ public interface Case extends Expression, ProvidesAffixes {
 	interface GenericCase extends Case {
 	}
 
+	/**
+	 * Creates a new {@link Case} {@link Expression}
+	 * @param expression starting expression for the simple case
+	 * @return The new expression
+	 */
 	static Case create(@Nullable Expression expression) {
 		return expression == null ? new AbstractCase.GenericCaseImpl() : new AbstractCase.SimpleCaseImpl(expression);
 	}

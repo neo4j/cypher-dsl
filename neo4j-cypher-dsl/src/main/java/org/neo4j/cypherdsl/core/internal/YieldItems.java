@@ -34,6 +34,12 @@ import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 @API(status = INTERNAL, since = "2020.0.1")
 public final class YieldItems extends TypedSubtree<Expression> {
 
+	/**
+	 * Creates a new {@literal YIELD} expressions
+	 *
+	 * @param c The elements to yield
+	 * @return The new expression
+	 */
 	public static YieldItems yieldAllOf(Expression... c) {
 
 		if (c == null || c.length == 0) {

@@ -40,6 +40,13 @@ public final class ProcedureName implements Visitable {
 
 	private final String value;
 
+	/**
+	 * Creates a new {@link ProcedureName} from an array of names: The last element will be the final procedure name,
+	 * the head items will be concatenated into a proper namespace.
+	 *
+	 * @param namespaceAndProcedure List of names
+	 * @return A new procedure
+	 */
 	public static ProcedureName from(String... namespaceAndProcedure) {
 		if (namespaceAndProcedure.length == 1) {
 			return new ProcedureName(namespaceAndProcedure[0]);
@@ -49,6 +56,12 @@ public final class ProcedureName implements Visitable {
 		}
 	}
 
+	/**
+	 * Creates a new {@link ProcedureName} from a given namespace and name.
+	 * @param namespace Optional (nested) namespace
+	 * @param procedure The actual name of the procedure
+	 * @return A new procedure
+	 */
 	public static ProcedureName from(List<String> namespace, String procedure) {
 		if (namespace.isEmpty()) {
 			return new ProcedureName(procedure);
@@ -67,6 +80,9 @@ public final class ProcedureName implements Visitable {
 		this.value = value;
 	}
 
+	/**
+	 * @return the fully qualified, Cypher name of this procedure
+	 */
 	public String getQualifiedName() {
 
 		String namespace = "";

@@ -33,11 +33,15 @@
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.graalvm</java-module-name>
-		<java.version>11</java.version>
 		<native-maven-plugin.version>0.9.19</native-maven-plugin.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<!-- This is in provided scope of core. If not present here, the compiler will spit out warnings as it won't find all annotations -->
+			<groupId>org.jetbrains</groupId>
+			<artifactId>annotations</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-parser</artifactId>
@@ -73,9 +77,10 @@
 					<execution>
 						<phase>package</phase>
 						<goals>
-							<goal>build</goal>
+							<goal>compile-no-fork</goal>
 						</goals>
 						<configuration>
+							<requiredVersion>22.3</requiredVersion>
 							<mainClass>org.neo4j.cypherdsl.graalvm.Application</mainClass>
 							<imageName>application</imageName>
 							<buildArgs>--no-fallback -H:+ReportExceptionStackTraces</buildArgs>
@@ -89,6 +94,11 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<skipIfEmpty>true</skipIfEmpty>
+					<archive>
+						<manifestEntries>
+							<Automatic-Module-Name>${java-module-name}</Automatic-Module-Name>
+						</manifestEntries>
+					</archive>
 				</configuration>
 			</plugin>
 			<plugin>

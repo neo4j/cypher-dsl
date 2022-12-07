@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Nullable;
@@ -79,20 +78,20 @@ public final class Subquery implements Clause {
 		if (imports.length > 0) {
 			ExpressionList returnItems = new ExpressionList(Arrays.stream(imports)
 				.map(i -> {
-					if (i instanceof AliasedExpression) {
-						return ((AliasedExpression) i).getDelegate();
+					if (i instanceof AliasedExpression aliasedExpression) {
+						return aliasedExpression.getDelegate();
 					} else {
 						return i.asExpression();
 					}
 				})
-				.collect(Collectors.toList()));
+				.toList());
 
 			optionalImports = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
 
 			returnItems = new ExpressionList(Arrays.stream(imports)
 				.filter(AliasedExpression.class::isInstance)
-				.map(AliasedExpression.class::cast)
-				.collect(Collectors.toList()));
+				.map(Expression.class::cast)
+				.toList());
 
 			optionalRenames = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
 		}
@@ -121,6 +120,9 @@ public final class Subquery implements Clause {
 		return new InTransactions(this, rows);
 	}
 
+	/**
+	 * @return {@literal true} if this subquery yields any items
+	 */
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
 		return statement.doesReturnOrYield();

@@ -20,7 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * A step exposing logical operators {@code and} and {@code or} after a {@code where} clause.

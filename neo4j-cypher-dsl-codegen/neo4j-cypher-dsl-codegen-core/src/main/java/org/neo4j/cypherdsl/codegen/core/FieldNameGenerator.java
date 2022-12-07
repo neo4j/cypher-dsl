@@ -24,12 +24,24 @@ package org.neo4j.cypherdsl.codegen.core;
  * @author Michael J. Simons
  * @since 2021.1.0
  */
-interface FieldNameGenerator {
+public interface FieldNameGenerator {
 
+	/**
+	 * Single instance of the default {@link FieldNameGenerator}.
+	 */
 	enum Default implements FieldNameGenerator {
+		/**
+		 * Singleton holder.
+		 */
 		INSTANCE
 	}
 
+	/**
+	 * Generate a new name for constant field
+	 *
+	 * @param name The name of a node or relationship
+	 * @return A valid constant field name
+	 */
 	default String generate(String name) {
 
 		StringBuilder sb = new StringBuilder();

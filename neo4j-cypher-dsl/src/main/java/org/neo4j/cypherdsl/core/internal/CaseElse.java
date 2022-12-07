@@ -34,6 +34,9 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class CaseElse implements Visitable {
 	private final Expression elseExpression;
 
+	/**
+	 * @param elseExpression finishing else part
+	 */
 	public CaseElse(Expression elseExpression) {
 		this.elseExpression = elseExpression;
 	}

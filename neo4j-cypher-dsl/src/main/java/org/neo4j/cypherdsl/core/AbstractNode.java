@@ -92,6 +92,7 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation") // IDEA is stupid.
 	public final FunctionInvocation internalId() {
 		return Functions.id(this);
 	}

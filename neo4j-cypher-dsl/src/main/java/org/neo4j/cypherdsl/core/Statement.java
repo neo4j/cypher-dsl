@@ -32,7 +32,6 @@ import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArg
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -155,6 +154,9 @@ public interface Statement extends Visitable {
 	@NotNull @Contract(pure = true)
 	String getCypher();
 
+	/**
+	 * @return The context of this statement, allowing access to parameter names etc.
+	 */
 	@API(status = INTERNAL, since = "2021.0.0")
 	@NotNull @Contract(pure = true)
 	StatementContext getContext();

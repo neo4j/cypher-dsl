@@ -38,10 +38,22 @@ public final class RelationshipLength implements Visitable {
 
 	private final boolean unbounded;
 
+	/**
+	 * Creates an unbounded {@link RelationshipLength}.
+	 *
+	 * @return The new length definition
+	 */
 	public static RelationshipLength unbounded() {
 		return new RelationshipLength(null, null);
 	}
 
+	/**
+	 * Creates a {@link RelationshipLength} with given minimum and maximum values.
+	 *
+	 * @param minimum Minimum length
+	 * @param maximum Maximum length
+	 * @return The new length definition
+	 */
 	public static RelationshipLength of(Integer minimum, Integer maximum) {
 		return new RelationshipLength(minimum, maximum);
 	}

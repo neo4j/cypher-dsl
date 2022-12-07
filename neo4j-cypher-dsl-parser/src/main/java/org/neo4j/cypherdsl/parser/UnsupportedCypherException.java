@@ -34,6 +34,9 @@ public final class UnsupportedCypherException extends UnsupportedOperationExcept
 
 	private static final long serialVersionUID = 2871262762217922044L;
 
+	/**
+	 * Original input to the parser.
+	 */
 	private final String input;
 
 	UnsupportedCypherException(String input, UnsupportedOperationException cause) {

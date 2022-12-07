@@ -28,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.CaseElse;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
-import org.neo4j.cypherdsl.core.utils.CheckReturnValue;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * Abstract base class for a {@link Case}.

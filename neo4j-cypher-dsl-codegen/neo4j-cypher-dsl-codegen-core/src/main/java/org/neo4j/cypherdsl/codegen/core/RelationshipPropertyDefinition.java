@@ -28,7 +28,7 @@ import java.util.Set;
 import org.apiguardian.api.API;
 
 /**
- * This represents a property in the static meta model for a relationship. Such a property can refer to several other
+ * This represents a property in the static metamodel for a relationship. Such a property can refer to several other
  * {@link PropertyDefinition property definitions} on its own when we detect properties stored on the relationship.
  *
  * @author Michael J. Simons
@@ -109,18 +109,30 @@ public final class RelationshipPropertyDefinition {
 			properties);
 	}
 
+	/**
+	 * @return The type of the relationship
+	 */
 	public String getType() {
 		return type;
 	}
 
+	/**
+	 * @return The name in the domain model (most likely the field name)
+	 */
 	public String getNameInDomain() {
 		return nameInDomain;
 	}
 
+	/**
+	 * @return A builder for the start node
+	 */
 	public NodeModelBuilder getStart() {
 		return start;
 	}
 
+	/**
+	 * @return A builder for the end node
+	 */
 	public NodeModelBuilder getEnd() {
 		return end;
 	}
@@ -129,6 +141,9 @@ public final class RelationshipPropertyDefinition {
 		return relationshipBuilder;
 	}
 
+	/**
+	 * @return A set of properties on this relationship
+	 */
 	public Set<PropertyDefinition> getProperties() {
 		return Collections.unmodifiableSet(properties);
 	}

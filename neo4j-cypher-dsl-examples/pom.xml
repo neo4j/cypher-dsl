@@ -39,7 +39,6 @@
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.examples</java-module-name>
-		<java.version>11</java.version>
 	</properties>
 	
 	<build>

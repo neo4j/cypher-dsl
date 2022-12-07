@@ -24,7 +24,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -115,8 +114,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		static Details create(Direction direction, SymbolicName symbolicName, String... types) {
 
 			List<String> listOfTypes = Arrays.stream(types)
-				.filter(type -> !(type == null || type.isEmpty()))
-				.collect(Collectors.toList());
+				.filter(type -> !(type == null || type.isEmpty())).toList();
 
 			return create(direction, symbolicName, 	listOfTypes.isEmpty()  ? null : RelationshipTypes.of(types));
 		}
@@ -230,8 +228,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		 * @return The relationship types being matched.
 		 */
 		@API(status = INTERNAL)
-		public RelationshipTypes getTypes() {
-			return types;
+		public List<String> getTypes() {
+			return List.copyOf(types.getValues());
 		}
 
 		/**
@@ -254,16 +252,22 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		}
 	}
 
+	/**
+	 * @return the left-hand side of this relationship
+	 */
 	Node getLeft();
 
 	/**
-	 * The details contains the types, properties and cardinality.
+	 * The details containing the types, properties and cardinality.
 	 *
 	 * @return A wrapper around the details of this relationship.
 	 */
 	@NotNull @Contract(pure = true)
 	Details getDetails();
 
+	/**
+	 * @return the right-hand side of this relationship
+	 */
 	@NotNull @Contract(pure = true)
 	Node getRight();
 

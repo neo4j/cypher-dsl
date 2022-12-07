@@ -60,6 +60,13 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class ScopingStrategy {
 
 	/**
+	 * @return an empty scoping strategy, for internal use only.
+	 */
+	public static ScopingStrategy create() {
+		return new ScopingStrategy();
+	}
+
+	/**
 	 * Keeps track of named objects that have been already visited.
 	 */
 	private final Deque<Set<IdentifiableElement>> dequeOfVisitedNamed = new ArrayDeque<>(new HashSet<>());
@@ -72,10 +79,15 @@ public final class ScopingStrategy {
 
 	private boolean inProperty = false;
 
-	public ScopingStrategy() {
+	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
 	}
 
+	/**
+	 * Called when visiting a {@link Visitable}
+	 *
+	 * @param visitable Element to be checked for new scope
+	 */
 	public void doEnter(Visitable visitable) {
 
 		// We don't want the identifiable in an order clause to be retained
@@ -93,15 +105,34 @@ public final class ScopingStrategy {
 		}
 	}
 
+	/**
+	 * @param namedItem An item that might have been visited in the current scope
+	 * @return {@literal true} if the named item has been visited in the current scope before
+	 */
+	public boolean hasVisitedBefore(Named namedItem) {
+
+		if (!hasScope()) {
+			return false;
+		}
+
+		Set<IdentifiableElement> scope = dequeOfVisitedNamed.peek();
+		return hasVisitedInScope(scope, namedItem);
+	}
+
+	/**
+	 * Called when leaving a {@link Visitable}
+	 *
+	 * @param visitable Element to be checked for a scope to be closed
+	 */
 	public void doLeave(Visitable visitable) {
 
 		if (!hasScope()) {
 			return;
 		}
 
-		if (visitable instanceof IdentifiableElement && !inOrder && (!inProperty || visitable instanceof Property)) {
+		if (visitable instanceof IdentifiableElement identifiableElement && !inOrder && (!inProperty || visitable instanceof Property)) {
 
-			dequeOfVisitedNamed.peek().add((IdentifiableElement) visitable);
+			dequeOfVisitedNamed.peek().add(identifiableElement);
 		}
 
 		if (visitable instanceof Statement) {
@@ -135,16 +166,6 @@ public final class ScopingStrategy {
 		previous = visitable;
 	}
 
-	public boolean hasVisitedBefore(Named namedItem) {
-
-		if (!hasScope()) {
-			return false;
-		}
-
-		Set<IdentifiableElement> scope = dequeOfVisitedNamed.peek();
-		return hasVisitedInScope(scope, namedItem);
-	}
-
 	private boolean hasScope() {
 		return !this.dequeOfVisitedNamed.isEmpty();
 	}
@@ -156,10 +177,10 @@ public final class ScopingStrategy {
 		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
 			.filter(hasAName)
 			.anyMatch(i -> {
-				if (i instanceof Named) {
-					return ((Named) i).getSymbolicName().equals(needle.getSymbolicName());
-				} else if (i instanceof AliasedExpression) {
-					return ((AliasedExpression) i).getAlias().equals(needle.getRequiredSymbolicName().getValue());
+				if (i instanceof Named named) {
+					return named.getSymbolicName().equals(needle.getSymbolicName());
+				} else if (i instanceof AliasedExpression aliasedExpression) {
+					return aliasedExpression.getAlias().equals(needle.getRequiredSymbolicName().getValue());
 				}
 				return false;
 			});
@@ -173,8 +194,8 @@ public final class ScopingStrategy {
 
 	private void clearPreviouslyVisitedNamed(Visitable visitable) {
 
-		if (visitable instanceof With) {
-			clearPreviouslyVisitedAfterWith((With) visitable);
+		if (visitable instanceof With with) {
+			clearPreviouslyVisitedAfterWith(with);
 		} else if (visitable instanceof Return || visitable instanceof YieldItems) {
 			clearPreviouslyVisitedAfterReturnish(visitable);
 		}
@@ -187,13 +208,13 @@ public final class ScopingStrategy {
 		Set<IdentifiableElement> retain = new HashSet<>();
 		Set<IdentifiableElement> visitedNamed = dequeOfVisitedNamed.peek();
 		with.accept(segment -> {
-			if (segment instanceof SymbolicName) {
+			if (segment instanceof SymbolicName symbolicName) {
 				visitedNamed.stream()
 					.filter(element -> {
-						if (element instanceof Named) {
-							return ((Named) element).getRequiredSymbolicName().equals(segment);
-						} else if (element instanceof AliasedExpression) {
-							return ((AliasedExpression) element).getAlias().equals(((SymbolicName) segment).getValue());
+						if (element instanceof Named named) {
+							return named.getRequiredSymbolicName().equals(segment);
+						} else if (element instanceof AliasedExpression aliasedExpression) {
+							return aliasedExpression.getAlias().equals((symbolicName).getValue());
 						}
 						return false;
 					})
@@ -229,8 +250,8 @@ public final class ScopingStrategy {
 				}
 
 				// Only collect things exactly one level into the list of returned items
-				if (level == 1 && segment instanceof IdentifiableElement) {
-					retain.add((IdentifiableElement) segment);
+				if (level == 1 && segment instanceof IdentifiableElement identifiableElement) {
+					retain.add(identifiableElement);
 				}
 			}
 
@@ -251,6 +272,9 @@ public final class ScopingStrategy {
 		}
 	}
 
+	/**
+	 * @return An unmodifiable collections with identifiables in the current scope
+	 */
 	public Collection<Expression> getIdentifiables() {
 
 		if (!hasScope()) {
@@ -258,7 +282,7 @@ public final class ScopingStrategy {
 		}
 
 		Predicate<IdentifiableElement> allNamedElementsHaveResolvedNames = e ->
-			!(e instanceof Named) || ((Named) e).getSymbolicName().isPresent();
+			!(e instanceof Named named) || named.getSymbolicName().isPresent();
 
 		Set<IdentifiableElement> items = Optional.ofNullable(this.dequeOfVisitedNamed.peek())
 			.filter(scope -> !scope.isEmpty())

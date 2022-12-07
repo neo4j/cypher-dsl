@@ -30,7 +30,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
-import org.neo4j.cypherdsl.build.RegisterForReflection;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Condition;
@@ -90,7 +90,7 @@ import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
-import org.neo4j.cypherdsl.core.internal.StatementContext;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Strings;
@@ -129,7 +129,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	/**
 	 * Keeps track of scoped, named variables.
 	 */
-	private final ScopingStrategy scopingStrategy = new ScopingStrategy();
+	private final ScopingStrategy scopingStrategy = ScopingStrategy.create();
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
@@ -234,12 +234,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return false;
 		}
 
-		if (visitable instanceof ProvidesAffixes) {
-			((ProvidesAffixes) visitable).getPrefix().ifPresent(this::doWithPrefix);
+		if (visitable instanceof ProvidesAffixes providesAffixes) {
+			providesAffixes.getPrefix().ifPresent(this::doWithPrefix);
 		}
 
-		if (visitable instanceof AliasedExpression) {
-			currentAliasedElements.push((AliasedExpression) visitable);
+		if (visitable instanceof AliasedExpression aliasedExpression) {
+			currentAliasedElements.push(aliasedExpression);
 		}
 
 		if (visitable instanceof MapProjection) {
@@ -292,8 +292,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		separatorOnCurrentLevel().ifPresent(ref -> ref.set(", "));
 
-		if (visitable instanceof ProvidesAffixes) {
-			((ProvidesAffixes) visitable).getSuffix().ifPresent(this::doWithSuffix);
+		if (visitable instanceof ProvidesAffixes providesAffixes) {
+			providesAffixes.getSuffix().ifPresent(this::doWithSuffix);
 		}
 
 		if (visitable instanceof TypedSubtree) {
@@ -308,8 +308,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			this.skipAliasing = false;
 		}
 
-		if (visitable instanceof AliasedExpression) {
-			AliasedExpression aliasedExpression = (AliasedExpression) visitable;
+		if (visitable instanceof AliasedExpression aliasedExpression) {
 			visitableToAliased.add(aliasedExpression);
 		}
 
@@ -360,12 +359,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(MergeAction onCreateOrMatchEvent) {
 		switch (onCreateOrMatchEvent.getType()) {
-			case ON_CREATE:
-				builder.append("ON CREATE");
-				break;
-			case ON_MATCH:
-				builder.append("ON MATCH");
-				break;
+			case ON_CREATE -> builder.append("ON CREATE");
+			case ON_MATCH -> builder.append("ON MATCH");
 		}
 		builder.append(" ");
 	}
@@ -649,8 +644,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
-		if (value instanceof ConstantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
-			builder.append(((ConstantParameterHolder) value).asString());
+		if (value instanceof ConstantParameterHolder constantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
+			builder.append(constantParameterHolder.asString());
 		} else {
 			renderParameter(parameter);
 		}
@@ -865,8 +860,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(UsingPeriodicCommit usingPeriodicCommit) {
 
 		builder.append("USING PERIODIC COMMIT ");
-		if (usingPeriodicCommit.getRate() != null) {
-			builder.append(usingPeriodicCommit.getRate()).append(" ");
+		if (usingPeriodicCommit.rate() != null) {
+			builder.append(usingPeriodicCommit.rate()).append(" ");
 		}
 	}
 

@@ -24,7 +24,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypher.internal.parser.javacc.CharStream;
 import org.neo4j.cypher.internal.parser.javacc.Cypher;
 import org.neo4j.cypher.internal.parser.javacc.CypherCharStream;
@@ -58,7 +57,7 @@ public final class CypherParser {
 	 * @param options Options for the parser
 	 * @return A node
 	 */
-	public static Node parseNode(String input, @Nullable Options options) {
+	public static Node parseNode(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
 			CypherDslASTExceptionFactory.INSTANCE,
@@ -81,7 +80,7 @@ public final class CypherParser {
 	 * @param options Options for the parser
 	 * @return A relationship pattern or chain of relationship pattern
 	 */
-	public static RelationshipPattern parseRelationship(String input, @Nullable Options options) {
+	public static RelationshipPattern parseRelationship(String input, Options options) {
 
 		return handle(input, () -> (RelationshipPattern) new Cypher<>(CypherDslASTFactory.getInstance(options),
 			CypherDslASTExceptionFactory.INSTANCE,
@@ -104,7 +103,7 @@ public final class CypherParser {
 	 * @param options Options for the parser
 	 * @return A valid Cypher-DSL expression instance
 	 */
-	public static Expression parseExpression(String input, @Nullable Options options) {
+	public static Expression parseExpression(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
 			CypherDslASTExceptionFactory.INSTANCE,
@@ -127,7 +126,7 @@ public final class CypherParser {
 	 * @param options Options for the parser
 	 * @return A {@link Clause} instance
 	 */
-	public static Clause parseClause(String input, @Nullable Options options) {
+	public static Clause parseClause(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
 			CypherDslASTExceptionFactory.INSTANCE,
@@ -151,7 +150,7 @@ public final class CypherParser {
 	 * @param options Options for the parser
 	 * @return A {@link Statement} statement.
 	 */
-	public static Statement parseStatement(String input, @Nullable Options options) {
+	public static Statement parseStatement(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
 			CypherDslASTExceptionFactory.INSTANCE,
@@ -177,7 +176,7 @@ public final class CypherParser {
 	 * @return A {@link Statement} statement.
 	 * @see #parseStatement(String, Options)
 	 */
-	public static Statement parse(String input, @Nullable Options options) {
+	public static Statement parse(String input, Options options) {
 		return parseStatement(input, options);
 	}
 

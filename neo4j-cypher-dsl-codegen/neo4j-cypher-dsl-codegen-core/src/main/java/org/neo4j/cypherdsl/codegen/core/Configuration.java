@@ -42,11 +42,29 @@ public final class Configuration {
 
 	private static final Configuration DEFAULT_CONFIG = newConfig().build();
 
+	/**
+	 * Lookup key to be used in an annotations processors environment options for prefixes to be used.
+	 */
 	public static final String PROPERTY_PREFIX = "org.neo4j.cypherdsl.codegen.prefix";
+	/**
+	 * Lookup key to be used in an annotations processors environment options for suffixes to be used.
+	 */
 	public static final String PROPERTY_SUFFIX = "org.neo4j.cypherdsl.codegen.suffix";
+	/**
+	 * Lookup key to be used in an annotations processors environment options for the indent style to be used.
+	 */
 	public static final String PROPERTY_INDENT_STYLE = "org.neo4j.cypherdsl.codegen.indent_style";
+	/**
+	 * Lookup key to be used in an annotations processors environment options for the indent size to be used.
+	 */
 	public static final String PROPERTY_INDENT_SIZE = "org.neo4j.cypherdsl.codegen.indent_size";
+	/**
+	 * Lookup key to be used in an annotations processors environment options for the timestamp to be used.
+	 */
 	public static final String PROPERTY_TIMESTAMP = "org.neo4j.cypherdsl.codegen.timestamp";
+	/**
+	 * Lookup key to be used in an annotations processors environment options for the flag whether generated code should be marked.
+	 */
 	public static final String PROPERTY_ADD_AT_GENERATED = "org.neo4j.cypherdsl.codegen.add_at_generated";
 
 	/**
@@ -60,11 +78,17 @@ public final class Configuration {
 	}
 
 	/**
-	 * The target Java base line.
+	 * The target Java baseline.
 	 */
 	public enum JavaVersion {
 
+		/**
+		 * Generated code should compile on Java 8.
+		 */
 		RELEASE_8,
+		/**
+		 * Generated code should compile on Java 11 or higher.
+		 */
 		RELEASE_11
 	}
 
@@ -117,14 +141,28 @@ public final class Configuration {
 	 */
 	private final boolean addAtGenerated;
 
+	/**
+	 * @return An instance of the default configuration
+	 */
 	public static Configuration defaultConfig() {
 		return DEFAULT_CONFIG;
 	}
 
+	/**
+	 * Starts building new configuration.
+	 *
+	 * @return A new builder
+	 */
 	public static Builder newConfig() {
 		return Builder.newConfig();
 	}
 
+	/**
+	 * Starts building a new configuration for the given path.
+	 *
+	 * @param path The path into which code should be generated
+	 * @return A new builder
+	 */
 	public static Builder newConfig(final Path path) {
 		return Builder.newConfig(path);
 	}
@@ -137,7 +175,7 @@ public final class Configuration {
 
 		private ClassNameGenerator nodeNameGenerator = new NodeNameGenerator();
 		private ClassNameGenerator relationshipNameGenerator = new RelationshipNameGenerator();
-		private JavaVersion target = JavaVersion.RELEASE_8;
+		private JavaVersion target = JavaVersion.RELEASE_11;
 		private String defaultPackage = "";
 		private Path path;
 		private String prefix;
@@ -158,6 +196,12 @@ public final class Configuration {
 			return new Builder().withPath(path);
 		}
 
+		/**
+		 * Changes the node name generator
+		 *
+		 * @param nodeNameGenerator A new generator
+		 * @return This builder
+		 */
 		public Builder withNodeNameGenerator(ClassNameGenerator nodeNameGenerator) {
 
 			if (nodeNameGenerator == null) {
@@ -167,6 +211,12 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * Changes the relationship name generator
+		 *
+		 * @param relationshipNameGenerator A new generator
+		 * @return This builder
+		 */
 		public Builder withRelationshipNameGenerator(ClassNameGenerator relationshipNameGenerator) {
 
 			if (relationshipNameGenerator == null) {
@@ -176,6 +226,12 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * Configures the targeted Java version.
+		 *
+		 * @param target The new target version
+		 * @return This builder
+		 */
 		public Builder withTarget(JavaVersion target) {
 
 			if (target == null) {
@@ -185,6 +241,12 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * Configures the default target package.
+		 *
+		 * @param defaultPackage The target package
+		 * @return This builder
+		 */
 		public Builder withDefaultPackage(String defaultPackage) {
 
 			if (defaultPackage == null) {
@@ -240,12 +302,24 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * Should generated sources be marked as such.
+		 *
+		 * @param addAtGenerated Set to {@literal true} to mark generated sources as generated
+		 * @return This builder
+		 */
 		public Builder withAddAtGenerated(boolean addAtGenerated) {
 
 			this.addAtGenerated = addAtGenerated;
 			return this;
 		}
 
+		/**
+		 * Configures the indentation style, aka Tabs vs. Spaces, I'll be watching.
+		 *
+		 * @param indentStyle The style to use
+		 * @return This builder
+		 */
 		public Builder withIndentStyle(IndentStyle indentStyle) {
 
 			if (indentStyle == null) {
@@ -255,11 +329,20 @@ public final class Configuration {
 			return this;
 		}
 
+		/**
+		 * Configures the indent size.
+		 *
+		 * @param indentSize The number of indents to use
+		 * @return This builder
+		 */
 		public Builder withIndentSize(int indentSize) {
 			this.indentSize = indentSize;
 			return this;
 		}
 
+		/**
+		 * @return A new, immutable configuration
+		 */
 		public Configuration build() {
 
 			UnaryOperator<String> typeNameDecorator;
@@ -273,11 +356,7 @@ public final class Configuration {
 			if (indentStyle == IndentStyle.TAB) {
 				indent = "\t";
 			} else {
-				StringBuilder indentBuilder = new StringBuilder();
-				for (int i = 0; i < indentSize; ++i) {
-					indentBuilder.append(" ");
-				}
-				indent = indentBuilder.toString();
+				indent = " ".repeat(Math.max(0, indentSize));
 			}
 
 			Clock clock = null;
@@ -307,42 +386,72 @@ public final class Configuration {
 		this.addAtGenerated = addAtGenerated;
 	}
 
+	/**
+	 * @return The generator for node names
+	 */
 	public ClassNameGenerator getNodeNameGenerator() {
 		return nodeNameGenerator;
 	}
 
+	/**
+	 * @return The generator for class names
+	 */
 	public ClassNameGenerator getRelationshipNameGenerator() {
 		return relationshipNameGenerator;
 	}
 
+	/**
+	 * @return The generator for constant field names
+	 */
 	public FieldNameGenerator getConstantFieldNameGenerator() {
 		return fieldNameGenerator;
 	}
 
+	/**
+	 * @return The target java version of the generated code
+	 */
 	public JavaVersion getTarget() {
 		return target;
 	}
 
+	/**
+	 * @return The default package name to use
+	 */
 	public String getDefaultPackage() {
 		return defaultPackage;
 	}
 
+	/**
+	 * @return The path to generate code into
+	 */
 	public Optional<Path> getPath() {
 		return path;
 	}
 
+	/**
+	 * @return The decorator that applies pre- and suffixes to typenames
+	 */
 	public UnaryOperator<String> getTypeNameDecorator() {
 		return typeNameDecorator;
 	}
 
+	/**
+	 * @return The string to be used as indent
+	 */
 	public String getIndent() {
 		return indent;
 	}
 
+	/**
+	 * @return An optional clock, different from the system.
+	 */
 	public Optional<Clock> getClock() {
 		return clock;
 	}
 
+	/**
+	 * @return {@literal true} if generated code is marked as such
+	 */
 	public boolean isAddAtGenerated() {
 		return addAtGenerated;
 	}

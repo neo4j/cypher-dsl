@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -30,10 +31,12 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
-public final class Namespace extends LiteralBase<String[]> {
+public final class Namespace implements Literal<String[]> {
+
+	private final String[] content;
 
 	Namespace(String[] value) {
-		super(value);
+		this.content = value;
 	}
 
 	@Override
@@ -47,6 +50,10 @@ public final class Namespace extends LiteralBase<String[]> {
 	@Override
 	public String asString() {
 
-		return String.join(".", getContent());
+		return String.join(".", content);
+	}
+
+	String[] getContent() {
+		return content;
 	}
 }
