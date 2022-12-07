@@ -24,8 +24,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.Record;
+import org.neo4j.driver.SimpleQueryRunner;
 import org.neo4j.driver.async.AsyncQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -50,7 +50,7 @@ public interface ExecutableResultStatement extends ExecutableStatement {
 	 * @param <T>             The type of the returned objects.
 	 * @return A list of objects.
 	 */
-	<T> List<T> fetchWith(QueryRunner queryRunner, Function<Record, T> mappingFunction);
+	<T> List<T> fetchWith(SimpleQueryRunner queryRunner, Function<Record, T> mappingFunction);
 
 	/**
 	 * Fetches a list of {@link Record records} from a database via the given {@code queryRunner}.
@@ -58,7 +58,7 @@ public interface ExecutableResultStatement extends ExecutableStatement {
 	 * @param queryRunner Any type of query runner. Neither sessions nor transactions will be closed.
 	 * @return A list of records.
 	 */
-	default List<Record> fetchWith(QueryRunner queryRunner) {
+	default List<Record> fetchWith(SimpleQueryRunner queryRunner) {
 		return fetchWith(queryRunner, Function.identity());
 	}
 
@@ -95,5 +95,5 @@ public interface ExecutableResultStatement extends ExecutableStatement {
 	 * @param streamHandler A handler for the stream: Do whatever you want with the items.
 	 * @return The result summary. There is no need to actually use this.
 	 */
-	ResultSummary streamWith(QueryRunner queryRunner, Consumer<Stream<Record>> streamHandler);
+	ResultSummary streamWith(SimpleQueryRunner queryRunner, Consumer<Stream<Record>> streamHandler);
 }

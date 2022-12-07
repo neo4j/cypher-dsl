@@ -30,6 +30,7 @@ import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ResultStatement;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.driver.QueryRunner;
+import org.neo4j.driver.SimpleQueryRunner;
 import org.neo4j.driver.async.AsyncQueryRunner;
 import org.neo4j.driver.summary.ResultSummary;
 
@@ -141,7 +142,7 @@ public interface ExecutableStatement {
 	 * @param queryRunner a query runner
 	 * @return A result summary (including server information, counters etc).
 	 */
-	ResultSummary executeWith(QueryRunner queryRunner);
+	ResultSummary executeWith(SimpleQueryRunner queryRunner);
 
 	/**
 	 * If the Neo4j Java Driver is on the classpath, this method can be used to pass a {@link QueryRunner} to the statement,
