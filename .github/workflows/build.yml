@@ -55,7 +55,6 @@ jobs:
           -pl !org.neo4j:neo4j-cypher-dsl-native-tests
           -pl !org.neo4j:neo4j-cypher-dsl-examples
           -pl !org.neo4j:neo4j-cypher-dsl-examples-core
-          -pl !org.neo4j:neo4j-cypher-dsl-examples-driver
           -pl !org.neo4j:neo4j-cypher-dsl-examples-parser
           -pl !org.neo4j:neo4j-cypher-dsl-examples-sdn6
       - name: Archive artifacts
