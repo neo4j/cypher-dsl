@@ -34,6 +34,7 @@
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.examples.driver</java-module-name>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
+		<deploy.examples.drivers.skip>true</deploy.examples.drivers.skip>
 	</properties>
 
 	<dependencyManagement>
@@ -119,7 +120,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-deploy-plugin</artifactId>
 				<configuration>
-					<skip>true</skip>
+					<skip>${deploy.examples.drivers.skip}</skip>
 				</configuration>
 			</plugin>
 			<plugin>
