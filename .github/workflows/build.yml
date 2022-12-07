@@ -13,12 +13,13 @@ jobs:
     outputs:
       revision: ${{ steps.revision_step.outputs.revision }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Required for JQAssistant
       - name: Set up JDK
-        uses: actions/setup-java@v1
+        uses: actions/setup-java@v3
         with:
+          distribution: zulu
           java-version: 17
       - name: Enable Sonar for local PRs not from Dependabot
         if:  ${{ github.event.sender.login != 'dependabot[bot]' && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository) }}
@@ -34,13 +35,13 @@ jobs:
           echo "OLD_VERSION=$(./bin/extract-version.sh latest)" >> $GITHUB_ENV
           echo "::set-output name=revision::$REVISION"
       - name: Cache SonarCloud packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
       - name: Cache Maven packages
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -77,7 +78,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
@@ -100,7 +101,7 @@ jobs:
     steps:
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
@@ -108,8 +109,9 @@ jobs:
           path: repository
       - name: Install dependencies
         run: "mkdir -p $HOME/.m2 && mv $GITHUB_WORKSPACE/repository $HOME/.m2/"
-      - uses: actions/setup-java@v1
+      - uses: actions/setup-java@v3
         with:
+          distribution: zulu
           java-version: ${{ matrix.java }}
       - name: Run Maven build
         run: >
