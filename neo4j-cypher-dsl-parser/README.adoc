@@ -364,12 +364,16 @@ WHERE start.name = 'A' AND finish.name = 'D'
 FOREACH (n IN nodes(p) | SET n.marked = true);
 MATCH (a)
 WHERE a.name = 'Eskil'
-RETURN a.array, filter(x IN a.array WHERE size(x)= 3);
+RETURN a.array, [x IN a.array WHERE size(x)= 3];
 MATCH p =(a)-->(b)-->(c)
 WHERE a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel'
-RETURN extract(n IN nodes(p)| n.age) AS extracted;
+RETURN [n IN nodes(p) | n.age] AS extracted;
 call apoc.cypher.run("CALL apoc.cypher.run('CALL apoc.cypher.run(\"CALL apoc.cypher.run(\\'CALL apoc.cypher.run(\\\\\"RETURN true\\\\\", {}) YIELD value RETURN value\\', {}) YIELD value RETURN value\", {}) YIELD value RETURN value', {}) YIELD value RETURN value", {}) YIELD value RETURN value;
 WITH 1 as year WHERE 2010 <= year <= 2020 RETURN *;
+MATCH (person:Person) WHERE COUNT { (person)-[:HAS_DOG]->(:Dog) } > 1 RETURN person.name AS name;
+MATCH (person:Person) WHERE COUNT { (person)-[:HAS_DOG]->(d:Dog) WHERE d.name = 'Lassie' } > 1 RETURN person.name AS name;
+MATCH (person:Person)
+RETURN person.name, COUNT { (person)-[:HAS_DOG]->(:Dog) } as howManyDogs;
 ----
 
 [[statements-output]]
@@ -433,10 +437,13 @@ MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS {MATCH 
 MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3}) RETURN person.name AS person, company.name AS company
 CALL {MATCH (p:`Person`)-[:`LIKES`]->(:`Technology` {type: 'Java'}) RETURN p UNION MATCH (p:`Person`) WHERE size((p)-[:`IS_FRIENDS_WITH`]->()) > 1 RETURN p} RETURN p.name AS person, p.birthdate AS dob ORDER BY dob DESC
 MATCH p = (start)-[*]->(finish) WHERE (start.name = 'A' AND finish.name = 'D') FOREACH (n IN nodes(p) | SET n.marked = true)
-MATCH (a) WHERE a.name = 'Eskil' RETURN a.array, [x IN a.array WHERE size(x) = 3 | x]
+MATCH (a) WHERE a.name = 'Eskil' RETURN a.array, [x IN a.array WHERE size(x) = 3]
 MATCH p = (a)-->(b)-->(c) WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') RETURN [n IN nodes(p) | n.age] AS extracted
 CALL apoc.cypher.run('CALL apoc.cypher.run(\'CALL apoc.cypher.run(\"CALL apoc.cypher.run(\\\'CALL apoc.cypher.run(\\\\\"RETURN true\\\\\", {}) YIELD value RETURN value\\\', {}) YIELD value RETURN value\", {}) YIELD value RETURN value\', {}) YIELD value RETURN value', {}) YIELD value RETURN value
 WITH 1 AS year WHERE (2010 <= year AND year <= 2020) RETURN *
+MATCH (person:`Person`) WHERE COUNT { (person)-[:`HAS_DOG`]->(:`Dog`) } > 1 RETURN person.name AS name
+MATCH (person:`Person`) WHERE COUNT { (person)-[:`HAS_DOG`]->(d:`Dog`) WHERE d.name = 'Lassie' } > 1 RETURN person.name AS name
+MATCH (person:`Person`) RETURN person.name, COUNT { (person)-[:`HAS_DOG`]->(:`Dog`) } AS howManyDogs
 ----
 
 === Hints

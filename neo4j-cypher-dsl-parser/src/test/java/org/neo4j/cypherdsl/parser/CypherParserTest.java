@@ -206,11 +206,6 @@ class CypherParserTest {
 		void newNumberedParameterShouldWork() {
 			assertExpression("$1", "$1");
 		}
-
-		@Test
-		void oldParametersShouldWork() {
-			assertExpression("{foo}", "$foo");
-		}
 	}
 
 	static void assertExpression(String expression) {
@@ -343,31 +338,31 @@ class CypherParserTest {
 
 	private static Stream<Arguments> inputAndIdentifiableExpressions() {
 		return Stream.of(
-			Arguments.of(
-				"CALL {\n"
-				+ "\tMATCH (p:Person)-[:LIKES]->(:Technology {type: \"Java\"})\n"
-				+ "\tRETURN p\n"
-				+ "\n"
-				+ "\tUNION\n"
-				+ "\n"
-				+ "\tMATCH (p:Person)\n"
-				+ "\tWHERE size((p)-[:IS_FRIENDS_WITH]->()) > 1\n"
-				+ "\tRETURN p\n"
-				+ "}\n"
-				+ "RETURN p.name AS person, p.birthdate AS dob\n"
-				+ "ORDER BY dob DESC",
+			Arguments.of("""
+				CALL {
+					MATCH (p:Person)-[:LIKES]->(:Technology {type: "Java"})
+					RETURN p
+
+					UNION
+
+					MATCH (p:Person)
+					WHERE size((p)-[:IS_FRIENDS_WITH]->()) > 1
+					RETURN p
+				}
+				RETURN p.name AS person, p.birthdate AS dob
+				ORDER BY dob DESC""",
 				List.of("person", "dob")
 			),
-			Arguments.of(
-				"MATCH p=(start)-[*]->(finish)\n"
-				+ "WHERE start.name = 'A' AND finish.f = 'D'\n"
-				+ "FOREACH (n IN nodes(p) | SET n.marked = true)",
+			Arguments.of("""
+				MATCH p=(start)-[*]->(finish)
+				WHERE start.name = 'A' AND finish.f = 'D'
+				FOREACH (n IN nodes(p) | SET n.marked = true)""",
 				List.of("finish", "start", "p")
 			),
-			Arguments.of(
-				"MATCH (a)\n"
-				+ "WHERE a.name = 'Eskil'\n"
-				+ "RETURN a.array, filter(x IN a.array WHERE size(x)= 3)",
+			Arguments.of("""
+				MATCH (a)
+				WHERE a.name = 'Eskil'
+				RETURN a.array, [x IN a.array WHERE size(x) = 3]""",
 				List.of("a.array")
 			)
 		);

@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -54,7 +56,9 @@ import org.neo4j.cypher.internal.ast.factory.SimpleEither;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
+import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Conditions;
+import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.ExposesPatternLengthAccessors;
 import org.neo4j.cypherdsl.core.ExposesProperties;
@@ -67,6 +71,7 @@ import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.MapProjection;
+import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.NamedPath;
 import org.neo4j.cypherdsl.core.Node;
@@ -85,9 +90,12 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.StatementBuilder;
 import org.neo4j.cypherdsl.core.StringLiteral;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * An implementation of Neo4j's {@link ASTFactory} that creates Cypher-DSL AST elements that can be used for creating
@@ -106,8 +114,8 @@ final class CypherDslASTFactory implements ASTFactory<
 		List<Expression>,
 		SortItem,
 		PatternElement,
-	NodeAtom,
-	PathAtom,
+		NodeAtom,
+		PathAtom,
 		PathLength,
 		Clause,
 		Expression,
@@ -115,7 +123,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		Expression,
 		Hint,
 		Expression,
-	LabelsOrTypes, // LABEL_EXPRESSION
+		LabelsOrTypes,
 		Parameter<?>,
 		Expression,
 		Property,
@@ -140,9 +148,9 @@ final class CypherDslASTFactory implements ASTFactory<
 		InputPosition,
 		EntityType,
 		NULL,
-	PatternAtom,
-	DatabaseName
-		> {
+		PatternAtom,
+		DatabaseName> {
+
 	private static CypherDslASTFactory instanceFromDefaultOptions;
 
 	static CypherDslASTFactory getInstance(Options options) {
@@ -1323,12 +1331,60 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression existsExpression(InputPosition p, List<PatternElement> patternElements, Statement q, Where where) {
-		throw new UnsupportedOperationException();
+
+		Where where0 = where;
+		List<PatternElement> patternElements0 = patternElements;
+
+		if (patternElements0 == null && q != null) {
+			AtomicReference<Where> capturedWhere = new AtomicReference<>();
+			AtomicBoolean inMatch = new AtomicBoolean();
+			AtomicReference<PatternElement> inPattern = new AtomicReference<>();
+			List<PatternElement> capturedElements = new ArrayList<>();
+			q.accept(new Visitor() {
+				@Override
+				public void enter(Visitable segment) {
+					inMatch.compareAndSet(false, segment instanceof Match);
+					if (!inMatch.get() || capturedWhere.get() != null) {
+						return;
+					}
+
+					if (segment instanceof Where innerWhere) {
+						capturedWhere.compareAndSet(null, innerWhere);
+					} else if (segment instanceof PatternElement patternElement && inPattern.compareAndSet(null, patternElement)) {
+						capturedElements.add(patternElement);
+					}
+				}
+
+				@Override
+				public void leave(Visitable segment) {
+					inMatch.compareAndSet(true, !(segment instanceof Match));
+					if (segment instanceof PatternElement patternElement) {
+						inPattern.compareAndSet(patternElement, null);
+					}
+				}
+			});
+			patternElements0 = capturedElements;
+			where0 = capturedWhere.get();
+		}
+
+		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(patternElements0);
+		if (where0 != null) {
+			var capturedCondition = new AtomicReference<Condition>();
+			where0.accept(segment -> {
+				if (segment instanceof Condition condition) {
+					capturedCondition.compareAndSet(null, condition);
+				}
+			});
+			return match.where(capturedCondition.get()).asCondition();
+		} else {
+			return match.asCondition();
+		}
 	}
 
 	@Override
 	public Expression countExpression(InputPosition p, List<PatternElement> patternElements, Expression where) {
-		throw new UnsupportedOperationException();
+
+		return CountExpression.of(patternElements, Optional.ofNullable(where));
 	}
 
 	@Override
