@@ -30,9 +30,9 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  * @soundtrack Pink Floyd - The Division Bell
  * @since 2021.3.0
  */
-final class PathDetails {
+final class PathAtom implements PatternAtom {
 
-	static PathDetails of(SymbolicName name, PathLength length, boolean left, boolean right,
+	static PathAtom of(SymbolicName name, PathLength length, boolean left, boolean right,
 		String[] relTypes, MapExpression properties) {
 
 		if (left && right) {
@@ -48,7 +48,7 @@ final class PathDetails {
 			direction = Direction.UNI;
 		}
 
-		return new PathDetails(name, length, direction, relTypes, properties);
+		return new PathAtom(name, length, direction, relTypes, properties);
 	}
 
 	private final SymbolicName name;
@@ -61,7 +61,7 @@ final class PathDetails {
 
 	private final MapExpression properties;
 
-	private PathDetails(SymbolicName name, PathLength length, Direction direction, String[] types,
+	private PathAtom(SymbolicName name, PathLength length, Direction direction, String[] types,
 		MapExpression properties) {
 		this.name = name;
 		this.length = length;

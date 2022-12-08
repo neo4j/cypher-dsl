@@ -34,6 +34,7 @@ import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Condition;
+import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.Delete;
 import org.neo4j.cypherdsl.core.ExistentialSubquery;
@@ -865,6 +866,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 	}
 
+	void enter(CountExpression countExpression) {
+		builder.append("COUNT { ");
+	}
+
+	void leave(CountExpression countExpression) {
+		builder.append(" }");
+	}
 
 	@Override
 	public String getRenderedContent() {

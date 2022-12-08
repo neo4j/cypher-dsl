@@ -21,14 +21,17 @@ package org.neo4j.cypherdsl.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.neo4j.cypherdsl.core.Cypher;
 
 /**
  * @author Michael J. Simons
@@ -49,12 +52,34 @@ class CypherDslASTFactoryTest {
 		assertThat(parameter.isAnon()).isFalse();
 	}
 
+	@Test
+	void databaseName() {
+		var factory = CypherDslASTFactory.getInstance(null);
+		var databaseName = factory.databaseName(null, List.of("x"));
+		assertThat(databaseName).isNotNull();
+
+		databaseName = factory.databaseName(null, List.of("x", "y"));
+		assertThat(databaseName).isNotNull();
+
+		var parameter = Cypher.parameter("foo");
+		databaseName = factory.databaseName(parameter);
+		assertThat(databaseName).isNotNull();
+		assertThat(databaseName.value()).isEqualTo(parameter);
+
+		var empty = List.<String>of();
+		assertThatIllegalArgumentException().isThrownBy(() -> factory.databaseName(null, empty))
+			.withMessage("No database name");
+	}
+
 	@Nested
 	class HandleNewMethods {
 
 		@ParameterizedTest
-		@ValueSource(strings = { "showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
-			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias" })
+		@ValueSource(strings = {"showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
+			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias", "intervalPathQuantifier", "fixedPathQuantifier", "plusPathQuantifier",
+			"starPathQuantifier", "parenthesizedPathPattern", "quantifiedRelationship", "useGraph", "setOwnPassword",
+			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
+			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
 			var methods = factory.getClass().getMethods();
