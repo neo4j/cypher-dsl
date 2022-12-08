@@ -1,5 +1,24 @@
 == 2022.8
 
+=== 2022.8.1
+
+==== 🔄️ Refactorings
+
+* Apply learnings from full JDK 17 migrations.
+* Prevent usage of `REMOVE` item inside `SET` clause (during RT). (#506)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump checker-qual from 3.27.0 to 3.28.0 (#517)
+** Bump compile-testing from 0.19 to 0.20 (#516)
+** Bump native-maven-plugin from 0.9.18 to 0.9.19 (#515)
+** Bump joda-time from 2.12.1 to 2.12.2 (#514)
+** Bump jackson-bom from 2.14.0 to 2.14.1 (#513)
+** Bump archunit from 1.0.0 to 1.0.1 (#512)
+** Bump native-maven-plugin from 0.9.17 to 0.9.18 (#511)
+** Bump checkstyle from 10.4 to 10.5.0 (#510)
+
 === 2022.8.0
 
 ==== 🚀 Features
