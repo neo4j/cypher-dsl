@@ -53,8 +53,11 @@ class CypherDslASTFactoryTest {
 	class HandleNewMethods {
 
 		@ParameterizedTest
-		@ValueSource(strings = { "showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
-			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias" })
+		@ValueSource(strings = {"showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
+			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias", "intervalPathQuantifier", "fixedPathQuantifier", "plusPathQuantifier",
+			"starPathQuantifier", "parenthesizedPathPattern", "quantifiedRelationship", "useGraph", "setOwnPassword",
+			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
+			"startDatabase", "stopDatabase"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
 			var methods = factory.getClass().getMethods();

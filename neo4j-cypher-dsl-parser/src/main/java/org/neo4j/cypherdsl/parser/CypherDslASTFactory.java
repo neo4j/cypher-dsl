@@ -530,36 +530,44 @@ final class CypherDslASTFactory implements ASTFactory<
 				case UNI -> relationshipPattern.relationshipBetween(nodes.get(i), pathAtom.getTypes());
 			};
 
-			if (pathAtom.getName() != null) {
-				if (relationshipPattern instanceof Relationship relationship) {
-					relationshipPattern = relationship.named(pathAtom.getName());
-				} else {
-					relationshipPattern = ((RelationshipChain) relationshipPattern).named(pathAtom.getName());
-				}
-			}
+			relationshipPattern = applyOptionalName(relationshipPattern, pathAtom);
 
-			if (pathAtom.getProperties() != null) {
-				if (relationshipPattern instanceof ExposesProperties) {
-					relationshipPattern = (ExposesRelationships<?>) ((ExposesProperties<?>) relationshipPattern)
-						.withProperties(pathAtom.getProperties());
-				} else {
-					relationshipPattern = ((RelationshipChain) relationshipPattern)
-						.properties(pathAtom.getProperties());
-				}
-			}
+			relationshipPattern = applyOptionalProperties(relationshipPattern, pathAtom);
 
-			if (length != null) {
-				if (length.isUnbounded()) {
-					relationshipPattern = ((ExposesPatternLengthAccessors<?>) relationshipPattern)
-						.unbounded();
-				} else {
-					relationshipPattern = ((ExposesPatternLengthAccessors<?>) relationshipPattern)
-						.length(length.getMinimum(), length.getMaximum());
-				}
-			}
+			relationshipPattern = applyOptionalLength(relationshipPattern, length);
 		}
 
 		return (PatternElement) relationshipPattern;
+	}
+
+	private static ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern, PathLength length) {
+		if (length == null) {
+			return relationshipPattern;
+		}
+		if (length.isUnbounded()) {
+			return ((ExposesPatternLengthAccessors<?>) relationshipPattern).unbounded();
+		}
+		return ((ExposesPatternLengthAccessors<?>) relationshipPattern).length(length.getMinimum(), length.getMaximum());
+	}
+
+	private static ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
+		if (pathAtom.getProperties() == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof ExposesProperties<?> exposesProperties) {
+			return (ExposesRelationships<?>) exposesProperties.withProperties(pathAtom.getProperties());
+		}
+		return ((RelationshipChain) relationshipPattern).properties(pathAtom.getProperties());
+	}
+
+	private static ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
+		if (pathAtom.getName() == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof Relationship relationship) {
+			return relationship.named(pathAtom.getName());
+		}
+		return ((RelationshipChain) relationshipPattern).named(pathAtom.getName());
 	}
 
 	@Override
@@ -1367,18 +1375,21 @@ final class CypherDslASTFactory implements ASTFactory<
 			where0 = capturedWhere.get();
 		}
 
+		return existsExpression0(where0, patternElements0);
+	}
+
+	private static Condition existsExpression0(Where where0, List<PatternElement> patternElements0) {
 		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(patternElements0);
-		if (where0 != null) {
-			var capturedCondition = new AtomicReference<Condition>();
-			where0.accept(segment -> {
-				if (segment instanceof Condition condition) {
-					capturedCondition.compareAndSet(null, condition);
-				}
-			});
-			return match.where(capturedCondition.get()).asCondition();
-		} else {
+		if (where0 == null) {
 			return match.asCondition();
 		}
+		var capturedCondition = new AtomicReference<Condition>();
+		where0.accept(segment -> {
+			if (segment instanceof Condition condition) {
+				capturedCondition.compareAndSet(null, condition);
+			}
+		});
+		return match.where(capturedCondition.get()).asCondition();
 	}
 
 	@Override
