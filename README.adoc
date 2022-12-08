@@ -95,11 +95,7 @@ class SimpleExample {
 
 === Required Java Version
 
-The minimal required Java version to use the Cypher-DSL core module is *Java 8*.
-The reason for staying on JDK 8 is the fact that the Cypher-DSL is widely used in https://github.com/spring-projects/spring-data-neo4j[Spring Data Neo4j 6+].
-Spring Data Neo4j shares JDK 8 as baseline with the Spring Framework until Spring Framework 6 is released.
-
-The minimal required JDK version to build the Cypher-DSL is *JDK 11*. To build the native examples, GraalVM 11 is required.
+From version 2023.0.0 onwards, the minimal required Java version to use and build the Cypher-DSL is *Java 17*. If you need a version that is compatible with Java 8, please use 2022.8.x.
 
 == Licensing
 
