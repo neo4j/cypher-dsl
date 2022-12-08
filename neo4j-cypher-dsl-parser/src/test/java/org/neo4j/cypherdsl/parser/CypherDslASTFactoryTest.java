@@ -39,6 +39,30 @@ import org.neo4j.cypherdsl.core.Cypher;
 class CypherDslASTFactoryTest {
 
 	@Test
+	void isInstanceOfCheckShouldWork() {
+
+		assertThatIllegalArgumentException().isThrownBy(() -> CypherDslASTFactory.isInstanceOf(null, null, null))
+			.withMessage("Type to check against must not be null");
+
+		assertThatIllegalArgumentException().isThrownBy(() -> CypherDslASTFactory.isInstanceOf(String.class, 42, "Not the answer"))
+			.withMessage("Not the answer");
+	}
+
+	@Test
+	void infinityLiteralShouldWork() {
+
+		var factory = CypherDslASTFactory.getInstance(null);
+		assertThat(factory.newInfinityLiteral(null)).isEqualTo(InfinityLiteral.INSTANCE);
+	}
+
+	@Test
+	void nanLiteralShouldWork() {
+
+		var factory = CypherDslASTFactory.getInstance(null);
+		assertThat(factory.newNaNLiteral(null)).isEqualTo(NaNLiteral.INSTANCE);
+	}
+
+	@Test
 	void parameterLiteralNullExpressionShouldWork() {
 		var parameter = CypherDslASTFactory.parameterFromSymbolicName(null);
 		assertThat(parameter).isNotNull();
@@ -79,7 +103,9 @@ class CypherDslASTFactoryTest {
 			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias", "intervalPathQuantifier", "fixedPathQuantifier", "plusPathQuantifier",
 			"starPathQuantifier", "parenthesizedPathPattern", "quantifiedRelationship", "useGraph", "setOwnPassword",
 			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
-			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter"})
+			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter",
+			"labelNegation", "labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",
+			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
 			var methods = factory.getClass().getMethods();

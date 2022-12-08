@@ -200,7 +200,7 @@ final class CypherDslASTFactory implements ASTFactory<
 			.toArray(new String[0]);
 	}
 
-	private static void isInstanceOf(Class<?> type, Object obj, String message) {
+	static void isInstanceOf(Class<?> type, Object obj, String message) {
 		if (type == null) {
 			throw new IllegalArgumentException("Type to check against must not be null");
 		}
