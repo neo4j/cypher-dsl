@@ -1,21 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-| Copyright (c) 2019-2022 "Neo4j,"
-| Neo4j Sweden AB [https://neo4j.com]
-|
-| This file is part of Neo4j.
-|
-| Licensed under the Apache License, Version 2.0 (the "License");
-| you may not use this file except in compliance with the License.
-| You may obtain a copy of the License at
-|
-|     https://www.apache.org/licenses/LICENSE-2.0
-|
-| Unless required by applicable law or agreed to in writing, software
-| distributed under the License is distributed on an "AS IS" BASIS,
-| WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-| See the License for the specific language governing permissions and
-| limitations under the License.
+
+    Copyright (c) "Neo4j"
+    Neo4j Sweden AB [http://neo4j.com]
+
+    This file is part of Neo4j.
+
+    Neo4j is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
@@ -35,10 +38,29 @@
 	<name>Examples (SDN 6 Code generator)</name>
 	<description>Example how to use the SDN 6 code generator.</description>
 
+	<licenses>
+		<license>
+			<name>GNU General Public License, Version 3</name>
+			<url>http://www.gnu.org/licenses/gpl-3.0-standalone.html</url>
+			<comments>The software ("Software") developed and owned by Neo4j Sweden AB (referred to in this notice as "Neo4j") is
+				licensed under the GNU GENERAL PUBLIC LICENSE Version 3 to all third
+				parties and that license is included below.
+
+				However, if you have executed an End User Software License and Services
+				Agreement or an OEM Software License and Support Services Agreement, or
+				another commercial license agreement with Neo4j or one of its
+				affiliates (each, a "Commercial Agreement"), the terms of the license in
+				such Commercial Agreement will supersede the GNU GENERAL PUBLIC LICENSE
+				Version 3 and you may use the Software solely pursuant to the terms of
+				the relevant Commercial Agreement.</comments>
+		</license>
+	</licenses>
+
 	<properties>
 		<checkstyle.version>10.5.0</checkstyle.version>
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>17</java.version>
+		<license-maven-plugin.version>4.2.rc2</license-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.2.0</maven-checkstyle-plugin.version>
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
@@ -115,6 +137,57 @@
 			<!-- end::sdn-processor[] -->
 
 			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>${license-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>check</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<header>etc/license-gpl.tpl</header>
+					<strictCheck>true</strictCheck>
+					<mapping>
+						<factories>SCRIPT_STYLE</factories>
+					</mapping>
+					<properties>
+						<year>2022</year>
+					</properties>
+					<includes>
+						<include>**</include>
+					</includes>
+					<excludes>
+						<exclude>**/.flattened-pom.xml</exclude>
+					</excludes>
+					<dependencyEnforce>true</dependencyEnforce>
+					<dependencyExceptionMessage>One or more dependencies are licensed under a non-approved license.</dependencyExceptionMessage>
+					<dependencyPolicies>
+						<!-- Apache 2 -->
+						<dependencyPolicy>
+							<type>LICENSE_URL</type>
+							<rule>APPROVE</rule>
+							<value>https://www.apache.org/licenses/LICENSE-2.0</value>
+						</dependencyPolicy>
+						<dependencyPolicy>
+							<type>LICENSE_NAME</type>
+							<rule>APPROVE</rule>
+							<value>The Apache Software License, Version 2.0</value>
+						</dependencyPolicy>
+						<!-- This is ourselves.  -->
+						<dependencyPolicy>
+							<type>ARTIFACT_PATTERN</type>
+							<rule>APPROVE</rule>
+							<value>org.neo4j:neo4j-cypher-dsl-parser*</value>
+						</dependencyPolicy>
+					</dependencyPolicies>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>${maven-checkstyle-plugin.version}</version>
@@ -128,8 +201,7 @@
 				<configuration>
 					<configLocation>../../etc/checkstyle/config.xml</configLocation>
 					<suppressionsLocation>../../etc/checkstyle/suppressions.xml</suppressionsLocation>
-					<headerLocation>../../etc/checkstyle/java-header.txt</headerLocation>
-					<encoding>${project.build.sourceEncoding}</encoding>
+					<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
 					<consoleOutput>true</consoleOutput>
 					<failsOnError>true</failsOnError>
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
