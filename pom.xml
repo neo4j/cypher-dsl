@@ -132,7 +132,7 @@
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.28.0</checker-qual.version>
 		<checkstyle.version>10.5.0</checkstyle.version>
-		<compile-testing.version>0.20</compile-testing.version>
+		<compile-testing.version>0.21.0</compile-testing.version>
 		<covered-ratio-complexity>0.75</covered-ratio-complexity>
 		<covered-ratio-instructions>0.75</covered-ratio-instructions>
 		<cypher-dsl.version.next />
