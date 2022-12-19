@@ -1340,6 +1340,25 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Expression existsExpression(InputPosition p, List<PatternElement> patternElements, Statement q, Where where) {
 
+		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
+		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(elementsAndWhere.elements());
+		if (elementsAndWhere.where() == null) {
+			return match.asCondition();
+		}
+		var capturedCondition = new AtomicReference<Condition>();
+		elementsAndWhere.where.accept(segment -> {
+			if (segment instanceof Condition condition) {
+				capturedCondition.compareAndSet(null, condition);
+			}
+		});
+		return match.where(capturedCondition.get()).asCondition();
+	}
+
+	record ElementsAndWhere(List<PatternElement> elements, Where where) {
+	}
+
+	private ElementsAndWhere extractElementsAndWhere(List<PatternElement> patternElements, Statement q, Where where) {
+
 		Where where0 = where;
 		List<PatternElement> patternElements0 = patternElements;
 
@@ -1375,27 +1394,26 @@ final class CypherDslASTFactory implements ASTFactory<
 			where0 = capturedWhere.get();
 		}
 
-		return existsExpression0(where0, patternElements0);
-	}
-
-	private static Condition existsExpression0(Where where0, List<PatternElement> patternElements0) {
-		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(patternElements0);
-		if (where0 == null) {
-			return match.asCondition();
-		}
-		var capturedCondition = new AtomicReference<Condition>();
-		where0.accept(segment -> {
-			if (segment instanceof Condition condition) {
-				capturedCondition.compareAndSet(null, condition);
-			}
-		});
-		return match.where(capturedCondition.get()).asCondition();
+		return new ElementsAndWhere(patternElements0, where0);
 	}
 
 	@Override
-	public Expression countExpression(InputPosition p, List<PatternElement> patternElements, Expression where) {
+	public Expression countExpression(InputPosition p, List<PatternElement> patternElements, Statement q, Where where) {
 
-		return CountExpression.of(patternElements, Optional.ofNullable(where));
+		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
+		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(elementsAndWhere.elements());
+		Expression condition = null;
+		if (elementsAndWhere.where() != null) {
+			var capturedCondition = new AtomicReference<Condition>();
+			elementsAndWhere.where.accept(segment -> {
+				if (segment instanceof Condition nestedCondition) {
+					capturedCondition.compareAndSet(null, nestedCondition);
+				}
+			});
+			condition = capturedCondition.get();
+		}
+
+		return CountExpression.of(elementsAndWhere.elements(), Optional.ofNullable(condition));
 	}
 
 	@Override
