@@ -1401,7 +1401,6 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Expression countExpression(InputPosition p, List<PatternElement> patternElements, Statement q, Where where) {
 
 		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
-		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(elementsAndWhere.elements());
 		Expression condition = null;
 		if (elementsAndWhere.where() != null) {
 			var capturedCondition = new AtomicReference<Condition>();
