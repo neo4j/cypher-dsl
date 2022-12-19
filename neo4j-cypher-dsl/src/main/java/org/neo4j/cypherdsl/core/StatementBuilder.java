@@ -172,7 +172,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReading
-		extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate,
+		extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate, ExposesMatch,
 		ExposesCall<OngoingInQueryCallWithoutArguments>, ExposesSubqueryCall {
 	}
 

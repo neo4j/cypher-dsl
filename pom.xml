@@ -620,6 +620,9 @@
 								 | Those are shaded classes from Neo4j and we work around their changes.
 								 -->
 								<exclude>org.neo4j.cypherdsl.parser.internal</exclude>
+
+								<!-- 2022.8.2, Not to be implemented by users, also a bug fix as it has been oversight -->
+								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$OngoingReading</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
