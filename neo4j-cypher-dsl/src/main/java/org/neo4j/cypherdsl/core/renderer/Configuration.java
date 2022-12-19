@@ -123,7 +123,8 @@ public final class Configuration {
 		}
 
 		/**
-		 * Enables or disables pretty printing
+		 * Enables or disables pretty printing. Enabling pretty printing will disable unnecessary escaping of labels and types.
+		 *
 		 * @param prettyPrint use {@literal true} for enabling pretty printing
 		 * @return this builder
 		 */
