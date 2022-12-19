@@ -31,6 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -1407,5 +1408,20 @@ class IssueRelatedIT {
 			.getCypher();
 
 		assertThat(correctQuery).isEqualTo("MATCH (n:`Wine`) WHERE id(n) = 1 REMOVE n:`Drink` RETURN id(n) AS id");
+	}
+
+	@Test // GH-524
+	void unwindWithoutWith() {
+
+		SymbolicName id = Cypher.name("id");
+		Node n = Cypher.node("Person").named("n");
+		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
+		Statement statement = Cypher.unwind(Cypher.parameter("ids"))
+			.as(id)
+			.match(n)
+			.where(n.elementId().isEqualTo(id))
+			.returning(n)
+			.build();
+		assertThat(renderer.render(statement)).isEqualTo("UNWIND $ids AS id MATCH (n:`Person`) WHERE elementId(n) = id RETURN n");
 	}
 }
