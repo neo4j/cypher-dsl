@@ -1,5 +1,29 @@
 == 2022.8
 
+=== 2022.8.2
+
+Thanks to @ikwattro from @graphaware for investing his time and creating valuable tickets for this release.
+
+==== 🐛 Bug Fixes
+
+* Allow `match` after unwind as defined by OpenCypher. (#531)
+
+==== 📝 Documentation
+
+* Make clear that pretty printing does not always escape names
+
+==== 🛠 Build
+
+* Upgrade various actions to non-deprecated versions. (#519)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump annotations from 23.0.0 to 23.1.0 (#521)
+** Bump compile-testing from 0.20 to 0.21.0 (#526)
+** Bump reactor-bom from 2022.0.0 to 2022.0.1 (#527)
+** Bump mockito.version from 4.9.0 to 4.10.0 (#528)
+
 === 2022.8.1
 
 ==== 🔄️ Refactorings
