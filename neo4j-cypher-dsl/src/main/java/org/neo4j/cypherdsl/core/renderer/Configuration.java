@@ -119,6 +119,12 @@ public final class Configuration {
 			return new Builder();
 		}
 
+		/**
+		 * Enables or disables pretty printing. Enabling pretty printing will disable unnecessary escaping of labels and types.
+		 *
+		 * @param prettyPrint use {@literal true} for enabling pretty printing
+		 * @return this builder
+		 */
 		public Builder withPrettyPrint(boolean prettyPrint) {
 			this.prettyPrint = prettyPrint;
 			if (this.prettyPrint) {
