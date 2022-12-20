@@ -30,11 +30,16 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * @author Michael J. Simons
  */
 class UseIT {
+
+	private final Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
 
 	@ParameterizedTest
 	@CsvSource(textBlock = """
@@ -92,4 +97,32 @@ class UseIT {
 			.returning(Cypher.name("movie").property("title").as("title")).build().getCypher();
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+	@Test
+	void useBeforeCall() {
+
+		var innerStatement = Cypher.call(Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build())
+			.returning("movie")
+			.build();
+		var cypher = Cypher.use("cineasts.latest", innerStatement).getCypher();
+		assertThat(cypher).isEqualTo("USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
+	}
+
+	@Test
+	void useBeforeCallWithCallInTx() {
+
+		var title = Cypher.name("title");
+		var movie = Cypher.node("Movie", Cypher.mapOf("title", title)).named("m");
+		var innerStatement = Cypher
+			.unwind(Cypher.parameter("newMovies")).as(title)
+			.call(
+				Cypher.with(title).
+				merge(movie).returning(movie.elementId().as("id")).build()
+			).returning("id")
+			.build();
+		var cypher = renderer.render(Cypher.use("cineasts.latest", innerStatement));
+		assertThat(cypher).isEqualTo("USE cineasts.latest UNWIND $newMovies AS title CALL {WITH title MERGE (m:`Movie` {title: title}) RETURN elementId(m) AS id} RETURN id");
+	}
+
+	// TODO Decorating decorated statements
 }
