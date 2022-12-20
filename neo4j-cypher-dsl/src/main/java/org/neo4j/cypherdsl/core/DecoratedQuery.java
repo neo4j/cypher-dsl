@@ -38,7 +38,7 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 		EXPLAIN, PROFILE
 	}
 
-	private final Decoration decoration;
+	private final Visitable decoration;
 	private final Statement target;
 
 	static DecoratedQuery explain(Statement target) {
@@ -64,7 +64,12 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 		return new DecoratedQuery(target, decoration);
 	}
 
-	private DecoratedQuery(Statement target, Decoration decoration) {
+	static DecoratedQuery decorate(Statement target, Use use) {
+
+		return new DecoratedQuery(target, use);
+	}
+
+	private DecoratedQuery(Statement target, Visitable decoration) {
 		this.decoration = decoration;
 		this.target = target;
 	}
@@ -76,9 +81,17 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 		this.target.accept(visitor);
 	}
 
+	@Override
+	public boolean doesReturnOrYield() {
+		if (this.decoration instanceof Use) {
+			return this.target.doesReturnOrYield();
+		}
+		return super.doesReturnOrYield();
+	}
+
 	/**
 	 * Only profiled queries can have a result statement.
-	 * Explained queries are only useful with {@link org.neo4j.cypherdsl.core.executables.ExecutableStatement#executeWith(org.neo4j.driver.QueryRunner)}.
+	 * Explained queries are only useful with {@link org.neo4j.cypherdsl.core.executables.ExecutableStatement#executeWith(org.neo4j.driver.SimpleQueryRunner)}.
 	 */
 	static final class DecoratedQueryWithResult extends DecoratedQuery implements ResultStatement {
 

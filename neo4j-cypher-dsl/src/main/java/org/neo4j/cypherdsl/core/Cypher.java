@@ -34,6 +34,8 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.Clauses.DynamicUseClause;
+import org.neo4j.cypherdsl.core.Clauses.StaticUseClause;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
@@ -1211,6 +1213,59 @@ public final class Cypher {
 	 */
 	public static String format(Expression expression) {
 		return Expressions.format(expression);
+	}
+
+	/**
+	 * Decorates the given statement by prepending a static {@literal USE} clause.
+	 *
+	 * @param target    The target. This might be a single database or a constituent of a composite database. This value
+	 *                  will be escaped if necessary. If it contains a {@literal .}, both the first and second part will
+	 *                  be escaped individually.
+	 * @param statement The statement to decorate
+	 * @return The new statement
+	 * @since 2023.0.0
+	 */
+	public static Statement use(String target, Statement statement) {
+		return DecoratedQuery.decorate(statement, new StaticUseClause(target));
+	}
+
+	/**
+	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
+	 * utilize {@code graph.byName} to resolve the target database.
+	 *
+	 * @param target    A parameter that must resolve to a Cypher string.
+	 * @param statement The statement to decorate
+	 * @return The new statement
+	 * @since 2023.0.0
+	 */
+	public static Statement use(Parameter<?> target, Statement statement) {
+		return DecoratedQuery.decorate(statement, new DynamicUseClause(target));
+	}
+
+	/**
+	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
+	 * utilize {@code graph.byName} to resolve the target database.
+	 *
+	 * @param target    A string expression
+	 * @param statement The statement to decorate
+	 * @return The new statement
+	 * @since 2023.0.0
+	 */
+	public static Statement use(StringLiteral target, Statement statement) {
+		return DecoratedQuery.decorate(statement, new DynamicUseClause(target));
+	}
+
+	/**
+	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
+	 * utilize {@code graph.byName} to resolve the target database.
+	 *
+	 * @param target    The name of a variable pointing to the graph or constituent
+	 * @param statement The statement to decorate
+	 * @return The new statement
+	 * @since 2023.0.0
+	 */
+	public static Statement use(SymbolicName target, Statement statement) {
+		return DecoratedQuery.decorate(statement, new DynamicUseClause(target));
 	}
 
 	/**

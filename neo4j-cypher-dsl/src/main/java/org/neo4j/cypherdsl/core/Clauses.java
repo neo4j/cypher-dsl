@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
@@ -28,10 +30,12 @@ import java.util.stream.Collectors;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
 
 /**
  * Builder / factory for various {@link Clause clauses}. It's mostly useful for building a Cypher-DSL AST
@@ -232,6 +236,67 @@ public final class Clauses {
 			"Only updating clauses SET, REMOVE, CREATE, MERGE, DELETE, and FOREACH are allowed as clauses applied inside FOREACH.");
 		return new Foreach(v, list,
 			updatingClauses.stream().map(UpdatingClause.class::cast).collect(Collectors.toList()));
+	}
+
+	/**
+	 * A static use-clause with a fixed target name.
+	 */
+	static final class StaticUseClause implements Use {
+
+		private final String target;
+
+		StaticUseClause(String target) {
+			var components = target.split("\\.");
+			if (components.length == 1) {
+				this.target = SchemaNames.sanitize(components[0], false).orElseThrow();
+			} else {
+				this.target = SchemaNames.sanitize(components[0], false)
+					.flatMap(composite -> SchemaNames.sanitize(components[1], false).map(v -> composite + "." + v))
+					.orElseThrow();
+			}
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+			visitor.enter(this);
+			if (visitor instanceof Appendable appendable) {
+				try {
+					appendable.append(target);
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			}
+			visitor.leave(this);
+		}
+
+	}
+
+	/**
+	 * A dynamic use clause that will resolve an expression.
+	 */
+	static final class DynamicUseClause implements Use {
+
+		private final Expression target;
+
+		DynamicUseClause(Expression target) {
+			this.target = target;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+			visitor.enter(this);
+			if (visitor instanceof Appendable appendable) {
+				try {
+					appendable.append("graph.byName(");
+					target.accept(visitor);
+					appendable.append(")");
+				} catch (IOException e) {
+					throw new UncheckedIOException(e);
+				}
+			}
+
+			visitor.leave(this);
+		}
 	}
 
 	/**

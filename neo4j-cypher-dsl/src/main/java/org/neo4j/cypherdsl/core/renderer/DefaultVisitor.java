@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayDeque;
@@ -73,6 +74,7 @@ import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.Unwind;
+import org.neo4j.cypherdsl.core.Use;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
@@ -113,7 +115,7 @@ import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
  */
 @SuppressWarnings({ "unused", "squid:S1172" })
 @RegisterForReflection
-class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
+class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor, Appendable {
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
@@ -874,6 +876,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" }");
 	}
 
+	void enter(Use use) {
+		builder.append("USE ");
+	}
+
+	void leave(Use use) {
+		builder.append(" ");
+	}
+
 	@Override
 	public String getRenderedContent() {
 		return this.builder.toString();
@@ -894,5 +904,20 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	protected final String escapeIfNecessary(String potentiallyNonIdentifier) {
 
 		return SchemaNames.sanitize(potentiallyNonIdentifier, false).orElse(null);
+	}
+
+	@Override
+	public Appendable append(CharSequence csq) throws IOException {
+		return builder.append(csq);
+	}
+
+	@Override
+	public Appendable append(CharSequence csq, int start, int end) throws IOException {
+		return builder.append(csq, start, end);
+	}
+
+	@Override
+	public Appendable append(char c) throws IOException {
+		return builder.append(c);
 	}
 }
