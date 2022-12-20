@@ -34,8 +34,6 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.neo4j.cypherdsl.core.Clauses.DynamicUseClause;
-import org.neo4j.cypherdsl.core.Clauses.StaticUseClause;
 import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
@@ -1226,7 +1224,7 @@ public final class Cypher {
 	 * @since 2023.0.0
 	 */
 	public static Statement use(String target, Statement statement) {
-		return DecoratedQuery.decorate(statement, new StaticUseClause(target));
+		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
 	}
 
 	/**
@@ -1239,7 +1237,7 @@ public final class Cypher {
 	 * @since 2023.0.0
 	 */
 	public static Statement use(Parameter<?> target, Statement statement) {
-		return DecoratedQuery.decorate(statement, new DynamicUseClause(target));
+		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
 	}
 
 	/**
@@ -1252,7 +1250,7 @@ public final class Cypher {
 	 * @since 2023.0.0
 	 */
 	public static Statement use(StringLiteral target, Statement statement) {
-		return DecoratedQuery.decorate(statement, new DynamicUseClause(target));
+		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
 	}
 
 	/**
@@ -1265,7 +1263,7 @@ public final class Cypher {
 	 * @since 2023.0.0
 	 */
 	public static Statement use(SymbolicName target, Statement statement) {
-		return DecoratedQuery.decorate(statement, new DynamicUseClause(target));
+		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
 	}
 
 	/**
