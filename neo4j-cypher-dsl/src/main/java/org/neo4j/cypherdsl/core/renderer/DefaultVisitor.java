@@ -73,8 +73,10 @@ import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.Unwind;
+import org.neo4j.cypherdsl.core.Use;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -95,7 +97,6 @@ import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Strings;
-import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
 
 /**
  * This is a simple (some would call it naive) implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -874,6 +875,20 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" }");
 	}
 
+	void enter(Use use) {
+		builder.append("USE ");
+		if (use.dynamic()) {
+			builder.append("graph.byName(");
+		}
+	}
+
+	void leave(Use use) {
+		if (use.dynamic()) {
+			builder.append(")");
+		}
+		builder.append(" ");
+	}
+
 	@Override
 	public String getRenderedContent() {
 		return this.builder.toString();
@@ -888,11 +903,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	protected final Optional<String> escapeName(String unescapedName) {
 
-		return SchemaNames.sanitize(unescapedName, alwaysEscapeNames);
+		return SchemaNamesBridge.sanitize(unescapedName, alwaysEscapeNames);
 	}
 
 	protected final String escapeIfNecessary(String potentiallyNonIdentifier) {
 
-		return SchemaNames.sanitize(potentiallyNonIdentifier, false).orElse(null);
+		return SchemaNamesBridge.sanitize(potentiallyNonIdentifier, false).orElse(null);
 	}
 }

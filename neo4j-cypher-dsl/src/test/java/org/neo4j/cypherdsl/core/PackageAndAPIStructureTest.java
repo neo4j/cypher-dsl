@@ -19,6 +19,8 @@
 package org.neo4j.cypherdsl.core;
 
 import static com.tngtech.archunit.base.DescribedPredicate.not;
+import static com.tngtech.archunit.core.domain.JavaAccess.Predicates.targetOwner;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.assignableTo;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
 import static com.tngtech.archunit.core.domain.properties.HasModifiers.Predicates.modifier;
@@ -33,6 +35,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
+import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
 
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
@@ -116,4 +120,14 @@ class PackageAndAPIStructureTest {
 		rule.check(coreClasses);
 	}
 	// end::arch-rules.structure:supporting-packages-are-dependency-free[]
+
+	@Test
+	void allCallsToSchemaNamesMustUseTheBridge() {
+
+		ArchRule rule = noClasses()
+			.that().areNotAssignableFrom(SchemaNamesBridge.class)
+			.should()
+			.callCodeUnitWhere(targetOwner(assignableTo(SchemaNames.class)));
+		rule.check(coreClasses);
+	}
 }
