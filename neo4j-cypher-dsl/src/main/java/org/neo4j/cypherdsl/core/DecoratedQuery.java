@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2020.1.2
  */
 @API(status = INTERNAL, since = "2020.1.2")
-sealed class DecoratedQuery extends AbstractStatement implements UseStatement permits DecoratedQuery.DecoratedQueryWithResult {
+sealed class DecoratedQuery extends AbstractStatement implements UseStatement {
 
 	private enum Decoration implements Visitable {
 
