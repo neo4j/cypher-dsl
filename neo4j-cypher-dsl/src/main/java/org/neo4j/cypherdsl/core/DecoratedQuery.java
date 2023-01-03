@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Statement.UseStatement;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -31,7 +32,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2020.1.2
  */
 @API(status = INTERNAL, since = "2020.1.2")
-class DecoratedQuery extends AbstractStatement implements Statement {
+sealed class DecoratedQuery extends AbstractStatement implements UseStatement permits DecoratedQuery.DecoratedQueryWithResult {
 
 	private enum Decoration implements Visitable {
 
@@ -53,7 +54,7 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 
 	private static DecoratedQuery decorate(Statement target, Decoration decoration) {
 
-		if (target instanceof DecoratedQuery) {
+		if (target instanceof DecoratedQuery decoratedQuery && !(decoratedQuery.decoration instanceof Use)) {
 			throw new IllegalArgumentException("Cannot explain an already explained or profiled query.");
 		}
 
@@ -65,6 +66,16 @@ class DecoratedQuery extends AbstractStatement implements Statement {
 	}
 
 	static DecoratedQuery decorate(Statement target, Use use) {
+
+		if (target instanceof DecoratedQuery decoratedQuery) {
+			String message;
+			if (decoratedQuery.decoration instanceof Decoration decoration) {
+				message = decoration.name() + (decoration.name().endsWith("E") ? "'" : "'e") + "d statements are not supported inside USE clauses";
+			} else { // Right now the only other decoration is the Use clause.
+				message = "Nested USE clauses are not supported";
+			}
+			throw new IllegalArgumentException(message);
+		}
 
 		return new DecoratedQuery(target, use);
 	}

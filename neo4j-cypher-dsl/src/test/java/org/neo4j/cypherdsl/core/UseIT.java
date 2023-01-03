@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,6 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingAndReturn;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -40,6 +42,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 class UseIT {
 
 	private final Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
+	private final OngoingReadingAndReturn ongoingInnerStatementDefinition = Cypher.call(Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build()).returning("movie");
 
 	@ParameterizedTest
 	@CsvSource(textBlock = """
@@ -101,11 +104,17 @@ class UseIT {
 	@Test
 	void useBeforeCall() {
 
-		var innerStatement = Cypher.call(Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build())
-			.returning("movie")
-			.build();
+		var innerStatement = ongoingInnerStatementDefinition.build();
 		var cypher = Cypher.use("cineasts.latest", innerStatement).getCypher();
 		assertThat(cypher).isEqualTo("USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
+	}
+
+	@Test
+	void nestedUseShouldThrow() {
+
+		var innerStatement = Cypher.use("x", ongoingInnerStatementDefinition.build());
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.use("y", innerStatement))
+			.withMessage("Nested USE clauses are not supported");
 	}
 
 	@Test
@@ -124,5 +133,27 @@ class UseIT {
 		assertThat(cypher).isEqualTo("USE cineasts.latest UNWIND $newMovies AS title CALL {WITH title MERGE (m:`Movie` {title: title}) RETURN elementId(m) AS id} RETURN id");
 	}
 
-	// TODO Decorating decorated statements
+	@Test
+	void addExplain() {
+
+		var innerStatement = ongoingInnerStatementDefinition.build();
+		var cypher = Cypher.use("cineasts.latest", innerStatement).explain().getCypher();
+		assertThat(cypher).isEqualTo("EXPLAIN USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
+	}
+
+	@Test
+	void innerProfileShouldThrow() {
+
+		var innerStatement = ongoingInnerStatementDefinition.profile();
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.use("x", innerStatement))
+			.withMessage("PROFILE'd statements are not supported inside USE clauses");
+	}
+
+	@Test
+	void innerExplainShouldThrow() {
+
+		var innerStatement = ongoingInnerStatementDefinition.explain();
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.use("x", innerStatement))
+			.withMessage("EXPLAIN'ed statements are not supported inside USE clauses");
+	}
 }

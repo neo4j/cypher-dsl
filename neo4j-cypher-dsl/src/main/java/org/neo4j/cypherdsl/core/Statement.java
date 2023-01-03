@@ -196,6 +196,23 @@ public interface Statement extends Visitable {
 	}
 
 	/**
+	 * Represents a {@code USE} statement, utilizing a composite graph call. A statement utilizing composite databases
+	 * might use an {@code EXPLAIN} clause but cannot be profiled (as of Neo4j 5.3).
+	 *
+	 * @since 2023.0.0
+	 */
+	sealed interface UseStatement extends Statement permits DecoratedQuery {
+
+		/**
+		 * @return Creates a statement that returns an explain plan for the original statement.
+		 */
+		@NotNull @Contract(pure = true)
+		default Statement explain() {
+			return DecoratedQuery.explain(this);
+		}
+	}
+
+	/**
 	 * @return True if this statement can be assured to return something.
 	 */
 	default boolean doesReturnOrYield() {
