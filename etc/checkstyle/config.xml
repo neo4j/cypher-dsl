@@ -92,6 +92,7 @@
                     com.github.stefanbirkner.systemlambda.SystemLambda.*,
                     com.tngtech.archunit.lang.syntax.ArchRuleDefinition.*,
                     com.tngtech.archunit.base.DescribedPredicate.*,
+                    com.tngtech.archunit.core.domain.JavaAccess.Predicates.*,
                     com.tngtech.archunit.core.domain.JavaClass.Predicates.*,
                     com.tngtech.archunit.core.domain.properties.HasModifiers.Predicates.*
                 "

@@ -19,7 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.support.schema_name.SchemaNames;
+import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 
 /**
  * The factory methods are on the concrete class, as they should not be exposed to the outside via the interface.
@@ -33,10 +33,10 @@ record UseClauseImpl(Expression target, boolean dynamic) implements Use {
 		var components = target.split("\\.");
 		Expression targetExpression;
 		if (components.length == 1) {
-			targetExpression = Cypher.raw(SchemaNames.sanitize(components[0], false).orElseThrow());
+			targetExpression = Cypher.raw(SchemaNamesBridge.sanitize(components[0], false).orElseThrow());
 		} else {
-			targetExpression = Cypher.raw(SchemaNames.sanitize(components[0], false)
-				.flatMap(composite -> SchemaNames.sanitize(components[1], false).map(v -> composite + "." + v))
+			targetExpression = Cypher.raw(SchemaNamesBridge.sanitize(components[0], false)
+				.flatMap(composite -> SchemaNamesBridge.sanitize(components[1], false).map(v -> composite + "." + v))
 				.orElseThrow());
 		}
 
