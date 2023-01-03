@@ -550,6 +550,7 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 <ul class="sectlevel2">
 <li><a href="#preparedependencies">2.1. Prepare dependencies</a></li>
 <li><a href="#how-to-use-it">2.2. How to use it</a></li>
+<li><a href="#dialect-support">2.3. Dialect support</a></li>
 </ul>
 </li>
 <li><a href="#properties">3. Properties</a></li>
@@ -1181,6 +1182,75 @@ We use a raw Cypher string with the placeholder <code>$E</code> which resolves t
 </tr>
 </table>
 </div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="dialect-support"><a class="anchor" href="#dialect-support"></a>2.3. Dialect support</h3>
+<div class="paragraph">
+<p>There is limited dialect support. The default dialect <code>org.neo4j.cypherdsl.core.renderer.Dialect.DEFAULT</code> is Neo4j 4.4 and earlier whereas <code>org.neo4j.cypherdsl.core.renderer.Dialect.NEO4J_5</code> is designated to work with Neo4j 5.</p>
+</div>
+<div class="paragraph">
+<p>The Neo4j 5 dialect will render some things differently:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>org.neo4j.cypherdsl.core.Functions.distance</code> will be rendered as <code>point.distance</code> instead of just <code>distance</code></p>
+</li>
+<li>
+<p><code>elementId</code> will be rendered "as is"</p>
+</li>
+<li>
+<p><code>EXISTS(n.property)</code> will be rendered as <code>n.property IS NOT NULL</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additional features might be added.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+It is especially noteworthy that <code>elementId(node)</code> will be rendered as <code>toString(id(node))</code> with the default dialect. This is helpful for building queries that must work a) without deprecation warnings and b) on both Neo4j 4 and 5. Of course this is not portable and the returned values must only be used for comparison inside one statement. But Neo4j advices strongly against making the internal entity ids available outside a transaction (See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-elementid">elementID</a>: "Outside of the scope of a single transaction, no guarantees are given about the mapping between ID values and elements.")
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Here is one example how to use a dialect:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Configuration</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Dialect</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Renderer</span>;
+
+<span class="type">class</span> <span class="class">DialectIT</span> {
+
+    <span class="type">void</span> shouldRenderElementId() {
+        <span class="type">var</span> screen = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">ScreenStateNode</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">screen</span><span class="delimiter">&quot;</span></span>);
+        <span class="type">var</span> id = Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2</span><span class="delimiter">&quot;</span></span>);
+        <span class="type">var</span> statement = Cypher.match(screen)
+            .where(Functions.elementId(screen).eq(id))
+            .returning(Functions.elementId(screen))
+            .build();
+        <span class="comment">// Config and renderer is thread safe, you can store it somewhere global</span>
+        <span class="type">var</span> rendererConfig = <span class="predefined-type">Configuration</span>.newConfig().withDialect(Dialect.NEO4J_5).build();
+        <span class="type">var</span> renderer = <span class="predefined-type">Renderer</span>.getRenderer(rendererConfig);
+        <span class="type">var</span> cypher = renderer.render(statement);
+        assertThat(cypher)
+            .isEqualTo(
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (screen:`ScreenStateNode`) </span><span class="delimiter">&quot;</span></span> +
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">WHERE elementId(screen) = '4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2' </span><span class="delimiter">&quot;</span></span> +
+                <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN elementId(screen)</span><span class="delimiter">&quot;</span></span>
+            );
+    }
+}</code></pre>
 </div>
 </div>
 </div>
@@ -6944,7 +7014,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2023-01-03 15:24:15 UTC
+Last updated 2023-01-03 16:06:30 UTC
 </div>
 </div>
 </body>
