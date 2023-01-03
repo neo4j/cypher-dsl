@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1672750487270">
+<licensePluginReport goal="CHECK" timestamp="1672759563700">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -137,6 +137,8 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/UnionQuery.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Unwind.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/UpdatingClause.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/Use.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/UseClauseImpl.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Where.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/With.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/annotations/CheckReturnValue.java" result="PRESENT"/>
@@ -166,6 +168,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/RelationshipLength.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/RelationshipPatternCondition.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/RelationshipTypes.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/internal/SchemaNamesBridge.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/ScopingStrategy.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/UsingPeriodicCommit.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/YieldItems.java" result="PRESENT"/>
@@ -219,6 +222,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/SymbolicNameTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/TemporalLiteralTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/TestUtils.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/UseIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/LoadCSVTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/ReflectiveVisitorTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/Person.java" result="PRESENT"/>
