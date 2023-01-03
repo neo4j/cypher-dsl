@@ -230,3 +230,25 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 ----
 <.> The Cypher-DSL doesn't support a dynamic lookup of properties on expression at the moment.
     We use a raw Cypher string with the placeholder `$E` which resolves to the symbolic name also passed to the `raw` function.
+
+[[dialect-support]]
+== Dialect support
+
+There is limited dialect support. The default dialect `org.neo4j.cypherdsl.core.renderer.Dialect.DEFAULT` is Neo4j 4.4 and earlier whereas `org.neo4j.cypherdsl.core.renderer.Dialect.NEO4J_5` is designated to work with Neo4j 5.
+
+The Neo4j 5 dialect will render some things differently:
+
+* `org.neo4j.cypherdsl.core.Functions.distance` will be rendered as `point.distance` instead of just `distance`
+* `elementId` will be rendered "as is"
+* `EXISTS(n.property)` will be rendered as `n.property IS NOT NULL`
+
+Additional features might be added.
+
+NOTE: It is especially noteworthy that `elementId(node)` will be rendered as `toString(id(node))` with the default dialect. This is helpful for building queries that must work a) without deprecation warnings and b) on both Neo4j 4 and 5. Of course this is not portable and the returned values must only be used for comparison inside one statement. But Neo4j advices strongly against making the internal entity ids available outside a transaction (See https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-elementid[elementID]: "Outside of the scope of a single transaction, no guarantees are given about the mapping between ID values and elements.")
+
+Here is one example how to use a dialect:
+
+[source, java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/DialectIT.java[tag=dialect-example]
+----

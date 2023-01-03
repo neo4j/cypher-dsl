@@ -22,17 +22,24 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+// tag::dialect-example[]
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+// end::dialect-example[]
 
 /**
  * @author Michael J. Simons
  */
+// tag::dialect-example[]
+
 class DialectIT {
+
+	// end::dialect-example[]
 
 	static Stream<Arguments> nPropExists() {
 		return Stream.of(
@@ -95,4 +102,26 @@ class DialectIT {
 			Cypher.match(n).returning(n.elementId()).build());
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+	@Test // GH-539
+	// tag::dialect-example[]
+	void shouldRenderElementId() {
+		var screen = Cypher.node("ScreenStateNode").named("screen");
+		var id = Cypher.literalOf("4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2");
+		var statement = Cypher.match(screen)
+			.where(Functions.elementId(screen).eq(id))
+			.returning(Functions.elementId(screen))
+			.build();
+		// Config and renderer is thread safe, you can store it somewhere global
+		var rendererConfig = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
+		var renderer = Renderer.getRenderer(rendererConfig);
+		var cypher = renderer.render(statement);
+		assertThat(cypher)
+			.isEqualTo(
+				"MATCH (screen:`ScreenStateNode`) " +
+				"WHERE elementId(screen) = '4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2' " +
+				"RETURN elementId(screen)"
+			);
+	}
 }
+// end::dialect-example[]
