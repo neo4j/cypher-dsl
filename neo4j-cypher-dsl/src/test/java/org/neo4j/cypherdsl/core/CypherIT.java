@@ -4592,6 +4592,11 @@ class CypherIT {
 									.project("foo", "bar", Cypher.name("bar"))
 									.as("anyThing"))
 							.build())
+					.with(userNode)
+					.call(
+							Cypher.use("movies.actors", Cypher.match(Cypher.node("Person").named("person")).returning("person").build())
+					)
+					.with(userNode)
 					.returning(userNode.project(
 					"name",
 					userNode.property("name"),
@@ -4670,6 +4675,13 @@ class CypherIT {
 					    bar: bar
 					  } AS anyThing
 					}
+					WITH u
+					CALL {
+					  USE movies.actors
+					  MATCH (person:Person)
+					  RETURN person
+					}
+					WITH u
 					RETURN u {
 					  name: u.name,
 					  anyThing: anyThing,
@@ -4723,6 +4735,13 @@ class CypherIT {
 					\t\tbar: bar
 					\t} AS anyThing
 					}
+					WITH u
+					CALL {
+					\tUSE movies.actors
+					\tMATCH (person:Person)
+					\tRETURN person
+					}
+					WITH u
 					RETURN u {
 					\tname: u.name,
 					\tanyThing: anyThing,

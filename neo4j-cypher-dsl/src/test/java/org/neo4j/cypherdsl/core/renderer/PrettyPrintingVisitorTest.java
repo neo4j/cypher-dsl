@@ -52,5 +52,4 @@ class PrettyPrintingVisitorTest {
 
 		assertThat(prettyPrintingVisitor.escapeName(null)).isEmpty();
 	}
-
 }

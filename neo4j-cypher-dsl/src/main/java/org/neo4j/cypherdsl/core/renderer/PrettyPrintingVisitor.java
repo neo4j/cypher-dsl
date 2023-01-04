@@ -34,18 +34,20 @@ import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.Unwind;
+import org.neo4j.cypherdsl.core.Use;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 
 /**
  * @author Andreas Berger
  * @author Michael J. Simons
+ * @author Christophe Willemsen
  */
 @SuppressWarnings("unused")
 @RegisterForReflection
@@ -258,6 +260,13 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		indent(indentationLevel);
 		indentationLevel++;
 		super.enter(subquery);
+	}
+
+	@Override
+	void enter(Use use) {
+		trimNewline();
+		indent(indentationLevel);
+		super.enter(use);
 	}
 
 	@Override
