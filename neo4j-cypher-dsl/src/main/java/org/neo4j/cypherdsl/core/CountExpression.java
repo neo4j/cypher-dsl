@@ -37,9 +37,11 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @soundtrack The Prodigy - Invaders Must Die
  * @since 2023.0.0
  */
+// TODO Consider an interface from the start
 @API(status = STABLE, since = "2023.0.0")
 public final class CountExpression implements Expression, ExposesWhere<Expression> {
 
+	// TODO make private
 	public static CountExpression of(List<PatternElement> elements, Optional<Expression> where) {
 		return new CountExpression(new Pattern(elements), where
 			.map(Expression::asCondition)
