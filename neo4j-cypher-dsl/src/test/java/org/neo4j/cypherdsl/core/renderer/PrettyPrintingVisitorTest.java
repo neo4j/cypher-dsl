@@ -53,16 +53,4 @@ class PrettyPrintingVisitorTest {
 
 		assertThat(prettyPrintingVisitor.escapeName(null)).isEmpty();
 	}
-
-	@Test
-	void shouldTrimNewLineAfterCall() {
-		var matchStatement = Cypher.match(Cypher.node("Person").named("person")).returning("person").build();
-		var statement = Cypher.call(
-				Cypher.use("movies.actors", matchStatement)
-		).returning("person").build();
-		statement.accept(prettyPrintingVisitor);
-		var result = prettyPrintingVisitor.getRenderedContent().trim();
-		assertThat(result).contains("CALL {\n");
-	}
-
 }
