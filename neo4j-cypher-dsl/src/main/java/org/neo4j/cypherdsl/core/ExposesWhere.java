@@ -30,11 +30,12 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
  * A step exposing a several {@code where} methods that are provide entry points of adding conditions.
  *
  * @author Michael J. Simons
+ * @param <T> The type of the owner exposing the {@literal WHERE} clause
  * @soundtrack Smoke Blow - Dark Angel
  * @since 2020.0.1
  */
 @API(status = STABLE, since = "2020.0.1")
-public interface ExposesWhere {
+public interface ExposesWhere<T> {
 
 	/**
 	 * Adds a where clause to this fragement.
@@ -43,7 +44,7 @@ public interface ExposesWhere {
 	 * @return A match or call restricted by a where clause with no return items yet.
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingWithWhere where(Condition condition);
+	T where(Condition condition);
 
 	/**
 	 * Adds a where clause based on a path pattern to this match.
@@ -56,7 +57,7 @@ public interface ExposesWhere {
 	 * @since 1.0.1
 	 */
 	@NotNull @CheckReturnValue
-	default StatementBuilder.OngoingReadingWithWhere where(RelationshipPattern pathPattern) {
+	default T where(RelationshipPattern pathPattern) {
 
 		Assertions.notNull(pathPattern, "The path pattern must not be null.");
 		return this.where(RelationshipPatternCondition.of(pathPattern));

@@ -33,17 +33,17 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
-final class UnionQuery extends AbstractStatement implements Statement.RegularQuery {
+final class UnionQueryImpl extends AbstractStatement implements Statement.UnionQuery {
 
 	@SuppressWarnings("squid:S6416") // This is about the assertion, Sonar suddenly things this is an issue: Idk. We want the exception.
-	static UnionQuery create(boolean unionAll, List<Statement> queries) {
+	static UnionQueryImpl create(boolean unionAll, List<Statement> queries) {
 
 		Assertions.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
 
 		@SuppressWarnings("squid:S2259") // Really, we asserted it
 		List<UnionPart> unionParts = queries.stream().skip(1).map(q -> new UnionPart(unionAll, q)).collect(
 			Collectors.toList());
-		return new UnionQuery(unionAll, queries.get(0), unionParts);
+		return new UnionQueryImpl(unionAll, queries.get(0), unionParts);
 	}
 
 	private final boolean all;
@@ -52,7 +52,7 @@ final class UnionQuery extends AbstractStatement implements Statement.RegularQue
 
 	private final List<UnionPart> additionalQueries;
 
-	private UnionQuery(boolean all, Statement firstQuery, List<UnionPart> additionalQueries) {
+	private UnionQueryImpl(boolean all, Statement firstQuery, List<UnionPart> additionalQueries) {
 		this.all = all;
 		this.firstQuery = firstQuery;
 		this.additionalQueries = additionalQueries;
@@ -64,7 +64,7 @@ final class UnionQuery extends AbstractStatement implements Statement.RegularQue
 	 * @param newAdditionalQueries more additional queries
 	 * @return A new union query
 	 */
-	UnionQuery addAdditionalQueries(List<Statement> newAdditionalQueries) {
+	UnionQueryImpl addAdditionalQueries(List<Statement> newAdditionalQueries) {
 
 		List<Statement> queries = new ArrayList<>();
 		queries.add(firstQuery);

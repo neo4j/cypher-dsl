@@ -153,7 +153,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReadingWithoutWhere
-		extends OngoingReading, ExposesHints, ExposesWhere, ExposesMatch, ExposesExistentialSubqueryCall {
+		extends OngoingReading, ExposesHints, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesMatch, ExposesExistentialSubqueryCall {
 	}
 
 	/**
@@ -1164,7 +1164,7 @@ public interface StatementBuilder
 	 */
 	interface OngoingStandaloneCallWithReturnFields extends
 		StatementBuilder.BuildableStatement<ResultStatement>,
-		ExposesMatch, ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 
 	/**
@@ -1211,6 +1211,6 @@ public interface StatementBuilder
 	 * An in-query call exposing where and return clauses.
 	 */
 	interface OngoingInQueryCallWithReturnFields extends
-		ExposesMatch, ExposesWhere, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
 	}
 }

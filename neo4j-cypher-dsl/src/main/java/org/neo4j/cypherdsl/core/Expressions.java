@@ -18,11 +18,13 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * Utility methods for dealing with expressions.
@@ -30,7 +32,17 @@ import org.apiguardian.api.API;
  * @author Michael J. Simons
  * @since 1.0
  */
-@API(status = INTERNAL, since = "1.0") final class Expressions {
+@API(status = STABLE, since = "1.0")
+public final class Expressions {
+
+	@NotNull
+	public static CountExpression count(PatternElement patternElement) {
+		return new CountExpression(new Pattern(List.of(patternElement)), null);
+	}
+
+	public static CountExpression count(Statement.UnionQuery union) {
+		return new CountExpression(union, null);
+	}
 
 	/**
 	 * @param expression Possibly named with a non-empty symbolic name.

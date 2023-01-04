@@ -38,6 +38,7 @@ import org.neo4j.cypherdsl.core.ListComprehension.OngoingDefinitionWithVariable;
 import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.PatternComprehension.OngoingDefinitionWithPattern;
 import org.neo4j.cypherdsl.core.Statement.SingleQuery;
+import org.neo4j.cypherdsl.core.Statement.UnionQuery;
 import org.neo4j.cypherdsl.core.Statement.UseStatement;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -767,7 +768,7 @@ public final class Cypher {
 	 * @return A union statement.
 	 */
 	@NotNull @Contract(pure = true)
-	public static Statement union(Statement... statements) {
+	public static UnionQuery union(Statement... statements) {
 		return unionImpl(false, statements);
 	}
 
@@ -779,7 +780,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static Statement union(Collection<Statement> statements) {
+	public static UnionQuery union(Collection<Statement> statements) {
 		return union(statements.toArray(new Statement[] {}));
 	}
 
@@ -1175,16 +1176,16 @@ public final class Cypher {
 		return LoadCSVStatementBuilder.loadCSV(from, withHeaders);
 	}
 
-	private static Statement unionImpl(boolean unionAll, Statement... statements) {
+	private static UnionQuery unionImpl(boolean unionAll, Statement... statements) {
 
 		Assertions.isTrue(statements != null && statements.length >= 2, "At least two statements are required!");
 
 		int i = 0;
-		UnionQuery existingUnionQuery = null;
+		UnionQueryImpl existingUnionQuery = null;
 		@SuppressWarnings("squid:S2259") // Really, we asserted it 4 lines above this one. Thank you, sonar.
-		boolean isUnionQuery = statements[0] instanceof UnionQuery;
+		boolean isUnionQuery = statements[0] instanceof UnionQueryImpl;
 		if (isUnionQuery) {
-			existingUnionQuery = (UnionQuery) statements[0];
+			existingUnionQuery = (UnionQueryImpl) statements[0];
 			Assertions.isTrue(existingUnionQuery.isAll() == unionAll, "Cannot mix union and union all!");
 			i = 1;
 		}
@@ -1197,7 +1198,7 @@ public final class Cypher {
 		} while (++i < statements.length);
 
 		if (existingUnionQuery == null) {
-			return UnionQuery.create(unionAll, listOfQueries);
+			return UnionQueryImpl.create(unionAll, listOfQueries);
 		} else {
 			return existingUnionQuery.addAdditionalQueries(listOfQueries);
 		}

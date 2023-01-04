@@ -1631,7 +1631,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	private static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
-		implements ExposesWhere, ExposesReturning, OngoingStandaloneCallWithReturnFields {
+		implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, OngoingStandaloneCallWithReturnFields {
 
 		private final YieldItems yieldItems;
 

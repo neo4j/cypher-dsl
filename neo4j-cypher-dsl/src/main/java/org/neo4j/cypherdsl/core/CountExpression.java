@@ -24,6 +24,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -34,7 +38,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2023.0.0
  */
 @API(status = STABLE, since = "2023.0.0")
-public final class CountExpression implements Expression {
+public final class CountExpression implements Expression, ExposesWhere<Expression> {
 
 	public static CountExpression of(List<PatternElement> elements, Optional<Expression> where) {
 		return new CountExpression(new Pattern(elements), where
@@ -44,20 +48,35 @@ public final class CountExpression implements Expression {
 		);
 	}
 
-	private final Pattern pattern;
+	private final Visitable patternOrUnion;
 
 	private final Where optionalWhere;
 
-	private CountExpression(Pattern pattern, Where optionalWhere) {
-		this.pattern = pattern;
+	CountExpression(Visitable patternOrUnion, @Nullable Where optionalWhere) {
+		if (patternOrUnion instanceof Statement.UnionQuery && optionalWhere != null) {
+			throw new IllegalArgumentException("Cannot use a UNION with a WHERE clause inside a COUNT {} expression");
+		}
+		this.patternOrUnion = patternOrUnion;
 		this.optionalWhere = optionalWhere;
+	}
+
+	/**
+	 * Creates a new {@link CountExpression count expression} with additional conditions
+	 *
+	 * @param condition the condition to apply in the count expression
+	 * @return A new {@link CountExpression}
+	 */
+	@NotNull @Contract(pure = true)
+	public CountExpression where(Condition condition) {
+
+		return new CountExpression(patternOrUnion, new Where(condition));
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		this.pattern.accept(visitor);
+		this.patternOrUnion.accept(visitor);
 		if (optionalWhere != null) {
 			this.optionalWhere.accept(visitor);
 		}

@@ -26,7 +26,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * Represents a part of an union.
+ * Represents a part of a union.
  *
  * @author Michael J. Simons
  * @since 1.0
