@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.neo4j.cypherdsl.core.Cypher;
 
 /**
  * @author Andreas Berger
@@ -51,6 +52,17 @@ class PrettyPrintingVisitorTest {
 	void shouldNotTryToEscapeNullNames() {
 
 		assertThat(prettyPrintingVisitor.escapeName(null)).isEmpty();
+	}
+
+	@Test
+	void shouldTrimNewLineAfterCall() {
+		var matchStatement = Cypher.match(Cypher.node("Person").named("person")).returning("person").build();
+		var statement = Cypher.call(
+				Cypher.use("movies.actors", matchStatement)
+		).returning("person").build();
+		statement.accept(prettyPrintingVisitor);
+		var result = prettyPrintingVisitor.getRenderedContent().trim();
+		assertThat(result).contains("CALL {\n");
 	}
 
 }

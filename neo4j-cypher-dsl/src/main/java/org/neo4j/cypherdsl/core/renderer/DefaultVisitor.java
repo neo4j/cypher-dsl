@@ -788,7 +788,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Subquery subquery) {
 
-		builder.append("CALL {");
+		builder.append("CALL {\n");
 	}
 
 	void leave(Subquery subquery) {
