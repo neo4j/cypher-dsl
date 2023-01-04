@@ -4676,7 +4676,8 @@ class CypherIT {
 					  } AS anyThing
 					}
 					WITH u
-					CALL {USE movies.actors
+					CALL {
+					  USE movies.actors
 					  MATCH (person:Person)
 					  RETURN person
 					}
@@ -4735,7 +4736,8 @@ class CypherIT {
 					\t} AS anyThing
 					}
 					WITH u
-					CALL {USE movies.actors
+					CALL {
+					\tUSE movies.actors
 					\tMATCH (person:Person)
 					\tRETURN person
 					}

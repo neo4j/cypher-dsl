@@ -21,26 +21,9 @@ package org.neo4j.cypherdsl.core.renderer;
 import java.util.function.BiConsumer;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
-import org.neo4j.cypherdsl.core.Condition;
-import org.neo4j.cypherdsl.core.Create;
-import org.neo4j.cypherdsl.core.ExistentialSubquery;
-import org.neo4j.cypherdsl.core.KeyValueMapEntry;
-import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.Match;
-import org.neo4j.cypherdsl.core.Merge;
-import org.neo4j.cypherdsl.core.MergeAction;
-import org.neo4j.cypherdsl.core.Operator;
-import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.PropertyLookup;
-import org.neo4j.cypherdsl.core.Return;
-import org.neo4j.cypherdsl.core.Set;
-import org.neo4j.cypherdsl.core.Subquery;
-import org.neo4j.cypherdsl.core.Unwind;
-import org.neo4j.cypherdsl.core.Where;
-import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.*;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 
 /**
@@ -258,6 +241,13 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		indent(indentationLevel);
 		indentationLevel++;
 		super.enter(subquery);
+	}
+
+	@Override
+	void enter(Use use) {
+		trimNewline();
+		indent(indentationLevel);
+		super.enter(use);
 	}
 
 	@Override
