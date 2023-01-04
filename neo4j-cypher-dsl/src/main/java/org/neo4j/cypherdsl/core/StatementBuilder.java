@@ -1100,19 +1100,11 @@ public interface StatementBuilder
 	}
 
 	/**
-	 * The union of a buildable statement and call exposing new arguments and yields.
+	 * A trait for an ongoing standalone call to expose all of its results via an asterisk.
+	 *
+	 * @since @since 2022.8.3
 	 */
-	interface OngoingStandaloneCallWithoutArguments extends
-		StatementBuilder.BuildableStatement<Statement>, ExposesCall.ExposesWithArgs<OngoingStandaloneCallWithArguments>,
-		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
-
-		/**
-		 * Turn this call into a void call to continue with querying
-		 *
-		 * @return the call, continue with a normal query from here.
-		 * @since 2022.4.0
-		 */
-		VoidCall withoutResults();
+	interface ExposesYieldStar {
 
 		/**
 		 * Mostly a helper method to indicate the overload as {@link org.neo4j.cypherdsl.core.ExposesCall.ExposesYield}
@@ -1136,11 +1128,27 @@ public interface StatementBuilder
 	}
 
 	/**
+	 * The union of a buildable statement and call exposing new arguments and yields.
+	 */
+	interface OngoingStandaloneCallWithoutArguments extends
+		StatementBuilder.BuildableStatement<Statement>, ExposesCall.ExposesWithArgs<OngoingStandaloneCallWithArguments>,
+		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction, ExposesYieldStar {
+
+		/**
+		 * Turn this call into a void call to continue with querying
+		 *
+		 * @return the call, continue with a normal query from here.
+		 * @since 2022.4.0
+		 */
+		VoidCall withoutResults();
+	}
+
+	/**
 	 * The union of a buildable statement and call exposing yields.
 	 */
 	interface OngoingStandaloneCallWithArguments extends
 		StatementBuilder.BuildableStatement<Statement>,
-		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction {
+		ExposesCall.ExposesYield<OngoingStandaloneCallWithReturnFields>, ExposesCall.AsFunction, ExposesYieldStar {
 
 		/**
 		 * Turn this call into a void call to continue with querying
