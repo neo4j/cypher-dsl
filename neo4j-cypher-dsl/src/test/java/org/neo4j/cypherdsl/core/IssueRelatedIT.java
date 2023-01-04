@@ -1379,6 +1379,12 @@ class IssueRelatedIT {
 		assertThat(Renderer.getDefaultRenderer().render(yield)).isEqualTo("CALL db.info() YIELD *");
 	}
 
+	@Test // GH-544
+	void shouldAllowAsteriskInYieldAndArgs() {
+		ResultStatement yield = Cypher.call("dbms.listConfig").withArgs(Cypher.literalOf("port")).yield(Cypher.asterisk()).build();
+		assertThat(Renderer.getDefaultRenderer().render(yield)).isEqualTo("CALL dbms.listConfig('port') YIELD *");
+	}
+
 	@Test // GH-505
 	void testLabelRemoval() {
 		Node node = Cypher.node("Wine").named("n");
