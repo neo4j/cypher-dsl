@@ -35,13 +35,52 @@ import org.jetbrains.annotations.NotNull;
 @API(status = STABLE, since = "1.0")
 public final class Expressions {
 
+	/**
+	 * Something that can build counting subqueries. Might be used in the future for existential subqueries, too.
+	 *
+	 * @since 2023.0.0
+	 */
+	public interface SubqueryExpressionBuilder {
+
+		@NotNull
+		CountExpression count(PatternElement patternElement);
+
+		@NotNull
+		CountExpression count(Statement.UnionQuery union);
+	}
+
+	// TODO document me
+
 	@NotNull
 	public static CountExpression count(PatternElement patternElement) {
-		return new CountExpression(new Pattern(List.of(patternElement)), null);
+		return new CountExpression(null, new Pattern(List.of(patternElement)), null);
 	}
 
 	public static CountExpression count(Statement.UnionQuery union) {
-		return new CountExpression(union, null);
+		return new CountExpression(null, union, null);
+	}
+
+	public static SubqueryExpressionBuilder with(String... identifiableElements) {
+
+		return with(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));
+	}
+
+	public static SubqueryExpressionBuilder with(IdentifiableElement... identifiableElements) {
+
+		var returnItems = new ExpressionList(Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
+		var with = new With(false, returnItems, null, null, null, null);
+		return new SubqueryExpressionBuilder() {
+			@Override
+			public @NotNull CountExpression count(PatternElement patternElement) {
+
+				return new CountExpression(with, new Pattern(List.of(patternElement)), null);
+			}
+
+			@Override
+			public @NotNull CountExpression count(Statement.UnionQuery union) {
+				return new CountExpression(with, union, null);
+			}
+		};
 	}
 
 	/**

@@ -39,27 +39,37 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 // TODO Consider an interface from the start
 @API(status = STABLE, since = "2023.0.0")
-public final class CountExpression implements Expression, ExposesWhere<Expression> {
+@Neo4jVersion(minimum = "5.0")
+public final class CountExpression implements SubqueryExpression, ExposesWhere<Expression> {
 
 	// TODO make private
 	public static CountExpression of(List<PatternElement> elements, Optional<Expression> where) {
-		return new CountExpression(new Pattern(elements), where
+		return new CountExpression(null, new Pattern(elements), where
 			.map(Expression::asCondition)
 			.map(Where::new)
 			.orElse(null)
 		);
 	}
 
+	private final With optionalWith;
+
 	private final Visitable patternOrUnion;
 
 	private final Where optionalWhere;
 
-	CountExpression(Visitable patternOrUnion, @Nullable Where optionalWhere) {
+	CountExpression(@Nullable With optionalWith, Visitable patternOrUnion, @Nullable Where optionalWhere) {
+
 		if (patternOrUnion instanceof Statement.UnionQuery && optionalWhere != null) {
 			throw new IllegalArgumentException("Cannot use a UNION with a WHERE clause inside a COUNT {} expression");
 		}
-		this.patternOrUnion = patternOrUnion;
-		this.optionalWhere = optionalWhere;
+		this.optionalWith = optionalWith;
+		if (optionalWith != null && patternOrUnion instanceof Pattern pattern) {
+			this.patternOrUnion = new Match(false, pattern, optionalWhere, null);
+			this.optionalWhere = null;
+		} else {
+			this.patternOrUnion = patternOrUnion;
+			this.optionalWhere = optionalWhere;
+		}
 	}
 
 	/**
@@ -71,13 +81,17 @@ public final class CountExpression implements Expression, ExposesWhere<Expressio
 	@NotNull @Contract(pure = true)
 	public CountExpression where(Condition condition) {
 
-		return new CountExpression(patternOrUnion, new Where(condition));
+		var exisitingPatternOrUnion = patternOrUnion instanceof Match match ? match.pattern : patternOrUnion;
+		return new CountExpression(optionalWith, exisitingPatternOrUnion, new Where(condition));
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
+		if (optionalWith != null) {
+			this.optionalWith.accept(visitor);
+		}
 		this.patternOrUnion.accept(visitor);
 		if (optionalWhere != null) {
 			this.optionalWhere.accept(visitor);

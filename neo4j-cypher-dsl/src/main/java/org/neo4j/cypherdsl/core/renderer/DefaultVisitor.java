@@ -70,6 +70,7 @@ import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Subquery;
+import org.neo4j.cypherdsl.core.SubqueryExpression;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.Unwind;
@@ -824,15 +825,24 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
-	void enter(ExistentialSubquery subquery) {
+	void enter(SubqueryExpression subquery) {
 
-		builder.append("EXISTS {");
+		if (subquery instanceof CountExpression) {
+			builder.append("COUNT");
+		} else if (subquery instanceof ExistentialSubquery) {
+			builder.append("EXISTS");
+		}
+		builder.append(" { ");
 	}
 
-	void leave(ExistentialSubquery subquery) {
+	void leave(SubqueryExpression subquery) {
 
 		// Trimming the inner match without having to do this in the match (looking up if inside subquery).
-		builder.replace(builder.length() - 1, builder.length(), "}");
+		if (builder.charAt(builder.length() - 1) == ' ') {
+			builder.replace(builder.length() - 1, builder.length(), " }");
+		} else {
+			builder.append(" }");
+		}
 	}
 
 	void enter(Hint hint) {
@@ -865,14 +875,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (usingPeriodicCommit.rate() != null) {
 			builder.append(usingPeriodicCommit.rate()).append(" ");
 		}
-	}
-
-	void enter(CountExpression countExpression) {
-		builder.append("COUNT { ");
-	}
-
-	void leave(CountExpression countExpression) {
-		builder.append(" }");
 	}
 
 	void enter(Use use) {

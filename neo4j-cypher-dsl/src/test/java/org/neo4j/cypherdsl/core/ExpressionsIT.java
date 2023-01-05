@@ -45,7 +45,11 @@ class ExpressionsIT {
 		var person = Cypher.node("Person").named("person");
 		var dog = Cypher.node("Dog").named("dog");
 		var cypher = Cypher.match(person)
-			.where(Expressions.count(person.relationshipTo(dog, "HAS_DOG")).where(person.property("name").eq(dog.property("name"))).gt(Cypher.literalOf(1)))
+			.where(Expressions
+					.count(person.relationshipTo(dog, "HAS_DOG"))
+					.where(person.property("name").eq(dog.property("name")))
+				.gt(Cypher.literalOf(1))
+			)
 			.returning(person.property("name").as("name"))
 			.build()
 			.getCypher();
@@ -82,6 +86,84 @@ class ExpressionsIT {
 			"MATCH (person)-[:`HAS_CAT`]->(cat:`Cat`) " +
 			"RETURN cat.name AS petName " +
 			"} AS numPets"
+		);
+	}
+
+	@Test
+	void countSubqueryWithWith() {
+
+		var person = Cypher.node("Person").named("person");
+		var dog = Cypher.node("Dog").named("d");
+
+		var dogName = Cypher.literalOf("Ozzy").as("dogName");
+		var cypher = Cypher.match(person)
+			.where(Expressions.with(dogName).count(person.relationshipTo(dog, "HAS_DOG")).where(dog.property("name").eq(dogName)).eq(Cypher.literalOf(1)))
+			.returning(
+				person.property("name").as("name")
+			).build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) " +
+			"WHERE COUNT { " +
+			"WITH 'Ozzy' AS dogName " +
+			"MATCH (person)-[:`HAS_DOG`]->(d:`Dog`) " +
+			"WHERE d.name = dogName " +
+			"} = 1 " +
+			"RETURN person.name AS name"
+		);
+	}
+
+	@Test
+	void countSubqueryInReturn() {
+
+		var person = Cypher.node("Person").named("person");
+		var dog = Cypher.node("Dog");
+
+		var cypher = Cypher.match(person)
+			.returning(
+				person.property("name"),
+				Expressions.count(person.relationshipTo(dog, "HAS_DOG")).as("howManyDogs")
+			).build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) RETURN person.name, COUNT { (person)-[:`HAS_DOG`]->(:`Dog`) } AS howManyDogs");
+	}
+
+	@Test
+	void countSubqueryInSet() {
+
+		var person = Cypher.node("Person").named("person");
+		var dog = Cypher.node("Dog");
+		var howManyDogs = person.property("howManyDogs");
+
+		var cypher = Cypher.match(person).where(person.property("name").eq(Cypher.literalOf("Andy")))
+			.set(howManyDogs.to(Expressions.count(person.relationshipTo(dog, "HAS_DOG"))))
+			.returning(howManyDogs.as("howManyDogs")).build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE person.name = 'Andy' " +
+			"SET person.howManyDogs = COUNT { (person)-[:`HAS_DOG`]->(:`Dog`) } " +
+			"RETURN person.howManyDogs AS howManyDogs"
+		);
+	}
+
+	@Test
+	void countSubqueryInCase() {
+
+		var person = Cypher.node("Person").named("person");
+		var dog = Cypher.node("Dog");
+		var dogCount = Expressions.count(person.relationshipTo(dog, "HAS_DOG"));
+		var personName = person.property("name");
+
+		var cypher = Cypher.match(person)
+			.returning(Cypher.caseExpression()
+				.when(dogCount.gt(Cypher.literalOf(1))).then(Cypher.literalOf("Doglover ").concat(personName))
+				.elseDefault(personName).as("result"))
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) " +
+			"RETURN " +
+			"CASE " +
+			"WHEN COUNT { (person)-[:`HAS_DOG`]->(:`Dog`) } > 1 THEN ('Doglover ' + person.name) " +
+			"ELSE person.name " +
+			"END AS result"
 		);
 	}
 }

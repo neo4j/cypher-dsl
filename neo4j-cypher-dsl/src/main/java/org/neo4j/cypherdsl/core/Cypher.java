@@ -491,7 +491,7 @@ public final class Cypher {
 	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
 	 * arguments to have an alias.
 	 *
-	 * @param expressions One ore more aliased expressions.
+	 * @param expressions One or more aliased expressions.
 	 * @return An ongoing with clause.
 	 * @since 2021.2.2
 	 */
@@ -509,7 +509,7 @@ public final class Cypher {
 	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
 	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.
 	 *
-	 * @param expressions One ore more expressions.
+	 * @param expressions One or more expressions.
 	 * @return An ongoing with clause.
 	 */
 	@NotNull @Contract(pure = true)

@@ -23,7 +23,6 @@ import java.util.function.BiConsumer;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
-import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
@@ -36,6 +35,7 @@ import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
+import org.neo4j.cypherdsl.core.SubqueryExpression;
 import org.neo4j.cypherdsl.core.Unwind;
 import org.neo4j.cypherdsl.core.Use;
 import org.neo4j.cypherdsl.core.Where;
@@ -240,13 +240,13 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	}
 
 	@Override
-	void enter(ExistentialSubquery subquery) {
+	void enter(SubqueryExpression subquery) {
 		super.enter(subquery);
 		indentationLevel++;
 	}
 
 	@Override
-	void leave(ExistentialSubquery subquery) {
+	void leave(SubqueryExpression subquery) {
 		indentationLevel--;
 		trimNewline();
 		indent(indentationLevel);

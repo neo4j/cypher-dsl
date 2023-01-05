@@ -225,7 +225,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS {MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})} RETURN p, r, friend");
+				"MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS { MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'}) } RETURN p, r, friend");
 		}
 
 		@Test
@@ -244,7 +244,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3}) RETURN person.name AS person, company.name AS company");
+				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS { MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3 }) RETURN person.name AS person, company.name AS company");
 
 			statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(Cypher.match(p.relationshipTo(t, "LIKES"))
@@ -255,7 +255,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3} AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
+				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS { MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3 } AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
 
 			statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(
@@ -267,7 +267,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3} AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
+				"MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (EXISTS { MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3 } AND company.name STARTS WITH 'Company') RETURN person.name AS person, company.name AS company");
 		}
 	}
 
