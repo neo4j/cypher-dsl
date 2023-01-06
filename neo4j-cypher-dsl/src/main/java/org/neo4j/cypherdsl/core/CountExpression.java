@@ -20,9 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -37,19 +34,9 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @soundtrack The Prodigy - Invaders Must Die
  * @since 2023.0.0
  */
-// TODO Consider an interface from the start
 @API(status = STABLE, since = "2023.0.0")
 @Neo4jVersion(minimum = "5.0")
 public final class CountExpression implements SubqueryExpression, ExposesWhere<Expression> {
-
-	// TODO make private
-	public static CountExpression of(List<PatternElement> elements, Optional<Expression> where) {
-		return new CountExpression(null, new Pattern(elements), where
-			.map(Expression::asCondition)
-			.map(Where::new)
-			.orElse(null)
-		);
-	}
 
 	private final With optionalWith;
 

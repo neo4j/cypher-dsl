@@ -21,10 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.Statement.UnionQuery;
 
 /**
  * Utility methods for dealing with expressions.
@@ -36,48 +36,89 @@ import org.jetbrains.annotations.NotNull;
 public final class Expressions {
 
 	/**
-	 * Something that can build counting subqueries. Might be used in the future for existential subqueries, too.
+	 * Something that can build counting sub-queries. Might be used in the future for existential sub-queries, too.
 	 *
 	 * @since 2023.0.0
 	 */
 	public interface SubqueryExpressionBuilder {
 
+		/**
+		 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
+		 *
+		 * @param requiredPattern One pattern is required
+		 * @param patternElement Optional pattern
+		 * @return The immutable {@link CountExpression}
+		 */
 		@NotNull
-		CountExpression count(PatternElement patternElement);
+		CountExpression count(PatternElement requiredPattern, PatternElement... patternElement);
 
+		/**
+		 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
+		 *
+		 * @param union The union that will be the source of the {@literal COUNT} sub-query
+		 * @return The immutable {@link CountExpression}
+		 * @since 2023.0.0
+		 */
 		@NotNull
-		CountExpression count(Statement.UnionQuery union);
+		CountExpression count(UnionQuery union);
 	}
 
-	// TODO document me
-
+	/**
+	 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
+	 *
+	 * @param requiredPattern One pattern is required
+	 * @param patternElement Optional pattern
+	 * @return The immutable {@link CountExpression}
+	 * @since 2023.0.0
+	 */
 	@NotNull
-	public static CountExpression count(PatternElement patternElement) {
-		return new CountExpression(null, new Pattern(List.of(patternElement)), null);
+	public static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
+		return new CountExpression(null, Pattern.of(requiredPattern, patternElement), null);
 	}
 
-	public static CountExpression count(Statement.UnionQuery union) {
+	/**
+	 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
+	 *
+	 * @param union The union that will be the source of the {@literal COUNT} sub-query
+	 * @return The immutable {@link CountExpression}
+	 * @since 2023.0.0
+	 */
+	@NotNull
+	public static CountExpression count(UnionQuery union) {
 		return new CountExpression(null, union, null);
 	}
 
+	/**
+	 * Start building a new sub-query expression by importing variables into the scope with a {@literal WITH} clause.
+	 *
+	 * @param identifiableElements The identifiable elements to import
+	 * @return A builder for creating the concrete sub-query
+	 * @since 2023.0.0
+	 */
 	public static SubqueryExpressionBuilder with(String... identifiableElements) {
 
 		return with(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
 
+	/**
+	 * Start building a new sub-query expression by importing variables into the scope with a {@literal WITH} clause.
+	 *
+	 * @param identifiableElements The identifiable elements to import
+	 * @return A builder for creating the concrete sub-query
+	 * @since 2023.0.0
+	 */
 	public static SubqueryExpressionBuilder with(IdentifiableElement... identifiableElements) {
 
 		var returnItems = new ExpressionList(Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
 		var with = new With(false, returnItems, null, null, null, null);
 		return new SubqueryExpressionBuilder() {
-			@Override
-			public @NotNull CountExpression count(PatternElement patternElement) {
-
-				return new CountExpression(with, new Pattern(List.of(patternElement)), null);
+			@Override @NotNull
+			public CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
+				return new CountExpression(with, Pattern.of(requiredPattern, patternElement), null);
 			}
 
-			@Override
-			public @NotNull CountExpression count(Statement.UnionQuery union) {
+			@Override @NotNull
+			public CountExpression count(UnionQuery union) {
 				return new CountExpression(with, union, null);
 			}
 		};

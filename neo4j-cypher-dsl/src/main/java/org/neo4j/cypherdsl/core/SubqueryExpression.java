@@ -19,7 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 /**
- * A sub query expression can either be an {@link ExistentialSubquery EXISTS-tential} or a {@link CountExpression COUNT}
+ * A sub-query expression can either be an {@link ExistentialSubquery EXISTS-tential} or a {@link CountExpression COUNT}
  * expression as of Neo4j 5.
  *
  * @author Michael J. Simons

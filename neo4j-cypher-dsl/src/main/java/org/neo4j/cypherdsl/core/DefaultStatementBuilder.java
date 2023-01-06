@@ -1227,7 +1227,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		public T build() {
-			return getUpdatingClauseProvider().apply(new Pattern(patternElements));
+			return getUpdatingClauseProvider().apply(Pattern.of(patternElements));
 		}
 
 		static class CreateBuilder extends AbstractUpdatingClauseBuilder<Create> {

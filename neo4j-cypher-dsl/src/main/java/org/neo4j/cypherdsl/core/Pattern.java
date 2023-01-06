@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -37,7 +39,23 @@ import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 @API(status = INTERNAL, since = "1.0")
 final class Pattern extends TypedSubtree<PatternElement> {
 
-	Pattern(List<PatternElement> patternElements) {
+	static Pattern of(PatternElement requiredPattern, PatternElement... patternElement) {
+		List<PatternElement> elements;
+		if (patternElement == null || patternElement.length == 0) {
+			elements = List.of(requiredPattern);
+		} else {
+			elements = new ArrayList<>();
+			elements.add(requiredPattern);
+			elements.addAll(Arrays.asList(patternElement));
+		}
+		return Pattern.of(elements);
+	}
+
+	static Pattern of(List<PatternElement> elements) {
+		return new Pattern(elements);
+	}
+
+	private Pattern(List<PatternElement> patternElements) {
 		super(patternElements);
 	}
 }

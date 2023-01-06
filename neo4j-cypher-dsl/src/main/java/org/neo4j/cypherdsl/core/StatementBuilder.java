@@ -1102,7 +1102,7 @@ public interface StatementBuilder
 	/**
 	 * A trait for an ongoing standalone call to expose all of its results via an asterisk.
 	 *
-	 * @since @since 2022.8.3
+	 * @since 2022.8.3
 	 */
 	interface ExposesYieldStar {
 

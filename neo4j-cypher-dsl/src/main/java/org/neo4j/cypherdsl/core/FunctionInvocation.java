@@ -23,7 +23,7 @@ import static org.apiguardian.api.API.Status.STABLE;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.Collections;
+import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
@@ -139,7 +139,7 @@ public final class FunctionInvocation implements Expression {
 		Assertions.notNull(pattern, message);
 
 		return new FunctionInvocation(definition.getImplementationName(),
-			new Pattern(Collections.singletonList(pattern)));
+			Pattern.of(List.of(pattern)));
 	}
 
 	static FunctionInvocation create(FunctionDefinition definition, TypedSubtree<?> arguments) {
