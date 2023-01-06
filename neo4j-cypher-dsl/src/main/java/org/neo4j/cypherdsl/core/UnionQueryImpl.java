@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -41,8 +40,7 @@ final class UnionQueryImpl extends AbstractStatement implements Statement.UnionQ
 		Assertions.isTrue(queries != null && queries.size() >= 2, "At least two queries are needed.");
 
 		@SuppressWarnings("squid:S2259") // Really, we asserted it
-		List<UnionPart> unionParts = queries.stream().skip(1).map(q -> new UnionPart(unionAll, q)).collect(
-			Collectors.toList());
+		List<UnionPart> unionParts = queries.stream().skip(1).map(q -> new UnionPart(unionAll, q)).toList();
 		return new UnionQueryImpl(unionAll, queries.get(0), unionParts);
 	}
 
@@ -68,7 +66,7 @@ final class UnionQueryImpl extends AbstractStatement implements Statement.UnionQ
 
 		List<Statement> queries = new ArrayList<>();
 		queries.add(firstQuery);
-		queries.addAll(additionalQueries.stream().map(UnionPart::getQuery).collect(Collectors.toList()));
+		queries.addAll(additionalQueries.stream().map(UnionPart::getQuery).toList());
 		queries.addAll(newAdditionalQueries);
 
 		return create(this.isAll(), queries);

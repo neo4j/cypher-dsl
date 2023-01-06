@@ -147,19 +147,7 @@ public final class ScopingStrategy {
 		}
 
 		if (visitable instanceof Statement) {
-			Set<IdentifiableElement> lastScope = this.dequeOfVisitedNamed.peek();
-			// We keep properties only around when they have been actually returned
-			if (!(previous instanceof Return || previous instanceof YieldItems)) {
-				this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
-					.collect(Collectors.toSet());
-			} else {
-				this.afterStatement = new HashSet<>(lastScope);
-			}
-
-			// A procedure call doesn't change scope.
-			if (!(visitable instanceof ProcedureCall)) {
-				lastScope.retainAll(Optional.ofNullable(this.implicitScope.peek()).orElseGet(Set::of));
-			}
+			leaveStatement(visitable);
 		} else if (hasLocalScope(visitable)) {
 			this.dequeOfVisitedNamed.pop();
 		} else {
@@ -179,6 +167,25 @@ public final class ScopingStrategy {
 		}
 
 		previous = visitable;
+	}
+
+	private void leaveStatement(Visitable visitable) {
+
+		Set<IdentifiableElement> lastScope = this.dequeOfVisitedNamed.peek();
+		// We keep properties only around when they have been actually returned
+		if (!(previous instanceof Return || previous instanceof YieldItems)) {
+			this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
+				.collect(Collectors.toSet());
+		} else {
+			this.afterStatement = new HashSet<>(lastScope);
+		}
+
+		// A procedure call doesn't change scope.
+		if (visitable instanceof ProcedureCall) {
+			return;
+		}
+
+		lastScope.retainAll(Optional.ofNullable(this.implicitScope.peek()).orElseGet(Set::of));
 	}
 
 	private boolean hasScope() {
