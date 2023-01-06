@@ -58,7 +58,7 @@ public final class Clauses {
 		@Nullable Where optionalWhere,
 		@Nullable List<Hint> optionalHints) {
 
-		return new Match(optional, new Pattern(patternElements), optionalWhere, optionalHints);
+		return new Match(optional, Pattern.of(patternElements), optionalWhere, optionalHints);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public final class Clauses {
 	@NotNull
 	public static Clause create(List<PatternElement> patternElements) {
 
-		return new Create(new Pattern(patternElements));
+		return new Create(Pattern.of(patternElements));
 	}
 
 	/**
@@ -118,7 +118,7 @@ public final class Clauses {
 	@NotNull
 	public static Clause merge(List<PatternElement> patternElements, @Nullable List<MergeAction> mergeActions) {
 
-		return new Merge(new Pattern(patternElements), mergeActions == null ? Collections.emptyList() : mergeActions);
+		return new Merge(Pattern.of(patternElements), mergeActions == null ? Collections.emptyList() : mergeActions);
 	}
 
 	/**

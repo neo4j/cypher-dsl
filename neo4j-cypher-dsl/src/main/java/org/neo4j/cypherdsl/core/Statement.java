@@ -196,6 +196,14 @@ public interface Statement extends Visitable {
 	}
 
 	/**
+	 * Represents a {@code UnionQuery}.
+	 *
+	 * @since 2023.0.0
+	 */
+	sealed interface UnionQuery extends RegularQuery permits UnionQueryImpl {
+	}
+
+	/**
 	 * Represents a {@code USE} statement, utilizing a composite graph call. A statement utilizing composite databases
 	 * might use an {@code EXPLAIN} clause but cannot be profiled (as of Neo4j 5.3).
 	 *
@@ -216,6 +224,6 @@ public interface Statement extends Visitable {
 	 * @return True if this statement can be assured to return something.
 	 */
 	default boolean doesReturnOrYield() {
-		return this instanceof ResultStatement || this instanceof UnionQuery;
+		return this instanceof ResultStatement || this instanceof UnionQueryImpl;
 	}
 }

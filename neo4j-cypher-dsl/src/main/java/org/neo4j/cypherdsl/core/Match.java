@@ -41,7 +41,7 @@ public final class Match implements ReadingClause {
 
 	private final boolean optional;
 
-	private final Pattern pattern;
+	final Pattern pattern;
 
 	/**
 	 * A Neo4j extension to the match clause that allows to specify hints via the {@code USING} clause.

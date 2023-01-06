@@ -32,6 +32,7 @@ import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.AliasedExpression;
+import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
@@ -71,6 +72,11 @@ public final class ScopingStrategy {
 	 */
 	private final Deque<Set<IdentifiableElement>> dequeOfVisitedNamed = new ArrayDeque<>(new HashSet<>());
 
+	/**
+	 * Some expressions have implicit scopes, we might not clear that after returning from inner statements or returns.
+	 */
+	private final Deque<Set<IdentifiableElement>> implicitScope = new ArrayDeque<>(new HashSet<>());
+
 	private Set<IdentifiableElement> afterStatement = Collections.emptySet();
 
 	private Visitable previous;
@@ -101,6 +107,11 @@ public final class ScopingStrategy {
 
 		if (hasLocalScope(visitable)) {
 			dequeOfVisitedNamed.push(
+				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
+		}
+
+		if (visitable instanceof CountExpression) {
+			implicitScope.push(
 				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		}
 	}
@@ -136,19 +147,7 @@ public final class ScopingStrategy {
 		}
 
 		if (visitable instanceof Statement) {
-			Set<IdentifiableElement> lastScope = this.dequeOfVisitedNamed.peek();
-			// We keep properties only around when they have been actually returned
-			if (!(previous instanceof Return || previous instanceof YieldItems)) {
-				this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
-					.collect(Collectors.toSet());
-			} else {
-				this.afterStatement = new HashSet<>(lastScope);
-			}
-
-			// A procedure call doesn't change scope.
-			if (!(visitable instanceof ProcedureCall)) {
-				lastScope.clear();
-			}
+			leaveStatement(visitable);
 		} else if (hasLocalScope(visitable)) {
 			this.dequeOfVisitedNamed.pop();
 		} else {
@@ -163,7 +162,30 @@ public final class ScopingStrategy {
 			this.inProperty = false;
 		}
 
+		if (visitable instanceof CountExpression) {
+			this.implicitScope.pop();
+		}
+
 		previous = visitable;
+	}
+
+	private void leaveStatement(Visitable visitable) {
+
+		Set<IdentifiableElement> lastScope = this.dequeOfVisitedNamed.peek();
+		// We keep properties only around when they have been actually returned
+		if (!(previous instanceof Return || previous instanceof YieldItems)) {
+			this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
+				.collect(Collectors.toSet());
+		} else {
+			this.afterStatement = new HashSet<>(lastScope);
+		}
+
+		// A procedure call doesn't change scope.
+		if (visitable instanceof ProcedureCall) {
+			return;
+		}
+
+		lastScope.retainAll(Optional.ofNullable(this.implicitScope.peek()).orElseGet(Set::of));
 	}
 
 	private boolean hasScope() {
@@ -222,6 +244,7 @@ public final class ScopingStrategy {
 			}
 		});
 
+		retain.addAll(Optional.ofNullable(implicitScope.peek()).orElseGet(Set::of));
 		if (visitedNamed != null) {
 			visitedNamed.retainAll(retain);
 		}
@@ -229,7 +252,7 @@ public final class ScopingStrategy {
 
 	private void clearPreviouslyVisitedAfterReturnish(Visitable returnish) {
 
-		// Everything not returned as to go.
+		// Everything not returned has to go.
 		Set<IdentifiableElement> retain = new HashSet<>();
 		Set<IdentifiableElement> visitedNamed = dequeOfVisitedNamed.peek();
 		returnish.accept(new Visitor() {
@@ -267,6 +290,7 @@ public final class ScopingStrategy {
 			}
 		});
 
+		retain.addAll(Optional.ofNullable(implicitScope.peek()).orElseGet(Set::of));
 		if (visitedNamed != null) {
 			visitedNamed.retainAll(retain);
 		}

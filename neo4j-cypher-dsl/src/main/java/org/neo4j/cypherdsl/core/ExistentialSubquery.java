@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 @API(status = STABLE, since = "2020.1.2")
 @Neo4jVersion(minimum = "4.0.0")
-public final class ExistentialSubquery implements Condition {
+public final class ExistentialSubquery implements SubqueryExpression, Condition {
 
 	static ExistentialSubquery exists(Match fragment) {
 

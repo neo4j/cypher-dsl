@@ -433,8 +433,8 @@ MATCH (person:`Person`) MERGE (city:`City` {name: person.bornIn}) MERGE (person)
 MATCH (person:`Person`) MERGE (person)-[r:`HAS_CHAUFFEUR`]->(chauffeur:`Chauffeur` {name: person.chauffeurName}) RETURN person.name, person.chauffeurName, chauffeur
 MATCH p = (a)-->(b)-->(c) WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') RETURN reduce(totalAge = 0, n IN nodes(p) | (totalAge + n.age)) AS reduction
 MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE exists((p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})) RETURN p, r, friend
-MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS {MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'})} RETURN p, r, friend
-MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS {MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3}) RETURN person.name AS person, company.name AS company
+MATCH (p:`Person`)-[r:`IS_FRIENDS_WITH`]->(friend:`Person`) WHERE EXISTS { MATCH (p)-[:`WORKS_FOR`]->(:`Company` {name: 'Neo4j'}) } RETURN p, r, friend
+MATCH (person:`Person`)-[:`WORKS_FOR`]->(company) WHERE (company.name STARTS WITH 'Company' AND EXISTS { MATCH (person)-[:`LIKES`]->(t:`Technology`) WHERE size((t)<-[:`LIKES`]-()) >= 3 }) RETURN person.name AS person, company.name AS company
 CALL {MATCH (p:`Person`)-[:`LIKES`]->(:`Technology` {type: 'Java'}) RETURN p UNION MATCH (p:`Person`) WHERE size((p)-[:`IS_FRIENDS_WITH`]->()) > 1 RETURN p} RETURN p.name AS person, p.birthdate AS dob ORDER BY dob DESC
 MATCH p = (start)-[*]->(finish) WHERE (start.name = 'A' AND finish.name = 'D') FOREACH (n IN nodes(p) | SET n.marked = true)
 MATCH (a) WHERE a.name = 'Eskil' RETURN a.array, [x IN a.array WHERE size(x) = 3]

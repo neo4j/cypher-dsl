@@ -1227,7 +1227,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		public T build() {
-			return getUpdatingClauseProvider().apply(new Pattern(patternElements));
+			return getUpdatingClauseProvider().apply(Pattern.of(patternElements));
 		}
 
 		static class CreateBuilder extends AbstractUpdatingClauseBuilder<Create> {
@@ -1631,7 +1631,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	private static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
-		implements ExposesWhere, ExposesReturning, OngoingStandaloneCallWithReturnFields {
+		implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, OngoingStandaloneCallWithReturnFields {
 
 		private final YieldItems yieldItems;
 

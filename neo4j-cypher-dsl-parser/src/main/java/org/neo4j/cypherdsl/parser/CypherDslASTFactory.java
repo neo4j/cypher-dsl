@@ -58,12 +58,12 @@ import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Conditions;
-import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.ExposesPatternLengthAccessors;
 import org.neo4j.cypherdsl.core.ExposesProperties;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Expressions;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Hint;
@@ -1412,7 +1412,13 @@ final class CypherDslASTFactory implements ASTFactory<
 			condition = capturedCondition.get();
 		}
 
-		return CountExpression.of(elementsAndWhere.elements(), Optional.ofNullable(condition));
+
+		var elements = elementsAndWhere.elements();
+		var count = Expressions.count(elements.get(0), elements.subList(1, elements.size()).toArray(PatternElement[]::new));
+		if (condition == null) {
+			return count;
+		}
+		return count.where(condition.asCondition());
 	}
 
 	@Override

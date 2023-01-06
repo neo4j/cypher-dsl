@@ -20,10 +20,11 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -34,30 +35,51 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2023.0.0
  */
 @API(status = STABLE, since = "2023.0.0")
-public final class CountExpression implements Expression {
+@Neo4jVersion(minimum = "5.0")
+public final class CountExpression implements SubqueryExpression, ExposesWhere<Expression> {
 
-	public static CountExpression of(List<PatternElement> elements, Optional<Expression> where) {
-		return new CountExpression(new Pattern(elements), where
-			.map(Expression::asCondition)
-			.map(Where::new)
-			.orElse(null)
-		);
-	}
+	private final With optionalWith;
 
-	private final Pattern pattern;
+	private final Visitable patternOrUnion;
 
 	private final Where optionalWhere;
 
-	private CountExpression(Pattern pattern, Where optionalWhere) {
-		this.pattern = pattern;
-		this.optionalWhere = optionalWhere;
+	CountExpression(@Nullable With optionalWith, Visitable patternOrUnion, @Nullable Where optionalWhere) {
+
+		if (patternOrUnion instanceof Statement.UnionQuery && optionalWhere != null) {
+			throw new IllegalArgumentException("Cannot use a UNION with a WHERE clause inside a COUNT {} expression");
+		}
+		this.optionalWith = optionalWith;
+		if (optionalWith != null && patternOrUnion instanceof Pattern pattern) {
+			this.patternOrUnion = new Match(false, pattern, optionalWhere, null);
+			this.optionalWhere = null;
+		} else {
+			this.patternOrUnion = patternOrUnion;
+			this.optionalWhere = optionalWhere;
+		}
+	}
+
+	/**
+	 * Creates a new {@link CountExpression count expression} with additional conditions
+	 *
+	 * @param condition the condition to apply in the count expression
+	 * @return A new {@link CountExpression}
+	 */
+	@NotNull @Contract(pure = true)
+	public CountExpression where(Condition condition) {
+
+		var exisitingPatternOrUnion = patternOrUnion instanceof Match match ? match.pattern : patternOrUnion;
+		return new CountExpression(optionalWith, exisitingPatternOrUnion, new Where(condition));
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		this.pattern.accept(visitor);
+		if (optionalWith != null) {
+			this.optionalWith.accept(visitor);
+		}
+		this.patternOrUnion.accept(visitor);
 		if (optionalWhere != null) {
 			this.optionalWhere.accept(visitor);
 		}
