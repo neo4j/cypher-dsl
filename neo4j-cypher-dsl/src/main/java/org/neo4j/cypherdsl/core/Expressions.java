@@ -138,17 +138,13 @@ public final class Expressions {
 		}
 	}
 
-	static Expression[] createSymbolicNames(String[] variables) {
-		return Arrays.stream(variables).map(SymbolicName::of).toArray(Expression[]::new);
+	static SymbolicName[] createSymbolicNames(String[] variables) {
+		return Arrays.stream(variables).map(SymbolicName::of).toArray(SymbolicName[]::new);
 	}
 
-	static Expression[] createSymbolicNames(Named[] variables) {
+	static SymbolicName[] createSymbolicNames(Named[] variables) {
 		return Arrays.stream(variables).map(Named::getRequiredSymbolicName)
-			.toArray(Expression[]::new);
-	}
-
-	static Expression[] createSymbolicNames(IdentifiableElement[] variables) {
-		return Arrays.stream(variables).map(IdentifiableElement::asExpression).toArray(Expression[]::new);
+			.toArray(SymbolicName[]::new);
 	}
 
 	static String format(Expression expression) {

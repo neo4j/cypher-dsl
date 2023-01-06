@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -205,7 +206,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		if (pattern.getClass().getComponentType() == PatternElement.class) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (PatternElement[]) pattern);
-		} else if (pattern.getClass().getComponentType() == Expression.class) {
+		} else if (Expression.class.isAssignableFrom(pattern.getClass().getComponentType())) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (Expression[]) pattern);
 		}
 
@@ -214,105 +215,48 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final OngoingReadingAndReturn returning(Expression... expressions) {
+	public final OngoingReadingAndReturn returning(Collection<Expression> elements) {
 
-		return returning(false, false, expressions);
+		return returning(false, false, elements);
 	}
 
 	@NotNull
 	@Override
-	public final OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+	public final OngoingReadingAndReturn returningDistinct(Collection<Expression> elements) {
 
-		return returning(expressions == null ? null : expressions.toArray(new Expression[] {}));
-	}
-
-	@NotNull
-	@Override
-	public final OngoingReadingAndReturn returningDistinct(Expression... expressions) {
-		return returning(false, true, expressions);
-	}
-
-	@NotNull
-	@Override
-	public final OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
-		return returningDistinct(expressions.toArray(new Expression[] {}));
+		return returning(false, true, elements);
 	}
 
 	@NotNull
 	@Override
 	public StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
-		return returning(true, false, rawExpression);
+
+		return new DefaultStatementWithReturnBuilder(rawExpression);
 	}
 
-	private OngoingReadingAndReturn returning(boolean raw, boolean distinct, Expression... expressions) {
+	private OngoingReadingAndReturn returning(boolean raw, boolean distinct, Collection<Expression> elements) {
 
 		DefaultStatementWithReturnBuilder ongoingMatchAndReturn = new DefaultStatementWithReturnBuilder(raw, distinct);
-		ongoingMatchAndReturn.addExpressions(expressions);
+		ongoingMatchAndReturn.addExpressions(elements);
 		return ongoingMatchAndReturn;
 	}
 
 	@NotNull
 	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
-		return with(false, Expressions.createSymbolicNames(variables));
+	public final OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
+		return with(false, elements);
 	}
 
 	@NotNull
 	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
-		return with(false, Expressions.createSymbolicNames(variables));
+	public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+		return with(true, elements);
 	}
 
-	@NotNull
-	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
-		return with(false, variables);
-	}
-
-	@NotNull
-	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
-		return with(false, Expressions.createSymbolicNames(elements));
-	}
-
-	@NotNull
-	@Override
-	public OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions) {
-		return with((Expression[]) expressions);
-	}
-
-	@NotNull
-	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
-
-		return with(false, expressions);
-	}
-
-	@NotNull
-	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
-
-		return with(expressions == null ? null : expressions.toArray(new Expression[] {}));
-	}
-
-	@NotNull
-	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
-
-		return with(true, expressions);
-	}
-
-	@NotNull
-	@Override
-	public final OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
-
-		return withDistinct(expressions.toArray(new Expression[] {}));
-	}
-
-	private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Expression... expressions) {
+	private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Collection<IdentifiableElement> elements) {
 
 		DefaultStatementWithWithBuilder ongoingMatchAndWith = new DefaultStatementWithWithBuilder(distinct);
-		ongoingMatchAndWith.addExpressions(expressions);
+		ongoingMatchAndWith.addElements(elements);
 		return ongoingMatchAndWith;
 	}
 
@@ -574,13 +518,39 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	protected class DefaultStatementWithReturnBuilder
+	abstract static class ReturnListWrapper {
+		protected final List<Expression> returnList = new ArrayList<>();
+
+		protected final void addElements(Collection<IdentifiableElement> elements) {
+
+			Assertions.notNull(elements, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			var filteredElements = elements.stream().filter(Objects::nonNull).map(IdentifiableElement::asExpression).toList();
+			Assertions.isTrue(!filteredElements.isEmpty(), Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+
+			this.returnList.addAll(filteredElements);
+		}
+
+		protected final void addExpressions(Collection<Expression> expressions) {
+
+			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
+			Assertions.isTrue(!expressions.isEmpty() && expressions.stream().noneMatch(Objects::isNull), Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+
+			this.returnList.addAll(expressions);
+		}
+	}
+
+	protected class DefaultStatementWithReturnBuilder extends ReturnListWrapper
 		implements OngoingReadingAndReturn, TerminalOngoingOrderDefinition, OngoingMatchAndReturnWithOrder {
 
-		protected final List<Expression> returnList = new ArrayList<>();
 		protected final OrderBuilder orderBuilder = new OrderBuilder();
 		protected boolean rawReturn;
 		protected boolean distinct;
+
+		protected DefaultStatementWithReturnBuilder(Expression rawReturnExpression) {
+			this.distinct = false;
+			this.rawReturn = true;
+			this.returnList.add(rawReturnExpression);
+		}
 
 		protected DefaultStatementWithReturnBuilder(boolean rawReturn, boolean distinct) {
 			this.distinct = distinct;
@@ -666,25 +636,16 @@ class DefaultStatementBuilder implements StatementBuilder,
 			Return returning = Return.create(rawReturn, distinct, returnList, orderBuilder);
 			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(returning);
 		}
-
-		protected final void addExpressions(Expression... expressions) {
-
-			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.notEmpty(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
-
-			this.returnList.addAll(Arrays.asList(expressions));
-		}
 	}
 
 	/**
 	 * Helper class aggregating a couple of interface, collecting conditions and returned objects.
 	 */
-	protected final class DefaultStatementWithWithBuilder
+	protected final class DefaultStatementWithWithBuilder extends ReturnListWrapper
 		implements OngoingOrderDefinition, OrderableOngoingReadingAndWithWithoutWhere,
 		OrderableOngoingReadingAndWithWithWhere, OngoingReadingAndWithWithWhereAndOrder, OngoingReadingAndWithWithSkip {
 
 		protected final ConditionBuilder conditionBuilder = new ConditionBuilder();
-		protected final List<Expression> returnList = new ArrayList<>();
 		protected final OrderBuilder orderBuilder = new OrderBuilder();
 		protected boolean distinct;
 
@@ -715,45 +676,22 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return extractIdentifiablesFromReturnList(returnList);
 		}
 
-		protected void addExpressions(Expression... expressions) {
-
-			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.notEmpty(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
-
-			this.returnList.addAll(Arrays.asList(expressions));
-		}
-
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Expression... expressions) {
+		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.returning(expressions);
 		}
 
-
-		@NotNull
-		@Override
-		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
-
-			return returning(expressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.returningDistinct(expressions);
-		}
-
 		@NotNull
 		@Override
 		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
 
-			return returningDistinct(expressions.toArray(new Expression[] {}));
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.returningDistinct(expressions);
 		}
 
 		@NotNull
@@ -871,34 +809,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
-				.with(expressions);
+				.with(elements);
 		}
 
 		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
-
-			return with(expressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
-				.withDistinct(expressions);
-		}
-
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
-
-			return withDistinct(expressions.toArray(new Expression[] {}));
+				.withDistinct(elements);
 		}
 
 		@NotNull
@@ -1283,48 +1207,30 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Expression... returnedExpressions) {
-
-			Assertions.notNull(returnedExpressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.notEmpty(returnedExpressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 
 			DefaultStatementWithReturnBuilder delegate = new DefaultStatementWithReturnBuilder(false, false);
-			delegate.returnList.addAll(Arrays.asList(returnedExpressions));
+			delegate.addExpressions(expressions);
 			return delegate;
 		}
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Collection<Expression> returnedExpressions) {
+		public OngoingReadingAndReturn returningDistinct(Collection<Expression> elements) {
 
-			return returning(returnedExpressions == null ? null : returnedExpressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public OngoingReadingAndReturn returningDistinct(Expression... returnedExpressions) {
-
-			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(returnedExpressions);
+			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(elements);
 			delegate.distinct = true;
 			return delegate;
 		}
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<Expression> returnedExpressions) {
-
-			return returningDistinct(returnedExpressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
 		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 
-			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(rawExpression);
-			delegate.rawReturn = true;
-			return delegate;
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return new DefaultStatementWithReturnBuilder(rawExpression);
 		}
 
 		@NotNull
@@ -1442,26 +1348,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... returnedExpressions) {
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> returnedExpressions) {
 			return this.with(false, returnedExpressions);
 		}
 
 		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> returnedExpressions) {
-			return with(returnedExpressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... returnedExpressions) {
-			return this.with(true, returnedExpressions);
-		}
-
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> returnedExpressions) {
-			return withDistinct(returnedExpressions.toArray(new Expression[] {}));
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+			return this.with(true, elements);
 		}
 
 		@NotNull
@@ -1477,9 +1371,9 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return create(pattern.toArray(new PatternElement[] {}));
 		}
 
-		private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Expression... returnedExpressions) {
+		private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Collection<IdentifiableElement> elements) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.with(distinct, returnedExpressions);
+			return DefaultStatementBuilder.this.with(distinct, elements);
 		}
 
 		@NotNull
@@ -1630,7 +1524,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 	}
 
-	private static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
+	static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
 		implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, OngoingStandaloneCallWithReturnFields {
 
 		private final YieldItems yieldItems;
@@ -1652,30 +1546,16 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
+		public StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returning(expressions);
 		}
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
-
-			return returning(expressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
-
-			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
-		}
-
-		@NotNull
-		@Override
 		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
 
-			return returningDistinct(expressions.toArray(new Expression[] {}));
+			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
 		}
 
 		@NotNull
@@ -1694,26 +1574,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
-			return new DefaultStatementBuilder(this.buildCall()).with(expressions);
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
+			return new DefaultStatementBuilder(this.buildCall()).with(elements);
 		}
 
 		@NotNull
 		@Override
-		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
-			return with(expressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
-			return new DefaultStatementBuilder(this.buildCall()).withDistinct(expressions);
-		}
-
-		@NotNull
-		@Override
-		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
-			return withDistinct(expressions.toArray(new Expression[] {}));
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+			return new DefaultStatementBuilder(this.buildCall()).withDistinct(elements);
 		}
 
 		@NotNull
@@ -1747,7 +1615,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 	}
 
-	private final class InQueryCallBuilder extends AbstractCallBuilder implements
+	final class InQueryCallBuilder extends AbstractCallBuilder implements
 
 		OngoingInQueryCallWithoutArguments,
 		OngoingInQueryCallWithArguments,
@@ -1800,7 +1668,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Expression... expressions) {
+		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returning(expressions);
@@ -1808,24 +1676,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
-
-			return returning(expressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public OngoingReadingAndReturn returningDistinct(Expression... expressions) {
+		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returningDistinct(expressions);
-		}
-
-		@NotNull
-		@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
-
-			return returningDistinct(expressions.toArray(new Expression[] {}));
 		}
 
 		@NotNull
@@ -1837,32 +1691,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.with(expressions);
+			return DefaultStatementBuilder.this.with(elements);
 		}
 
 		@NotNull
 		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
-
-			return with(expressions.toArray(new Expression[] {}));
-		}
-
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions) {
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.withDistinct(expressions);
-		}
-
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions) {
-
-			return withDistinct(expressions.toArray(new Expression[] {}));
+			return DefaultStatementBuilder.this.withDistinct(elements);
 		}
 
 		@NotNull

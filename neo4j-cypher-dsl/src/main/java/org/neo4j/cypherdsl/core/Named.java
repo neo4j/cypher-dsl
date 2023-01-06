@@ -33,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public interface Named extends IdentifiableElement {
+public non-sealed interface Named extends IdentifiableElement {
 
 	/**
 	 * @return An optional symbolic name.

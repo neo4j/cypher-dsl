@@ -46,4 +46,15 @@ public final class Asterisk extends LiteralBase<String> {
 	public String asString() {
 		return super.getContent();
 	}
+
+	enum IdentifiableAsterisk implements IdentifiableElement {
+
+		INSTANCE;
+
+		@NotNull
+		@Override
+		public Expression asExpression() {
+			return Asterisk.INSTANCE;
+		}
+	}
 }

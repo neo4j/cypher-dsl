@@ -31,6 +31,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Expression;
@@ -201,8 +202,8 @@ public final class ScopingStrategy {
 			.anyMatch(i -> {
 				if (i instanceof Named named) {
 					return named.getSymbolicName().equals(needle.getSymbolicName());
-				} else if (i instanceof AliasedExpression aliasedExpression) {
-					return aliasedExpression.getAlias().equals(needle.getRequiredSymbolicName().getValue());
+				} else if (i instanceof Aliased aliased) {
+					return aliased.getAlias().equals(needle.getRequiredSymbolicName().getValue());
 				}
 				return false;
 			});
@@ -235,8 +236,8 @@ public final class ScopingStrategy {
 					.filter(element -> {
 						if (element instanceof Named named) {
 							return named.getRequiredSymbolicName().equals(segment);
-						} else if (element instanceof AliasedExpression aliasedExpression) {
-							return aliasedExpression.getAlias().equals((symbolicName).getValue());
+						} else if (element instanceof Aliased aliased) {
+							return aliased.getAlias().equals((symbolicName).getValue());
 						}
 						return false;
 					})

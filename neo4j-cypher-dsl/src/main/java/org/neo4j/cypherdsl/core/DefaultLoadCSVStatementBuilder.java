@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 @API(status = INTERNAL, since = "2021.2.1")
 final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder implements LoadCSVStatementBuilder {
 
-	static class PrepareLoadCSVStatementImpl implements ExposesLoadCSV, OngoingLoadCSV {
+	static final class PrepareLoadCSVStatementImpl implements ExposesLoadCSV, OngoingLoadCSV {
 
 		private final UsingPeriodicCommit usingPeriodicCommit;
 		private final DefaultStatementBuilder source;

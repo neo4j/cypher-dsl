@@ -24,8 +24,9 @@ import org.jetbrains.annotations.NotNull;
 /**
  * This interface represents an element that can be for example an identifiable part of the {@code WITH} clause.
  * It has been introduced to circumvent the absence of union types in Java
- * and to avoid an overload of {@link StatementBuilder#with(Expression...)} with an {@code Object...} parameter
- * to allow passing {@link Named named things} or {@link AliasedExpression aliased expression} into a pipeline.
+ * and to avoid an overload of {@link StatementBuilder#with(String...)} or other expressions with an {@code Object...}
+ * parameter. This type here allows passing {@link Named named things}. {@link AliasedExpression aliased expression},
+ * {@link SymbolicName symobolic names} into a pipeline.
  * <p>
  * There should be no need to implement this on your own.
  *
@@ -33,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @soundtrack Fatoni &amp; Edgar Wasser - Delirium
  * @since 2021.2.2
  */
-public interface IdentifiableElement {
+public sealed interface IdentifiableElement permits AliasedExpression, Asterisk.IdentifiableAsterisk, Named, Property, SymbolicName {
 
 	/**
 	 * Transform this element into an expression
