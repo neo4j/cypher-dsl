@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1672836880422">
+<licensePluginReport goal="CHECK" timestamp="1673013325361">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -131,10 +131,11 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/StatementContextImpl.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/StringLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Subquery.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/SubqueryExpression.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/SymbolicName.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/TemporalLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/UnionPart.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/UnionQuery.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/UnionQueryImpl.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Unwind.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/UpdatingClause.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Use.java" result="PRESENT"/>
@@ -200,6 +201,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/DefaultStatementBuilderTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DialectIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ExpressionTest.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/ExpressionsIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ForeignAdapterFactoryTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/FunctionInvocationTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/FunctionsIT.java" result="PRESENT"/>
