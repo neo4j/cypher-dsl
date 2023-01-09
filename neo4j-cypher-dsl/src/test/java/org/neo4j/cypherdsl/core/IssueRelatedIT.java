@@ -1430,4 +1430,14 @@ class IssueRelatedIT {
 			.build();
 		assertThat(renderer.render(statement)).isEqualTo("UNWIND $ids AS id MATCH (n:`Person`) WHERE elementId(n) = id RETURN n");
 	}
+
+	@Test // GH-547
+	void mixedBagOfWith() {
+
+		var cypher = Cypher.match(person)
+			.with(person, Expressions.count(person.relationshipTo(Cypher.anyNode(), "ACTED_IN")).as("actedInDegree"))
+			.returning(Cypher.asterisk())
+			.build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WITH person, COUNT { (person)-[:`ACTED_IN`]->() } AS actedInDegree RETURN *");
+	}
 }
