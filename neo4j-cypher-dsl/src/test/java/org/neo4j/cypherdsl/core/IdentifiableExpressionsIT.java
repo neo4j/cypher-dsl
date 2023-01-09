@@ -113,7 +113,7 @@ class IdentifiableExpressionsIT {
 		Node b = Cypher.anyNode("b");
 		Node a = Cypher.node("Label").named("a");
 		Collection<Expression> variables = Cypher.match(a.relationshipTo(b))
-			.with(Cypher.literalOf(1), b.as("007"))
+			.with(b.as("007"))
 			.getIdentifiableExpressions();
 
 		assertThat(variables.stream().map(Cypher::format))

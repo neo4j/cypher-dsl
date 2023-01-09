@@ -50,7 +50,7 @@ class DefaultStatementBuilderTest {
 			assertThatIllegalArgumentException().isThrownBy(() -> builder.returning((Collection<Expression>) null))
 				.withMessage("Expressions to return are required.");
 
-			assertThatIllegalArgumentException().isThrownBy(() -> builder.with((Collection<Expression>) null))
+			assertThatIllegalArgumentException().isThrownBy(() -> builder.with((Collection<IdentifiableElement>) null))
 				.withMessage("Expressions to return are required.");
 
 			StatementBuilder.BuildableMatchAndUpdate update = builder.set(Cypher.node("N").named("n"), "x");
@@ -65,7 +65,7 @@ class DefaultStatementBuilderTest {
 			assertThatIllegalArgumentException().isThrownBy(() -> builder.returning((Expression) null))
 				.withMessage("At least one expressions to return is required.");
 
-			assertThatIllegalArgumentException().isThrownBy(() -> builder.with((Expression) null))
+			assertThatIllegalArgumentException().isThrownBy(() -> builder.with((IdentifiableElement) null))
 				.withMessage("At least one expressions to return is required.");
 
 			StatementBuilder.BuildableMatchAndUpdate update = builder.set(Cypher.node("N").named("n"), "x");

@@ -461,21 +461,6 @@ public final class Cypher {
 	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
 	 * arguments to have an alias.
 	 *
-	 * @param variables One ore more variables.
-	 * @return An ongoing with clause.
-	 * @since 2021.2.2
-	 */
-	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
-
-		return Statement.builder().with(variables);
-	}
-
-	/**
-	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
-	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
-	 * arguments to have an alias.
-	 *
 	 * @param elements One ore more variables.
 	 * @return An ongoing with clause.
 	 * @since 2020.1.2
@@ -490,50 +475,18 @@ public final class Cypher {
 	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
 	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
 	 * arguments to have an alias.
-	 *
-	 * @param expressions One or more aliased expressions.
-	 * @return An ongoing with clause.
-	 * @since 2021.2.2
-	 */
-	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions) {
-
-		return Statement.builder().with(expressions);
-	}
-
-	/**
-	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
-	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
-	 * arguments to have an alias.
 	 * <p>
 	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
 	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.
 	 *
-	 * @param expressions One or more expressions.
-	 * @return An ongoing with clause.
-	 */
-	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions) {
-
-		return Statement.builder().with(expressions);
-	}
-
-	/**
-	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
-	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
-	 * arguments to have an alias.
-	 * <p>
-	 * This method takes both aliased and non-aliased expression. The later will produce only valid Cypher when used in
-	 * combination with a correlated subquery via {@link Cypher#call(Statement)}.
-	 *
-	 * @param expressions One ore more expressions.
+	 * @param elements One ore more expressions.
 	 * @return An ongoing with clause.
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions) {
+	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 
-		return with(expressions.toArray(new Expression[] {}));
+		return Statement.builder().with(elements);
 	}
 
 	/**
@@ -810,7 +763,7 @@ public final class Cypher {
 	/**
 	 * A {@literal RETURN} statement without a previous match.
 	 *
-	 * @param expressions The expressions to return
+	 * @param expressions The elements to return
 	 * @return A buildable statement
 	 * @since 1.0.1
 	 */
@@ -828,7 +781,7 @@ public final class Cypher {
 	 */
 	@NotNull @Contract(pure = true)
 	public static StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
-		return returning(expressions.toArray(new Expression[] {}));
+		return Statement.builder().returning(expressions);
 	}
 
 	/**

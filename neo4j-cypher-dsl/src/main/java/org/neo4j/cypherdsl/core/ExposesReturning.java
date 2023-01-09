@@ -24,6 +24,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -65,7 +66,9 @@ public interface ExposesReturning {
 	 * @return A match that can be build now
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions);
+	default StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
+		return returning(expressions == null ? null : Arrays.asList(expressions));
+	}
 
 	/**
 	 * Create a match that returns one or more expressions.
@@ -81,7 +84,7 @@ public interface ExposesReturning {
 	 * must be valid {@link SymbolicName symbolic names}. {@link Expression#property(String...)} must be used to return
 	 * single properties.
 	 *
-	 * @param variables The named things to return
+	 * @param variables The variables to return
 	 * @return A build step with a defined list of things to return.
 	 */
 	@NotNull @CheckReturnValue
@@ -107,7 +110,9 @@ public interface ExposesReturning {
 	 * @return A match that can be build now
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions);
+	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
+		return returningDistinct(expressions == null ? null : Arrays.asList(expressions));
+	}
 
 	/**
 	 * Creates a {@code RETURN} clause returning the distinct set of one or more expressions.

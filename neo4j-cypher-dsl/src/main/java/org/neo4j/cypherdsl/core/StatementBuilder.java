@@ -25,9 +25,9 @@ import java.util.Collection;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * @author Michael J. Simons
@@ -37,76 +37,7 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
  */
 @API(status = STABLE, since = "1.0")
 public interface StatementBuilder
-	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning, ExposesSubqueryCall {
-
-	/**
-	 * Starts a with clause by passing variables to it.
-	 *
-	 * @param variables The variables to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 * @since 2020.1.2
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(String... variables);
-
-	/**
-	 * Starts a with clause by passing variables to it.
-	 *
-	 * @param variables The variables to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 * @since 2020.1.2
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables);
-
-	/**
-	 * Starts a with clause by passing named expressions to it.
-	 *
-	 * @param expressions The expressions to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 * @since 2020.1.2
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(Named... expressions);
-
-	/**
-	 * Starts a with clause by passing named expressions to it.
-	 *
-	 * @param elements The expressions to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 * @since 2020.2.2
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements);
-
-	/**
-	 * Starts a with clause by passing named expressions to it.
-	 *
-	 * @param expressions The expressions to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 * @since 2021.2.2
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions);
-
-	/**
-	 * Allows for queries starting with {@code with range(1,10) as x return x} or similar.
-	 *
-	 * @param expressions The expressions to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
-
-	/**
-	 * Allows for queries starting with {@code with range(1,10) as x return x} or similar.
-	 *
-	 * @param expressions The expressions to start the query with
-	 * @return An ongoing read, exposing return and further matches.
-	 * @since 2021.2.2
-	 */
-	@NotNull @CheckReturnValue
-	OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
+	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning, ExposesSubqueryCall, ExposesWith {
 
 	/**
 	 * An ongoing update statement that can be used to chain more update statements or add a with or return clause.
@@ -406,154 +337,6 @@ public interface StatementBuilder
 	}
 
 	/**
-	 * A step that exposes the {@code WITH} clause.
-	 *
-	 * @since 1.0
-	 */
-	interface ExposesWith {
-
-		/**
-		 * @param variables The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #with(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
-			return with(Expressions.createSymbolicNames(variables));
-		}
-
-		/**
-		 * @param variables The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #with(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere with(SymbolicName... variables) {
-			return with((Expression[]) variables);
-		}
-
-		/**
-		 * @param variables The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #with(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere with(Named... variables) {
-			return with(Expressions.createSymbolicNames(variables));
-		}
-
-		/**
-		 * @param elements The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #with(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
-			return with(Expressions.createSymbolicNames(elements));
-		}
-
-		/**
-		 * Create a match that returns one or more expressions.
-		 *
-		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-		 * @return A match that can be build now
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere with(AliasedExpression... expressions) {
-			return with((Expression[]) expressions);
-		}
-
-		/**
-		 * Create a match that returns one or more expressions.
-		 *
-		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-		 * @return A match that can be build now
-		 */
-		@NotNull @CheckReturnValue
-		OrderableOngoingReadingAndWithWithoutWhere with(Expression... expressions);
-
-		/**
-		 * Create a match that returns one or more expressions.
-		 *
-		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-		 * @return A match that can be build now
-		 * @since 2021.2.2
-		 */
-		@NotNull @CheckReturnValue
-		OrderableOngoingReadingAndWithWithoutWhere with(Collection<Expression> expressions);
-
-		/**
-		 * @param variables The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #withDistinct(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(String... variables) {
-			return withDistinct(Expressions.createSymbolicNames(variables));
-		}
-
-		/**
-		 * @param variables The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #withDistinct(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(SymbolicName... variables) {
-			return withDistinct((Expression[]) variables);
-		}
-
-		/**
-		 * @param variables The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #withDistinct(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(Named... variables) {
-			return withDistinct(Expressions.createSymbolicNames(variables));
-		}
-
-		/**
-		 * @param elements The variables to pass on to the next part
-		 * @return A match that can be build now
-		 * @see #withDistinct(Expression...)
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(IdentifiableElement... elements) {
-			return withDistinct(Expressions.createSymbolicNames(elements));
-		}
-
-		/**
-		 * Create a match that returns the distinct set of one or more expressions.
-		 *
-		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-		 * @return A match that can be build now
-		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithoutWhere withDistinct(AliasedExpression... expressions) {
-			return withDistinct((Expression[]) expressions);
-		}
-
-		/**
-		 * Create a match that returns the distinct set of one or more expressions.
-		 *
-		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-		 * @return A match that can be build now
-		 */
-		@NotNull @CheckReturnValue
-		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Expression... expressions);
-
-		/**
-		 * Create a match that returns the distinct set of one or more expressions.
-		 *
-		 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-		 * @return A match that can be build now
-		 * @since 2021.2.2
-		 */
-		@NotNull @CheckReturnValue
-		OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<Expression> expressions);
-	}
-
-	/**
 	 * A step that exposes several methods to specify ordering. This is a terminal operation just before a statement
 	 * is buildable.
 	 *
@@ -766,7 +549,7 @@ public interface StatementBuilder
 		 * previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @return A match with a delete clause that can be build now
+		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
 		default OngoingUpdate delete(String... variables) {
@@ -778,7 +561,7 @@ public interface StatementBuilder
 		 * previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @return A match with a delete clause that can be build now
+		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
 		default OngoingUpdate delete(Named... variables) {
@@ -789,7 +572,7 @@ public interface StatementBuilder
 		 * Creates a delete step with one or more expressions to be deleted.
 		 *
 		 * @param expressions The expressions to be deleted.
-		 * @return A match with a delete clause that can be build now
+		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
 		OngoingUpdate delete(Expression... expressions);
@@ -1162,9 +945,9 @@ public interface StatementBuilder
 	/**
 	 * A buildable statement exposing where and return clauses.
 	 */
-	interface OngoingStandaloneCallWithReturnFields extends
+	sealed interface OngoingStandaloneCallWithReturnFields extends
 		StatementBuilder.BuildableStatement<ResultStatement>,
-		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesWith, ExposesSubqueryCall permits DefaultStatementBuilder.YieldingStandaloneCallBuilder {
 	}
 
 	/**
@@ -1211,6 +994,6 @@ public interface StatementBuilder
 	 * An in-query call exposing where and return clauses.
 	 */
 	interface OngoingInQueryCallWithReturnFields extends
-		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, StatementBuilder.ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesWith, ExposesSubqueryCall {
 	}
 }

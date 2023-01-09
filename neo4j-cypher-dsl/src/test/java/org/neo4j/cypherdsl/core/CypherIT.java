@@ -4521,9 +4521,9 @@ class CypherIT {
 			Node li = Cypher.node("LineItem").named("li");
 			Relationship hasLineItems = o.relationshipTo(li).named("h");
 
-			Expression netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
+			var netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
 				.as("netAmount");
-			Expression totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
+			var totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
 				.as("totalAmount");
 			Statement statement = Cypher.match(hasLineItems)
 				.where(o.property("id").isEqualTo(Cypher.parameter("id")))
@@ -4544,9 +4544,9 @@ class CypherIT {
 			Node li = Cypher.node("LineItem").named("li");
 			Relationship hasLineItems = o.relationshipTo(li).named("h");
 
-			Expression netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
+			var netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
 				.as("netAmount");
-			Expression totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
+			var totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
 				.as("totalAmount");
 			Statement statement = Cypher.match(hasLineItems)
 				.where(o.property("id").isEqualTo(Cypher.parameter("id")))

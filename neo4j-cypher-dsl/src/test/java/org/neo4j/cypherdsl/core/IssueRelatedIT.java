@@ -411,7 +411,7 @@ class IssueRelatedIT {
 		SymbolicName nn = Cypher.name("nn");
 
 		Node rnNode = Cypher.node("SomeLabel").named(rn);
-		Expression rnAliasedAsNN = rnNode.as("nn");
+		var rnAliasedAsNN = rnNode.as("nn");
 		Statement statement = Cypher.match(Cypher.node("User").named(u), rnNode, Cypher.node("SomeLabel").named(nn))
 			.withDistinct(u, rn, rnAliasedAsNN)
 			.returning(u, rn, rnAliasedAsNN)
@@ -433,7 +433,7 @@ class IssueRelatedIT {
 	@Test // GH-123
 	void propertiesOfFunctionsInsideQuery() {
 
-		Expression collectedThings = Functions.collect(Cypher.name("n")).as("collectedThings");
+		var collectedThings = Functions.collect(Cypher.name("n")).as("collectedThings");
 		Statement statement = Cypher.match(Cypher.anyNode().named("n"))
 			.with(collectedThings)
 			.returning(Cypher.property(Functions.last(collectedThings), "name")).build();
@@ -767,7 +767,7 @@ class IssueRelatedIT {
 		Node node = Cypher.node("Node").named("node");
 		Expression someExpression = Cypher.literalFalse();
 
-		String cypher = Cypher.match(node).with((Expression) Cypher.name("n"), someExpression.as("f"), Functions.date().as("aDate"))
+		String cypher = Cypher.match(node).with(Cypher.name("n"), someExpression.as("f"), Functions.date().as("aDate"))
 			.returning(Cypher.asterisk()).build().getCypher();
 		assertThat(cypher).isEqualTo(
 			"MATCH (node:`Node`) WITH n, false AS f, date() AS aDate RETURN *");
