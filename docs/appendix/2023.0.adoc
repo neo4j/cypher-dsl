@@ -1,0 +1,77 @@
+== 2022.8
+
+=== 2023.0.0
+
+Welcome to 2023, welcome Java 17, welcome Neo4j 5 clauses. This is the first release of the Cypher-DSL requiring Java 17. This is in line with Neo4j itself, Spring Data Neo4j 7 and several other frameworks out there. This allows for more concise code (which is nice for us) as well as using the Neo4j 5 parser in `neo4j-cypher-dsl-parser` module. Bumping the JDK warrants a major upgrade already.
+
+Apart from that we have been very reluctant on breaking changes. As a matter of fact, close to none has been necessary. One of the few improvements that might need changes on your side is #551 (Commit 10080df) in which we improved the `WITH` clause: You might see ambiguous method errors and the fix can be seen https://github.com/neo4j-contrib/cypher-dsl/commit/10080df4c537742218584d80bf4682dd74088a15#diff-dd86a606c4e4fe3151d8d7bb6af70b1aeecb25b5a32bcc9e9862483ca666a261[here] for example: Either use JDK 17 reserved name `var` for local variable type-inference or use explicit `IdentifiableElement`.
+
+There's a lot of new stuff as well: You can now use `Expressions.count` to build new Neo4j 5 `COUNT` expressions and we do support the `USE` clause for composite database queries as well.
+
+Please fear not if you are still on JDK 8: We will maintain the 2022.8.x branch at least as long as Spring Data Neo4j 6.3 is maintained, as the latter is build on top of the Cypher-DSL and is JDK 8, too.
+
+Thanks a lot to our friend @ikwattro from @graphaware for his continuous and well appreciated feedback and input to this project.
+
+==== 🚀 Features
+
+* Add support for the `COUNT {}` sub-query expressions. (#546)
+* Pretty print `USE` clause proper. (#543, thanks to @ikwattro for contributing this)
+* Add support for the `USE` clause in the DSL. (#542)
+
+==== 🐛 Bug Fixes
+
+* Allow `match` after unwind as defined by OpenCypher. (#531)
+
+==== 🔄️ Refactorings
+
+* Improve `returning` and `with`. (#551)
+* Allow `yield *` for standalone calls with arguments, too. (#545, thanks to @zakjan taking the time and report this)
+* Upgrade the parser module to use the new Neo4j 5 parser. (#503)
+* Migrate the project to Java 17. (#518)
+* Prevent usage of `REMOVE` item inside `SET` clause (during RT). (#506)
+
+==== 📖 Documentation
+
+* Update changelog.
+* Add section about dialect support.
+* Make clear that pretty printing does not always escape names.
+* Document correct Java version in `README.adoc`.
+
+==== 🧰 Tasks
+
+* Extend license header to 2023.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump assertj-core from 3.23.1 to 3.24.1 (#549)
+** Bump checker-qual from 3.28.0 to 3.29.0 (#548)
+** Bump neo4j-java-driver from 5.3.0 to 5.3.1 (#535)
+** Bump spring-boot-starter-parent from 3.0.0 to 3.0.1 (#534)
+** Bump checkstyle from 10.5.0 to 10.6.0 (#537)
+** Bump mockito.version from 4.10.0 to 4.11.0 (#536)
+** Bump neo4j-cypher-javacc-parser from 5.2.0 to 5.3.0 (#529)
+** Bump annotations from 23.0.0 to 23.1.0 (#521)
+** Bump compile-testing from 0.20 to 0.21.0 (#526)
+** Bump reactor-bom from 2022.0.0 to 2022.0.1 (#527)
+** Bump mockito.version from 4.9.0 to 4.10.0 (#528)
+** Bump spring-boot-starter-parent from 2.7.5 to 3.0.0 (#509)
+** Bump neo4j-java-driver from 4.4.9 to 5.3.0 (#508)
+** Bump checker-qual from 3.27.0 to 3.28.0 (#517)
+** Bump compile-testing from 0.19 to 0.20 (#516)
+** Bump native-maven-plugin from 0.9.18 to 0.9.19 (#515)
+** Bump joda-time from 2.12.1 to 2.12.2 (#514)
+** Bump jackson-bom from 2.14.0 to 2.14.1 (#513)
+** Bump archunit from 1.0.0 to 1.0.1 (#512)
+** Bump native-maven-plugin from 0.9.17 to 0.9.18 (#511)
+** Bump checkstyle from 10.4 to 10.5.0 (#510)
+
+==== 🛠 Build
+
+* Add more tests for GH-547.
+* Define JaCoCo config in plugin-management. (#541)
+* Add `license-maven-plugin` for checking Apache 2 compatible license and header formatting.
+* Fix quality gate.
+* Verify examples on Java LTS and next version.
+* Fix docs build.
+* Upgrade various actions to non-deprecated versions. (#519)
