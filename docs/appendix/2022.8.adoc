@@ -1,5 +1,20 @@
 == 2022.8
 
+=== 2022.8.3
+
+==== 🔄️ Refactorings
+
+* Allow `yield *` for standalone calls with arguments, too. (#545, thanks to @zakjan taking the time and report this)
+
+==== 🧹 Housekeeping
+
+* Extend license header to 2023.
+* Dependency upgrades:
+** Bump assertj-core from 3.23.1 to 3.24.1 (#549)
+** Bump checker-qual from 3.28.0 to 3.29.0 (#548)
+** Bump checkstyle from 10.5.0 to 10.6.0 (#537)
+** Bump mockito.version from 4.10.0 to 4.11.0 (#536)
+
 === 2022.8.2
 
 Thanks to @ikwattro from @graphaware for investing his time and creating valuable tickets for this release.
