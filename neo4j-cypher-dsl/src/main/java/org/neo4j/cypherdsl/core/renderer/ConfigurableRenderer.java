@@ -18,7 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
@@ -52,7 +51,7 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 		return CONFIGURATIONS.computeIfAbsent(configuration, ConfigurableRenderer::new);
 	}
 
-	private final LinkedHashMap<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
+	private final LRUCache<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 	private final Lock read = lock.readLock();
@@ -70,6 +69,9 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 	}
 
 	@Override
+	// This is about not using map.computeIfAbsent. This is done very much on purpose to keep this
+	// class thread safe. The LRUCache is basically LinkedHashMap and the method wouldn't be threadsafe.
+	@SuppressWarnings("squid:S3824")
 	public String render(Visitable visitable) {
 
 		BiFunction<StatementContext, Visitable, String> renderOp = (ctx, v) -> {
