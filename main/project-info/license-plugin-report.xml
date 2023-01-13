@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1673346829302">
+<licensePluginReport goal="CHECK" timestamp="1673626112806">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
         <file path="src/main/java/module-info.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/AbstractCase.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/AbstractClause.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/AbstractNode.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/AbstractPropertyContainer.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/AbstractStatement.java" result="PRESENT"/>
@@ -119,6 +120,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/RelationshipChain.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/RelationshipPattern.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Remove.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/RendererBridge.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ResultStatement.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Return.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ReturnBody.java" result="PRESENT"/>
@@ -182,6 +184,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Configuration.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/DefaultVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Dialect.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/GeneralizedRenderer.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Neo4j5ComparisonVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Neo4j5FunctionInvocationVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/PrettyPrintingVisitor.java" result="PRESENT"/>
@@ -225,6 +228,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/SymbolicNameTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/TemporalLiteralTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/TestUtils.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/ToStringSmokeTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/UseIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/LoadCSVTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/ReflectiveVisitorTest.java" result="PRESENT"/>
