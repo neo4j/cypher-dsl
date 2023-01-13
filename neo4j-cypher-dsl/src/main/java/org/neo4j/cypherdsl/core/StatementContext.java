@@ -38,7 +38,7 @@ public sealed interface StatementContext permits StatementContextImpl {
 	 *
 	 * @return A new default statement context.
 	 */
-	@API(status = INTERNAL, since = "2023.0.1")
+	@API(status = INTERNAL, since = "2023.1.0")
 	static StatementContext of() {
 		return new StatementContextImpl();
 	}

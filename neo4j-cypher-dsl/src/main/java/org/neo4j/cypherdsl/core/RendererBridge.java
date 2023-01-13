@@ -26,7 +26,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
  * A bridge to the renderer as a single entry point from core to the renderer infrastructure.
  *
  * @author Michael J. Simons
- * @since 2023.0.1
+ * @since 2023.1.0
  */
 class RendererBridge {
 

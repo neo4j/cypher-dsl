@@ -32,7 +32,7 @@ public interface Visitable {
 	 * Not meant to be overridden.
 	 *
 	 * @param visitable The visitable to visit if not null
-	 * @param visitor The visitor to use
+	 * @param visitor   The visitor to use
 	 */
 	static void visitIfNotNull(Visitable visitable, Visitor visitor) {
 
@@ -51,4 +51,16 @@ public interface Visitable {
 		visitor.enter(this);
 		visitor.leave(this);
 	}
+
+	/**
+	 * Most {@link Visitable visitables} will render themselves into a Cypher fragment preceded with the actual classname.
+	 * The representation however is not cached - in contrast to the ones for full statements. Using {@code toString}
+	 * is recommended for debugging purposes mainly, and not for production use.
+	 * <p>
+	 * The concrete classname has been prepended to help debugging and actually to discourage using fragments to build queries
+	 * without explicitly rendering them, either as statement or going through the renderer on purpose.
+	 *
+	 * @return A string representation of this visitable formatted as {@literal Classname{cypher=value}}
+	 */
+	String toString();
 }
