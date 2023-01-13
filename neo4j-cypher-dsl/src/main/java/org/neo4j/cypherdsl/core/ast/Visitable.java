@@ -51,8 +51,4 @@ public interface Visitable {
 		visitor.enter(this);
 		visitor.leave(this);
 	}
-
-	default String toString() {
-		return "";
-	}
 }
