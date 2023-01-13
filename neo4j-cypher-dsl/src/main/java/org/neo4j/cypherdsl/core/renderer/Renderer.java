@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.Statement;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public interface Renderer {
+public sealed interface Renderer permits ConfigurableRenderer, GeneralizedRenderer {
 
 	/**
 	 * Renders a statement.
@@ -57,6 +57,16 @@ public interface Renderer {
 	 * @return A new renderer (might be a shared instance).
 	 */
 	static Renderer getRenderer(Configuration configuration) {
-		return ConfigurableRenderer.create(configuration);
+		return getRenderer(configuration, Renderer.class);
+	}
+
+	/**
+	 * Creates a new renderer for the given configuration.
+	 *
+	 * @param configuration The configuration for this renderer
+	 * @return A new renderer (might be a shared instance).
+	 */
+	static <T extends Renderer> T getRenderer(Configuration configuration, Class<T> type) {
+		return type.cast(ConfigurableRenderer.create(configuration));
 	}
 }

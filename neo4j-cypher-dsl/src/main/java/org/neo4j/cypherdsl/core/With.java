@@ -62,4 +62,9 @@ public final class With implements Visitable, Clause {
 		Visitable.visitIfNotNull(where, visitor);
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

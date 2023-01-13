@@ -99,5 +99,10 @@ public final class Comparison implements Condition {
 		}
 		return Condition.super.not();
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }
 

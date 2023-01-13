@@ -83,6 +83,11 @@ public final class SortItem implements Visitable {
 		visitor.leave(this);
 	}
 
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
+
 	/**
 	 * Sort direction.
 	 * @since 1.0
@@ -107,6 +112,11 @@ public final class SortItem implements Visitable {
 		 */
 		public String getSymbol() {
 			return this.symbol;
+		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
 		}
 	}
 }

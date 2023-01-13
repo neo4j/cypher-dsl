@@ -47,4 +47,8 @@ final class NodeLabels implements Visitable {
 		values.forEach(value -> value.accept(visitor));
 		visitor.leave(this);
 	}
+
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

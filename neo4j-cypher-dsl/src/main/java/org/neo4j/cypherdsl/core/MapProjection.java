@@ -130,14 +130,13 @@ public final class MapProjection implements Expression {
 				knownKeys.add(lastKey);
 			} else if (lastExpression instanceof SymbolicName || lastExpression instanceof PropertyLookup) {
 				newContent.add(lastExpression);
-			} else if (lastExpression instanceof Property) {
-				List<PropertyLookup> names = ((Property) lastExpression).getNames();
+			} else if (lastExpression instanceof Property property) {
+				List<PropertyLookup> names = property.getNames();
 				if (names.size() > 1) {
 					throw new IllegalArgumentException("Cannot project nested properties!");
 				}
 				newContent.addAll(names);
-			} else if (lastExpression instanceof AliasedExpression) {
-				AliasedExpression aliasedExpression = (AliasedExpression) lastExpression;
+			} else if (lastExpression instanceof AliasedExpression aliasedExpression) {
 				newContent.add(KeyValueMapEntry.create(aliasedExpression.getAlias(), aliasedExpression));
 			} else if (lastExpression instanceof KeyValueMapEntry) {
 				newContent.add(lastExpression);
@@ -152,5 +151,10 @@ public final class MapProjection implements Expression {
 			lastExpression = null;
 		}
 		return newContent;
+	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
 	}
 }

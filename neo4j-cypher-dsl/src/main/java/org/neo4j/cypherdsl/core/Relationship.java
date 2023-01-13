@@ -250,6 +250,11 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			Visitable.visitIfNotNull(this.properties, visitor);
 			visitor.leave(this);
 		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
 	}
 
 	/**

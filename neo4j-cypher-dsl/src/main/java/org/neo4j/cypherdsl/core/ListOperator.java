@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 2020.1.0
  */
 @API(status = API.Status.EXPERIMENTAL, since = "2020.1.0")
-public final class ListOperator implements Expression {
+public final class ListOperator implements Expression, Visitable {
 
 	/**
 	 * A literal for the dots.
@@ -92,6 +92,11 @@ public final class ListOperator implements Expression {
 		@Override
 		public Optional<String> getSuffix() {
 			return Optional.of("]");
+		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
 		}
 	}
 

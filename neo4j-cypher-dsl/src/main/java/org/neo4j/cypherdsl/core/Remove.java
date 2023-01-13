@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public final class Remove implements UpdatingClause {
+public final class Remove extends AbstractClause implements UpdatingClause {
 
 	private final ExpressionList setItems;
 

@@ -284,4 +284,9 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

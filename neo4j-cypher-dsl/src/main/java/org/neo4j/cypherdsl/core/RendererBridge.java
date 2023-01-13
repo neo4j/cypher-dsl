@@ -18,43 +18,32 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
-import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.core.utils.Assertions;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
- * @author Gerrit Meier
+ * A bridge to the renderer as a single entry point from core to the renderer infrastructure.
+ *
  * @author Michael J. Simons
- * @since 1.0
+ * @since 2023.1.0
  */
-@API(status = STABLE, since = "1.0")
-public final class Limit implements Visitable {
+class RendererBridge {
 
-	static Limit create(Expression value) {
+	private static final Configuration CONFIGURATION = Configuration.newConfig().alwaysEscapeNames(false).build();
 
-		Assertions.notNull(value, "A limit cannot have a null value.");
-
-		return new Limit(value);
+	static String render(Visitable visitable) {
+		String name;
+		Class<? extends Visitable> clazz = visitable.getClass();
+		if (clazz.isAnonymousClass()) {
+			name = clazz.getName();
+		} else {
+			name = clazz.getSimpleName();
+		}
+		return "%s{cypher=%s}".formatted(name, Renderer.getRenderer(CONFIGURATION, GeneralizedRenderer.class).render(visitable));
 	}
 
-	private final Expression limitExpression;
-
-	private Limit(Expression limitExpression) {
-		this.limitExpression = limitExpression;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		limitExpression.accept(visitor);
-		visitor.leave(this);
-	}
-
-	@Override
-	public String toString() {
-		return RendererBridge.render(this);
+	private RendererBridge() {
 	}
 }

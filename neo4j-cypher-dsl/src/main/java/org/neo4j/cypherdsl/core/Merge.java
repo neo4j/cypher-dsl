@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public final class Merge implements UpdatingClause {
+public final class Merge extends AbstractClause implements UpdatingClause {
 
 	/**
 	 * A literal for the blank.
@@ -81,4 +81,3 @@ public final class Merge implements UpdatingClause {
 		visitor.leave(this);
 	}
 }
-

@@ -50,4 +50,9 @@ class ExpressionList extends TypedSubtree<Expression> {
 	boolean isEmpty() {
 		return super.children.isEmpty();
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

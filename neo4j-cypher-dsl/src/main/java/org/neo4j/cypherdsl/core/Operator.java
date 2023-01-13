@@ -218,6 +218,11 @@ public enum Operator implements Visitable {
 		return type;
 	}
 
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
+
 	/**
 	 * {@link Operator} type.
 	 *

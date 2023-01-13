@@ -129,4 +129,9 @@ public final class Operation implements Expression {
 	Operator getOperator() {
 		return operator;
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

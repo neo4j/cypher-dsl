@@ -231,4 +231,9 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

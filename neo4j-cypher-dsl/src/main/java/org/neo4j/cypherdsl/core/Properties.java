@@ -60,4 +60,8 @@ public final class Properties implements Visitable {
 		this.value.accept(visitor);
 		visitor.leave(this);
 	}
+
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

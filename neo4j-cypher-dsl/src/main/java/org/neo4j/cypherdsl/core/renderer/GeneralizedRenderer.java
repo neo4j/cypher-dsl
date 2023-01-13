@@ -16,33 +16,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.renderer;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Set.html">Set</a>.
+ * This is a more general renderer than {@link Renderer}. The generalized renderer will render any {@link Visitable}.
+ * This renderer will not cache rendered results for visitables.
  *
  * @author Michael J. Simons
- * @since 1.0
+ * @since 2023.1.0
  */
-@API(status = STABLE, since = "1.0")
-public final class Set extends AbstractClause implements UpdatingClause {
+@API(status = STABLE, since = "2023.1.0")
+public sealed interface GeneralizedRenderer extends Renderer permits ConfigurableRenderer {
 
-	private final ExpressionList setItems;
-
-	Set(ExpressionList setItems) {
-		this.setItems = setItems;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		setItems.accept(visitor);
-		visitor.leave(this);
-	}
+	/**
+	 * Renders any {@link Visitable}.
+	 *
+	 * @param visitable the visitable to render
+	 * @return a Cypher fragment (in case of arbitrary visitables), a full statement in case a {@link org.neo4j.cypherdsl.core.Statement} was passed to the renderer.
+	 */
+	String render(Visitable visitable);
 }

@@ -61,4 +61,9 @@ public final class Where implements Visitable {
 
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

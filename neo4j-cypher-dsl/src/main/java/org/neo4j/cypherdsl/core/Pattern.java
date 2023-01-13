@@ -58,4 +58,9 @@ final class Pattern extends TypedSubtree<PatternElement> {
 	private Pattern(List<PatternElement> patternElements) {
 		super(patternElements);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

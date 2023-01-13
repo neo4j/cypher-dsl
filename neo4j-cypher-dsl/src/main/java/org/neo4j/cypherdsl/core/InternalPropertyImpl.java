@@ -165,4 +165,9 @@ final class InternalPropertyImpl implements Property {
 	public Expression asExpression() {
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

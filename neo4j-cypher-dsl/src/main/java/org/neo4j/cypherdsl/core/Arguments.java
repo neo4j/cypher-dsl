@@ -55,4 +55,9 @@ final class Arguments extends TypedSubtree<Expression> implements ProvidesAffixe
 	public Optional<String> getSuffix() {
 		return Optional.of(")");
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

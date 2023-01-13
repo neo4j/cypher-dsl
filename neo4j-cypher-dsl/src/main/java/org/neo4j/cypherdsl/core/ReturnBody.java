@@ -55,4 +55,9 @@ public final class ReturnBody implements Visitable {
 		Visitable.visitIfNotNull(skip, visitor);
 		Visitable.visitIfNotNull(limit, visitor);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

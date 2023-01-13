@@ -20,9 +20,9 @@ package org.neo4j.cypherdsl.core;
 
 import static com.tngtech.archunit.base.DescribedPredicate.not;
 import static com.tngtech.archunit.core.domain.JavaAccess.Predicates.targetOwner;
+import static com.tngtech.archunit.core.domain.JavaClass.Predicates.assignableFrom;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.assignableTo;
 import static com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAPackage;
-import static com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleName;
 import static com.tngtech.archunit.core.domain.properties.HasModifiers.Predicates.modifier;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
@@ -101,7 +101,7 @@ class PackageAndAPIStructureTest {
 	void coreMostNotDependOnRendering() {
 		ArchRule rule = noClasses().that()
 			.resideInAPackage("..core")
-			.and(not(simpleName("AbstractStatement")))
+			.and(not(assignableFrom(AbstractStatement.class).or(assignableFrom(RendererBridge.class))))
 			.should().dependOnClassesThat(resideInAPackage("..renderer.."));
 		rule.check(coreClasses);
 	}

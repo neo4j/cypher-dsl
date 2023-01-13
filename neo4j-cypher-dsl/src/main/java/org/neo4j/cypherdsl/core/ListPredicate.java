@@ -65,4 +65,9 @@ final class ListPredicate implements Expression {
 		this.where.accept(visitor);
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

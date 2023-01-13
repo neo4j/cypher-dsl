@@ -106,4 +106,9 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 	protected Visitable prepareVisit(Expression child) {
 		return Expressions.nameOrExpression(child);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

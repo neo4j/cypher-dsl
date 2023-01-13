@@ -36,7 +36,12 @@ sealed class DecoratedQuery extends AbstractStatement implements UseStatement {
 
 	private enum Decoration implements Visitable {
 
-		EXPLAIN, PROFILE
+		EXPLAIN, PROFILE;
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
 	}
 
 	private final Visitable decoration;

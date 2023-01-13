@@ -1114,37 +1114,7 @@ class IssueRelatedIT {
 	@Test // GH-349
 	void wildValidate() {
 
-		Node this0 = Cypher.node("Movie").named("this0");
-
-		Condition validationCondition = Predicates.any("r")
-			.in(Cypher.listOf(Cypher.literalOf("admin")))
-			.where(Predicates.any("rr").in(Cypher.parameter("$auth.roles")).where(SymbolicName.of("r").eq(SymbolicName.of("rr"))));
-
-		Node g = Cypher.node("Genre").named("this0_genres_connectOrCreate0")
-			.withProperties(Cypher.mapOf("name", Cypher.parameter("this0_genres_connectOrCreate0_node_name")));
-
-
-		Statement innerSubquery = Cypher
-			.call("apoc.util.validate")
-			.withArgs(validationCondition.not(), Cypher.literalOf("@neo4j/graphql/FORBIDDEN"), Cypher.listOf(Cypher.literalOf(0)))
-			.withoutResults()
-			.merge(g)
-			.onCreate().set(g.property("name").to(Cypher.parameter("this0_genres_connectOrCreate0_on_create_name")))
-			.merge(this0.relationshipTo(g, "IN_GENRE").named("this0_relationship_this0_genres_connectOrCreate0"))
-			.returning(Functions.count(Cypher.asterisk()))
-			.build();
-
-		Statement subquery = Cypher.create(this0)
-			.set(this0.property("title").to(Cypher.parameter("this0_title")))
-			.with(this0)
-			.call(innerSubquery, this0)
-			.returning(this0)
-			.build();
-
-		Statement statement = Cypher
-			.call(subquery)
-			.returning(Cypher.listOf(MapProjection.create(this0.getRequiredSymbolicName(), "title")).as("data"))
-			.build();
+		Statement statement = createSomewhatComplexStatement();
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
 		assertThat(renderer.render(statement))
 			.isEqualTo(""
@@ -1164,6 +1134,39 @@ class IssueRelatedIT {
 				+ " RETURN this0"
 				+ "}"
 				+ " RETURN [this0{.title}] AS data");
+	}
+
+	public static Statement createSomewhatComplexStatement() {
+		Node this0 = Cypher.node("Movie").named("this0");
+
+		Condition validationCondition = Predicates.any("r")
+			.in(Cypher.listOf(Cypher.literalOf("admin")))
+			.where(Predicates.any("rr").in(Cypher.parameter("$auth.roles")).where(SymbolicName.of("r").eq(SymbolicName.of("rr"))));
+
+		Node g = Cypher.node("Genre").named("this0_genres_connectOrCreate0")
+			.withProperties(Cypher.mapOf("name", Cypher.parameter("this0_genres_connectOrCreate0_node_name")));
+
+		Statement innerSubquery = Cypher
+			.call("apoc.util.validate")
+			.withArgs(validationCondition.not(), Cypher.literalOf("@neo4j/graphql/FORBIDDEN"), Cypher.listOf(Cypher.literalOf(0)))
+			.withoutResults()
+			.merge(g)
+			.onCreate().set(g.property("name").to(Cypher.parameter("this0_genres_connectOrCreate0_on_create_name")))
+			.merge(this0.relationshipTo(g, "IN_GENRE").named("this0_relationship_this0_genres_connectOrCreate0"))
+			.returning(Functions.count(Cypher.asterisk()))
+			.build();
+
+		Statement subquery = Cypher.create(this0)
+			.set(this0.property("title").to(Cypher.parameter("this0_title")))
+			.with(this0)
+			.call(innerSubquery, this0)
+			.returning(this0)
+			.build();
+
+		return Cypher
+			.call(subquery)
+			.returning(Cypher.listOf(MapProjection.create(this0.getRequiredSymbolicName(), "title")).as("data"))
+			.build();
 	}
 
 	@Test // GH-362

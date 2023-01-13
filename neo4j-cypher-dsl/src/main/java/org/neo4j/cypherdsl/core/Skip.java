@@ -52,4 +52,9 @@ public final class Skip implements Visitable {
 		expression.accept(visitor);
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }
