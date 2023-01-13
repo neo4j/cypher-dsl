@@ -21,7 +21,7 @@ package org.neo4j.cypherdsl.core.renderer;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.Statement;
 
 /**
  * Instances of this class are supposed to be thread-safe. Please use {@link Renderer#getDefaultRenderer()} to get hold
@@ -31,15 +31,15 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public sealed interface Renderer permits ConfigurableRenderer {
+public sealed interface Renderer permits ConfigurableRenderer, GeneralizedRenderer {
 
 	/**
 	 * Renders a statement.
 	 *
-	 * @param visitable the statement to render
+	 * @param statement the statement to render
 	 * @return The rendered Cypher statement.
 	 */
-	String render(Visitable visitable);
+	String render(Statement statement);
 
 	/**
 	 * Provides the default renderer. This method may or may not provide shared instances of the renderer.
@@ -57,6 +57,16 @@ public sealed interface Renderer permits ConfigurableRenderer {
 	 * @return A new renderer (might be a shared instance).
 	 */
 	static Renderer getRenderer(Configuration configuration) {
-		return ConfigurableRenderer.create(configuration);
+		return getRenderer(configuration, Renderer.class);
+	}
+
+	/**
+	 * Creates a new renderer for the given configuration.
+	 *
+	 * @param configuration The configuration for this renderer
+	 * @return A new renderer (might be a shared instance).
+	 */
+	static <T extends Renderer> T getRenderer(Configuration configuration, Class<T> type) {
+		return type.cast(ConfigurableRenderer.create(configuration));
 	}
 }

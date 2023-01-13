@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -40,7 +41,7 @@ class RendererBridge {
 		} else {
 			name = clazz.getSimpleName();
 		}
-		return "%s{cypher=%s}".formatted(name, Renderer.getRenderer(CONFIGURATION).render(visitable));
+		return "%s{cypher=%s}".formatted(name, Renderer.getRenderer(CONFIGURATION, GeneralizedRenderer.class).render(visitable));
 	}
 
 	private RendererBridge() {

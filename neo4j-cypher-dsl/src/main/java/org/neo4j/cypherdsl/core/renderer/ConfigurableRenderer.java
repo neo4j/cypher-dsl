@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.StatementContext;
  * @author Gerrit Meier
  * @since 1.0
  */
-final class ConfigurableRenderer implements Renderer {
+final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 
 	private static final Map<Configuration, ConfigurableRenderer> CONFIGURATIONS = new ConcurrentHashMap<>(8);
 	private static final int STATEMENT_CACHE_SIZE = 128;
@@ -62,6 +62,11 @@ final class ConfigurableRenderer implements Renderer {
 
 	ConfigurableRenderer(Configuration configuration) {
 		this.configuration = configuration;
+	}
+
+	@Override
+	public String render(Statement statement) {
+		return render((Visitable) statement);
 	}
 
 	@Override
