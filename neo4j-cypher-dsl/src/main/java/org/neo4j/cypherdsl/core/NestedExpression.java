@@ -43,4 +43,9 @@ public final class NestedExpression implements Expression {
 		Expressions.nameOrExpression(this.delegate).accept(visitor);
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

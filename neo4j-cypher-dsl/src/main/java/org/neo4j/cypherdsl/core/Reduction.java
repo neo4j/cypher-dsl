@@ -178,5 +178,10 @@ public final class Reduction extends TypedSubtree<Visitable> {
 			this.expression.accept(visitor);
 			visitor.leave(this);
 		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
 	}
 }

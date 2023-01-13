@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2021.3.0
  */
 @API(status = STABLE, since = "2021.3.0")
-public final class Foreach implements UpdatingClause {
+public final class Foreach extends AbstractClause implements UpdatingClause {
 
 	private final SymbolicName variable;
 

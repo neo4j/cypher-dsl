@@ -81,7 +81,7 @@ public class SymbolicNameTest {
 		void toStringShouldWork() {
 
 			SymbolicName name1 = SymbolicName.of("a");
-			assertThat(name1).hasToString("SymbolicName{name='a'}");
+			assertThat(name1).hasToString("SymbolicName{cypher=a}");
 		}
 	}
 

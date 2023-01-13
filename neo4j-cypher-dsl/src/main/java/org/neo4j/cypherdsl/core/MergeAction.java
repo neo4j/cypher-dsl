@@ -41,6 +41,11 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = STABLE, since = "2020.1.2")
 public final class MergeAction implements Visitable {
 
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
+
 	/**
 	 * The type of the action.
 	 */

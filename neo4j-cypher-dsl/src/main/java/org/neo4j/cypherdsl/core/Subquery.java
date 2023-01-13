@@ -39,7 +39,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 @API(status = STABLE, since = "2020.1.2")
 @Neo4jVersion(minimum = "4.0.0")
-public final class Subquery implements Clause {
+public final class Subquery extends AbstractClause implements Clause {
 
 	private final With imports;
 	private final With renames;

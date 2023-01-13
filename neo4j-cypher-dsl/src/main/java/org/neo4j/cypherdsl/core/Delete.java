@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public final class Delete implements UpdatingClause {
+public final class Delete extends AbstractClause implements UpdatingClause {
 
 	private final ExpressionList deleteItems;
 

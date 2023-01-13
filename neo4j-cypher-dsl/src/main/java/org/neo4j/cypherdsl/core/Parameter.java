@@ -111,4 +111,9 @@ public final class Parameter<T> implements Expression {
 	boolean hasValue() {
 		return !Objects.equals(value, NO_VALUE);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

@@ -94,4 +94,9 @@ public final class Return implements Clause {
 	ReturnBody getBody() {
 		return body;
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

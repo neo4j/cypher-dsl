@@ -79,4 +79,9 @@ public final class KeyValueMapEntry implements Expression {
 		value.accept(visitor);
 		visitor.leave(this);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

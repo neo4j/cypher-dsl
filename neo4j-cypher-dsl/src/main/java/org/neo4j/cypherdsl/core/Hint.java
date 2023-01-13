@@ -40,9 +40,19 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 public final class Hint implements Visitable {
 
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
+
 	private enum Type implements Visitable {
 
-		INDEX, INDEX_SEEK, SCAN, JOIN_ON
+		INDEX, INDEX_SEEK, SCAN, JOIN_ON;
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
 	}
 
 	private static final class IndexReference implements Visitable {
@@ -70,6 +80,11 @@ public final class Hint implements Visitable {
 			this.symbolicName.accept(visitor);
 			Visitable.visitIfNotNull(this.optionalLabel, visitor);
 			visitor.leave(this);
+		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
 		}
 	}
 

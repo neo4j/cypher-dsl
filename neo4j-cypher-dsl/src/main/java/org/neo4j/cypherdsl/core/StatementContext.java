@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
@@ -31,6 +32,16 @@ import org.apiguardian.api.API;
  */
 @API(status = STABLE, since = "2021.1.0")
 public sealed interface StatementContext permits StatementContextImpl {
+
+	/**
+	 * Utility method creating a new default context. Mainly internal use.
+	 *
+	 * @return A new default statement context.
+	 */
+	@API(status = INTERNAL, since = "2023.0.1")
+	static StatementContext of() {
+		return new StatementContextImpl();
+	}
 
 	/**
 	 * Gets or creates the name of a parameter

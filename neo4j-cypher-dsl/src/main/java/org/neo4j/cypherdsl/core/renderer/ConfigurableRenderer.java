@@ -25,8 +25,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.function.BiFunction;
 
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.LRUCache;
 import org.neo4j.cypherdsl.core.StatementContext;
 
@@ -35,7 +37,7 @@ import org.neo4j.cypherdsl.core.StatementContext;
  * @author Gerrit Meier
  * @since 1.0
  */
-class ConfigurableRenderer implements Renderer {
+final class ConfigurableRenderer implements Renderer {
 
 	private static final Map<Configuration, ConfigurableRenderer> CONFIGURATIONS = new ConcurrentHashMap<>(8);
 	private static final int STATEMENT_CACHE_SIZE = 128;
@@ -63,33 +65,38 @@ class ConfigurableRenderer implements Renderer {
 	}
 
 	@Override
-	public String render(Statement statement) {
+	public String render(Visitable visitable) {
 
-		int key = Objects.hash(statement, statement.isRenderConstantsAsParameters());
+		BiFunction<StatementContext, Visitable, String> renderOp = (ctx, v) -> {
+			var renderingVisitor = createVisitor(ctx);
+			v.accept(renderingVisitor);
+			return renderingVisitor.getRenderedContent().trim();
+		};
 
-		String renderedContent;
-		try {
-			read.lock();
-			renderedContent = renderedStatementCache.get(key);
-		} finally {
-			read.unlock();
-		}
+		if (visitable instanceof Statement statement) {
+			String renderedContent;
 
-		if (renderedContent == null) {
+			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters());
 			try {
-				write.lock();
-
-				RenderingVisitor renderingVisitor = createVisitor(statement.getContext());
-				statement.accept(renderingVisitor);
-				renderedContent = renderingVisitor.getRenderedContent().trim();
-
-				renderedStatementCache.put(key, renderedContent);
+				read.lock();
+				renderedContent = renderedStatementCache.get(key);
 			} finally {
-				write.unlock();
+				read.unlock();
 			}
-		}
 
-		return renderedContent;
+			if (renderedContent == null) {
+				try {
+					write.lock();
+					renderedContent = renderOp.apply(statement.getContext(), statement);
+					renderedStatementCache.put(key, renderedContent);
+				} finally {
+					write.unlock();
+				}
+			}
+			return renderedContent;
+		} else {
+			return renderOp.apply(StatementContext.of(), visitable);
+		}
 	}
 
 	private RenderingVisitor createVisitor(StatementContext statementContext) {

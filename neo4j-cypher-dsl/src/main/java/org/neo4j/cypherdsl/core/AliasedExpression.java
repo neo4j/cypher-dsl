@@ -81,4 +81,9 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 	public Expression asExpression() {
 		return this;
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

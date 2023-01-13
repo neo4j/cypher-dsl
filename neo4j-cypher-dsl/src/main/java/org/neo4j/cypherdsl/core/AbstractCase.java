@@ -48,15 +48,16 @@ abstract class AbstractCase implements Case {
 		return expression == null ? new GenericCaseImpl() : new SimpleCaseImpl(expression);
 	}
 
-	AbstractCase() {
-		this(Collections.emptyList());
-	}
-
 	AbstractCase(List<CaseWhenThen> caseWhenThens) {
 		this.caseWhenThens = new ArrayList<>(caseWhenThens);
 	}
 
 	abstract Expression getCaseExpression();
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 
 	void setCaseElse(CaseElse caseElse) {
 		this.caseElse = caseElse;

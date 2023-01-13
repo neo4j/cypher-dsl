@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public final class Create implements UpdatingClause {
+public final class Create extends AbstractClause implements UpdatingClause {
 
 	private final Pattern pattern;
 

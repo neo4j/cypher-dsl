@@ -51,5 +51,10 @@ abstract class LiteralBase<T> implements Literal<T> {
 	public final T getContent() {
 		return content;
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }
 

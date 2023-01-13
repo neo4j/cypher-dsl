@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public final class Unwind implements ReadingClause {
+public final class Unwind extends AbstractClause implements ReadingClause {
 
 	private final Expression expressionToUnwind;
 

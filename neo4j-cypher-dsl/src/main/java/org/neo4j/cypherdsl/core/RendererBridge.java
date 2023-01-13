@@ -18,31 +18,31 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Set.html">Set</a>.
+ * A bridge to the renderer as a single entry point from core to the renderer infrastructure.
  *
  * @author Michael J. Simons
- * @since 1.0
+ * @since 2023.0.1
  */
-@API(status = STABLE, since = "1.0")
-public final class Set extends AbstractClause implements UpdatingClause {
+class RendererBridge {
 
-	private final ExpressionList setItems;
+	private static final Configuration CONFIGURATION = Configuration.newConfig().alwaysEscapeNames(false).build();
 
-	Set(ExpressionList setItems) {
-		this.setItems = setItems;
+	static String render(Visitable visitable) {
+		String name;
+		Class<? extends Visitable> clazz = visitable.getClass();
+		if (clazz.isAnonymousClass()) {
+			name = clazz.getName();
+		} else {
+			name = clazz.getSimpleName();
+		}
+		return "%s{cypher=%s}".formatted(name, Renderer.getRenderer(CONFIGURATION).render(visitable));
 	}
 
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		setItems.accept(visitor);
-		visitor.leave(this);
+	private RendererBridge() {
 	}
 }

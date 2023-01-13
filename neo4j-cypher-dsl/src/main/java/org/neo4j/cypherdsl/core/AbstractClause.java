@@ -18,31 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.ast.Visitor;
-
-/**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Set.html">Set</a>.
- *
- * @author Michael J. Simons
- * @since 1.0
- */
-@API(status = STABLE, since = "1.0")
-public final class Set extends AbstractClause implements UpdatingClause {
-
-	private final ExpressionList setItems;
-
-	Set(ExpressionList setItems) {
-		this.setItems = setItems;
-	}
+abstract class AbstractClause implements Clause {
 
 	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		setItems.accept(visitor);
-		visitor.leave(this);
+	public final String toString() {
+		return RendererBridge.render(this);
 	}
 }

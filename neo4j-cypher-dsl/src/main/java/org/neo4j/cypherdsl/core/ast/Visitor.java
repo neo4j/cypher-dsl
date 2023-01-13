@@ -33,8 +33,8 @@ public interface Visitor {
 	void enter(Visitable segment);
 
 	/**
-	 * A method that is used to pass control to some extend from the visitor to the {@link Visitable}. Not all visitables
-	 * react to this and we don't give any guarantees about which will. This method has been mainly introduced in parallel
+	 * A method that is used to pass control to some extent from the visitor to the {@link Visitable}. Not all visitables
+	 * react to this, and we don't give any guarantees about which will. This method has been mainly introduced in parallel
 	 * to {@link #enter(Visitable)} so that existing external implementations of {@link Visitor visitors} won't break.
 	 *
 	 * @param segment the segment to visit.

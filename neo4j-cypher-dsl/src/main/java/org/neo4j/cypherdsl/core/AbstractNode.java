@@ -120,4 +120,9 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 	public final Relationship relationshipBetween(Node other, String... types) {
 		return new InternalRelationshipImpl(null, this, Relationship.Direction.UNI, other, types);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

@@ -128,9 +128,7 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 
 	@Override
 	public String toString() {
-		return value != null ? "SymbolicName{" +
-			"name='" + value + '\'' +
-			'}' : "Unresolved SymbolicName";
+		return value != null ? RendererBridge.render(this) : "Unresolved SymbolicName";
 	}
 
 	@Override

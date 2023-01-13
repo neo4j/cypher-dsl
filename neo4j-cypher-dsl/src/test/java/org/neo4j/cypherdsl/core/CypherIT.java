@@ -3873,7 +3873,7 @@ class CypherIT {
 		@SuppressWarnings("ResultOfMethodCallIgnored") @Test
 		void invalid() {
 
-			String expectedMessage = "FunctionInvocation{functionName='id'} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";
+			String expectedMessage = "FunctionInvocation{cypher=id(n)} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";
 			assertThatIllegalArgumentException().isThrownBy(() -> {
 				Node n = Cypher.anyNode("n");
 				n.project(Functions.id(n));
