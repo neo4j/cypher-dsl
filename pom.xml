@@ -632,16 +632,14 @@
 								</overrideCompatibilityChangeParameter>
 							</overrideCompatibilityChangeParameters>
 							<excludes>
-								<!--
-								 | Internal packages, protected by Java Module system on module path.
-								 -->
+								<!-- Internal packages, protected by Java Module system on module path. -->
 								<exclude>org.neo4j.cypherdsl.core.internal</exclude>
+								<!-- 2023.1.0, changed for #553. It's safely marked as internal -->
+								<exclude>org.neo4j.cypherdsl.core.ast.TypedSubtree</exclude>
 								<!-- Not exported either, but let's be a more lenient. -->
 								<exclude>org.neo4j.cypherdsl.core.utils.Strings#isValidJavaIdentifierPartAt(int,int)</exclude>
 								<exclude>org.neo4j.cypherdsl.core.utils.Strings#isIdentifier(java.lang.CharSequence)</exclude>
-								<!--
-								 | Those are shaded classes from Neo4j and we work around their changes.
-								 -->
+								<!-- Those are shaded classes from Neo4j, and we work around their changes. -->
 								<exclude>org.neo4j.cypherdsl.parser.internal</exclude>
 							</excludes>
 						</parameter>

@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -51,8 +52,8 @@ final class Pattern extends TypedSubtree<PatternElement> {
 		return Pattern.of(elements);
 	}
 
-	static Pattern of(List<PatternElement> elements) {
-		return new Pattern(elements);
+	static Pattern of(Collection<? extends PatternElement> elements) {
+		return new Pattern(elements.stream().map(PatternElement.class::cast).toList());
 	}
 
 	private Pattern(List<PatternElement> patternElements) {

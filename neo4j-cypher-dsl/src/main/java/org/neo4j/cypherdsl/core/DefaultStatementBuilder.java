@@ -133,7 +133,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final OngoingUpdate create(Collection<PatternElement> pattern) {
+	public final OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 
 		return create(pattern.toArray(new PatternElement[] {}));
 	}
@@ -182,7 +182,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			@NotNull
 			@Override
-			public BuildableOngoingMergeAction set(Collection<Expression> expressions) {
+			public BuildableOngoingMergeAction set(Collection<? extends Expression> expressions) {
 				return set(expressions.toArray(new Expression[] {}));
 			}
 		};
@@ -215,14 +215,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final OngoingReadingAndReturn returning(Collection<Expression> elements) {
+	public final OngoingReadingAndReturn returning(Collection<? extends Expression> elements) {
 
 		return returning(false, false, elements);
 	}
 
 	@NotNull
 	@Override
-	public final OngoingReadingAndReturn returningDistinct(Collection<Expression> elements) {
+	public final OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> elements) {
 
 		return returning(false, true, elements);
 	}
@@ -234,7 +234,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithReturnBuilder(rawExpression);
 	}
 
-	private OngoingReadingAndReturn returning(boolean raw, boolean distinct, Collection<Expression> elements) {
+	private OngoingReadingAndReturn returning(boolean raw, boolean distinct, Collection<? extends Expression> elements) {
 
 		DefaultStatementWithReturnBuilder ongoingMatchAndReturn = new DefaultStatementWithReturnBuilder(raw, distinct);
 		ongoingMatchAndReturn.addExpressions(elements);
@@ -269,7 +269,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final OngoingUpdate delete(Collection<Expression> expressions) {
+	public final OngoingUpdate delete(Collection<? extends Expression> expressions) {
 
 		return delete(expressions.toArray(new Expression[] {}));
 	}
@@ -283,7 +283,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final OngoingUpdate detachDelete(Collection<Expression> expressions) {
+	public final OngoingUpdate detachDelete(Collection<? extends Expression> expressions) {
 
 		return detachDelete(expressions.toArray(new Expression[] {}));
 	}
@@ -299,7 +299,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public final BuildableMatchAndUpdate set(Collection<Expression> expressions) {
+	public final BuildableMatchAndUpdate set(Collection<? extends Expression> expressions) {
 
 		return set(expressions.toArray(new Expression[] {}));
 	}
@@ -530,7 +530,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.returnList.addAll(filteredElements);
 		}
 
-		protected final void addExpressions(Collection<Expression> expressions) {
+		protected final void addExpressions(Collection<? extends Expression> expressions) {
 
 			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
 			Assertions.isTrue(!expressions.isEmpty() && expressions.stream().noneMatch(Objects::isNull), Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
@@ -678,7 +678,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -687,7 +687,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -713,7 +713,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingUpdate delete(Collection<Expression> expressions) {
+		public OngoingUpdate delete(Collection<? extends Expression> expressions) {
 
 			return delete(expressions.toArray(new Expression[] {}));
 		}
@@ -729,7 +729,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingUpdate detachDelete(Collection<Expression> expressions) {
+		public OngoingUpdate detachDelete(Collection<? extends Expression> expressions) {
 
 			return detachDelete(expressions.toArray(new Expression[] {}));
 		}
@@ -745,7 +745,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public BuildableMatchAndUpdate set(Collection<Expression> expressions) {
+		public BuildableMatchAndUpdate set(Collection<? extends Expression> expressions) {
 
 			return set(expressions.toArray(new Expression[] {}));
 		}
@@ -869,7 +869,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingUpdate create(Collection<PatternElement> pattern) {
+		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 
 			return create(pattern.toArray(new PatternElement[]{}));
 		}
@@ -1207,7 +1207,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 
@@ -1218,7 +1218,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<Expression> elements) {
+		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> elements) {
 
 			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(elements);
 			delegate.distinct = true;
@@ -1241,7 +1241,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingUpdate delete(Collection<Expression> deletedExpressions) {
+		public OngoingUpdate delete(Collection<? extends Expression> deletedExpressions) {
 			return delete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
@@ -1253,7 +1253,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingUpdate detachDelete(Collection<Expression> deletedExpressions) {
+		public OngoingUpdate detachDelete(Collection<? extends Expression> deletedExpressions) {
 			return detachDelete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
@@ -1281,7 +1281,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public BuildableMatchAndUpdate set(Collection<Expression> keyValuePairs) {
+		public BuildableMatchAndUpdate set(Collection<? extends Expression> keyValuePairs) {
 
 			return set(keyValuePairs.toArray(new Expression[] {}));
 		}
@@ -1367,7 +1367,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingUpdate create(Collection<PatternElement> pattern) {
+		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 			return create(pattern.toArray(new PatternElement[] {}));
 		}
 
@@ -1546,14 +1546,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+		public StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returning(expressions);
 		}
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
 		}
@@ -1668,7 +1668,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returning(expressions);
@@ -1676,7 +1676,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions) {
+		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returningDistinct(expressions);

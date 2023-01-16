@@ -581,18 +581,18 @@ public interface StatementBuilder
 		 * Creates a delete step with one or more expressions to be deleted.
 		 *
 		 * @param expressions The expressions to be deleted.
-		 * @return A match with a delete clause that can be build now
+		 * @return A match with a {@literal DELETE} clause that can be build now
 		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
-		OngoingUpdate delete(Collection<Expression> expressions);
+		OngoingUpdate delete(Collection<? extends Expression> expressions);
 
 		/**
 		 * Renders a {@code DETACH DELETE} clause targeting the given variables. NO checks are done whether they have
 		 * been matched previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @return A match with a detach delete clause that can be build now
+		 * @return A match with a {@literal DETACH DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
 		default OngoingUpdate detachDelete(String... variables) {
@@ -604,7 +604,7 @@ public interface StatementBuilder
 		 * been matched previously.
 		 *
 		 * @param variables Variables indicating the things to delete.
-		 * @return A match with a detach delete clause that can be build now
+		 * @return A match with a {@literal DETACH DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
 		default OngoingUpdate detachDelete(Named... variables) {
@@ -615,7 +615,7 @@ public interface StatementBuilder
 		 * Starts building a delete step that will use {@code DETACH} to remove relationships.
 		 *
 		 * @param expressions The expressions to be deleted.
-		 * @return A match with a delete clause that can be build now
+		 * @return A match with {@literal DETACH DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
 		OngoingUpdate detachDelete(Expression... expressions);
@@ -624,11 +624,11 @@ public interface StatementBuilder
 		 * Starts building a delete step that will use {@code DETACH} to remove relationships.
 		 *
 		 * @param expressions The expressions to be deleted.
-		 * @return A match with a delete clause that can be build now
+		 * @return A match with {@literal DETACH DELETE} clause that can be build now
 		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
-		OngoingUpdate detachDelete(Collection<Expression> expressions);
+		OngoingUpdate detachDelete(Collection<? extends Expression> expressions);
 	}
 
 	/**
@@ -657,7 +657,7 @@ public interface StatementBuilder
 		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
-		BuildableMatchAndUpdate set(Collection<Expression> expressions);
+		BuildableMatchAndUpdate set(Collection<? extends Expression> expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.
@@ -841,7 +841,7 @@ public interface StatementBuilder
 		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
-		BuildableOngoingMergeAction set(Collection<Expression> expressions);
+		BuildableOngoingMergeAction set(Collection<? extends Expression> expressions);
 
 		/**
 		 * Adds a {@code SET} clause to the statement, modifying the given named thing with an expression.

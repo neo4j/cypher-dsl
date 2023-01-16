@@ -1443,4 +1443,12 @@ class IssueRelatedIT {
 			.build().getCypher();
 		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WITH person, COUNT { (person)-[:`ACTED_IN`]->() } AS actedInDegree RETURN *");
 	}
+
+	@Test // GH-553
+	void allowCovariantForMakingDynamicCypherCreationEasier() {
+
+		var patterns = List.of(Cypher.node("A").named("a"), Cypher.node("B").relationshipTo(Cypher.node("C"), "IS_RELATED").named("r"));
+		var cypher = Cypher.match(patterns.stream().toList()).returning(Cypher.asterisk()).build().getCypher();
+		assertThat(cypher).isEqualTo("MATCH (a:`A`), (:`B`)-[r:`IS_RELATED`]->(:`C`) RETURN *");
+	}
 }

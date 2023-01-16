@@ -77,7 +77,7 @@ public interface ExposesReturning {
 	 * @return A match that can be build now
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions);
+	StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions);
 
 	/**
 	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword. All variables passed via {@code variables}
@@ -121,7 +121,7 @@ public interface ExposesReturning {
 	 * @return A match that can be build now
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<Expression> expressions);
+	StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions);
 
 	/**
 	 * Creates a {@code RETURN} clause from a raw Cypher expression created via {@link Cypher#raw(String, Object...)}.
