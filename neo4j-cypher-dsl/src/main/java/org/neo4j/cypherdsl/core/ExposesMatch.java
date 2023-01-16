@@ -53,7 +53,7 @@ public interface ExposesMatch {
 	 * @since 2021.2.2
 	 */
 	@NotNull @CheckReturnValue
-	default StatementBuilder.OngoingReadingWithoutWhere match(Collection<PatternElement> pattern) {
+	default StatementBuilder.OngoingReadingWithoutWhere match(Collection<? extends PatternElement> pattern) {
 		return this.match(pattern.toArray(new PatternElement[] {}));
 	}
 
@@ -76,7 +76,7 @@ public interface ExposesMatch {
 	 * @since 2021.2.2
 	 */
 	@NotNull @CheckReturnValue
-	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<PatternElement> pattern) {
+	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<? extends PatternElement> pattern) {
 		return this.optionalMatch(pattern.toArray(pattern.toArray(new PatternElement[] {})));
 	}
 

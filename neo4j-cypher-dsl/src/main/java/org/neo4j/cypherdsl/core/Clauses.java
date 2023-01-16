@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public final class Clauses {
 	 * @since 2022.0.0
 	 */
 	@NotNull
-	public static Clause match(boolean optional, List<PatternElement> patternElements,
+	public static Clause match(boolean optional, Collection<? extends PatternElement> patternElements,
 		@Nullable Where optionalWhere,
 		@Nullable List<Hint> optionalHints) {
 
@@ -103,7 +104,7 @@ public final class Clauses {
 	 * @return an immutable create clause
 	 */
 	@NotNull
-	public static Clause create(List<PatternElement> patternElements) {
+	public static Clause create(Collection<? extends PatternElement> patternElements) {
 
 		return new Create(Pattern.of(patternElements));
 	}
@@ -116,7 +117,7 @@ public final class Clauses {
 	 * @return an immutable merge clause
 	 */
 	@NotNull
-	public static Clause merge(List<PatternElement> patternElements, @Nullable List<MergeAction> mergeActions) {
+	public static Clause merge(Collection<? extends PatternElement> patternElements, @Nullable List<MergeAction> mergeActions) {
 
 		return new Merge(Pattern.of(patternElements), mergeActions == null ? Collections.emptyList() : mergeActions);
 	}

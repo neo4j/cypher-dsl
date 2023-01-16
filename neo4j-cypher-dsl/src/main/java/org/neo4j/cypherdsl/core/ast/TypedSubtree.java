@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -59,7 +60,7 @@ public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 	 *
 	 * @param children The content of this subtree.
 	 */
-	protected TypedSubtree(List<T> children) {
+	protected TypedSubtree(Collection<T> children) {
 
 		this.children = new ArrayList<>(children);
 	}

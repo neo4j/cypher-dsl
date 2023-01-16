@@ -50,5 +50,5 @@ public interface ExposesCreate {
 	 * @since 2021.2.2
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern);
+	StatementBuilder.OngoingUpdate create(Collection<? extends PatternElement> pattern);
 }

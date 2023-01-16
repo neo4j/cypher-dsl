@@ -354,7 +354,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<PatternElement> pattern) {
+	public static StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<? extends PatternElement> pattern) {
 
 		return optionalMatch(pattern.toArray(new PatternElement[] {}));
 	}
@@ -381,7 +381,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingReadingWithoutWhere match(Collection<PatternElement> pattern) {
+	public static StatementBuilder.OngoingReadingWithoutWhere match(Collection<? extends PatternElement> pattern) {
 
 		return match(pattern.toArray(new PatternElement[] {}));
 	}
@@ -411,7 +411,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, Collection<PatternElement> pattern) {
+	public static StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, Collection<? extends PatternElement> pattern) {
 
 		return match(optional, pattern.toArray(new PatternElement[] {}));
 	}
@@ -436,7 +436,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingUpdate create(Collection<PatternElement> pattern) {
+	public static StatementBuilder.OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 
 		return create(pattern.toArray(new PatternElement[] {}));
 	}
@@ -509,7 +509,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingMerge merge(Collection<PatternElement> pattern) {
+	public static StatementBuilder.OngoingMerge merge(Collection<? extends PatternElement> pattern) {
 
 		return merge(pattern.toArray(new PatternElement[] {}));
 	}
@@ -549,7 +549,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingUnwind unwind(Collection<Expression> expressions) {
+	public static StatementBuilder.OngoingUnwind unwind(Collection<? extends Expression> expressions) {
 
 		return unwind(expressions.toArray(new Expression[] {}));
 	}
@@ -625,7 +625,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static ListExpression listOf(Collection<Expression> expressions) {
+	public static ListExpression listOf(Collection<? extends Expression> expressions) {
 
 		return Cypher.listOf(expressions.toArray(new Expression[0]));
 	}
@@ -780,7 +780,7 @@ public final class Cypher {
 	 * @since 2021.2.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OngoingReadingAndReturn returning(Collection<Expression> expressions) {
+	public static StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 		return Statement.builder().returning(expressions);
 	}
 
