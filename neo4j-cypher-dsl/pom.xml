@@ -227,7 +227,7 @@
 						<configuration>
 							<overwriteExistingFiles>true</overwriteExistingFiles>
 							<module>
-								<moduleInfoFile>${project.build.directory}/generated-sources/misc/module-info.java</moduleInfoFile>
+								<moduleInfoFile>${project.build.directory}/modules/module-info.java</moduleInfoFile>
 							</module>
 						</configuration>
 					</execution>
