@@ -266,6 +266,7 @@ class FunctionsIT {
 			Arguments.of(Functions.head(e1), "RETURN head(e1)"),
 			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
 			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
+			Arguments.of(Functions.length(Cypher.path("p").definedBy(r)), "RETURN length(p)"),
 			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
 			Arguments.of(Functions.properties(n), "RETURN properties(n)"),
 			Arguments.of(Functions.properties(r), "RETURN properties(r)"),

@@ -1964,6 +1964,22 @@ public final class Functions {
 		return FunctionInvocation.create(() -> "randomUUID");
 	}
 
+	/**
+	 * Creates a function invocation for {@code length{}}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-length">length</a>.
+	 *
+	 * @param path The path for which the length should be retrieved
+	 * @return A function call for {@code length()} on a path.
+	 * @since 2023.0.1
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation length(@NotNull NamedPath path) {
+
+		Assertions.notNull(path, "The path for length is required.");
+		return FunctionInvocation.create(Scalars.LENGTH,
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+	}
+
 	private Functions() {
 	}
 }
