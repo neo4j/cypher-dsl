@@ -25,10 +25,10 @@ module org.neo4j.cypherdsl.core {
 
 	requires static com.querydsl.core;
 	requires static java.sql;
-	requires static transitive org.jetbrains.annotations;
+	requires static org.jetbrains.annotations;
 	requires static org.neo4j.cypherdsl.build.annotations;
-	requires static transitive org.neo4j.driver;
-	requires static transitive org.reactivestreams;
+	requires static org.neo4j.driver;
+	requires static org.reactivestreams;
 	requires static reactor.core;
 
 	requires transitive org.apiguardian.api;
