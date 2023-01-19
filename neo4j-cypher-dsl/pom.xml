@@ -110,6 +110,23 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>${exec-maven-plugin.version}</version>
+				<executions>
+					<execution>
+						<id>remove-shaded-modules</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bin/remove-shaded-modules.sh</executable>
+						</configuration>
+						<phase>generate-sources</phase>
+					</execution>
+				</executions>
+			</plugin>
 			<!-- Configuration for surefire added because the stuff is not able to deal with the optional required module and in turn, JUnit 5 falls over during test discovering -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -128,7 +145,7 @@
 							<forceJavacCompilerUse>true</forceJavacCompilerUse>
 							<compilerArgs>
 								<arg>-Aorg.neo4j.cypherdsl.build.native_config_dir=${project.groupId}/${project.artifactId}</arg>
-								<arg>-Xlint:all,-options,-path,-processing</arg>
+								<arg>-Xlint:all,-options,-path,-processing,-exports</arg>
 								<arg>-Werror</arg>
 							</compilerArgs>
 							<annotationProcessorPaths>
@@ -210,7 +227,7 @@
 						<configuration>
 							<overwriteExistingFiles>true</overwriteExistingFiles>
 							<module>
-								<moduleInfoFile>src/main/java/module-info.java</moduleInfoFile>
+								<moduleInfoFile>${project.build.directory}/generated-sources/misc/module-info.java</moduleInfoFile>
 							</module>
 						</configuration>
 					</execution>
