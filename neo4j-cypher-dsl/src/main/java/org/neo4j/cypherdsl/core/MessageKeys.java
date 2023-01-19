@@ -45,6 +45,7 @@ final class MessageKeys {
 	public static final String ASSERTIONS_PATTERN_FOR_FUNCTION_REQUIRED = "assertions.pattern-for-function-required";
 	public static final String ASSERTIONS_AT_LEAST_ONE_ARG_REQUIRED = "assertions.at-least-one-arg-required";
 	public static final String ASSERTIONS_CORRECT_USAGE_OF_DISTINCT = "assertions.correct-usage-of-distinct";
+	public static final String ASSERTIONS_NAMED_PATH_REQUIRED = "assertions.named-path-required";
 
 	public static final String ASSERTIONS_REQUIRES_NAME_FOR_MUTATION = "assertions.requires-name-for-mutation";
 

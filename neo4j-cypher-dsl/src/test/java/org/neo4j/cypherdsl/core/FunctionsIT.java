@@ -18,9 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
@@ -31,6 +34,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -194,6 +198,17 @@ class FunctionsIT {
 		Assertions.assertThat(renderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
 	}
 
+	@Test
+	void errorMessagesShouldWorkForNamedPath() {
+
+		var path = Mockito.spy(Cypher.path("x").definedBy(Cypher.node("Movie").relationshipTo(Cypher.node("Person"))));
+		Mockito.when(path.getSymbolicName()).thenReturn(Optional.empty());
+		var expectedMessages = "The path needs to be named!";
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.length(path)).withMessage(expectedMessages);
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.nodes(path)).withMessage(expectedMessages);
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.relationships(path)).withMessage(expectedMessages);
+	}
+
 	private static Stream<Arguments> neo5jSpecificFunctions() {
 		Node n = Cypher.node("Node").named("n");
 		Node m = Cypher.node("Node2").named("m");
@@ -266,6 +281,7 @@ class FunctionsIT {
 			Arguments.of(Functions.head(e1), "RETURN head(e1)"),
 			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
 			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
+			Arguments.of(Functions.length(Cypher.path("p").definedBy(r)), "RETURN length(p)"),
 			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
 			Arguments.of(Functions.properties(n), "RETURN properties(n)"),
 			Arguments.of(Functions.properties(r), "RETURN properties(r)"),
