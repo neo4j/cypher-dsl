@@ -60,6 +60,7 @@ final class BuiltInFunctions {
 		ID("id"),
 		ELEMENT_ID("elementId"),
 		LAST("last"),
+		LENGTH("length"),
 
 		PROPERTIES("properties"),
 		SHORTEST_PATH("shortestPath"),
