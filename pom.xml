@@ -494,7 +494,7 @@
 						<forceJavacCompilerUse>true</forceJavacCompilerUse>
 						<showWarnings>true</showWarnings>
 						<compilerArgs>
-							<arg>-Xlint:all,-options,-path,-processing</arg>
+							<arg>-Xlint:all,-options,-path,-processing,-exports</arg>
 							<arg>-Werror</arg>
 						</compilerArgs>
 					</configuration>
