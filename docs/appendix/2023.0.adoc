@@ -1,5 +1,17 @@
 == 2023.0
 
+=== 2023.0.1
+
+This patch releases adds a build-in `length` function for paths (thanks @Lukasmp3 for the request) and fixes issues when running Cypher-DSL on the module path (see c7747ca35 on main for more information).
+
+==== 🚀 Features
+
+* Add `length()` function. (#569)
+
+==== 🔄️ Refactorings
+
+* Replace `requires static transitive` with `requires static`.
+
 === 2023.0.0
 
 Welcome to 2023, welcome Java 17, welcome Neo4j 5 clauses. This is the first release of the Cypher-DSL requiring Java 17. This is in line with Neo4j itself, Spring Data Neo4j 7 and several other frameworks out there. This allows for more concise code (which is nice for us) as well as using the Neo4j 5 parser in `neo4j-cypher-dsl-parser` module. Bumping the JDK warrants a major upgrade already.
