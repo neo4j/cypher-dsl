@@ -882,7 +882,7 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for nodes is required.");
 		return FunctionInvocation.create(Lists.NODES,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
@@ -913,7 +913,7 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
@@ -1977,7 +1977,7 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for length is required.");
 		return FunctionInvocation.create(Scalars.LENGTH,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException("The path needs to be named!")));
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	private Functions() {
