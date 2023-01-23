@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -36,9 +37,12 @@ import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Clauses;
+import org.neo4j.cypherdsl.core.Condition;
+import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
+import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Operation;
@@ -47,6 +51,7 @@ import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -54,6 +59,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
  import org.neo4j.cypherdsl.parser.CypherParser;
  // end::main-entry-point[]
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
+import org.neo4j.cypherdsl.parser.MatchDefinition;
 import org.neo4j.cypherdsl.parser.Options;
 import org.neo4j.cypherdsl.parser.PatternElementCreatedEventType;
 import org.neo4j.cypherdsl.parser.ReturnDefinition;
@@ -479,4 +485,33 @@ class CypherDSLParserExamplesTest {
 			.isEqualTo("MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result ORDER BY o.x DESC LIMIT 23");
 		// end::example-shape-the-return-clause[]
 	}
+
+	@Test // GH-574
+	void collectingPropertyReferencesShouldWork() {
+
+		var query = "MATCH (m:Movie {title: 'The Matrix'}) <-[r:ACTED_IN] - (p:Person {born: 1964}) WHERE m.releaseYear IS NOT NULL AND p.name = 'Keanu Reeves' RETURN m";
+		var collectingPropertyReferences = new ConditionExtractingMatchFactory() {
+			@Override
+			Match apply0(MatchDefinition matchDefinition) {
+				var newConditions = Conditions.noCondition();
+				for (Condition value : nodeConditions.values().stream().flatMap(Collection::stream).toList()) {
+					newConditions = newConditions.and(value);
+				}
+				return Clauses.match(
+					matchDefinition.optional(),
+					List.of(Cypher.node("Movie").named("m").relationshipFrom(Cypher.node("Person").named("p"), "ACTED_IN")),
+					Where.from(newConditions),
+					matchDefinition.optionalHints()
+				);
+			}
+		};
+		var options = Options.newOptions()
+			.withMatchClauseFactory(collectingPropertyReferences)
+			.build();
+
+		var cypher = CypherParser.parse(query, options).getCypher();
+		assertThat(cypher).isEqualTo("MATCH (m:`Movie`)<-[:`ACTED_IN`]-(p:`Person`) WHERE (p.born = 1964 AND p.name = 'Keanu Reeves' AND m.title = 'The Matrix' AND m.releaseYear IS NOT NULL) RETURN m");
+	}
+
+	// Example how to extract conditions for nodes and relationships during match creation
 }

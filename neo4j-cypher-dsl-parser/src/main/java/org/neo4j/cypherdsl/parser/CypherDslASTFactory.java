@@ -94,8 +94,10 @@ import org.neo4j.cypherdsl.core.StatementBuilder;
 import org.neo4j.cypherdsl.core.StringLiteral;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
+import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
  * An implementation of Neo4j's {@link ASTFactory} that creates Cypher-DSL AST elements that can be used for creating
@@ -319,8 +321,10 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where where) {
 
-		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
-		return Clauses.match(optional, transformIfPossible(callbacks, patternElements), where, hints);
+		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
+		var transformedPatternElements = transformIfPossible(patternElementCallbacks, patternElements);
+
+		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, where, hints));
 	}
 
 	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
@@ -337,6 +341,31 @@ final class CypherDslASTFactory implements ASTFactory<
 		return patternElements.stream().map(transformer)
 			.filter(Objects::nonNull)
 			.toList();
+	}
+
+	private Where transformIfPossible(List<UnaryOperator<Condition>> callbacks, Where where) {
+		if (callbacks.isEmpty() || where == null) {
+			return where;
+		}
+
+		@SuppressWarnings("squid:S4276") // The function is needed due to the assigment below
+		var transformer = Function.<Condition>identity();
+		for (UnaryOperator<Condition> callback : callbacks) {
+			transformer = transformer.andThen(callback);
+		}
+
+		var originalCondition = new AtomicReference<Condition>();
+		where.accept(new VisitorWithResult() {
+			@Override
+			public EnterResult enterWithResult(Visitable segment) {
+				if (segment instanceof Condition c && originalCondition.compareAndSet(null, c)) {
+					return EnterResult.SKIP_CHILDREN;
+				}
+				return EnterResult.CONTINUE;
+			}
+		});
+
+		return Optional.ofNullable(originalCondition.get()).map(transformer).map(Where::from).orElse(null);
 	}
 
 	@Override
@@ -1491,6 +1520,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Where whereClause(InputPosition p, Expression optionalWhere) {
+
 		return Where.from(optionalWhere);
 	}
 

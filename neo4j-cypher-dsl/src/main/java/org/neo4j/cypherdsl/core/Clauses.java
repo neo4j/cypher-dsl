@@ -54,7 +54,7 @@ public final class Clauses {
 	 * @since 2022.0.0
 	 */
 	@NotNull
-	public static Clause match(boolean optional, List<PatternElement> patternElements,
+	public static Match match(boolean optional, List<PatternElement> patternElements,
 		@Nullable Where optionalWhere,
 		@Nullable List<Hint> optionalHints) {
 

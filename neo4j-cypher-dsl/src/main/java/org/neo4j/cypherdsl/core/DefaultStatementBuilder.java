@@ -1402,7 +1402,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		Match buildMatch() {
-			return (Match) Clauses.match(optional, this.patternList, Where.from(conditionBuilder.buildCondition().orElse(null)), hints);
+			return Clauses.match(optional, this.patternList, Where.from(conditionBuilder.buildCondition().orElse(null)), hints);
 		}
 	}
 

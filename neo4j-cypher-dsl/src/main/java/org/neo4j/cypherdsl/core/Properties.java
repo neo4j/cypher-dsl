@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.List;
+
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -59,6 +61,10 @@ public final class Properties implements Visitable {
 		visitor.enter(this);
 		this.value.accept(visitor);
 		visitor.leave(this);
+	}
+
+	List<Condition> asConditions() {
+		return null;
 	}
 
 	public String toString() {
