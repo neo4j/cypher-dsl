@@ -72,6 +72,14 @@ public final class KeyValueMapEntry implements Expression {
 		return key;
 	}
 
+	/**
+	 * @return The value of this entry.
+	 */
+	@API(status = INTERNAL)
+	public Expression getValue() {
+		return value;
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 

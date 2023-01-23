@@ -319,8 +319,10 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where where) {
 
-		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
-		return Clauses.match(optional, transformIfPossible(callbacks, patternElements), where, hints);
+		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
+		var transformedPatternElements = transformIfPossible(patternElementCallbacks, patternElements);
+
+		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, where, hints));
 	}
 
 	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
@@ -1491,6 +1493,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Where whereClause(InputPosition p, Expression optionalWhere) {
+
 		return Where.from(optionalWhere);
 	}
 
