@@ -20,7 +20,7 @@
 package org.neo4j.cypherdsl.examples.parser;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,12 +47,12 @@ abstract class ConditionExtractingMatchFactory implements Function<MatchDefiniti
 	/**
 	 * Conditions extracted from matching properties on nodes aka {@code (n:Movie {title: 'WHATEVER'}) }.
 	 */
-	protected final Map<Node, List<Condition>> nodeConditions = new HashMap<>();
+	protected final Map<Node, List<Condition>> nodeConditions = new LinkedHashMap<>();
 
 	/**
 	 * Conditions extracted from matching properties on nodes aka {@code () -[r:ACTED_IN {as: 'WHATEVER'}] ->() }.
 	 */
-	protected final Map<Relationship, List<Condition>> relationshipConditions = new HashMap<>();
+	protected final Map<Relationship, List<Condition>> relationshipConditions = new LinkedHashMap<>();
 
 	@Override
 	public Match apply(MatchDefinition matchDefinition) {

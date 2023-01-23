@@ -497,7 +497,7 @@ class CypherDSLParserExamplesTest {
 				for (Condition value : nodeConditions.values().stream().flatMap(Collection::stream).toList()) {
 					newConditions = newConditions.and(value);
 				}
-				return Clauses.match(
+				return (Match) Clauses.match(
 					matchDefinition.optional(),
 					List.of(Cypher.node("Movie").named("m").relationshipFrom(Cypher.node("Person").named("p"), "ACTED_IN")),
 					Where.from(newConditions),
@@ -510,7 +510,7 @@ class CypherDSLParserExamplesTest {
 			.build();
 
 		var cypher = CypherParser.parse(query, options).getCypher();
-		assertThat(cypher).isEqualTo("MATCH (m:`Movie`)<-[:`ACTED_IN`]-(p:`Person`) WHERE (p.born = 1964 AND p.name = 'Keanu Reeves' AND m.title = 'The Matrix' AND m.releaseYear IS NOT NULL) RETURN m");
+		assertThat(cypher).isEqualTo("MATCH (m:`Movie`)<-[:`ACTED_IN`]-(p:`Person`) WHERE (m.title = 'The Matrix' AND m.releaseYear IS NOT NULL AND p.born = 1964 AND p.name = 'Keanu Reeves') RETURN m");
 	}
 
 	// Example how to extract conditions for nodes and relationships during match creation
