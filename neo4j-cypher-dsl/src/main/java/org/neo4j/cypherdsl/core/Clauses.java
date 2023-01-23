@@ -44,7 +44,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class Clauses {
 
 	/**
-	 * Builds a {@code MATCH} clause.
+	 * Builds a {@code MATCH} clause. The result can be safely cast to a {@link Match} if needed.
 	 *
 	 * @param optional        Should this be an optional match?
 	 * @param patternElements The pattern elements to match
@@ -54,7 +54,7 @@ public final class Clauses {
 	 * @since 2022.0.0
 	 */
 	@NotNull
-	public static Match match(boolean optional, List<PatternElement> patternElements,
+	public static Clause match(boolean optional, List<PatternElement> patternElements,
 		@Nullable Where optionalWhere,
 		@Nullable List<Hint> optionalHints) {
 

@@ -242,7 +242,7 @@ public final class Options {
 
 		this.matchClauseFactory = builder.matchClauseFactory != null ?
 			builder.matchClauseFactory :
-			returnDefinition -> Clauses
+			returnDefinition -> (Match) Clauses
 				.match(returnDefinition.optional(), returnDefinition.patternElements(),
 					returnDefinition.optionalWhere(), returnDefinition.optionalHints());
 	}

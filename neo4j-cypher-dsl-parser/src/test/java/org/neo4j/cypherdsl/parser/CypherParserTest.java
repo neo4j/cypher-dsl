@@ -42,6 +42,7 @@ import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Where;
@@ -384,7 +385,7 @@ class CypherParserTest {
 	void transformingWhereShouldWork() {
 
 		var query = "MATCH (m:Movie {title: 'The Matrix'}) WHERE m.releaseYear IS NOT NULL OR false RETURN m";
-		var options = Options.newOptions().withMatchClauseFactory(matchDefinition -> Clauses.match(matchDefinition.optional(), matchDefinition.patternElements(), Where.from(Conditions.isFalse()), matchDefinition.optionalHints())).build();
+		var options = Options.newOptions().withMatchClauseFactory(matchDefinition -> (Match) Clauses.match(matchDefinition.optional(), matchDefinition.patternElements(), Where.from(Conditions.isFalse()), matchDefinition.optionalHints())).build();
 		var cypher = CypherParser.parse(query, options).getCypher();
 		assertThat(cypher).isEqualTo("MATCH (m:`Movie` {title: 'The Matrix'}) WHERE false RETURN m");
 	}
