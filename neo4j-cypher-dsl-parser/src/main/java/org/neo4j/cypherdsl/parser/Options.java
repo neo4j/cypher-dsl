@@ -33,8 +33,10 @@ import java.util.function.UnaryOperator;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Return;
+import org.neo4j.cypherdsl.core.Where;
 
 /**
  * Provides arguments to the {@link CypherParser cypher parser}. The options itself are thread safe and can be reused.
@@ -82,6 +84,8 @@ public final class Options {
 			= new EnumMap<>(PatternElementCreatedEventType.class);
 
 		private Function<ReturnDefinition, Return> returnClauseFactory;
+
+		private Function<MatchDefinition, Match> matchClauseFactory;
 
 		private Builder() {
 		}
@@ -149,7 +153,7 @@ public final class Options {
 		/**
 		 * Adds a callback for when a {@link PatternElement} is created during one of the phases described by {@link PatternElementCreatedEventType}.
 		 * For one type of event one or more callbacks can be declared which will be called in order in which they have been declared.
-		 * Callbacks can just collect or actually visit the elements created or they are free to create new ones, effectively rewriting the query.
+		 * Callbacks can just collect or actually visit the elements created, or they are free to create new ones, effectively rewriting the query.
 		 * <p>
 		 * Parsing will be aborted when a callback throws a {@link RuntimeException}.
 		 *
@@ -181,6 +185,21 @@ public final class Options {
 		}
 
 		/**
+		 * Configures the factory for return clauses. The idea here is that you might intercept what is being matched
+		 * and or how it is restricted. The {@link MatchDefinition definition} passed to the factory contains
+		 * all necessary information for delegating to the {@link org.neo4j.cypherdsl.core.Clauses#match(boolean, List, Where, List)}
+		 * factory.
+		 *
+		 * @param matchClauseFactory The factory producing return classes that should be used.
+		 * @return This builder
+		 * @since 2023.0.2
+		 */
+		public Builder withMatchClauseFactory(Function<MatchDefinition, Match> matchClauseFactory) {
+			this.matchClauseFactory = matchClauseFactory;
+			return this;
+		}
+
+		/**
 		 * @return A new, unmodifiable {@link Options options instance}.
 		 */
 		public Options build() {
@@ -197,6 +216,8 @@ public final class Options {
 	private final Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> onNewPatternElementCallbacks;
 
 	private final Function<ReturnDefinition, Return> returnClauseFactory;
+
+	private Function<MatchDefinition, Match> matchClauseFactory;
 
 	private Options(Builder builder) {
 
@@ -217,6 +238,13 @@ public final class Options {
 				.returning(returnDefinition.isDistinct(), returnDefinition.getExpressions(),
 					returnDefinition.getOptionalSortItems(),
 					returnDefinition.getOptionalSkip(), returnDefinition.getOptionalLimit());
+
+
+		this.matchClauseFactory = builder.matchClauseFactory != null ?
+			builder.matchClauseFactory :
+			returnDefinition -> (Match) Clauses
+				.match(returnDefinition.optional(), returnDefinition.patternElements(),
+					returnDefinition.optionalWhere(), returnDefinition.optionalHints());
 	}
 
 	BiFunction<LabelParsedEventType, Collection<String>, Collection<String>> getLabelFilter() {
@@ -239,8 +267,12 @@ public final class Options {
 		return returnClauseFactory;
 	}
 
+	Function<MatchDefinition, Match> getMatchClauseFactory() {
+		return matchClauseFactory;
+	}
+
 	/**
-	 * @return True if this are the default options.
+	 * @return True if these are the default options.
 	 */
 	boolean areDefault() {
 		return this == DEFAULT_OPTIONS;

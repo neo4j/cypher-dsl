@@ -38,10 +38,14 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.AliasedExpression;
+import org.neo4j.cypherdsl.core.Clauses;
+import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
+import org.neo4j.cypherdsl.core.Where;
 
 /**
  * @author Michael J. Simons
@@ -378,19 +382,11 @@ class CypherParserTest {
 	}
 
 	@Test
-	void getIdentifiableElementsShouldWork2() {
+	void transformingWhereShouldWork() {
 
-		var cypher = """
-			MATCH (n)-[:PING_EVENT]->(e)
-			WITH n, e WHERE e.date CONTAINS "-"
-			WITH n, e, date(e.date) AS date
-			WITH n, e ORDER BY date
-			WITH n, head(collect(e)) AS event
-			RETURN id(n) AS id, datetime(event.date + 'T23:59:59Z') AS lastSeenDate
-		""";
-
-		var statement = CypherParser.parse(cypher);
-		var returnedNames = statement.getIdentifiableExpressions().stream().map(e -> ((AliasedExpression) e).getAlias()).toList();
-		assertThat(returnedNames).contains("lastSeenDate");
+		var query = "MATCH (m:Movie {title: 'The Matrix'}) WHERE m.releaseYear IS NOT NULL OR false RETURN m";
+		var options = Options.newOptions().withMatchClauseFactory(matchDefinition -> (Match) Clauses.match(matchDefinition.optional(), matchDefinition.patternElements(), Where.from(Conditions.isFalse()), matchDefinition.optionalHints())).build();
+		var cypher = CypherParser.parse(query, options).getCypher();
+		assertThat(cypher).isEqualTo("MATCH (m:`Movie` {title: 'The Matrix'}) WHERE false RETURN m");
 	}
 }
