@@ -258,18 +258,18 @@ public final class ScopingStrategy {
 		Set<IdentifiableElement> visitedNamed = dequeOfVisitedNamed.peek();
 		returnish.accept(new Visitor() {
 
-			boolean in = false;
-
 			int level = 0;
+
+			Visitable entranceLevel1;
 
 			@Override
 			public void enter(Visitable segment) {
-				if (!in && segment instanceof TypedSubtree) {
-					in = true;
+				if (entranceLevel1 == null && segment instanceof TypedSubtree) {
+					entranceLevel1 = segment;
 					return;
 				}
 
-				if (in) {
+				if (entranceLevel1 != null) {
 					++level;
 				}
 
@@ -282,10 +282,10 @@ public final class ScopingStrategy {
 			@Override
 			public void leave(Visitable segment) {
 
-				if (in) {
-					--level;
-					if (segment instanceof TypedSubtree) {
-						in = false;
+				if (entranceLevel1 != null) {
+					level = Math.max(0, level - 1);
+					if (segment == entranceLevel1) {
+						entranceLevel1 = null;
 					}
 				}
 			}

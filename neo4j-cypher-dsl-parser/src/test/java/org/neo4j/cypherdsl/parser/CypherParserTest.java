@@ -376,4 +376,21 @@ class CypherParserTest {
 		assertThat(identifiables.stream().map(Cypher::format))
 			.containsExactlyInAnyOrderElementsOf(expected);
 	}
+
+	@Test
+	void getIdentifiableElementsShouldWork2() {
+
+		var cypher = """
+			MATCH (n)-[:PING_EVENT]->(e)
+			WITH n, e WHERE e.date CONTAINS "-"
+			WITH n, e, date(e.date) AS date
+			WITH n, e ORDER BY date
+			WITH n, head(collect(e)) AS event
+			RETURN id(n) AS id, datetime(event.date + 'T23:59:59Z') AS lastSeenDate
+		""";
+
+		var statement = CypherParser.parse(cypher);
+		var returnedNames = statement.getIdentifiableExpressions().stream().map(e -> ((AliasedExpression) e).getAlias()).toList();
+		assertThat(returnedNames).contains("lastSeenDate");
+	}
 }
