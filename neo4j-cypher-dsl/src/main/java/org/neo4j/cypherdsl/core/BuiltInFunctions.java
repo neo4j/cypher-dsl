@@ -88,9 +88,19 @@ final class BuiltInFunctions {
 
 	enum Strings implements FunctionDefinition {
 
+		LEFT("left"),
+		LTRIM("ltrim"),
+		REPLACE("replace"),
+		REVERSE("reverse"),
+		RIGHT("right"),
+		RTRIM("rtrim"),
+		SPLIT("split"),
+		SUBSTRING("substring"),
 		TO_LOWER("toLower"),
-		TRIM("trim"),
-		SPLIT("split");
+		TO_STRING("toString"),
+		TO_STRING_OR_NULL("toStringOrNull"),
+		TO_UPPER("toUpper"),
+		TRIM("trim");
 
 		private final String implementationName;
 

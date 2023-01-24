@@ -209,6 +209,13 @@ class FunctionsIT {
 		assertThatIllegalArgumentException().isThrownBy(() -> Functions.relationships(path)).withMessage(expectedMessages);
 	}
 
+	@Test
+	void assortedErrors() {
+		var literalExpression = Cypher.literalOf("something");
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.left(literalExpression, null)).withMessage("length might not be null when the expression is not null");
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.right(literalExpression, null)).withMessage("length might not be null when the expression is not null");
+	}
+
 	private static Stream<Arguments> neo5jSpecificFunctions() {
 		Node n = Cypher.node("Node").named("n");
 		Node m = Cypher.node("Node2").named("m");
@@ -233,6 +240,16 @@ class FunctionsIT {
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
 		return Stream.of(
+			Arguments.of(Functions.left(null, null), "RETURN left(NULL, NULL)"),
+			Arguments.of(Functions.left(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN left('hello', 3)"),
+			Arguments.of(Functions.ltrim(null), "RETURN ltrim(NULL)"),
+			Arguments.of(Functions.ltrim(Cypher.literalOf("   hello")), "RETURN ltrim('   hello')"),
+			Arguments.of(Functions.replace(Cypher.literalOf("hello"), Cypher.literalOf("l"), Cypher.literalOf("w")), "RETURN replace('hello', 'l', 'w')"),
+			Arguments.of(Functions.reverse(Cypher.literalOf("hello")), "RETURN reverse('hello')"),
+			Arguments.of(Functions.right(null, null), "RETURN right(NULL, NULL)"),
+			Arguments.of(Functions.right(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN right('hello', 3)"),
+			Arguments.of(Functions.rtrim(null), "RETURN rtrim(NULL)"),
+			Arguments.of(Functions.rtrim(Cypher.literalOf("   hello  ")), "RETURN rtrim('   hello  ')"),
 			Arguments.of(Functions.id(n), "RETURN id(n)"),
 			Arguments.of(Functions.id(r), "RETURN id(r)"),
 			Arguments.of(Functions.elementId(n), "RETURN toString(id(n))"),

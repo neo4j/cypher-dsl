@@ -289,6 +289,129 @@ public final class Functions {
 	}
 
 	/**
+	 * Creates a function invocation for the {@code left()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">left</a>.
+	 *
+	 * @param expression An expression resolving to a string
+	 * @param length desired length
+	 * @return A function call for {@code left()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation left(Expression expression, Expression length) {
+
+		if (expression != null && length == null) {
+			throw new IllegalArgumentException("length might not be null when the expression is not null");
+		}
+		return FunctionInvocation.create(Strings.LEFT,
+			expressionOrNullLit(expression),
+			expressionOrNullLit(length)
+		);
+	}
+
+	/**
+	 * Creates a function invocation for the {@code ltrim()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">ltrim</a>.
+	 *
+	 * @param expression An expression resolving to a string
+	 * @return A function call for {@code ltrim()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation ltrim(Expression expression) {
+
+		return FunctionInvocation.create(Strings.LTRIM, expressionOrNullLit(expression));
+	}
+
+	/**
+	 * Creates a function invocation for the {@code replace()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">replace</a>.
+	 *
+	 * @param original An expression that returns a string
+	 * @param search An expression that specifies the string to be replaced in {@code original}.
+	 * @param replace An expression that specifies the replacement string.
+	 * @return A function call for {@code replace()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation replace(Expression original, Expression search, Expression replace) {
+
+		return FunctionInvocation.create(Strings.REPLACE, expressionOrNullLit(original), expressionOrNullLit(search), expressionOrNullLit(replace));
+	}
+
+	/**
+	 * Creates a function invocation for the {@code reverse()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-reverse">reverse</a>.
+	 *
+	 * @param original An expression that returns a string
+	 * @return A function call for {@code reverse()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation reverse(Expression original) {
+
+		return FunctionInvocation.create(Strings.REVERSE, expressionOrNullLit(original));
+	}
+
+	/**
+	 * Creates a function invocation for the {@code right()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">right</a>.
+	 *
+	 * @param expression An expression resolving to a string
+	 * @param length desired length
+	 * @return A function call for {@code right()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation right(Expression expression, Expression length) {
+
+		if (expression != null && length == null) {
+			throw new IllegalArgumentException("length might not be null when the expression is not null");
+		}
+		return FunctionInvocation.create(Strings.RIGHT,
+			expressionOrNullLit(expression),
+			expressionOrNullLit(length)
+		);
+	}
+
+	/**
+	 * Creates a function invocation for the {@code rtrim()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-rtrim">rtrim</a>.
+	 *
+	 * @param expression An expression resolving to a string
+	 * @return A function call for {@code rtrim()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation rtrim(Expression expression) {
+
+		return FunctionInvocation.create(Strings.RTRIM, expressionOrNullLit(expression));
+	}
+
+	/**
+	 * Creates a function invocation for the {@code substring()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-substring">rtrim</a>.
+	 *
+	 * @param original An expression resolving to a string
+	 * @param original An expression that returns a string.
+	 * @param start An expression that returns a positive integer, denoting the position at which the substring will begin.
+	 * @param length An expression that returns a positive integer, denoting how many characters of original will be returned.
+	 * @return A function call for {@code substring()}
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation substring(Expression original, Expression start, Expression length) {
+
+		Assertions.notNull(start, "start is required");
+		Assertions.notNull(length, "length is required");
+		return FunctionInvocation.create(Strings.SUBSTRING, expressionOrNullLit(original), start, length);
+	}
+
+	private static Expression expressionOrNullLit(Expression expression) {
+		return expression == null ? Cypher.literalNull() : expression;
+	}
+
+	/**
 	 * Creates a function invocation for the {@code toLower()} function.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toLower">toLower</a>.
 	 *
