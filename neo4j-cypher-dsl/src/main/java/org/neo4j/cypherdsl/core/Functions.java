@@ -403,8 +403,10 @@ public final class Functions {
 	public static FunctionInvocation substring(Expression original, Expression start, Expression length) {
 
 		Assertions.notNull(start, "start is required");
-		Assertions.notNull(length, "length is required");
-		return FunctionInvocation.create(Strings.SUBSTRING, expressionOrNullLit(original), start, length);
+		if (length != null) {
+			return FunctionInvocation.create(Strings.SUBSTRING, expressionOrNullLit(original), start, length);
+		}
+		return FunctionInvocation.create(Strings.SUBSTRING, expressionOrNullLit(original), start);
 	}
 
 	private static Expression expressionOrNullLit(Expression expression) {
@@ -419,10 +421,23 @@ public final class Functions {
 	 * @return A function call for {@code toLower()} for one expression
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation toLower(@NotNull Expression expression) {
+	public static FunctionInvocation toLower(Expression expression) {
 
-		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
-		return FunctionInvocation.create(Strings.TO_LOWER, expression);
+		return FunctionInvocation.create(Strings.TO_LOWER, expressionOrNullLit(expression));
+	}
+
+	/**
+	 * Creates a function invocation for the {@code toUpper()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toUpper">toUpper</a>.
+	 *
+	 * @param expression An expression resolving to a string
+	 * @return A function call for {@code toLower()} for one expression
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation toUpper(Expression expression) {
+
+		return FunctionInvocation.create(Strings.TO_UPPER, expressionOrNullLit(expression));
 	}
 
 	/**
@@ -2021,6 +2036,20 @@ public final class Functions {
 
 		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Scalars.TO_STRING, expression);
+	}
+
+	/**
+	 * Creates a function invocation for {@code toStringOrNull({})}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toStringOrNull">toStringOrNull</a>.
+	 *
+	 * @param expression The value to pass to the function.
+	 * @return A function call for {@code toStringOrNull({})}.
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation toStringOrNull(Expression expression) {
+
+		return FunctionInvocation.create(Strings.TO_STRING_OR_NULL, expressionOrNullLit(expression));
 	}
 
 	/**
