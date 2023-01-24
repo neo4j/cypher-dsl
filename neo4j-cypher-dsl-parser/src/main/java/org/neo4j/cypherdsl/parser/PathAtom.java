@@ -36,7 +36,7 @@ final class PathAtom implements PatternAtom {
 		String[] relTypes, MapExpression properties) {
 
 		if (left && right) {
-			throw new IllegalArgumentException("Only left-to-rhs, rhs-to-left or unidirectional path elements are supported.");
+			throw new IllegalArgumentException("Only left-to-right, right-to-left or unidirectional path elements are supported.");
 		}
 
 		Direction direction;
