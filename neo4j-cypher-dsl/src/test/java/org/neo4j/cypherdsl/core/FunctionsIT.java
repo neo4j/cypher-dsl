@@ -209,6 +209,14 @@ class FunctionsIT {
 		assertThatIllegalArgumentException().isThrownBy(() -> Functions.relationships(path)).withMessage(expectedMessages);
 	}
 
+	@Test
+	void assortedErrors() {
+		var literalExpression = Cypher.literalOf("something");
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.left(literalExpression, null)).withMessage("length might not be null when the expression is not null");
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.right(literalExpression, null)).withMessage("length might not be null when the expression is not null");
+		assertThatIllegalArgumentException().isThrownBy(() -> Functions.substring(literalExpression, null, null)).withMessage("start is required");
+	}
+
 	private static Stream<Arguments> neo5jSpecificFunctions() {
 		Node n = Cypher.node("Node").named("n");
 		Node m = Cypher.node("Node2").named("m");
@@ -233,6 +241,17 @@ class FunctionsIT {
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
 		return Stream.of(
+			Arguments.of(Functions.left(null, null), "RETURN left(NULL, NULL)"),
+			Arguments.of(Functions.left(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN left('hello', 3)"),
+			Arguments.of(Functions.ltrim(Cypher.literalOf("   hello")), "RETURN ltrim('   hello')"),
+			Arguments.of(Functions.replace(Cypher.literalOf("hello"), Cypher.literalOf("l"), Cypher.literalOf("w")), "RETURN replace('hello', 'l', 'w')"),
+			Arguments.of(Functions.reverse(Cypher.literalOf("hello")), "RETURN reverse('hello')"),
+			Arguments.of(Functions.right(null, null), "RETURN right(NULL, NULL)"),
+			Arguments.of(Functions.right(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN right('hello', 3)"),
+			Arguments.of(Functions.rtrim(Cypher.literalOf("   hello  ")), "RETURN rtrim('   hello  ')"),
+			Arguments.of(Functions.substring(Cypher.literalOf("hello"), Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN substring('hello', 1, 3)"),
+			Arguments.of(Functions.substring(Cypher.literalOf("hello"), Cypher.literalOf(2), null), "RETURN substring('hello', 2)"),
+			Arguments.of(Functions.toStringOrNull(Cypher.literalOf("hello")), "RETURN toStringOrNull('hello')"),
 			Arguments.of(Functions.id(n), "RETURN id(n)"),
 			Arguments.of(Functions.id(r), "RETURN id(r)"),
 			Arguments.of(Functions.elementId(n), "RETURN toString(id(n))"),
@@ -248,6 +267,7 @@ class FunctionsIT {
 			Arguments.of(Functions.countDistinct(e1), "RETURN count(DISTINCT e1)"),
 			Arguments.of(Functions.coalesce(e1, e2), "RETURN coalesce(e1, e2)"),
 			Arguments.of(Functions.toLower(e1), "RETURN toLower(e1)"),
+			Arguments.of(Functions.toUpper(e1), "RETURN toUpper(e1)"),
 			Arguments.of(Functions.trim(e1), "RETURN trim(e1)"),
 			Arguments.of(Functions.split(e1, Cypher.literalOf(",")), "RETURN split(e1, ',')"),
 			Arguments.of(Functions.size(e1), "RETURN size(e1)"),
