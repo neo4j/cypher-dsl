@@ -106,7 +106,7 @@ class CypherParserTest {
 		@Test
 		void pointyThingAtBothSidesIsNotSupported() {
 			assertThatIllegalArgumentException().isThrownBy(() -> CypherParser.parseRelationship("(n)<-->(m)"))
-				.withMessage("Only left-to-rhs, rhs-to-left or unidirectional path elements are supported.");
+				.withMessage("Only left-to-right, right-to-left or unidirectional path elements are supported.");
 		}
 
 		@Test

@@ -114,7 +114,7 @@ class CypherDslASTFactoryTest {
 					Object[] args = new Object[method.getParameterCount()];
 					int i = 0;
 					for (Class<?> type : method.getParameterTypes()) {
-						// Other primitives needs to be dealt with, but rhs now, not in the mood todo t his.
+						// Other primitives needs to be dealt with, but right now, not in the mood todo t his.
 						args[i++] = type == boolean.class ? false : null;
 					}
 					assertThatExceptionOfType(InvocationTargetException.class)
