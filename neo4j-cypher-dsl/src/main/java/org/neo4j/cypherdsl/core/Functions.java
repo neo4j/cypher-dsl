@@ -318,8 +318,9 @@ public final class Functions {
 	 * @since 2023.0.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation ltrim(Expression expression) {
+	public static FunctionInvocation ltrim(@NotNull Expression expression) {
 
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.LTRIM, expressionOrNullLit(expression));
 	}
 
@@ -348,8 +349,9 @@ public final class Functions {
 	 * @since 2023.0.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation reverse(Expression original) {
+	public static FunctionInvocation reverse(@NotNull Expression original) {
 
+		Assertions.notNull(original, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.REVERSE, expressionOrNullLit(original));
 	}
 
@@ -383,8 +385,9 @@ public final class Functions {
 	 * @since 2023.0.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation rtrim(Expression expression) {
+	public static FunctionInvocation rtrim(@NotNull Expression expression) {
 
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.RTRIM, expressionOrNullLit(expression));
 	}
 
@@ -421,8 +424,9 @@ public final class Functions {
 	 * @return A function call for {@code toLower()} for one expression
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation toLower(Expression expression) {
+	public static FunctionInvocation toLower(@NotNull Expression expression) {
 
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TO_LOWER, expressionOrNullLit(expression));
 	}
 
@@ -435,8 +439,9 @@ public final class Functions {
 	 * @since 2023.0.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation toUpper(Expression expression) {
+	public static FunctionInvocation toUpper(@NotNull Expression expression) {
 
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TO_UPPER, expressionOrNullLit(expression));
 	}
 
@@ -2047,8 +2052,9 @@ public final class Functions {
 	 * @since 2023.0.2
 	 */
 	@NotNull @Contract(pure = true)
-	public static FunctionInvocation toStringOrNull(Expression expression) {
+	public static FunctionInvocation toStringOrNull(@NotNull Expression expression) {
 
+		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 		return FunctionInvocation.create(Strings.TO_STRING_OR_NULL, expressionOrNullLit(expression));
 	}
 

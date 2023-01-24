@@ -76,7 +76,7 @@ class FunctionsTest {
 					method.getParameterTypes()[0].isAssignableFrom(Node.class) ||
 					method.getParameterTypes()[0].isAssignableFrom(Relationship.class) ||
 					method.getParameterTypes()[0].isAssignableFrom(MapExpression.class)
-				) && (!method.getName().equals("properties") || !method.getParameterTypes()[0].isAssignableFrom(MapExpression.class)),
+				) && (!java.util.Set.of("properties", "expressionOrNullLit").contains(method.getName()) || !method.getParameterTypes()[0].isAssignableFrom(MapExpression.class)),
 				ReflectionUtils.HierarchyTraversalMode.TOP_DOWN
 			)
 			.stream().map(method -> Arguments.of(Named.of(method.getName(), method)));
