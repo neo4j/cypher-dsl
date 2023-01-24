@@ -1,5 +1,29 @@
 == 2023.0
 
+=== 2023.0.2
+
+Thanks to @ikwattro, @lukaseder and @bonelli for their input!
+
+==== 🚀 Features
+
+* Add missing string functions. (#584)
+* Add support for rewriting the `MATCH` clause after parsing. (#580)
+
+==== 🐛 Bug Fixes
+
+* Add support for label expressions. (#582)
+* Correctly track identifiable elements. (#579)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump spring-boot-starter-parent from 3.0.1 to 3.0.2 (#577)
+** Bump assertj-core from 3.24.1 to 3.24.2 (#576)
+
+==== 🛠 Build
+
+* Move the fixed `module-info.java` somewhere out of IDEAs reach.
+
 === 2023.0.1
 
 This patch releases adds a build-in `length` function for paths (thanks @Lukasmp3 for the request) and fixes issues when running Cypher-DSL on the module path (see c7747ca35 on main for more information).
