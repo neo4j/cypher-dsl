@@ -37,16 +37,19 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = INTERNAL, since = "2021.1.0")
 final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 
+	InternalNodeImpl() {
+	}
+
+	InternalNodeImpl(LabelExpression labelExpression) {
+		super(null, null, labelExpression, null);
+	}
+
 	InternalNodeImpl(String primaryLabel, String... additionalLabels) {
 		super(primaryLabel, additionalLabels);
 	}
 
-	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels,
-		Properties properties) {
-		super(symbolicName, labels, properties);
-	}
-
-	InternalNodeImpl() {
+	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties) {
+		super(symbolicName, labels, labelExpression, properties);
 	}
 
 	InternalNodeImpl(SymbolicName symbolicName, String primaryLabel,
@@ -59,7 +62,7 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	public InternalNodeImpl named(SymbolicName newSymbolicName) {
 
 		Assertions.notNull(newSymbolicName, "Symbolic name is required.");
-		return new InternalNodeImpl(newSymbolicName, labels, properties);
+		return new InternalNodeImpl(newSymbolicName, labels, labelExpression, properties);
 
 	}
 
@@ -67,6 +70,6 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	@Override
 	public InternalNodeImpl withProperties(MapExpression newProperties) {
 
-		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, Properties.create(newProperties));
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, Properties.create(newProperties));
 	}
 }
