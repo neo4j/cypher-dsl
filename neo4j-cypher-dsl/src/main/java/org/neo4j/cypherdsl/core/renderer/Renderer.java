@@ -63,8 +63,11 @@ public sealed interface Renderer permits ConfigurableRenderer, GeneralizedRender
 	/**
 	 * Creates a new renderer for the given configuration.
 	 *
+	 * @param <T> The specific type of the renderer
 	 * @param configuration The configuration for this renderer
+	 * @param type Reification of the renderers type
 	 * @return A new renderer (might be a shared instance).
+	 * @since 2023.1.0
 	 */
 	static <T extends Renderer> T getRenderer(Configuration configuration, Class<T> type) {
 		return type.cast(ConfigurableRenderer.create(configuration));
