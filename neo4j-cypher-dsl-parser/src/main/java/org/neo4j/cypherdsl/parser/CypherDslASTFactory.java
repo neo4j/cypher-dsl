@@ -33,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
@@ -184,22 +183,22 @@ final class CypherDslASTFactory implements ASTFactory<
 	private String[] computeFinalLabelList(LabelParsedEventType event, List<StringPos<InputPosition>> inputLabels) {
 
 		return inputLabels == null ? new String[0] : this.options.getLabelFilter()
-			.apply(event, inputLabels.stream().map(v -> v.string).collect(Collectors.toList()))
+			.apply(event, inputLabels.stream().map(v -> v.string).toList())
 			.toArray(new String[0]);
 	}
 
-	private String[] computeFinalLabelList(LabelParsedEventType event, LabelExpression inputLabels) {
+	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, LabelExpression inputLabels) {
 
 		if (inputLabels == null) {
-			return new String[0];
+			return Optional.of(new String[0]);
 		}
 
 		if (inputLabels.type() == LabelExpression.Type.COLON_CONJUNCTION || (inputLabels.type() == LabelExpression.Type.LEAF && inputLabels.value() != null)) {
-			return this.options.getLabelFilter()
+			return Optional.of(this.options.getLabelFilter()
 				.apply(event, inputLabels.value())
-				.toArray(new String[0]);
+				.toArray(new String[0]));
 		}
-		return null;
+		return Optional.empty();
 	}
 
 	private String[] computeFinalTypeList(TypeParsedEventType event, LabelExpression inputTypes) {
@@ -610,13 +609,11 @@ final class CypherDslASTFactory implements ASTFactory<
 			node = Cypher.anyNode();
 		} else {
 			var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
-			if (finalLabels == null) {
-				node = Cypher.node(labels);
-			} else {
-				var primaryLabel = finalLabels[0];
-				var additionalLabels = Arrays.stream(finalLabels).skip(1).toList();
-				node = Cypher.node(primaryLabel, additionalLabels);
-			}
+			node = finalLabels.map(l -> {
+				var primaryLabel = l[0];
+				var additionalLabels = Arrays.stream(l).skip(1).toList();
+				return Cypher.node(primaryLabel, additionalLabels);
+			}).orElseGet(() -> Cypher.node(labels));
 		}
 
 		if (v != null) {

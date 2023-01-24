@@ -550,10 +550,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(LabelExpression labelExpression) {
 		builder.append(":");
-		traverseLabelExpressionDfs(labelExpression, null);
+		renderLabelExpression(labelExpression, null);
 	}
 
-	void traverseLabelExpressionDfs(LabelExpression l, LabelExpression.Type parent) {
+	@SuppressWarnings("squid:S3776")
+	void renderLabelExpression(LabelExpression l, LabelExpression.Type parent) {
 		if (l == null) {
 			return;
 		}
@@ -571,60 +572,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (close) {
 			builder.append("(");
 		}
-		traverseLabelExpressionDfs(l.lhs(), current);
+		renderLabelExpression(l.lhs(), current);
 		if (current == LabelExpression.Type.LEAF) {
 			l.value().forEach(v ->
 				escapeName(v).ifPresent(builder::append)
 			);
-		} else if (current == LabelExpression.Type.COLON_CONJUNCTION) {
-			builder.append(l.value().stream().map(this::escapeName)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
-				.collect(Collectors.joining(":")));
 		}  else {
 			builder.append(current.getValue());
 		}
-		traverseLabelExpressionDfs(l.rhs(), current);
+		renderLabelExpression(l.rhs(), current);
 		if (close) {
 			builder.append(")");
-		}
-	}
-
-	void renderLabelExpression(LabelExpression labelExpression) {
-		renderLabelExpression(labelExpression, LabelExpression.Type.LEAF);
-	}
-
-	void renderLabelExpression(LabelExpression labelExpression, LabelExpression.Type outer) {
-		if (labelExpression.negated()) {
-			builder.append("!");
-		}
-
-		boolean close = false;
-		if (labelExpression.value() == null) {
-			if (labelExpression.negated() || (outer != labelExpression.type() && labelExpression.type() != LabelExpression.Type.CONJUNCTION && (labelExpression.lhs().type() != labelExpression.rhs().type()))) {
-				builder.append("(");
-				close = true;
-			}
-			renderLabelExpression(labelExpression.lhs(), labelExpression.type());
-			builder.append(labelExpression.type().getValue());
-			renderLabelExpression(labelExpression.rhs(), labelExpression.type());
-			if (close) {
-				builder.append(")");
-			}
-
-		} else {
-			if (labelExpression.negated() || (outer == LabelExpression.Type.CONJUNCTION && outer != labelExpression.type() && labelExpression.rhs() != null)) {
-				builder.append("(");
-				close = true;
-			}
-			builder.append(labelExpression.value());
-			if (labelExpression.rhs() != null) {
-				builder.append(labelExpression.type().getValue());
-				renderLabelExpression(labelExpression.rhs(), labelExpression.type());
-				if (close) {
-					builder.append(")");
-				}
-			}
 		}
 	}
 
