@@ -43,6 +43,7 @@ import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.InTransactions;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
+import org.neo4j.cypherdsl.core.LabelExpression;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
 import org.neo4j.cypherdsl.core.ListExpression;
@@ -113,7 +114,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @author Gerrit Meier
  * @since 1.0
  */
-@SuppressWarnings({ "unused", "squid:S1172" })
+@SuppressWarnings({"unused", "squid:S1172"})
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
@@ -544,6 +545,44 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(NodeLabel nodeLabel) {
 
 		escapeName(nodeLabel.getValue()).ifPresent(label -> builder.append(Symbols.NODE_LABEL_START).append(label));
+	}
+
+	void enter(LabelExpression labelExpression) {
+		builder.append(":");
+		renderLabelExpression(labelExpression, null);
+	}
+
+	@SuppressWarnings("squid:S3776")
+	void renderLabelExpression(LabelExpression l, LabelExpression.Type parent) {
+		if (l == null) {
+			return;
+		}
+		if (l.negated()) {
+			builder.append("!");
+		}
+		var current = l.type();
+		boolean close = false;
+		if (current != LabelExpression.Type.LEAF) {
+			close = (parent != null || l.negated()) && l.type() != parent;
+			if (close && !l.negated() && (current == LabelExpression.Type.CONJUNCTION || parent == LabelExpression.Type.DISJUNCTION)) {
+				close = false;
+			}
+		}
+		if (close) {
+			builder.append("(");
+		}
+		renderLabelExpression(l.lhs(), current);
+		if (current == LabelExpression.Type.LEAF) {
+			l.value().forEach(v ->
+				escapeName(v).ifPresent(builder::append)
+			);
+		}  else {
+			builder.append(current.getValue());
+		}
+		renderLabelExpression(l.rhs(), current);
+		if (close) {
+			builder.append(")");
+		}
 	}
 
 	void enter(Properties properties) {
