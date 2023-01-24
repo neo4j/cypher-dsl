@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1674504931956">
+<licensePluginReport goal="CHECK" timestamp="1674552640747">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -68,6 +68,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/InternalPropertyImpl.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/InternalRelationshipImpl.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/KeyValueMapEntry.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/LabelExpression.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Limit.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ListComprehension.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ListExpression.java" result="PRESENT"/>
