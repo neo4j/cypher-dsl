@@ -243,6 +243,10 @@
 							<ignoreMissingClassesByRegularExpression>org\.neo4j\.cypherdsl\.core\.internal\.LiteralBase</ignoreMissingClassesByRegularExpression>
 							<ignoreMissingClassesByRegularExpression>org\.neo4j\.cypherdsl\.core\.internal\.StatementContext</ignoreMissingClassesByRegularExpression>
 						</ignoreMissingClassesByRegularExpressions>
+						<excludes>
+							<!-- Inevitable addition needed to fix 581. -->
+							<exclude>org.neo4j.cypherdsl.core.LabelExpression</exclude>
+						</excludes>
 					</parameter>
 				</configuration>
 			</plugin>

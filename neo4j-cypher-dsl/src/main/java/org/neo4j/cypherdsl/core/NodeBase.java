@@ -50,6 +50,8 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 	final List<NodeLabel> labels;
 
+	final LabelExpression labelExpression;
+
 	final Properties properties;
 
 	// ------------------------------------------------------------------------
@@ -77,9 +79,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 */
 	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
 
-		this.symbolicName = symbolicName;
-		this.labels = new ArrayList<>(labels);
-		this.properties = properties;
+		this(symbolicName, new ArrayList<>(labels), null, properties);
 	}
 
 	@Override
@@ -143,7 +143,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	@Override
 	@NotNull
 	public final List<NodeLabel> getLabels() {
-		return Collections.unmodifiableList(labels);
+		return labels == null ? List.of() : List.copyOf(labels);
 	}
 
 	@Override
@@ -183,12 +183,23 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 		this(symbolicName, assertLabels(primaryLabel, additionalLabels), Properties.create(properties));
 	}
 
+	NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties) {
+
+		this.symbolicName = symbolicName;
+		this.labels = labels;
+		this.labelExpression = labelExpression;
+		this.properties = properties;
+	}
+
 	@Override
 	public final void accept(Visitor visitor) {
 
 		visitor.enter(this);
 		this.getSymbolicName().ifPresent(s -> s.accept(visitor));
-		this.labels.forEach(label -> label.accept(visitor));
+		if (this.labels != null) {
+			this.labels.forEach(label -> label.accept(visitor));
+		}
+		Visitable.visitIfNotNull(this.labelExpression, visitor);
 		Visitable.visitIfNotNull(this.properties, visitor);
 		visitor.leave(this);
 	}

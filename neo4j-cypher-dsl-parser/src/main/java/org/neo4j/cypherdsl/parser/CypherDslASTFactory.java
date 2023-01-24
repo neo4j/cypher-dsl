@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -34,7 +33,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
@@ -68,6 +66,7 @@ import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
+import org.neo4j.cypherdsl.core.LabelExpression;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.MapProjection;
@@ -123,7 +122,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		Expression,
 		Hint,
 		Expression,
-		LabelsOrTypes,
+	LabelExpression,
 		Parameter<?>,
 		Expression,
 		Property,
@@ -183,21 +182,51 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	private String[] computeFinalLabelList(LabelParsedEventType event, List<StringPos<InputPosition>> inputLabels) {
 
-		return computeFinalLabelList(event, new LabelsOrTypes(EntityType.NODE, inputLabels.stream().map(l -> l.string).collect(Collectors.toCollection(LinkedHashSet::new))));
-	}
-
-	private String[] computeFinalLabelList(LabelParsedEventType event, LabelsOrTypes inputLabels) {
-
 		return inputLabels == null ? new String[0] : this.options.getLabelFilter()
-			.apply(event, inputLabels.value())
+			.apply(event, inputLabels.stream().map(v -> v.string).toList())
 			.toArray(new String[0]);
 	}
 
-	private String[] computeFinalTypeList(TypeParsedEventType event, LabelsOrTypes inputTypes) {
+	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, LabelExpression inputLabels) {
 
-		return inputTypes == null ? new String[0] : this.options.getTypeFilter()
-			.apply(event, inputTypes.value())
+		if (inputLabels == null) {
+			return Optional.of(new String[0]);
+		}
+
+		if (inputLabels.type() == LabelExpression.Type.COLON_CONJUNCTION || (inputLabels.type() == LabelExpression.Type.LEAF && inputLabels.value() != null)) {
+			return Optional.of(this.options.getLabelFilter()
+				.apply(event, inputLabels.value())
+				.toArray(new String[0]));
+		}
+		return Optional.empty();
+	}
+
+	private String[] computeFinalTypeList(TypeParsedEventType event, LabelExpression inputTypes) {
+
+		if (inputTypes == null) {
+			return new String[0];
+		}
+
+		if (inputTypes.negated() || inputTypes.type() == LabelExpression.Type.CONJUNCTION) {
+			throw new UnsupportedOperationException("Expressions for relationship types are not supported in Cypher-DSL");
+		}
+
+		List<String> types = new ArrayList<>();
+			traverseTypeExpression(types, inputTypes);
+
+		return this.options.getTypeFilter()
+			.apply(event, types)
 			.toArray(new String[0]);
+	}
+
+	void traverseTypeExpression(List<String> types, LabelExpression expression) {
+
+		if (expression.type() == LabelExpression.Type.LEAF || expression.type() == LabelExpression.Type.COLON_DISJUNCTION) {
+			types.addAll(expression.value());
+		} else {
+			traverseTypeExpression(types, expression.lhs());
+			traverseTypeExpression(types, expression.rhs());
+		}
 	}
 
 	static void isInstanceOf(Class<?> type, Object obj, String message) {
@@ -573,17 +602,18 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NodeAtom nodePattern(InputPosition p, Expression v, LabelsOrTypes labels, Expression properties, Expression predicate) {
+	public NodeAtom nodePattern(InputPosition p, Expression v, LabelExpression labels, Expression properties, Expression predicate) {
 
-		var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
 		Node node;
-
-		if (finalLabels.length == 0) {
+		if (labels == null) {
 			node = Cypher.anyNode();
 		} else {
-			var primaryLabel = finalLabels[0];
-			var additionalLabels = Arrays.stream(finalLabels).skip(1).toList();
-			node = Cypher.node(primaryLabel, additionalLabels);
+			var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
+			node = finalLabels.map(l -> {
+				var primaryLabel = l[0];
+				var additionalLabels = Arrays.stream(l).skip(1).toList();
+				return Cypher.node(primaryLabel, additionalLabels);
+			}).orElseGet(() -> Cypher.node(labels));
 		}
 
 		if (v != null) {
@@ -596,7 +626,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v, LabelsOrTypes relTypes, PathLength pathLength, Expression properties, Expression predicate) {
+	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v, LabelExpression relTypes, PathLength pathLength, Expression properties, Expression predicate) {
 		return PathAtom.of(assertSymbolicName(v), pathLength, left, right, computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties);
 	}
 
@@ -1020,74 +1050,66 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public LabelsOrTypes labelConjunction(InputPosition p, LabelsOrTypes lhs, LabelsOrTypes rhs) {
+	public LabelExpression labelConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
 
-		if (lhs.entityType() != rhs.entityType()) {
-			throw new IllegalArgumentException("Can't create conjunction of labels for nodes an relationships");
-		}
-
-		var conjunction = new LinkedHashSet<String>();
-		lhs.value().stream().filter(rhs.value()::contains).forEach(conjunction::add);
-		rhs.value().stream().filter(lhs.value()::contains).forEach(conjunction::add);
-		return new LabelsOrTypes(lhs.entityType(), conjunction);
+		return lhs.and(rhs);
 	}
 
 	@Override
-	public LabelsOrTypes labelDisjunction(InputPosition p, LabelsOrTypes lhs, LabelsOrTypes rhs) {
+	public LabelExpression labelDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
 
-
-		if (lhs.entityType() != rhs.entityType()) {
-			throw new IllegalArgumentException("Can't create disjunction of labels for nodes an relationships");
-		}
-
-		var disjunction = new LinkedHashSet<String>();
-		disjunction.addAll(lhs.value());
-		disjunction.addAll(rhs.value());
-		return new LabelsOrTypes(lhs.entityType(), disjunction);
+		return lhs.or(rhs);
 	}
 
 	@Override
-	public LabelsOrTypes labelNegation(InputPosition p, LabelsOrTypes e) {
+	public LabelExpression labelNegation(InputPosition p, LabelExpression e) {
+
+		return e.negate();
+	}
+
+	@Override
+	public LabelExpression labelWildcard(InputPosition p) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public LabelsOrTypes labelWildcard(InputPosition p) {
-		throw new UnsupportedOperationException();
+	public LabelExpression labelLeaf(InputPosition p, String e, EntityType entityType) {
+		return new LabelExpression(e);
 	}
 
 	@Override
-	public LabelsOrTypes labelLeaf(InputPosition p, String e, EntityType entityType) {
-		var value = new LinkedHashSet<String>();
-		value.add(e);
-		return new LabelsOrTypes(entityType, value);
+	public LabelExpression labelColonConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
+
+		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_CONJUNCTION);
 	}
 
 	@Override
-	public LabelsOrTypes labelColonConjunction(InputPosition p, LabelsOrTypes lhs, LabelsOrTypes rhs) {
+	public LabelExpression labelColonDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
 
-		if (lhs.entityType() == EntityType.NODE) {
-			return labelDisjunction(p, lhs, rhs);
-		}
-		return labelConjunction(p, lhs, rhs);
+		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_DISJUNCTION);
+	}
+
+	@NotNull
+	private static LabelExpression colonJunjction(LabelExpression lhs, LabelExpression rhs, LabelExpression.Type colonDisjunction) {
+		List<String> value = new ArrayList<>();
+		value.addAll(lhs.value());
+		value.addAll(rhs.value());
+		return new LabelExpression(colonDisjunction, false, value, null, null);
 	}
 
 	@Override
-	public LabelsOrTypes labelColonDisjunction(InputPosition p, LabelsOrTypes lhs, LabelsOrTypes rhs) {
-
-		if (lhs.entityType() == EntityType.NODE) {
-			return labelConjunction(p, lhs, rhs);
-		}
-		return labelDisjunction(p, lhs, rhs);
-	}
-
-	@Override
-	public Expression labelExpressionPredicate(Expression subject, LabelsOrTypes exp) {
+	public Expression labelExpressionPredicate(Expression subject, LabelExpression exp) {
 
 		if (!(subject instanceof SymbolicName symbolicName)) {
 			throw new IllegalArgumentException("Expected an symbolic name to create a label based expression predicate!");
 		} else {
-			return Conditions.hasLabelsOrType(symbolicName, exp.value().toArray(String[]::new));
+			List<String> values = new ArrayList<>();
+			LabelExpression current = exp;
+			while (current != null) {
+				values.addAll(current.value());
+				current = current.rhs();
+			}
+			return Conditions.hasLabelsOrType(symbolicName, values.toArray(String[]::new));
 		}
 	}
 
