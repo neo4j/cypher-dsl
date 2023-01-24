@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.function.Consumer;
 
@@ -124,6 +125,16 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static Node anyNode() {
 		return new InternalNodeImpl();
+	}
+
+	/**
+	 * @param labelExpression required expression
+	 * @return A node matching a label expression
+	 * @since 2023.0.2
+	 */
+	@NotNull @Contract(pure = true)
+	public static Node node(LabelExpression labelExpression) {
+		return new InternalNodeImpl(Objects.requireNonNull(labelExpression));
 	}
 
 	/**

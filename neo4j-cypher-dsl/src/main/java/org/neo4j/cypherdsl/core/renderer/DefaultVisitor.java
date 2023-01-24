@@ -43,6 +43,7 @@ import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.InTransactions;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
+import org.neo4j.cypherdsl.core.LabelExpression;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
 import org.neo4j.cypherdsl.core.ListExpression;
@@ -113,7 +114,7 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @author Gerrit Meier
  * @since 1.0
  */
-@SuppressWarnings({ "unused", "squid:S1172" })
+@SuppressWarnings({"unused", "squid:S1172"})
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
@@ -544,6 +545,86 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(NodeLabel nodeLabel) {
 
 		escapeName(nodeLabel.getValue()).ifPresent(label -> builder.append(Symbols.NODE_LABEL_START).append(label));
+	}
+
+	void enter(LabelExpression labelExpression) {
+		builder.append(":");
+		traverseLabelExpressionDfs(labelExpression, null);
+	}
+
+	void traverseLabelExpressionDfs(LabelExpression l, LabelExpression.Type parent) {
+		if (l == null) {
+			return;
+		}
+		if (l.negated()) {
+			builder.append("!");
+		}
+		var current = l.type();
+		boolean close = false;
+		if (current != LabelExpression.Type.LEAF) {
+			close = (parent != null || l.negated()) && l.type() != parent;
+			if (close && !l.negated() && (current == LabelExpression.Type.CONJUNCTION || parent == LabelExpression.Type.DISJUNCTION)) {
+				close = false;
+			}
+		}
+		if (close) {
+			builder.append("(");
+		}
+		traverseLabelExpressionDfs(l.lhs(), current);
+		if (current == LabelExpression.Type.LEAF) {
+			l.value().forEach(v ->
+				escapeName(v).ifPresent(builder::append)
+			);
+		} else if (current == LabelExpression.Type.COLON_CONJUNCTION) {
+			builder.append(l.value().stream().map(this::escapeName)
+				.filter(Optional::isPresent)
+				.map(Optional::get)
+				.collect(Collectors.joining(":")));
+		}  else {
+			builder.append(current.getValue());
+		}
+		traverseLabelExpressionDfs(l.rhs(), current);
+		if (close) {
+			builder.append(")");
+		}
+	}
+
+	void renderLabelExpression(LabelExpression labelExpression) {
+		renderLabelExpression(labelExpression, LabelExpression.Type.LEAF);
+	}
+
+	void renderLabelExpression(LabelExpression labelExpression, LabelExpression.Type outer) {
+		if (labelExpression.negated()) {
+			builder.append("!");
+		}
+
+		boolean close = false;
+		if (labelExpression.value() == null) {
+			if (labelExpression.negated() || (outer != labelExpression.type() && labelExpression.type() != LabelExpression.Type.CONJUNCTION && (labelExpression.lhs().type() != labelExpression.rhs().type()))) {
+				builder.append("(");
+				close = true;
+			}
+			renderLabelExpression(labelExpression.lhs(), labelExpression.type());
+			builder.append(labelExpression.type().getValue());
+			renderLabelExpression(labelExpression.rhs(), labelExpression.type());
+			if (close) {
+				builder.append(")");
+			}
+
+		} else {
+			if (labelExpression.negated() || (outer == LabelExpression.Type.CONJUNCTION && outer != labelExpression.type() && labelExpression.rhs() != null)) {
+				builder.append("(");
+				close = true;
+			}
+			builder.append(labelExpression.value());
+			if (labelExpression.rhs() != null) {
+				builder.append(labelExpression.type().getValue());
+				renderLabelExpression(labelExpression.rhs(), labelExpression.type());
+				if (close) {
+					builder.append(")");
+				}
+			}
+		}
 	}
 
 	void enter(Properties properties) {

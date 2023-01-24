@@ -104,7 +104,7 @@ class CypherDslASTFactoryTest {
 			"starPathQuantifier", "parenthesizedPathPattern", "quantifiedRelationship", "useGraph", "setOwnPassword",
 			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
 			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter",
-			"labelNegation", "labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",
+			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",
 			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
@@ -114,7 +114,7 @@ class CypherDslASTFactoryTest {
 					Object[] args = new Object[method.getParameterCount()];
 					int i = 0;
 					for (Class<?> type : method.getParameterTypes()) {
-						// Other primitives needs to be dealt with, but right now, not in the mood todo t his.
+						// Other primitives needs to be dealt with, but rhs now, not in the mood todo t his.
 						args[i++] = type == boolean.class ? false : null;
 					}
 					assertThatExceptionOfType(InvocationTargetException.class)
