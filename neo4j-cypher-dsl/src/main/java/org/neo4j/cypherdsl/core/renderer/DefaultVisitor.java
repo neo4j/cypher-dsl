@@ -154,11 +154,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private boolean skipAliasing = false;
 
 	/**
-	 * Keeps track of unresolved symbolic names.
-	 */
-	private final Map<SymbolicName, String> resolvedSymbolicNames = new ConcurrentHashMap<>();
-
-	/**
 	 * A cache of delegates, avoiding unnecessary object creation.
 	 */
 	private final Map<Class<? extends Visitor>, Visitor> delegateCache = new ConcurrentHashMap<>();
@@ -217,17 +212,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private Optional<AtomicReference<String>> separatorOnCurrentLevel() {
 
 		return Optional.ofNullable(separatorOnLevel.get(currentLevel));
-	}
-
-	private String resolve(SymbolicName symbolicName) {
-
-		return this.resolvedSymbolicNames.computeIfAbsent(symbolicName, k -> {
-			String value = k.getValue();
-			if (Strings.hasText(value)) {
-				return escapeIfNecessary(symbolicName.getValue());
-			}
-			return String.format("%s%03d", Strings.randomIdentifier(8), resolvedSymbolicNames.size());
-		});
 	}
 
 	@Override
@@ -528,7 +512,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		if (skipNodeContent) {
 			String symbolicName = node.getSymbolicName()
-				.map(SymbolicName::getValue).orElseGet(() -> resolve(node.getRequiredSymbolicName()));
+				.map(SymbolicName::getValue).orElseGet(() -> statementContext.resolve(node.getRequiredSymbolicName()));
 			builder.append(symbolicName);
 		}
 
@@ -595,11 +579,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		if (inRelationshipCondition) {
 			String value = symbolicName.getValue();
-			if (Strings.hasText(value) && resolvedSymbolicNames.containsKey(symbolicName)) {
+			if (Strings.hasText(value) && statementContext.isResolved(symbolicName)) {
 				builder.append(escapeIfNecessary(symbolicName.getValue()));
 			}
 		} else {
-			builder.append(resolve(symbolicName));
+			builder.append(statementContext.resolve(symbolicName));
 		}
 	}
 

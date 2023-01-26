@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -1439,5 +1440,25 @@ class IssueRelatedIT {
 			.returning(Cypher.asterisk())
 			.build().getCypher();
 		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WITH person, COUNT { (person)-[:`ACTED_IN`]->() } AS actedInDegree RETURN *");
+	}
+
+	@Test // GH-585
+	void rerenderShouldYieldSameResultOnSameRenderer() throws NoSuchFieldException, IllegalAccessException {
+
+		var anonymous = Cypher.node("Person");
+		var statement = Cypher.match(anonymous).delete(anonymous).build();
+		var s1 = statement.getCypher();
+		var s2 = statement.getCypher();
+		var defaultRenderer = Renderer.getDefaultRenderer();
+		var s3 = defaultRenderer.render(statement);
+		assertThat(s1).isEqualTo(s2);
+		assertThat(s2).isEqualTo(s3);
+
+		// Nuke the cache
+		var renderedStatementCache = defaultRenderer.getClass().getDeclaredField("renderedStatementCache");
+		renderedStatementCache.setAccessible(true);
+		((Map<?, ?>) renderedStatementCache.get(defaultRenderer)).clear();
+		var s4 = defaultRenderer.render(statement);
+		assertThat(s3).isEqualTo(s4);
 	}
 }
