@@ -246,6 +246,11 @@
 						<excludes>
 							<!-- Inevitable addition needed to fix 581. -->
 							<exclude>org.neo4j.cypherdsl.core.LabelExpression</exclude>
+
+							<!-- Inevitable addition needed to fix 585. The interface is sealed anyway, so adding is not
+								an issue, but we shouldn't remove this -->
+							<exclude>org.neo4j.cypherdsl.core.StatementContext#resolve(org.neo4j.cypherdsl.core.SymbolicName)</exclude>
+							<exclude>org.neo4j.cypherdsl.core.StatementContext#isResolved(org.neo4j.cypherdsl.core.SymbolicName)</exclude>
 						</excludes>
 					</parameter>
 				</configuration>
