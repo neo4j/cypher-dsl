@@ -58,4 +58,24 @@ public sealed interface StatementContext permits StatementContextImpl {
 	 * constants rather than actual Cypher parameters.
 	 */
 	boolean isRenderConstantsAsParameters();
+
+	/**
+	 * Resolves a {@link SymbolicName symbolic name} into a string: A symbolic name can be a placeholder without an actual
+	 * value. In such cases a value is randomly generated and will stay constant for that name as long as the statement exists.
+	 * In case the {@code symbolicName} has a constant value it will be returned,
+	 *
+	 * @param symbolicName the symbolic name to resolve
+	 * @return a value for the given name
+	 * @since 2023.0.3
+	 */
+	String resolve(SymbolicName symbolicName);
+
+	/**
+	 * Checks whether a given {@link SymbolicName symbolic name} has been resolved in this {@link StatementContext context}.
+	 *
+	 * @param symbolicName the symbolic name to check
+	 * @return true if the given name has already been resolved in this context
+	 * @since 2023.0.3
+	 */
+	boolean isResolved(SymbolicName symbolicName);
 }
