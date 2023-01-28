@@ -1472,4 +1472,43 @@ class IssueRelatedIT {
 		var s4 = defaultRenderer.render(statement);
 		assertThat(s3).isEqualTo(s4);
 	}
+
+	@Test // GH-589
+	void unionMustNotDestroyScope() {
+
+		var actor = Cypher.node("Actor").named("a");
+		var movie = Cypher.node("Movie").named("m");
+		var serie = Cypher.node("Serie").named("s");
+		var x = Cypher.name("x");
+		Statement statement = Cypher
+			.match(actor)
+			.call(
+				Cypher.union(
+					Cypher.with(actor)
+						.match(actor.relationshipTo(movie).named("ACTED_IN"))
+						.returning(movie.as(x.getValue()))
+						.build(),
+					Cypher.with(actor)
+						.match(actor.relationshipTo(serie).named("ACTED_IN"))
+						.returning(serie.as(x.getValue()))
+						.build()
+				)
+			).returning(x)
+			.build();
+
+		var expected = """
+			MATCH (a:Actor)
+			CALL {
+			  WITH a
+			  MATCH (a)-[ACTED_IN]->(m:Movie)
+			  RETURN m AS x UNION
+			  WITH a
+			  MATCH (a)-[ACTED_IN]->(s:Serie)
+			  RETURN s AS x
+			}
+			RETURN x""";
+		var cypher = Renderer.getRenderer(Configuration.prettyPrinting())
+				.render(statement);
+		assertThat(cypher).isEqualTo(expected);
+	}
 }
