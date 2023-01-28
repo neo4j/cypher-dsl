@@ -111,7 +111,7 @@ public final class ScopingStrategy {
 				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		}
 
-		if (visitable instanceof CountExpression) {
+		if (hasImplicitScope(visitable)) {
 			implicitScope.push(
 				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		}
@@ -163,11 +163,15 @@ public final class ScopingStrategy {
 			this.inProperty = false;
 		}
 
-		if (visitable instanceof CountExpression) {
+		if (hasImplicitScope(visitable)) {
 			this.implicitScope.pop();
 		}
 
 		previous = visitable;
+	}
+
+	private boolean hasImplicitScope(Visitable visitable) {
+		return visitable instanceof CountExpression || visitable instanceof Statement.UnionQuery;
 	}
 
 	private void leaveStatement(Visitable visitable) {
