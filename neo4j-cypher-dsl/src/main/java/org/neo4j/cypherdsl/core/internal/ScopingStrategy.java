@@ -201,6 +201,7 @@ public final class ScopingStrategy {
 
 		Predicate<IdentifiableElement> hasAName = Named.class::isInstance;
 		hasAName = hasAName.or(AliasedExpression.class::isInstance);
+		hasAName = hasAName.or(SymbolicName.class::isInstance);
 		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
 			.filter(hasAName)
 			.anyMatch(i -> {
@@ -208,8 +209,9 @@ public final class ScopingStrategy {
 					return named.getSymbolicName().equals(needle.getSymbolicName());
 				} else if (i instanceof Aliased aliased) {
 					return aliased.getAlias().equals(needle.getRequiredSymbolicName().getValue());
+				} else {
+					return  i.equals(needle.getRequiredSymbolicName());
 				}
-				return false;
 			});
 	}
 
@@ -234,6 +236,9 @@ public final class ScopingStrategy {
 		// Everything not taken into the next step has to go.
 		Set<IdentifiableElement> retain = new HashSet<>();
 		Set<IdentifiableElement> visitedNamed = dequeOfVisitedNamed.peek();
+		if (visitedNamed == null) {
+			return;
+		}
 		with.accept(segment -> {
 			if (segment instanceof SymbolicName symbolicName) {
 				visitedNamed.stream()
@@ -242,8 +247,9 @@ public final class ScopingStrategy {
 							return named.getRequiredSymbolicName().equals(segment);
 						} else if (element instanceof Aliased aliased) {
 							return aliased.getAlias().equals((symbolicName).getValue());
+						} else {
+							return element.equals(segment);
 						}
-						return false;
 					})
 					.forEach(retain::add);
 			}
