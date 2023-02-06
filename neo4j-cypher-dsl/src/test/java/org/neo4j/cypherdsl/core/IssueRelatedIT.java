@@ -1500,4 +1500,49 @@ class IssueRelatedIT {
 				.render(statement);
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+	@Test // GH-595
+	void callWithMostImportIntoScope() {
+		SymbolicName var = Cypher.name("var");
+		Node movie = Cypher.node("Movie").named("m");
+		Node actor = Cypher.node("Actor").named("a");
+		SymbolicName actors = Cypher.name("actors");
+		Statement statement =
+			Cypher.unwind(Cypher.parameter("x")).as(var)
+				.call(
+					Cypher.with(var)
+						.create(movie)
+						.returning(movie)
+						.build()
+				)
+				.call(
+					Cypher.with(movie)
+						.match(movie.relationshipFrom(actor, "ACTED_IN"))
+						.returning(Functions.collect(actor).as(actors))
+						.build()
+				)
+				.returning(movie.project(
+					movie.property("title"),
+					"actors", actors
+				))
+				.build();
+		var expected = """
+			UNWIND $x AS var
+			CALL {
+			  WITH var
+			  CREATE (m:Movie)
+			  RETURN m
+			}
+			CALL {
+			  WITH m
+			  MATCH (m)<-[:ACTED_IN]-(a:Actor)
+			  RETURN collect(a) AS actors
+			}
+			RETURN m {
+			  .title,
+			  actors: actors
+			}""";
+		var cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
+		assertThat(cypher).isEqualTo(expected);
+	}
 }
