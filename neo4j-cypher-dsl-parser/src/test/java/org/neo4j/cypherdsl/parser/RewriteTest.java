@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
@@ -30,6 +31,7 @@ import java.util.function.BiFunction;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
@@ -134,5 +136,27 @@ class RewriteTest {
 			.build();
 		var statement = CypherParser.parse("CREATE (p:Person {name: $name, height: $height, birthDate: $birthDate, templateEmail: 'Welcome $name!'})", parserOptions).getCypher();
 		assertThat(statement).isEqualTo("CREATE (p:`Person` {name: $1, height: $2, birthDate: $3, templateEmail: 'Welcome $name!'})");
+	}
+
+	@Test
+	void shouldRewriteParameters2() {
+
+		var mapping = Map.of("param1", "foo", "x", "y");
+		var parserOptions = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Expression.class, e -> {
+				if (e instanceof Parameter<?> p) {
+					return Cypher.parameter(mapping.getOrDefault(p.getName(), p.getName()), p.getValue());
+				}
+				return e;
+			})
+			.withCallback(ExpressionCreatedEventType.ON_NEW_VARIABLE, Expression.class, e -> {
+				if (e instanceof SymbolicName s) {
+					return Cypher.name(mapping.getOrDefault(s.getValue(), s.getValue()));
+				}
+				return e;
+			})
+			.build();
+		var statement = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x", parserOptions).getCypher();
+		assertThat(statement).isEqualTo("MATCH (y:`Movie`) WHERE y.title = $foo RETURN y");
 	}
 }
