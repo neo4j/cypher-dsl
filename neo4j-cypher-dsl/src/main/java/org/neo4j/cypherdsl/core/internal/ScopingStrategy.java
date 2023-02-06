@@ -256,9 +256,7 @@ public final class ScopingStrategy {
 		});
 
 		retain.addAll(Optional.ofNullable(implicitScope.peek()).orElseGet(Set::of));
-		if (visitedNamed != null) {
-			visitedNamed.retainAll(retain);
-		}
+		visitedNamed.retainAll(retain);
 	}
 
 	private void clearPreviouslyVisitedAfterReturnish(Visitable returnish) {
