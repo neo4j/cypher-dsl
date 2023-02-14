@@ -1430,4 +1430,19 @@ class IssueRelatedIT {
 			.build();
 		assertThat(renderer.render(statement)).isEqualTo("UNWIND $ids AS id MATCH (n:`Person`) WHERE elementId(n) = id RETURN n");
 	}
+
+	static Stream<Arguments> conditionExpressionShouldWorkInReturn() {
+		return Stream.of(
+			Arguments.of(Cypher.returning(Cypher.literalOf(1), Cypher.literalTrue().asCondition()).build(), "RETURN 1, true"),
+			Arguments.of(Cypher.returning(Cypher.literalOf(1), Cypher.literalTrue().asCondition().and(Cypher.literalFalse().asCondition())).build(), "RETURN 1, (true AND false)"),
+			Arguments.of(Cypher.returning(Cypher.literalOf(1), Cypher.literalTrue().asCondition().or(Cypher.literalFalse().asCondition())).build(), "RETURN 1, (true OR false)")
+		);
+	}
+
+	@ParameterizedTest(name = "{1}") // GH-605
+	@MethodSource
+	void conditionExpressionShouldWorkInReturn(Statement statement, String expected) {
+		String cypher = statement.getCypher();
+		assertThat(cypher).isEqualTo(expected);
+	}
 }
