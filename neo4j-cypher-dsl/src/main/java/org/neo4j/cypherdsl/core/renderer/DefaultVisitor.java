@@ -222,10 +222,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return false;
 		}
 
-		if (visitable instanceof ProvidesAffixes providesAffixes) {
-			providesAffixes.getPrefix().ifPresent(this::doWithPrefix);
-		}
-
 		if (visitable instanceof AliasedExpression aliasedExpression) {
 			currentAliasedElements.push(aliasedExpression);
 		}
@@ -240,6 +236,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		separatorOnCurrentLevel().ifPresent(ref -> builder.append(ref.getAndSet("")));
+
+		if (visitable instanceof ProvidesAffixes providesAffixes) {
+			providesAffixes.getPrefix().ifPresent(this::doWithPrefix);
+		}
 
 		boolean doEnter = !skipNodeContent;
 		if (doEnter) {
