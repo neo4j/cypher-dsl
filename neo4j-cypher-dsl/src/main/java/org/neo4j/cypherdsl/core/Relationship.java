@@ -229,7 +229,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		 */
 		@API(status = INTERNAL)
 		public List<String> getTypes() {
-			return List.copyOf(types.getValues());
+			return types == null ? List.of() : List.copyOf(types.getValues());
 		}
 
 		/**
