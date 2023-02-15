@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1676450058303">
+<licensePluginReport goal="CHECK" timestamp="1676452970333">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -224,6 +224,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/ProcedureCallsIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/RawLiteralTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/RelationshipChainTest.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/RelationshipTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/StringLiteralTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/SubqueriesIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/SymbolicNameTest.java" result="PRESENT"/>
