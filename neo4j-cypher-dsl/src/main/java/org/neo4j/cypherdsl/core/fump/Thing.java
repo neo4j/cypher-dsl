@@ -26,23 +26,20 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
-import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.PatternElement;
-import org.neo4j.cypherdsl.core.PropertyLookup;
-import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 
 /**
  * @author Michael J. Simons
- * @since TBA
  * @soundtrack Avenger - Prayers Of Steel
+ * @since TBA
  */
 @RegisterForReflection
 public class Thing extends ReflectiveVisitor {
@@ -58,23 +55,14 @@ public class Thing extends ReflectiveVisitor {
 	// TODO this is bonkers without scope
 	private final Map<SymbolicName, PatternElement> patternLookup = new HashMap<>();
 
-	// TODO this is bonkers without scope
-
-
-	// This is not going to be public API
-	@Deprecated(forRemoval = true)
-	public static void getThings(Statement statement) {
-		var thing = new Thing();
-		statement.accept(thing);
-		System.out.println("labels matched " + thing.tokens.stream().filter(t -> t.type() == Token.Type.LABEL).map(Token::value).collect(Collectors.toSet()));
-		thing.properties.forEach(p -> {
-			System.out.printf("Matched property `%s` on label `%s`%n", p.name(), p.owningToken().stream().map(Token::value).collect(Collectors.joining(", ")));
-		});
+	// TODO make private
+	public Thing() {
 	}
 
-	Thing() {
+	// TODO make package private
+	public Things getResult() {
+		return new Things(this.tokens, this.properties);
 	}
-
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
@@ -89,32 +77,42 @@ public class Thing extends ReflectiveVisitor {
 		inMatch = true;
 	}
 
-
 	void leave(Match match) {
 		inMatch = false;
 	}
 
 	void enter(Node node) {
 
-		node.getSymbolicName().ifPresent(s -> {
-			patternLookup.put(s, node);
-		});
+		node.getSymbolicName().ifPresent(s -> patternLookup.put(s, node));
 		currentPatternElement.compareAndSet(null, node);
 	}
 
 	void enter(KeyValueMapEntry mapEntry) {
+
 		var owner = currentPatternElement.get();
 		if (owner == null) {
 			return;
 		}
 
 		if (owner instanceof Node node) {
-			this.properties.add(new Property(mapEntry.getKey(), node.getLabels().stream().map(Token::of).collect(Collectors.toSet())));
+			this.properties.add(new Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey()));
+		} else if (owner instanceof Relationship relationship) {
+			this.properties.add(new Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey()));
 		}
 	}
 
 	void leave(Node node) {
 		currentPatternElement.compareAndSet(node, null);
+	}
+
+	void enter(Relationship relationship) {
+
+		relationship.getSymbolicName().ifPresent(s -> patternLookup.put(s, relationship));
+		currentPatternElement.compareAndSet(null, relationship);
+	}
+
+	void leave(Relationship relationship) {
+		currentPatternElement.compareAndSet(relationship, null);
 	}
 
 	void enter(org.neo4j.cypherdsl.core.Property property) {
@@ -127,25 +125,29 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
-
 		if (property.getContainerReference() instanceof SymbolicName s) {
 			var patternElement = patternLookup.get(s);
 			if (patternElement instanceof Node node) {
-				lookup.accept(new Visitor() {
-					@Override
-					public void enter(Visitable segment) {
-						if(segment instanceof SymbolicName name) {
-							properties.add(new Property(name.getValue(), node.getLabels().stream().map(Token::of).collect(Collectors.toSet())));
-						}
+				lookup.accept(segment -> {
+					if (segment instanceof SymbolicName name) {
+						properties.add(new Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), name.getValue()));
+					}
+				});
+			} else if (patternElement instanceof Relationship relationship) {
+				lookup.accept(segment -> {
+					if (segment instanceof SymbolicName name) {
+						properties.add(new Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), name.getValue()));
 					}
 				});
 			}
 		}
-
-		// TODO more identifiable.
 	}
 
 	void enter(NodeLabel label) {
-		this.tokens.add(new Token(Token.Type.LABEL, label.getValue()));
+		this.tokens.add(new Token(Token.Type.NODE_LABEL, label.getValue()));
+	}
+
+	void enter(Relationship.Details details) {
+		details.getTypes().stream().map(Token::type).forEach(tokens::add);
 	}
 }

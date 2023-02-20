@@ -30,6 +30,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.fump.Things;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
@@ -139,6 +140,16 @@ public interface Statement extends Visitable {
 	 */
 	@NotNull @Contract(pure = true)
 	Collection<Expression> getIdentifiableExpressions();
+
+	/**
+	 * Analyzes the statement and provides access to the resolved properties, their (potential) owners and the context
+	 * in which they have been resolved.
+	 * Also, a view on {@link #getIdentifiableExpressions()} is provided.
+	 * TODO Naming subject to change
+	 * @return An immutable object representing properties resolved in a statement together with their context and owner
+	 * @since TBA
+	 */
+	Things getThings();
 
 	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher

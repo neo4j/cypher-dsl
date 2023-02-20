@@ -27,6 +27,8 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
+import org.neo4j.cypherdsl.core.fump.Thing;
+import org.neo4j.cypherdsl.core.fump.Things;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -61,6 +63,9 @@ abstract class AbstractStatement implements Statement {
 	 */
 	@SuppressWarnings("squid:S3077")
 	private volatile Collection<Expression> identifiables;
+
+	@SuppressWarnings("squid:S3077")
+	private volatile Things things;
 
 	@NotNull
 	@Override
@@ -156,5 +161,28 @@ abstract class AbstractStatement implements Statement {
 		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext());
 		this.accept(parameterCollectingVisitor);
 		return parameterCollectingVisitor.getResult();
+	}
+
+	@Override
+	public Things getThings() {
+
+		Things result = this.things;
+		if (result == null) {
+			synchronized (this) {
+				result = this.things;
+				if (result == null) {
+					this.things = getThings0();
+					result = this.things;
+				}
+			}
+		}
+		return result;
+	}
+
+	private Things getThings0() {
+
+		var thing = new Thing();
+		this.accept(thing);
+		return thing.getResult();
 	}
 }
