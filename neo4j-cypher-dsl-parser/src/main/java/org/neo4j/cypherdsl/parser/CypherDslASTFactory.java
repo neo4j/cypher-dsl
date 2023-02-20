@@ -842,8 +842,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement alterDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists,
-		AccessType accessType, Integer topologyPrimaries, Integer topologySecondaries) {
+	public Statement alterDatabase(InputPosition inputPosition, DatabaseName databaseName, boolean b, AccessType accessType, Integer integer, Integer integer1, Map<String, Expression> map, java.util.Set<String> set) {
 		throw new UnsupportedOperationException();
 	}
 
