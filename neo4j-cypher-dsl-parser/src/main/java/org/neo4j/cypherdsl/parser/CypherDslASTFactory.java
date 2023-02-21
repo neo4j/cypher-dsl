@@ -362,24 +362,27 @@ final class CypherDslASTFactory implements ASTFactory<
 			}
 		}
 		var transformedPatternElements = transformIfPossible(patternElementCallbacks, openForTransformation);
-		Where where;
-		if (condition == Conditions.noCondition()) {
-			where = whereIn;
-		} else {
-			if (whereIn == null) {
-				where = Where.from(condition);
-			} else {
-				AtomicReference<Condition> capturedCondition = new AtomicReference<>();
-				whereIn.accept(segment -> {
-					if (segment instanceof Condition inner) {
-						capturedCondition.compareAndSet(null, inner);
-					}
-				});
-				where = Where.from(capturedCondition.get().and(condition));
-			}
-		}
+		Where where = computeFinalWhere(whereIn, condition);
 
 		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, where, hints));
+	}
+
+	private static Where computeFinalWhere(Where whereIn, Condition condition) {
+
+		if (condition == Conditions.noCondition()) {
+			return whereIn;
+		}
+		if (whereIn == null) {
+			return Where.from(condition);
+		}
+
+		AtomicReference<Condition> capturedCondition = new AtomicReference<>();
+		whereIn.accept(segment -> {
+			if (segment instanceof Condition inner) {
+				capturedCondition.compareAndSet(null, inner);
+			}
+		});
+		return Where.from(capturedCondition.get().and(condition));
 	}
 
 	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
