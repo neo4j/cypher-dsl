@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -29,6 +30,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -71,9 +76,21 @@ public final class ScopingStrategy {
 	}
 
 	/**
+	 * @param onScopeEntered Event handlers to be called after entering local or implicit scope
+	 * @param onScopeLeft    Event handlers to b called after leaving local or implicit scope
+	 * @return an empty scoping strategy, for internal use only.
+	 */
+	public static ScopingStrategy create(List<Consumer<Visitable>> onScopeEntered, List<Consumer<Visitable>> onScopeLeft) {
+		var strategy = create();
+		strategy.onScopeEntered.addAll(onScopeEntered);
+		strategy.onScopeLeft.addAll(onScopeLeft);
+		return strategy;
+	}
+
+	/**
 	 * Keeps track of named objects that have been already visited.
 	 */
-	private final Deque<Set<IdentifiableElement>> dequeOfVisitedNamed = new ArrayDeque<>(new HashSet<>());
+	private final Deque<Set<IdentifiableElement>> dequeOfVisitedNamed = new ArrayDeque<>();
 
 	/**
 	 * Some expressions have implicit scopes, we might not clear that after returning from inner statements or returns.
@@ -91,6 +108,8 @@ public final class ScopingStrategy {
 	private boolean inSubquery = false;
 
 	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
+	private final List<Consumer<Visitable>> onScopeEntered = new ArrayList<>();
+	private final List<Consumer<Visitable>> onScopeLeft = new ArrayList<>();
 
 	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
@@ -126,14 +145,21 @@ public final class ScopingStrategy {
 			this.currentImports.compareAndSet(null, imports);
 		}
 
+		boolean notify = false;
 		if (hasLocalScope(visitable)) {
+			notify = true;
 			dequeOfVisitedNamed.push(
 				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		}
 
 		if (hasImplicitScope(visitable)) {
+			notify = true;
 			implicitScope.push(
 				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
+		}
+
+		if (notify) {
+			this.onScopeEntered.forEach(c -> c.accept(visitable));
 		}
 	}
 
@@ -167,9 +193,11 @@ public final class ScopingStrategy {
 			dequeOfVisitedNamed.peek().add(identifiableElement);
 		}
 
+		boolean notify = false;
 		if (visitable instanceof Statement) {
 			leaveStatement(visitable);
 		} else if (hasLocalScope(visitable)) {
+			notify = true;
 			this.dequeOfVisitedNamed.pop();
 		} else {
 			clearPreviouslyVisitedNamed(visitable);
@@ -188,13 +216,18 @@ public final class ScopingStrategy {
 		}
 
 		if (hasImplicitScope(visitable)) {
+			notify = true;
 			this.implicitScope.pop();
 		}
 
 		previous = visitable;
+
+		if (notify) {
+			this.onScopeLeft.forEach(c -> c.accept(visitable));
+		}
 	}
 
-	private boolean hasImplicitScope(Visitable visitable) {
+	private static boolean hasImplicitScope(Visitable visitable) {
 		return visitable instanceof CountExpression || visitable instanceof Statement.UnionQuery;
 	}
 

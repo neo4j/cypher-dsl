@@ -18,8 +18,11 @@
  */
 package org.neo4j.cypherdsl.core.fump;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,6 +38,7 @@ import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
+import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 
 /**
  * @author Michael J. Simons
@@ -52,11 +56,17 @@ public class Thing extends ReflectiveVisitor {
 
 	private final Set<Property> properties = new HashSet<>();
 
-	// TODO this is bonkers without scope
-	private final Map<SymbolicName, PatternElement> patternLookup = new HashMap<>();
+	private final Deque<Map<SymbolicName, PatternElement>> patternLookup = new ArrayDeque<>();
+
+	private final ScopingStrategy scopingStrategy;
 
 	// TODO make private
 	public Thing() {
+		this.scopingStrategy = ScopingStrategy.create(
+			List.of(ignored -> patternLookup.push(new HashMap<>())),
+			List.of(ignored -> patternLookup.pop())
+		);
+		this.patternLookup.push(new HashMap<>());
 	}
 
 	// TODO make package private
@@ -66,11 +76,13 @@ public class Thing extends ReflectiveVisitor {
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
+		scopingStrategy.doEnter(visitable);
 		return true;
 	}
 
 	@Override
 	protected void postLeave(Visitable visitable) {
+		scopingStrategy.doLeave(visitable);
 	}
 
 	void enter(Match match) {
@@ -83,7 +95,7 @@ public class Thing extends ReflectiveVisitor {
 
 	void enter(Node node) {
 
-		node.getSymbolicName().ifPresent(s -> patternLookup.put(s, node));
+		node.getSymbolicName().ifPresent(s -> store(s, node));
 		currentPatternElement.compareAndSet(null, node);
 	}
 
@@ -107,7 +119,7 @@ public class Thing extends ReflectiveVisitor {
 
 	void enter(Relationship relationship) {
 
-		relationship.getSymbolicName().ifPresent(s -> patternLookup.put(s, relationship));
+		relationship.getSymbolicName().ifPresent(s -> store(s, relationship));
 		currentPatternElement.compareAndSet(null, relationship);
 	}
 
@@ -126,7 +138,7 @@ public class Thing extends ReflectiveVisitor {
 		}
 
 		if (property.getContainerReference() instanceof SymbolicName s) {
-			var patternElement = patternLookup.get(s);
+			var patternElement = lookup(s);
 			if (patternElement instanceof Node node) {
 				lookup.accept(segment -> {
 					if (segment instanceof SymbolicName name) {
@@ -149,5 +161,19 @@ public class Thing extends ReflectiveVisitor {
 
 	void enter(Relationship.Details details) {
 		details.getTypes().stream().map(Token::type).forEach(tokens::add);
+	}
+
+	PatternElement lookup(SymbolicName s) {
+		if (patternLookup.isEmpty()) {
+			throw new IllegalStateException("Invalid scope");
+		}
+		return patternLookup.peek().get(s);
+	}
+
+	void store(SymbolicName s, PatternElement patternElement) {
+		if (patternLookup.isEmpty()) {
+			throw new IllegalStateException("Invalid scope");
+		}
+		patternLookup.peek().put(s, patternElement);
 	}
 }

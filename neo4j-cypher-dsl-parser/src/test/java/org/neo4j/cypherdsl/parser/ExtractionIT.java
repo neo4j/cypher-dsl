@@ -198,6 +198,22 @@ class ExtractionIT {
 			List.of(Token.label("Person"), Token.label("Movie")),
 			List.of(Token.type("ACTED_IN")),
 			List.of(new Property(Token.type("ACTED_IN"), "as"))
+		),
+		new TestData(
+			"""
+			match (n:Person)
+			call {
+			match (n:Movie {title: 'The Matrix'}) where n.released >= 1900 return n as m
+			}
+			return n.name
+			""",
+			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(),
+			List.of(
+				new Property(Token.label("Person"), "name"),
+				new Property(Token.label("Movie"), "title"),
+				new Property(Token.label("Movie"), "released")
+			)
 		)
 	);
 }
