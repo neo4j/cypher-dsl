@@ -25,8 +25,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -86,6 +88,10 @@ public final class ScopingStrategy {
 
 	private boolean inProperty = false;
 
+	private boolean inSubquery = false;
+
+	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
+
 	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
 	}
@@ -104,6 +110,20 @@ public final class ScopingStrategy {
 
 		if (visitable instanceof Property) {
 			this.inProperty = true;
+		}
+
+		if (visitable instanceof Subquery) {
+			this.inSubquery = true;
+		}
+
+		if (this.inSubquery && visitable instanceof With with) {
+			Set<String> imports = new HashSet<>();
+			with.accept(segment -> {
+				if (segment instanceof SymbolicName symbolicName) {
+					imports.add(symbolicName.getValue());
+				}
+			});
+			this.currentImports.compareAndSet(null, imports);
 		}
 
 		if (hasLocalScope(visitable)) {
@@ -162,6 +182,10 @@ public final class ScopingStrategy {
 		if (visitable instanceof Property) {
 			this.inProperty = false;
 		}
+		if (visitable instanceof Subquery) {
+			this.inSubquery = false;
+			this.currentImports.set(null);
+		}
 
 		if (hasImplicitScope(visitable)) {
 			this.implicitScope.pop();
@@ -204,14 +228,26 @@ public final class ScopingStrategy {
 		hasAName = hasAName.or(SymbolicName.class::isInstance);
 		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
 			.filter(hasAName)
-			.anyMatch(i -> {
+			.map(i -> {
+				String value;
 				if (i instanceof Named named) {
-					return named.getSymbolicName().equals(needle.getSymbolicName());
+					value = named.getSymbolicName().map(SymbolicName::getValue).orElse(null);
 				} else if (i instanceof Aliased aliased) {
-					return aliased.getAlias().equals(needle.getRequiredSymbolicName().getValue());
+					value = aliased.getAlias();
+				} else if (i instanceof SymbolicName symbolicName) {
+					value = symbolicName.getValue();
 				} else {
-					return  i.equals(needle.getRequiredSymbolicName());
+					value = null;
 				}
+				return value;
+			})
+			.filter(Objects::nonNull)
+			.anyMatch(i -> {
+				boolean result = i.equals(needle.getRequiredSymbolicName().getValue());
+				if (result && inSubquery) {
+					return Optional.ofNullable(currentImports.get()).orElseGet(Set::of).contains(i);
+				}
+				return result;
 			});
 	}
 

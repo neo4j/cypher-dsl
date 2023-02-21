@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -34,6 +35,19 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 class SubqueriesIT {
 
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+
+	@Nested
+	class Scope {
+		@Test
+		void nodePatternInCallMustBeFullAndNotKnown() {
+			Statement parsed = Cypher.match(Cypher.node("Person").named("n"))
+				.call(Cypher.match(Cypher.node("Movie").named("n").withProperties("title", Cypher.literalOf("The Matrix"))).where(Cypher.anyNode("n").property("released").gte(Cypher.literalOf(1980))).returning(Cypher.anyNode("n").as("m")).build())
+				.returning(Cypher.anyNode("n").property("name"))
+				.build();
+			String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
+			assertThat(cypher).isEqualTo("MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1980 RETURN n AS m} RETURN n.name");
+		}
+	}
 
 	@Nested
 	class ResultReturningSubqueries {

@@ -463,4 +463,19 @@ class CypherParserTest {
 		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+	@Test
+	void nodePatternInCall() {
+
+		var statement = """
+			match (n:Person)
+			call {
+			match (n:Movie {title: 'The Matrix'}) where n.released >= 1900 return n as m
+			}
+			return n.name
+			""";
+		Statement parsed = CypherParser.parseStatement(statement);
+		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
+		assertThat(cypher).isEqualTo("MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
+	}
 }
