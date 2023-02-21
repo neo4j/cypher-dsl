@@ -26,14 +26,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -41,6 +39,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.CountExpression;
+import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
@@ -80,7 +79,7 @@ public final class ScopingStrategy {
 	 * @param onScopeLeft    Event handlers to b called after leaving local or implicit scope
 	 * @return an empty scoping strategy, for internal use only.
 	 */
-	public static ScopingStrategy create(List<Consumer<Collection<IdentifiableElement>>> onScopeEntered, List<Consumer<Collection<IdentifiableElement>>> onScopeLeft) {
+	public static ScopingStrategy create(List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered, List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft) {
 		var strategy = create();
 		strategy.onScopeEntered.addAll(onScopeEntered);
 		strategy.onScopeLeft.addAll(onScopeLeft);
@@ -109,8 +108,8 @@ public final class ScopingStrategy {
 
 	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
 
-	private final List<Consumer<Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
-	private final List<Consumer<Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
+	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
+	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
 
 	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
@@ -159,7 +158,7 @@ public final class ScopingStrategy {
 		}
 
 		if (notify) {
-			this.onScopeEntered.forEach(c -> c.accept(scopeSeed));
+			this.onScopeEntered.forEach(c -> c.accept(visitable, scopeSeed));
 		}
 	}
 
@@ -217,13 +216,14 @@ public final class ScopingStrategy {
 
 		if (hasImplicitScope(visitable)) {
 			notify = true;
+			this.implicitScope.pop();
 		}
 
 		previous = visitable;
 
 		if (notify) {
 			Set<IdentifiableElement> retainedElements = new HashSet<>(afterStatement);
-			this.onScopeLeft.forEach(c -> c.accept(retainedElements));
+			this.onScopeLeft.forEach(c -> c.accept(visitable, retainedElements));
 		}
 	}
 
@@ -394,5 +394,12 @@ public final class ScopingStrategy {
 			.filter(allNamedElementsHaveResolvedNames)
 			.map(IdentifiableElement::asExpression)
 			.collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+	}
+
+	/**
+	 * @return The set of current imports
+	 */
+	public Set<SymbolicName> getCurrentImports() {
+		return Optional.ofNullable(this.currentImports.get()).stream().flatMap(v -> v.stream().map(Cypher::name)).collect(Collectors.toSet());
 	}
 }

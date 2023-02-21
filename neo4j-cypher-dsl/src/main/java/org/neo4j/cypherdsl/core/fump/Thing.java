@@ -65,8 +65,9 @@ public class Thing extends ReflectiveVisitor {
 
 	// TODO make private
 	public Thing() {
+
 		this.scopingStrategy = ScopingStrategy.create(
-			List.of(imports -> {
+			List.of((cause, imports) -> {
 				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
 				Map<SymbolicName, PatternElement> newScope = new HashMap<>();
 				for (IdentifiableElement e : imports) {
@@ -78,10 +79,10 @@ public class Thing extends ReflectiveVisitor {
 				}
 				patternLookup.push(newScope);
 			}),
-			List.of(ignored -> {
+			List.of((cause, exports) -> {
 				Map<SymbolicName, PatternElement> previousScope = patternLookup.pop();
 				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
-				for (IdentifiableElement e : ignored) {
+				for (IdentifiableElement e : exports) {
 					if (e instanceof SymbolicName s && previousScope.containsKey(s)) {
 						currentScope.put(s, previousScope.get(s));
 					} else if (e instanceof Named n && e instanceof PatternElement p) {
@@ -199,10 +200,9 @@ public class Thing extends ReflectiveVisitor {
 		if (patternLookup.isEmpty()) {
 			throw new IllegalStateException("Invalid scope");
 		}
-
 		var currentScope = patternLookup.peek();
-		// don't overwrite on with for example
-		if (currentScope.containsKey(s)) {
+		// Don't overwrite in same scope or when imported
+		if (currentScope.containsKey(s) && scopingStrategy.getCurrentImports().contains(s)) {
 			return;
 		}
 		currentScope.put(s, patternElement);
