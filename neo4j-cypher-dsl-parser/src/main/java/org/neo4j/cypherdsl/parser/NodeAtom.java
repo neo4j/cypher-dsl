@@ -19,14 +19,17 @@
  */
 package org.neo4j.cypherdsl.parser;
 
+import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Node;
+import org.neo4j.cypherdsl.core.PatternElement;
 
 /**
  * A value object for {@link Node nodes}.
  *
  * @author Michael J. Simons
  * @param value The actual node
+ * @param predicate An optional predicate to capture node pattern predicates.
  * @since 2023.0.0
  */
-public record NodeAtom(Node value) implements PatternAtom {
+public record NodeAtom(Node value, Expression predicate) implements PatternAtom, PatternElement {
 }

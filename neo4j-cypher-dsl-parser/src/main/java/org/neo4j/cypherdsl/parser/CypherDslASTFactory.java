@@ -346,10 +346,38 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where where) {
+	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where whereIn) {
 
 		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
-		var transformedPatternElements = transformIfPossible(patternElementCallbacks, patternElements);
+		Condition condition = Conditions.noCondition();
+		List<PatternElement> openForTransformation = new ArrayList<>();
+		for (PatternElement patternElement : patternElements) {
+			if (patternElement instanceof NodeAtom nodeAtom) {
+				openForTransformation.add(nodeAtom.value());
+				if (nodeAtom.predicate() != null) {
+					condition = condition.and(nodeAtom.predicate().asCondition());
+				}
+			} else {
+				openForTransformation.add(patternElement);
+			}
+		}
+		var transformedPatternElements = transformIfPossible(patternElementCallbacks, openForTransformation);
+		Where where;
+		if (condition == Conditions.noCondition()) {
+			where = whereIn;
+		} else {
+			if (whereIn == null) {
+				where = Where.from(condition);
+			} else {
+				AtomicReference<Condition> capturedCondition = new AtomicReference<>();
+				whereIn.accept(segment -> {
+					if (segment instanceof Condition inner) {
+						capturedCondition.compareAndSet(null, inner);
+					}
+				});
+				where = Where.from(capturedCondition.get().and(condition));
+			}
+		}
 
 		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, where, hints));
 	}
@@ -392,7 +420,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Hint usingScan(InputPosition p, Expression v, String label) {
 
 		var s = assertSymbolicName(v);
-		// Same note applies as with usingIndexHint in regards of relationships
+		// Same note applies as with usingIndexHint in regard to relationships
 		return Hint.useScanFor(Cypher.node(label).named(s));
 	}
 
@@ -400,7 +428,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Clause createClause(InputPosition p, List<PatternElement> patternElements) {
 
 		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_CREATE, List.of());
-		return Clauses.create(transformIfPossible(callbacks, patternElements));
+		return Clauses.create(transformIfPossible(callbacks, patternElements.stream().map(v -> v instanceof NodeAtom n ? n.value() : v).toList()));
 	}
 
 	@Override
@@ -461,9 +489,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause mergeClause(InputPosition p, PatternElement patternElement, List<Clause> setClauses,
+	public Clause mergeClause(InputPosition p, PatternElement patternElementIn, List<Clause> setClauses,
 		List<MergeActionType> actionTypes, List<InputPosition> positions) {
 
+
+		var patternElement = patternElementIn instanceof NodeAtom n ? n.value() : patternElementIn;
 		var mergeActions = new ArrayList<MergeAction>();
 		if (setClauses != null && !setClauses.isEmpty() && actionTypes != null && !actionTypes.isEmpty()) {
 
@@ -536,7 +566,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 
 		var nodes = atoms.stream()
-			.filter(NodeAtom.class::isInstance).map(NodeAtom.class::cast).map(NodeAtom::value).toList();
+			.filter(NodeAtom.class::isInstance).map(NodeAtom.class::cast).toList();
 		var relationships = atoms.stream()
 			.filter(PathAtom.class::isInstance).map(PathAtom.class::cast).toList();
 
@@ -550,15 +580,16 @@ final class CypherDslASTFactory implements ASTFactory<
 				+ " path details.");
 		}
 
-		ExposesRelationships<?> relationshipPattern = nodes.get(0);
+		ExposesRelationships<?> relationshipPattern = nodes.get(0).value();
 		for (int i = 1; i < nodes.size(); i++) {
+			Node node = nodes.get(i).value();
 			PathAtom pathAtom = relationships.get(i - 1);
 			PathLength length = pathAtom.getLength();
 
 			relationshipPattern = switch (pathAtom.getDirection()) {
-				case LTR -> relationshipPattern.relationshipTo(nodes.get(i), pathAtom.getTypes());
-				case RTL -> relationshipPattern.relationshipFrom(nodes.get(i), pathAtom.getTypes());
-				case UNI -> relationshipPattern.relationshipBetween(nodes.get(i), pathAtom.getTypes());
+				case LTR -> relationshipPattern.relationshipTo(node, pathAtom.getTypes());
+				case RTL -> relationshipPattern.relationshipFrom(node, pathAtom.getTypes());
+				case UNI -> relationshipPattern.relationshipBetween(node, pathAtom.getTypes());
 			};
 
 			relationshipPattern = applyOptionalName(relationshipPattern, pathAtom);
@@ -622,7 +653,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		if (properties != null) {
 			node = node.withProperties((MapExpression) properties);
 		}
-		return new NodeAtom(node);
+		return new NodeAtom(node, predicate);
 	}
 
 	@Override
