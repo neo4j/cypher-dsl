@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core.fump;
 
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,8 +30,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
+import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Match;
+import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.PatternElement;
@@ -63,8 +66,29 @@ public class Thing extends ReflectiveVisitor {
 	// TODO make private
 	public Thing() {
 		this.scopingStrategy = ScopingStrategy.create(
-			List.of(ignored -> patternLookup.push(new HashMap<>())),
-			List.of(ignored -> patternLookup.pop())
+			List.of(imports -> {
+				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
+				Map<SymbolicName, PatternElement> newScope = new HashMap<>();
+				for (IdentifiableElement e : imports) {
+					if (e instanceof SymbolicName s && currentScope.containsKey(s)) {
+						newScope.put(s, currentScope.get(s));
+					} else if (e instanceof Named n && e instanceof PatternElement p) {
+						newScope.put(n.getRequiredSymbolicName(), p);
+					}
+				}
+				patternLookup.push(newScope);
+			}),
+			List.of(ignored -> {
+				Map<SymbolicName, PatternElement> previousScope = patternLookup.pop();
+				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
+				for (IdentifiableElement e : ignored) {
+					if (e instanceof SymbolicName s && previousScope.containsKey(s)) {
+						currentScope.put(s, previousScope.get(s));
+					} else if (e instanceof Named n && e instanceof PatternElement p) {
+						currentScope.put(n.getRequiredSymbolicName(), p);
+					}
+				}
+			})
 		);
 		this.patternLookup.push(new HashMap<>());
 	}
@@ -167,13 +191,20 @@ public class Thing extends ReflectiveVisitor {
 		if (patternLookup.isEmpty()) {
 			throw new IllegalStateException("Invalid scope");
 		}
-		return patternLookup.peek().get(s);
+		var patternElement = patternLookup.peek().get(s);
+		return patternElement;
 	}
 
 	void store(SymbolicName s, PatternElement patternElement) {
 		if (patternLookup.isEmpty()) {
 			throw new IllegalStateException("Invalid scope");
 		}
-		patternLookup.peek().put(s, patternElement);
+
+		var currentScope = patternLookup.peek();
+		// don't overwrite on with for example
+		if (currentScope.containsKey(s)) {
+			return;
+		}
+		currentScope.put(s, patternElement);
 	}
 }

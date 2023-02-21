@@ -80,7 +80,7 @@ public final class ScopingStrategy {
 	 * @param onScopeLeft    Event handlers to b called after leaving local or implicit scope
 	 * @return an empty scoping strategy, for internal use only.
 	 */
-	public static ScopingStrategy create(List<Consumer<Visitable>> onScopeEntered, List<Consumer<Visitable>> onScopeLeft) {
+	public static ScopingStrategy create(List<Consumer<Collection<IdentifiableElement>>> onScopeEntered, List<Consumer<Collection<IdentifiableElement>>> onScopeLeft) {
 		var strategy = create();
 		strategy.onScopeEntered.addAll(onScopeEntered);
 		strategy.onScopeLeft.addAll(onScopeLeft);
@@ -108,8 +108,9 @@ public final class ScopingStrategy {
 	private boolean inSubquery = false;
 
 	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
-	private final List<Consumer<Visitable>> onScopeEntered = new ArrayList<>();
-	private final List<Consumer<Visitable>> onScopeLeft = new ArrayList<>();
+
+	private final List<Consumer<Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
+	private final List<Consumer<Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
 
 	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
@@ -146,20 +147,19 @@ public final class ScopingStrategy {
 		}
 
 		boolean notify = false;
+		Set<IdentifiableElement> scopeSeed = dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek();
 		if (hasLocalScope(visitable)) {
 			notify = true;
-			dequeOfVisitedNamed.push(
-				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
+			dequeOfVisitedNamed.push(new HashSet<>(scopeSeed));
 		}
 
 		if (hasImplicitScope(visitable)) {
 			notify = true;
-			implicitScope.push(
-				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
+			implicitScope.push(new HashSet<>(scopeSeed));
 		}
 
 		if (notify) {
-			this.onScopeEntered.forEach(c -> c.accept(visitable));
+			this.onScopeEntered.forEach(c -> c.accept(scopeSeed));
 		}
 	}
 
@@ -217,13 +217,13 @@ public final class ScopingStrategy {
 
 		if (hasImplicitScope(visitable)) {
 			notify = true;
-			this.implicitScope.pop();
 		}
 
 		previous = visitable;
 
 		if (notify) {
-			this.onScopeLeft.forEach(c -> c.accept(visitable));
+			Set<IdentifiableElement> retainedElements = new HashSet<>(afterStatement);
+			this.onScopeLeft.forEach(c -> c.accept(retainedElements));
 		}
 	}
 

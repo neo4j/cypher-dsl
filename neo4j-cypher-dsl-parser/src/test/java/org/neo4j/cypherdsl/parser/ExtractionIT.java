@@ -25,9 +25,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.fump.Property;
 import org.neo4j.cypherdsl.core.fump.Token;
 
@@ -48,14 +52,27 @@ class ExtractionIT {
 	@ParameterizedTest
 	@MethodSource
 	void extractionShouldWork(TestData testData) {
-		var statement = CypherParser.parse(testData.query());
+		var statement = testData.statement() == null ? CypherParser.parse(testData.query()) : testData.statement();
 		var things = statement.getThings();
+		System.out.println(statement.getCypher());
 		assertThat(things.getNodeLabels()).containsExactlyInAnyOrderElementsOf(testData.expectedLabels());
 		assertThat(things.getRelationshipTypes()).containsExactlyInAnyOrderElementsOf(testData.expectedTypes());
 		assertThat(things.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
 	}
 
-	record TestData(String query, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties) {
+	record TestData(String query, Statement statement, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties) {
+		TestData(Statement statement, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties) {
+			this(null, statement, expectedLabels, expectedTypes, expectedProperties);
+		}
+
+		TestData(String query, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties) {
+			this(query, null, expectedLabels, expectedTypes, expectedProperties);
+		}
+
+		@Override
+		public String toString() {
+			return query == null ? "(Statement based)" : query;
+		}
 	}
 
 	static final List<TestData> TEST_DATA = List.of(
@@ -213,6 +230,71 @@ class ExtractionIT {
 				new Property(Token.label("Person"), "name"),
 				new Property(Token.label("Movie"), "title"),
 				new Property(Token.label("Movie"), "released")
+			)
+		),
+		new TestData(
+			"""
+			MATCH (n:Person {name: 'Tom Hanks'})
+			CALL {
+			  WITH n
+			  MATCH (m:Movie)<-[:ACTED_IN]-(n)
+			  WHERE (m.released >= 1900
+			    AND n.born = 1956)
+			  RETURN m
+			}
+			RETURN n.name, m.title
+			""",
+			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(Token.type("ACTED_IN")),
+			List.of(
+				new Property(Token.label("Person"), "name"),
+				new Property(Token.label("Person"), "born"),
+				new Property(Token.label("Movie"), "released"),
+				new Property(Token.label("Movie"), "title")
+			)
+		),
+		new TestData(
+			Cypher
+				.match(Cypher.node("Person").named("n").withProperties("name", Cypher.literalOf("Tom Hanks")))
+				.call(
+					Cypher.match(
+							Cypher.node("Movie").named("m").relationshipFrom(Cypher.anyNode("n"), "ACTED_IN")
+						).where(Cypher.anyNode("m").property("released").gte(Cypher.literalOf(1900)).and(Cypher.anyNode("n").property("born").eq(Cypher.literalOf(1956))))
+						.returning(Cypher.anyNode("m"))
+						.build(), Cypher.anyNode("n")
+				)
+				.returning(Cypher.anyNode("n").property("name"), Cypher.anyNode("m").property("title"))
+				.build(),
+			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(Token.type("ACTED_IN")),
+			List.of(
+				new Property(Token.label("Person"), "name"),
+				new Property(Token.label("Person"), "born"),
+				new Property(Token.label("Movie"), "released"),
+				new Property(Token.label("Movie"), "title")
+			)
+		),
+		new TestData(
+			"""
+			MATCH (n:Person WHERE n.name = 'Tom Hanks')
+			CALL {
+			  WITH n
+			  MATCH (m:Movie)<-[:ACTED_IN]-(n)
+			  WHERE (m.released >= 1900
+			    AND n.born = 1956)
+			  RETURN m
+			}
+			WITH n, m
+			WHERE m.title = 'Apollo 13'
+			RETURN n, m
+			""",
+			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(Token.type("ACTED_IN")),
+			List.of(
+				new Property(Token.label("Person"), "name"),
+				new Property(Token.label("Person"), "born"),
+				new Property(Token.label("Movie"), "released"),
+				new Property(Token.label("Movie"), "title")
 			)
 		)
 	);
