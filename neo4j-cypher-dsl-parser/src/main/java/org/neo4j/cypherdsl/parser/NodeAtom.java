@@ -31,5 +31,5 @@ import org.neo4j.cypherdsl.core.PatternElement;
  * @param predicate An optional predicate to capture node pattern predicates.
  * @since 2023.0.0
  */
-public record NodeAtom(Node value, Expression predicate) implements PatternAtom, PatternElement {
+record NodeAtom(Node value, Expression predicate) implements PatternAtom, PatternElement {
 }
