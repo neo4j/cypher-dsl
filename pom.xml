@@ -643,6 +643,8 @@
 								 | Those are shaded classes from Neo4j and we work around their changes.
 								 -->
 								<exclude>org.neo4j.cypherdsl.parser.internal</exclude>
+								<!-- 2023.0.4 and higher, this should have been package private to begin with -->
+								<exclude>org.neo4j.cypherdsl.parser.NodeAtom</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
