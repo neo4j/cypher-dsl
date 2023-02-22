@@ -25,23 +25,37 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
+import org.neo4j.cypherdsl.core.Condition;
+import org.neo4j.cypherdsl.core.Create;
+import org.neo4j.cypherdsl.core.Delete;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Match;
+import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
+import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.PatternElement;
+import org.neo4j.cypherdsl.core.PropertyContainer;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * @author Michael J. Simons
@@ -51,7 +65,22 @@ import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 @RegisterForReflection
 public class Thing extends ReflectiveVisitor {
 
+	private static final Configuration CYPHER_RENDERER_CONFIGURATION = Configuration.newConfig().alwaysEscapeNames(false).build();
+
+	private static final GeneralizedRenderer RENDERER = Renderer.getRenderer(CYPHER_RENDERER_CONFIGURATION, GeneralizedRenderer.class);
+
+	/**
+	 * Constant class name for skipping compounds, not inclined to make this type public.
+	 */
+	private static final String TYPE_OF_COMPOUND_CONDITION = "org.neo4j.cypherdsl.core.CompoundCondition";
+
 	private boolean inMatch = false;
+
+	private boolean inCreate = false;
+
+	private boolean inMerge = false;
+
+	private boolean inDelete = false;
 
 	private final AtomicReference<PatternElement> currentPatternElement = new AtomicReference<>();
 
@@ -59,7 +88,11 @@ public class Thing extends ReflectiveVisitor {
 
 	private final Set<Property> properties = new HashSet<>();
 
+	private final Set<SomeGoodNameForANNonSTCComparison> conditions = new HashSet<>();
+
 	private final Deque<Map<SymbolicName, PatternElement>> patternLookup = new ArrayDeque<>();
+
+	private final Deque<Condition> currentConditions = new ArrayDeque<>();
 
 	private final ScopingStrategy scopingStrategy;
 
@@ -96,7 +129,7 @@ public class Thing extends ReflectiveVisitor {
 
 	// TODO make package private
 	public Things getResult() {
-		return new Things(this.tokens, this.properties);
+		return new Things(this.tokens, this.properties, this.conditions);
 	}
 
 	@Override
@@ -118,6 +151,30 @@ public class Thing extends ReflectiveVisitor {
 		inMatch = false;
 	}
 
+	void enter(Create match) {
+		inCreate = true;
+	}
+
+	void leave(Create match) {
+		inCreate = false;
+	}
+
+	void enter(Merge match) {
+		inMerge = true;
+	}
+
+	void leave(Merge match) {
+		inMerge = false;
+	}
+
+	void enter(Delete match) {
+		inDelete = true;
+	}
+
+	void leave(Delete match) {
+		inDelete = false;
+	}
+
 	void enter(Node node) {
 
 		node.getSymbolicName().ifPresent(s -> store(s, node));
@@ -131,11 +188,21 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
+		Property property;
 		if (owner instanceof Node node) {
-			this.properties.add(new Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey()));
+			property = new Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey());
 		} else if (owner instanceof Relationship relationship) {
-			this.properties.add(new Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey()));
+			property = new Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey());
+		} else {
+			property = null;
 		}
+
+		if (property == null) {
+			return;
+		}
+		this.properties.add(property);
+		var left = ((PropertyContainer) owner).getSymbolicName().map(s -> s.getValue() + ".").or(() -> Optional.of("")).map(v -> v + property.name()).get();
+		this.conditions.add(new SomeGoodNameForANNonSTCComparison(property, left, Operator.EQUALITY, RENDERER.render(mapEntry.getValue())));
 	}
 
 	void leave(Node node) {
@@ -162,22 +229,80 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
-		if (property.getContainerReference() instanceof SymbolicName s) {
-			var patternElement = lookup(s);
-			if (patternElement instanceof Node node) {
-				lookup.accept(segment -> {
-					if (segment instanceof SymbolicName name) {
-						properties.add(new Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), name.getValue()));
-					}
-				});
-			} else if (patternElement instanceof Relationship relationship) {
-				lookup.accept(segment -> {
-					if (segment instanceof SymbolicName name) {
-						properties.add(new Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), name.getValue()));
-					}
-				});
-			}
+		if (!(property.getContainerReference() instanceof SymbolicName s)) {
+			return;
 		}
+
+		var storedProperty = new AtomicReference<Property>();
+		var patternElement = lookup(s);
+
+		Function<String, Token> mapper;
+		Stream<String> tokenStream;
+
+		if (patternElement instanceof Node node) {
+			mapper = Token::label;
+			tokenStream = node.getLabels().stream().map(NodeLabel::getValue);
+		} else if (patternElement instanceof Relationship relationship) {
+			mapper = Token::type;
+			tokenStream = relationship.getDetails().getTypes().stream();
+		} else {
+			return;
+		}
+
+		lookup.accept(segment -> {
+			if (segment instanceof SymbolicName name) {
+				storedProperty.set(new Property(tokenStream.map(mapper).collect(Collectors.toSet()), name.getValue()));
+			}
+		});
+		properties.add(storedProperty.get());
+		if (inCurrentCondition(property)) {
+			conditions.add(extractComparison(storedProperty.get(), currentConditions.peek()));
+		}
+	}
+
+	private boolean inCurrentCondition(org.neo4j.cypherdsl.core.Property property) {
+		var currentCondition = this.currentConditions.peek();
+
+		if (currentCondition == null) {
+			return false;
+		}
+
+		var result = new AtomicBoolean();
+		currentCondition.accept(segment -> {
+			if (segment == property) {
+				result.compareAndSet(false, true);
+			}
+		});
+		return result.get();
+	}
+
+	private SomeGoodNameForANNonSTCComparison extractComparison(Property property, Condition condition) {
+
+		AtomicReference<String> left = new AtomicReference<>();
+		AtomicReference<Operator> op = new AtomicReference<>();
+		AtomicReference<String> right = new AtomicReference<>();
+		condition.accept(new Visitor() {
+			int cnt;
+
+			@Override
+			public void enter(Visitable segment) {
+				if (++cnt != 2) {
+					return;
+				}
+				var cypher = RENDERER.render(segment);
+				if (segment instanceof Operator operator) {
+					op.compareAndSet(null, operator);
+				} else if (!left.compareAndSet(null, cypher)) {
+					right.compareAndSet(null, cypher);
+				}
+			}
+
+			@Override
+			public void leave(Visitable segment) {
+				--cnt;
+			}
+		});
+		return new SomeGoodNameForANNonSTCComparison(property, left.get(), op.get(), right.get());
 	}
 
 	void enter(NodeLabel label) {
@@ -192,8 +317,21 @@ public class Thing extends ReflectiveVisitor {
 		if (patternLookup.isEmpty()) {
 			throw new IllegalStateException("Invalid scope");
 		}
-		var patternElement = patternLookup.peek().get(s);
-		return patternElement;
+		return patternLookup.peek().get(s);
+	}
+
+	void enter(Condition condition) {
+		if (TYPE_OF_COMPOUND_CONDITION.equals(condition.getClass().getName())) {
+			return;
+		}
+		this.currentConditions.push(condition);
+	}
+
+	void leave(Condition condition) {
+		if (TYPE_OF_COMPOUND_CONDITION.equals(condition.getClass().getName())) {
+			return;
+		}
+		this.currentConditions.pop();
 	}
 
 	void store(SymbolicName s, PatternElement patternElement) {

@@ -37,9 +37,12 @@ public final class Things {
 
 	private final Set<Property> properties;
 
-	Things(Set<Token> tokens, Set<Property> properties) {
+	private final Set<SomeGoodNameForANNonSTCComparison> comparisons;
+
+	Things(Set<Token> tokens, Set<Property> properties, Set<SomeGoodNameForANNonSTCComparison> comparisons) {
 		this.tokens = Set.copyOf(tokens);
 		this.properties = Set.copyOf(properties);
+		this.comparisons = Set.copyOf(comparisons);
 	}
 
 	/**
@@ -84,5 +87,14 @@ public final class Things {
 	 */
 	public Collection<Property> getProperties() {
 		return properties;
+	}
+
+	/**
+	 * Returns a collection of all comparisons in the statement involving the resolved properties.
+	 *
+	 * @return A collection of all comparisons
+	 */
+	public Collection<SomeGoodNameForANNonSTCComparison> getComparisons() {
+		return comparisons;
 	}
 }
