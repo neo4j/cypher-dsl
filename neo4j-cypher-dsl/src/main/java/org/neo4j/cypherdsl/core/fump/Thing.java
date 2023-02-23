@@ -25,7 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -37,6 +36,7 @@ import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Create;
 import org.neo4j.cypherdsl.core.Delete;
+import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.Match;
@@ -47,6 +47,7 @@ import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.PropertyContainer;
+import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.With;
@@ -55,9 +56,6 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison.Clause;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
-import org.neo4j.cypherdsl.core.renderer.Configuration;
-import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
-import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * @author Michael J. Simons
@@ -66,10 +64,6 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
  */
 @RegisterForReflection
 public class Thing extends ReflectiveVisitor {
-
-	private static final Configuration CYPHER_RENDERER_CONFIGURATION = Configuration.newConfig().alwaysEscapeNames(false).build();
-
-	private static final GeneralizedRenderer RENDERER = Renderer.getRenderer(CYPHER_RENDERER_CONFIGURATION, GeneralizedRenderer.class);
 
 	/**
 	 * Constant class name for skipping compounds, not inclined to make this type public.
@@ -205,8 +199,14 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 		this.properties.add(property);
-		var left = ((PropertyContainer) owner).getSymbolicName().map(s -> s.getValue() + ".").or(() -> Optional.of("")).map(v -> v + property.name()).get();
-		this.conditions.add(new SomeGoodNameForANNonSTCComparison(currentClause, property, left, Operator.EQUALITY, RENDERER.render(mapEntry.getValue())));
+
+		Expression left;
+		if (((PropertyContainer) owner).getSymbolicName().isPresent()) {
+			left = ((PropertyContainer) owner).property(mapEntry.getKey());
+		} else {
+			left = PropertyLookup.forName(mapEntry.getKey());
+		}
+		this.conditions.add(new SomeGoodNameForANNonSTCComparison(currentClause, property, left, Operator.EQUALITY, mapEntry.getValue()));
 	}
 
 	void leave(Node node) {
@@ -282,9 +282,9 @@ public class Thing extends ReflectiveVisitor {
 
 	private SomeGoodNameForANNonSTCComparison extractComparison(Property property, Condition condition) {
 
-		AtomicReference<String> left = new AtomicReference<>();
+		AtomicReference<Expression> left = new AtomicReference<>();
 		AtomicReference<Operator> op = new AtomicReference<>();
-		AtomicReference<String> right = new AtomicReference<>();
+		AtomicReference<Expression> right = new AtomicReference<>();
 		condition.accept(new Visitor() {
 			int cnt;
 
@@ -293,11 +293,12 @@ public class Thing extends ReflectiveVisitor {
 				if (++cnt != 2) {
 					return;
 				}
-				var cypher = RENDERER.render(segment);
 				if (segment instanceof Operator operator) {
 					op.compareAndSet(null, operator);
-				} else if (!left.compareAndSet(null, cypher)) {
-					right.compareAndSet(null, cypher);
+				} else if (segment instanceof Expression expression) {
+					if (!left.compareAndSet(null, expression)) {
+						right.compareAndSet(null, expression);
+					}
 				}
 			}
 

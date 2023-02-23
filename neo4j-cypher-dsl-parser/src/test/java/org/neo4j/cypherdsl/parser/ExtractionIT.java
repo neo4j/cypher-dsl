@@ -32,9 +32,11 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.fump.Property;
-import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison;
 import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison.Clause;
 import org.neo4j.cypherdsl.core.fump.Token;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * The test does really not belong here, as the core is under test, not the parser, but as Christophe already was so kind
@@ -44,6 +46,10 @@ import org.neo4j.cypherdsl.core.fump.Token;
  * @author Christophe Willemsen
  */
 class ExtractionIT {
+
+	private static final Configuration CYPHER_RENDERER_CONFIGURATION = Configuration.newConfig().alwaysEscapeNames(false).build();
+
+	private static final GeneralizedRenderer RENDERER = Renderer.getRenderer(CYPHER_RENDERER_CONFIGURATION, GeneralizedRenderer.class);
 
 	static Stream<Arguments> extractionShouldWork() {
 		return TEST_DATA.stream().map(Arguments::of);
@@ -60,22 +66,29 @@ class ExtractionIT {
 		assertThat(things.getRelationshipTypes()).containsExactlyInAnyOrderElementsOf(testData.expectedTypes());
 		assertThat(things.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
 		if (testData.expectedComparisons != null) {
-			assertThat(things.getComparisons()).containsExactlyInAnyOrderElementsOf(testData.expectedComparisons());
+			assertThat(things.getComparisons()).allMatch(v -> testData.expectedComparisons().contains(
+				new TestDataComparison(v.clause(), v.property(), v.left() == null ? null : RENDERER.render(v.left()), v.operator(), v.right() == null ? null : RENDERER.render(v.right()))
+			));
 		}
+	}
+
+	record TestDataComparison(
+		Clause clause, Property property, String left, Operator operator, String right
+	) {
 	}
 
 	record TestData(String query, Statement statement,
 					List<Token> expectedLabels,
 					List<Token> expectedTypes,
 					List<Property> expectedProperties,
-					List<SomeGoodNameForANNonSTCComparison> expectedComparisons
+					List<TestDataComparison> expectedComparisons
 	) {
 
 		TestData(String query, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties) {
 			this(query, null, expectedLabels, expectedTypes, expectedProperties, null);
 		}
 
-		TestData(String query, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties, List<SomeGoodNameForANNonSTCComparison> expectedComparisons) {
+		TestData(String query, List<Token> expectedLabels, List<Token> expectedTypes, List<Property> expectedProperties, List<TestDataComparison> expectedComparisons) {
 			this(query, null, expectedLabels, expectedTypes, expectedProperties, expectedComparisons);
 		}
 
@@ -94,7 +107,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Person"), "name")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "$name")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "$name")
 			)
 		),
 		new TestData("""
@@ -105,7 +118,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Person"), "name")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "$name")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "$name")
 			)
 		),
 		new TestData("""
@@ -121,7 +134,7 @@ class ExtractionIT {
 			List.of(Token.type("CHECKED_IN_EVENT")),
 			List.of(new Property("date")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property("date"), "e.date", Operator.CONTAINS, "'-'")
+				new TestDataComparison(Clause.MATCH, new Property("date"), "e.date", Operator.CONTAINS, "'-'")
 			)
 		),
 		new TestData("""
@@ -138,7 +151,7 @@ class ExtractionIT {
 			List.of(Token.type("CHECKED_IN_EVENT")),
 			List.of(new Property("date")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property("date"), "e.date", Operator.CONTAINS, "'-'")
+				new TestDataComparison(Clause.MATCH, new Property("date"), "e.date", Operator.CONTAINS, "'-'")
 			)
 		),
 		new TestData("""
@@ -149,8 +162,8 @@ class ExtractionIT {
 			List.of(), List.of(),
 			List.of(new Property("name"), new Property("lastSeenDate")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property("name"), "n.name", Operator.EQUALITY, "$name"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property("lastSeenDate"), "n.lastSeenDate", Operator.GREATER_THAN, "(datetime() - duration({hours: 12}))")
+				new TestDataComparison(Clause.MATCH, new Property("name"), "n.name", Operator.EQUALITY, "$name"),
+				new TestDataComparison(Clause.MATCH, new Property("lastSeenDate"), "n.lastSeenDate", Operator.GREATER_THAN, "(datetime() - duration({hours: 12}))")
 			)
 		),
 		new TestData("""
@@ -164,8 +177,8 @@ class ExtractionIT {
 			List.of(Token.type("FOLLOWS")),
 			List.of(new Property(Token.type("FOLLOWS"), "id"), new Property("computed")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.type("FOLLOWS"), "id"), "r.id", Operator.LESS_THAN, "25"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property("computed"), "r2.computed", Operator.EQUALITY, "false")
+				new TestDataComparison(Clause.MATCH, new Property(Token.type("FOLLOWS"), "id"), "r.id", Operator.LESS_THAN, "25"),
+				new TestDataComparison(Clause.MATCH, new Property("computed"), "r2.computed", Operator.EQUALITY, "false")
 			)
 		),
 		new TestData("""
@@ -178,7 +191,7 @@ class ExtractionIT {
 			List.of(Token.type("FOLLOWS"), Token.type("TRANSACTS_WITH")),
 			List.of(new Property(Token.type("TRANSACTS_WITH"), "computed")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.type("TRANSACTS_WITH"), "computed"), "r2.computed", Operator.EQUALITY, "false")
+				new TestDataComparison(Clause.MATCH, new Property(Token.type("TRANSACTS_WITH"), "computed"), "r2.computed", Operator.EQUALITY, "false")
 			)
 		),
 		new TestData("""
@@ -190,7 +203,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Person"), "name")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'John Doe'")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'John Doe'")
 			)
 		),
 		new TestData("""
@@ -202,7 +215,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Person"), "id")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "id"), "12", Operator.GREATER_THAN, "n.id")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "id"), "12", Operator.GREATER_THAN, "n.id")
 			)
 		),
 		new TestData("""
@@ -214,7 +227,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Event"), "position")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Event"), "position"), "point.distance($point, n.position)", Operator.LESS_THAN, "1000")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Event"), "position"), "point.distance($point, n.position)", Operator.LESS_THAN, "1000")
 			)
 		),
 		new TestData("""
@@ -226,7 +239,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Event"), "position")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Event"), "position"), "point.withinBox(n.position, $lowerLeft, $upperRight)", null, null)
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Event"), "position"), "point.withinBox(n.position, $lowerLeft, $upperRight)", null, null)
 			)
 		),
 		new TestData("""
@@ -238,7 +251,7 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Person"), "name")),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "name")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "name")
 			)
 		),
 		new TestData("""
@@ -257,16 +270,16 @@ class ExtractionIT {
 				new Property(Set.of(Token.type("OFFICER_OF"), Token.type("INTERMEDIARY_OF"), Token.type("REGISTERED_ADDRESS")), "isActive")
 			),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Officer"), "name"), "a.name", Operator.CONTAINS, "'MR. ISAAC ELBAZ'"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Officer"), "name"), "b.name", Operator.CONTAINS, "'Stephanie J. Bridges'"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Set.of(Token.type("OFFICER_OF"), Token.type("INTERMEDIARY_OF"), Token.type("REGISTERED_ADDRESS")), "isActive"), "r.isActive", Operator.EQUALITY, "$activeFlag")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Officer"), "name"), "a.name", Operator.CONTAINS, "'MR. ISAAC ELBAZ'"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Officer"), "name"), "b.name", Operator.CONTAINS, "'Stephanie J. Bridges'"),
+				new TestDataComparison(Clause.MATCH, new Property(Set.of(Token.type("OFFICER_OF"), Token.type("INTERMEDIARY_OF"), Token.type("REGISTERED_ADDRESS")), "isActive"), "r.isActive", Operator.EQUALITY, "$activeFlag")
 			)
 		),
 		new TestData(" MATCH (p:Person) -[:ACTED_IN {as: 'Neo'}] -> (m:Movie)",
 			List.of(Token.label("Person"), Token.label("Movie")),
 			List.of(Token.type("ACTED_IN")),
 			List.of(new Property(Token.type("ACTED_IN"), "as")),
-			List.of(new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.type("ACTED_IN"), "as"), "as", Operator.EQUALITY, "'Neo'"))
+			List.of(new TestDataComparison(Clause.MATCH, new Property(Token.type("ACTED_IN"), "as"), ".as", Operator.EQUALITY, "'Neo'"))
 		),
 		new TestData(
 			"""
@@ -284,8 +297,8 @@ class ExtractionIT {
 				new Property(Token.label("Movie"), "released")
 			),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Movie"), "title"), "n.title", Operator.EQUALITY, "'The Matrix'"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "n.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "title"), "n.title", Operator.EQUALITY, "'The Matrix'"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "n.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900")
 			)
 		),
 		new TestData(
@@ -309,9 +322,9 @@ class ExtractionIT {
 				new Property(Token.label("Movie"), "title")
 			),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900")
 			)
 		),
 		new TestData(
@@ -336,9 +349,9 @@ class ExtractionIT {
 				new Property(Token.label("Movie"), "title")
 			),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900")
 			)
 		),
 		new TestData(
@@ -364,10 +377,10 @@ class ExtractionIT {
 				new Property(Token.label("Movie"), "title")
 			),
 			List.of(
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956"),
-				new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900"),
-				new SomeGoodNameForANNonSTCComparison(Clause.WITH, new Property(Token.label("Movie"), "title"), "m.title", Operator.EQUALITY, "'Apollo 13'")
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956"),
+				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900"),
+				new TestDataComparison(Clause.WITH, new Property(Token.label("Movie"), "title"), "m.title", Operator.EQUALITY, "'Apollo 13'")
 			)
 		),
 		new TestData(
@@ -375,21 +388,21 @@ class ExtractionIT {
 			List.of(Token.label("Foo")),
 			List.of(),
 			List.of(new Property(Token.label("Foo"), "m")),
-			List.of(new SomeGoodNameForANNonSTCComparison(Clause.CREATE, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'"))
+			List.of(new TestDataComparison(Clause.CREATE, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'"))
 		),
 		new TestData(
 			"MATCH (n:Foo {m: 'Bar'}) DELETE n",
 			List.of(Token.label("Foo")),
 			List.of(),
 			List.of(new Property(Token.label("Foo"), "m")),
-			List.of(new SomeGoodNameForANNonSTCComparison(Clause.MATCH, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'"))
+			List.of(new TestDataComparison(Clause.MATCH, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'"))
 		),
 		new TestData(
 			"MERGE (n:Foo {m: 'Bar'})",
 			List.of(Token.label("Foo")),
 			List.of(),
 			List.of(new Property(Token.label("Foo"), "m")),
-			List.of(new SomeGoodNameForANNonSTCComparison(Clause.MERGE, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'"))
+			List.of(new TestDataComparison(Clause.MERGE, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'"))
 		)
 	);
 }

@@ -18,24 +18,33 @@
  */
 package org.neo4j.cypherdsl.core.fump;
 
+import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Operator;
 
 /**
  * This type encapsulates a comparison in which a property of a node or relationship was used. The property may appear
  * on the left hand side or right hand side or even on both side of the comparison (think being used in a function on
- * both sides with different arguments). The {@code context} attribute will specify
+ * both sides with different arguments). The {@code clause} attribute will specify the context in which the comparison
+ * was made.
+ * <p>
+ * The expressions used in the comparison are provided as Cypher-DSL AST expressions. They can be freely visited or rendered
+ * into Cypher via the {@link org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer} like this:
+ * <pre>{@code
+ *     var cypher = Renderer.getRenderer(Configuration.prettyPrinting(), GeneralizedRenderer.class)
+ *          .render(comparison.left());
+ * }</pre>
  *
  * @author Michael J. Simons
  * @param clause   The clause in which the comparison was used
  * @param property The property used in this condition
- * @param left     The left hand side of the comparison represented as Cypher
+ * @param left     The left hand side of the comparison
  * @param operator The operator used
- * @param right    The right hand side of the comparison represented as Cypher
+ * @param right    The right hand side of the comparison
  * @soundtrack Die Ärzte - Le Frisur
  * @since TBA
  */
 public record SomeGoodNameForANNonSTCComparison(
-	Clause clause, Property property, String left, Operator operator, String right
+	Clause clause, Property property, Expression left, Operator operator, Expression right
 ) {
 
 	/**
