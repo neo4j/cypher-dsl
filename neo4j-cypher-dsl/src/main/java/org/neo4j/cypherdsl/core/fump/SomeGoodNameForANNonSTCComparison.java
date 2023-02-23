@@ -18,8 +18,12 @@
  */
 package org.neo4j.cypherdsl.core.fump;
 
+import java.util.Map;
+import java.util.Set;
+
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Operator;
+import org.neo4j.cypherdsl.core.Statement;
 
 /**
  * This type encapsulates a comparison in which a property of a node or relationship was used. The property may appear
@@ -35,17 +39,25 @@ import org.neo4j.cypherdsl.core.Operator;
  * }</pre>
  *
  * @author Michael J. Simons
- * @param clause   The clause in which the comparison was used
- * @param property The property used in this condition
- * @param left     The left hand side of the comparison
- * @param operator The operator used
- * @param right    The right hand side of the comparison
+ * @param clause         The clause in which the comparison was used
+ * @param property       The property used in this condition
+ * @param left           The left hand side of the comparison
+ * @param operator       The operator used
+ * @param right          The right hand side of the comparison
+ * @param parameterNames The parameter names used in this comparison (analoge to {@link Statement#getParameterNames()}
+ * @param parameters     Parameters with defined values used in this comparison (analoge to {@link Statement#getParameters()}
  * @soundtrack Die Ärzte - Le Frisur
  * @since TBA
  */
 public record SomeGoodNameForANNonSTCComparison(
-	Clause clause, Property property, Expression left, Operator operator, Expression right
+	Clause clause, Property property, Expression left, Operator operator, Expression right, Set<String> parameterNames,
+	Map<String, Object> parameters
 ) {
+
+	public SomeGoodNameForANNonSTCComparison {
+		parameterNames = Set.copyOf(parameterNames);
+		parameters = Map.copyOf(parameters);
+	}
 
 	/**
 	 * Enum for the clause in which a comparison was made.

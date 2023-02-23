@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.fump;
+package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayDeque;
 import java.util.Collections;
@@ -33,27 +33,13 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
-import org.neo4j.cypherdsl.core.Condition;
-import org.neo4j.cypherdsl.core.Create;
-import org.neo4j.cypherdsl.core.Delete;
-import org.neo4j.cypherdsl.core.Expression;
-import org.neo4j.cypherdsl.core.IdentifiableElement;
-import org.neo4j.cypherdsl.core.KeyValueMapEntry;
-import org.neo4j.cypherdsl.core.Match;
-import org.neo4j.cypherdsl.core.Merge;
-import org.neo4j.cypherdsl.core.Named;
-import org.neo4j.cypherdsl.core.Node;
-import org.neo4j.cypherdsl.core.NodeLabel;
-import org.neo4j.cypherdsl.core.Operator;
-import org.neo4j.cypherdsl.core.PatternElement;
-import org.neo4j.cypherdsl.core.PropertyContainer;
-import org.neo4j.cypherdsl.core.PropertyLookup;
-import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.SymbolicName;
-import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison;
 import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison.Clause;
+import org.neo4j.cypherdsl.core.fump.Things;
+import org.neo4j.cypherdsl.core.fump.Token;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 
@@ -76,7 +62,7 @@ public class Thing extends ReflectiveVisitor {
 
 	private final Set<Token> tokens = new HashSet<>();
 
-	private final Set<Property> properties = new HashSet<>();
+	private final Set<org.neo4j.cypherdsl.core.fump.Property> properties = new HashSet<>();
 
 	private final Set<SomeGoodNameForANNonSTCComparison> conditions = new HashSet<>();
 
@@ -84,11 +70,14 @@ public class Thing extends ReflectiveVisitor {
 
 	private final Deque<Condition> currentConditions = new ArrayDeque<>();
 
+	private final StatementContext statementContext;
+
 	private final ScopingStrategy scopingStrategy;
 
 	// TODO make private
-	public Thing() {
+	public Thing(StatementContext statementContext) {
 
+		this.statementContext = statementContext;
 		this.scopingStrategy = ScopingStrategy.create(
 			List.of((cause, imports) -> {
 				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
@@ -186,11 +175,11 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
-		Property property;
+		org.neo4j.cypherdsl.core.fump.Property property;
 		if (owner instanceof Node node) {
-			property = new Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey());
+			property = new org.neo4j.cypherdsl.core.fump.Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey());
 		} else if (owner instanceof Relationship relationship) {
-			property = new Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey());
+			property = new org.neo4j.cypherdsl.core.fump.Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey());
 		} else {
 			property = null;
 		}
@@ -206,7 +195,8 @@ public class Thing extends ReflectiveVisitor {
 		} else {
 			left = PropertyLookup.forName(mapEntry.getKey());
 		}
-		this.conditions.add(new SomeGoodNameForANNonSTCComparison(currentClause, property, left, Operator.EQUALITY, mapEntry.getValue()));
+		var parameterInformation = extractParameters(mapEntry.getValue());
+		this.conditions.add(new SomeGoodNameForANNonSTCComparison(currentClause, property, left, Operator.EQUALITY, mapEntry.getValue(), parameterInformation.names, parameterInformation.values));
 	}
 
 	void leave(Node node) {
@@ -237,7 +227,7 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
-		var storedProperty = new AtomicReference<Property>();
+		var storedProperty = new AtomicReference<org.neo4j.cypherdsl.core.fump.Property>();
 		var patternElement = lookup(s);
 
 		Function<String, Token> mapper;
@@ -255,7 +245,7 @@ public class Thing extends ReflectiveVisitor {
 
 		lookup.accept(segment -> {
 			if (segment instanceof SymbolicName name) {
-				storedProperty.set(new Property(tokenStream.map(mapper).collect(Collectors.toSet()), name.getValue()));
+				storedProperty.set(new org.neo4j.cypherdsl.core.fump.Property(tokenStream.map(mapper).collect(Collectors.toSet()), name.getValue()));
 			}
 		});
 		properties.add(storedProperty.get());
@@ -280,7 +270,7 @@ public class Thing extends ReflectiveVisitor {
 		return result.get();
 	}
 
-	private SomeGoodNameForANNonSTCComparison extractComparison(Property property, Condition condition) {
+	private SomeGoodNameForANNonSTCComparison extractComparison(org.neo4j.cypherdsl.core.fump.Property property, Condition condition) {
 
 		AtomicReference<Expression> left = new AtomicReference<>();
 		AtomicReference<Operator> op = new AtomicReference<>();
@@ -307,7 +297,8 @@ public class Thing extends ReflectiveVisitor {
 				--cnt;
 			}
 		});
-		return new SomeGoodNameForANNonSTCComparison(currentClause, property, left.get(), op.get(), right.get());
+		var parameterInformation = extractParameters(left.get(), right.get());
+		return new SomeGoodNameForANNonSTCComparison(currentClause, property, left.get(), op.get(), right.get(), parameterInformation.names, parameterInformation.values);
 	}
 
 	void enter(NodeLabel label) {
@@ -349,5 +340,17 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 		currentScope.put(s, patternElement);
+	}
+
+	private ParameterInformation extractParameters(Expression... expressions) {
+
+		var parameterCollectingVisitor = new ParameterCollectingVisitor(this.statementContext);
+		for (Expression expression : expressions) {
+			if (expression == null) {
+				continue;
+			}
+			expression.accept(parameterCollectingVisitor);
+		}
+		return parameterCollectingVisitor.getResult();
 	}
 }

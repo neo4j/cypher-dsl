@@ -39,7 +39,8 @@ public final class Things {
 
 	private final Set<SomeGoodNameForANNonSTCComparison> comparisons;
 
-	Things(Set<Token> tokens, Set<Property> properties, Set<SomeGoodNameForANNonSTCComparison> comparisons) {
+	// TODO make private
+	public Things(Set<Token> tokens, Set<Property> properties, Set<SomeGoodNameForANNonSTCComparison> comparisons) {
 		this.tokens = Set.copyOf(tokens);
 		this.properties = Set.copyOf(properties);
 		this.comparisons = Set.copyOf(comparisons);

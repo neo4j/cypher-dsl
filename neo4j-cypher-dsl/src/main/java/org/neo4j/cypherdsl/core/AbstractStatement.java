@@ -27,7 +27,6 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
-import org.neo4j.cypherdsl.core.fump.Thing;
 import org.neo4j.cypherdsl.core.fump.Things;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -181,7 +180,7 @@ abstract class AbstractStatement implements Statement {
 
 	private Things getThings0() {
 
-		var thing = new Thing();
+		var thing = new Thing(getContext());
 		this.accept(thing);
 		return thing.getResult();
 	}

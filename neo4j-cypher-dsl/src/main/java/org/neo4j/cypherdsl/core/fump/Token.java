@@ -64,7 +64,7 @@ public record Token(Type type, String value) {
 	/**
 	 * The specific token type.
 	 */
-	enum Type {
+	public enum Type {
 		/**
 		 * Represents a node label.
 		 */
