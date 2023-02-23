@@ -28,16 +28,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison;
-import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison.Clause;
+import org.neo4j.cypherdsl.core.fump.PropertyCondition;
+import org.neo4j.cypherdsl.core.fump.PropertyCondition.Clause;
 import org.neo4j.cypherdsl.core.fump.Things;
 import org.neo4j.cypherdsl.core.fump.Token;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
@@ -56,22 +54,40 @@ public class Thing extends ReflectiveVisitor {
 	 */
 	private static final String TYPE_OF_COMPOUND_CONDITION = "org.neo4j.cypherdsl.core.CompoundCondition";
 
-	private Clause currentClause = Clause.UNKNOWN;
+	/**
+	 * Current clause the visitor is in.
+	 */
+	private AtomicReference<Clause> currentClause = new AtomicReference<>(Clause.UNKNOWN);
 
+	/**
+	 * The current pattern element visited.
+	 */
 	private final AtomicReference<PatternElement> currentPatternElement = new AtomicReference<>();
 
 	private final Set<Token> tokens = new HashSet<>();
 
 	private final Set<org.neo4j.cypherdsl.core.fump.Property> properties = new HashSet<>();
 
-	private final Set<SomeGoodNameForANNonSTCComparison> conditions = new HashSet<>();
+	private final Set<PropertyCondition> conditions = new HashSet<>();
 
+	/**
+	 * Scoped lookup tables from symbolic name to pattern elements (nodes or relationships).
+	 */
 	private final Deque<Map<SymbolicName, PatternElement>> patternLookup = new ArrayDeque<>();
 
+	/**
+	 * A stack of conditions (keeping track of the latest entered).
+	 */
 	private final Deque<Condition> currentConditions = new ArrayDeque<>();
 
+	/**
+	 * Required for resolving parameter names, must be from the same statement that is analyzed.
+	 */
 	private final StatementContext statementContext;
 
+	/**
+	 * Delegating the hard work to the shared scope strategy in most cases.
+	 */
 	private final ScopingStrategy scopingStrategy;
 
 	// TODO make private
@@ -123,43 +139,43 @@ public class Thing extends ReflectiveVisitor {
 	}
 
 	void enter(Match match) {
-		currentClause = Clause.MATCH;
+		currentClause.compareAndSet(Clause.UNKNOWN, Clause.MATCH);
 	}
 
 	void leave(Match match) {
-		currentClause = Clause.UNKNOWN;
+		currentClause.compareAndSet(Clause.MATCH, Clause.UNKNOWN);
 	}
 
 	void enter(Create create) {
-		currentClause = Clause.CREATE;
+		currentClause.compareAndSet(Clause.UNKNOWN, Clause.CREATE);
 	}
 
 	void leave(Create create) {
-		currentClause = Clause.UNKNOWN;
+		currentClause.compareAndSet(Clause.CREATE, Clause.UNKNOWN);
 	}
 
 	void enter(Merge merge) {
-		currentClause = Clause.MERGE;
+		currentClause.compareAndSet(Clause.UNKNOWN, Clause.MERGE);
 	}
 
 	void leave(Merge merge) {
-		currentClause = Clause.UNKNOWN;
+		currentClause.compareAndSet(Clause.MERGE, Clause.UNKNOWN);
 	}
 
 	void enter(Delete delete) {
-		currentClause = Clause.DELETE;
+		currentClause.compareAndSet(Clause.UNKNOWN, Clause.DELETE);
 	}
 
 	void leave(Delete delete) {
-		currentClause = Clause.UNKNOWN;
+		currentClause.compareAndSet(Clause.DELETE, Clause.UNKNOWN);
 	}
 
 	void enter(With with) {
-		currentClause = Clause.WITH;
+		currentClause.compareAndSet(Clause.UNKNOWN, Clause.WITH);
 	}
 
 	void leave(With with) {
-		currentClause = Clause.UNKNOWN;
+		currentClause.compareAndSet(Clause.WITH, Clause.UNKNOWN);
 	}
 
 	void enter(Node node) {
@@ -196,7 +212,7 @@ public class Thing extends ReflectiveVisitor {
 			left = PropertyLookup.forName(mapEntry.getKey());
 		}
 		var parameterInformation = extractParameters(mapEntry.getValue());
-		this.conditions.add(new SomeGoodNameForANNonSTCComparison(currentClause, property, left, Operator.EQUALITY, mapEntry.getValue(), parameterInformation.names, parameterInformation.values));
+		this.conditions.add(new PropertyCondition(currentClause.get(), property, left, Operator.EQUALITY, mapEntry.getValue(), parameterInformation.names, parameterInformation.values));
 	}
 
 	void leave(Node node) {
@@ -227,30 +243,32 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
-		var storedProperty = new AtomicReference<org.neo4j.cypherdsl.core.fump.Property>();
+		var propertyName = new AtomicReference<String>();
+		lookup.accept(segment -> {
+			if (segment instanceof SymbolicName name) {
+				propertyName.compareAndSet(null, name.getValue());
+			}
+		});
+
+		org.neo4j.cypherdsl.core.fump.Property newProperty;
 		var patternElement = lookup(s);
-
-		Function<String, Token> mapper;
-		Stream<String> tokenStream;
-
 		if (patternElement instanceof Node node) {
-			mapper = Token::label;
-			tokenStream = node.getLabels().stream().map(NodeLabel::getValue);
+			newProperty = new org.neo4j.cypherdsl.core.fump.Property(
+				node.getLabels().stream().map(NodeLabel::getValue).map(Token::label).collect(Collectors.toSet()),
+				propertyName.get()
+			);
 		} else if (patternElement instanceof Relationship relationship) {
-			mapper = Token::type;
-			tokenStream = relationship.getDetails().getTypes().stream();
+			newProperty = new org.neo4j.cypherdsl.core.fump.Property(
+				relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()),
+				propertyName.get()
+			);
 		} else {
 			return;
 		}
 
-		lookup.accept(segment -> {
-			if (segment instanceof SymbolicName name) {
-				storedProperty.set(new org.neo4j.cypherdsl.core.fump.Property(tokenStream.map(mapper).collect(Collectors.toSet()), name.getValue()));
-			}
-		});
-		properties.add(storedProperty.get());
+		properties.add(newProperty);
 		if (inCurrentCondition(property)) {
-			conditions.add(extractComparison(storedProperty.get(), currentConditions.peek()));
+			conditions.add(extractPropertyCondition(newProperty, currentConditions.peek()));
 		}
 	}
 
@@ -270,11 +288,11 @@ public class Thing extends ReflectiveVisitor {
 		return result.get();
 	}
 
-	private SomeGoodNameForANNonSTCComparison extractComparison(org.neo4j.cypherdsl.core.fump.Property property, Condition condition) {
+	private PropertyCondition extractPropertyCondition(org.neo4j.cypherdsl.core.fump.Property property, Condition condition) {
 
-		AtomicReference<Expression> left = new AtomicReference<>();
-		AtomicReference<Operator> op = new AtomicReference<>();
-		AtomicReference<Expression> right = new AtomicReference<>();
+		var left = new AtomicReference<Expression>();
+		var op = new AtomicReference<Operator>();
+		var right = new AtomicReference<Expression>();
 		condition.accept(new Visitor() {
 			int cnt;
 
@@ -298,7 +316,7 @@ public class Thing extends ReflectiveVisitor {
 			}
 		});
 		var parameterInformation = extractParameters(left.get(), right.get());
-		return new SomeGoodNameForANNonSTCComparison(currentClause, property, left.get(), op.get(), right.get(), parameterInformation.names, parameterInformation.values);
+		return new PropertyCondition(currentClause.get(), property, left.get(), op.get(), right.get(), parameterInformation.names, parameterInformation.values);
 	}
 
 	void enter(NodeLabel label) {

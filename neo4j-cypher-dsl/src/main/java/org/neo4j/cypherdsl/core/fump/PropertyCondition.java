@@ -49,12 +49,12 @@ import org.neo4j.cypherdsl.core.Statement;
  * @soundtrack Die Ärzte - Le Frisur
  * @since TBA
  */
-public record SomeGoodNameForANNonSTCComparison(
+public record PropertyCondition(
 	Clause clause, Property property, Expression left, Operator operator, Expression right, Set<String> parameterNames,
 	Map<String, Object> parameters
 ) {
 
-	public SomeGoodNameForANNonSTCComparison {
+	public PropertyCondition {
 		parameterNames = Set.copyOf(parameterNames);
 		parameters = Map.copyOf(parameters);
 	}

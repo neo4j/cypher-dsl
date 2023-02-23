@@ -84,6 +84,7 @@ abstract class AbstractStatement implements Statement {
 			this.context.setRenderConstantsAsParameters(renderConstantsAsParameters);
 			this.cypher = null;
 			this.parameterInformation = null;
+			// TODO RESET META
 		}
 	}
 

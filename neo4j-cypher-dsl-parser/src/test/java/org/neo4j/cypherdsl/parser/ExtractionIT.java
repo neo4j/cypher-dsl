@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.fump.Property;
-import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison.Clause;
+import org.neo4j.cypherdsl.core.fump.PropertyCondition.Clause;
 import org.neo4j.cypherdsl.core.fump.Token;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
@@ -66,7 +66,7 @@ class ExtractionIT {
 		assertThat(things.getRelationshipTypes()).containsExactlyInAnyOrderElementsOf(testData.expectedTypes());
 		assertThat(things.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
 		if (testData.expectedComparisons != null) {
-			assertThat(things.getComparisons()).allMatch(v -> testData.expectedComparisons().contains(
+			assertThat(things.getPropertyConditions()).allMatch(v -> testData.expectedComparisons().contains(
 				new TestDataComparison(v.clause(), v.property(), v.left() == null ? null : RENDERER.render(v.left()), v.operator(), v.right() == null ? null : RENDERER.render(v.right()), v.parameterNames())
 			));
 		}

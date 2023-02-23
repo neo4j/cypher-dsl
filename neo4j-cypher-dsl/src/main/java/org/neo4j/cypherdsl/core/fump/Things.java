@@ -31,19 +31,17 @@ import org.neo4j.cypherdsl.core.fump.Token.Type;
  */
 public final class Things {
 
-	// TODO all the tokens and properties are missing context (MATCH, MERGE, CREATE, DELETE)
-
 	private final Set<Token> tokens;
 
 	private final Set<Property> properties;
 
-	private final Set<SomeGoodNameForANNonSTCComparison> comparisons;
+	private final Set<PropertyCondition> propertyConditions;
 
 	// TODO make private
-	public Things(Set<Token> tokens, Set<Property> properties, Set<SomeGoodNameForANNonSTCComparison> comparisons) {
+	public Things(Set<Token> tokens, Set<Property> properties, Set<PropertyCondition> propertyConditions) {
 		this.tokens = Set.copyOf(tokens);
 		this.properties = Set.copyOf(properties);
-		this.comparisons = Set.copyOf(comparisons);
+		this.propertyConditions = Set.copyOf(propertyConditions);
 	}
 
 	/**
@@ -91,11 +89,11 @@ public final class Things {
 	}
 
 	/**
-	 * Returns a collection of all comparisons in the statement involving the resolved properties.
+	 * Returns a collection of all property based conditions in the statement involving the resolved properties.
 	 *
-	 * @return A collection of all comparisons
+	 * @return A collection of all conditions involving properties resolved in the statement
 	 */
-	public Collection<SomeGoodNameForANNonSTCComparison> getComparisons() {
-		return comparisons;
+	public Collection<PropertyCondition> getPropertyConditions() {
+		return propertyConditions;
 	}
 }

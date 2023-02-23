@@ -23,13 +23,15 @@ import java.util.Objects;
 import org.neo4j.cypherdsl.core.NodeLabel;
 
 /**
+ * A token can either describe a node label or a relationship type.
+ *
  * @author Michael J. Simons
  * @param type  The type of this token
  * @param value The concrete value
  * @soundtrack Avenger - Prayers Of Steel
  * @since TBA
  */
-public record Token(Type type, String value) {
+public record Token(Type type, String value) implements Comparable<Token> {
 
 	/**
 	 * Turns a specific {@link NodeLabel label} into a more abstract token.
@@ -59,6 +61,15 @@ public record Token(Type type, String value) {
 	 */
 	public static Token type(String type) {
 		return new Token(Type.RELATIONSHIP_TYPE, Objects.requireNonNull(type, "Type must not be null."));
+	}
+
+	@Override
+	public int compareTo(Token o) {
+		int result = this.type().compareTo(o.type());
+		if (result == 0) {
+			result = this.value().compareTo(o.value());
+		}
+		return result;
 	}
 
 	/**

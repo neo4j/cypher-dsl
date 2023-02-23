@@ -18,11 +18,19 @@
  */
 package org.neo4j.cypherdsl.core.fump;
 
+import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
+ * A property that has been resolved. In case this property has been resolved for an entity, the entity itself
+ * will be defined by its set of tokens. Tokens are guaranteed to be sorted and will be of the same type.
+ *
+ * @author Michael J. Simons
  * @param name        The name of the resolved property
  * @param owningToken Zero or many owning tokens for a property
+ * @since TBA
  */
 public record Property(Set<Token> owningToken, String name) {
 
@@ -35,6 +43,16 @@ public record Property(Set<Token> owningToken, String name) {
 	}
 
 	public Property {
-		owningToken = Set.copyOf(owningToken);
+		if (owningToken.stream().map(Token::type).distinct().count() > 1) {
+			throw new IllegalArgumentException("Owning tokens are of multiple types");
+		}
+		owningToken = Collections.unmodifiableSet(new TreeSet<>(owningToken));
+	}
+
+	/**
+	 * @return An optional, owning type.
+	 */
+	public Optional<Token.Type> owningType() {
+		return owningToken.stream().map(Token::type).distinct().findFirst();
 	}
 }
