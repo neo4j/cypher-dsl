@@ -49,8 +49,10 @@ import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.PropertyContainer;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.fump.SomeGoodNameForANNonSTCComparison.Clause;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
@@ -74,13 +76,7 @@ public class Thing extends ReflectiveVisitor {
 	 */
 	private static final String TYPE_OF_COMPOUND_CONDITION = "org.neo4j.cypherdsl.core.CompoundCondition";
 
-	private boolean inMatch = false;
-
-	private boolean inCreate = false;
-
-	private boolean inMerge = false;
-
-	private boolean inDelete = false;
+	private Clause currentClause = Clause.UNKNOWN;
 
 	private final AtomicReference<PatternElement> currentPatternElement = new AtomicReference<>();
 
@@ -144,35 +140,43 @@ public class Thing extends ReflectiveVisitor {
 	}
 
 	void enter(Match match) {
-		inMatch = true;
+		currentClause = Clause.MATCH;
 	}
 
 	void leave(Match match) {
-		inMatch = false;
+		currentClause = Clause.UNKNOWN;
 	}
 
-	void enter(Create match) {
-		inCreate = true;
+	void enter(Create create) {
+		currentClause = Clause.CREATE;
 	}
 
-	void leave(Create match) {
-		inCreate = false;
+	void leave(Create create) {
+		currentClause = Clause.UNKNOWN;
 	}
 
-	void enter(Merge match) {
-		inMerge = true;
+	void enter(Merge merge) {
+		currentClause = Clause.MERGE;
 	}
 
-	void leave(Merge match) {
-		inMerge = false;
+	void leave(Merge merge) {
+		currentClause = Clause.UNKNOWN;
 	}
 
-	void enter(Delete match) {
-		inDelete = true;
+	void enter(Delete delete) {
+		currentClause = Clause.DELETE;
 	}
 
-	void leave(Delete match) {
-		inDelete = false;
+	void leave(Delete delete) {
+		currentClause = Clause.UNKNOWN;
+	}
+
+	void enter(With with) {
+		currentClause = Clause.WITH;
+	}
+
+	void leave(With with) {
+		currentClause = Clause.UNKNOWN;
 	}
 
 	void enter(Node node) {
@@ -202,7 +206,7 @@ public class Thing extends ReflectiveVisitor {
 		}
 		this.properties.add(property);
 		var left = ((PropertyContainer) owner).getSymbolicName().map(s -> s.getValue() + ".").or(() -> Optional.of("")).map(v -> v + property.name()).get();
-		this.conditions.add(new SomeGoodNameForANNonSTCComparison(property, left, Operator.EQUALITY, RENDERER.render(mapEntry.getValue())));
+		this.conditions.add(new SomeGoodNameForANNonSTCComparison(currentClause, property, left, Operator.EQUALITY, RENDERER.render(mapEntry.getValue())));
 	}
 
 	void leave(Node node) {
@@ -302,7 +306,7 @@ public class Thing extends ReflectiveVisitor {
 				--cnt;
 			}
 		});
-		return new SomeGoodNameForANNonSTCComparison(property, left.get(), op.get(), right.get());
+		return new SomeGoodNameForANNonSTCComparison(currentClause, property, left.get(), op.get(), right.get());
 	}
 
 	void enter(NodeLabel label) {
