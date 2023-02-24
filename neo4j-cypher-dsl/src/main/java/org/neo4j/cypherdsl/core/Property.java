@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.List;
@@ -57,8 +58,21 @@ public non-sealed interface Property extends Expression, IdentifiableElement {
 	/**
 	 * @return The container "owning" this property.
 	 */
-	@NotNull @Contract(pure = true)
+	@Contract(pure = true)
 	Named getContainer();
+
+	/**
+	 * @return A reference to the container owning this property
+	 */
+	@API(status = INTERNAL, since = "2023.1.0")
+	@NotNull
+	@Contract(pure = true)
+	default Expression getContainerReference() {
+		if (getContainer() == null) {
+			throw new UnsupportedOperationException();
+		}
+		return getContainer().getRequiredSymbolicName();
+	}
 
 	/**
 	 * Creates a new property with an external reference.

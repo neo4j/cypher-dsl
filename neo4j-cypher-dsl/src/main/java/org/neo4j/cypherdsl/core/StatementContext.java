@@ -19,9 +19,9 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 
 /**
  * Context for while rendering a statement.
@@ -30,18 +30,8 @@ import org.apiguardian.api.API;
  * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
  * @since 2021.1.0
  */
-@API(status = STABLE, since = "2021.1.0")
-public sealed interface StatementContext permits StatementContextImpl {
-
-	/**
-	 * Utility method creating a new default context. Mainly internal use.
-	 *
-	 * @return A new default statement context.
-	 */
-	@API(status = INTERNAL, since = "2023.1.0")
-	static StatementContext of() {
-		return new StatementContextImpl();
-	}
+@API(status = INTERNAL, since = "2021.1.0")
+public sealed interface StatementContext permits DefaultStatementContext {
 
 	/**
 	 * Gets or creates the name of a parameter
@@ -50,14 +40,6 @@ public sealed interface StatementContext permits StatementContextImpl {
 	 * @return The name of the parameter or a generated name
 	 */
 	String getParameterName(Parameter<?> parameter);
-
-	/**
-	 * Some parameters may be rendered as constants.
-	 *
-	 * @return {@literal true} if objects passed via the QueryDSL context as parameters should be rendered as Cypher-String
-	 * constants rather than actual Cypher parameters.
-	 */
-	boolean isRenderConstantsAsParameters();
 
 	/**
 	 * Resolves a {@link SymbolicName symbolic name} into a string: A symbolic name can be a placeholder without an actual

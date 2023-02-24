@@ -18,13 +18,16 @@
  */
 package org.neo4j.cypherdsl.graalvm;
 
+import java.util.Comparator;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -56,6 +59,18 @@ public class Application {
 		}
 		System.out.println(useParserForRewrite());
 		System.out.println(generateDialectBasedQuery());
+		statement = CypherParser.parseStatement("MATCH (m:Movie {title: 'The Matrix'}) <- [a:ACTED_IN] - (p:Person) WHERE p.born >= 1979 RETURN m, a, p");
+		var catalog = statement.getCatalog();
+		catalog.getIdentifiableExpressions().stream()
+			.filter(SymbolicName.class::isInstance)
+			.map(SymbolicName.class::cast)
+			.map(SymbolicName::getValue)
+			.sorted()
+			.forEach(System.out::println);
+		catalog.getAllConditions()
+			.entrySet()
+			.stream().sorted(Comparator.comparing(o -> o.getKey().name()))
+			.forEach(e -> System.out.println(e.getKey().name() + ": " + e.getValue().stream().limit(1).map(cc -> cc.right().toString()).collect(Collectors.joining())));
 	}
 
 	private static Statement findAllMovies() {

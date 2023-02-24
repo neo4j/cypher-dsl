@@ -55,7 +55,10 @@ class NativeApplicationIT {
 			"MATCH (p:`Parser`) RETURN p",
 			"At least one expressions to return is required.",
 			"MATCH (p:`Person`)-[:`ACTED_IN`]->(n:`Movie`) RETURN n",
-			"MATCH (n) RETURN point.distance(n.a, n.b)"
+			"MATCH (n) RETURN point.distance(n.a, n.b)",
+			"a", "m", "p",
+			"born: NumberLiteral{cypher=1979}",
+			"title: StringLiteral{cypher='The Matrix'}"
 		);
 
 		var p = new ProcessBuilder(Paths.get(".", "target", "application").toAbsolutePath().normalize().toString())

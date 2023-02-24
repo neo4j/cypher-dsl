@@ -101,10 +101,15 @@ final class InternalPropertyImpl implements Property {
 		return names;
 	}
 
-	@NotNull
 	@Override
 	public Named getContainer() {
 		return container;
+	}
+
+	@NotNull
+	@Override
+	public Expression getContainerReference() {
+		return containerReference;
 	}
 
 	@NotNull

@@ -101,14 +101,14 @@ import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
- * This is a simple (some would call it naive) implementation of a visitor to the Cypher AST created by the Cypher builder
- * based on the {@link ReflectiveVisitor reflective visitor}.
+ * This is  a simple (some would  call it naive) implementation  of a visitor to  the Cypher AST created  by the Cypher
+ * builder based on the {@link ReflectiveVisitor reflective visitor}.
  * <p>
- * It takes care of separating elements of subtrees containing the element type with a separator and provides pairs of
+ * It takes care of separating elements of subtrees containing  the element type with a separator and provides pairs of
  * {@code enter} / {@code leave} for the structuring elements of the Cypher AST as needed.
  * <p>
- * This rendering visitor is not meant to be used outside framework code, and we don't give any guarantees on the format
- * being output apart from that it works within the constraints of SDN-RX respectively SDN 6 and later.
+ * This rendering  visitor is not  meant to be  used outside framework code,  and we don't  give any guarantees  on the
+ * format being output apart from that it works within the constraints of SDN-RX respectively SDN 6 and later.
  *
  * @author Michael J. Simons
  * @author Gerrit Meier
@@ -187,16 +187,27 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private boolean skipSymbolicName = false;
 
+	/**
+	 * Rendering parameters is not a config property due to some needs in Spring Data Neo4j: This needs to be configured
+	 * per statement, not per config  there.
+	 */
+	private final boolean renderConstantsAsParameters;
+
 	private final boolean alwaysEscapeNames;
 
 	private final Dialect dialect;
 
 	DefaultVisitor(StatementContext statementContext) {
-		this(statementContext, Configuration.newConfig().alwaysEscapeNames(true).build());
+		this(statementContext, false);
 	}
 
-	DefaultVisitor(StatementContext statementContext, Configuration configuration) {
+	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
+		this(statementContext, renderConstantsAsParameters, Configuration.newConfig().alwaysEscapeNames(true).build());
+	}
+
+	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
 		this.statementContext = statementContext;
+		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
 		this.dialect = configuration.getDialect();
 	}
@@ -669,7 +680,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
-		if (value instanceof ConstantParameterHolder constantParameterHolder && !statementContext.isRenderConstantsAsParameters()) {
+		if (value instanceof ConstantParameterHolder constantParameterHolder && !renderConstantsAsParameters) {
 			builder.append(constantParameterHolder.asString());
 		} else {
 			renderParameter(parameter);

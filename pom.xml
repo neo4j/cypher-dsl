@@ -643,6 +643,8 @@
 								<exclude>org.neo4j.cypherdsl.parser.internal</exclude>
 								<!-- 2023.0.4 and higher, this should have been package private to begin with -->
 								<exclude>org.neo4j.cypherdsl.parser.NodeAtom</exclude>
+								<!-- 2023.1.0 and higher, this is internal API -->
+								<exclude>org.neo4j.cypherdsl.core.StatementContext</exclude>
 							</excludes>
 						</parameter>
 					</configuration>

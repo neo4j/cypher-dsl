@@ -136,9 +136,22 @@ public interface Statement extends Visitable {
 	/**
 	 * @return The set of identifiable expressions that are available when this statement ends.
 	 * @since 2021.3.2
+	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getIdentifiableExpressions()}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated(forRemoval = true, since = "2023.1.0")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
 	Collection<Expression> getIdentifiableExpressions();
+
+	/**
+	 * Analyzes the statement and provides access to the resolved properties, their (potential) owners and the context
+	 * in which they have been resolved. Also, a view on {@link #getIdentifiableExpressions()} is provided.
+	 *
+	 * @return An immutable object representing properties resolved in a statement together with their context and owner
+	 * @since 2023.1.0
+	 */
+	@NotNull @Contract(pure = true)
+	StatementCatalog getCatalog();
 
 	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher

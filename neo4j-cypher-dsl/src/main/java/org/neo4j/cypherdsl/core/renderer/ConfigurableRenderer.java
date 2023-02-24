@@ -27,6 +27,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
 
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.LRUCache;
 import org.neo4j.cypherdsl.core.StatementContext;
@@ -74,8 +75,11 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 	@SuppressWarnings("squid:S3824")
 	public String render(Visitable visitable) {
 
-		BiFunction<StatementContext, Visitable, String> renderOp = (ctx, v) -> {
-			var renderingVisitor = createVisitor(ctx);
+		record RenderingConfig(StatementContext ctx, boolean renderConstantsAsParameters) {
+		}
+
+		BiFunction<RenderingConfig, Visitable, String> renderOp = (cfg, v) -> {
+			var renderingVisitor = createVisitor(cfg.ctx, cfg.renderConstantsAsParameters);
 			v.accept(renderingVisitor);
 			return renderingVisitor.getRenderedContent().trim();
 		};
@@ -94,7 +98,7 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 			if (renderedContent == null) {
 				try {
 					write.lock();
-					renderedContent = renderOp.apply(statement.getContext(), statement);
+					renderedContent = renderOp.apply(new RenderingConfig(statement.getContext(), statement.isRenderConstantsAsParameters()), statement);
 					renderedStatementCache.put(key, renderedContent);
 				} finally {
 					write.unlock();
@@ -102,16 +106,16 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 			}
 			return renderedContent;
 		} else {
-			return renderOp.apply(StatementContext.of(), visitable);
+			return renderOp.apply(new RenderingConfig(new DefaultStatementContext(), false), visitable);
 		}
 	}
 
-	private RenderingVisitor createVisitor(StatementContext statementContext) {
+	private RenderingVisitor createVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 
 		if (!this.configuration.isPrettyPrint()) {
-			return new DefaultVisitor(statementContext, this.configuration);
+			return new DefaultVisitor(statementContext, renderConstantsAsParameters, this.configuration);
 		} else {
-			return new PrettyPrintingVisitor(statementContext, this.configuration);
+			return new PrettyPrintingVisitor(statementContext, renderConstantsAsParameters, this.configuration);
 		}
 	}
 

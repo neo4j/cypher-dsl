@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
+import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -43,7 +44,13 @@ abstract class AbstractStatement implements Statement {
 	/**
 	 * Provides context during visiting of this statement.
 	 */
-	private final StatementContextImpl context = new StatementContextImpl();
+	private final StatementContext context = new DefaultStatementContext();
+
+	/**
+	 * A flag that indicates whether parameters coming from QueryDSL integration should be rendered as Cypher {@link  Literal literals}
+	 * or as actual parameters.
+	 */
+	private boolean renderConstantsAsParameters = false;
 
 	/**
 	 * The collected parameter information (names only and names + values). Will be initialized with Double-checked locking into an unmodifiable object.
@@ -57,10 +64,10 @@ abstract class AbstractStatement implements Statement {
 	private volatile String cypher;
 
 	/**
-	 * Identifiable expressions. Will be initialized with Double-checked locking into an unmodifiable collection.
+	 * The catalog for this statement, will be lazily available and needs refreshment if parameter rendering changes.
 	 */
 	@SuppressWarnings("squid:S3077")
-	private volatile Collection<Expression> identifiables;
+	private volatile StatementCatalog statementCatalog;
 
 	@NotNull
 	@Override
@@ -70,16 +77,17 @@ abstract class AbstractStatement implements Statement {
 
 	@Override
 	public synchronized boolean isRenderConstantsAsParameters() {
-		return this.context.isRenderConstantsAsParameters();
+		return this.renderConstantsAsParameters;
 	}
 
 	@Override
 	public void setRenderConstantsAsParameters(boolean renderConstantsAsParameters) {
 
 		synchronized (this) {
-			this.context.setRenderConstantsAsParameters(renderConstantsAsParameters);
+			this.renderConstantsAsParameters = renderConstantsAsParameters;
 			this.cypher = null;
 			this.parameterInformation = null;
+			this.statementCatalog = null;
 		}
 	}
 
@@ -95,22 +103,10 @@ abstract class AbstractStatement implements Statement {
 		return getParameterInformation().names;
 	}
 
+	@SuppressWarnings("removal")
 	@NotNull
 	public Collection<Expression> getIdentifiableExpressions() {
-
-		Collection<Expression> result = this.identifiables;
-		if (result == null) {
-			synchronized (this) {
-				result = this.identifiables;
-				if (result == null) {
-					IdentifiableExpressionCollectingVisitor visitor = new IdentifiableExpressionCollectingVisitor();
-					this.accept(visitor);
-					this.identifiables = visitor.getResult();
-					result = this.identifiables;
-				}
-			}
-		}
-		return result;
+		return getCatalog().getIdentifiableExpressions();
 	}
 
 	@NotNull
@@ -153,8 +149,32 @@ abstract class AbstractStatement implements Statement {
 	 */
 	private ParameterInformation collectParameters() {
 
-		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext());
+		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext(), isRenderConstantsAsParameters());
 		this.accept(parameterCollectingVisitor);
 		return parameterCollectingVisitor.getResult();
+	}
+
+	@Override
+	@NotNull
+	public StatementCatalog getCatalog() {
+
+		StatementCatalog result = this.statementCatalog;
+		if (result == null) {
+			synchronized (this) {
+				result = this.statementCatalog;
+				if (result == null) {
+					this.statementCatalog = getCatalog0();
+					result = this.statementCatalog;
+				}
+			}
+		}
+		return result;
+	}
+
+	private StatementCatalog getCatalog0() {
+
+		var thing = new StatementCatalogBuildingVisitor(getContext(), renderConstantsAsParameters);
+		this.accept(thing);
+		return thing.getResult();
 	}
 }

@@ -62,7 +62,11 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private boolean passedFirstReadingOrUpdatingClause;
 
 	PrettyPrintingVisitor(StatementContext statementContext, Configuration configuration) {
-		super(statementContext, configuration);
+		this(statementContext, false, configuration);
+	}
+
+	PrettyPrintingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
+		super(statementContext, renderConstantsAsParameters, configuration);
 
 		IndentStyle indentStyle = configuration.getIndentStyle();
 		int indentSize = configuration.getIndentSize();
