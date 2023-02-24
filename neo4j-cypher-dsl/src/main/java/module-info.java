@@ -35,8 +35,6 @@ module org.neo4j.cypherdsl.core {
 	requires org.neo4j.cypherdsl.support.schema_name;
 
 	exports org.neo4j.cypherdsl.core;
-	// TODO this needs to go away ofc
-	exports org.neo4j.cypherdsl.core.fump;
 	exports org.neo4j.cypherdsl.core.ast;
 	exports org.neo4j.cypherdsl.core.executables;
 	exports org.neo4j.cypherdsl.core.renderer;

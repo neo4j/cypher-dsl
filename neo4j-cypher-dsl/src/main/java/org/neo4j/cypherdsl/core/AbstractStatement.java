@@ -20,14 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
-import org.neo4j.cypherdsl.core.fump.StatementCatalog;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -65,11 +63,8 @@ abstract class AbstractStatement implements Statement {
 	private volatile String cypher;
 
 	/**
-	 * Identifiable expressions. Will be initialized with Double-checked locking into an unmodifiable collection.
+	 * The catalog for this statement, will be lazily available and needs refreshment if parameter rendering changes.
 	 */
-	@SuppressWarnings("squid:S3077")
-	private volatile Collection<Expression> identifiables;
-
 	@SuppressWarnings("squid:S3077")
 	private volatile StatementCatalog statementCatalog;
 
@@ -91,7 +86,7 @@ abstract class AbstractStatement implements Statement {
 			this.renderConstantsAsParameters = renderConstantsAsParameters;
 			this.cypher = null;
 			this.parameterInformation = null;
-			// TODO RESET META
+			this.statementCatalog = null;
 		}
 	}
 
@@ -105,24 +100,6 @@ abstract class AbstractStatement implements Statement {
 	@Override
 	public Set<String> getParameterNames() {
 		return getParameterInformation().names;
-	}
-
-	@NotNull
-	public Collection<Expression> getIdentifiableExpressions() {
-
-		Collection<Expression> result = this.identifiables;
-		if (result == null) {
-			synchronized (this) {
-				result = this.identifiables;
-				if (result == null) {
-					IdentifiableExpressionCollectingVisitor visitor = new IdentifiableExpressionCollectingVisitor();
-					this.accept(visitor);
-					this.identifiables = visitor.getResult();
-					result = this.identifiables;
-				}
-			}
-		}
-		return result;
 	}
 
 	@NotNull
@@ -171,14 +148,15 @@ abstract class AbstractStatement implements Statement {
 	}
 
 	@Override
-	public StatementCatalog getThings() {
+	@NotNull
+	public StatementCatalog getCatalog() {
 
 		StatementCatalog result = this.statementCatalog;
 		if (result == null) {
 			synchronized (this) {
 				result = this.statementCatalog;
 				if (result == null) {
-					this.statementCatalog = getThings0();
+					this.statementCatalog = getCatalog0();
 					result = this.statementCatalog;
 				}
 			}
@@ -186,9 +164,9 @@ abstract class AbstractStatement implements Statement {
 		return result;
 	}
 
-	private StatementCatalog getThings0() {
+	private StatementCatalog getCatalog0() {
 
-		var thing = new Thing(getContext(), renderConstantsAsParameters);
+		var thing = new StatementCatalogBuildingVisitor(getContext(), renderConstantsAsParameters);
 		this.accept(thing);
 		return thing.getResult();
 	}

@@ -63,7 +63,7 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("UNWIND [0, 1, 2] AS x CALL {WITH x RETURN (x * 10) AS y} RETURN x, y");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("x"),
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("x"),
 				SymbolicName.of("y"));
 		}
 
@@ -134,7 +134,7 @@ class SubqueriesIT {
 				.isEqualTo(
 					"CALL dbms.components() YIELD name WITH name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} RETURN n");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 
 			// Without with
 			statement = Cypher.call("dbms.components").yield("name")
@@ -161,7 +161,7 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL {WITH label MATCH (n) WHERE n.name = label RETURN n} RETURN n");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 
 			// After inQueryCall without with
 			statement = Cypher
@@ -188,7 +188,7 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (p:`Person`) WITH p CALL {WITH p MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 		}
 
 		@Test
@@ -203,7 +203,7 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (p:`Person`) WITH p CALL {WITH p MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 		}
 
 		@Test
@@ -356,7 +356,7 @@ class SubqueriesIT {
 			expected += " RETURN u";
 			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("u"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("u"));
 		}
 
 		@ParameterizedTest
@@ -384,7 +384,7 @@ class SubqueriesIT {
 			expected += " RETURN u";
 			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("u"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("u"));
 		}
 
 		@Test
@@ -401,7 +401,7 @@ class SubqueriesIT {
 				.isEqualTo(
 					"CALL dbms.components() YIELD name WITH name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 
 			// Without with
 			statement = Cypher.call("dbms.components").yield("name")
@@ -428,7 +428,7 @@ class SubqueriesIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL {WITH label MATCH (n) WHERE n.name = label RETURN n} IN TRANSACTIONS RETURN n");
 
-			assertThat(statement.getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
+			assertThat(statement.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(SymbolicName.of("n"));
 
 			// After inQueryCall without with
 			statement = Cypher

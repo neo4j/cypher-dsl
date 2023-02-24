@@ -31,9 +31,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Statement;
-import org.neo4j.cypherdsl.core.fump.Property;
-import org.neo4j.cypherdsl.core.fump.PropertyCondition.Clause;
-import org.neo4j.cypherdsl.core.fump.Token;
+import org.neo4j.cypherdsl.core.StatementCatalog.Property;
+import org.neo4j.cypherdsl.core.StatementCatalog.Condition.Clause;
+import org.neo4j.cypherdsl.core.StatementCatalog.Token;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -60,15 +60,17 @@ class ExtractionIT {
 	@MethodSource
 	void extractionShouldWork(TestData testData) {
 		var statement = testData.statement() == null ? CypherParser.parse(testData.query()) : testData.statement();
-		var things = statement.getThings();
+		var things = statement.getCatalog();
 
 		assertThat(things.getNodeLabels()).containsExactlyInAnyOrderElementsOf(testData.expectedLabels());
 		assertThat(things.getRelationshipTypes()).containsExactlyInAnyOrderElementsOf(testData.expectedTypes());
 		assertThat(things.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
 		if (testData.expectedComparisons != null) {
-			assertThat(things.getPropertyConditions()).allMatch(v -> testData.expectedComparisons().contains(
-				new TestDataComparison(v.clause(), v.property(), v.left() == null ? null : RENDERER.render(v.left()), v.operator(), v.right() == null ? null : RENDERER.render(v.right()), v.parameterNames())
-			));
+			for (TestDataComparison expectedComparison : testData.expectedComparisons()) {
+				assertThat(things.getConditions(expectedComparison.property())).allMatch(v -> testData.expectedComparisons().contains(
+					new TestDataComparison(v.clause(), expectedComparison.property, v.left() == null ? null : RENDERER.render(v.left()), v.operator(), v.right() == null ? null : RENDERER.render(v.right()), v.parameterNames())
+				));
+			}
 		}
 	}
 

@@ -379,7 +379,7 @@ class CypherParserTest {
 	@MethodSource("inputAndIdentifiableExpressions")
 	void parseAndIdentifyShouldWork(String cypher, List<String> expected) {
 
-		var identifiables = CypherParser.parse(cypher).getIdentifiableExpressions();
+		var identifiables = CypherParser.parse(cypher).getCatalog().getIdentifiableExpressions();
 		assertThat(identifiables.stream().map(Cypher::format))
 			.containsExactlyInAnyOrderElementsOf(expected);
 	}

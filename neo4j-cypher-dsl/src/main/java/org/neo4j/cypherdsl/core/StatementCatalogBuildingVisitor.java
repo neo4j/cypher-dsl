@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -32,22 +33,24 @@ import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
+import org.neo4j.cypherdsl.core.StatementCatalog.Condition;
+import org.neo4j.cypherdsl.core.StatementCatalog.Condition.Clause;
+import org.neo4j.cypherdsl.core.StatementCatalog.Token;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.core.fump.PropertyCondition;
-import org.neo4j.cypherdsl.core.fump.PropertyCondition.Clause;
-import org.neo4j.cypherdsl.core.fump.StatementCatalog;
-import org.neo4j.cypherdsl.core.fump.Token;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 
 /**
+ * This visitor  creates a  {@link StatementCatalog  statement catalog}.  It is  not thread  safe and  must not  be used
+ * multiple times. Please create a new instance on each invocation.
+ *
  * @author Michael J. Simons
  * @soundtrack Avenger - Prayers Of Steel
  * @since TBA
  */
 @RegisterForReflection
-public class Thing extends ReflectiveVisitor {
+class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 	/**
 	 * Constant class name for skipping compounds, not inclined to make this type public.
@@ -66,9 +69,9 @@ public class Thing extends ReflectiveVisitor {
 
 	private final Set<Token> tokens = new HashSet<>();
 
-	private final Set<org.neo4j.cypherdsl.core.fump.Property> properties = new HashSet<>();
+	private final Set<StatementCatalog.Property> properties = new HashSet<>();
 
-	private final Set<PropertyCondition> conditions = new HashSet<>();
+	private final Map<StatementCatalog.Property, Set<Condition>> conditions = new HashMap<>();
 
 	/**
 	 * Scoped lookup tables from symbolic name to pattern elements (nodes or relationships).
@@ -78,7 +81,7 @@ public class Thing extends ReflectiveVisitor {
 	/**
 	 * A stack of conditions (keeping track of the latest entered).
 	 */
-	private final Deque<Condition> currentConditions = new ArrayDeque<>();
+	private final Deque<org.neo4j.cypherdsl.core.Condition> currentConditions = new ArrayDeque<>();
 
 	/**
 	 * Required for resolving parameter names, must be from the same statement that is analyzed.
@@ -92,8 +95,7 @@ public class Thing extends ReflectiveVisitor {
 	 */
 	private final ScopingStrategy scopingStrategy;
 
-	// TODO make private
-	public Thing(StatementContext statementContext, boolean renderConstantsAsParameters) {
+	StatementCatalogBuildingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 
 		this.statementContext = statementContext;
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
@@ -125,9 +127,8 @@ public class Thing extends ReflectiveVisitor {
 		this.patternLookup.push(new HashMap<>());
 	}
 
-	// TODO make package private
-	public StatementCatalog getResult() {
-		return new StatementCatalog(this.tokens, this.properties, this.conditions);
+	StatementCatalog getResult() {
+		return new DefaultStatementCatalog(this.tokens, this.properties, this.conditions, scopingStrategy.getIdentifiables());
 	}
 
 	@Override
@@ -194,11 +195,11 @@ public class Thing extends ReflectiveVisitor {
 			return;
 		}
 
-		org.neo4j.cypherdsl.core.fump.Property property;
+		StatementCatalog.Property property;
 		if (owner instanceof Node node) {
-			property = new org.neo4j.cypherdsl.core.fump.Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey());
+			property = new StatementCatalog.Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey());
 		} else if (owner instanceof Relationship relationship) {
-			property = new org.neo4j.cypherdsl.core.fump.Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey());
+			property = new StatementCatalog.Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey());
 		} else {
 			property = null;
 		}
@@ -215,7 +216,8 @@ public class Thing extends ReflectiveVisitor {
 			left = PropertyLookup.forName(mapEntry.getKey());
 		}
 		var parameterInformation = extractParameters(mapEntry.getValue());
-		this.conditions.add(new PropertyCondition(currentClause.get(), property, left, Operator.EQUALITY, mapEntry.getValue(), parameterInformation.names, parameterInformation.values));
+		this.conditions.computeIfAbsent(property, ignored -> new HashSet<>())
+			.add(new Condition(currentClause.get(), left, Operator.EQUALITY, mapEntry.getValue(), parameterInformation.names, parameterInformation.values));
 	}
 
 	void leave(Node node) {
@@ -253,15 +255,15 @@ public class Thing extends ReflectiveVisitor {
 			}
 		});
 
-		org.neo4j.cypherdsl.core.fump.Property newProperty;
+		StatementCatalog.Property newProperty;
 		var patternElement = lookup(s);
 		if (patternElement instanceof Node node) {
-			newProperty = new org.neo4j.cypherdsl.core.fump.Property(
+			newProperty = new StatementCatalog.Property(
 				node.getLabels().stream().map(NodeLabel::getValue).map(Token::label).collect(Collectors.toSet()),
 				propertyName.get()
 			);
 		} else if (patternElement instanceof Relationship relationship) {
-			newProperty = new org.neo4j.cypherdsl.core.fump.Property(
+			newProperty = new StatementCatalog.Property(
 				relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()),
 				propertyName.get()
 			);
@@ -271,7 +273,8 @@ public class Thing extends ReflectiveVisitor {
 
 		properties.add(newProperty);
 		if (inCurrentCondition(property)) {
-			conditions.add(extractPropertyCondition(newProperty, currentConditions.peek()));
+			conditions.computeIfAbsent(newProperty, ignored -> new HashSet<>())
+				.add(extractPropertyCondition(newProperty, currentConditions.peek()));
 		}
 	}
 
@@ -291,7 +294,7 @@ public class Thing extends ReflectiveVisitor {
 		return result.get();
 	}
 
-	private PropertyCondition extractPropertyCondition(org.neo4j.cypherdsl.core.fump.Property property, Condition condition) {
+	private Condition extractPropertyCondition(StatementCatalog.Property property, org.neo4j.cypherdsl.core.Condition condition) {
 
 		var left = new AtomicReference<Expression>();
 		var op = new AtomicReference<Operator>();
@@ -319,7 +322,7 @@ public class Thing extends ReflectiveVisitor {
 			}
 		});
 		var parameterInformation = extractParameters(left.get(), right.get());
-		return new PropertyCondition(currentClause.get(), property, left.get(), op.get(), right.get(), parameterInformation.names, parameterInformation.values);
+		return new Condition(currentClause.get(), left.get(), op.get(), right.get(), parameterInformation.names, parameterInformation.values);
 	}
 
 	void enter(NodeLabel label) {
@@ -337,14 +340,14 @@ public class Thing extends ReflectiveVisitor {
 		return patternLookup.peek().get(s);
 	}
 
-	void enter(Condition condition) {
+	void enter(org.neo4j.cypherdsl.core.Condition condition) {
 		if (TYPE_OF_COMPOUND_CONDITION.equals(condition.getClass().getName())) {
 			return;
 		}
 		this.currentConditions.push(condition);
 	}
 
-	void leave(Condition condition) {
+	void leave(org.neo4j.cypherdsl.core.Condition condition) {
 		if (TYPE_OF_COMPOUND_CONDITION.equals(condition.getClass().getName())) {
 			return;
 		}
@@ -373,5 +376,44 @@ public class Thing extends ReflectiveVisitor {
 			expression.accept(parameterCollectingVisitor);
 		}
 		return parameterCollectingVisitor.getResult();
+	}
+
+	static final class DefaultStatementCatalog implements StatementCatalog {
+
+		private final Set<Token> tokens;
+
+		private final Set<Property> properties;
+
+		private final Map<Property, Collection<Condition>> conditions;
+
+		private final Set<Expression> identifiableExpressions;
+
+		DefaultStatementCatalog(Set<Token> tokens, Set<Property> properties, Map<Property, Set<Condition>> conditions, Collection<Expression> identifiableExpressions) {
+			this.tokens = Set.copyOf(tokens);
+			this.properties = Set.copyOf(properties);
+			this.conditions = conditions.entrySet().stream()
+				.collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, e -> Set.copyOf(e.getValue())), Map::copyOf));
+			this.identifiableExpressions = Set.copyOf(identifiableExpressions);
+		}
+
+		@Override
+		public Set<Token> getAllTokens() {
+			return tokens;
+		}
+
+		@Override
+		public Set<Property> getProperties() {
+			return properties;
+		}
+
+		@Override
+		public Map<Property, Collection<Condition>> getAllConditions() {
+			return conditions;
+		}
+
+		@Override
+		public Set<Expression> getIdentifiableExpressions() {
+			return identifiableExpressions;
+		}
 	}
 }

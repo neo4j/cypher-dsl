@@ -384,11 +384,12 @@ public final class ScopingStrategy {
 		}
 
 		Predicate<IdentifiableElement> allNamedElementsHaveResolvedNames = e ->
-			!(e instanceof Named named) || named.getSymbolicName().isPresent();
+			!(e instanceof Named named) || named.getSymbolicName().filter(s -> s.getValue() != null).isPresent();
 
 		Set<IdentifiableElement> items = Optional.ofNullable(this.dequeOfVisitedNamed.peek())
 			.filter(scope -> !scope.isEmpty())
 			.orElse(afterStatement);
+
 		return items
 			.stream()
 			.filter(allNamedElementsHaveResolvedNames)

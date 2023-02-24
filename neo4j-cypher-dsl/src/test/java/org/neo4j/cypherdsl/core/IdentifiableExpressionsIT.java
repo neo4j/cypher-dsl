@@ -89,6 +89,7 @@ class IdentifiableExpressionsIT {
 					.as("isNullOrLabel")
 			)
 			.build()
+			.getCatalog()
 			.getIdentifiableExpressions();
 
 		assertThat(variables.stream().map(Cypher::format))
@@ -102,6 +103,7 @@ class IdentifiableExpressionsIT {
 		Collection<Expression> variables = Cypher.match(a.relationshipTo(b))
 			.returning(a)
 			.build()
+			.getCatalog()
 			.getIdentifiableExpressions();
 
 		assertThat(variables.stream().map(Cypher::format))

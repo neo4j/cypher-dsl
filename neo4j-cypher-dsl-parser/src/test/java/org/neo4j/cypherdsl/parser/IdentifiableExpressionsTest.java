@@ -47,7 +47,7 @@ class IdentifiableExpressionsTest {
 	@MethodSource
 	void testGetIdentifiableElementsFromQuery(TestData testData) {
 		var statement = CypherParser.parse(testData.query());
-		var elements = statement.getIdentifiableExpressions().stream().map(e -> {
+		var elements = statement.getCatalog().getIdentifiableExpressions().stream().map(e -> {
 			if (e instanceof AliasedExpression) {
 				return ((AliasedExpression) e).getAlias();
 			}

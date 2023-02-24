@@ -30,7 +30,6 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.fump.StatementCatalog;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
@@ -137,19 +136,23 @@ public interface Statement extends Visitable {
 	/**
 	 * @return The set of identifiable expressions that are available when this statement ends.
 	 * @since 2021.3.2
+	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getIdentifiableExpressions()}
 	 */
 	@NotNull @Contract(pure = true)
-	Collection<Expression> getIdentifiableExpressions();
+	@Deprecated(forRemoval = true, since = "TBA")
+	default Collection<Expression> getIdentifiableExpressions() {
+		return getCatalog().getIdentifiableExpressions();
+	}
 
 	/**
 	 * Analyzes the statement and provides access to the resolved properties, their (potential) owners and the context
-	 * in which they have been resolved.
-	 * Also, a view on {@link #getIdentifiableExpressions()} is provided.
-	 * TODO Naming subject to change
+	 * in which they have been resolved. Also, a view on {@link #getIdentifiableExpressions()} is provided.
+	 *
 	 * @return An immutable object representing properties resolved in a statement together with their context and owner
 	 * @since TBA
 	 */
-	StatementCatalog getThings();
+	@NotNull @Contract(pure = true)
+	StatementCatalog getCatalog();
 
 	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher
