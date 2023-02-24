@@ -140,6 +140,7 @@ public interface Statement extends Visitable {
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated(forRemoval = true, since = "2023.1.0")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
 	Collection<Expression> getIdentifiableExpressions();
 
 	/**
