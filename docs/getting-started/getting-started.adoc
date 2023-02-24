@@ -252,3 +252,26 @@ Here is one example how to use a dialect:
 ----
 include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/DialectIT.java[tag=dialect-example]
 ----
+
+[[catalog-support]]
+== Catalog support
+
+The Cypher-DSL offers a catalog view on statements. After a statement has been build, a catalog can be retrieved like this:
+
+.Using the statement catalog from a constructed statement
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/StatementCatalogBuildingVisitorTest.java[tag=catalog-example]
+----
+
+In the above example the catalog contains all labels and types used (`Movie`, `Person`, `ACTED_IN`) and all conditions
+that involves a property of an entity combining the labels or types into a node or relationship. In addition, the catalog
+contains the identifiable elements.
+
+This becomes especially powerful when combining with the optional <<cypher-parser,parser module>>:
+
+.Using the statement catalog from a parsed statement
+[source,java,indent=0,tabsize=4]
+----
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/StatementCatalogBuildingVisitorViaParserTest.java[tag=catalog-example]
+----

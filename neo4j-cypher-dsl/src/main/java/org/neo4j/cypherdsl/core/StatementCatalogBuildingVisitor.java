@@ -61,12 +61,12 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	/**
 	 * Current clause the visitor is in.
 	 */
-	private AtomicReference<Clause> currentClause = new AtomicReference<>(Clause.UNKNOWN);
+	private final AtomicReference<Clause> currentClause = new AtomicReference<>(Clause.UNKNOWN);
 
 	/**
 	 * The current pattern element visited.
 	 */
-	private final AtomicReference<PatternElement> currentPatternElement = new AtomicReference<>();
+	private final Deque<PatternElement> currentPatternElement = new ArrayDeque<>();
 
 	private final Set<Token> tokens = new HashSet<>();
 
@@ -116,7 +116,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 	private void importIntoCurrentScope(Collection<IdentifiableElement> exports) {
 		Map<SymbolicName, PatternElement> previousScope = patternLookup.pop();
-		Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
+		Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? new HashMap<>() : patternLookup.peek();
 		copyIdentifiableElements(exports, previousScope, currentScope);
 	}
 
@@ -188,12 +188,12 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	void enter(Node node) {
 
 		node.getSymbolicName().ifPresent(s -> store(s, node));
-		currentPatternElement.compareAndSet(null, node);
+		currentPatternElement.push(node);
 	}
 
 	void enter(KeyValueMapEntry mapEntry) {
 
-		var owner = currentPatternElement.get();
+		var owner = currentPatternElement.peek();
 		if (owner == null) {
 			return;
 		}
@@ -224,17 +224,17 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	}
 
 	void leave(Node node) {
-		currentPatternElement.compareAndSet(node, null);
+		currentPatternElement.removeFirstOccurrence(node);
 	}
 
 	void enter(Relationship relationship) {
 
 		relationship.getSymbolicName().ifPresent(s -> store(s, relationship));
-		currentPatternElement.compareAndSet(null, relationship);
+		currentPatternElement.push(relationship);
 	}
 
 	void leave(Relationship relationship) {
-		currentPatternElement.compareAndSet(relationship, null);
+		currentPatternElement.removeFirstOccurrence(relationship);
 	}
 
 	void enter(org.neo4j.cypherdsl.core.Property property) {
@@ -312,10 +312,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 				}
 				if (segment instanceof Operator operator) {
 					op.compareAndSet(null, operator);
-				} else if (segment instanceof Expression expression) {
-					if (!left.compareAndSet(null, expression)) {
-						right.compareAndSet(null, expression);
-					}
+				} else if (segment instanceof Expression expression && !left.compareAndSet(null, expression)) {
+					right.compareAndSet(null, expression);
 				}
 			}
 

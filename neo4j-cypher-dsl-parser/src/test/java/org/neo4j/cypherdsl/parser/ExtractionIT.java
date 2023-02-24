@@ -60,14 +60,14 @@ class ExtractionIT {
 	@MethodSource
 	void extractionShouldWork(TestData testData) {
 		var statement = testData.statement() == null ? CypherParser.parse(testData.query()) : testData.statement();
-		var things = statement.getCatalog();
+		var catalog = statement.getCatalog();
 
-		assertThat(things.getNodeLabels()).containsExactlyInAnyOrderElementsOf(testData.expectedLabels());
-		assertThat(things.getRelationshipTypes()).containsExactlyInAnyOrderElementsOf(testData.expectedTypes());
-		assertThat(things.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
+		assertThat(catalog.getNodeLabels()).containsExactlyInAnyOrderElementsOf(testData.expectedLabels());
+		assertThat(catalog.getRelationshipTypes()).containsExactlyInAnyOrderElementsOf(testData.expectedTypes());
+		assertThat(catalog.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
 		if (testData.expectedComparisons != null) {
 			for (TestDataComparison expectedComparison : testData.expectedComparisons()) {
-				assertThat(things.getConditions(expectedComparison.property())).allMatch(v -> testData.expectedComparisons().contains(
+				assertThat(catalog.getConditions(expectedComparison.property())).allMatch(v -> testData.expectedComparisons().contains(
 					new TestDataComparison(v.clause(), expectedComparison.property, v.left() == null ? null : RENDERER.render(v.left()), v.operator(), v.right() == null ? null : RENDERER.render(v.right()), v.parameterNames())
 				));
 			}
@@ -100,28 +100,45 @@ class ExtractionIT {
 		}
 	}
 
+	private static final Token FOLLOWS = Token.type("FOLLOWS");
+	private static final Token TRANSACTS_WITH = Token.type("TRANSACTS_WITH");
+	private static final Token PERSON = Token.label("Person");
+	private static final Token ACTIVE = Token.label("Active");
+	private static final Token EVENT = Token.label("Event");
+	private static final Token CHECKED_IN_EVENT = Token.type("CHECKED_IN_EVENT");
+	private static final Token OFFICER = Token.label("Officer");
+	private static final Token MOVIE = Token.label("Movie");
+
+	private static final Property PERSON_NAME = new Property(PERSON, "name");
+	private static final Property DATE = new Property("date");
+	private static final Property LAST_SEEN_DATE = new Property("lastSeenDate");
+	private static final Property NAME = new Property("name");
+	private static final Property FOLLOWS_ID = new Property(FOLLOWS, "id");
+	private static final Property PERSON_ID = new Property(PERSON, "id");
+	private static final Property EVENT_POSITION = new Property(EVENT, "position");
+	private static final Property OFFICER_NAME = new Property(OFFICER, "name");
+	private static final Property PERSON_BORN = new Property(PERSON, "born");
+	private static final Property MOVIE_RELEASED = new Property(MOVIE, "released");
+	private static final Property MOVIE_TITLE = new Property(MOVIE, "title");
+
 	static final List<TestData> TEST_DATA = List.of(
 		new TestData("""
 			MATCH (n:Person {name: $name})
 			RETURN n, COUNT { (n)--() } AS degree
 			""",
-			List.of(Token.label("Person")),
+			List.of(PERSON),
 			List.of(),
-			List.of(new Property(Token.label("Person"), "name")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "$name", Set.of("name"))
-			)
+			List.of(PERSON_NAME),
+			List.of(new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "$name", Set.of("name")))
 		),
 		new TestData("""
 			MATCH (n:Person) WHERE n.name = $name
 			RETURN n, COUNT { (n)--() } AS degree
 			""",
-			List.of(Token.label("Person")),
+			List.of(PERSON),
 			List.of(),
-			List.of(new Property(Token.label("Person"), "name")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "$name", Set.of("name"))
-			)
+			List.of(PERSON_NAME),
+			List.of(new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "$name", Set.of("name")))
 		),
 		new TestData("""
 			MATCH (n) WHERE id(n) = $id
@@ -133,11 +150,9 @@ class ExtractionIT {
 			RETURN datetime(event.date + 'T23:59:59Z') AS lastSeenDate, $id AS id
 			""",
 			List.of(),
-			List.of(Token.type("CHECKED_IN_EVENT")),
-			List.of(new Property("date")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property("date"), "e.date", Operator.CONTAINS, "'-'", Set.of())
-			)
+			List.of(CHECKED_IN_EVENT),
+			List.of(DATE),
+			List.of(new TestDataComparison(Clause.MATCH, DATE, "e.date", Operator.CONTAINS, "'-'", Set.of()))
 		),
 		new TestData("""
 			MATCH (n) WHERE id(n) = $id
@@ -150,11 +165,9 @@ class ExtractionIT {
 			RETURN datetime(event.date + 'T23:59:59Z') AS lastSeenDate, $id AS id
 			""",
 			List.of(),
-			List.of(Token.type("CHECKED_IN_EVENT")),
-			List.of(new Property("date")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property("date"), "e.date", Operator.CONTAINS, "'-'", Set.of())
-			)
+			List.of(CHECKED_IN_EVENT),
+			List.of(DATE),
+			List.of(new TestDataComparison(Clause.MATCH, DATE, "e.date", Operator.CONTAINS, "'-'", Set.of()))
 		),
 		new TestData("""
 			MATCH (n) WHERE n.name = $name
@@ -162,10 +175,10 @@ class ExtractionIT {
 			RETURN n
 			""",
 			List.of(), List.of(),
-			List.of(new Property("name"), new Property("lastSeenDate")),
+			List.of(NAME, LAST_SEEN_DATE),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property("name"), "n.name", Operator.EQUALITY, "$name", Set.of("name")),
-				new TestDataComparison(Clause.MATCH, new Property("lastSeenDate"), "n.lastSeenDate", Operator.GREATER_THAN, "(datetime() - duration({hours: 12}))", Set.of())
+				new TestDataComparison(Clause.MATCH, NAME, "n.name", Operator.EQUALITY, "$name", Set.of("name")),
+				new TestDataComparison(Clause.MATCH, LAST_SEEN_DATE, "n.lastSeenDate", Operator.GREATER_THAN, "(datetime() - duration({hours: 12}))", Set.of())
 			)
 		),
 		new TestData("""
@@ -176,10 +189,10 @@ class ExtractionIT {
 			RETURN count(*) AS matches
 			""",
 			List.of(),
-			List.of(Token.type("FOLLOWS")),
-			List.of(new Property(Token.type("FOLLOWS"), "id"), new Property("computed")),
+			List.of(FOLLOWS),
+			List.of(FOLLOWS_ID, new Property("computed")),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.type("FOLLOWS"), "id"), "r.id", Operator.LESS_THAN, "25", Set.of()),
+				new TestDataComparison(Clause.MATCH, FOLLOWS_ID, "r.id", Operator.LESS_THAN, "25", Set.of()),
 				new TestDataComparison(Clause.MATCH, new Property("computed"), "r2.computed", Operator.EQUALITY, "false", Set.of())
 			)
 		),
@@ -190,10 +203,9 @@ class ExtractionIT {
 			RETURN count(*) AS matches
 			""",
 			List.of(),
-			List.of(Token.type("FOLLOWS"), Token.type("TRANSACTS_WITH")),
-			List.of(new Property(Token.type("TRANSACTS_WITH"), "computed")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.type("TRANSACTS_WITH"), "computed"), "r2.computed", Operator.EQUALITY, "false", Set.of())
+			List.of(FOLLOWS, TRANSACTS_WITH),
+			List.of(new Property(TRANSACTS_WITH, "computed")),
+			List.of(new TestDataComparison(Clause.MATCH, new Property(TRANSACTS_WITH, "computed"), "r2.computed", Operator.EQUALITY, "false", Set.of())
 			)
 		),
 		new TestData("""
@@ -201,59 +213,51 @@ class ExtractionIT {
 			WHERE n:Active
 			RETURN n
 			""",
-			List.of(Token.label("Person"), Token.label("Active")),
+			List.of(PERSON, ACTIVE),
 			List.of(),
-			List.of(new Property(Token.label("Person"), "name")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'John Doe'", Set.of())
-			)
+			List.of(PERSON_NAME),
+			List.of(new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "'John Doe'", Set.of()))
 		),
 		new TestData("""
 			MATCH (n:Person)
 			WHERE 12 > n.id
 			RETURN n
 			""",
-			List.of(Token.label("Person")),
+			List.of(PERSON),
 			List.of(),
-			List.of(new Property(Token.label("Person"), "id")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "id"), "12", Operator.GREATER_THAN, "n.id", Set.of())
-			)
+			List.of(PERSON_ID),
+			List.of(new TestDataComparison(Clause.MATCH, PERSON_ID, "12", Operator.GREATER_THAN, "n.id", Set.of()))
 		),
 		new TestData("""
 			MATCH (n:Event)
 			WHERE point.distance($point, n.position) < 1000
 			RETURN n
 			""",
-			List.of(Token.label("Event")),
+			List.of(EVENT),
 			List.of(),
-			List.of(new Property(Token.label("Event"), "position")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Event"), "position"), "point.distance($point, n.position)", Operator.LESS_THAN, "1000", Set.of("point"))
-			)
+			List.of(EVENT_POSITION),
+			List.of(new TestDataComparison(Clause.MATCH, EVENT_POSITION, "point.distance($point, n.position)", Operator.LESS_THAN, "1000", Set.of("point")))
 		),
 		new TestData("""
 			MATCH (n:Event)
 			WHERE point.withinBox(n.position, $lowerLeft, $upperRight)
 			RETURN n
 			""",
-			List.of(Token.label("Event")),
+			List.of(EVENT),
 			List.of(),
-			List.of(new Property(Token.label("Event"), "position")),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Event"), "position"), "point.withinBox(n.position, $lowerLeft, $upperRight)", null, null, Set.of("lowerLeft", "upperRight"))
-			)
+			List.of(EVENT_POSITION),
+			List.of(new TestDataComparison(Clause.MATCH, EVENT_POSITION, "point.withinBox(n.position, $lowerLeft, $upperRight)", null, null, Set.of("lowerLeft", "upperRight")))
 		),
 		new TestData("""
 			UNWIND $names AS name
 			MATCH (n:Person {name: name})
 			RETURN n
 			""",
-			List.of(Token.label("Person")),
+			List.of(PERSON),
 			List.of(),
-			List.of(new Property(Token.label("Person"), "name")),
+			List.of(PERSON_NAME),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "name", Set.of())
+				new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "name", Set.of())
 			)
 		),
 		new TestData("""
@@ -265,20 +269,20 @@ class ExtractionIT {
 			RETURN p
 			LIMIT 50
 			""",
-			List.of(Token.label("Officer")),
+			List.of(OFFICER),
 			List.of(Token.type("OFFICER_OF"), Token.type("INTERMEDIARY_OF"), Token.type("REGISTERED_ADDRESS")),
 			List.of(
-				new Property(Token.label("Officer"), "name"),
+				OFFICER_NAME,
 				new Property(Set.of(Token.type("OFFICER_OF"), Token.type("INTERMEDIARY_OF"), Token.type("REGISTERED_ADDRESS")), "isActive")
 			),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Officer"), "name"), "a.name", Operator.CONTAINS, "'MR. ISAAC ELBAZ'", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Officer"), "name"), "b.name", Operator.CONTAINS, "'Stephanie J. Bridges'", Set.of()),
+				new TestDataComparison(Clause.MATCH, OFFICER_NAME, "a.name", Operator.CONTAINS, "'MR. ISAAC ELBAZ'", Set.of()),
+				new TestDataComparison(Clause.MATCH, OFFICER_NAME, "b.name", Operator.CONTAINS, "'Stephanie J. Bridges'", Set.of()),
 				new TestDataComparison(Clause.MATCH, new Property(Set.of(Token.type("OFFICER_OF"), Token.type("INTERMEDIARY_OF"), Token.type("REGISTERED_ADDRESS")), "isActive"), "r.isActive", Operator.EQUALITY, "$activeFlag", Set.of("activeFlag"))
 			)
 		),
 		new TestData(" MATCH (p:Person) -[:ACTED_IN {as: 'Neo'}] -> (m:Movie)",
-			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(PERSON, MOVIE),
 			List.of(Token.type("ACTED_IN")),
 			List.of(new Property(Token.type("ACTED_IN"), "as")),
 			List.of(new TestDataComparison(Clause.MATCH, new Property(Token.type("ACTED_IN"), "as"), ".as", Operator.EQUALITY, "'Neo'", Set.of()))
@@ -291,16 +295,12 @@ class ExtractionIT {
 			}
 			return n.name
 			""",
-			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(PERSON, MOVIE),
 			List.of(),
+			List.of(PERSON_NAME, MOVIE_TITLE, MOVIE_RELEASED),
 			List.of(
-				new Property(Token.label("Person"), "name"),
-				new Property(Token.label("Movie"), "title"),
-				new Property(Token.label("Movie"), "released")
-			),
-			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "title"), "n.title", Operator.EQUALITY, "'The Matrix'", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "n.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of())
+				new TestDataComparison(Clause.MATCH, MOVIE_TITLE, "n.title", Operator.EQUALITY, "'The Matrix'", Set.of()),
+				new TestDataComparison(Clause.MATCH, MOVIE_RELEASED, "n.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of())
 			)
 		),
 		new TestData(
@@ -315,18 +315,18 @@ class ExtractionIT {
 			}
 			RETURN n.name, m.title
 			""",
-			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(PERSON, MOVIE),
 			List.of(Token.type("ACTED_IN")),
 			List.of(
-				new Property(Token.label("Person"), "name"),
-				new Property(Token.label("Person"), "born"),
-				new Property(Token.label("Movie"), "released"),
-				new Property(Token.label("Movie"), "title")
+				PERSON_NAME,
+				PERSON_BORN,
+				MOVIE_RELEASED,
+				MOVIE_TITLE
 			),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of())
+				new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "'Tom Hanks'", Set.of()),
+				new TestDataComparison(Clause.MATCH, PERSON_BORN, "n.born", Operator.EQUALITY, "1956", Set.of()),
+				new TestDataComparison(Clause.MATCH, MOVIE_RELEASED, "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of())
 			)
 		),
 		new TestData(
@@ -342,18 +342,18 @@ class ExtractionIT {
 				)
 				.returning(Cypher.anyNode("n").property("name"), Cypher.anyNode("m").property("title"))
 				.build(),
-			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(PERSON, MOVIE),
 			List.of(Token.type("ACTED_IN")),
 			List.of(
-				new Property(Token.label("Person"), "name"),
-				new Property(Token.label("Person"), "born"),
-				new Property(Token.label("Movie"), "released"),
-				new Property(Token.label("Movie"), "title")
+				PERSON_NAME,
+				PERSON_BORN,
+				MOVIE_RELEASED,
+				MOVIE_TITLE
 			),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of())
+				new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "'Tom Hanks'", Set.of()),
+				new TestDataComparison(Clause.MATCH, PERSON_BORN, "n.born", Operator.EQUALITY, "1956", Set.of()),
+				new TestDataComparison(Clause.MATCH, MOVIE_RELEASED, "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of())
 			)
 		),
 		new TestData(
@@ -370,19 +370,19 @@ class ExtractionIT {
 			WHERE m.title = 'Apollo 13'
 			RETURN n, m
 			""",
-			List.of(Token.label("Person"), Token.label("Movie")),
+			List.of(PERSON, MOVIE),
 			List.of(Token.type("ACTED_IN")),
 			List.of(
-				new Property(Token.label("Person"), "name"),
-				new Property(Token.label("Person"), "born"),
-				new Property(Token.label("Movie"), "released"),
-				new Property(Token.label("Movie"), "title")
+				PERSON_NAME,
+				PERSON_BORN,
+				MOVIE_RELEASED,
+				MOVIE_TITLE
 			),
 			List.of(
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "name"), "n.name", Operator.EQUALITY, "'Tom Hanks'", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Person"), "born"), "n.born", Operator.EQUALITY, "1956", Set.of()),
-				new TestDataComparison(Clause.MATCH, new Property(Token.label("Movie"), "released"), "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of()),
-				new TestDataComparison(Clause.WITH, new Property(Token.label("Movie"), "title"), "m.title", Operator.EQUALITY, "'Apollo 13'", Set.of())
+				new TestDataComparison(Clause.MATCH, PERSON_NAME, "n.name", Operator.EQUALITY, "'Tom Hanks'", Set.of()),
+				new TestDataComparison(Clause.MATCH, PERSON_BORN, "n.born", Operator.EQUALITY, "1956", Set.of()),
+				new TestDataComparison(Clause.MATCH, MOVIE_RELEASED, "m.released", Operator.GREATER_THAN_OR_EQUAL_TO, "1900", Set.of()),
+				new TestDataComparison(Clause.WITH, MOVIE_TITLE, "m.title", Operator.EQUALITY, "'Apollo 13'", Set.of())
 			)
 		),
 		new TestData(
@@ -405,6 +405,16 @@ class ExtractionIT {
 			List.of(),
 			List.of(new Property(Token.label("Foo"), "m")),
 			List.of(new TestDataComparison(Clause.MERGE, new Property(Token.label("Foo"), "m"), "n.m", Operator.EQUALITY, "'Bar'", Set.of()))
+		),
+		new TestData(
+			"MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`) WHERE p.born >= $born RETURN p",
+			List.of(MOVIE, PERSON),
+			List.of(Token.type("ACTED_IN")),
+			List.of(MOVIE_TITLE, PERSON_BORN),
+			List.of(
+				new TestDataComparison(Clause.MATCH, MOVIE_TITLE, "m.title", Operator.EQUALITY, "'The Matrix'", Set.of()),
+				new TestDataComparison(Clause.MATCH, PERSON_BORN, "p.born", Operator.GREATER_THAN_OR_EQUAL_TO, "$born", Set.of("born"))
+			)
 		)
 	);
 }

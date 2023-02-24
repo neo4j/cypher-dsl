@@ -49,6 +49,47 @@ import java.util.stream.Collectors;
 public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor.DefaultStatementCatalog {
 
 	/**
+	 * Convenience method to create node label tokens.
+	 *
+	 * @param label The label to be used
+	 * @return A new label token
+	 */
+	static Token label(String label) {
+		return Token.label(label);
+	}
+
+	/**
+	 * Convenience method to create relationship type tokens.
+	 *
+	 * @param type The type to be used
+	 * @return A new relationship type token
+	 */
+	static Token type(String type) {
+		return Token.type(type);
+	}
+
+	/**
+	 * Convenience method to create a new property without a specific owner.
+	 *
+	 * @param name The name of the property
+	 * @return A new property
+	 */
+	static Property property(String name) {
+		return new Property(name);
+	}
+
+	/**
+	 * Convenience method to create a new property with a defined owner.
+	 *
+	 * @param owner The set of tokens defining the owner
+	 * @param name  The name of the property
+	 * @return A new property
+	 */
+	static Property property(Set<Token> owner, String name) {
+		return new Property(owner, name);
+	}
+
+	/**
 	 * Returns a collection of all tokens used in the analyzed statement.
 	 *
 	 * @return A collection of all tokens used
