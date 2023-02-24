@@ -47,7 +47,7 @@ import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
  *
  * @author Michael J. Simons
  * @soundtrack Avenger - Prayers Of Steel
- * @since TBA
+ * @since 2023.1.0
  */
 @RegisterForReflection
 class StatementCatalogBuildingVisitor extends ReflectiveVisitor {

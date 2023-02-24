@@ -139,7 +139,7 @@ public interface Statement extends Visitable {
 	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getIdentifiableExpressions()}
 	 */
 	@NotNull @Contract(pure = true)
-	@Deprecated(forRemoval = true, since = "TBA")
+	@Deprecated(forRemoval = true, since = "2023.1.0")
 	default Collection<Expression> getIdentifiableExpressions() {
 		return getCatalog().getIdentifiableExpressions();
 	}
@@ -149,7 +149,7 @@ public interface Statement extends Visitable {
 	 * in which they have been resolved. Also, a view on {@link #getIdentifiableExpressions()} is provided.
 	 *
 	 * @return An immutable object representing properties resolved in a statement together with their context and owner
-	 * @since TBA
+	 * @since 2023.1.0
 	 */
 	@NotNull @Contract(pure = true)
 	StatementCatalog getCatalog();

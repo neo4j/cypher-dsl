@@ -64,7 +64,7 @@ public non-sealed interface Property extends Expression, IdentifiableElement {
 	/**
 	 * @return A reference to the container owning this property
 	 */
-	@API(status = INTERNAL, since = "TBA")
+	@API(status = INTERNAL, since = "2023.1.0")
 	@NotNull
 	@Contract(pure = true)
 	default Expression getContainerReference() {

@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  *
  * @author Michael J. Simons
  * @soundtrack Guns n' Roses - Use Your Illusion II
- * @since TBA
+ * @since 2023.1.0
  */
 public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor.DefaultStatementCatalog {
 
