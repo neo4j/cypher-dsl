@@ -50,6 +50,7 @@ import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
  * @since 2023.1.0
  */
 @RegisterForReflection
+@SuppressWarnings({"unused", "squid:S1172"})
 class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 	/**
@@ -100,31 +101,33 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		this.statementContext = statementContext;
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.scopingStrategy = ScopingStrategy.create(
-			List.of((cause, imports) -> {
-				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
-				Map<SymbolicName, PatternElement> newScope = new HashMap<>();
-				for (IdentifiableElement e : imports) {
-					if (e instanceof SymbolicName s && currentScope.containsKey(s)) {
-						newScope.put(s, currentScope.get(s));
-					} else if (e instanceof Named n && e instanceof PatternElement p) {
-						newScope.put(n.getRequiredSymbolicName(), p);
-					}
-				}
-				patternLookup.push(newScope);
-			}),
-			List.of((cause, exports) -> {
-				Map<SymbolicName, PatternElement> previousScope = patternLookup.pop();
-				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
-				for (IdentifiableElement e : exports) {
-					if (e instanceof SymbolicName s && previousScope.containsKey(s)) {
-						currentScope.put(s, previousScope.get(s));
-					} else if (e instanceof Named n && e instanceof PatternElement p) {
-						currentScope.put(n.getRequiredSymbolicName(), p);
-					}
-				}
-			})
+			List.of((cause, imports) -> patternLookup.push(createNewScope(imports))),
+			List.of((cause, exports) -> importIntoCurrentScope(exports))
 		);
 		this.patternLookup.push(new HashMap<>());
+	}
+
+	private Map<SymbolicName, PatternElement> createNewScope(Collection<IdentifiableElement> imports) {
+		Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
+		Map<SymbolicName, PatternElement> newScope = new HashMap<>();
+		copyIdentifiableElements(imports, currentScope, newScope);
+		return newScope;
+	}
+
+	private void importIntoCurrentScope(Collection<IdentifiableElement> exports) {
+		Map<SymbolicName, PatternElement> previousScope = patternLookup.pop();
+		Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
+		copyIdentifiableElements(exports, previousScope, currentScope);
+	}
+
+	private static void copyIdentifiableElements(Collection<IdentifiableElement> elements, Map<SymbolicName, PatternElement> source, Map<SymbolicName, PatternElement> target) {
+		for (IdentifiableElement e : elements) {
+			if (e instanceof SymbolicName s && source.containsKey(s)) {
+				target.put(s, source.get(s));
+			} else if (e instanceof Named n && e instanceof PatternElement p) {
+				target.put(n.getRequiredSymbolicName(), p);
+			}
+		}
 	}
 
 	StatementCatalog getResult() {
