@@ -30,7 +30,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.fump.Things;
+import org.neo4j.cypherdsl.core.fump.StatementCatalog;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
@@ -149,7 +149,7 @@ public interface Statement extends Visitable {
 	 * @return An immutable object representing properties resolved in a statement together with their context and owner
 	 * @since TBA
 	 */
-	Things getThings();
+	StatementCatalog getThings();
 
 	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher

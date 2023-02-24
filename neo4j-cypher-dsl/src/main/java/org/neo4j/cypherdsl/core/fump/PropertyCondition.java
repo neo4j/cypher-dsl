@@ -26,13 +26,14 @@ import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Statement;
 
 /**
- * This type encapsulates a comparison in which a property of a node or relationship was used. The property may appear
- * on the left hand side or right hand side or even on both side of the comparison (think being used in a function on
- * both sides with different arguments). The {@code clause} attribute will specify the context in which the comparison
+ * This type encapsulates a comparison  in which a property of a node or relationship was  used. The property may appear
+ * on the left hand  side or right hand side or even on  both side of the comparison (think being used  in a function on
+ * both sides with different  arguments). The {@code clause} attribute will specify the  context in which the comparison
  * was made.
  * <p>
- * The expressions used in the comparison are provided as Cypher-DSL AST expressions. They can be freely visited or rendered
- * into Cypher via the {@link org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer} like this:
+ * The expressions  used in the comparison  are provided as  Cypher-DSL AST expressions.  They can be freely  visited or
+ * rendered into Cypher via the {@link org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer} like this:
+ *
  * <pre>{@code
  *     var cypher = Renderer.getRenderer(Configuration.prettyPrinting(), GeneralizedRenderer.class)
  *          .render(comparison.left());
@@ -44,8 +45,10 @@ import org.neo4j.cypherdsl.core.Statement;
  * @param left           The left hand side of the comparison
  * @param operator       The operator used
  * @param right          The right hand side of the comparison
- * @param parameterNames The parameter names used in this comparison (analoge to {@link Statement#getParameterNames()}
- * @param parameters     Parameters with defined values used in this comparison (analoge to {@link Statement#getParameters()}
+ * @param parameterNames The parameter names used in this comparison
+ *                       (analoge to {@link Statement#getParameterNames()}
+ * @param parameters     Parameters with defined values used in this comparison
+ *                       (analoge to {@link Statement#getParameters()}
  * @soundtrack Die Ärzte - Le Frisur
  * @since TBA
  */

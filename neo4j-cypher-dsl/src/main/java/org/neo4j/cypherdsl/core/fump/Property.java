@@ -24,8 +24,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * A property that has been resolved. In case this property has been resolved for an entity, the entity itself
- * will be defined by its set of tokens. Tokens are guaranteed to be sorted and will be of the same type.
+ * A property that has been  resolved. In case this property has been resolved for an  entity, the entity itself will be
+ * defined by its set of tokens. Tokens are guaranteed to be sorted and will be of the same type.
  *
  * @author Michael J. Simons
  * @param name        The name of the resolved property

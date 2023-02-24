@@ -36,7 +36,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.fump.PropertyCondition;
 import org.neo4j.cypherdsl.core.fump.PropertyCondition.Clause;
-import org.neo4j.cypherdsl.core.fump.Things;
+import org.neo4j.cypherdsl.core.fump.StatementCatalog;
 import org.neo4j.cypherdsl.core.fump.Token;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
@@ -126,8 +126,8 @@ public class Thing extends ReflectiveVisitor {
 	}
 
 	// TODO make package private
-	public Things getResult() {
-		return new Things(this.tokens, this.properties, this.conditions);
+	public StatementCatalog getResult() {
+		return new StatementCatalog(this.tokens, this.properties, this.conditions);
 	}
 
 	@Override

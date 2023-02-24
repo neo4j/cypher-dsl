@@ -27,7 +27,7 @@ import java.util.Set;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
-import org.neo4j.cypherdsl.core.fump.Things;
+import org.neo4j.cypherdsl.core.fump.StatementCatalog;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -71,7 +71,7 @@ abstract class AbstractStatement implements Statement {
 	private volatile Collection<Expression> identifiables;
 
 	@SuppressWarnings("squid:S3077")
-	private volatile Things things;
+	private volatile StatementCatalog statementCatalog;
 
 	@NotNull
 	@Override
@@ -171,22 +171,22 @@ abstract class AbstractStatement implements Statement {
 	}
 
 	@Override
-	public Things getThings() {
+	public StatementCatalog getThings() {
 
-		Things result = this.things;
+		StatementCatalog result = this.statementCatalog;
 		if (result == null) {
 			synchronized (this) {
-				result = this.things;
+				result = this.statementCatalog;
 				if (result == null) {
-					this.things = getThings0();
-					result = this.things;
+					this.statementCatalog = getThings0();
+					result = this.statementCatalog;
 				}
 			}
 		}
 		return result;
 	}
 
-	private Things getThings0() {
+	private StatementCatalog getThings0() {
 
 		var thing = new Thing(getContext(), renderConstantsAsParameters);
 		this.accept(thing);

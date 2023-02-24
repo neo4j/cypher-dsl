@@ -25,11 +25,20 @@ import java.util.stream.Collectors;
 import org.neo4j.cypherdsl.core.fump.Token.Type;
 
 /**
+ * The statement catalog gives an  overview about relevant items in a statement. These  items include tokens (labels and
+ * relationship  types), the  resolved properties  for given  sets  of these  tokens (those  sets reassembling  concrete
+ * entities, think Nodes with one  or more labels or relationships with a concrete type) as  well as conditions in which
+ * the properties have  been used. This structural analysis can  be used to predict how graph  elements are accessed, or
+ * they can be used to make sure certain conditions are contained within a statement.
+ * <p>
+ * Finally, the list of identifiable elements at the end of a statement (aka after a {@code RETURN} clause) is contained
+ * in the catalog.
+ *
  * @author Michael J. Simons
  * @soundtrack Guns n' Roses - Use Your Illusion II
  * @since TBA
  */
-public final class Things {
+public final class StatementCatalog {
 
 	private final Set<Token> tokens;
 
@@ -38,7 +47,7 @@ public final class Things {
 	private final Set<PropertyCondition> propertyConditions;
 
 	// TODO make private
-	public Things(Set<Token> tokens, Set<Property> properties, Set<PropertyCondition> propertyConditions) {
+	public StatementCatalog(Set<Token> tokens, Set<Property> properties, Set<PropertyCondition> propertyConditions) {
 		this.tokens = Set.copyOf(tokens);
 		this.properties = Set.copyOf(properties);
 		this.propertyConditions = Set.copyOf(propertyConditions);
@@ -63,7 +72,7 @@ public final class Things {
 	 * @return A collection of all labels used
 	 */
 	public Collection<Token> getNodeLabels() {
-		return tokens.stream().filter(Things::isNodeLabel).collect(Collectors.toSet());
+		return tokens.stream().filter(StatementCatalog::isNodeLabel).collect(Collectors.toSet());
 	}
 
 	private static boolean isRelationshipType(Token token) {
@@ -76,7 +85,7 @@ public final class Things {
 	 * @return A collection of all types used
 	 */
 	public Collection<Token> getRelationshipTypes() {
-		return tokens.stream().filter(Things::isRelationshipType).collect(Collectors.toSet());
+		return tokens.stream().filter(StatementCatalog::isRelationshipType).collect(Collectors.toSet());
 	}
 
 	/**
