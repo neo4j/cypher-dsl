@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
@@ -100,6 +101,12 @@ abstract class AbstractStatement implements Statement {
 	@Override
 	public Set<String> getParameterNames() {
 		return getParameterInformation().names;
+	}
+
+	@SuppressWarnings("removal")
+	@NotNull
+	public Collection<Expression> getIdentifiableExpressions() {
+		return getCatalog().getIdentifiableExpressions();
 	}
 
 	@NotNull

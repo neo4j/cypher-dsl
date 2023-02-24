@@ -140,9 +140,7 @@ public interface Statement extends Visitable {
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated(forRemoval = true, since = "2023.1.0")
-	default Collection<Expression> getIdentifiableExpressions() {
-		return getCatalog().getIdentifiableExpressions();
-	}
+	Collection<Expression> getIdentifiableExpressions();
 
 	/**
 	 * Analyzes the statement and provides access to the resolved properties, their (potential) owners and the context
