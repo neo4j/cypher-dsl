@@ -85,15 +85,18 @@ public class Thing extends ReflectiveVisitor {
 	 */
 	private final StatementContext statementContext;
 
+	private final boolean renderConstantsAsParameters;
+
 	/**
 	 * Delegating the hard work to the shared scope strategy in most cases.
 	 */
 	private final ScopingStrategy scopingStrategy;
 
 	// TODO make private
-	public Thing(StatementContext statementContext) {
+	public Thing(StatementContext statementContext, boolean renderConstantsAsParameters) {
 
 		this.statementContext = statementContext;
+		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.scopingStrategy = ScopingStrategy.create(
 			List.of((cause, imports) -> {
 				Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
@@ -362,7 +365,7 @@ public class Thing extends ReflectiveVisitor {
 
 	private ParameterInformation extractParameters(Expression... expressions) {
 
-		var parameterCollectingVisitor = new ParameterCollectingVisitor(this.statementContext);
+		var parameterCollectingVisitor = new ParameterCollectingVisitor(this.statementContext, this.renderConstantsAsParameters);
 		for (Expression expression : expressions) {
 			if (expression == null) {
 				continue;

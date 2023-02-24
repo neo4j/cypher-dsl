@@ -28,6 +28,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.fump.Things;
+import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -44,7 +45,13 @@ abstract class AbstractStatement implements Statement {
 	/**
 	 * Provides context during visiting of this statement.
 	 */
-	private final StatementContextImpl context = new StatementContextImpl();
+	private final StatementContext context = new DefaultStatementContext();
+
+	/**
+	 * A flag that indicates whether parameters coming from QueryDSL integration should be rendered as Cypher {@link  Literal literals}
+	 * or as actual parameters.
+	 */
+	private boolean renderConstantsAsParameters = false;
 
 	/**
 	 * The collected parameter information (names only and names + values). Will be initialized with Double-checked locking into an unmodifiable object.
@@ -74,14 +81,14 @@ abstract class AbstractStatement implements Statement {
 
 	@Override
 	public synchronized boolean isRenderConstantsAsParameters() {
-		return this.context.isRenderConstantsAsParameters();
+		return this.renderConstantsAsParameters;
 	}
 
 	@Override
 	public void setRenderConstantsAsParameters(boolean renderConstantsAsParameters) {
 
 		synchronized (this) {
-			this.context.setRenderConstantsAsParameters(renderConstantsAsParameters);
+			this.renderConstantsAsParameters = renderConstantsAsParameters;
 			this.cypher = null;
 			this.parameterInformation = null;
 			// TODO RESET META
@@ -158,7 +165,7 @@ abstract class AbstractStatement implements Statement {
 	 */
 	private ParameterInformation collectParameters() {
 
-		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext());
+		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext(), isRenderConstantsAsParameters());
 		this.accept(parameterCollectingVisitor);
 		return parameterCollectingVisitor.getResult();
 	}
@@ -181,7 +188,7 @@ abstract class AbstractStatement implements Statement {
 
 	private Things getThings0() {
 
-		var thing = new Thing(getContext());
+		var thing = new Thing(getContext(), renderConstantsAsParameters);
 		this.accept(thing);
 		return thing.getResult();
 	}

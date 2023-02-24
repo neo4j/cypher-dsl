@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core;
+package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
@@ -25,7 +25,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
+import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.StatementContext;
+import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
@@ -34,11 +36,10 @@ import org.neo4j.cypherdsl.core.utils.Strings;
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
-final class StatementContextImpl implements StatementContext {
+public final class DefaultStatementContext implements StatementContext {
 
 	private final AtomicInteger parameterCount = new AtomicInteger();
 	private final Map<Parameter<?>, String> parameterNames = new ConcurrentHashMap<>();
-	private boolean renderConstantsAsParameters = false;
 
 	/**
 	 * Keeps track of unresolved symbolic names.
@@ -51,15 +52,6 @@ final class StatementContextImpl implements StatementContext {
 		return parameterNames
 			.computeIfAbsent(parameter,
 				p -> p.isAnon() ? String.format("pcdsl%02d", parameterCount.incrementAndGet()) : p.getName());
-	}
-
-	@Override
-	public boolean isRenderConstantsAsParameters() {
-		return renderConstantsAsParameters;
-	}
-
-	void setRenderConstantsAsParameters(boolean renderConstantsAsParameters) {
-		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 
 	@Override

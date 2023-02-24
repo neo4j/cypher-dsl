@@ -57,12 +57,14 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 	}
 
 	private final StatementContext statementContext;
+	private final boolean renderConstantsAsParameters;
 	private final Set<String> names = new TreeSet<>();
 	private final Map<String, Object> values = new TreeMap<>();
 	private final Map<String, Set<Object>> erroneousParameters = new TreeMap<>();
 
-	ParameterCollectingVisitor(StatementContext statementContext) {
+	ParameterCollectingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 		this.statementContext = statementContext;
+		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 
 	@Override
@@ -81,7 +83,7 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 		String parameterName = statementContext.getParameterName(parameter);
 		Object newValue = parameter.getValue();
 		if (newValue instanceof ConstantParameterHolder constantParameterHolder) {
-			if (!statementContext.isRenderConstantsAsParameters()) {
+			if (!renderConstantsAsParameters) {
 				return;
 			}
 			newValue = constantParameterHolder.getValue();
