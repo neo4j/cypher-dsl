@@ -671,7 +671,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<header>etc/license.tpl</header>
+
 					<strictCheck>true</strictCheck>
 					<mapping>
 						<factories>SCRIPT_STYLE</factories>
@@ -679,24 +679,29 @@
 					<properties>
 						<year>2023</year>
 					</properties>
-					<includes>
-						<include>**</include>
-					</includes>
-					<excludes>
-						<exclude>**/*.adoc</exclude>
-						<exclude>**/*.csv</exclude>
-						<exclude>**/*.cypher</exclude>
-						<exclude>**/*.sh</exclude>
-						<exclude>**/*.tpl</exclude>
-						<exclude>**/*.txt</exclude>
-						<exclude>**/*.yaml</exclude>
-						<exclude>**/.flattened-pom.xml</exclude>
-						<exclude>**/org.mockito.plugins.MockMaker</exclude>
-						<exclude>bin/runtests.java</exclude>
-						<exclude>**/package-info.java</exclude>
-						<!-- Expected generated classes -->
-						<exclude>**/src/test/resources/**/*_.java</exclude>
-					</excludes>
+					<licenseSets>
+						<licenseSet>
+							<header>etc/license.tpl</header>
+							<includes>
+								<include>**</include>
+							</includes>
+							<excludes>
+								<exclude>**/*.adoc</exclude>
+								<exclude>**/*.csv</exclude>
+								<exclude>**/*.cypher</exclude>
+								<exclude>**/*.sh</exclude>
+								<exclude>**/*.tpl</exclude>
+								<exclude>**/*.txt</exclude>
+								<exclude>**/*.yaml</exclude>
+								<exclude>**/.flattened-pom.xml</exclude>
+								<exclude>**/org.mockito.plugins.MockMaker</exclude>
+								<exclude>bin/runtests.java</exclude>
+								<exclude>**/package-info.java</exclude>
+								<!-- Expected generated classes -->
+								<exclude>**/src/test/resources/**/*_.java</exclude>
+							</excludes>
+						</licenseSet>
+					</licenseSets>
 					<dependencyEnforce>true</dependencyEnforce>
 					<dependencyExceptionMessage>One or more dependencies are licensed under a non-approved license.</dependencyExceptionMessage>
 					<dependencyPolicies>

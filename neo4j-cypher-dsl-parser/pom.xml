@@ -114,7 +114,11 @@
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<configuration combine.self="append">
-					<header>etc/license-gpl.tpl</header>
+					<licenseSets>
+						<licenseSet>
+							<header>etc/license-gpl.tpl</header>
+						</licenseSet>
+					</licenseSets>
 				</configuration>
 			</plugin>
 			<!--

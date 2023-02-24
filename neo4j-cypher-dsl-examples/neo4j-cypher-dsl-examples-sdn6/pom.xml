@@ -150,7 +150,6 @@
 					</execution>
 				</executions>
 				<configuration>
-					<header>etc/license-gpl.tpl</header>
 					<strictCheck>true</strictCheck>
 					<mapping>
 						<factories>SCRIPT_STYLE</factories>
@@ -158,12 +157,18 @@
 					<properties>
 						<year>2022</year>
 					</properties>
-					<includes>
-						<include>**</include>
-					</includes>
-					<excludes>
-						<exclude>**/.flattened-pom.xml</exclude>
-					</excludes>
+					<licenseSets>
+						<licenseSet>
+							<header>etc/license-gpl.tpl</header>
+							<includes>
+								<include>**</include>
+							</includes>
+							<excludes>
+								<exclude>**/.flattened-pom.xml</exclude>
+								<exclude>**/*.cypher</exclude>
+							</excludes>
+						</licenseSet>
+					</licenseSets>
 					<dependencyEnforce>true</dependencyEnforce>
 					<dependencyExceptionMessage>One or more dependencies are licensed under a non-approved license.</dependencyExceptionMessage>
 					<dependencyPolicies>
