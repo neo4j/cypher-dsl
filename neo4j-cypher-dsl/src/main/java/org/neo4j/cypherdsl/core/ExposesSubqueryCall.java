@@ -87,7 +87,7 @@ public interface ExposesSubqueryCall {
 	}
 
 	/**
-	 * The {@link Statement subquery} parameter must be a valid subquery.
+	 * The {@link Statement subquery} parameter must be a valid sub-query.
 	 * <ul>
 	 * <li>must end with a RETURN clause</li>
 	 * <li>cannot refer to variables from the enclosing query</li>
@@ -95,9 +95,10 @@ public interface ExposesSubqueryCall {
 	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
 	 * </ul>
 	 *
-	 * @param statement The statement representing the subquery.
-	 * @param imports   Additional things that should be imported into the subquery. {@link AliasedExpression aliased expressions}
-	 *                  will automatically imported twice (once as WITH a, then WITH a AS alias).
+	 * @param statement The statement representing the sub-query.
+	 * @param imports   Additional things that  should be imported into the sub-query.  {@link AliasedExpression aliased
+	 *                  expressions} will automatically be  importe twice (once as {@code WITH a}, then  {code WITH a AS
+	 *                  alias}).
 	 * @return An ongoing reading
 	 * @since 2021.3.0
 	 */

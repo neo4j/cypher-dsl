@@ -40,6 +40,7 @@ import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
@@ -228,7 +229,7 @@ public final class ScopingStrategy {
 	}
 
 	private static boolean hasImplicitScope(Visitable visitable) {
-		return visitable instanceof CountExpression || visitable instanceof Statement.UnionQuery;
+		return visitable instanceof CountExpression || visitable instanceof ExistentialSubquery || visitable instanceof Statement.UnionQuery;
 	}
 
 	private void leaveStatement(Visitable visitable) {

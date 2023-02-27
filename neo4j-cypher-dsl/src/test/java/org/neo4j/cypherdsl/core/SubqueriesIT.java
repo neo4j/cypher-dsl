@@ -224,6 +224,30 @@ class SubqueriesIT {
 	@Nested
 	class ExistentialSubqueries {
 
+		@Test // GH-578
+		void fullStatementsAsExistentialSubQuery() {
+
+			Node p = Cypher.node("Person").named("person");
+			Statement inner = Cypher.match(p.relationshipTo(Cypher.node("Dog"), "HAS_DOG")).returning(p.property("name")).build();
+			Statement outer = Cypher.match(p).where(Predicates.exists(inner)).returning(p.property("name").as("name")).build();
+
+			String cypher = outer.getCypher();
+			assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE EXISTS { MATCH (person)-[:`HAS_DOG`]->(:`Dog`) RETURN person.name } RETURN person.name AS name");
+		}
+
+		@Test // GH-578
+		void fullStatementsAsExistentialSubQueryWithImports() {
+
+			Node p = Cypher.node("Person").named("person");
+			Node d = Cypher.node("Dog").named("d");
+			SymbolicName dogName = Cypher.name("dogName");
+			Statement inner = Cypher.match(p.relationshipTo(d, "HAS_DOG")).where(d.property("name").eq(dogName)).returning(p.property("name")).build();
+			Statement outer = Cypher.match(p).where(Predicates.exists(inner, Cypher.literalOf("Ozzy").as(dogName))).returning(p.property("name").as("name")).build();
+
+			String cypher = outer.getCypher();
+			assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE EXISTS { WITH 'Ozzy' AS dogName MATCH (person)-[:`HAS_DOG`]->(d:`Dog`) WHERE d.name = dogName RETURN person.name } RETURN person.name AS name");
+		}
+
 		@Test
 		void simple() {
 

@@ -73,7 +73,7 @@ public final class Expressions {
 	 */
 	@NotNull
 	public static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
-		return new CountExpression(null, Pattern.of(requiredPattern, patternElement), null);
+		return CountExpression.count(Pattern.of(requiredPattern, patternElement));
 	}
 
 	/**
@@ -85,7 +85,22 @@ public final class Expressions {
 	 */
 	@NotNull
 	public static CountExpression count(UnionQuery union) {
-		return new CountExpression(null, union, null);
+		return CountExpression.count(union);
+	}
+
+	/**
+	 * Creates a {@literal COUNT} from a full statement, including  its filters and conditions. The statement may or may
+	 * not have a {@literal RETURN} clause. It must however not contain any updates. While it would render syntactically
+	 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
+	 *
+	 * @param statement The statement to be passed to {@code count{}}
+	 * @param imports   Optional imports to be used in the statement (will be imported with {@literal WITH})
+	 * @return A counting sub-query.
+	 * @since 2023.1.0
+	 */
+	@NotNull
+	public static CountExpression count(Statement statement, IdentifiableElement... imports) {
+		return CountExpression.count(statement, imports);
 	}
 
 	/**
@@ -114,12 +129,12 @@ public final class Expressions {
 		return new SubqueryExpressionBuilder() {
 			@Override @NotNull
 			public CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
-				return new CountExpression(with, Pattern.of(requiredPattern, patternElement), null);
+				return CountExpression.count(with, Pattern.of(requiredPattern, patternElement));
 			}
 
 			@Override @NotNull
 			public CountExpression count(UnionQuery union) {
-				return new CountExpression(with, union, null);
+				return CountExpression.count(with, union);
 			}
 		};
 	}

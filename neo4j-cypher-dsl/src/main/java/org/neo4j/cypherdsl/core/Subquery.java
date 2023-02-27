@@ -21,16 +21,12 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
-import java.util.Arrays;
-
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
-import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * Represents a "callable" subquery. A subquery can contain statement that returns something (standard statements, union
- * statements and calls to stored procedures, yielding their elements). Subqueries can be nested.
+ * Represents a  "callable" sub-query. A  sub-query can contain statement  that returns something  (standard statements,
+ * union statements and calls to stored procedures, yielding their elements). Sub-queries can be nested.
  *
  * @author Michael J. Simons
  * @soundtrack Die Ärzte - Seitenhirsch
@@ -41,16 +37,15 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @Neo4jVersion(minimum = "4.0.0")
 public final class Subquery extends AbstractClause implements Clause {
 
-	private final With imports;
-	private final With renames;
+	private ImportingWith importingWith;
 	private final Statement statement;
 
 	/**
 	 * The {@code statement} must return elements, either through a {@literal RETURN} or {@literal YIELD} clause.
 	 *
-	 * @param statement The statement to wrap into a subquery.
+	 * @param statement The statement to wrap into a sub-query.
 	 * @param imports   additional imports
-	 * @return A subquery.
+	 * @return A sub-query.
 	 */
 	static Subquery call(Statement statement, IdentifiableElement... imports) {
 		return call(statement, false, imports);
@@ -59,10 +54,11 @@ public final class Subquery extends AbstractClause implements Clause {
 	/**
 	 * The {@code statement} must return elements, either through a {@literal RETURN} or {@literal YIELD} clause.
 	 *
-	 * @param statement      The statement to wrap into a subquery.
-	 * @param skipAssertions Set to true to skip assertions about the statement that should make up the subquery. This comes in handy
-	 *                       when building a statement based on a list of flat clauses and not through the fluent api.
-	 * @return A subquery.
+	 * @param statement      The statement to wrap into a sub-query.
+	 * @param skipAssertions Set to true to skip assertions about the  statement that should make up the sub-query. This
+	 *                       comes in handy  when building a statement based  on a list of flat clauses  and not through
+	 *                       the fluent api.
+	 * @return A sub-query.
 	 */
 	static Subquery call(Statement statement, boolean skipAssertions, IdentifiableElement... imports) {
 
@@ -73,35 +69,11 @@ public final class Subquery extends AbstractClause implements Clause {
 			}
 		}
 
-		With optionalImports = null;
-		With optionalRenames = null;
-		if (imports.length > 0) {
-			ExpressionList returnItems = new ExpressionList(Arrays.stream(imports)
-				.map(i -> {
-					if (i instanceof AliasedExpression aliasedExpression) {
-						return aliasedExpression.getDelegate();
-					} else {
-						return i.asExpression();
-					}
-				})
-				.toList());
-
-			optionalImports = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
-
-			returnItems = new ExpressionList(Arrays.stream(imports)
-				.filter(AliasedExpression.class::isInstance)
-				.map(Expression.class::cast)
-				.toList());
-
-			optionalRenames = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
-		}
-
-		return new Subquery(optionalImports, optionalRenames, statement);
+		return new Subquery(ImportingWith.of(imports), statement);
 	}
 
-	private Subquery(@Nullable With imports, @Nullable With renames, Statement statement) {
-		this.imports = imports;
-		this.renames = renames;
+	private Subquery(ImportingWith importingWith, Statement statement) {
+		this.importingWith = importingWith;
 		this.statement = statement;
 	}
 
@@ -109,8 +81,7 @@ public final class Subquery extends AbstractClause implements Clause {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		Visitable.visitIfNotNull(this.imports, visitor);
-		Visitable.visitIfNotNull(this.renames, visitor);
+		this.importingWith.accept(visitor);
 		statement.accept(visitor);
 		visitor.leave(this);
 	}
@@ -121,7 +92,7 @@ public final class Subquery extends AbstractClause implements Clause {
 	}
 
 	/**
-	 * @return {@literal true} if this subquery yields any items
+	 * @return {@literal true} if this sub-query yields any items
 	 */
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
