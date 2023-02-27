@@ -1,0 +1,95 @@
+== 2023.1
+
+=== 2023.1.0
+
+2023.1.0 is the first feat release after 2023.0.0 and contains several ideas and improvements that stem from https://github.com/neo4j-contrib/sql2cypher[sql2cypher] and from input by @lukaseder. Thank you!
+
+Additionally, we worked again with @ikwattro from https://graphaware.com[Graph Aware] on building the catalog feature. Each statement - regardless of being built or parsed with the Cypher-DSL - can be analyzed via it's catalog now. The catalog will contain labels, types and properties used in a statement and the filters created based on those tokens. You can access the catalog like this:
+
+[source,java]
+----
+var input = """
+    MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`)
+    WHERE p.born >= $born
+    RETURN p
+    """;
+var statement = CypherParser.parse(input);
+
+var catalog = statement.getCatalog();
+----
+
+Also: All AST elements will now render themselves to Cypher-Fragments when used in `toString()` scenarios. Apart from that, all bug fixes and dependency upgrades from 2022.8.5 and 2023.0.4 are included:
+
+==== 🚀 Features
+
+* Add overloads for `count` and `exists` taking in a statement and optional imports. (#623)
+* Add label existences conditions to catalog. (#622)
+* Provide a catalog for identifiable items in a statement. (#617)
+* Allow retrieving parameter names
+* Add missing string functions. (#584)
+* Add support for rewriting the `MATCH` clause after parsing. (#580)
+* Add `length()` function. (#569)
+* Allow direct rendering of `Visitable` objects. (#554)
+
+==== 🐛 Bug Fixes
+
+* Correctly shadow visible nodes in a subquery. (#616)
+* Parse Node pattern predicates correctly. (#615)
+* Ensure getting the type of relationships without type is safe.
+* Apply prefixes after potential separator. (#606)
+* Resolve symbolic names when looking for visited items. (#602)
+* Open implicit scope when entering a `UNION` clause. (#590)
+* Move resolved symbolic names into `StatementContext`. (#586)
+* Add support for label expressions. (#583)
+* Correctly track identifiable elements. (#579)
+
+==== 🔄️ Refactorings
+
+* Replace `requires static transitive` with `requires static`.
+* Allow covariant collection overloads for `PatternElement` and `Expression` where sensible. (#566)
+
+==== 📖 Documentation
+
+* Fix title.
+* Improve JavaDoc.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j-java-driver from 5.5.0 to 5.6.0 (#621)
+** Bump spring-boot-starter-parent from 3.0.2 to 3.0.3 (#619)
+** Bump checkstyle from 10.7.0 to 10.8.0 (#620)
+** Bump spring-data-neo4j from 7.0.1 to 7.0.2 (#614)
+** Bump maven-surefire-plugin from 3.0.0-M8 to 3.0.0-M9 (#613)
+** Bump maven-failsafe-plugin from 3.0.0-M8 to 3.0.0-M9 (#612)
+** Bump checker-qual from 3.30.0 to 3.31.0 (#611)
+** Bump reactor-bom from 2022.0.2 to 2022.0.3 (#610)
+** Bump native-maven-plugin from 0.9.19 to 0.9.20 (#608)
+** Bump maven-javadoc-plugin from 3.4.1 to 3.5.0 (#607)
+** Bump neo4j-cypher-javacc-parser from 5.4.0 to 5.5.0 (#609)
+** Bump maven-deploy-plugin from 3.0.0 to 3.1.0 (#603)
+** Bump checker-qual from 3.29.0 to 3.30.0 (#601)
+** Bump maven-enforcer-plugin from 3.1.0 to 3.2.1 (#600)
+** Bump mockito.version from 5.0.0 to 5.1.1 (#599)
+** Bump checkstyle from 10.6.0 to 10.7.0 (#598)
+** Bump asciidoctorj-diagram from 2.2.3 to 2.2.4 (#597)
+** Bump jackson-bom from 2.14.1 to 2.14.2 (#594)
+** Bump neo4j-java-driver from 5.4.0 to 5.5.0 (#592)
+** Bump neo4j-cypher-javacc-parser from 5.3.0 to 5.4.0 (#593)
+** Bump spring-boot-starter-parent from 3.0.1 to 3.0.2 (#577)
+** Bump assertj-core from 3.24.1 to 3.24.2 (#576)
+** Bump maven-checkstyle-plugin from 3.2.0 to 3.2.1 (#564)
+** Bump junit-bom from 5.9.1 to 5.9.2 (#563)
+** Bump maven-failsafe-plugin from 3.0.0-M7 to 3.0.0-M8 (#560)
+** Bump reactor-bom from 2022.0.1 to 2022.0.2 (#559)
+** Bump mockito.version from 4.11.0 to 5.0.0 (#558)
+** Bump annotations from 23.1.0 to 24.0.0 (#557)
+** Bump jna from 5.12.1 to 5.13.0 (#556)
+** Bump maven-surefire-plugin from 3.0.0-M7 to 3.0.0-M8 (#555)
+** Bump spring-data-neo4j from 7.0.0 to 7.0.1 (#562)
+** Bump neo4j-java-driver from 5.3.1 to 5.4.0 (#561)
+
+==== 🛠 Build
+
+* Improve configuration of the license plugin.
+* Move the fixed `module-info.java` somewhere out of IDEAs reach.
