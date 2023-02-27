@@ -1,5 +1,19 @@
 == 2022.8
 
+=== 2022.8.5
+
+==== 🐛 Bug Fixes
+
+* Apply prefixes after potential separator. (#606)
+
+==== 🔄️ Refactorings
+
+* Ensure getting the type of relationships without type is safe.
+
+==== 🛠 Build
+
+* Use `inputEncoding` for configuring checkstyle encoding.
+
 === 2022.8.4
 
 ==== 🐛 Bug Fixes
