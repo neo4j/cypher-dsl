@@ -63,6 +63,23 @@ public final class Predicates {
 	}
 
 	/**
+	 * Creates                  a                 new                  condition                 via                  an
+	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
+	 * sub-query</a>. The statement may or  may not have  a {@literal  RETURN} clause. It  must however not  contain any
+	 * updates. While it  would render syntactically correct  Cypher, Neo4j does not support  updates inside existential
+	 * sub-queries.
+	 *
+	 * @param statement The statement to be passed to {@code exists{}}
+	 * @param imports   Optional imports to be used in the statement (will be imported with {@literal WITH})
+	 * @return An existential sub-query.
+	 * @since 2023.1.0
+	 */
+	public static Condition exists(Statement statement, IdentifiableElement... imports) {
+
+		return ExistentialSubquery.exists(statement, imports);
+	}
+
+	/**
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code all()} predicate function
 	 * @see #all(SymbolicName)

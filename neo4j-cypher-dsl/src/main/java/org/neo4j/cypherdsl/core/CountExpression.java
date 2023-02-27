@@ -38,19 +38,32 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @Neo4jVersion(minimum = "5.0")
 public final class CountExpression implements SubqueryExpression, ExposesWhere<Expression> {
 
-	private final With optionalWith;
+	private final ImportingWith optionalWith;
 
 	private final Visitable patternOrUnion;
 
 	private final Where optionalWhere;
 
-	CountExpression(@Nullable With optionalWith, Visitable patternOrUnion, @Nullable Where optionalWhere) {
+	static CountExpression count(Statement statement, IdentifiableElement... imports) {
+
+		return new CountExpression(ImportingWith.of(imports), statement, null);
+	}
+
+	static CountExpression count(Visitable patternOrUnion) {
+		return new CountExpression(new ImportingWith(), patternOrUnion, null);
+	}
+
+	static CountExpression count(@Nullable With optionalWith, Visitable patternOrUnion) {
+		return new CountExpression(new ImportingWith(optionalWith, null), patternOrUnion, null);
+	}
+
+	private CountExpression(ImportingWith optionalWith, Visitable patternOrUnion, @Nullable Where optionalWhere) {
 
 		if (patternOrUnion instanceof Statement.UnionQuery && optionalWhere != null) {
 			throw new IllegalArgumentException("Cannot use a UNION with a WHERE clause inside a COUNT {} expression");
 		}
 		this.optionalWith = optionalWith;
-		if (optionalWith != null && patternOrUnion instanceof Pattern pattern) {
+		if (optionalWith.imports() != null && patternOrUnion instanceof Pattern pattern) {
 			this.patternOrUnion = new Match(false, pattern, optionalWhere, null);
 			this.optionalWhere = null;
 		} else {
@@ -68,6 +81,9 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 	@NotNull @Contract(pure = true)
 	public CountExpression where(Condition condition) {
 
+		if (patternOrUnion instanceof Statement) {
+			throw new IllegalArgumentException("This count expression is build upon a full statement, adding a condition to it is not supported.");
+		}
 		var exisitingPatternOrUnion = patternOrUnion instanceof Match match ? match.pattern : patternOrUnion;
 		return new CountExpression(optionalWith, exisitingPatternOrUnion, new Where(condition));
 	}
@@ -76,9 +92,7 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		if (optionalWith != null) {
-			this.optionalWith.accept(visitor);
-		}
+		this.optionalWith.accept(visitor);
 		this.patternOrUnion.accept(visitor);
 		if (optionalWhere != null) {
 			this.optionalWhere.accept(visitor);

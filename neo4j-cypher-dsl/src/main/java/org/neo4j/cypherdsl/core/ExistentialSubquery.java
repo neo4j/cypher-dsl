@@ -21,11 +21,12 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * An existential subquery can only be used in a where clause. The subquery must consisted only of a match statement
- * which may have a {@code WHERE} clause on its own but is not not allowed to return anything.
+ * An existential sub-query  can only be used in  a where clause. The  sub-query must consist only of  a match statement
+ * which may have a {@code WHERE} clause on its own but is not allowed to return anything.
  *
  * @author Michael J. Simons
  * @soundtrack Die Ärzte - Seitenhirsch
@@ -41,16 +42,28 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 		return new ExistentialSubquery(fragment);
 	}
 
-	private final Match fragment;
+	static Condition exists(Statement statement, IdentifiableElement... imports) {
+		return new ExistentialSubquery(statement, imports);
+	}
+
+	private final Visitable fragment;
+	private final ImportingWith importingWith;
 
 	ExistentialSubquery(Match fragment) {
 		this.fragment = fragment;
+		this.importingWith = new ImportingWith();
+	}
+
+	ExistentialSubquery(Statement statement, IdentifiableElement... imports) {
+		this.fragment = statement;
+		this.importingWith = ImportingWith.of(imports);
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
+		importingWith.accept(visitor);
 		fragment.accept(visitor);
 		visitor.leave(this);
 	}

@@ -166,4 +166,28 @@ class ExpressionsIT {
 			"END AS result"
 		);
 	}
+
+	@Test // GH-578
+	void fullStatementsAsCountSubQuery() {
+
+		Node p = Cypher.node("Person").named("person");
+		Statement inner = Cypher.match(p.relationshipTo(Cypher.node("Dog"), "HAS_DOG")).returning(p.property("name")).build();
+		Statement outer = Cypher.match(p).where(Expressions.count(inner).eq(Cypher.literalOf(1))).returning(p.property("name").as("name")).build();
+
+		String cypher = outer.getCypher();
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE COUNT { MATCH (person)-[:`HAS_DOG`]->(:`Dog`) RETURN person.name } = 1 RETURN person.name AS name");
+	}
+
+	@Test // GH-578
+	void fullStatementsAsCountSubQueryWithImports() {
+
+		Node p = Cypher.node("Person").named("person");
+		Node d = Cypher.node("Dog").named("d");
+		SymbolicName dogName = Cypher.name("dogName");
+		Statement inner = Cypher.match(p.relationshipTo(d, "HAS_DOG")).where(d.property("name").eq(dogName)).returning(p.property("name")).build();
+		Statement outer = Cypher.match(p).where(Expressions.count(inner, Cypher.literalOf("Ozzy").as(dogName)).eq(Cypher.literalOf(1))).returning(p.property("name").as("name")).build();
+
+		String cypher = outer.getCypher();
+		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE COUNT { WITH 'Ozzy' AS dogName MATCH (person)-[:`HAS_DOG`]->(d:`Dog`) WHERE d.name = dogName RETURN person.name } = 1 RETURN person.name AS name");
+	}
 }
