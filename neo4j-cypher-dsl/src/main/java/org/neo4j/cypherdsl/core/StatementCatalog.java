@@ -129,7 +129,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 *
 	 * @return A map of all filters.
 	 */
-	default Collection<? extends Filter> getAllFilters() {
+	default Collection<Filter> getAllFilters() {
 		Set<Filter> result = new HashSet<>(this.getAllLabelFilters());
 		this.getAllPropertyFilters().forEach((p, f) -> result.addAll(f));
 		return result;
