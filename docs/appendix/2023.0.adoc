@@ -1,4 +1,30 @@
-== 2022.8
+== 2023.0
+
+=== 2023.0.4
+
+2023.0.4 is a bug fix release and fully compatible with 2023.0.3.
+
+==== 🐛 Bug Fixes
+
+* Correctly shadow visible nodes in a subquery. (#616)
+* Parse Node pattern predicates correctly. (#615)
+* Ensure getting the type of relationships without type is safe.
+* Apply prefixes after potential separator. (#606)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j-java-driver from 5.5.0 to 5.6.0 (#621)
+** Bump spring-boot-starter-parent from 3.0.2 to 3.0.3 (#619)
+** Bump checkstyle from 10.7.0 to 10.8.0 (#620)
+** Bump spring-data-neo4j from 7.0.0 to 7.0.2 (#614)
+** Bump maven-surefire-plugin from 3.0.0-M8 to 3.0.0-M9 (#613)
+** Bump maven-failsafe-plugin from 3.0.0-M8 to 3.0.0-M9 (#612)
+** Bump checker-qual from 3.30.0 to 3.31.0 (#611)
+** Bump reactor-bom from 2022.0.1 to 2022.0.3 (#610)
+** Bump native-maven-plugin from 0.9.19 to 0.9.20 (#608)
+** Bump maven-javadoc-plugin from 3.4.1 to 3.5.0 (#607)
+** Bump neo4j-cypher-javacc-parser from 5.4.0 to 5.5.0 (#609)
 
 === 2023.0.3
 
