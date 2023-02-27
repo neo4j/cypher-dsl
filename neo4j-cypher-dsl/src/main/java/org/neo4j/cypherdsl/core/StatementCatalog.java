@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -38,7 +39,7 @@ import java.util.stream.Collectors;
  * in the catalog.
  * <p>
  * In addition, this interface provides the namespace for all  elements that are represented as non-AST elements as part
- * of a catalog, such as the {@link Property properties} and {@link Condition property conditions}.
+ * of a catalog, such as the {@link Property properties} and {@link PropertyFilter property conditions}.
  * <p>
  * Any instance of a {@link StatementCatalog catalog} and its contents can be safely assumed to be immutable.
  *
@@ -124,20 +125,38 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	Collection<Property> getProperties();
 
 	/**
+	 * Returns a collection all filters resolved in the analyzed statement.
+	 *
+	 * @return A map of all filters.
+	 */
+	default Collection<? extends Filter> getAllFilters() {
+		Set<Filter> result = new HashSet<>(this.getAllLabelFilters());
+		this.getAllPropertyFilters().forEach((p, f) -> result.addAll(f));
+		return result;
+	}
+
+	/**
+	 * Returns a collection of all filters that checked for the existence of labels.
+	 *
+	 * @return A collection of all label filters
+	 */
+	Collection<LabelFilter> getAllLabelFilters();
+
+	/**
 	 * Returns a map that contains all properties that have been used in a comparing condition as keys and a set of all
 	 * comparisons they appeared in.
 	 *
 	 * @return A map of all properties used in comparisons
 	 */
-	Map<Property, Collection<Condition>> getAllConditions();
+	Map<Property, Collection<PropertyFilter>> getAllPropertyFilters();
 
 	/**
-	 * Returns a collection of all property based conditions in the statement involving the resolved properties.
+	 * Returns a collection of all property based filters in the statement involving the resolved properties.
 	 *
 	 * @return A collection of all conditions involving properties resolved in the statement
 	 */
-	default Collection<Condition> getConditions(Property property) {
-		return getAllConditions().get(property);
+	default Collection<PropertyFilter> getFilters(Property property) {
+		return getAllPropertyFilters().get(property);
 	}
 
 	/**
@@ -261,6 +280,27 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	}
 
 	/**
+	 * This     interface     represents    all     kinds     of     filters    in     a     query     such    as     <a
+	 * href="https://neo4j.com/docs/cypher-manual/current/clauses/where/#filter-on-node-label">filters   on   labels</a>
+	 * and   <a  href="https://neo4j.com/docs/cypher-manual/current/clauses/where/#filter-on-node-property">filters   on
+	 * properties</a>.
+	 */
+	sealed interface Filter permits LabelFilter, PropertyFilter {
+	}
+
+	/**
+	 * This type represents a filter on nodes requiring one or more labels.
+	 *
+	 * @param symbolicName The symbolic name used when creating the filter
+	 * @param value        The set of tokens that made up this filter
+	 */
+	record LabelFilter(String symbolicName, Set<Token> value) implements Filter {
+		public LabelFilter {
+			value = Set.copyOf(value);
+		}
+	}
+
+	/**
 	 * This type  encapsulates a comparison in  which a property  of a node or  relationship was used. The  property may
 	 * appear on the  left hand side or right hand  side or even on both  side of the comparison (think being  used in a
 	 * function on both sides with different arguments). The  {@code clause} attribute will specify the context in which
@@ -283,9 +323,9 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 * @param parameters     Parameters with defined values used in this comparison
 	 *                       (analoge to {@link Statement#getParameters()}
 	 */
-	record Condition(Clause clause, Expression left, Operator operator, Expression right, Set<String> parameterNames,
+	record PropertyFilter(Clause clause, Expression left, Operator operator, Expression right, Set<String> parameterNames,
 		Map<String, Object> parameters
-	) {
+	) implements Filter {
 
 		/**
 		 * The constructor enforces the use of unmodifiable sets.
@@ -299,41 +339,41 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 		 * @param parameters     Parameters with defined values used in this comparison
 		 *                       (analoge to {@link Statement#getParameters()}
 		 */
-		public Condition {
+		public PropertyFilter {
 			parameterNames = Set.copyOf(parameterNames);
 			parameters = Map.copyOf(parameters);
 		}
+	}
 
+	/**
+	 * Enum for the clause in which a comparison was made.
+	 */
+	enum Clause {
 		/**
-		 * Enum for the clause in which a comparison was made.
+		 * The comparison was used in a {@code MATCH} clause.
 		 */
-		public enum Clause {
-			/**
-			 * The comparison was used in a {@code MATCH} clause.
-			 */
-			MATCH,
-			/**
-			 * The comparison was used in a {@code CREATE} clause.
-			 */
-			CREATE,
-			/**
-			 * The comparison was used in a {@code MERGE} clause.
-			 */
-			MERGE,
-			/**
-			 * The comparison was used in a {@code DELETE} clause.
-			 */
-			DELETE,
-			/**
-			 * The comparison was used in a {@code WITH} clause. The {@code WITH} clause is different to the {@code WHERE}
-			 * clause as here "WHERE simply filters the results."
-			 * (quoting from <a href="https://neo4j.com/docs/cypher-manual/current/clauses/where/">where</a>).
-			 */
-			WITH,
-			/**
-			 * Used in case the analysis could not determine a clause.
-			 */
-			UNKNOWN
-		}
+		MATCH,
+		/**
+		 * The comparison was used in a {@code CREATE} clause.
+		 */
+		CREATE,
+		/**
+		 * The comparison was used in a {@code MERGE} clause.
+		 */
+		MERGE,
+		/**
+		 * The comparison was used in a {@code DELETE} clause.
+		 */
+		DELETE,
+		/**
+		 * The comparison was used in a {@code WITH} clause. The {@code WITH} clause is different to the {@code WHERE}
+		 * clause as here "WHERE simply filters the results."
+		 * (quoting from <a href="https://neo4j.com/docs/cypher-manual/current/clauses/where/">where</a>).
+		 */
+		WITH,
+		/**
+		 * Used in case the analysis could not determine a clause.
+		 */
+		UNKNOWN
 	}
 }

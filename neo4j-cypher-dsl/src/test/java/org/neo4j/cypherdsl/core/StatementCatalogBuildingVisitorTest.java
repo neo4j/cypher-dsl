@@ -58,4 +58,29 @@ class StatementCatalogBuildingVisitorTest {
 		var cypher = statement.getCypher();
 		assertThat(cypher).isEqualTo("MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`) WHERE p.born >= $born RETURN p");
 	}
+
+	@Test
+	void labelFiltersShouldWork() {
+		var n = Cypher.node("Person").withProperties("name", Cypher.literalOf("John Doe")).named("n");
+		var m = Cypher.node("Person").named("m");
+
+		var statement = Cypher.match(n.relationshipTo(m, "IS_FRIEND_WITH"))
+			.where(n.hasLabels("Active")).and(m.hasLabels("Kind", "Positive").and(m.property("name").eq(Cypher.literalOf("Jane"))))
+			.returning(Cypher.asterisk())
+			.build();
+		var cypher = statement.getCypher();
+		assertThat(cypher).isEqualTo("MATCH (n:`Person` {name: 'John Doe'})-[:`IS_FRIEND_WITH`]->(m:`Person`) WHERE (n:`Active` AND m:`Kind`:`Positive` AND m.name = 'Jane') RETURN *");
+
+		var catalog = statement.getCatalog();
+		var expectedLabelFilters = Set.of(
+			new StatementCatalog.LabelFilter("n", Set.of(StatementCatalog.label("Active"))),
+			new StatementCatalog.LabelFilter("m", Set.of(StatementCatalog.label("Kind"), StatementCatalog.label("Positive")))
+		);
+		assertThat(catalog.getAllFilters())
+			.hasSize(4)
+			.filteredOn(StatementCatalog.LabelFilter.class::isInstance)
+			.map(StatementCatalog.LabelFilter.class::cast)
+			.containsExactlyInAnyOrderElementsOf(expectedLabelFilters);
+		assertThat(catalog.getAllLabelFilters()).containsExactlyInAnyOrderElementsOf(expectedLabelFilters);
+	}
 }

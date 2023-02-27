@@ -67,7 +67,7 @@ public class Application {
 			.map(SymbolicName::getValue)
 			.sorted()
 			.forEach(System.out::println);
-		catalog.getAllConditions()
+		catalog.getAllPropertyFilters()
 			.entrySet()
 			.stream().sorted(Comparator.comparing(o -> o.getKey().name()))
 			.forEach(e -> System.out.println(e.getKey().name() + ": " + e.getValue().stream().limit(1).map(cc -> cc.right().toString()).collect(Collectors.joining())));

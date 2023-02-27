@@ -32,7 +32,7 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.StatementCatalog.Property;
-import org.neo4j.cypherdsl.core.StatementCatalog.Condition.Clause;
+import org.neo4j.cypherdsl.core.StatementCatalog.Clause;
 import org.neo4j.cypherdsl.core.StatementCatalog.Token;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
@@ -67,7 +67,7 @@ class ExtractionIT {
 		assertThat(catalog.getProperties()).containsExactlyInAnyOrderElementsOf(testData.expectedProperties());
 		if (testData.expectedComparisons != null) {
 			for (TestDataComparison expectedComparison : testData.expectedComparisons()) {
-				assertThat(catalog.getConditions(expectedComparison.property())).allMatch(v -> testData.expectedComparisons().contains(
+				assertThat(catalog.getFilters(expectedComparison.property())).allMatch(v -> testData.expectedComparisons().contains(
 					new TestDataComparison(v.clause(), expectedComparison.property, v.left() == null ? null : RENDERER.render(v.left()), v.operator(), v.right() == null ? null : RENDERER.render(v.right()), v.parameterNames())
 				));
 			}
