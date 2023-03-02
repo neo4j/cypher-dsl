@@ -1571,4 +1571,22 @@ class IssueRelatedIT {
 		String cypher = statement.getCypher();
 		assertThat(cypher).isEqualTo(expected);
 	}
+
+	@Test
+	void manipulatingListExpressionsShouldBePossible() {
+		var n = Cypher.node("Person").named("n");
+		var x = Cypher.name("x");
+		var rolesToAdd = Cypher.parameter("rolesToAdd");
+		var rolesToRemove = Cypher.parameter("rolesToRemove");
+		var cypher = Cypher.match(n)
+			.returning(
+				Cypher.listWith(x)
+					.in(n.property("roles"))
+					.where(x.in(rolesToAdd).and(Conditions.not(x.in(rolesToRemove))))
+					.returning().add(rolesToAdd)
+			)
+			.build()
+			.getCypher();
+		assertThat(cypher).isEqualTo("MATCH (n:`Person`) RETURN ([x IN n.roles WHERE (x IN $rolesToAdd AND NOT (x IN $rolesToRemove))] + $rolesToAdd)");
+	}
 }
