@@ -117,13 +117,13 @@
 				<executions>
 					<execution>
 						<id>remove-shaded-modules</id>
+						<phase>generate-sources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
 							<executable>bin/remove-shaded-modules.sh</executable>
 						</configuration>
-						<phase>generate-sources</phase>
 					</execution>
 				</executions>
 			</plugin>

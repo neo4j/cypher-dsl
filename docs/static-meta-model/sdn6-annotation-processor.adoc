@@ -5,7 +5,7 @@ We provide a Java annotation processor for https://docs.spring.io/spring-data/ne
 [source,subs="verbatim,attributes",indent=0,tabsize=4]
 .Coordinates of the SDN 6 annotation processor
 ----
-{groupId}:neo4j-cypher-dsl-codegen-sdn6:{neo4j-cypher-dsl-version}
+{groupId}:neo4j-cypher-dsl-codegen-sdn6:{the-version}
 ----
 
 The annotation processor understands classes annotated with `@Node` and `@RelationshipProperties`.
@@ -55,7 +55,7 @@ In a Gradle project, please add the following:
 [source,groovy,subs="verbatim,attributes"]
 ----
 dependencies {
-    annotationProcessor '{groupId}:neo4j-cypher-dsl-codegen-sdn6:{neo4j-cypher-dsl-version}'
+    annotationProcessor '{groupId}:neo4j-cypher-dsl-codegen-sdn6:{the-version}'
 }
 ----
 

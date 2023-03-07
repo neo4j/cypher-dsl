@@ -10,12 +10,21 @@ Gerrit Meier <gerrit.meier@neo4j.com>; Michael Simons <michael.simons@neo4j.com>
 :sectanchors: true
 :numbered: true
 :xrefstyle: short
+:use-latest-version-for-docs: 0
 
 ifndef::manualIncludeDir[]
 :manualIncludeDir: ../
 endif::[]
 
 include::{manualIncludeDir}/README.adoc[tags=properties]
+
+ifeval::[{use-latest-version-for-docs} == 1]
+:the-version: {neo4j-cypher-dsl-version-latest}
+endif::[]
+
+ifeval::[{use-latest-version-for-docs} == 0]
+:the-version: {neo4j-cypher-dsl-version}
+endif::[]
 
 :copyright: 2020 Neo4j, Inc.,
 :gh-base: https://github.com/neo4j/sdn-rx
@@ -29,7 +38,7 @@ include::{manualIncludeDir}/README.adoc[tags=properties]
 
 [abstract]
 --
-This is the Neo4j Cypher-DSL manual version {neo4j-cypher-dsl-version}.
+This is the Neo4j Cypher-DSL manual version {the-version}.
 --
 
 _Who should read this?_

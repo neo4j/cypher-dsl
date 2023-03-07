@@ -32,7 +32,7 @@ jobs:
           java-version: 17
       - name: Run docs generation
         run: >
-          ./mvnw --no-transfer-progress asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} &&
+          ./mvnw --no-transfer-progress asciidoctor:process-asciidoc@generate-docs -pl org.neo4j:neo4j-cypher-dsl-parent -Dproject.build.docs=target/gh-pages/${refName} -Duse-latest-version-for-docs=`[ $refName = "main" ] && echo "0" || echo "1"` &&
           ./mvnw --no-transfer-progress site -pl org.neo4j:neo4j-cypher-dsl-build-proc -pl org.neo4j:neo4j-cypher-dsl -am &&
           rm -rf target/gh-pages/${refName}/project-info &&
           mv neo4j-cypher-dsl/target/site target/gh-pages/${refName}/project-info

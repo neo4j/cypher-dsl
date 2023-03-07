@@ -21,7 +21,7 @@ into elements of the Cypher-DSL. In such cases an `UnsupportedOperationException
 <dependency>
     <groupId>{groupId}</groupId>
     <artifactId>neo4j-cypher-dsl-parser</artifactId>
-    <version>{neo4j-cypher-dsl-version}</version>
+    <version>{the-version}</version>
 </dependency>
 ----
 
@@ -31,7 +31,7 @@ into elements of the Cypher-DSL. In such cases an `UnsupportedOperationException
 .Gradle variant for additional dependencies
 ----
 dependencies {
-    implementation '{groupId}:neo4j-cypher-dsl-parser:{neo4j-cypher-dsl-version}'
+    implementation '{groupId}:neo4j-cypher-dsl-parser:{the-version}'
 }
 ----
 

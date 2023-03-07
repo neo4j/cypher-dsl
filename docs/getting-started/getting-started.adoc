@@ -10,7 +10,7 @@ Please use a dependency management system. We recommend either Maven or Gradle.
 <dependency>
 	<groupId>{groupId}</groupId>
 	<artifactId>{artifactId}</artifactId>
-	<version>{neo4j-cypher-dsl-version}</version>
+	<version>{the-version}</version>
 </dependency>
 ----
 
@@ -20,7 +20,7 @@ Please use a dependency management system. We recommend either Maven or Gradle.
 .Inclusion of the Neo4j Cypher-DSL in a Gradle project
 ----
 dependencies {
-    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version}'
+    implementation '{groupId}:{artifactId}:{the-version}'
 }
 ----
 

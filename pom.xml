@@ -187,6 +187,7 @@
 		<sortpom-maven-plugin.version>2.15.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>7.0.2</spring-data-neo4j.version>
 		<testcontainers.version>1.17.6</testcontainers.version>
+		<use-latest-version-for-docs>0</use-latest-version-for-docs>
 	</properties>
 
 	<dependencyManagement>
@@ -417,11 +418,6 @@
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco-maven-plugin.version}</version>
-					<configuration>
-						<includes>
-							<include>**/*</include>
-						</includes>
-					</configuration>
 					<executions>
 						<execution>
 							<id>pre-unit-test</id>
@@ -470,6 +466,11 @@
 							</configuration>
 						</execution>
 					</executions>
+					<configuration>
+						<includes>
+							<include>**/*</include>
+						</includes>
+					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -949,8 +950,8 @@
 						<neo4j-version>${neo4j.version}</neo4j-version>
 						<neo4j-java-driver-version>${neo4j-java-driver.version}</neo4j-java-driver-version>
 						<reactor-version>${reactor.version}</reactor-version>
-						<neo4j-cypher-dsl.version>${project.version}</neo4j-cypher-dsl.version>
 						<source-highlighter>coderay</source-highlighter>
+						<use-latest-version-for-docs>${use-latest-version-for-docs}</use-latest-version-for-docs>
 					</attributes>
 					<requires>
 						<require>asciidoctor-diagram</require>
