@@ -36,10 +36,9 @@ jobs:
           ./mvnw --no-transfer-progress site -pl org.neo4j:neo4j-cypher-dsl-build-proc -pl org.neo4j:neo4j-cypher-dsl -am &&
           rm -rf target/gh-pages/${refName}/project-info &&
           mv neo4j-cypher-dsl/target/site target/gh-pages/${refName}/project-info
-      - name: Create symlink
+      - name: Update index
         if: (github.event_name == 'create' && github.event.ref_type == 'tag')
-        working-directory: ./target/gh-pages
-        run: ln -sfn ${refName} current
+        run: sed -e "s/\${current}/${refName}/g" ./etc/index.tpl > ./target/gh-pages/index.html
       - name: Commit to gh-pages
         working-directory: ./target/gh-pages
         run: |
