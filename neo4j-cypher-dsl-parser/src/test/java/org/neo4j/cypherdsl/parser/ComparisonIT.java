@@ -22,6 +22,7 @@ package org.neo4j.cypherdsl.parser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.TreeNode;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -84,22 +86,22 @@ class ComparisonIT {
 				"""
 					MATCH (n:Person {name: 'Tom Hanks'})
 					CALL {
-					  WITH n
-					  MATCH (m:Movie)<-[:ACTED_IN]-(n)
-					  WHERE (m.released >= 1900
+						WITH n
+						MATCH (m:Movie)<-[:ACTED_IN]-(n)
+						WHERE (m.released >= 1900
 						AND n.born = 1956)
-					  RETURN m
+						RETURN m
 					}
 					RETURN n.name, m.title
 					""",
 				"""
 					MATCH (v0:Person {name: 'Tom Hanks'})
 					CALL {
-					  WITH v0
-					  MATCH (v1:Movie)<-[:ACTED_IN]-(v0)
-					  WHERE (v1.released >= 1900
+						WITH v0
+						MATCH (v1:Movie)<-[:ACTED_IN]-(v0)
+						WHERE (v1.released >= 1900
 						AND v0.born = 1956)
-					  RETURN v1
+						RETURN v1
 					}
 					RETURN v0.name, v1.title
 					"""
@@ -160,6 +162,97 @@ class ComparisonIT {
 		assertThat(areSemanticallyEquivalent(stmt1, Map.of("param1", "The Matrix"), stmt2, Map.of("foo", "Matrix Resurrections"))).isFalse();
 	}
 
+	@Test
+	void treeCanBeUsedToAnalyseStatements() {
+
+		var stmt = CypherParser.parse("""
+			MATCH (n:Person {name: 'Tom Hanks'})
+			CALL {
+			  WITH n
+			  MATCH (m:Movie)<-[:ACTED_IN]-(n)
+			  WHERE (m.released >= 1900
+				AND n.born = 1956)
+			  RETURN m
+			}
+			RETURN n.name, m.title
+			""");
+
+		var target = new StringBuilder();
+		print(target, "", TreeNode.from(stmt), true);
+		assertThat(target)
+			.isEqualToNormalizingNewlines(
+				"""
+				└── MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
+				    ├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
+				    │   └── Pattern{cypher=(n:Person {name: 'Tom Hanks'})}
+				    │       └── InternalNodeImpl{cypher=(n:Person {name: 'Tom Hanks'})}
+				    │           ├── SymbolicName{cypher=n}
+				    │           ├── NodeLabel{value='Person'}
+				    │           └── Properties{cypher={name: 'Tom Hanks'}}
+				    │               └── MapExpression{cypher={name: 'Tom Hanks'}}
+				    │                   └── KeyValueMapEntry{cypher=name: 'Tom Hanks'}
+				    │                       └── StringLiteral{cypher='Tom Hanks'}
+				    ├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
+				    │   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
+				    │       ├── With{cypher=WITH n}
+				    │       │   └── ExpressionList{cypher=n}
+				    │       │       └── SymbolicName{cypher=n}
+				    │       ├── Match{cypher=MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956)}
+				    │       │   ├── Pattern{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
+				    │       │   │   └── InternalRelationshipImpl{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
+				    │       │   │       ├── InternalNodeImpl{cypher=(m:Movie)}
+				    │       │   │       │   ├── SymbolicName{cypher=m}
+				    │       │   │       │   └── NodeLabel{value='Movie'}
+				    │       │   │       ├── Details{cypher=<-[:ACTED_IN]-}
+				    │       │   │       │   └── RelationshipTypes{values=[ACTED_IN]}
+				    │       │   │       └── InternalNodeImpl{cypher=(n)}
+				    │       │   │           └── SymbolicName{cypher=n}
+				    │       │   └── Where{cypher=WHERE (m.released >= 1900 AND n.born = 1956)}
+				    │       │       └── CompoundCondition{cypher=(m.released >= 1900 AND n.born = 1956)}
+				    │       │           ├── Comparison{cypher=m.released >= 1900}
+				    │       │           │   ├── InternalPropertyImpl{cypher=m.released}
+				    │       │           │   │   ├── SymbolicName{cypher=m}
+				    │       │           │   │   └── PropertyLookup{cypher=.released}
+				    │       │           │   │       └── SymbolicName{cypher=released}
+				    │       │           │   ├── Operator{cypher=>=}
+				    │       │           │   └── NumberLiteral{cypher=1900}
+				    │       │           ├── Operator{cypher=AND}
+				    │       │           └── Comparison{cypher=n.born = 1956}
+				    │       │               ├── InternalPropertyImpl{cypher=n.born}
+				    │       │               │   ├── SymbolicName{cypher=n}
+				    │       │               │   └── PropertyLookup{cypher=.born}
+				    │       │               │       └── SymbolicName{cypher=born}
+				    │       │               ├── Operator{cypher==}
+				    │       │               └── NumberLiteral{cypher=1956}
+				    │       └── Return{cypher=RETURN m}
+				    │           └── ExpressionList{cypher=m}
+				    │               └── SymbolicName{cypher=m}
+				    └── Return{cypher=RETURN n.name, m.title}
+				        └── ExpressionList{cypher=n.name, m.title}
+				            ├── InternalPropertyImpl{cypher=n.name}
+				            │   ├── SymbolicName{cypher=n}
+				            │   └── PropertyLookup{cypher=.name}
+				            │       └── SymbolicName{cypher=name}
+				            └── InternalPropertyImpl{cypher=m.title}
+				                ├── SymbolicName{cypher=m}
+				                └── PropertyLookup{cypher=.title}
+				                    └── SymbolicName{cypher=title}
+				""");
+	}
+
+	private static void print(StringBuilder target, String prefix, TreeNode<?> node, boolean isTail) {
+		var value = node.getValue() instanceof Statement stmt ? stmt.getCypher() : node.getValue().toString();
+		var connector = isTail ? "└── " : "├── ";
+
+		target.append(prefix).append(connector).append(value).append("\n");
+
+		var cnt = new AtomicInteger(0);
+		node.getChildren().forEach(child -> {
+			var newPrefix = prefix + (isTail ? " ".repeat(connector.length()) : "│   ");
+			print(target, newPrefix, child, cnt.incrementAndGet() == node.getChildren().size());
+		});
+	}
+
 	static boolean areSemanticallyEquivalent(Statement statement1, Statement statement2) {
 
 		var cfg = Configuration.newConfig().useGeneratedNames(true).build();
@@ -191,5 +284,4 @@ class ComparisonIT {
 
 		return true;
 	}
-
 }

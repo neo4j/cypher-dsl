@@ -204,4 +204,9 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 	public Optional<String> getSuffix() {
 		return Optional.of(")");
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
 }

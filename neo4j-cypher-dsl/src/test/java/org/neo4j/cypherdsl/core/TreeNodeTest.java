@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.blerg;
+package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
@@ -28,12 +28,12 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Michael J. Simons
  */
-class MutableTreeTest {
+class TreeNodeTest {
 
-	private final static MutableTree<Integer> ROOT;
+	private final static TreeNode<Integer> ROOT;
 
 	static {
-		ROOT = MutableTree.root(10);
+		ROOT = TreeNode.root(10);
 		var n2 = ROOT.append(2);
 		ROOT.append(34);
 		var n56 = ROOT.append(56);
@@ -53,7 +53,7 @@ class MutableTreeTest {
 		var it = ROOT.breadthFirst();
 		assertThat(it)
 			.toIterable()
-			.extracting(MutableTree::value)
+			.extracting(TreeNode::getValue)
 			.containsExactly(10, 2, 34, 56, 100, 77, 88, 1, 7, 8, 9, 23);
 
 		assertThatExceptionOfType(NoSuchElementException.class)
@@ -66,7 +66,7 @@ class MutableTreeTest {
 		var it = ROOT.preOrder();
 		assertThat(it)
 			.toIterable()
-			.extracting(MutableTree::value)
+			.extracting(TreeNode::getValue)
 			.containsExactly(10, 2, 77, 88, 34, 56, 1, 23, 100, 7, 8, 9);
 
 		assertThatExceptionOfType(NoSuchElementException.class)

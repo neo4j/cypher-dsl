@@ -16,7 +16,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.core.blerg;
+package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayDeque;
 import java.util.Collection;
@@ -26,6 +26,10 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * A  mutable   tree  structure  providing   <a  href="https://en.wikipedia.org/wiki/Breadth-first_search">Breadth-first
@@ -37,7 +41,21 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * @soundtrack Black Sabbath - The End: Live in Birmingham
  * @since TBA
  */
-public final class MutableTree<E> {
+@API(status = API.Status.EXPERIMENTAL, since = "TBA")
+public final class TreeNode<E> {
+
+	/**
+	 * Creates a  tree from a  {@link Statement}. This  allows to visit all  elements of statement  without implementing
+	 * custom {@link Visitor visitors.} The root of the returned tree will always be the statement.
+	 *
+	 * @param statement The statement that should be represented as a tree
+	 * @return A tree with the statement as root
+	 */
+	public static TreeNode<Visitable> from(Statement statement) {
+		var visitor = new TreeBuildingVisitor();
+		statement.accept(visitor);
+		return visitor.root;
+	}
 
 	/**
 	 * Creates a new tree, starting at the root.
@@ -46,16 +64,16 @@ public final class MutableTree<E> {
 	 * @param <E>   The type of the value
 	 * @return The new node
 	 */
-	static <E> MutableTree<E> root(E value) {
-		return new MutableTree<>(null, 0, value);
+	static <E> TreeNode<E> root(E value) {
+		return new TreeNode<>(null, 0, value);
 	}
 
-	private final MutableTree<E> parent;
+	private final TreeNode<E> parent;
 	private final int level;
-	private final Collection<MutableTree<E>> children;
+	private final Collection<TreeNode<E>> children;
 	private final E value;
 
-	private MutableTree(MutableTree<E> parent, int level, E value) {
+	private TreeNode(TreeNode<E> parent, int level, E value) {
 		this.parent = parent;
 		this.level = level;
 		this.value = value;
@@ -69,31 +87,83 @@ public final class MutableTree<E> {
 	 * @param childValue The value of the new child node
 	 * @return The new child (this node will be the parent of the new node)
 	 */
-	public MutableTree<E> append(E childValue) {
-		var newChild = new MutableTree<>(this, this.level + 1, childValue);
+	TreeNode<E> append(E childValue) {
+		var newChild = new TreeNode<>(this, this.level + 1, childValue);
 		this.children.add(newChild);
 		return newChild;
 	}
 
 	/**
+	 * @return The level or the height in this tree ({@literal 0} is the level of the root node)
+	 */
+	public int getLevel() {
+		return level;
+	}
+
+	/**
 	 * @return The parent of this node or {@literal null} if this is a root node.
 	 */
-	public MutableTree<E> getParent() {
+	public TreeNode<E> getParent() {
 		return parent;
+	}
+
+	/**
+	 * @return An immutable collection of this nodes children
+	 */
+	public Collection<TreeNode<E>> getChildren() {
+		return List.copyOf(children);
 	}
 
 	/**
 	 * @return The value of this node.
 	 */
-	public E value() {
+	public E getValue() {
 		return value;
 	}
 
-	private static final class BreadthFirstIterator<E> implements Iterator<MutableTree<E>> {
+	/**
+	 * @return a breadth-first iterator of this node and it's children
+	 */
+	public Iterator<TreeNode<E>> breadthFirst() {
+		return new BreadthFirstIterator<>(this);
+	}
 
-		private final Queue<MutableTree<E>> queue;
+	/**
+	 * @return a depth-first, pre-ordered iterator of this node and it's children
+	 */
+	public Iterator<TreeNode<E>> preOrder() {
+		return new PreOrderIterator<>(this);
+	}
 
-		BreadthFirstIterator(MutableTree<E> root) {
+	private static class TreeBuildingVisitor implements Visitor {
+
+		final Deque<TreeNode<Visitable>> nodes = new ArrayDeque<>();
+
+		TreeNode<Visitable> root;
+
+		@Override
+		public void enter(Visitable segment) {
+			var currentParent = nodes.peek();
+			if (currentParent == null) {
+				currentParent = TreeNode.root(segment);
+			} else {
+				currentParent = currentParent.append(segment);
+			}
+
+			nodes.push(currentParent);
+		}
+
+		@Override
+		public void leave(Visitable segment) {
+			root = nodes.pop();
+		}
+	}
+
+	private static final class BreadthFirstIterator<E> implements Iterator<TreeNode<E>> {
+
+		private final Queue<TreeNode<E>> queue;
+
+		BreadthFirstIterator(TreeNode<E> root) {
 			this.queue = new ArrayDeque<>();
 			this.queue.add(root);
 		}
@@ -104,7 +174,7 @@ public final class MutableTree<E> {
 		}
 
 		@Override
-		public MutableTree<E> next() {
+		public TreeNode<E> next() {
 			if (queue.isEmpty()) {
 				throw new NoSuchElementException();
 			}
@@ -114,15 +184,11 @@ public final class MutableTree<E> {
 		}
 	}
 
-	public Iterator<MutableTree<E>> breadthFirst() {
-		return new BreadthFirstIterator<>(this);
-	}
+	private static final class PreOrderIterator<E> implements Iterator<TreeNode<E>> {
 
-	private static final class PreOrderIterator<E> implements Iterator<MutableTree<E>> {
+		private final Deque<Iterator<TreeNode<E>>> stack;
 
-		private final Deque<Iterator<MutableTree<E>>> stack;
-
-		PreOrderIterator(MutableTree<E> root) {
+		PreOrderIterator(TreeNode<E> root) {
 			this.stack = new ArrayDeque<>();
 			this.stack.push(List.of(root).iterator());
 		}
@@ -133,7 +199,7 @@ public final class MutableTree<E> {
 		}
 
 		@Override
-		public MutableTree<E> next() {
+		public TreeNode<E> next() {
 			if (stack.isEmpty()) {
 				throw new NoSuchElementException();
 			}
@@ -150,9 +216,5 @@ public final class MutableTree<E> {
 
 			return currentNode;
 		}
-	}
-
-	public Iterator<MutableTree<E>> preOrder() {
-		return new PreOrderIterator<>(this);
 	}
 }

@@ -83,5 +83,10 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 			aReturn.accept(visitor);
 			visitor.leave(this);
 		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
 	}
 }
