@@ -50,13 +50,13 @@ class DefaultExecutableStatement implements ExecutableStatement {
 	@NotNull
 	@Override
 	public final Map<String, Object> getParameters() {
-		return delegate.getParameters();
+		return delegate.getCatalog().getParameters();
 	}
 
 	@NotNull
 	@Override
 	public final Collection<String> getParameterNames() {
-		return delegate.getParameterNames();
+		return delegate.getCatalog().getParameterNames();
 	}
 
 	@NotNull
@@ -87,6 +87,6 @@ class DefaultExecutableStatement implements ExecutableStatement {
 	 */
 	final Query createQuery() {
 
-		return new Query(delegate.getCypher(), delegate.getParameters());
+		return new Query(delegate.getCypher(), getParameters());
 	}
 }

@@ -162,6 +162,8 @@
 						<configuration combine.self="append">
 							<compilerArgs>
 								<arg>-Aquerydsl.generatedAnnotationClass=com.querydsl.core.annotations.Generated</arg>
+								<arg>-Xlint:all,-options,-path,-processing,-exports,-missing-explicit-ctor</arg>
+								<arg>-Werror</arg>
 							</compilerArgs>
 							<annotationProcessorPaths>
 								<annotationProcessorPath>

@@ -74,6 +74,15 @@ public final class Configuration {
 	private final boolean alwaysEscapeNames;
 
 	/**
+	 * Turning this flag on will replace all symbolic names and all parameter names with a generated name. This name will
+	 * stay constant for the lifetime of a statement. It defaults to {@literal false}. This flag can be useful if you want
+	 * to normalize your statements: Imagine two statements coming from two different sources who may have used different
+	 * variable or parameter names. Turning {@code useGeneratedNames} on will make those statements produce the same rendering,
+	 * given they have the same semantics.
+	 */
+	private final boolean useGeneratedNames;
+
+	/**
 	 * The dialect to use when rendering a statement. The default dialect works well with Neo4j 4.4 and prior.
 	 */
 	private final Dialect dialect;
@@ -114,6 +123,7 @@ public final class Configuration {
 		private int indentSize = 2;
 		private boolean alwaysEscapeNames = true;
 		private Dialect dialect = Dialect.DEFAULT;
+		private boolean useGeneratedNames = false;
 
 		private Builder() {
 		}
@@ -170,6 +180,16 @@ public final class Configuration {
 		}
 
 		/**
+		 * Configure whether variable names should be always generated.
+		 * @param useGeneratedNames Set to {@literal true} to use generated symbolic and parameter names.
+		 * @return this builder
+		 */
+		public Builder useGeneratedNames(boolean useGeneratedNames) {
+			this.useGeneratedNames = useGeneratedNames;
+			return this;
+		}
+
+		/**
 		 * Use a configuration with a dialect fitting your target database if the {@link Dialect#DEFAULT default dialect}
 		 * leads to incompatible results with your version of Neo4j.
 		 *
@@ -196,6 +216,7 @@ public final class Configuration {
 		this.indentStyle = builder.indentStyle;
 		this.indentSize = builder.indentSize;
 		this.dialect = builder.dialect == null ? Dialect.DEFAULT : builder.dialect;
+		this.useGeneratedNames = builder.useGeneratedNames;
 	}
 
 	/**
@@ -227,6 +248,14 @@ public final class Configuration {
 	}
 
 	/**
+	 * @return {@literal true} when symbolic and parameter names should be replaced with generated names
+	 * @since TBA
+	 */
+	public boolean isUseGeneratedNames() {
+		return useGeneratedNames;
+	}
+
+	/**
 	 * @return the target dialect
 	 */
 	public Dialect getDialect() {
@@ -242,12 +271,14 @@ public final class Configuration {
 			return false;
 		}
 		Configuration that = (Configuration) o;
-		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle && alwaysEscapeNames == that.alwaysEscapeNames && dialect == that.dialect;
+		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle &&
+			alwaysEscapeNames == that.alwaysEscapeNames && dialect == that.dialect &&
+			useGeneratedNames == that.useGeneratedNames;
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect);
+		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect, useGeneratedNames);
 	}
 
 	@Override

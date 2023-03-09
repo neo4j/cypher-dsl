@@ -101,6 +101,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	 */
 	private final ScopingStrategy scopingStrategy;
 
+	private final ParameterCollectingVisitor allParameters;
+
 	StatementCatalogBuildingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 
 		this.statementContext = statementContext;
@@ -110,6 +112,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 			List.of((cause, exports) -> importIntoCurrentScope(exports))
 		);
 		this.patternLookup.push(new HashMap<>());
+
+		this.allParameters = new ParameterCollectingVisitor(statementContext, renderConstantsAsParameters);
 	}
 
 	private Map<SymbolicName, PatternElement> createNewScope(Collection<IdentifiableElement> imports) {
@@ -136,7 +140,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	}
 
 	StatementCatalog getResult() {
-		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables());
+		var parameterInformation = allParameters.getResult();
+		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables(), parameterInformation);
 	}
 
 	@Override
@@ -286,6 +291,10 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 	}
 
+	void enter(Parameter<?> parameter) {
+		this.allParameters.enter(parameter);
+	}
+
 	private boolean inCurrentCondition(org.neo4j.cypherdsl.core.Property property) {
 		var currentCondition = this.currentConditions.peek();
 
@@ -414,12 +423,15 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 		private final Set<Expression> identifiableExpressions;
 
+		private final ParameterInformation parameterInformation;
+
 		DefaultStatementCatalog(
 			Set<Token> tokens,
 			Set<LabelFilter> labelFilters,
 			Set<Property> properties,
 			Map<Property, Set<PropertyFilter>> propertyFilters,
-			Collection<Expression> identifiableExpressions
+			Collection<Expression> identifiableExpressions,
+			ParameterInformation parameterInformation
 		) {
 			this.tokens = Set.copyOf(tokens);
 			this.labelFilters = Set.copyOf(labelFilters);
@@ -429,6 +441,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 				.collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, e -> Set.copyOf(e.getValue())), Map::copyOf));
 
 			this.identifiableExpressions = Set.copyOf(identifiableExpressions);
+			this.parameterInformation = parameterInformation;
 		}
 
 		@Override
@@ -454,6 +467,21 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		@Override
 		public Set<Expression> getIdentifiableExpressions() {
 			return identifiableExpressions;
+		}
+
+		@Override
+		public Map<String, Object> getParameters() {
+			return parameterInformation.values;
+		}
+
+		@Override
+		public Collection<String> getParameterNames() {
+			return parameterInformation.names;
+		}
+
+		@Override
+		public Map<String, String> getRenamedParameters() {
+			return parameterInformation.renames;
 		}
 	}
 }

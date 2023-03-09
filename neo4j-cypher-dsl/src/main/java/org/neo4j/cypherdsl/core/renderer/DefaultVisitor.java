@@ -78,6 +78,7 @@ import org.neo4j.cypherdsl.core.Unwind;
 import org.neo4j.cypherdsl.core.Use;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
+import org.neo4j.cypherdsl.core.internal.NameResolvingStrategy;
 import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
@@ -98,7 +99,6 @@ import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
-import org.neo4j.cypherdsl.core.utils.Strings;
 
 /**
  * This is  a simple (some would  call it naive) implementation  of a visitor to  the Cypher AST created  by the Cypher
@@ -158,7 +158,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private final Map<Class<? extends Visitor>, Visitor> delegateCache = new ConcurrentHashMap<>();
 
-	protected final StatementContext statementContext;
+	private final NameResolvingStrategy nameResolvingStrategy;
 
 	/**
 	 * The current level in the tree of cypher elements.
@@ -197,6 +197,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private final Dialect dialect;
 
+	private boolean inEntity;
+
 	DefaultVisitor(StatementContext statementContext) {
 		this(statementContext, false);
 	}
@@ -206,7 +208,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
-		this.statementContext = statementContext;
+		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ? NameResolvingStrategy.useGeneratedNames(statementContext) :
+			NameResolvingStrategy.useGivenNames(statementContext);
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
 		this.dialect = configuration.getDialect();
@@ -521,12 +524,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		skipNodeContent = scopingStrategy.hasVisitedBefore(node);
 
 		if (skipNodeContent) {
-			String symbolicName = node.getSymbolicName()
-				.map(SymbolicName::getValue).orElseGet(() -> statementContext.resolve(node.getRequiredSymbolicName()));
-			builder.append(symbolicName);
+			builder.append(nameResolvingStrategy.resolve(
+				node.getSymbolicName().orElseGet(node::getRequiredSymbolicName), true));
 		}
 
 		skipSymbolicName = inRelationshipCondition;
+		inEntity = true;
 	}
 
 	void leave(Node node) {
@@ -535,6 +538,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		skipNodeContent = false;
 		skipSymbolicName = false;
+		inEntity = false;
 	}
 
 	void enter(NodeLabel nodeLabel) {
@@ -587,13 +591,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(SymbolicName symbolicName) {
 
-		if (inRelationshipCondition) {
-			String value = symbolicName.getValue();
-			if (Strings.hasText(value) && statementContext.isResolved(symbolicName)) {
-				builder.append(escapeIfNecessary(symbolicName.getValue()));
-			}
-		} else {
-			builder.append(statementContext.resolve(symbolicName));
+		if (!inRelationshipCondition || nameResolvingStrategy.isResolved(symbolicName)) {
+			builder.append(nameResolvingStrategy.resolve(symbolicName, inEntity));
 		}
 	}
 
@@ -611,6 +610,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		skipSymbolicName = inRelationshipCondition && !skipRelationshipContent;
+		inEntity = true;
 	}
 
 	void enter(RelationshipTypes types) {
@@ -622,7 +622,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder
 			.append(types.getValues().stream()
 				.map(this::escapeName)
-				.map(Optional::get).collect(Collectors.joining(Symbols.REL_TYP_SEPARATOR, Symbols.REL_TYPE_START, "")));
+				.map(Optional::orElseThrow)
+				.collect(Collectors.joining(Symbols.REL_TYP_SEPARATOR, Symbols.REL_TYPE_START, "")));
 	}
 
 	void enter(RelationshipLength length) {
@@ -662,19 +663,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(direction.getSymbolRight());
 
 		skipSymbolicName = false;
+		inEntity = false;
 	}
 
 	void leave(Relationship relationship) {
 
 		skipRelationshipContent = false;
-	}
-
-	protected final void renderParameter(Parameter<?> parameter) {
-
-		if (statementContext == null) {
-			throw new IllegalStateException("Parameter outside a statement context are not supported.");
-		}
-		builder.append("$").append(statementContext.getParameterName(parameter));
 	}
 
 	void enter(Parameter<?> parameter) {
@@ -683,7 +677,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (value instanceof ConstantParameterHolder constantParameterHolder && !renderConstantsAsParameters) {
 			builder.append(constantParameterHolder.asString());
 		} else {
-			renderParameter(parameter);
+			builder.append("$").append(nameResolvingStrategy.resolve(parameter));
 		}
 	}
 

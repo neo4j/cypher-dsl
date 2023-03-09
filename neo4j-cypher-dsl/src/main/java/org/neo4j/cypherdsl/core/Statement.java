@@ -117,8 +117,11 @@ public interface Statement extends Visitable {
 	 *
 	 * @return A map of all parameters with a bound value.
 	 * @since 2021.0.0
+	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getParameters()}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated(forRemoval = true, since = "TBA")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
 	Map<String, Object> getParameters();
 
 	/**
@@ -129,8 +132,11 @@ public interface Statement extends Visitable {
 	 *
 	 * @return A set of parameter names being used.
 	 * @since 2021.0.0
+	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getParameterNames()}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated(forRemoval = true, since = "TBA")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
 	Collection<String> getParameterNames();
 
 	/**

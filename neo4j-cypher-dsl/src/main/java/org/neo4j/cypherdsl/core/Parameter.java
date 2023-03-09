@@ -118,4 +118,24 @@ public final class Parameter<T> implements Expression {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		if (this.isAnon()) {
+			return super.equals(o);
+		}
+		Parameter<?> parameter = (Parameter<?>) o;
+		return Objects.equals(name, parameter.name);
+	}
+
+	@Override
+	public int hashCode() {
+		return this.isAnon() ? super.hashCode() : Objects.hash(name);
+	}
 }

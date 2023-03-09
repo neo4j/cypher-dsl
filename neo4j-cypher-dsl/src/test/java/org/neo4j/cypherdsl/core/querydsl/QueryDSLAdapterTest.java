@@ -220,7 +220,7 @@ class QueryDSLAdapterTest {
 			.build();
 
 		statement.setRenderConstantsAsParameters(true);
-		assertThat(statement.getParameters()).containsExactlyEntriesOf(expectedParameters);
+		assertThat(statement.getCatalog().getParameters()).containsExactlyEntriesOf(expectedParameters);
 		assertThat(statement.getCypher())
 			.isEqualTo("WITH 1 AS e WHERE " + expectedFragment + " RETURN e");
 	}
@@ -246,7 +246,7 @@ class QueryDSLAdapterTest {
 				finalExpectedParameters.put(k, v);
 			}
 		}
-		assertThat(statement.getParameters()).containsExactlyEntriesOf(finalExpectedParameters);
+		assertThat(statement.getCatalog().getParameters()).containsExactlyEntriesOf(finalExpectedParameters);
 		assertThat(statement.getCypher()).isEqualTo(expectedString);
 	}
 
@@ -278,7 +278,7 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
 			.where(Cypher.adapt(expr).asCondition()).returning(Cypher.adapt(person).asName()).build();
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
 	}
@@ -292,7 +292,7 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.node("Person").named("n"))
 			.where(Cypher.adapt(p).asCondition()).returning(Cypher.name(person.toString())).build();
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
 	}
@@ -305,7 +305,7 @@ class QueryDSLAdapterTest {
 
 		Statement statement = Cypher.match(Cypher.adapt(person).asNode())
 			.where(Cypher.adapt(p).asCondition()).returning(Cypher.adapt(person).asName()).build();
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (person:`Person`) WHERE person.firstName = 'P' AND person.age > 25 RETURN person");
 	}
@@ -320,7 +320,7 @@ class QueryDSLAdapterTest {
 			.orderBy(Cypher.adapt(person.firstName).asExpression().descending())
 			.build();
 
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo(
 				"MATCH (person:`Person`) WHERE person.firstName = 'Rickard' RETURN person.firstName ORDER BY person.firstName DESC");
@@ -336,7 +336,7 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName()) // <.>
 			.build();
 
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
 		// end::query-dsl-simple[]
@@ -353,8 +353,8 @@ class QueryDSLAdapterTest {
 			.build();
 
 		statement.setRenderConstantsAsParameters(true); // <.>
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P"); // <.>
-		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getCatalog().getParameters()).containsEntry("pcdsl01", "P"); // <.>
+		assertThat(statement.getCatalog().getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n"); // <.>
 		// end::query-dsl-simple-avoid-constants[]
@@ -370,12 +370,12 @@ class QueryDSLAdapterTest {
 			.build();
 
 		statement.setRenderConstantsAsParameters(true); // <.>
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P"); // <.>
-		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getCatalog().getParameters()).containsEntry("pcdsl01", "P"); // <.>
+		assertThat(statement.getCatalog().getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age > $pcdsl02 RETURN n"); // <.>
 
 		statement.setRenderConstantsAsParameters(false);
-		assertThat(statement.getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age > 25 RETURN n");
 	}
 
@@ -389,12 +389,14 @@ class QueryDSLAdapterTest {
 			.build();
 
 		statement.setRenderConstantsAsParameters(true);
-		assertThat(statement.getParameters()).containsEntry("pcdsl01", "P");
-		assertThat(statement.getParameters()).containsEntry("pcdsl02", 25);
+		assertThat(statement.getCatalog().getParameters()).containsEntry("pcdsl01", "P");
+		assertThat(statement.getCatalog().getParameters()).containsEntry("pcdsl02", 25);
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
-			.isEqualTo("MATCH (n:Person)\n"
-				+ "WHERE n.firstName = 'P' AND n.age > 25\n"
-				+ "RETURN n");
+			.isEqualTo("""
+				MATCH (n:Person)
+				WHERE n.firstName = 'P' AND n.age > 25
+				RETURN n"""
+			);
 	}
 
 	@Test
@@ -410,7 +412,7 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName())
 			.build();
 
-		assertThat(statement.getParameterNames()).hasSize(2); // <.>
+		assertThat(statement.getCatalog().getParameterNames()).hasSize(2); // <.>
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName = $name AND n.age > $age RETURN n");
 		// end::query-dsl-parameters[]
@@ -425,7 +427,7 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName())
 			.build();
 
-		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getCatalog().getParameterNames()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE n.firstName =~ '(?i).*rick.*' RETURN n");
 	}
@@ -439,7 +441,7 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.adapt(n).asName())
 			.build();
 
-		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getCatalog().getParameterNames()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n:`Person`) WHERE exists(n.firstName) RETURN n");
 	}
@@ -474,7 +476,7 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.name("n"))
 			.build();
 
-		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getCatalog().getParameterNames()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n) RETURN n");
 	}
@@ -488,7 +490,7 @@ class QueryDSLAdapterTest {
 			.returning(Cypher.name("n"))
 			.build();
 
-		assertThat(statement.getParameterNames()).isEmpty();
+		assertThat(statement.getCatalog().getParameterNames()).isEmpty();
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (n) WHERE false AND true RETURN n");
 	}

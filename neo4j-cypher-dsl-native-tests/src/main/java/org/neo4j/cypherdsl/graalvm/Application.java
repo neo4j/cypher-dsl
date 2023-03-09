@@ -47,8 +47,9 @@ public class Application {
 
 		System.out.println(cypherRenderer.render(findAllMovies()));
 		var statement = generateQueryWithParams();
-		statement.getParameters().forEach((k, v) -> System.out.println(k + "=" + v));
-		statement.getParameterNames().forEach(System.out::println);
+		var catalog = statement.getCatalog();
+		catalog.getParameters().forEach((k, v) -> System.out.println(k + "=" + v));
+		catalog.getParameterNames().forEach(System.out::println);
 		System.out.println(cypherRenderer.render(statement));
 		System.out.println(cypherRenderer.render(generateComplexQuery()));
 		System.out.println(CypherParser.parse("MATCH (p:Parser) RETURN p").getCypher());
@@ -60,7 +61,7 @@ public class Application {
 		System.out.println(useParserForRewrite());
 		System.out.println(generateDialectBasedQuery());
 		statement = CypherParser.parseStatement("MATCH (m:Movie {title: 'The Matrix'}) <- [a:ACTED_IN] - (p:Person) WHERE p.born >= 1979 RETURN m, a, p");
-		var catalog = statement.getCatalog();
+		catalog = statement.getCatalog();
 		catalog.getIdentifiableExpressions().stream()
 			.filter(SymbolicName.class::isInstance)
 			.map(SymbolicName.class::cast)

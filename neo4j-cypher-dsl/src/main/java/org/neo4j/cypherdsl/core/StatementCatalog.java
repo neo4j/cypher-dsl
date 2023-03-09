@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+
 /**
  * The statement catalog gives an  overview about relevant items in a statement. These  items include tokens (labels and
  * relationship  types), the  resolved properties  for given  sets  of these  tokens (those  sets reassembling  concrete
@@ -160,13 +162,43 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	}
 
 	/**
-	 * Returns a collection of all expressions that are identifiable expression in a non-void (or non-unit) Cypher statement.
-	 * These expressions might refer to properties, but can be of course function calls, existential subqueries and the
-	 * like.
+	 * Returns a  collection of  all expressions that  are identifiable  expression in a  non-void (or  non-unit) Cypher
+	 * statement.  These expressions  might  refer to  properties,  but can  be of  course  function calls,  existential
+	 * sub-queries and the like.
 	 *
 	 * @return A collection of identifiable expressions.
 	 */
 	Collection<Expression> getIdentifiableExpressions();
+
+	/**
+	 * After a statement has been  build, all parameters that have been added to the  statement can be retrieved through
+	 * this method. The result will only contain parameters with a defined value. If you are interested in all parameter
+	 * names, use {@link #getParameterNames()}.
+	 * <p>
+	 * The map  can be used  for example as an  argument with various  methods on the  Neo4j Java Driver that  allow the
+	 * execution of parameterized queries.
+	 *
+	 * @return A map of all parameters with a bound value.
+	 * @since TBA
+	 */
+	Map<String, Object> getParameters();
+
+	/**
+	 * After the statement has been build, this method returns  a list of all parameter names used, regardless whether a
+	 * value was bound to the parameter o not.
+	 *
+	 * @return A set of parameter names being used.
+	 * @since TBA
+	 */
+	Collection<String> getParameterNames();
+
+	/**
+	 * A statement  can be  configured to  use generated names  (see {@link  Configuration#isUseGeneratedNames()}). This
+	 * method returns the used remapping table.
+	 *
+	 * @return A map of renamed parameters when {@link Configuration#isUseGeneratedNames()} would be set to {@literal true}
+	 */
+	Map<String, String> getRenamedParameters();
 
 	/**
 	 * A token can either describe a node label or a relationship type.

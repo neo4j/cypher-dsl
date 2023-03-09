@@ -32,8 +32,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  * search</a>         (aka         in-level         order          traversal)         and         pre-ordered         <a
  * href="https://en.wikipedia.org/wiki/Depth-first_search">depth-first search</a>. This class is thread-safe.
  *
- * @param <E> The type of each node value
  * @author Michael J. Simons
+ * @param <E> The type of each node value
  * @soundtrack Black Sabbath - The End: Live in Birmingham
  * @since TBA
  */
@@ -66,11 +66,11 @@ public final class MutableTree<E> {
 	 * Appends a value to  this node and thus creating a new  child node. This node will be modified  and keeps track of
 	 * the child node.
 	 *
-	 * @param value The value of the new child node
+	 * @param childValue The value of the new child node
 	 * @return The new child (this node will be the parent of the new node)
 	 */
-	public MutableTree<E> append(E value) {
-		var newChild = new MutableTree<>(this, this.level + 1, value);
+	public MutableTree<E> append(E childValue) {
+		var newChild = new MutableTree<>(this, this.level + 1, childValue);
 		this.children.add(newChild);
 		return newChild;
 	}
@@ -118,29 +118,11 @@ public final class MutableTree<E> {
 		return new BreadthFirstIterator<>(this);
 	}
 
-	public Iterator<MutableTree<E>> bfs() {
-		Queue<MutableTree<E>> q = new ArrayDeque<>();
-		q.add(this);
-		var currentLevel = 0;
-		while (!q.isEmpty()) {
-			var n = q.remove();
-			q.addAll(n.children);
-
-			if (currentLevel != n.level) {
-				System.out.println();
-				currentLevel = n.level;
-			}
-			System.out.print(n.value + "(" + n.level + ") ");
-		}
-		System.out.println();
-		return null;
-	}
-
 	private static final class PreOrderIterator<E> implements Iterator<MutableTree<E>> {
 
 		private final Deque<Iterator<MutableTree<E>>> stack;
 
-		public PreOrderIterator(MutableTree<E> root) {
+		PreOrderIterator(MutableTree<E> root) {
 			this.stack = new ArrayDeque<>();
 			this.stack.push(List.of(root).iterator());
 		}
@@ -172,33 +154,5 @@ public final class MutableTree<E> {
 
 	public Iterator<MutableTree<E>> preOrder() {
 		return new PreOrderIterator<>(this);
-	}
-
-
-	public void dfs() {
-
-		Deque<Iterator<MutableTree<E>>> s = new ArrayDeque<>();
-		s.push(List.of(this).iterator());
-		while (!s.isEmpty()) {
-			var f = s.peek();
-			var n = f.next();
-
-
-			if (!f.hasNext()) {
-				s.pop();
-			}
-			if (!n.children.isEmpty()) {
-				s.push(n.children.iterator());
-			}
-			System.out.println(n.value + " (" + n.level + ")");
-		}
-	}
-
-	@Override
-	public String toString() {
-		return "MutableTree{" +
-		       "level=" + level +
-		       ", value=" + value +
-		       '}';
 	}
 }

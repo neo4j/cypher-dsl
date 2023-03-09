@@ -23,32 +23,31 @@ import java.util.Deque;
 
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 
-public class Wurstsalat extends ReflectiveVisitor {
+public class Wurstsalat implements Visitor {
 
 
 	Deque<MutableTree<String>> nodes = new ArrayDeque<>();
 
 	MutableTree<String> root;
 
-	@Override
-	protected boolean preEnter(Visitable visitable) {
 
+	@Override
+	public void enter(Visitable segment) {
 		var currentParent = nodes.peek();
 		if(currentParent == null) {
-			currentParent = MutableTree.root(visitable.toString());
+			currentParent = MutableTree.root(segment.toString());
 		} else {
-			currentParent = currentParent.append(visitable.toString());
+			currentParent = currentParent.append(segment.toString());
 		}
 
 		nodes.push(currentParent);
-
-		return true;
 	}
 
 	@Override
-	protected void postLeave(Visitable visitable) {
+	public void leave(Visitable segment) {
 		root = nodes.pop();
 	}
 
@@ -61,7 +60,7 @@ public class Wurstsalat extends ReflectiveVisitor {
 		System.out.println(stment.getCypher());
 		stment.accept(visitor);
 
-		visitor.root.bfs();
+		//visitor.root.bfs();
 		System.out.println("\n---");
 
 		var root = MutableTree.root(10);
@@ -77,10 +76,54 @@ public class Wurstsalat extends ReflectiveVisitor {
 		var n7 = n100.append( 7);
 		var n8 = n100.append( 8);
 		var n9 = n100.append( 9);
-		root.bfs();
+		// root.bfs();
 		System.out.println("---");
-		root.dfs();
+		// root.dfs();
 	}
+
+	/*
+
+		public Iterator<MutableTree<E>> bfs() {
+		Queue<MutableTree<E>> q = new ArrayDeque<>();
+		q.add(this);
+		var currentLevel = 0;
+		while (!q.isEmpty()) {
+			var n = q.remove();
+			q.addAll(n.children);
+
+			if (currentLevel != n.level) {
+				System.out.println();
+				currentLevel = n.level;
+			}
+			System.out.print(n.value + "(" + n.level + ") ");
+		}
+		System.out.println();
+		return null;
+	}
+
+public void dfs() {
+
+		Deque<Iterator<MutableTree<E>>> s = new ArrayDeque<>();
+		s.push(List.of(this).iterator());
+		while (!s.isEmpty()) {
+			var f = s.peek();
+			var n = f.next();
+
+
+			if (!f.hasNext()) {
+				s.pop();
+			}
+			if (!n.children.isEmpty()) {
+				s.push(n.children.iterator());
+			}
+			System.out.println(n.value + " (" + n.level + ")");
+		}
+	}
+
+
+	 */
+
+
 
 }
 
