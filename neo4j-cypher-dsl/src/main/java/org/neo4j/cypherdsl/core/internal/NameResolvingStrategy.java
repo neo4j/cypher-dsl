@@ -31,7 +31,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  *
  * @author Michael J. Simons
  */
-@API(status = INTERNAL, since = "TBA")
+@API(status = INTERNAL, since = "2023.2.0")
 public sealed interface NameResolvingStrategy permits FixedNamesStrategy, GeneratedNamesStrategy {
 
 	/**

@@ -179,7 +179,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 * execution of parameterized queries.
 	 *
 	 * @return A map of all parameters with a bound value.
-	 * @since TBA
+	 * @since 2023.2.0
 	 */
 	Map<String, Object> getParameters();
 
@@ -188,7 +188,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 * value was bound to the parameter o not.
 	 *
 	 * @return A set of parameter names being used.
-	 * @since TBA
+	 * @since 2023.2.0
 	 */
 	Collection<String> getParameterNames();
 

@@ -120,7 +120,7 @@ public interface Statement extends Visitable {
 	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getParameters()}
 	 */
 	@NotNull @Contract(pure = true)
-	@Deprecated(forRemoval = true, since = "TBA")
+	@Deprecated(forRemoval = true, since = "2023.2.0")
 	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
 	Map<String, Object> getParameters();
 
@@ -135,7 +135,7 @@ public interface Statement extends Visitable {
 	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getParameterNames()}
 	 */
 	@NotNull @Contract(pure = true)
-	@Deprecated(forRemoval = true, since = "TBA")
+	@Deprecated(forRemoval = true, since = "2023.2.0")
 	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
 	Collection<String> getParameterNames();
 

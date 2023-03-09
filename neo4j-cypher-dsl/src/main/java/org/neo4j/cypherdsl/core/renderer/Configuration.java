@@ -249,7 +249,7 @@ public final class Configuration {
 
 	/**
 	 * @return {@literal true} when symbolic and parameter names should be replaced with generated names
-	 * @since TBA
+	 * @since 2023.2.0
 	 */
 	public boolean isUseGeneratedNames() {
 		return useGeneratedNames;

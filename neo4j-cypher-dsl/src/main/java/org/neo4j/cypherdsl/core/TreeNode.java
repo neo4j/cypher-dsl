@@ -39,9 +39,9 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @author Michael J. Simons
  * @param <E> The type of each node value
  * @soundtrack Black Sabbath - The End: Live in Birmingham
- * @since TBA
+ * @since 2023.2.0
  */
-@API(status = API.Status.EXPERIMENTAL, since = "TBA")
+@API(status = API.Status.EXPERIMENTAL, since = "2023.2.0")
 public final class TreeNode<E> {
 
 	/**
