@@ -29,6 +29,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ResultStatement;
 import org.neo4j.cypherdsl.core.Statement;
+import org.neo4j.cypherdsl.core.StatementCatalog;
 import org.neo4j.driver.QueryRunner;
 import org.neo4j.driver.SimpleQueryRunner;
 import org.neo4j.driver.async.AsyncQueryRunner;
@@ -110,14 +111,14 @@ public interface ExecutableStatement {
 
 	/**
 	 * @return A map of all parameters with a bound value.
-	 * @see Statement#getParameters()
+	 * @see StatementCatalog#getParameters()
 	 */
 	@NotNull @Contract(pure = true)
 	Map<String, Object> getParameters();
 
 	/**
 	 * @return A set of parameter names being used.
-	 * @see Statement#getParameterNames()
+	 * @see StatementCatalog#getParameterNames()
 	 */
 	@NotNull @Contract(pure = true)
 	Collection<String> getParameterNames();

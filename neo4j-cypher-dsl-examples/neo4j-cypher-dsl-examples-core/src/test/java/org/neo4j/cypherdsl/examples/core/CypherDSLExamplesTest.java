@@ -289,10 +289,14 @@ class CypherDSLExamplesTest {
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("MATCH (p:`Person`) WHERE p.nickname = $nickname SET p.firstName = $firstName, p.name = $name RETURN p");
 
-		Collection<String> parameterNames = statement.getParameterNames();
+		Collection<String> parameterNames = statement
+			.getCatalog()
+			.getParameterNames();
 		assertThat(parameterNames).containsExactlyInAnyOrder("nickname", "firstName", "name"); // <.>
 
-		Map<String, Object> parameters = statement.getParameters();
+		Map<String, Object> parameters = statement
+			.getCatalog()
+			.getParameters();
 		assertThat(parameters).hasSize(2); // <.>
 		assertThat(parameters)
 			.containsEntry("firstName", "Thomas")
@@ -392,7 +396,7 @@ class CypherDSLExamplesTest {
 			.limit(Cypher.anonParameter(Integer.parseInt(limit)))
 			.build();
 		assertThat(statement.getCypher()).isEqualTo("MATCH (m:`Movie`) WHERE exists(m[$pcdsl01]) RETURN m{.*} ORDER BY m[$pcdsl01] ASC SKIP $pcdsl02 LIMIT $pcdsl03");
-		assertThat(statement.getParameters())
+		assertThat(statement.getCatalog().getParameters())
 			.containsAllEntriesOf(Map.of("pcdsl01", "some property", "pcdsl02", 21, "pcdsl03", 42));
 	}
 }

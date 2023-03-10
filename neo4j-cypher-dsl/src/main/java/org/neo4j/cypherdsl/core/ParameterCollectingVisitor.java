@@ -26,10 +26,11 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
-import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
-import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
+import org.neo4j.cypherdsl.core.internal.NameResolvingStrategy;
+import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 
 /**
  * This is an implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -42,43 +43,44 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @author Michael J. Simons
  * @since 2021.0.0
  */
-@RegisterForReflection
-final class ParameterCollectingVisitor extends ReflectiveVisitor {
+final class ParameterCollectingVisitor implements Visitor {
 
 	static class ParameterInformation {
 
 		final Set<String> names;
 		final Map<String, Object> values;
+		final Map<String, String> renames;
 
-		ParameterInformation(Set<String> names, Map<String, Object> values) {
+		ParameterInformation(Set<String> names, Map<String, Object> values, Map<String, String> renames) {
 			this.names = Collections.unmodifiableSet(names);
 			this.values = Collections.unmodifiableMap(values);
+			this.renames = Collections.unmodifiableMap(renames);
 		}
 	}
 
 	private final StatementContext statementContext;
 	private final boolean renderConstantsAsParameters;
-	private final Set<String> names = new TreeSet<>();
-	private final Map<String, Object> values = new TreeMap<>();
+
+	private final Set<String> parameterNames = new TreeSet<>();
+	private final Map<String, Object> parameterValues = new TreeMap<>();
+	final Map<String, String> parameterMapping = new TreeMap<>();
 	private final Map<String, Set<Object>> erroneousParameters = new TreeMap<>();
+
+	private final NameResolvingStrategy nameGenerator;
 
 	ParameterCollectingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 		this.statementContext = statementContext;
+		this.nameGenerator = NameResolvingStrategy.useGeneratedNames(statementContext);
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 
-	@Override
-	protected boolean preEnter(Visitable visitable) {
-		return true;
-	}
 
 	@Override
-	protected void postLeave(Visitable visitable) {
-		// Nothing to track here.
-	}
+	public void enter(Visitable segment) {
 
-	@SuppressWarnings("unused")
-	void enter(Parameter<?> parameter) {
+		if (!(segment instanceof Parameter<?> parameter)) {
+			return;
+		}
 
 		String parameterName = statementContext.getParameterName(parameter);
 		Object newValue = parameter.getValue();
@@ -88,13 +90,16 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 			}
 			newValue = constantParameterHolder.getValue();
 		}
-		boolean knownParameterName = !this.names.add(parameterName);
+		boolean knownParameterName = !this.parameterNames.add(parameterName);
+		if (!(knownParameterName || parameter.isAnon())) {
+			this.parameterMapping.put(parameterName, nameGenerator.resolve(parameter));
+		}
 
-		Object oldValue = knownParameterName && this.values.containsKey(parameterName) ?
-			this.values.get(parameterName) :
+		Object oldValue = knownParameterName && this.parameterValues.containsKey(parameterName) ?
+			this.parameterValues.get(parameterName) :
 			Parameter.NO_VALUE;
 		if (parameter.hasValue()) {
-			this.values.put(parameterName, newValue);
+			this.parameterValues.put(parameterName, newValue);
 		}
 		if (knownParameterName && !Objects.equals(oldValue, newValue)) {
 			Set<Object> conflictingObjects = this.erroneousParameters.computeIfAbsent(parameterName, s -> {
@@ -112,6 +117,6 @@ final class ParameterCollectingVisitor extends ReflectiveVisitor {
 			throw new ConflictingParametersException(erroneousParameters);
 		}
 
-		return new ParameterInformation(this.names, this.values);
+		return new ParameterInformation(this.parameterNames, this.parameterValues, this.parameterMapping);
 	}
 }

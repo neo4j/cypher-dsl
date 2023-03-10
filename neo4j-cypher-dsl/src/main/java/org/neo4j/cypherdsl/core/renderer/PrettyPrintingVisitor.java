@@ -299,7 +299,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		if (value instanceof ConstantParameterHolder constantParameterHolder) {
 			builder.append(constantParameterHolder.asString());
 		} else {
-			renderParameter(parameter);
+			super.enter(parameter);
 		}
 	}
 }

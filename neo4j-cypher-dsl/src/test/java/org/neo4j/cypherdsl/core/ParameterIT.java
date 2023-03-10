@@ -36,6 +36,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @author Andreas Berger
  * @author Michael J. Simons
  */
+@SuppressWarnings("removal") // This is for the parameter methods. I want to keep calling them this way until they are gone.
 class ParameterIT {
 
 	private static final Node userNode = Cypher.node("User").named("u");

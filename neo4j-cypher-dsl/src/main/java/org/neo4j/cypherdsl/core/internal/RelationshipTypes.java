@@ -62,4 +62,9 @@ public final class RelationshipTypes implements Visitable {
 	public List<String> getValues() {
 		return values;
 	}
+
+	@Override
+	public String toString() {
+		return "RelationshipTypes{values=" + values + '}';
+	}
 }

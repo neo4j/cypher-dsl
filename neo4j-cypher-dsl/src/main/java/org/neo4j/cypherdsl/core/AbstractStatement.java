@@ -22,11 +22,9 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
-import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -51,12 +49,6 @@ abstract class AbstractStatement implements Statement {
 	 * or as actual parameters.
 	 */
 	private boolean renderConstantsAsParameters = false;
-
-	/**
-	 * The collected parameter information (names only and names + values). Will be initialized with Double-checked locking into an unmodifiable object.
-	 */
-	@SuppressWarnings("squid:S3077")
-	private volatile ParameterInformation parameterInformation;
 
 	/**
 	 * The rendered Cypher statement.
@@ -86,25 +78,27 @@ abstract class AbstractStatement implements Statement {
 		synchronized (this) {
 			this.renderConstantsAsParameters = renderConstantsAsParameters;
 			this.cypher = null;
-			this.parameterInformation = null;
 			this.statementCatalog = null;
 		}
 	}
 
+	@SuppressWarnings("removal")
 	@NotNull
 	@Override
 	public Map<String, Object> getParameters() {
-		return getParameterInformation().values;
-	}
-
-	@NotNull
-	@Override
-	public Set<String> getParameterNames() {
-		return getParameterInformation().names;
+		return getCatalog().getParameters();
 	}
 
 	@SuppressWarnings("removal")
 	@NotNull
+	@Override
+	public Collection<String> getParameterNames() {
+		return getCatalog().getParameterNames();
+	}
+
+	@SuppressWarnings("removal")
+	@NotNull
+	@Override
 	public Collection<Expression> getIdentifiableExpressions() {
 		return getCatalog().getIdentifiableExpressions();
 	}
@@ -126,34 +120,6 @@ abstract class AbstractStatement implements Statement {
 		return result;
 	}
 
-	private ParameterInformation getParameterInformation() {
-
-		ParameterInformation result = this.parameterInformation;
-		if (result == null) {
-			synchronized (this) {
-				result = this.parameterInformation;
-				if (result == null) {
-					this.parameterInformation = collectParameters();
-					result = this.parameterInformation;
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Collects all bound parameters from the statement.
-	 *
-	 * @return a map of used parameters with its bound values
-	 * @see org.neo4j.cypherdsl.core.Parameter#withValue(Object)
-	 */
-	private ParameterInformation collectParameters() {
-
-		ParameterCollectingVisitor parameterCollectingVisitor = new ParameterCollectingVisitor(getContext(), isRenderConstantsAsParameters());
-		this.accept(parameterCollectingVisitor);
-		return parameterCollectingVisitor.getResult();
-	}
-
 	@Override
 	@NotNull
 	public StatementCatalog getCatalog() {
@@ -173,8 +139,8 @@ abstract class AbstractStatement implements Statement {
 
 	private StatementCatalog getCatalog0() {
 
-		var thing = new StatementCatalogBuildingVisitor(getContext(), renderConstantsAsParameters);
-		this.accept(thing);
-		return thing.getResult();
+		var catalogBuildingVisitor = new StatementCatalogBuildingVisitor(getContext(), isRenderConstantsAsParameters());
+		this.accept(catalogBuildingVisitor);
+		return catalogBuildingVisitor.getResult();
 	}
 }
