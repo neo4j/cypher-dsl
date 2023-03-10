@@ -1589,4 +1589,44 @@ class IssueRelatedIT {
 			.getCypher();
 		assertThat(cypher).isEqualTo("MATCH (n:`Person`) RETURN ([x IN n.roles WHERE (x IN $rolesToAdd AND NOT (x IN $rolesToRemove))] + $rolesToAdd)");
 	}
+
+	@Test // GH-630
+	void typesOfShouldWork() {
+
+		var p = Cypher.path("p").definedBy(Cypher.node("Movie").relationshipFrom(Cypher.anyNode()).named("r"));
+		var x = Cypher.name("x");
+		var relationTypeCast = Cypher.listWith(x)
+			.in(Functions.relationships(p))
+			.returning(Functions.type(x));
+
+		assertThat(Cypher.match(p).returning(relationTypeCast).build().getCypher())
+			.isEqualTo("MATCH p = (:`Movie`)<-[r]-() RETURN [x IN relationships(p) | type(x)]");
+
+		// Current workaround
+		var relationTypeCast2 = Cypher.listWith(x)
+			.in(Functions.relationships(p))
+			.returning(Cypher.call("type").withArgs(x).asFunction());
+		assertThat(Cypher.match(p).returning(relationTypeCast2).build().getCypher())
+			.isEqualTo("MATCH p = (:`Movie`)<-[r]-() RETURN [x IN relationships(p) | type(x)]");
+	}
+
+	@Test // GH-630
+	void labelsOfShouldWork() {
+
+		var p = Cypher.path("p").definedBy(Cypher.node("Movie").relationshipFrom(Cypher.anyNode()).named("r"));
+
+		var nodes = Cypher.name("nodes");
+		var node = Cypher.name("node");
+		var labels = Cypher.name("labels");
+		var label = Cypher.name("label");
+
+		// The worst query ever to retrieve those labels. Don't do this at home.
+		assertThat(Cypher.match(p)
+			.with(Functions.nodes(p).as(nodes))
+			.unwind(nodes).as(node)
+			.with(Functions.labels(node).as(labels))
+			.unwind(labels).as(label)
+			.returningDistinct(label).build().getCypher())
+			.isEqualTo("MATCH p = (:`Movie`)<-[r]-() WITH nodes(p) AS nodes UNWIND nodes AS node WITH labels(node) AS labels UNWIND labels AS label RETURN DISTINCT label");
+	}
 }

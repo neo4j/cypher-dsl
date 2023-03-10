@@ -163,7 +163,25 @@ public final class Functions {
 
 		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
 
-		return FunctionInvocation.create(Lists.LABELS, node.getRequiredSymbolicName());
+		return labels(node.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a  function invocation for  {@code labels{}}.  The {@link SymbolicName  symbolic name} {@code  node} must
+	 * point to a node. This can't be checked during compile time, so please make sure of that.
+	 * <p>
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-labels">labels</a>.
+	 *
+	 * @param node The node for which the labels should be retrieved
+	 * @return A function call for {@code labels()} on a node.
+	 * @since 2023.2.0
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation labels(@NotNull SymbolicName node) {
+
+		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
+
+		return FunctionInvocation.create(Lists.LABELS, node);
 	}
 
 	/**
@@ -178,7 +196,25 @@ public final class Functions {
 
 		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
 
-		return FunctionInvocation.create(Scalars.TYPE, relationship.getRequiredSymbolicName());
+		return type(relationship.getRequiredSymbolicName());
+	}
+
+	/**
+	 * Creates a  function invocation for  {@code type{}}. The {@link  SymbolicName symbolic name}  {@code relationship}
+	 * must point to a relationship. This can't be checked during compile time, so please make sure of that.
+	 * <p>
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-type">type</a>.
+	 *
+	 * @param relationship The relationship for which the type should be retrieved
+	 * @return A function call for {@code type()} on a relationship.
+	 * @since 2023.2.0
+	 */
+	@NotNull @Contract(pure = true)
+	public static FunctionInvocation type(@NotNull SymbolicName relationship) {
+
+		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
+
+		return FunctionInvocation.create(Scalars.TYPE, relationship);
 	}
 
 	/**
