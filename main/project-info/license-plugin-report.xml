@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1678439467493">
+<licensePluginReport goal="CHECK" timestamp="1678445113401">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -139,6 +139,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/SubqueryExpression.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/SymbolicName.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/TemporalLiteral.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/TreeNode.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/UnionPart.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/UnionQueryImpl.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Unwind.java" result="PRESENT"/>
@@ -167,8 +168,11 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/ConstantParameterHolder.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/DefaultStatementContext.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/Distinct.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/internal/FixedNamesStrategy.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/internal/GeneratedNamesStrategy.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/HandlerException.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/LoadCSV.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/internal/NameResolvingStrategy.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/Namespace.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/ProcedureName.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/ReflectiveVisitor.java" result="PRESENT"/>
@@ -234,6 +238,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/TemporalLiteralTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/TestUtils.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ToStringSmokeTest.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/TreeNodeTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/UseIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/LoadCSVTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/ReflectiveVisitorTest.java" result="PRESENT"/>
@@ -242,6 +247,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/QueryDSLAdapterTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/Stuff.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/UnsupportedOperatorExceptionTest.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/renderer/ConfigurableRendererTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/renderer/ConfigurationTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/renderer/DefaultVisitorTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/renderer/PrettyPrintingVisitorTest.java" result="PRESENT"/>
