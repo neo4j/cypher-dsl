@@ -19,13 +19,15 @@
 package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -70,14 +72,14 @@ public final class TreeNode<E> {
 
 	private final TreeNode<E> parent;
 	private final int level;
-	private final Collection<TreeNode<E>> children;
+	private final List<TreeNode<E>> children;
 	private final E value;
 
 	private TreeNode(TreeNode<E> parent, int level, E value) {
 		this.parent = parent;
 		this.level = level;
 		this.value = value;
-		this.children = new ConcurrentLinkedQueue<>();
+		this.children = new ArrayList<>();
 	}
 
 	/**
@@ -91,6 +93,13 @@ public final class TreeNode<E> {
 		var newChild = new TreeNode<>(this, this.level + 1, childValue);
 		this.children.add(newChild);
 		return newChild;
+	}
+
+	/**
+	 * @return {@literal true} if this is the root node
+	 */
+	public boolean isRoot() {
+		return this.parent == null;
 	}
 
 	/**
@@ -133,6 +142,30 @@ public final class TreeNode<E> {
 	 */
 	public Iterator<TreeNode<E>> preOrder() {
 		return new PreOrderIterator<>(this);
+	}
+
+	/**
+	 * Creates an ASCII representation of this node and its children
+	 *
+	 * @param target   The target to which to print this tree to
+	 * @param toString How to format nodes if this type
+	 */
+	public void printTo(Consumer<CharSequence> target, Function<TreeNode<E>, String> toString) {
+		this.printTo0(target, toString, this, "", true);
+	}
+
+	private void printTo0(Consumer<CharSequence> target, Function<TreeNode<E>, String> toString, TreeNode<E> node, String prefix, boolean isTail) {
+
+		var localValue = toString.apply(node);
+		var connector = isTail ? "└── " : "├── ";
+
+		target.accept(prefix + connector + localValue + "\n");
+
+		for (int i = 0; i < node.children.size(); ++i) {
+			var child = node.children.get(i);
+			var newPrefix = prefix + (isTail ? " ".repeat(connector.length()) : "│   ");
+			printTo0(target, toString, child, newPrefix, i + 1 == node.getChildren().size());
+		}
 	}
 
 	private static class TreeBuildingVisitor implements Visitor {

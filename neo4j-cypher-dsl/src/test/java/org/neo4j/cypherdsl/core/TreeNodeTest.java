@@ -72,4 +72,31 @@ class TreeNodeTest {
 		assertThatExceptionOfType(NoSuchElementException.class)
 			.isThrownBy(it::next);
 	}
+
+	@Test
+	void rootsBloodyRoots() {
+		assertThat(ROOT.isRoot()).isTrue();
+	}
+
+	@Test
+	void printShouldWork() {
+
+		var buffer = new StringBuilder();
+		ROOT.printTo(buffer::append, node -> node.getValue().toString());
+		assertThat(buffer.toString())
+			.isEqualTo("""
+				└── 10
+				    ├── 2
+				    │   ├── 77
+				    │   └── 88
+				    ├── 34
+				    ├── 56
+				    │   └── 1
+				    │       └── 23
+				    └── 100
+				        ├── 7
+				        ├── 8
+				        └── 9
+				""");
+	}
 }

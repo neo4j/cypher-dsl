@@ -87,7 +87,6 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 		if (visitable instanceof Statement statement) {
 			String renderedContent;
 
-			//var contextSupplier = configuration.getContextSupplier();
 			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters());
 			try {
 				read.lock();

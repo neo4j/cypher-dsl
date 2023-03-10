@@ -22,7 +22,6 @@ package org.neo4j.cypherdsl.parser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -178,7 +177,7 @@ class ComparisonIT {
 			""");
 
 		var target = new StringBuilder();
-		print(target, "", TreeNode.from(stmt), true);
+		TreeNode.from(stmt).printTo(target::append, node -> node.getValue() instanceof Statement s ? s.getCypher() : node.getValue().toString());
 		assertThat(target)
 			.isEqualToNormalizingNewlines(
 				"""
@@ -238,19 +237,6 @@ class ComparisonIT {
 				                └── PropertyLookup{cypher=.title}
 				                    └── SymbolicName{cypher=title}
 				""");
-	}
-
-	private static void print(StringBuilder target, String prefix, TreeNode<?> node, boolean isTail) {
-		var value = node.getValue() instanceof Statement stmt ? stmt.getCypher() : node.getValue().toString();
-		var connector = isTail ? "└── " : "├── ";
-
-		target.append(prefix).append(connector).append(value).append("\n");
-
-		var cnt = new AtomicInteger(0);
-		node.getChildren().forEach(child -> {
-			var newPrefix = prefix + (isTail ? " ".repeat(connector.length()) : "│   ");
-			print(target, newPrefix, child, cnt.incrementAndGet() == node.getChildren().size());
-		});
 	}
 
 	static boolean areSemanticallyEquivalent(Statement statement1, Statement statement2) {
