@@ -83,8 +83,8 @@ class TreeNodeTest {
 
 		var buffer = new StringBuilder();
 		ROOT.printTo(buffer::append, node -> node.getValue().toString());
-		assertThat(buffer.toString())
-			.isEqualTo("""
+		assertThat(buffer)
+			.hasToString("""
 				└── 10
 				    ├── 2
 				    │   ├── 77

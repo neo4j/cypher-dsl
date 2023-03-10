@@ -179,7 +179,7 @@ class ComparisonIT {
 		var target = new StringBuilder();
 		TreeNode.from(stmt).printTo(target::append, node -> node.getValue() instanceof Statement s ? s.getCypher() : node.getValue().toString());
 		assertThat(target)
-			.isEqualToNormalizingNewlines(
+			.hasToString(
 				"""
 				└── MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
 				    ├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
