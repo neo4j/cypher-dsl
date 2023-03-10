@@ -82,10 +82,10 @@ public final class MapProjection implements Expression {
 	private static Object contentAt(Object[] content, int i) {
 
 		Object currentObject = content[i];
-		if (currentObject instanceof Expression) {
-			return Expressions.nameOrExpression((Expression) currentObject);
-		} else if (currentObject instanceof Named) {
-			return ((Named) currentObject).getSymbolicName().map(Object.class::cast).orElse(currentObject);
+		if (currentObject instanceof Expression expression) {
+			return Expressions.nameOrExpression(expression);
+		} else if (currentObject instanceof Named named) {
+			return named.getSymbolicName().map(Object.class::cast).orElse(currentObject);
 		}
 		return currentObject;
 	}
@@ -107,17 +107,17 @@ public final class MapProjection implements Expression {
 			}
 			Object current = contentAt(content, i);
 
-			if (current instanceof String) {
+			if (current instanceof String stringValue) {
 				if (next instanceof Expression) {
-					lastKey = (String) current;
+					lastKey = stringValue;
 					lastExpression = (Expression) next;
 					i += 2;
 				} else {
 					lastExpression = PropertyLookup.forName((String) current);
 					i += 1;
 				}
-			} else if (current instanceof Expression) {
-				lastExpression = (Expression) current;
+			} else if (current instanceof Expression expression) {
+				lastExpression = expression;
 				i += 1;
 			}
 			if (lastExpression instanceof Asterisk) {

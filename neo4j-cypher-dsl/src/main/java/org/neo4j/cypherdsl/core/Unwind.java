@@ -40,8 +40,8 @@ public final class Unwind extends AbstractClause implements ReadingClause {
 
 	Unwind(Expression expressionToUnwind, String variable) {
 
-		if (expressionToUnwind instanceof Aliased) {
-			this.expressionToUnwind = ((Aliased) expressionToUnwind).asName();
+		if (expressionToUnwind instanceof Aliased aliased) {
+			this.expressionToUnwind = aliased.asName();
 		} else {
 			this.expressionToUnwind = expressionToUnwind;
 		}

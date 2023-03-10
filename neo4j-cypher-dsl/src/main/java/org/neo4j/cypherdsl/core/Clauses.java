@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -210,8 +209,8 @@ public final class Clauses {
 	 * Creates a {@literal CALL {}} sub-query clause. No checking is done whether the statement passed in returns anything meaningful
 	 * so that the resulting clause will be runnable or not.
 	 *
-	 * @param statement A statement to be used inside the subquery.
-	 * @return An immutable subquery clause.
+	 * @param statement A statement to be used inside the sub-query.
+	 * @return An immutable sub-query clause.
 	 */
 	public static Clause callClause(Statement statement) {
 
@@ -231,7 +230,7 @@ public final class Clauses {
 		Assertions.isTrue(updatingClauses.stream().allMatch(UpdatingClause.class::isInstance),
 			"Only updating clauses SET, REMOVE, CREATE, MERGE, DELETE, and FOREACH are allowed as clauses applied inside FOREACH.");
 		return new Foreach(v, list,
-			updatingClauses.stream().map(UpdatingClause.class::cast).collect(Collectors.toList()));
+			updatingClauses.stream().map(UpdatingClause.class::cast).toList());
 	}
 
 	/**
