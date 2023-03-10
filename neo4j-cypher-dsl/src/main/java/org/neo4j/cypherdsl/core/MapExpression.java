@@ -65,10 +65,10 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 		for (int i = 0; i < input.length; i += 2) {
 			Object keyCandidate = input[i];
 			String key;
-			if (keyCandidate instanceof String) {
-				key = (String) keyCandidate;
-			} else if (keyCandidate instanceof Property) {
-				List<PropertyLookup> names = ((Property) keyCandidate).getNames();
+			if (keyCandidate instanceof String v) {
+				key = v;
+			} else if (keyCandidate instanceof Property property) {
+				List<PropertyLookup> names = property.getNames();
 				if (names.size() != 1) {
 					throw new IllegalArgumentException("Nested properties are not supported in a map expression");
 				}

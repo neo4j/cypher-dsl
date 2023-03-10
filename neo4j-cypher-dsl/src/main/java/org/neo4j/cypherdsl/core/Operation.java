@@ -18,13 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
@@ -82,7 +81,7 @@ public final class Operation implements Expression {
 			String.format("Only operators %s can be used to modify labels", LABEL_OPERATORS));
 		Assertions.notEmpty(nodeLabels, "The labels cannot be empty.");
 
-		List<NodeLabel> listOfNodeLabels = Arrays.stream(nodeLabels).map(NodeLabel::new).collect(Collectors.toList());
+		List<NodeLabel> listOfNodeLabels = Arrays.stream(nodeLabels).map(NodeLabel::new).toList();
 		return new Operation(op1.getRequiredSymbolicName(), operator, new NodeLabels(listOfNodeLabels));
 	}
 

@@ -146,8 +146,8 @@ public final class Expressions {
 	 */
 	static <T extends Expression> Expression nameOrExpression(T expression) {
 
-		if (expression instanceof Named) {
-			return ((Named) expression).getSymbolicName().map(Expression.class::cast).orElse(expression);
+		if (expression instanceof Named named) {
+			return named.getSymbolicName().map(Expression.class::cast).orElse(expression);
 		} else {
 			return expression;
 		}
@@ -164,20 +164,20 @@ public final class Expressions {
 
 	static String format(Expression expression) {
 
-		if (expression instanceof Named) {
-			return ((Named) expression).getRequiredSymbolicName().getValue();
-		} else if (expression instanceof AliasedExpression) {
-			return ((AliasedExpression) expression).getAlias();
-		} else if (expression instanceof SymbolicName) {
-			return ((SymbolicName) expression).getValue();
+		if (expression instanceof Named named) {
+			return named.getRequiredSymbolicName().getValue();
+		} else if (expression instanceof AliasedExpression aliasedExpression) {
+			return aliasedExpression.getAlias();
+		} else if (expression instanceof SymbolicName symbolicName) {
+			return symbolicName.getValue();
 		} else if (expression instanceof Property) {
 			StringBuilder ref = new StringBuilder();
 			expression.accept(segment -> {
-				if (segment instanceof SymbolicName) {
+				if (segment instanceof SymbolicName symbolicName) {
 					if (ref.length() > 0) {
 						ref.append(".");
 					}
-					ref.append(((SymbolicName) segment).getValue());
+					ref.append(symbolicName.getValue());
 
 				}
 			});

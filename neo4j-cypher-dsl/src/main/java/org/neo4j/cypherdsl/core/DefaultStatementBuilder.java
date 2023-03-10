@@ -988,8 +988,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@NotNull
 		public LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
 
-			DefaultStatementBuilder $this = DefaultStatementBuilder.this.addWith(buildWith());
-			return new DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl(from, withHeaders, $this);
+			DefaultStatementBuilder this0 = DefaultStatementBuilder.this.addWith(buildWith());
+			return new DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl(from, withHeaders, this0);
 		}
 	}
 
