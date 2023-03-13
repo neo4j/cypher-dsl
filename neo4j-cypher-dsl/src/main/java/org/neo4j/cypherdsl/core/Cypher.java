@@ -698,7 +698,7 @@ public final class Cypher {
 			return (Literal<T>) listLiteral;
 		}
 		if (object instanceof Map) {
-			Map<CharSequence, Literal<?>> map = new LinkedHashMap<>();
+			Map<String, Literal<?>> map = new LinkedHashMap<>();
 			BiConsumer<Object, Object> handleEntry = (key, value) -> {
 				if (!(key instanceof CharSequence || key instanceof Character)) {
 					throw new UnsupportedLiteralException(
@@ -714,7 +714,7 @@ public final class Cypher {
 					}
 				}
 			};
-			((Map<String, ?>) object).forEach(handleEntry);
+			((Map<?, ?>) object).forEach(handleEntry);
 			MapLiteral mapLiteral = new MapLiteral(map);
 			return (Literal<T>) mapLiteral;
 		}

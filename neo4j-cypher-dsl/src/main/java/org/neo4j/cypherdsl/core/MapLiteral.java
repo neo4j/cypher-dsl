@@ -34,9 +34,9 @@ import static org.apiguardian.api.API.Status.STABLE;
  * @since 2023.1.1
  */
 @API(status = STABLE, since = "2023.1.1")
-public class MapLiteral extends LiteralBase<Map<CharSequence, Literal<?>>> {
+public class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 
-	MapLiteral(Map<CharSequence, Literal<?>> content) {
+	MapLiteral(Map<String, Literal<?>> content) {
 		super(content);
 	}
 
