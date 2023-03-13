@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -36,24 +35,9 @@ public final class Unwind extends AbstractClause implements ReadingClause {
 
 	private final Expression expressionToUnwind;
 
-	private final String variable;
-
 	Unwind(Expression expressionToUnwind, String variable) {
 
-		if (expressionToUnwind instanceof Aliased aliased) {
-			this.expressionToUnwind = aliased.asName();
-		} else {
-			this.expressionToUnwind = expressionToUnwind;
-		}
-		this.variable = variable;
-	}
-
-	/**
-	 * @return The variable being unwound.
-	 */
-	@API(status = INTERNAL)
-	public String getVariable() {
-		return variable;
+		this.expressionToUnwind = (expressionToUnwind instanceof Aliased aliased ? aliased.asName() : expressionToUnwind).as(variable);
 	}
 
 	@Override

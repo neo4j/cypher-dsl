@@ -713,8 +713,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(Unwind unwind) {
 
-		builder.append(" AS ")
-			.append(unwind.getVariable())
+		builder
 			.append(" ");
 	}
 

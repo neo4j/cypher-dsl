@@ -646,6 +646,8 @@
 								<exclude>org.neo4j.cypherdsl.parser.NodeAtom</exclude>
 								<!-- 2023.1.0 and higher, this is internal API -->
 								<exclude>org.neo4j.cypherdsl.core.StatementContext</exclude>
+								<!-- 2023.2.0 and higher, removed internal API -->
+								<exclude>org.neo4j.cypherdsl.core.Unwind#getVariable()</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
