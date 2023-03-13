@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -76,7 +78,7 @@ class ComparisonIT {
 				"""
 					match (v0:Person)
 					call {
-					match (v0:Movie {title: 'The Matrix'}) where v0.released >= 1900 return v0 as m
+					match (v0:Movie {title: 'The Matrix'}) where v0.released >= 1900 return v0 as v1
 					}
 					return v0.name
 					"""
@@ -104,6 +106,69 @@ class ComparisonIT {
 					}
 					RETURN v0.name, v1.title
 					"""
+			),
+			Arguments.of(
+				"""
+					UNWIND $foo AS input
+					CALL {
+						WITH input
+						CREATE (v0:Movie)
+						SET v0.title = input.title
+						RETURN v0
+					}
+					RETURN count(*)
+					""",
+				"""
+					UNWIND $p0 AS v0
+					CALL {
+						WITH v0
+						CREATE (v1:Movie)
+						SET v1.title = v0.title
+						RETURN v1
+					}
+					RETURN count(*)
+					"""),
+			Arguments.of(
+				"""
+					MATCH (this:Movie)
+					CALL {
+						WITH this
+						MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+						RETURN {
+							min: min(this_actorsAggregate_this0.screentime),
+							max: max(this_actorsAggregate_this0.screentime),
+							average: avg(this_actorsAggregate_this0.screentime),
+							sum: sum(this_actorsAggregate_this0.screentime)
+						} AS this_actorsAggregate_var2
+					}
+					RETURN this {
+						actorsAggregate: {
+							edge: {
+								screentime: this_actorsAggregate_var2
+							}
+						}
+					} AS this
+					""",
+				"""
+					MATCH (v0:Movie)
+					CALL {
+						WITH v0
+						MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
+						RETURN {
+							min: min(v2.screentime),
+							max: max(v2.screentime),
+							average: avg(v2.screentime),
+							sum: sum(v2.screentime)
+						} AS v3
+					}
+					RETURN v0 {
+						actorsAggregate: {
+							edge: {
+								screentime: v3
+							}
+						}
+					} AS v4
+					"""
 			)
 		);
 	}
@@ -112,6 +177,187 @@ class ComparisonIT {
 	@MethodSource
 	void generatedNamesShouldBeGood(String in, String expected) {
 		var stmt = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(true).build())
+			.render(CypherParser.parseStatement(in));
+		assertThat(stmt).isEqualTo(CypherParser.parseStatement(expected).getCypher());
+	}
+
+	static Stream<Arguments> generatedNamesShouldBeConfigurable() {
+		return Stream.of(
+			Arguments.of(
+				EnumSet.allOf(Configuration.GeneratedNames.class),
+				"""
+					MATCH (v0:Movie)
+					WHERE v0.released = $p0
+					CALL {
+						WITH v0
+						MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
+						RETURN {
+							min: min(v2.screentime),
+							max: max(v2.screentime),
+							average: avg(v2.screentime),
+							sum: sum(v2.screentime)
+						} AS v3
+					}
+					RETURN v0 {
+						actorsAggregate: {
+							edge: {
+								screentime: v3
+							}
+						}
+					} AS v4
+					"""
+			),
+			Arguments.of(
+				EnumSet.of(Configuration.GeneratedNames.ENTITY_NAMES),
+				"""
+					MATCH (v0:Movie)
+					WHERE v0.released = $releaseYear
+					CALL {
+						WITH v0
+						MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
+						RETURN {
+							min: min(v2.screentime),
+							max: max(v2.screentime),
+							average: avg(v2.screentime),
+							sum: sum(v2.screentime)
+						} AS this_actorsAggregate_var2
+					}
+					RETURN v0 {
+						actorsAggregate: {
+							edge: {
+								screentime: this_actorsAggregate_var2
+							}
+						}
+					} AS this
+					"""
+			),
+			Arguments.of(
+				EnumSet.of(Configuration.GeneratedNames.PARAMETER_NAMES),
+				"""
+					MATCH (this:Movie)
+					WHERE this.released = $p0
+					CALL {
+						WITH this
+						MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+						RETURN {
+							min: min(this_actorsAggregate_this0.screentime),
+							max: max(this_actorsAggregate_this0.screentime),
+							average: avg(this_actorsAggregate_this0.screentime),
+							sum: sum(this_actorsAggregate_this0.screentime)
+						} AS this_actorsAggregate_var2
+					}
+					RETURN this {
+						actorsAggregate: {
+							edge: {
+								screentime: this_actorsAggregate_var2
+							}
+						}
+					} AS this
+					"""
+			),
+			Arguments.of(
+				EnumSet.of(Configuration.GeneratedNames.ALL_ALIASES),
+				"""
+					MATCH (this:Movie)
+					WHERE this.released = $releaseYear
+					CALL {
+						WITH this
+						MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+						RETURN {
+							min: min(this_actorsAggregate_this0.screentime),
+							max: max(this_actorsAggregate_this0.screentime),
+							average: avg(this_actorsAggregate_this0.screentime),
+							sum: sum(this_actorsAggregate_this0.screentime)
+						} AS v0
+					}
+					RETURN this {
+						actorsAggregate: {
+							edge: {
+								screentime: v0
+							}
+						}
+					} AS v1
+					"""
+			),
+			Arguments.of(
+				EnumSet.of(Configuration.GeneratedNames.INTERNAL_ALIASES_ONLY),
+				"""
+					MATCH (this:Movie)
+					WHERE this.released = $releaseYear
+					CALL {
+						WITH this
+						MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+						RETURN {
+							min: min(this_actorsAggregate_this0.screentime),
+							max: max(this_actorsAggregate_this0.screentime),
+							average: avg(this_actorsAggregate_this0.screentime),
+							sum: sum(this_actorsAggregate_this0.screentime)
+						} AS v0
+					}
+					RETURN this {
+						actorsAggregate: {
+							edge: {
+								screentime: v0
+							}
+						}
+					} AS this
+					"""
+			),
+			Arguments.of(
+				EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.ALL_ALIASES)),
+				"""
+					MATCH (v0:Movie)
+					WHERE v0.released = $p0
+					CALL {
+						WITH v0
+						MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
+						RETURN {
+							min: min(v2.screentime),
+							max: max(v2.screentime),
+							average: avg(v2.screentime),
+							sum: sum(v2.screentime)
+						} AS v3
+					}
+					RETURN v0 {
+						actorsAggregate: {
+							edge: {
+								screentime: v3
+							}
+						}
+					} AS this
+					"""
+			)
+		);
+	}
+
+
+	@ParameterizedTest
+	@MethodSource
+	void generatedNamesShouldBeConfigurable(Set<Configuration.GeneratedNames> config, String expected) {
+
+		var in = """
+			MATCH (this:Movie)
+			WHERE this.released = $releaseYear
+			CALL {
+				WITH this
+				MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+				RETURN {
+					min: min(this_actorsAggregate_this0.screentime),
+					max: max(this_actorsAggregate_this0.screentime),
+					average: avg(this_actorsAggregate_this0.screentime),
+					sum: sum(this_actorsAggregate_this0.screentime)
+				} AS this_actorsAggregate_var2
+			}
+			RETURN this {
+				actorsAggregate: {
+					edge: {
+						screentime: this_actorsAggregate_var2
+					}
+				}
+			} AS this
+			""";
+
+		var stmt = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(config).build())
 			.render(CypherParser.parseStatement(in));
 		assertThat(stmt).isEqualTo(CypherParser.parseStatement(expected).getCypher());
 	}

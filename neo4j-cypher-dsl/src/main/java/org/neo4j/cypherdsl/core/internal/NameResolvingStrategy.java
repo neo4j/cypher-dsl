@@ -20,10 +20,15 @@ package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.EnumSet;
+import java.util.Set;
+
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.renderer.Configuration.GeneratedNames;
 
 /**
  * This class acts as facade towards the {@link StatementContext statement context} and can generate variable and
@@ -38,10 +43,21 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	 * Creates a strategy for using generated names in the given context
 	 *
 	 * @param context A statement context
+	 * @param config for which generated names should be used
 	 * @return A new strategy
 	 */
-	static NameResolvingStrategy useGeneratedNames(StatementContext context) {
-		return new GeneratedNamesStrategy(context);
+	static NameResolvingStrategy useGeneratedNames(StatementContext context, Set<GeneratedNames> config) {
+		return new GeneratedNamesStrategy(context, config);
+	}
+
+	/**
+	 * Creates a strategy that uses generated parameter names.
+	 *
+	 * @param context A statement context
+	 * @return A new strategy
+	 */
+	static NameResolvingStrategy useGeneratedParameterNames(StatementContext context) {
+		return new GeneratedNamesStrategy(context, EnumSet.of(GeneratedNames.PARAMETER_NAMES));
 	}
 
 	/**
@@ -57,11 +73,20 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	/**
 	 * Resolves a symbolic name
 	 *
-	 * @param symbolicName The name to resolve
-	 * @param inEntity     {@literal true} if this happens inside an entity
+	 * @param symbolicName     The name to resolve
+	 * @param inEntity         {@literal true} if this happens inside an entity
+	 * @param inPropertyLookup {@literal true} if this happens for a property lookup
 	 * @return A value
 	 */
-	String resolve(SymbolicName symbolicName, boolean inEntity);
+	String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup);
+
+	/**
+	 * Resolves an aliased expression.
+	 *
+	 * @param aliasedExpression The aliased expression to resolve
+	 * @return A value
+	 */
+	String resolve(AliasedExpression aliasedExpression, boolean isNew, boolean inLastReturn);
 
 	/**
 	 * @param symbolicName The name that might be already resolved

@@ -70,7 +70,7 @@ final class ParameterCollectingVisitor implements Visitor {
 
 	ParameterCollectingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 		this.statementContext = statementContext;
-		this.nameGenerator = NameResolvingStrategy.useGeneratedNames(statementContext);
+		this.nameGenerator = NameResolvingStrategy.useGeneratedParameterNames(statementContext);
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 

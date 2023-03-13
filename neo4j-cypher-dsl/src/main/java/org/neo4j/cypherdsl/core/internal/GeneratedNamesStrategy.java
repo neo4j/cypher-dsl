@@ -19,12 +19,16 @@
 package org.neo4j.cypherdsl.core.internal;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.renderer.Configuration.GeneratedNames;
 
 final class GeneratedNamesStrategy implements NameResolvingStrategy {
 
@@ -39,20 +43,61 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 
 	private final Map<Key, String> nameLookup = new ConcurrentHashMap<>();
 
-	GeneratedNamesStrategy(StatementContext statementContext) {
+	private final Set<GeneratedNames> config;
+
+	GeneratedNamesStrategy(StatementContext statementContext, Set<GeneratedNames> config) {
 		this.statementContext = statementContext;
+		this.config = config;
 	}
 
 	@Override
-	public String resolve(SymbolicName symbolicName, boolean inEntity) {
+	public String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup) {
+
+		if (inPropertyLookup) {
+			return statementContext.resolve(symbolicName);
+		}
+
+		// Maybe it has been used as an alias, so we can't skip early
+		var theKey = new Key(symbolicName);
+		if (!config.contains(GeneratedNames.ENTITY_NAMES)) {
+			// Not using nameLookup.getOrDefault() to not resolve the name early
+			if (nameLookup.containsKey(theKey)) {
+				return nameLookup.get(theKey);
+			}
+			return statementContext.resolve(symbolicName);
+		}
+
 		return nameLookup.computeIfAbsent(
-			new Key(symbolicName),
+			theKey,
 			key -> inEntity ? String.format("v%d", variableCount.incrementAndGet()) : statementContext.resolve((SymbolicName) key.value())
 		);
 	}
 
 	@Override
+	public String resolve(AliasedExpression aliasedExpression, boolean isNew, boolean inLastReturn) {
+
+		if (!(config.contains(GeneratedNames.ALL_ALIASES) || (config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY) && !inLastReturn))) {
+			return aliasedExpression.getAlias();
+		}
+
+		var symNameKey = new Key(aliasedExpression.asName());
+		Function<Key, String> nameSupplier = key -> String.format("v%d", variableCount.incrementAndGet());
+		if (isNew) {
+			var result = nameSupplier.apply(symNameKey);
+			nameLookup.put(symNameKey, result);
+			return result;
+		} else {
+			return nameLookup.computeIfAbsent(symNameKey, nameSupplier);
+		}
+	}
+
+	@Override
 	public String resolve(Parameter<?> parameter) {
+
+		if (!config.contains(GeneratedNames.PARAMETER_NAMES)) {
+			return statementContext.getParameterName(parameter);
+		}
+
 		return nameLookup.computeIfAbsent(
 			new Key(parameter),
 			key -> {

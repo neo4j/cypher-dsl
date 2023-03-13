@@ -73,10 +73,10 @@ class ConfigurableRendererTest {
 		var cypher1 = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(true).build())
 			.render(statement);
 
-		var expectedGeneratedNames = "WITH 'The Matrix' AS title " +
-			"MATCH (v0:`Movie` {foo: 'bazbar'})<-[v1:`ACTED_IN`]-(v2:`Actor`) " +
-			"WHERE (v0.title = title AND v2.name = 'Keanu Reeves' AND v2.born = $p0 AND " +
-			"v2.cool = $p1 AND v2.cool2 = $p1 AND v2.whatever = $p0 AND v1.x = $pcdsl01) RETURN v0.f";
+		var expectedGeneratedNames = "WITH 'The Matrix' AS v0 " +
+			"MATCH (v1:`Movie` {foo: 'bazbar'})<-[v2:`ACTED_IN`]-(v3:`Actor`) " +
+			"WHERE (v1.title = v0 AND v3.name = 'Keanu Reeves' AND v3.born = $p0 AND " +
+			"v3.cool = $p1 AND v3.cool2 = $p1 AND v3.whatever = $p0 AND v2.x = $pcdsl01) RETURN v1.f";
 
 		var expectedDefault = "WITH 'The Matrix' AS title " +
 			"MATCH (n:`Movie` {foo: 'bazbar'})<-[r:`ACTED_IN`]-(a:`Actor`) " +
