@@ -20,11 +20,14 @@ package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Set;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.renderer.Configuration.GeneratedNames;
 
 /**
  * This class acts as facade towards the {@link StatementContext statement context} and can generate variable and
@@ -41,8 +44,8 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	 * @param context A statement context
 	 * @return A new strategy
 	 */
-	static NameResolvingStrategy useGeneratedNames(StatementContext context) {
-		return new GeneratedNamesStrategy(context);
+	static NameResolvingStrategy useGeneratedNames(StatementContext context, Set<GeneratedNames> config) {
+		return new GeneratedNamesStrategy(context, config);
 	}
 
 	/**
@@ -71,7 +74,7 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	 * @param aliasedExpression The aliased expression to resolve
 	 * @return A value
 	 */
-	String resolve(AliasedExpression aliasedExpression, boolean isNew);
+	String resolve(AliasedExpression aliasedExpression, boolean isNew, boolean inLastReturn);
 
 	/**
 	 * @param symbolicName The name that might be already resolved

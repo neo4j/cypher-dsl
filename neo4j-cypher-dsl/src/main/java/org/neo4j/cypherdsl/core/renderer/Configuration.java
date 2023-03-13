@@ -20,7 +20,9 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.EnumSet;
 import java.util.Objects;
+import java.util.Set;
 
 import org.apiguardian.api.API;
 
@@ -53,6 +55,28 @@ public final class Configuration {
 	}
 
 	/**
+	 * Enum for configuring name rewriting.
+	 */
+	public enum GeneratedNames {
+		/**
+		 * Entity names are rewritten
+		 */
+		ENTITY_NAMES,
+		/**
+		 * Parameter names are rewritten
+		 */
+		PARAMETER_NAMES,
+		/**
+		 * All aliases are rewritten
+		 */
+		ALL_ALIASES,
+		/**
+		 * All aliases except the ones used in the last {@literal RETURN} clause.
+		 */
+		INTERNAL_ALIASES_ONLY
+	}
+
+	/**
 	 * Set to {@literal true} to enable pretty printing.
 	 */
 	private final boolean prettyPrint;
@@ -74,13 +98,14 @@ public final class Configuration {
 	private final boolean alwaysEscapeNames;
 
 	/**
-	 * Turning this flag on will replace all symbolic names and all parameter names with a generated name. This name will
-	 * stay constant for the lifetime of a statement. It defaults to {@literal false}. This flag can be useful if you want
-	 * to normalize your statements: Imagine two statements coming from two different sources who may have used different
-	 * variable or parameter names. Turning {@code useGeneratedNames} on will make those statements produce the same rendering,
-	 * given they have the same semantics.
+	 * Configure  if and  which names  (identifiers of  entities, parameter  names and  aliases) will  be replaced  with
+	 * generated names during  rendering. The names will stay constant  for the lifetime of a statement.  It defaults to
+	 * the empty set. This setting can be useful if you want to normalize your statements: Imagine two statements coming
+	 * from two different  sources who may have used  different variable or parameter names. Using  generated names will
+	 * make those statements produce the same rendering, given they have the same semantics.
+	 *
 	 */
-	private final boolean useGeneratedNames;
+	private final Set<GeneratedNames> generatedNames;
 
 	/**
 	 * The dialect to use when rendering a statement. The default dialect works well with Neo4j 4.4 and prior.
@@ -123,7 +148,7 @@ public final class Configuration {
 		private int indentSize = 2;
 		private boolean alwaysEscapeNames = true;
 		private Dialect dialect = Dialect.DEFAULT;
-		private boolean useGeneratedNames = false;
+		private Set<GeneratedNames> generatedNames = EnumSet.noneOf(GeneratedNames.class);
 
 		private Builder() {
 		}
@@ -181,11 +206,26 @@ public final class Configuration {
 
 		/**
 		 * Configure whether variable names should be always generated.
-		 * @param useGeneratedNames Set to {@literal true} to use generated symbolic and parameter names.
+		 * @param useGeneratedNames Set to {@literal true} to use generated symbolic names, parameter names and aliases
 		 * @return this builder
 		 */
 		public Builder useGeneratedNames(boolean useGeneratedNames) {
-			this.useGeneratedNames = useGeneratedNames;
+			if (useGeneratedNames) {
+				this.generatedNames = EnumSet.allOf(GeneratedNames.class);
+			} else {
+				this.generatedNames = EnumSet.noneOf(GeneratedNames.class);
+			}
+			return this;
+		}
+
+		/**
+		 * Configure for which type of object generated names should be used.
+		 *
+		 * @param useGeneratedNames The set of objects for which generated names should be used
+		 * @return this builder
+		 */
+		public Builder useGeneratedNames(Set<GeneratedNames> useGeneratedNames) {
+			this.generatedNames = Objects.requireNonNullElseGet(useGeneratedNames, () -> EnumSet.noneOf(GeneratedNames.class));
 			return this;
 		}
 
@@ -216,7 +256,7 @@ public final class Configuration {
 		this.indentStyle = builder.indentStyle;
 		this.indentSize = builder.indentSize;
 		this.dialect = builder.dialect == null ? Dialect.DEFAULT : builder.dialect;
-		this.useGeneratedNames = builder.useGeneratedNames;
+		this.generatedNames = builder.generatedNames;
 	}
 
 	/**
@@ -248,11 +288,19 @@ public final class Configuration {
 	}
 
 	/**
+	 * @return The set of object types for which generated names should be used
+	 * @since 2023.2.0
+	 */
+	public Set<GeneratedNames> getGeneratedNames() {
+		return generatedNames;
+	}
+
+	/**
 	 * @return {@literal true} when symbolic and parameter names should be replaced with generated names
 	 * @since 2023.2.0
 	 */
 	public boolean isUseGeneratedNames() {
-		return useGeneratedNames;
+		return !this.generatedNames.isEmpty();
 	}
 
 	/**
@@ -273,12 +321,12 @@ public final class Configuration {
 		Configuration that = (Configuration) o;
 		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle &&
 			alwaysEscapeNames == that.alwaysEscapeNames && dialect == that.dialect &&
-			useGeneratedNames == that.useGeneratedNames;
+			generatedNames.equals(that.generatedNames);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect, useGeneratedNames);
+		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect, generatedNames);
 	}
 
 	@Override

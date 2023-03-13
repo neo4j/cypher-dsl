@@ -41,7 +41,7 @@ final class FixedNamesStrategy implements NameResolvingStrategy {
 	}
 
 	@Override
-	public String resolve(AliasedExpression aliasedExpression, boolean isNew) {
+	public String resolve(AliasedExpression aliasedExpression, boolean isNew, boolean inLastReturn) {
 		return aliasedExpression.getAlias();
 	}
 

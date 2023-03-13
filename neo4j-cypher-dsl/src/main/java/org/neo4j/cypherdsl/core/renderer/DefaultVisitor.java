@@ -209,7 +209,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
-		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ? NameResolvingStrategy.useGeneratedNames(statementContext) :
+		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ? NameResolvingStrategy.useGeneratedNames(statementContext, configuration.getGeneratedNames()) :
 			NameResolvingStrategy.useGivenNames(statementContext);
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
@@ -380,10 +380,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append("DISTINCT ");
 	}
 
+	boolean inReturn;
 	void enter(Return returning) {
+
+		inReturn = true;
 		if (!returning.isRaw()) {
 			builder.append("RETURN ");
 		}
+	}
+
+	void leave(Return returning) {
+		inReturn = false;
 	}
 
 	void enter(With with) {
@@ -407,17 +414,21 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
+	boolean inLastReturn() {
+		return inReturn && !inSubquery;
+	}
+
 	void enter(AliasedExpression aliased) {
 
 		if (this.visitableToAliased.contains(aliased)) {
-			builder.append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, false)));
+			builder.append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, false, inLastReturn())));
 		}
 	}
 
 	void leave(AliasedExpression aliased) {
 
 		if (!(this.visitableToAliased.contains(aliased) || skipAliasing)) {
-			builder.append(" AS ").append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, true)));
+			builder.append(" AS ").append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, true, inLastReturn())));
 		}
 	}
 
@@ -815,13 +826,16 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(anEnum.name().replace("_", " ")).append(" ");
 	}
 
+	boolean inSubquery;
 	void enter(Subquery subquery) {
 
+		this.inSubquery = true;
 		builder.append("CALL {");
 	}
 
 	void leave(Subquery subquery) {
 
+		this.inSubquery = false;
 		int l = builder.length() - 1;
 		if (builder.charAt(l) == ' ' && !subquery.doesReturnOrYield()) {
 			builder.replace(l, builder.length(), "}");
