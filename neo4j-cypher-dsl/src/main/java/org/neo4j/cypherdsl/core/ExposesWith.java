@@ -39,15 +39,6 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 public interface ExposesWith {
 
 	/**
-	 * Pipes all known variables into the next step of the pipeline
-	 * @param asterisk the asterisk
-	 * @return A match that can be build now
-	 */
-	default OrderableOngoingReadingAndWithWithoutWhere with(@SuppressWarnings("unused") Asterisk asterisk) {
-		return with(Asterisk.IdentifiableAsterisk.INSTANCE);
-	}
-
-	/**
 	 * Starts a with clause by passing variables to it.
 	 *
 	 * @param variables The variables to pass on to the next part
