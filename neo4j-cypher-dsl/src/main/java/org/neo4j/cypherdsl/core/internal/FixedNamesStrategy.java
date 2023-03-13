@@ -18,10 +18,15 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
+/**
+ * @author Michael J. Simons
+ * @since 2023.2.0
+ */
 final class FixedNamesStrategy implements NameResolvingStrategy {
 
 	private final StatementContext context;
@@ -31,8 +36,13 @@ final class FixedNamesStrategy implements NameResolvingStrategy {
 	}
 
 	@Override
-	public String resolve(SymbolicName symbolicName, boolean inEntity) {
+	public String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup) {
 		return context.resolve(symbolicName);
+	}
+
+	@Override
+	public String resolve(AliasedExpression aliasedExpression, boolean isNew) {
+		return aliasedExpression.getAlias();
 	}
 
 	@Override

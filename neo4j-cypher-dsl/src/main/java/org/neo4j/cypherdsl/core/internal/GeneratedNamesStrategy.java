@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.core.internal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -44,11 +46,27 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	}
 
 	@Override
-	public String resolve(SymbolicName symbolicName, boolean inEntity) {
+	public String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup) {
+		if (inPropertyLookup) {
+			return statementContext.resolve(symbolicName);
+		}
 		return nameLookup.computeIfAbsent(
 			new Key(symbolicName),
 			key -> inEntity ? String.format("v%d", variableCount.incrementAndGet()) : statementContext.resolve((SymbolicName) key.value())
 		);
+	}
+
+	@Override
+	public String resolve(AliasedExpression aliasedExpression, boolean isNew) {
+		var symNameKey = new Key(aliasedExpression.asName());
+		Function<Key, String> nameSupplier = key -> String.format("v%d", variableCount.incrementAndGet());
+		if (isNew) {
+			var result = nameSupplier.apply(symNameKey);
+			nameLookup.put(symNameKey, result);
+			return result;
+		} else {
+			return nameLookup.computeIfAbsent(symNameKey, nameSupplier);
+		}
 	}
 
 	@Override

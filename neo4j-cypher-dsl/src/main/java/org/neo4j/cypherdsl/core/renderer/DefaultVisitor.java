@@ -198,6 +198,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private final Dialect dialect;
 
 	private boolean inEntity;
+	private boolean inPropertyLookup;
 
 	DefaultVisitor(StatementContext statementContext) {
 		this(statementContext, false);
@@ -409,14 +410,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(AliasedExpression aliased) {
 
 		if (this.visitableToAliased.contains(aliased)) {
-			builder.append(escapeIfNecessary(aliased.getAlias()));
+			builder.append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, false)));
 		}
 	}
 
 	void leave(AliasedExpression aliased) {
 
 		if (!(this.visitableToAliased.contains(aliased) || skipAliasing)) {
-			builder.append(" AS ").append(escapeIfNecessary(aliased.getAlias()));
+			builder.append(" AS ").append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, true)));
 		}
 	}
 
@@ -448,6 +449,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(PropertyLookup propertyLookup) {
 
+		inPropertyLookup = true;
 		if (propertyLookup.isDynamicLookup()) {
 			builder.append("[");
 		} else {
@@ -457,6 +459,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(PropertyLookup propertyLookup) {
 
+		inPropertyLookup = false;
 		if (propertyLookup.isDynamicLookup()) {
 			builder.append("]");
 		}
@@ -525,7 +528,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		if (skipNodeContent) {
 			builder.append(nameResolvingStrategy.resolve(
-				node.getSymbolicName().orElseGet(node::getRequiredSymbolicName), true));
+				node.getSymbolicName().orElseGet(node::getRequiredSymbolicName), true, false));
 		}
 
 		skipSymbolicName = inRelationshipCondition;
@@ -590,9 +593,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(SymbolicName symbolicName) {
-
 		if (!inRelationshipCondition || nameResolvingStrategy.isResolved(symbolicName)) {
-			builder.append(nameResolvingStrategy.resolve(symbolicName, inEntity));
+			builder.append(nameResolvingStrategy.resolve(symbolicName, inEntity, inPropertyLookup));
 		}
 	}
 

@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -57,11 +58,20 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	/**
 	 * Resolves a symbolic name
 	 *
-	 * @param symbolicName The name to resolve
-	 * @param inEntity     {@literal true} if this happens inside an entity
+	 * @param symbolicName     The name to resolve
+	 * @param inEntity         {@literal true} if this happens inside an entity
+	 * @param inPropertyLookup {@literal true} if this happens for a property lookup
 	 * @return A value
 	 */
-	String resolve(SymbolicName symbolicName, boolean inEntity);
+	String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup);
+
+	/**
+	 * Resolves an aliased expression.
+	 *
+	 * @param aliasedExpression The aliased expression to resolve
+	 * @return A value
+	 */
+	String resolve(AliasedExpression aliasedExpression, boolean isNew);
 
 	/**
 	 * @param symbolicName The name that might be already resolved
