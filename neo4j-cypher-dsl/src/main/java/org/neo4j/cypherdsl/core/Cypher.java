@@ -25,10 +25,12 @@ import java.net.URI;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.ResourceBundle;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.apiguardian.api.API;
@@ -647,7 +649,7 @@ public final class Cypher {
 	 * @param object the object to represent.
 	 * @param <T>    The type of the literal returned
 	 * @return a new {@link Literal Literal&lt;?&gt;}.
-	 * @throws IllegalArgumentException when the object cannot be represented as a literal
+	 * @throws UnsupportedLiteralException when the object cannot be represented as a literal
 	 */
 	@SuppressWarnings("unchecked")
 	@NotNull @Contract(pure = true)
@@ -694,6 +696,27 @@ public final class Cypher {
 
 			ListLiteral listLiteral = new ListLiteral(elements);
 			return (Literal<T>) listLiteral;
+		}
+		if (object instanceof Map) {
+			Map<CharSequence, Literal<?>> map = new LinkedHashMap<>();
+			BiConsumer<Object, Object> handleElement = (key, value) -> {
+				if (!(key instanceof CharSequence || key instanceof Character)) {
+					throw new UnsupportedLiteralException(
+							"Unsupported literal map key (not a string/char type).", key);
+				}
+				if (value instanceof Literal) {
+					map.put(key.toString(), (Literal<?>) value);
+				} else {
+					try {
+						map.put(key.toString(), Cypher.literalOf(value));
+					} catch (UnsupportedLiteralException e) {
+						throw new UnsupportedLiteralException("Unsupported literal type in map.", value);
+					}
+				}
+			};
+			((Map<String, ?>) object).forEach(handleElement);
+			MapLiteral mapLiteral = new MapLiteral(map);
+			return (Literal<T>) mapLiteral;
 		}
 		if (object instanceof Boolean) {
 			return (Literal<T>) BooleanLiteral.of((Boolean) object);
