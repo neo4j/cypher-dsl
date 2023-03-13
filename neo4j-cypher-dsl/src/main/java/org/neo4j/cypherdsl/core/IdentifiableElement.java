@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
  * @soundtrack Fatoni &amp; Edgar Wasser - Delirium
  * @since 2021.2.2
  */
-public sealed interface IdentifiableElement permits AliasedExpression, Asterisk.IdentifiableAsterisk, Named, Property, SymbolicName {
+public sealed interface IdentifiableElement permits AliasedExpression, Asterisk, Named, Property, SymbolicName {
 
 	/**
 	 * Transform this element into an expression

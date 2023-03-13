@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public final class Asterisk extends LiteralBase<String> {
+public final class Asterisk extends LiteralBase<String> implements IdentifiableElement {
 
 	/**
 	 * The single instance of the {@code *}.
@@ -47,14 +47,9 @@ public final class Asterisk extends LiteralBase<String> {
 		return super.getContent();
 	}
 
-	enum IdentifiableAsterisk implements IdentifiableElement {
-
-		INSTANCE;
-
-		@NotNull
-		@Override
-		public Expression asExpression() {
-			return Asterisk.INSTANCE;
-		}
+	@Override
+	@NotNull
+	public  Expression asExpression() {
+		return this;
 	}
 }

@@ -1636,11 +1636,23 @@ class IssueRelatedIT {
 		var this0 = Cypher.node("User").named("this");
 		var x = Cypher.name("x");
 		var stmt = Cypher.match(this0)
-			.call(Cypher.withAll().with(this0.as("x")).returning(Functions.count(Cypher.asterisk()).as(x)).build())
+			.call(Cypher.with(Cypher.asterisk()).with(this0.as("x")).returning(Functions.count(Cypher.asterisk()).as(x)).build())
 			.returning(x, Functions.count(Cypher.asterisk()))
 			.build();
 
 		var expected = "MATCH (this:`User`) CALL {WITH * WITH this AS x RETURN count(*) AS x} RETURN x, count(*)";
+		assertThat(stmt.getCypher()).isEqualTo(expected);
+	}
+
+	@Test // GH-634
+	void withAllAndThenSome() {
+
+		var stmt = Cypher.match(Cypher.anyNode("n"))
+			.with(Cypher.asterisk(), Functions.count(Cypher.asterisk()).as("count"))
+			.returning(Cypher.asterisk())
+			.build();
+
+		var expected = "MATCH (n) WITH *, count(*) AS count RETURN *";
 		assertThat(stmt.getCypher()).isEqualTo(expected);
 	}
 }

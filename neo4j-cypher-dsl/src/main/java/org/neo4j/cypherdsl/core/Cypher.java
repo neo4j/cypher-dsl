@@ -468,19 +468,6 @@ public final class Cypher {
 	}
 
 	/**
-	 * Starts a statement with a leading {@code WITH *}, meaning all outer variables are imported into the query.
-	 * The created statement is only semantically meaningful inside a {@code CALL{}} clause.
-	 *
-	 * @return An ongoing with clause.
-	 * @since 2023.2.0
-	 */
-	@NotNull @Contract(pure = true)
-	public static StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withAll() {
-
-		return Statement.builder().with(Cypher.asterisk());
-	}
-
-	/**
 	 * Starts a statement with a leading {@code WITH}. Those are useful for passing on lists of various type that
 	 * can be unwound later on etc. A leading {@code WITH} cannot be used with patterns obviously and needs its
 	 * arguments to have an alias.
