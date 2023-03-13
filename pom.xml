@@ -648,6 +648,8 @@
 								<exclude>org.neo4j.cypherdsl.core.StatementContext</exclude>
 								<!-- 2023.2.0 and higher, removed internal API -->
 								<exclude>org.neo4j.cypherdsl.core.Unwind#getVariable()</exclude>
+								<!-- 2023.2.0 and higher, made Asterisk identifiable proper -->
+								<exclude>org.neo4j.cypherdsl.core.ExposesWith#with(org.neo4j.cypherdsl.core.Asterisk)</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
