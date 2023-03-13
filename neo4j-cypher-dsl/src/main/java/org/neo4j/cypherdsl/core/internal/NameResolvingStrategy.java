@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.apiguardian.api.API;
@@ -42,10 +43,21 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	 * Creates a strategy for using generated names in the given context
 	 *
 	 * @param context A statement context
+	 * @param config for which generated names should be used
 	 * @return A new strategy
 	 */
 	static NameResolvingStrategy useGeneratedNames(StatementContext context, Set<GeneratedNames> config) {
 		return new GeneratedNamesStrategy(context, config);
+	}
+
+	/**
+	 * Creates a strategy that uses generated parameter names.
+	 *
+	 * @param context A statement context
+	 * @return A new strategy
+	 */
+	static NameResolvingStrategy useGeneratedParameterNames(StatementContext context) {
+		return new GeneratedNamesStrategy(context, EnumSet.of(GeneratedNames.PARAMETER_NAMES));
 	}
 
 	/**

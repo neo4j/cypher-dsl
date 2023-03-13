@@ -31,7 +31,6 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.internal.NameResolvingStrategy;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
-import org.neo4j.cypherdsl.core.renderer.Configuration;
 
 /**
  * This is an implementation of a visitor to the Cypher AST created by the Cypher builder
@@ -71,7 +70,7 @@ final class ParameterCollectingVisitor implements Visitor {
 
 	ParameterCollectingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 		this.statementContext = statementContext;
-		this.nameGenerator = NameResolvingStrategy.useGeneratedNames(statementContext, Set.of(Configuration.GeneratedNames.PARAMETER_NAMES));
+		this.nameGenerator = NameResolvingStrategy.useGeneratedParameterNames(statementContext);
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 
