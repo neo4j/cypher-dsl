@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1678737344096">
+<licensePluginReport goal="CHECK" timestamp="1678782545166">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -79,6 +79,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/LiteralBase.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/LoadCSVStatementBuilder.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/MapExpression.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/MapLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/MapProjection.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Match.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Merge.java" result="PRESENT"/>
