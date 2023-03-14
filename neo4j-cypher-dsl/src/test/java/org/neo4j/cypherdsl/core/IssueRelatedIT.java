@@ -25,6 +25,7 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -1654,5 +1655,13 @@ class IssueRelatedIT {
 
 		var expected = "MATCH (n) WITH *, count(*) AS count RETURN *";
 		assertThat(stmt.getCypher()).isEqualTo(expected);
+	}
+
+	@Test // GH-642
+	void mapLiteralShouldRenderProper() {
+
+		var l = Cypher.literalOf(new TreeMap<>(Map.of("a", 1, "b", "c", "whatever", Cypher.literalOf(1))));
+		assertThat(l)
+			.hasToString("MapLiteral{cypher={a: 1, b: 'c', whatever: 1}}");
 	}
 }

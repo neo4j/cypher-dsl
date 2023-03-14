@@ -22,9 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.fail;
 
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.jupiter.api.Test;
@@ -70,6 +73,26 @@ class CypherTest {
 
 		assertThat(listLiteral).isInstanceOf(ListLiteral.class)
 			.returns("[false, true]", Literal::asString);
+	}
+
+	@Test
+	void shouldCreateMapLiterals() {
+
+		Map<Object, Literal<?>> params = new LinkedHashMap<>();
+
+		Map<String, Object> mapValue = new LinkedHashMap<>();
+		mapValue.put("m1", 1);
+		mapValue.put("m2", "m2");
+
+		params.put('k', Cypher.literalFalse()); // Character key also valid
+		params.put("k2", Cypher.literalTrue());
+		params.put("k3", Cypher.literalOf(Arrays.asList("a", "b", "c")));
+		params.put("k4", Cypher.literalOf(mapValue));
+
+		Literal<?> mapLiteral = Cypher.literalOf(params);
+
+		assertThat(mapLiteral).isInstanceOf(MapLiteral.class)
+				.returns("{k: false, k2: true, k3: ['a', 'b', 'c'], k4: {m1: 1, m2: 'm2'}}", Literal::asString);
 	}
 
 	@Test
