@@ -43,23 +43,14 @@ class ExpressionTest {
 		operation.accept(segment -> {
 			int i = counter.getAndIncrement();
 			switch (i) {
-				case 0:
-					assertThat(segment).isInstanceOf(Operation.class);
-					break;
-				case 1:
-					assertThat(segment)
-						.isInstanceOfSatisfying(NumberLiteral.class, v -> assertThat(v.getContent()).isEqualTo(1));
-					break;
-				case 2:
-					assertThat(segment)
-						.isInstanceOfSatisfying(Operator.class, Assertions::assertThat).isEqualTo(expectedOperator);
-					break;
-				case 3:
-					assertThat(segment)
-						.isInstanceOfSatisfying(NumberLiteral.class, v -> assertThat(v.getContent()).isEqualTo(2));
-					break;
-				default:
-					throw new IllegalArgumentException("Too many segments to visit.");
+				case 0 -> assertThat(segment).isInstanceOf(Operation.class);
+				case 1 -> assertThat(segment)
+					.isInstanceOfSatisfying(NumberLiteral.class, v -> assertThat(v.getContent()).isEqualTo(1));
+				case 2 -> assertThat(segment)
+					.isInstanceOfSatisfying(Operator.class, Assertions::assertThat).isEqualTo(expectedOperator);
+				case 3 -> assertThat(segment)
+					.isInstanceOfSatisfying(NumberLiteral.class, v -> assertThat(v.getContent()).isEqualTo(2));
+				default -> throw new IllegalArgumentException("Too many segments to visit.");
 			}
 		});
 		assertThat(counter.get()).isEqualTo(4);

@@ -645,15 +645,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 		implements OngoingOrderDefinition, OrderableOngoingReadingAndWithWithoutWhere,
 		OrderableOngoingReadingAndWithWithWhere, OngoingReadingAndWithWithWhereAndOrder, OngoingReadingAndWithWithSkip {
 
-		protected final ConditionBuilder conditionBuilder = new ConditionBuilder();
-		protected final OrderBuilder orderBuilder = new OrderBuilder();
-		protected boolean distinct;
+		private final ConditionBuilder conditionBuilder = new ConditionBuilder();
+		private final OrderBuilder orderBuilder = new OrderBuilder();
+		private final boolean distinct;
 
-		protected DefaultStatementWithWithBuilder(boolean distinct) {
+		private DefaultStatementWithWithBuilder(boolean distinct) {
 			this.distinct = distinct;
 		}
 
-		protected Optional<With> buildWith() {
+		private Optional<With> buildWith() {
 
 			if (returnList.isEmpty()) {
 				return Optional.empty();
@@ -1195,12 +1195,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		final UpdatingClauseBuilder builder;
 
-		protected DefaultStatementWithUpdateBuilder(UpdateType updateType, PatternElement... pattern) {
+		private DefaultStatementWithUpdateBuilder(UpdateType updateType, PatternElement... pattern) {
 
 			this.builder = getUpdatingClauseBuilder(updateType, pattern);
 		}
 
-		protected DefaultStatementWithUpdateBuilder(UpdateType updateType, Expression... expressions) {
+		private DefaultStatementWithUpdateBuilder(UpdateType updateType, Expression... expressions) {
 
 			this.builder = getUpdatingClauseBuilder(updateType, expressions);
 		}
@@ -1738,7 +1738,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	static final class ConditionBuilder {
-		protected Condition condition;
+		private Condition condition;
 
 		void where(Condition newCondition) {
 

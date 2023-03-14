@@ -49,13 +49,14 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
+	@NotNull
 	public Condition asCondition() {
 
 		if (!(expression instanceof Predicate)) {
 			throw new IllegalArgumentException("Only Query-DSL predicates can be turned into Cypher-DSL's predicates.");
 		}
 
-		if (expression instanceof BooleanBuilder && !((BooleanBuilder) expression).hasValue()) {
+		if (expression instanceof BooleanBuilder booleanBuilder && !booleanBuilder.hasValue()) {
 			return Conditions.noCondition();
 		}
 
@@ -66,6 +67,7 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
+	@NotNull
 	public Expression asExpression() {
 
 		CypherContext context = new CypherContext();
@@ -75,13 +77,13 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
+	@NotNull
 	public Node asNode() {
 
-		if (!(expression instanceof Path<?>)) {
+		if (!(expression instanceof Path<?> entityPath)) {
 			throw new IllegalArgumentException("Only Query-DSL paths can be turned into nodes.");
 		}
 
-		Path<?> entityPath = (Path<?>) expression;
 		return Cypher.node(entityPath.getRoot().getType().getSimpleName()).named(entityPath.getMetadata().getName());
 	}
 
@@ -93,13 +95,13 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
+	@NotNull
 	public SymbolicName asName() {
 
-		if (!(expression instanceof Path<?>)) {
+		if (!(expression instanceof Path<?> entityPath)) {
 			throw new IllegalArgumentException("Only Query-DSL paths can be turned into names.");
 		}
 
-		Path<?> entityPath = (Path<?>) expression;
 		return Cypher.name(entityPath.getMetadata().getName());
 	}
 }

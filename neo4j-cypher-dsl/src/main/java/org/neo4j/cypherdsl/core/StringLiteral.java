@@ -66,13 +66,13 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 			return Optional.empty();
 		}
 
-		final StringBuffer stringBuffer = new StringBuffer();
+		final StringBuilder buffer = new StringBuilder();
 		Matcher matcher = RESERVED_CHARS.matcher(unescapedString);
 		while (matcher.find()) {
-			matcher.appendReplacement(stringBuffer, "\\\\\\" + matcher.group(1));
+			matcher.appendReplacement(buffer, "\\\\\\" + matcher.group(1));
 		}
-		matcher.appendTail(stringBuffer);
-		return Optional.of(stringBuffer.toString());
+		matcher.appendTail(buffer);
+		return Optional.of(buffer.toString());
 	}
 
 }

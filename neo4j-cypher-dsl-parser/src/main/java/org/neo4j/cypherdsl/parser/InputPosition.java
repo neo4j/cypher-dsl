@@ -28,36 +28,5 @@ import org.apiguardian.api.API;
  * @since 2021.3.0
  */
 @API(status = INTERNAL, since = "2021.3.0")
-final class InputPosition {
-
-	private final int offset;
-	private final int line;
-	private final int column;
-
-	InputPosition(int offset, int line, int column) {
-		this.offset = offset;
-		this.line = line;
-		this.column = column;
-	}
-
-	public int getOffset() {
-		return offset;
-	}
-
-	public int getLine() {
-		return line;
-	}
-
-	public int getColumn() {
-		return column;
-	}
-
-	@Override
-	public String toString() {
-		return "InputPosition{" +
-			"offset=" + offset +
-			", line=" + line +
-			", column=" + column +
-			'}';
-	}
+record InputPosition(int offset, int line, int column) {
 }

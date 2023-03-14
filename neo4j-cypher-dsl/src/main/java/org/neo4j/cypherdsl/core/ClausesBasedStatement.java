@@ -20,8 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -48,7 +46,7 @@ class ClausesBasedStatement extends AbstractStatement {
 
 	ClausesBasedStatement(@NotNull List<Clause> clauses, @Nullable UsingPeriodicCommit optionalPeriodicCommit) {
 		this.optionalPeriodicCommit = optionalPeriodicCommit;
-		this.clauses = Collections.unmodifiableList(new ArrayList<>(clauses));
+		this.clauses = List.copyOf(clauses);
 	}
 
 	@Override

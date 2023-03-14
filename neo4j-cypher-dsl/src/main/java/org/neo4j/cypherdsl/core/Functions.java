@@ -147,7 +147,7 @@ public final class Functions {
 
 		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 
-		Expression param = expression instanceof Named ? ((Named) expression).getRequiredSymbolicName() : expression;
+		Expression param = expression instanceof Named named ? named.getRequiredSymbolicName() : expression;
 		return FunctionInvocation.create(Lists.KEYS, param);
 	}
 
@@ -432,7 +432,6 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-substring">rtrim</a>.
 	 *
 	 * @param original An expression resolving to a string
-	 * @param original An expression that returns a string.
 	 * @param start An expression that returns a positive integer, denoting the position at which the substring will begin.
 	 * @param length An expression that returns a positive integer, denoting how many characters of original will be returned.
 	 * @return A function call for {@code substring()}

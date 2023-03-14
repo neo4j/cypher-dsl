@@ -117,37 +117,26 @@ public final class NamedPath implements PatternElement, Named {
 		NamedPath definedBy(Relationship relationship);
 	}
 
-	private static class Builder implements OngoingDefinitionWithName {
+	private record Builder(SymbolicName name) implements OngoingDefinitionWithName {
 
-		private final SymbolicName name;
-
-		private Builder(SymbolicName name) {
-			this.name = name;
-		}
-
+		@NotNull
 		@Override
 		public NamedPath definedBy(PatternElement pattern) {
-			if (pattern instanceof NamedPath) {
-				return (NamedPath) pattern;
+			if (pattern instanceof NamedPath namedPath) {
+				return namedPath;
 			}
 			return new NamedPath(name, pattern);
 		}
 
+		@NotNull
 		@Override
 		public NamedPath get() {
 			return new NamedPath(name);
 		}
 	}
 
-	private static class ShortestPathBuilder implements OngoingShortestPathDefinitionWithName {
-
-		private final SymbolicName name;
-		private final FunctionDefinition algorithm;
-
-		private ShortestPathBuilder(SymbolicName name, FunctionDefinition algorithm) {
-			this.name = name;
-			this.algorithm = algorithm;
-		}
+	private record ShortestPathBuilder(
+		SymbolicName name, FunctionDefinition algorithm) implements OngoingShortestPathDefinitionWithName {
 
 		@Override
 		public NamedPath definedBy(Relationship relationship) {
@@ -171,6 +160,7 @@ public final class NamedPath implements PatternElement, Named {
 	}
 
 	@Override
+	@NotNull
 	public Optional<SymbolicName> getSymbolicName() {
 		return Optional.of(name);
 	}
