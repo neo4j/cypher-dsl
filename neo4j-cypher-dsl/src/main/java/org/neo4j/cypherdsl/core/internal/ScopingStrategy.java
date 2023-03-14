@@ -95,7 +95,7 @@ public final class ScopingStrategy {
 	/**
 	 * Some expressions have implicit scopes, we might not clear that after returning from inner statements or returns.
 	 */
-	private final Deque<Set<IdentifiableElement>> implicitScope = new ArrayDeque<>(new HashSet<>());
+	private final Deque<Set<IdentifiableElement>> implicitScope = new ArrayDeque<>();
 
 	private Set<IdentifiableElement> afterStatement = Collections.emptySet();
 

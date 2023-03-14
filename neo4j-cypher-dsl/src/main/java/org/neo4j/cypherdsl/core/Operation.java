@@ -54,14 +54,11 @@ public final class Operation implements Expression {
 		Assertions.isTrue(operator.isUnary(), "Operator must be unary.");
 		Assertions.notNull(expression, "The expression must not be null.");
 
-		switch (operator.getType()) {
-			case PREFIX:
-				return new Operation(null, operator, expression);
-			case POSTFIX:
-				return new Operation(expression, operator, (Expression) null);
-			default:
-				throw new IllegalArgumentException("Invalid operator type " + operator.getType());
-		}
+		return switch (operator.getType()) {
+			case PREFIX -> new Operation(null, operator, expression);
+			case POSTFIX -> new Operation(expression, operator, (Expression) null);
+			default -> throw new IllegalArgumentException("Invalid operator type " + operator.getType());
+		};
 	}
 
 	static Operation create(Expression op1, Operator operator, Expression op2) {

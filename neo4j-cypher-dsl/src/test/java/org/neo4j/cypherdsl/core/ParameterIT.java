@@ -18,19 +18,18 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Stream;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
  * @author Andreas Berger
@@ -96,7 +95,7 @@ class ParameterIT {
 	void shouldFailWithNoValueVsNull(Statement statement) {
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-			.isThrownBy(() -> statement.getParameters());
+			.isThrownBy(statement::getParameters);
 	}
 
 	@Test
@@ -143,7 +142,7 @@ class ParameterIT {
 				.limit(Cypher.parameter("param").withValue(5)).build();
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(() -> statement.getParameters())
+				.isThrownBy(statement::getParameters)
 				.satisfies(e -> {
 					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
 					assertThat(erroneousParameters).containsKey("param");
@@ -163,7 +162,7 @@ class ParameterIT {
 				.limit(Cypher.parameter("param").withValue(1)).build();
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(() -> statement.getParameters())
+				.isThrownBy(statement::getParameters)
 				.satisfies(e -> {
 					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
 					assertThat(erroneousParameters).containsKey("param");
@@ -201,10 +200,11 @@ class ParameterIT {
 				.isEqualTo(
 						"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b:`Bike`) WHERE b.b = $p2 RETURN b UNION MATCH (b:`Bike`) WHERE b.c = $p3 RETURN b");
 
-		Map<String, Object> expectedParams = new HashMap<>();
-		expectedParams.put("p1", "A");
-		expectedParams.put("p2", "B");
-		expectedParams.put("p3", "C");
+		Map<String, Object> expectedParams = Map.of(
+			"p1", "A",
+			"p2", "B",
+			"p3", "C"
+		);
 		assertThat(statement.getParameters()).containsAllEntriesOf(expectedParams);
 	}
 }

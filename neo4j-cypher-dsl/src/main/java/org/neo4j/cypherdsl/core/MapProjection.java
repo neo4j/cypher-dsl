@@ -108,9 +108,9 @@ public final class MapProjection implements Expression {
 			Object current = contentAt(content, i);
 
 			if (current instanceof String stringValue) {
-				if (next instanceof Expression) {
+				if (next instanceof Expression expression) {
 					lastKey = stringValue;
-					lastExpression = (Expression) next;
+					lastExpression = expression;
 					i += 2;
 				} else {
 					lastExpression = PropertyLookup.forName((String) current);
