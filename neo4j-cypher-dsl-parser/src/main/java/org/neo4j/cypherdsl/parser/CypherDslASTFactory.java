@@ -122,7 +122,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		Expression,
 		Hint,
 		Expression,
-	LabelExpression,
+		LabelExpression,
 		Parameter<?>,
 		Expression,
 		Property,
@@ -1059,7 +1059,7 @@ final class CypherDslASTFactory implements ASTFactory<
 			keysAndValues[i++] = key.string;
 			keysAndValues[i++] = valueIterator.next();
 		}
-		return Cypher.mapOf(keysAndValues);
+		return options.isCreateSortedMaps() ? Cypher.sortedMapOf(keysAndValues) : Cypher.mapOf(keysAndValues);
 	}
 
 	@Override

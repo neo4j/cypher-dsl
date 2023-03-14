@@ -105,7 +105,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 		MapExpression newProperties = null;
 		if (keysAndValues != null && keysAndValues.length != 0) {
-			newProperties = MapExpression.create(keysAndValues);
+			newProperties = MapExpression.create(false, keysAndValues);
 		}
 		return withProperties(newProperties);
 	}

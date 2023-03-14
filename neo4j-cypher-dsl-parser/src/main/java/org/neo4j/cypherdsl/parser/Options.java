@@ -87,6 +87,8 @@ public final class Options {
 
 		private Function<MatchDefinition, Match> matchClauseFactory;
 
+		private boolean createSortedMaps = false;
+
 		private Builder() {
 		}
 
@@ -200,6 +202,18 @@ public final class Options {
 		}
 
 		/**
+		 * Set {@code createSortedMaps} to {@literal true} to parse existing maps into alphabetically sorted maps.
+		 *
+		 * @param createSortedMaps A flag whether to create sorted maps or not
+		 * @return This builder
+		 * @since 2023.2.0
+		 */
+		public Builder createSortedMaps(boolean createSortedMaps) {
+			this.createSortedMaps = createSortedMaps;
+			return this;
+		}
+
+		/**
 		 * @return A new, unmodifiable {@link Options options instance}.
 		 */
 		public Options build() {
@@ -217,7 +231,9 @@ public final class Options {
 
 	private final Function<ReturnDefinition, Return> returnClauseFactory;
 
-	private Function<MatchDefinition, Match> matchClauseFactory;
+	private final Function<MatchDefinition, Match> matchClauseFactory;
+
+	private final boolean createSortedMaps;
 
 	private Options(Builder builder) {
 
@@ -245,6 +261,8 @@ public final class Options {
 			returnDefinition -> (Match) Clauses
 				.match(returnDefinition.optional(), returnDefinition.patternElements(),
 					returnDefinition.optionalWhere(), returnDefinition.optionalHints());
+
+		this.createSortedMaps = builder.createSortedMaps;
 	}
 
 	BiFunction<LabelParsedEventType, Collection<String>, Collection<String>> getLabelFilter() {
@@ -269,6 +287,10 @@ public final class Options {
 
 	Function<MatchDefinition, Match> getMatchClauseFactory() {
 		return matchClauseFactory;
+	}
+
+	boolean isCreateSortedMaps() {
+		return createSortedMaps;
 	}
 
 	/**

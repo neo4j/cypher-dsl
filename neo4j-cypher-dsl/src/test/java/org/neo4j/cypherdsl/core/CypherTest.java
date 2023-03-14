@@ -136,7 +136,7 @@ class CypherTest {
 
 	@Test // GH-189
 	void shouldCreateAdditionalLabelsFromCollection() {
-		Node node = Cypher.node("Primary", MapExpression.create(), Collections.singleton("Secondary"));
+		Node node = Cypher.node("Primary", MapExpression.create(false), Collections.singleton("Secondary"));
 		assertThat(node.getLabels()).extracting("value").containsExactly("Primary", "Secondary");
 	}
 
