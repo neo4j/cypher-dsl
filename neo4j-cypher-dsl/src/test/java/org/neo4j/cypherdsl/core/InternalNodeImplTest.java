@@ -129,7 +129,7 @@ class InternalNodeImplTest {
 		private Stream<Arguments> createNodesWithProperties() {
 			return Stream.of(
 				Arguments.of(new InternalNodeImpl("N").named("n").withProperties("p", Cypher.literalTrue())),
-				Arguments.of(new InternalNodeImpl("N").named("n").withProperties(MapExpression.create("p", Cypher.literalTrue())))
+				Arguments.of(new InternalNodeImpl("N").named("n").withProperties(MapExpression.create(false, "p", Cypher.literalTrue())))
 			);
 		}
 

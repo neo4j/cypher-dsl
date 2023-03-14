@@ -132,7 +132,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 		MapExpression newProperties = null;
 		if (keysAndValues != null && keysAndValues.length != 0) {
-			newProperties = MapExpression.create(keysAndValues);
+			newProperties = MapExpression.create(false, keysAndValues);
 		}
 		return withProperties(newProperties);
 	}

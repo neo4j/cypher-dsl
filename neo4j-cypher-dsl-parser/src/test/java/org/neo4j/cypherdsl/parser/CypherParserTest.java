@@ -478,4 +478,54 @@ class CypherParserTest {
 		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
 		assertThat(cypher).isEqualTo("MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
 	}
+
+	@Test
+	void shouldBeAbleToParseIntoSortedMaps() {
+
+		var in = """
+			MATCH (this:Movie)
+			WHERE this.released = $releaseYear
+			CALL {
+				WITH this
+				MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+				RETURN {
+					min: min(this_actorsAggregate_this0.screentime),
+					max: max(this_actorsAggregate_this0.screentime),
+					average: avg(this_actorsAggregate_this0.screentime),
+					sum: sum(this_actorsAggregate_this0.screentime)
+				} AS this_actorsAggregate_var2
+			}
+			RETURN this {
+				actorsAggregate: {
+					edge: {
+						screentime: this_actorsAggregate_var2
+					}
+				}
+			} AS this
+			""";
+
+		var parsed = CypherParser.parse(in, Options.newOptions().createSortedMaps(true).build());
+		var cypher = Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentStyle(Configuration.IndentStyle.TAB).build()).render(parsed);
+		assertThat(cypher)
+			.isEqualTo("""
+				MATCH (this:Movie)
+				WHERE this.released = $releaseYear
+				CALL {
+					WITH this
+					MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+					RETURN {
+						average: avg(this_actorsAggregate_this0.screentime),
+						max: max(this_actorsAggregate_this0.screentime),
+						min: min(this_actorsAggregate_this0.screentime),
+						sum: sum(this_actorsAggregate_this0.screentime)
+					} AS this_actorsAggregate_var2
+				}
+				RETURN this {
+					actorsAggregate: {
+						edge: {
+							screentime: this_actorsAggregate_var2
+						}
+					}
+				} AS this""");
+	}
 }

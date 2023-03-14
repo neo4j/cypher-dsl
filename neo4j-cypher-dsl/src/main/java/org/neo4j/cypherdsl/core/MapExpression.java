@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,10 +54,10 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 			args[i++] = entry.getKey();
 			args[i++] = value instanceof Expression ? value : Cypher.literalOf(value);
 		}
-		return create(args);
+		return create(false, args);
 	}
 
-	static MapExpression create(Object... input) {
+	static MapExpression create(boolean sort, Object... input) {
 
 		Assertions.isTrue(input.length % 2 == 0, "Need an even number of input parameters");
 		List<Expression> newContent = new ArrayList<>(input.length / 2);
@@ -84,6 +85,9 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 			knownKeys.add(entry.getKey());
 		}
 
+		if (sort) {
+			newContent.sort(Comparator.comparing(o -> ((KeyValueMapEntry) o).getKey()));
+		}
 		return new MapExpression(newContent);
 	}
 

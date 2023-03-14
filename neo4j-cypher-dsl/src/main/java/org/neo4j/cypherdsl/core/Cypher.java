@@ -602,7 +602,19 @@ public final class Cypher {
 	@NotNull @Contract(pure = true)
 	public static MapExpression mapOf(Object... keysAndValues) {
 
-		return MapExpression.create(keysAndValues);
+		return MapExpression.create(false, keysAndValues);
+	}
+
+	/**
+	 * Creates an alphabetically sorted map of expression from a list of key/value pairs.
+	 *
+	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}
+	 * @return A new map expression.
+	 */
+	@NotNull @Contract(pure = true)
+	public static MapExpression sortedMapOf(Object... keysAndValues) {
+
+		return MapExpression.create(true, keysAndValues);
 	}
 
 	/**

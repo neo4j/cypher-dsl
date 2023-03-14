@@ -60,7 +60,7 @@ class InternalRelationshipImplTest {
 				Arguments.of(Cypher.node("N").named("n").relationshipTo(Cypher.anyNode())
 					.withProperties("p", Cypher.literalTrue())),
 				Arguments.of(Cypher.node("N").named("n").relationshipTo(Cypher.anyNode())
-					.withProperties(MapExpression.create("p", Cypher.literalTrue())))
+					.withProperties(MapExpression.create(false, "p", Cypher.literalTrue())))
 			);
 		}
 
