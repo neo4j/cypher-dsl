@@ -650,6 +650,8 @@
 								<exclude>org.neo4j.cypherdsl.core.Unwind#getVariable()</exclude>
 								<!-- 2023.2.0 and higher, made Asterisk identifiable proper -->
 								<exclude>org.neo4j.cypherdsl.core.ExposesWith#with(org.neo4j.cypherdsl.core.Asterisk)</exclude>
+								<!-- 2023.2.0 and higher, internal API being polished -->
+								<exclude>org.neo4j.cypherdsl.core.DefaultStatementBuilder$DefaultStatementWithWithBuilder</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
