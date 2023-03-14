@@ -18,23 +18,22 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
+import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A map of literals.
  *
  * @author Aaron Hiniker
- * @since 2023.1.1
+ * @since 2023.2.0
  */
-@API(status = STABLE, since = "2023.1.1")
-public class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
+@API(status = STABLE, since = "2023.2.0")
+public final class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 
 	MapLiteral(Map<String, Literal<?>> content) {
 		super(content);
@@ -43,8 +42,8 @@ public class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 	@NotNull
 	@Override
 	public String asString() {
-		return StreamSupport.stream(getContent().entrySet().spliterator(), false)
-				.map(entry -> entry.getKey() + ": " + entry.getValue().asString()).collect(
-				Collectors.joining(", ", "{", "}"));
+		return getContent().entrySet().stream()
+			.map(entry -> entry.getKey() + ": " + entry.getValue().asString())
+			.collect(Collectors.joining(", ", "{", "}"));
 	}
 }
