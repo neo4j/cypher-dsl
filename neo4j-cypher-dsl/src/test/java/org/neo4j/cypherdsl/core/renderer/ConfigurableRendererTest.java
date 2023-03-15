@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.EnumSet;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
@@ -98,5 +99,30 @@ class ConfigurableRendererTest {
 		assertThat(cypher1).isSameAs(cypher2);
 
 		assertThat(statement.getCypher()).isEqualTo(expectedDefault);
+	}
+
+	@Test // GH-645
+	void shouldExportSymbolicNames() {
+
+		var stmnt = Cypher.match(Cypher.node("N").named("n"))
+			.call(Cypher.match(Cypher.anyNode("m")).returning(Cypher.name("m")).build())
+			.returning("n", "m")
+			.build();
+		assertThat(Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(
+			EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.ENTITY_NAMES))).build()).render(stmnt))
+			.isEqualTo("MATCH (n:`N`) CALL {MATCH (m) RETURN m} RETURN n, m");
+	}
+
+	@Test // GH-645
+	void shouldExportNamedAsSymbolicNames() {
+
+		var m = Cypher.anyNode("m");
+		var stmnt = Cypher.match(Cypher.node("N").named("n"))
+			.call(Cypher.match(m).returning(m).build())
+			.returning("n", "m")
+			.build();
+		assertThat(Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(
+			EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.ENTITY_NAMES))).build()).render(stmnt))
+			.isEqualTo("MATCH (n:`N`) CALL {MATCH (m) RETURN m} RETURN n, m");
 	}
 }

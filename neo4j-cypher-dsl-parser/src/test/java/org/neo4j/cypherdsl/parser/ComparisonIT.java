@@ -275,6 +275,33 @@ class ComparisonIT {
 						}
 					} AS v5
 					"""
+			),
+			Arguments.of(
+				"""
+					MATCH (this:Post)
+					CALL {
+						WITH this
+						MATCH (this1:User)-[this0:LIKES]->(this)
+						RETURN any(var2 IN collect(this0.someBigInt) WHERE var2 = $param0) AS var3
+					}
+					WITH *
+					WHERE var3 = true
+					RETURN this {
+						.content
+					} AS this
+					""",
+				"""
+					MATCH (v0:Post)
+					CALL {
+						WITH v0
+						MATCH (v1:User)-[v2:LIKES]->(v0)
+						RETURN any(v3 IN collect(v2.someBigInt) WHERE v3 = $p0) AS v4
+					}
+					WITH *
+					WHERE v4 = true
+					RETURN v0 {
+						.content
+					} AS v5"""
 			)
 		);
 	}
@@ -302,7 +329,8 @@ class ComparisonIT {
 							max: max(v2.screentime),
 							average: avg(v2.screentime),
 							sum: sum(v2.screentime)
-						} AS v3
+						} AS v3,
+						any(v4 IN collect(v1.someBigInt) WHERE v4 = $p1) AS v5
 					}
 					RETURN v0 {
 						actorsAggregate: {
@@ -310,7 +338,7 @@ class ComparisonIT {
 								screentime: v3
 							}
 						}
-					} AS v4
+					} AS v6
 					"""
 			),
 			Arguments.of(
@@ -326,7 +354,8 @@ class ComparisonIT {
 							max: max(v2.screentime),
 							average: avg(v2.screentime),
 							sum: sum(v2.screentime)
-						} AS this_actorsAggregate_var2
+						} AS this_actorsAggregate_var2,
+						any(foo IN collect(v1.someBigInt) WHERE foo = $param0) AS blerg
 					}
 					RETURN v0 {
 						actorsAggregate: {
@@ -350,7 +379,8 @@ class ComparisonIT {
 							max: max(this_actorsAggregate_this0.screentime),
 							average: avg(this_actorsAggregate_this0.screentime),
 							sum: sum(this_actorsAggregate_this0.screentime)
-						} AS this_actorsAggregate_var2
+						} AS this_actorsAggregate_var2,
+						any(foo IN collect(this_actorsAggregate_this1.someBigInt) WHERE foo = $p1) AS blerg
 					}
 					RETURN this {
 						actorsAggregate: {
@@ -374,7 +404,8 @@ class ComparisonIT {
 							max: max(this_actorsAggregate_this0.screentime),
 							average: avg(this_actorsAggregate_this0.screentime),
 							sum: sum(this_actorsAggregate_this0.screentime)
-						} AS v0
+						} AS v0,
+						any(foo IN collect(this_actorsAggregate_this1.someBigInt) WHERE foo = $param0) AS v1
 					}
 					RETURN this {
 						actorsAggregate: {
@@ -382,7 +413,7 @@ class ComparisonIT {
 								screentime: v0
 							}
 						}
-					} AS v1
+					} AS v2
 					"""
 			),
 			Arguments.of(
@@ -398,7 +429,8 @@ class ComparisonIT {
 							max: max(this_actorsAggregate_this0.screentime),
 							average: avg(this_actorsAggregate_this0.screentime),
 							sum: sum(this_actorsAggregate_this0.screentime)
-						} AS v0
+						} AS v0,
+						any(foo IN collect(this_actorsAggregate_this1.someBigInt) WHERE foo = $param0) AS v1
 					}
 					RETURN this {
 						actorsAggregate: {
@@ -422,7 +454,8 @@ class ComparisonIT {
 							max: max(v2.screentime),
 							average: avg(v2.screentime),
 							sum: sum(v2.screentime)
-						} AS v3
+						} AS v3,
+						any(v4 IN collect(v1.someBigInt) WHERE v4 = $p1) AS v5
 					}
 					RETURN v0 {
 						actorsAggregate: {
@@ -451,7 +484,8 @@ class ComparisonIT {
 					max: max(this_actorsAggregate_this0.screentime),
 					average: avg(this_actorsAggregate_this0.screentime),
 					sum: sum(this_actorsAggregate_this0.screentime)
-				} AS this_actorsAggregate_var2
+				} AS this_actorsAggregate_var2,
+				any(foo IN collect(this_actorsAggregate_this1.someBigInt) WHERE foo = $param0) AS blerg
 			}
 			RETURN this {
 				actorsAggregate: {
