@@ -707,9 +707,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append("{");
 	}
 
+	boolean inKeyValueMapEntry = false;
 	void enter(KeyValueMapEntry map) {
 
+		this.inKeyValueMapEntry = true;
 		builder.append(escapeIfNecessary(map.getKey())).append(": ");
+	}
+
+
+	void leave(KeyValueMapEntry map) {
+
+		this.inKeyValueMapEntry = false;
 	}
 
 	void leave(MapExpression map) {

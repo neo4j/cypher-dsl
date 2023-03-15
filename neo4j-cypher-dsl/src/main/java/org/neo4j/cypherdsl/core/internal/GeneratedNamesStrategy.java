@@ -32,6 +32,7 @@ import java.util.function.Function;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
+import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -57,7 +58,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	/**
 	 * Unscoped counter for parameters.
 	 */
-	private final AtomicInteger parameterCount = new AtomicInteger(-1);
+	private final AtomicInteger parameterCount = new AtomicInteger(0);
 
 	/**
 	 * Stack of counters per scope for the variable names.
@@ -108,7 +109,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			newUsedNames.addAll(outerNameLookup.values());
 		}
 
-		this.scopedVariableCount.push(new AtomicInteger(-1));
+		this.scopedVariableCount.push(new AtomicInteger(0));
 		this.scopedNameLookup.push(newNameLookup);
 		this.scopedNamesUsed.push(newUsedNames);
 	}
@@ -127,6 +128,12 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			var theKey = Key.of(anExport);
 			if (innerNameLookup.containsKey(theKey)) {
 				outerNameLookup.put(theKey, innerNameLookup.get(theKey));
+			} else if (anExport instanceof AliasedExpression name) {
+				outerNameLookup.put(theKey, name.getAlias());
+			} else if (anExport instanceof SymbolicName name) {
+				outerNameLookup.put(theKey, name.getValue());
+			} else if (anExport instanceof Named name && name.getSymbolicName().isPresent()) {
+				outerNameLookup.put(theKey, name.getSymbolicName().get().getValue());
 			}
 		}
 		previouslyUsedNames.addAll(innerNameLookup.values());
@@ -143,7 +150,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 		var theKey = Key.of(symbolicName);
 		var nameLookup = nameLookup();
 
-		if (!config.contains(GeneratedNames.ENTITY_NAMES)) {
+		if (!config.contains(GeneratedNames.ENTITY_NAMES) || (!inEntity && !config.contains(GeneratedNames.ALL_ALIASES) && !config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY))) {
 			// Not using nameLookup.getOrDefault() to not resolve the name early
 			if (nameLookup.containsKey(theKey)) {
 				return nameLookup.get(theKey);
@@ -151,7 +158,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			return statementContext.resolve(symbolicName);
 		}
 
-		return nameLookup.computeIfAbsent(theKey, key -> inEntity ? newName() : statementContext.resolve((SymbolicName) key.value()));
+		return nameLookup.computeIfAbsent(theKey, key -> newName());
 	}
 
 	private String newName() {
@@ -160,7 +167,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 		var namesUsed = Objects.requireNonNull(scopedNamesUsed.peek());
 		var variableCount = Objects.requireNonNull(this.scopedVariableCount.peek());
 		do {
-			name = String.format("v%d", variableCount.incrementAndGet());
+			name = String.format("v%d", variableCount.getAndIncrement());
 		} while (namesUsed.contains(name));
 		return name;
 	}
@@ -194,7 +201,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			Key.of(parameter),
 			key -> {
 				var p = (Parameter<?>) key.value();
-				return !p.isAnon() ? String.format("p%d", parameterCount.incrementAndGet()) : statementContext.getParameterName(p);
+				return !p.isAnon() ? String.format("p%d", parameterCount.getAndIncrement()) : statementContext.getParameterName(p);
 			});
 	}
 
