@@ -24,6 +24,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
@@ -133,7 +134,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	/**
 	 * Keeps track of scoped, named variables.
 	 */
-	private final ScopingStrategy scopingStrategy = ScopingStrategy.create();
+	private final ScopingStrategy scopingStrategy;
 
 	/**
 	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
@@ -209,8 +210,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
-		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ? NameResolvingStrategy.useGeneratedNames(statementContext, configuration.getGeneratedNames()) :
+		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ?
+			NameResolvingStrategy.useGeneratedNames(statementContext, configuration.getGeneratedNames()) :
 			NameResolvingStrategy.useGivenNames(statementContext);
+
+		this.scopingStrategy = ScopingStrategy.create(
+			List.of(nameResolvingStrategy::enterScope),
+			List.of(nameResolvingStrategy::leaveScope)
+		);
+
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
 		this.dialect = configuration.getDialect();

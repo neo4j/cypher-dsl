@@ -169,6 +169,112 @@ class ComparisonIT {
 						}
 					} AS v4
 					"""
+			),
+			Arguments.of(
+				"""
+					MATCH (this:Movie)
+					CALL {
+						WITH this
+						MATCH (person:Person)-[edge:ACTED_IN]->(this)
+						WITH *
+						WHERE person.name CONTAINS $param0
+						RETURN count(person) AS this_actorsAggregate_var0
+					}
+					CALL {
+						WITH this
+						MATCH (person:Person)-[edge:DIRECTED]->(this)
+						WITH *
+						WHERE person.name CONTAINS $param1
+						RETURN count(person) AS this_directorsAggregate_var0
+					}
+					RETURN this {
+						.title,
+						actorsAggregate: {
+							count: this_actorsAggregate_var0
+						},
+						directorsAggregate: {
+							count: this_directorsAggregate_var0
+						}
+					} AS this""",
+				"""
+					MATCH (v0:Movie)
+					CALL {
+						WITH v0
+						MATCH (v1:Person)-[v2:ACTED_IN]->(v0)
+						WITH *
+						WHERE v1.name CONTAINS $p0
+						RETURN count(v1) AS v3
+					}
+					CALL {
+						WITH v0
+						MATCH (v1:Person)-[v2:DIRECTED]->(v0)
+						WITH *
+						WHERE v1.name CONTAINS $p1
+						RETURN count(v1) AS v4
+					}
+					RETURN v0 {
+						.title,
+						actorsAggregate: {
+							count: v3
+						},
+						directorsAggregate: {
+							count: v4
+						}
+					} AS v5
+					"""
+			),
+			Arguments.of(
+				"""
+					MATCH (this:Movie)
+					CALL {
+						WITH this
+						MATCH (this_actorsAggregate_this1:Person)-[this_actorsAggregate_this0:ACTED_IN]->(this)
+						WITH *
+						WHERE this_actorsAggregate_this1.name CONTAINS $this_actorsAggregate_param0
+						RETURN count(this_actorsAggregate_this1) AS this_actorsAggregate_var2
+					}
+					CALL {
+						WITH this
+						MATCH (this_directorsAggregate_this1:Person)-[this_directorsAggregate_this0:DIRECTED]->(this)
+						WITH *
+						WHERE this_directorsAggregate_this1.name CONTAINS $this_directorsAggregate_param0
+						RETURN count(this_directorsAggregate_this1) AS this_directorsAggregate_var2
+					}
+					RETURN this {
+						.title,
+						actorsAggregate: {
+							count: this_actorsAggregate_var2
+						},
+						directorsAggregate: {
+							count: this_directorsAggregate_var2
+						}
+					} AS this""",
+				"""
+					MATCH (v0:Movie)
+					CALL {
+						WITH v0
+						MATCH (v1:Person)-[v2:ACTED_IN]->(v0)
+						WITH *
+						WHERE v1.name CONTAINS $p0
+						RETURN count(v1) AS v3
+					}
+					CALL {
+						WITH v0
+						MATCH (v1:Person)-[v2:DIRECTED]->(v0)
+						WITH *
+						WHERE v1.name CONTAINS $p1
+						RETURN count(v1) AS v4
+					}
+					RETURN v0 {
+						.title,
+						actorsAggregate: {
+							count: v3
+						},
+						directorsAggregate: {
+							count: v4
+						}
+					} AS v5
+					"""
 			)
 		);
 	}
@@ -176,7 +282,7 @@ class ComparisonIT {
 	@ParameterizedTest
 	@MethodSource
 	void generatedNamesShouldBeGood(String in, String expected) {
-		var stmt = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(true).build())
+		var stmt = Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(true).build())
 			.render(CypherParser.parseStatement(in));
 		assertThat(stmt).isEqualTo(CypherParser.parseStatement(expected).getCypher());
 	}
@@ -330,7 +436,6 @@ class ComparisonIT {
 		);
 	}
 
-
 	@ParameterizedTest
 	@MethodSource
 	void generatedNamesShouldBeConfigurable(Set<Configuration.GeneratedNames> config, String expected) {
@@ -357,7 +462,7 @@ class ComparisonIT {
 			} AS this
 			""";
 
-		var stmt = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(config).build())
+		var stmt = Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(config).build())
 			.render(CypherParser.parseStatement(in));
 		assertThat(stmt).isEqualTo(CypherParser.parseStatement(expected).getCypher());
 	}
@@ -487,7 +592,7 @@ class ComparisonIT {
 
 	static boolean areSemanticallyEquivalent(Statement statement1, Statement statement2) {
 
-		var cfg = Configuration.newConfig().useGeneratedNames(true).build();
+		var cfg = Configuration.newConfig().withGeneratedNames(true).build();
 		var renderer = Renderer.getRenderer(cfg);
 		var cypher1 = renderer.render(statement1);
 		var cypher2 = renderer.render(statement2);

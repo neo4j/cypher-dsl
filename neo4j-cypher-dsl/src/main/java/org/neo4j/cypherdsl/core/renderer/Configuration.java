@@ -209,7 +209,7 @@ public final class Configuration {
 		 * @param useGeneratedNames Set to {@literal true} to use generated symbolic names, parameter names and aliases
 		 * @return this builder
 		 */
-		public Builder useGeneratedNames(boolean useGeneratedNames) {
+		public Builder withGeneratedNames(boolean useGeneratedNames) {
 			if (useGeneratedNames) {
 				this.generatedNames = EnumSet.allOf(GeneratedNames.class);
 			} else {
@@ -224,7 +224,7 @@ public final class Configuration {
 		 * @param useGeneratedNames The set of objects for which generated names should be used
 		 * @return this builder
 		 */
-		public Builder useGeneratedNames(Set<GeneratedNames> useGeneratedNames) {
+		public Builder withGeneratedNames(Set<GeneratedNames> useGeneratedNames) {
 			this.generatedNames = Objects.requireNonNullElseGet(useGeneratedNames, () -> EnumSet.noneOf(GeneratedNames.class));
 			return this;
 		}

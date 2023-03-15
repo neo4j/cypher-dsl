@@ -20,14 +20,17 @@ package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.AliasedExpression;
+import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.renderer.Configuration.GeneratedNames;
 
 /**
@@ -101,4 +104,22 @@ public sealed interface NameResolvingStrategy permits FixedNamesStrategy, Genera
 	 * @return A value
 	 */
 	String resolve(Parameter<?> parameter);
+
+	/**
+	 * A callback used together with a {@link ScopingStrategy} to deal with imports into a local scope
+	 *
+	 * @param cause   The clause that caused the creation of a new scope
+	 * @param imports The imports
+	 */
+	default void enterScope(Visitable cause, Collection<IdentifiableElement> imports) {
+	}
+
+	/**
+	 * A callback used together with a {@link ScopingStrategy} to deal with exports when leaving a local scope
+	 *
+	 * @param cause   The clause being left
+	 * @param exports The exports
+	 */
+	default void leaveScope(Visitable cause, Collection<IdentifiableElement> exports) {
+	}
 }

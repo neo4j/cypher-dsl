@@ -70,7 +70,7 @@ class ConfigurableRendererTest {
 				.returning(Cypher.name("n").property("f"))
 				.build();
 
-		var cypher1 = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(true).build())
+		var cypher1 = Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(true).build())
 			.render(statement);
 
 		var expectedGeneratedNames = "WITH 'The Matrix' AS v0 " +
@@ -92,7 +92,7 @@ class ConfigurableRendererTest {
 			);
 
 		// Compare a second rendering
-		var cypher2 = Renderer.getRenderer(Configuration.newConfig().useGeneratedNames(true).build())
+		var cypher2 = Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(true).build())
 				.render(statement);
 		assertThat(cypher2).isEqualTo(expectedGeneratedNames);
 		assertThat(cypher1).isSameAs(cypher2);
