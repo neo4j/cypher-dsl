@@ -28,11 +28,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
-import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -132,9 +130,6 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 				outerNameLookup.put(theKey, name.getAlias());
 			} else if (anExport instanceof SymbolicName name) {
 				outerNameLookup.put(theKey, name.getValue());
-			} else if (anExport instanceof Named name) {
-				name.getSymbolicName().map(SymbolicName::getValue)
-						.ifPresent(v -> outerNameLookup.put(theKey, v));
 			}
 		}
 		previouslyUsedNames.addAll(innerNameLookup.values());
@@ -180,15 +175,9 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			return aliasedExpression.getAlias();
 		}
 
-		var symNameKey = Key.of(aliasedExpression);
-		Function<Key, String> nameSupplier = key -> newName();
-		if (isNew) {
-			var result = nameSupplier.apply(symNameKey);
-			nameLookup().put(symNameKey, result);
-			return result;
-		} else {
-			return nameLookup().computeIfAbsent(symNameKey, nameSupplier);
-		}
+		var result = newName();
+		nameLookup().put(Key.of(aliasedExpression), result);
+		return result;
 	}
 
 	@Override
