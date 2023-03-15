@@ -132,8 +132,9 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 				outerNameLookup.put(theKey, name.getAlias());
 			} else if (anExport instanceof SymbolicName name) {
 				outerNameLookup.put(theKey, name.getValue());
-			} else if (anExport instanceof Named name && name.getSymbolicName().isPresent()) {
-				outerNameLookup.put(theKey, name.getSymbolicName().get().getValue());
+			} else if (anExport instanceof Named name) {
+				name.getSymbolicName().map(SymbolicName::getValue)
+						.ifPresent(v -> outerNameLookup.put(theKey, v));
 			}
 		}
 		previouslyUsedNames.addAll(innerNameLookup.values());
