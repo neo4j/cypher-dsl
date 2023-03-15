@@ -38,6 +38,10 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.renderer.Configuration.GeneratedNames;
 
+/**
+ * @author Michael J. Simons
+ * @since 2023.2.0
+ */
 final class GeneratedNamesStrategy implements NameResolvingStrategy {
 
 	record Key(Object value) {
@@ -87,6 +91,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 		return Objects.requireNonNull(scopedNameLookup.peek());
 	}
 
+	@Override
 	public void enterScope(Visitable cause, Collection<IdentifiableElement> imports) {
 
 		var newNameLookup = new HashMap<Key, String>();
@@ -108,6 +113,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 		this.scopedNamesUsed.push(newUsedNames);
 	}
 
+	@Override
 	public void leaveScope(Visitable cause, Collection<IdentifiableElement> exports) {
 
 		this.scopedVariableCount.pop();
