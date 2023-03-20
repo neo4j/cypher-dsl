@@ -1,0 +1,89 @@
+== 2023.2
+
+=== 2023.2.0
+
+Thanks to @Andy2003 for his input on the 2023.2.0 release. The main topic of this release is https://github.com/neo4j-contrib/cypher-dsl/issues/596[adding support for semantic comparison]. The Cypher-DSLs builder method creates an AST, so that is in theory an excellent and doable request. The AST has originally been created as good enough means of rendering Cypher proper when we invented the Cypher-DSL for Spring Data Neo4j 6 back in 2019. Good enough here means that it has optimizing potential and a full-blown analysis is - at least at the moment - out of scope.
+
+Instead, we went with another approach: We added ways of normalizing
+
+* Variable names (identifiers for entities (nodes and relationships) and variables of lists and map comprehensions)
+* Parameter names
+* Aliases
+
+into generated names and optionally make the parsing of literal Cypher maps constant (maps sorted alphabetically and not by order of key appearance).
+
+This allows now for a "poor man's" semantic comparison. Imagine 2 Cypher-DSL `Statement` objects that you either created using the builder or parsed through our parser module. You can compare them like this:
+
+[source,java]
+----
+static boolean areSemanticallyEquivalent(Statement statement1, Map<String, Object> args1, Statement statement2, Map<String, Object> args2) {
+
+    if (!areSemanticallyEquivalent(statement1, statement2)) {
+        return false;
+    }
+
+    var mapping1 = statement1.getCatalog().getRenamedParameters();
+    var mapping2 = statement2.getCatalog().getRenamedParameters();
+    for (Map.Entry<String, String> entry : mapping1.entrySet()) {
+        String key1 = entry.getKey();
+        String mapped = entry.getValue();
+
+        String key2 = mapping2.entrySet().stream().filter(e -> e.getValue().equals(mapped))
+            .map(Map.Entry::getKey).findFirst().orElseThrow();
+        if (!args1.get(key1).equals(args2.get(key2))) {
+            return false;
+        }
+    }
+
+    return true;
+}
+----
+
+The catalog featured added in 2023.1.0 has been enhanced so that it can return now the mapping of the renamed parameters as well, allowing for inspection of parameters from different sources.
+
+Also thanks to @hindog for contributing map literals in #642 and to @sathishkumar294 for inspiring the new dedicated overloads for `type` and `labels` that now work with symbolic names, too.
+
+==== 🚀 Features
+
+* Allow map literals to be parsed into sorted maps. (#644)
+* Add support for Map literals. (#642)
+* Use generated names for aliases too if possible. (#640)
+* Make the `Asterisk` proper identifiable. (#641)
+* Add `Cypher.withAll` to create a with clause importing all (`*`) variables. (#639)
+* Add overloads of `Functions.type` and `Functions.labels` taking in a symbolic name. (#633)
+* Add extended meta data and the ability to use generated variables. (#631)
+
+==== 🔄️ Refactorings
+
+* Replace identifiers in list / pattern comprehensions, too. (#647)
+* Use scope for generated names. (#646)
+* Some general housekeeping. (#643 and #632)
+* Optimize structure of `UNWIND`.
+
+==== 📖 Documentation
+
+* Add a list comprehension example.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump checkstyle from 10.8.1 to 10.9.2 (#653)
+** Bump reactor-bom from 2022.0.4 to 2022.0.5 (#652)
+** Bump asciidoctor-maven-plugin from 2.2.2 to 2.2.3 (#651)
+** Bump maven-failsafe-plugin from 3.0.0-M9 to 3.0.0 (#650)
+** Bump maven-surefire-plugin from 3.0.0-M9 to 3.0.0 (#649)
+** Bump flatten-maven-plugin from 1.3.0 to 1.4.0 (#648)
+** Bump moditect-maven-plugin from 1.0.0.RC2 to 1.0.0.RC3 (#637)
+** Bump checkstyle from 10.8.0 to 10.8.1 (#638)
+** Bump mockito.version from 5.1.1 to 5.2.0 (#636)
+** Bump spring-boot-starter-parent from 3.0.3 to 3.0.4 (#629)
+** Bump annotations from 24.0.0 to 24.0.1 (#628)
+** Bump checker-qual from 3.31.0 to 3.32.0 (#627)
+** Bump spring-data-neo4j from 7.0.2 to 7.0.3 (#626)
+** Bump reactor-bom from 2022.0.3 to 2022.0.4 (#625)
+** Bump japicmp-maven-plugin from 0.17.1 to 0.17.2 (#624)
+
+==== 🛠 Build
+
+* Use correct version numbers for tags.
+* Replace symlink in gh-pages with static href.
