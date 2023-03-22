@@ -184,7 +184,7 @@ public final class SchemaNames {
 		// Replace escaped octal hex
 		// Excluding the support for 6 digit literals, as this contradicts the overall example in CIP-59r
 		Matcher matcher = PATTERN_ESCAPED_4DIGIT_UNICODE.matcher(workingValue);
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 		while (matcher.find()) {
 			String replacement = Character.toString((char) Integer.parseInt(matcher.group(1), 16));
 			matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
