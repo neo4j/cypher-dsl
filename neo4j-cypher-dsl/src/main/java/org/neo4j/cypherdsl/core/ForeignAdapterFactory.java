@@ -20,9 +20,16 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import org.apiguardian.api.API;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.querydsl.core.types.Expression;
+import org.apiguardian.api.API;
 
 /**
  * This factory is meant to decouple the instantiating respectively concrete usage of classes on the provided path as
@@ -35,6 +42,8 @@ import com.querydsl.core.types.Expression;
 @API(status = INTERNAL, since = "2021.1.0")
 final class ForeignAdapterFactory {
 
+	private final Map<Class<?>, Constructor<ForeignAdapter<?>>> adapterCache = new HashMap<>();
+
 	@SuppressWarnings("unchecked") // We do check the type of expression
 	<FE> ForeignAdapter<FE> getAdapterFor(FE expression) {
 
@@ -42,11 +51,43 @@ final class ForeignAdapterFactory {
 			throw new IllegalArgumentException("Cannot adapt literal NULL expressions.");
 		}
 
-		if (!(expression instanceof Expression)) {
-			throw new IllegalArgumentException(
-				"Cannot adapt expressions of type " + expression.getClass().getName() + " to Cypher-DSL expressions.");
+		var constructor = adapterCache.computeIfAbsent(expression.getClass(), k -> {
+			var interfaces = getInterfaces(k);
+			String adapterName;
+			if (interfaces.stream().anyMatch("org.neo4j.driver.Value"::equals)) {
+				adapterName = "org.neo4j.cypherdsl.core.DriverValueAdapter";
+			} else if (interfaces.stream().anyMatch("com.querydsl.core.types.Expression"::equals)) {
+				adapterName = "org.neo4j.cypherdsl.core.QueryDSLAdapter";
+			} else {
+				throw newCannotAdaptException(k, null);
+			}
+			try {
+				return (Constructor<ForeignAdapter<?>>) Class.forName(adapterName).getDeclaredConstructors()[0];
+			} catch (ClassNotFoundException e) {
+				throw newCannotAdaptException(k, e);
+			}
+		});
+
+		try {
+			return (ForeignAdapter<FE>) constructor.newInstance(expression);
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+			throw newCannotAdaptException(expression.getClass(), e);
+		}
+	}
+
+	private static IllegalArgumentException newCannotAdaptException(Class<?> k, Exception cause) {
+		var msg = "Cannot adapt expressions of type " + k.getName() + " to Cypher-DSL expressions.";
+		return new IllegalArgumentException(msg, cause);
+	}
+
+	private static Set<String> getInterfaces(Class<?> type) {
+
+		if (type == null || type == Object.class) {
+			return Set.of();
 		}
 
-		return (ForeignAdapter<FE>) new QueryDSLAdapter((Expression<?>) expression);
+		return Stream.concat(getInterfaces(type.getSuperclass()).stream(), Arrays.stream(type.getInterfaces())
+				.flatMap(i -> Stream.concat(Stream.of(i.getName()), getInterfaces(i).stream())))
+			.collect(Collectors.toSet());
 	}
 }

@@ -3163,7 +3163,7 @@ class CypherIT {
 						Cypher.mapOf(
 							"latitude", Cypher.parameter("latitude"),
 							"longitude", Cypher.parameter("longitude"),
-							"crs", Cypher.literalOf(4326)
+							"crs", Cypher.literalOf("WGS-84")
 						)
 					)
 				)
@@ -3171,7 +3171,7 @@ class CypherIT {
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
-					"MATCH (n) RETURN point({latitude: $latitude, longitude: $longitude, crs: 4326})");
+					"MATCH (n) RETURN point({latitude: $latitude, longitude: $longitude, crs: 'WGS-84'})");
 		}
 
 		@Test

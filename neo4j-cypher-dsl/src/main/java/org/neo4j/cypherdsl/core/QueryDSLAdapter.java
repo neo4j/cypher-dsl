@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.querydsl.CypherContext;
 import org.neo4j.cypherdsl.core.querydsl.ToCypherFormatStringVisitor;
 
@@ -40,6 +41,8 @@ import com.querydsl.core.types.Predicate;
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
+@SuppressWarnings("unused")
+@RegisterForReflection(allDeclaredConstructors = true)
 final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Expression<?>> {
 
 	private final com.querydsl.core.types.Expression<?> expression;

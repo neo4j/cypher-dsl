@@ -58,7 +58,9 @@ class NativeApplicationIT {
 			"MATCH (n) RETURN point.distance(n.a, n.b)",
 			"a", "m", "p",
 			"born: NumberLiteral{cypher=1979}",
-			"title: StringLiteral{cypher='The Matrix'}"
+			"title: StringLiteral{cypher='The Matrix'}",
+			"TemporalLiteral{cypher=localdatetime('2023-03-24T10:50:23')}",
+			"RETURN true = true AND false = true"
 		);
 
 		var p = new ProcessBuilder(Paths.get(".", "target", "application").toAbsolutePath().normalize().toString())

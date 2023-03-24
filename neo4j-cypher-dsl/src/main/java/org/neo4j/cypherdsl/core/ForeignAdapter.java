@@ -54,7 +54,7 @@ public interface ForeignAdapter<FE> {
 	Expression asExpression();
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link Node}, that allows to to address it further down in queries.
+	 * Adapts a foreign expression into a Cypher-DSL {@link Node}, that allows to address it further down in queries.
 	 *
 	 * @return A node
 	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
@@ -63,7 +63,7 @@ public interface ForeignAdapter<FE> {
 	Node asNode();
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link Relationship}, that allows to to address it further down in queries.
+	 * Adapts a foreign expression into a Cypher-DSL {@link Relationship}, that allows to address it further down in queries.
 	 *
 	 * @return A node
 	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node

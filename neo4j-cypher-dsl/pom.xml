@@ -132,7 +132,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration combine.self="append">
-					<argLine>@{argLine} -Xverify:all --add-modules com.querydsl.core --add-reads org.neo4j.cypherdsl.core=com.querydsl.core</argLine>
+					<argLine>@{argLine} -Xverify:all --add-modules org.neo4j.driver --add-reads org.neo4j.cypherdsl.core=org.neo4j.driver --add-modules com.querydsl.core --add-reads org.neo4j.cypherdsl.core=com.querydsl.core</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
