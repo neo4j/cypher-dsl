@@ -22,6 +22,8 @@ import static org.apiguardian.api.API.Status.STABLE;
 
 import java.lang.reflect.Array;
 import java.net.URI;
+import java.time.Duration;
+import java.time.Period;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -673,17 +675,23 @@ public final class Cypher {
 		if (object instanceof Literal<?>) {
 			return (Literal<T>) object;
 		}
-		if (object instanceof CharSequence) {
-			return (Literal<T>) new StringLiteral((CharSequence) object);
+		if (object instanceof CharSequence charSequence) {
+			return (Literal<T>) new StringLiteral(charSequence);
 		}
 		if (object instanceof Character) {
 			return (Literal<T>) new StringLiteral(String.valueOf(object));
 		}
-		if (object instanceof Number) {
-			return (Literal<T>) new NumberLiteral((Number) object);
+		if (object instanceof Number number) {
+			return (Literal<T>) new NumberLiteral(number);
 		}
-		if (object instanceof TemporalAccessor) {
-			return (Literal<T>) new TemporalLiteral((TemporalAccessor) object);
+		if (object instanceof TemporalAccessor temporalAccessor) {
+			return (Literal<T>) new TemporalLiteral(temporalAccessor);
+		}
+		if (object instanceof Duration duration) {
+			return (Literal<T>) DurationLiteral.of(duration);
+		}
+		if (object instanceof Period period) {
+			return (Literal<T>) PeriodLiteral.of(period);
 		}
 		if (object instanceof Iterable || object.getClass().isArray()) {
 			List<Literal<?>> elements = new ArrayList<>();
@@ -730,8 +738,8 @@ public final class Cypher {
 			MapLiteral mapLiteral = new MapLiteral(map);
 			return (Literal<T>) mapLiteral;
 		}
-		if (object instanceof Boolean) {
-			return (Literal<T>) BooleanLiteral.of((Boolean) object);
+		if (object instanceof Boolean b) {
+			return (Literal<T>) BooleanLiteral.of(b);
 		}
 		throw new UnsupportedLiteralException(object);
 	}
