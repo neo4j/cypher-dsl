@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.graalvm;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +36,9 @@ import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.Options;
+import org.neo4j.driver.Values;
+
+import com.querydsl.core.types.dsl.Expressions;
 
 /**
  * @author Michael J. Simons
@@ -72,6 +78,8 @@ public class Application {
 			.entrySet()
 			.stream().sorted(Comparator.comparing(o -> o.getKey().name()))
 			.forEach(e -> System.out.println(e.getKey().name() + ": " + e.getValue().stream().limit(1).map(cc -> cc.right().toString()).collect(Collectors.joining())));
+		System.out.println(Cypher.adapt(Values.value(LocalDateTime.of(LocalDate.of(2023, 3, 24), LocalTime.of(10, 50, 23)))).asExpression());
+		System.out.println(Cypher.returning(Cypher.adapt(Expressions.TRUE.isTrue().and(Expressions.FALSE.isTrue())).asExpression()).build().getCypher());
 	}
 
 	private static Statement findAllMovies() {
