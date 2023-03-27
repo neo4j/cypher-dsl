@@ -1479,6 +1479,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public Expression collectExpression(InputPosition inputPosition, Statement statement) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Expression mapProjection(InputPosition p, Expression v, List<Expression> items) {
 		return MapProjection.create(assertSymbolicName(v), items.toArray(new Object[0]));
 	}
@@ -1584,6 +1589,11 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause turnYieldToWith(Clause yieldClause) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Clause showSettingsClause(InputPosition inputPosition, SimpleEither<List<String>, Expression> simpleEither, Where where, boolean b) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1767,6 +1777,11 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public List<NULL> procedureQualifier(InputPosition p, List<String> procedures) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public List<NULL> settingQualifier(InputPosition inputPosition, List<String> list) {
 		throw new UnsupportedOperationException();
 	}
 
