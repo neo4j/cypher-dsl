@@ -52,7 +52,12 @@ import org.neo4j.driver.Value;
 import org.neo4j.driver.Values;
 import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
+/**
+ * @author Michael J. Simons
+ */
+@Testcontainers(disabledWithoutDocker = true)
 class DriverValueAdapterIT {
 
 	private final GeneralizedRenderer renderer = Renderer.getRenderer(Configuration.defaultConfig(), GeneralizedRenderer.class);
