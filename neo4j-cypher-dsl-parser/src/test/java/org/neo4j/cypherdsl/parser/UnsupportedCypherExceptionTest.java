@@ -49,12 +49,12 @@ class UnsupportedCypherExceptionTest {
 		var input = "This is invalid cypher";
 		var unsupportedCypherException = new UnsupportedCypherException(input, cause);
 
-		assertThat(unsupportedCypherException.getMessage()).isEqualTo(""
-			+ "You used one Cypher construct not yet supported by the Cypher-DSL:\n"
-			+ "\n"
-			+ "\tThis is invalid cypher\n"
-			+ "\n"
-			+ "Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new"
+		assertThat(unsupportedCypherException.getMessage()).isEqualTo("""
+			You used one Cypher construct not yet supported by the Cypher-DSL:
+
+			\tThis is invalid cypher
+
+			Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new"""
 		);
 	}
 }
