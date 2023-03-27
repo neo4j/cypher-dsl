@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * A literal representing a duration value to be formatted in a way that Neo4j's Cypher understands it.
  *
  * @author Michael J. Simons
- * @since TBA
+ * @since 2023.2.1
  */
 final class DurationLiteral extends LiteralBase<Duration> {
 

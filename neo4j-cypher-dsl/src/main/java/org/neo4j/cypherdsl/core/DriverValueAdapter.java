@@ -41,9 +41,9 @@ import org.neo4j.driver.types.TypeSystem;
 /**
  * @author Michael J. Simons
  * @soundtrack Prezident - Gesunder Eskapismus
- * @since TBA
+ * @since 2023.2.1
  */
-@API(status = INTERNAL, since = "TBA")
+@API(status = INTERNAL, since = "2023.2.1")
 @SuppressWarnings("unused")
 @RegisterForReflection(allDeclaredConstructors = true)
 class DriverValueAdapter implements ForeignAdapter<Value> {

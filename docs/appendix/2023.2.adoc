@@ -1,5 +1,29 @@
 == 2023.2
 
+=== 2023.2.1
+
+==== 🚀 Features
+
+* Add adapter for Neo4j driver value.
+* Add support for `Duration` and `Period` literals.
+
+==== 🔄️ Refactorings
+
+* Use `StringBuilder` with `Matcher#appendReplacement`.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j-cypher-javacc-parser from 5.5.0 to 5.6.0 (#657)
+** Bump maven-install-plugin from 3.1.0 to 3.1.1 (#664)
+** Bump joda-time from 2.12.2 to 2.12.4 (#663)
+** Bump spring-boot-starter-parent from 3.0.4 to 3.0.5 (#662)
+** Bump asm from 9.4 to 9.5 (#661)
+** Bump checkstyle from 10.9.2 to 10.9.3 (#660)
+** Bump maven-deploy-plugin from 3.1.0 to 3.1.1 (#659)
+** Bump spring-data-neo4j from 7.0.3 to 7.0.4 (#658)
+** Bump maven-resources-plugin from 3.3.0 to 3.3.1 (#656)
+
 === 2023.2.0
 
 Thanks to @Andy2003 for his input on the 2023.2.0 release. The main topic of this release is https://github.com/neo4j-contrib/cypher-dsl/issues/596[adding support for semantic comparison]. The Cypher-DSLs builder method creates an AST, so that is in theory an excellent and doable request. The AST has originally been created as good enough means of rendering Cypher proper when we invented the Cypher-DSL for Spring Data Neo4j 6 back in 2019. Good enough here means that it has optimizing potential and a full-blown analysis is - at least at the moment - out of scope.
