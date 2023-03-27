@@ -150,7 +150,7 @@
 		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 		<jaxb.version>2.3.1</jaxb.version>
 		<jetbrains-annotations.version>24.0.1</jetbrains-annotations.version>
-		<joda-time.version>2.12.2</joda-time.version>
+		<joda-time.version>2.12.4</joda-time.version>
 		<jsr305.version>3.0.2</jsr305.version>
 		<junit-jupiter.version>5.9.2</junit-jupiter.version>
 		<license-maven-plugin.version>4.2.rc2</license-maven-plugin.version>
