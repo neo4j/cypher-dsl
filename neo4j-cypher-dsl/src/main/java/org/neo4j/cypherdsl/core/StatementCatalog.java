@@ -119,6 +119,26 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 			.collect(Collectors.toUnmodifiableSet());
 	}
 
+	//record Relationship(Set<Token> left, Set<Token> right)
+
+	default Collection<Token> getOutgoingRelationshipTypes(Token label) {
+		return Set.of();
+	}
+
+	default Collection<Token> getTargetNodeLabels(Token type) {
+		return Set.of();
+	}
+
+	default Collection<Token> getIncomingRelationshipTypes(Token label) {
+		return Set.of();
+	}
+
+	default Collection<Token> getSourceNodeLabels(Token type) {
+		return Set.of();
+	}
+
+
+
 	/**
 	 * Returns a collection of all properties resolved in the analyzed statement.
 	 *

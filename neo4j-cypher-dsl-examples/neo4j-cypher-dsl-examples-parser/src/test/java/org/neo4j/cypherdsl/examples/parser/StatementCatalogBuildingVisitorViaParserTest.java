@@ -29,6 +29,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.StatementCatalog;
 import org.neo4j.cypherdsl.parser.CypherParser;
@@ -96,5 +97,22 @@ class StatementCatalogBuildingVisitorViaParserTest {
 
 		assertThat(labelsAndProperties)
 			.containsExactly(Map.entry("Movie", List.of("title")), Map.entry("Actor,Person", List.of("b", "born")));
+	}
+
+
+	@Test
+	void directions() {
+		var input = """
+			MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`|Actor {b:true})
+			MATCH () -[:WHATEVER]-> (m)
+			WHERE p.born >= $born
+			  AND a.starring = true
+			RETURN p
+			""";
+		var statement = CypherParser.parse(input);
+
+		var catalog = statement.getCatalog();
+		Assertions.fail("todo scope and things, unidirected");
+
 	}
 }

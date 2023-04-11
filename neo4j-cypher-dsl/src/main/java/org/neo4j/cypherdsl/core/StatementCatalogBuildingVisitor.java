@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -31,6 +32,7 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
@@ -141,8 +143,28 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 	StatementCatalog getResult() {
 		var parameterInformation = allParameters.getResult();
+
+		var currentScope = patternLookup.peek();
+		/*incoming.forEach((k,v) -> {
+			System.out.println("INCOMING TO " + k );
+			for(Node node : v) {
+				var x = getAllLabels((Node) node.getSymbolicName().map(this::lookup).orElse(node));
+				System.out.println(x);
+			}
+		});*/
+		outgoing.forEach((k,v) -> {
+			System.out.println("OUTGOING FROM " + k );
+			for(Node node : v) {
+				var x = getAllLabels((Node) node.getSymbolicName().map(this::lookup).orElse(node));
+				System.out.println(x);
+			}
+		});
+
+
 		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables(), parameterInformation);
 	}
+
+
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
@@ -237,10 +259,35 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		currentPatternElement.removeFirstOccurrence(node);
 	}
 
+	Map<Token, List<Node>> outgoing = new HashMap<>();
+	Map<Token, List<Node>> incoming = new HashMap<>();
+
 	void enter(Relationship relationship) {
 
 		relationship.getSymbolicName().ifPresent(s -> store(s, relationship));
 		currentPatternElement.push(relationship);
+		var types = relationship.getDetails().getTypes().stream().map(Token::type).toList();
+		tokens.addAll(types);
+
+		var left = relationship.getLeft();
+		var right = relationship.getRight();
+
+		switch (relationship.getDetails().getDirection()) {
+			case UNI:
+				break;
+			case LTR:
+				types.forEach(type -> incoming.computeIfAbsent(type, unused -> new ArrayList<>()).add(left));
+				types.forEach(type -> outgoing.computeIfAbsent(type, unused -> new ArrayList<>()).add(right));
+				break;
+			case RTL:
+				types.forEach(type -> incoming.computeIfAbsent(type, unused -> new ArrayList<>()).add(right));
+				types.forEach(type -> outgoing.computeIfAbsent(type, unused -> new ArrayList<>()).add(left));
+				break;
+		}
+
+		System.out.println(right);
+		System.out.println("---");
+
 	}
 
 	void leave(Relationship relationship) {
@@ -381,10 +428,6 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		collectLabels(labelExpression, null, tokens);
 	}
 
-	void enter(Relationship.Details details) {
-		details.getTypes().stream().map(Token::type).forEach(tokens::add);
-	}
-
 	PatternElement lookup(SymbolicName s) {
 		if (patternLookup.isEmpty()) {
 			throw new IllegalStateException("Invalid scope");
@@ -426,7 +469,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 		var currentScope = patternLookup.peek();
 		// Don't overwrite in same scope or when imported
-		if (currentScope.containsKey(s) && scopingStrategy.getCurrentImports().contains(s)) {
+		if (currentScope.containsKey(s) || scopingStrategy.getCurrentImports().contains(s)) {
 			return;
 		}
 		currentScope.put(s, patternElement);
