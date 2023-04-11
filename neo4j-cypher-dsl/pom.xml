@@ -77,6 +77,13 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
+			<!--
+			QueryDSL proxy feature requires cglib. It's gonna be a pain in the future, I guess, quoting from cglibs GitHub:
+
+			"IMPORTANT NOTE: cglib is unmaintained and does not work well (or possibly at all?) in newer JDKs, particularly JDK17+.
+			If you need to support newer JDKs, we will accept well-tested well-thought-out patches...
+			but you'll probably have better luck migrating to something like ByteBuddy"
+			-->
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>
 			<scope>test</scope>
@@ -132,7 +139,14 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration combine.self="append">
-					<argLine>@{argLine} -Xverify:all --add-modules org.neo4j.driver --add-reads org.neo4j.cypherdsl.core=org.neo4j.driver --add-modules com.querydsl.core --add-reads org.neo4j.cypherdsl.core=com.querydsl.core</argLine>
+					<!-- -add-opens java.base/java.lang=ALL-UNNAMED added for QueryDSL proxy mechanics based on ages old cglib -->
+					<argLine>@{argLine} -Xverify:all
+						--add-modules org.neo4j.driver
+						--add-reads org.neo4j.cypherdsl.core=org.neo4j.driver
+						--add-modules com.querydsl.core
+						--add-reads org.neo4j.cypherdsl.core=com.querydsl.core
+						--add-opens java.base/java.lang=ALL-UNNAMED
+					</argLine>
 				</configuration>
 			</plugin>
 			<plugin>
