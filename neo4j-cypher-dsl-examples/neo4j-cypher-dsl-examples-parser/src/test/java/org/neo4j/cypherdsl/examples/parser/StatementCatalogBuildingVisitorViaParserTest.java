@@ -21,7 +21,13 @@ package org.neo4j.cypherdsl.examples.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.StatementCatalog;
@@ -57,5 +63,38 @@ class StatementCatalogBuildingVisitorViaParserTest {
 
 		var cypher = statement.getCypher();
 		assertThat(cypher).isEqualTo("MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`) WHERE p.born >= $born RETURN p");
+	}
+
+	@Test
+	void mapOfLabelsAndProperties() {
+		var input = """
+			MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`|Actor {b:true})
+			WHERE p.born >= $born
+			  AND a.starring = true
+			RETURN p
+			""";
+		var statement = CypherParser.parse(input);
+
+		var catalog = statement.getCatalog();
+
+		assertThat(catalog.getProperties())
+			.anyMatch(p -> p.owningToken().equals(Set.of(StatementCatalog.label("Person"), StatementCatalog.label("Actor"))));
+		Map<String, List<String>> labelsAndProperties = catalog.getProperties()
+			.stream()
+			.filter(p -> p.owningToken().stream().allMatch(t -> t.type() == StatementCatalog.Token.Type.NODE_LABEL))
+			.collect(
+				Collectors.toMap(
+					p -> p.owningToken().stream().map(StatementCatalog.Token::value).collect(Collectors.joining(",")),
+					p -> List.of(p.name()),
+				(l1, l2) -> {
+					var mergedList = new ArrayList<>(l1);
+					mergedList.addAll(l2);
+					Collections.sort(mergedList);
+					return mergedList;
+				})
+			);
+
+		assertThat(labelsAndProperties)
+			.containsExactly(Map.entry("Movie", List.of("title")), Map.entry("Actor,Person", List.of("b", "born")));
 	}
 }

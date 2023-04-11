@@ -34,8 +34,8 @@ import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
-import org.neo4j.cypherdsl.core.StatementCatalog.PropertyFilter;
 import org.neo4j.cypherdsl.core.StatementCatalog.Clause;
+import org.neo4j.cypherdsl.core.StatementCatalog.PropertyFilter;
 import org.neo4j.cypherdsl.core.StatementCatalog.Token;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -210,7 +210,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 		StatementCatalog.Property property;
 		if (owner instanceof Node node) {
-			property = new StatementCatalog.Property(node.getLabels().stream().map(Token::label).collect(Collectors.toSet()), mapEntry.getKey());
+			property = new StatementCatalog.Property(getAllLabels(node), mapEntry.getKey());
 		} else if (owner instanceof Relationship relationship) {
 			property = new StatementCatalog.Property(relationship.getDetails().getTypes().stream().map(Token::type).collect(Collectors.toSet()), mapEntry.getKey());
 		} else {
@@ -272,7 +272,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		var patternElement = lookup(s);
 		if (patternElement instanceof Node node) {
 			newProperty = new StatementCatalog.Property(
-				node.getLabels().stream().map(NodeLabel::getValue).map(Token::label).collect(Collectors.toSet()),
+				getAllLabels(node),
 				propertyName.get()
 			);
 		} else if (patternElement instanceof Relationship relationship) {
@@ -289,6 +289,35 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 			propertyFilters.computeIfAbsent(newProperty, ignored -> new HashSet<>())
 				.add(extractPropertyCondition(newProperty, currentConditions.peek()));
 		}
+	}
+
+	private static Set<Token> getAllLabels(Node node) {
+		Set<Token> result = new TreeSet<>();
+		if (node.getLabels().isEmpty()) {
+			node.accept(segment -> {
+				if (segment instanceof LabelExpression l) {
+					collectLabels(l, null, result);
+				}
+			});
+		} else {
+			node.getLabels().stream()
+				.map(NodeLabel::getValue)
+				.map(Token::label)
+				.forEach(result::add);
+		}
+		return result;
+	}
+
+	private static void collectLabels(LabelExpression l, LabelExpression.Type parent, Set<Token> labels) {
+		if (l == null) {
+			return;
+		}
+		var current = l.type();
+		collectLabels(l.lhs(), current, labels);
+		if (current == LabelExpression.Type.LEAF) {
+			l.value().stream().map(Token::label).forEach(labels::add);
+		}
+		collectLabels(l.rhs(), current, labels);
 	}
 
 	void enter(Parameter<?> parameter) {
@@ -346,6 +375,10 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		if (currentCondition instanceof HasLabelCondition hasLabelCondition) {
 			this.currentHasLabelCondition.get().add(Token.label(label));
 		}
+	}
+
+	void enter(LabelExpression labelExpression) {
+		collectLabels(labelExpression, null, tokens);
 	}
 
 	void enter(Relationship.Details details) {
