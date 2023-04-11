@@ -60,6 +60,28 @@ class StatementCatalogBuildingVisitorTest {
 	}
 
 	@Test
+	void labelExpressionsShouldWork() {
+
+		var p = Cypher.node(new LabelExpression("Person").or(new LabelExpression("Actor")));
+		var statement = Cypher
+			.match(p)
+			.where(p.property("born").gte(Cypher.parameter("born", 1979)))
+			.returning(p)
+			.build();
+
+
+		var catalog = statement.getCatalog();
+
+		assertThat(catalog.getNodeLabels())
+			.extracting(StatementCatalog.Token::value)
+			.containsExactlyInAnyOrder("Actor", "Person");
+		assertThat(catalog.getProperties())
+			.containsExactlyInAnyOrder(
+				StatementCatalog.property(Set.of(StatementCatalog.label("Actor"), StatementCatalog.label("Person")), "born")
+			);
+	}
+
+	@Test
 	void labelFiltersShouldWork() {
 		var n = Cypher.node("Person").withProperties("name", Cypher.literalOf("John Doe")).named("n");
 		var m = Cypher.node("Person").named("m");

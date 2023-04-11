@@ -78,7 +78,7 @@ class StatementCatalogBuildingVisitorViaParserTest {
 		var catalog = statement.getCatalog();
 
 		assertThat(catalog.getProperties())
-			.anyMatch(p -> p.owningToken().equals(Set.of(StatementCatalog.Token.label("Person"), StatementCatalog.Token.label("Actor"))));
+			.anyMatch(p -> p.owningToken().equals(Set.of(StatementCatalog.label("Person"), StatementCatalog.label("Actor"))));
 		Map<String, List<String>> labelsAndProperties = catalog.getProperties()
 			.stream()
 			.filter(p -> p.owningToken().stream().allMatch(t -> t.type() == StatementCatalog.Token.Type.NODE_LABEL))

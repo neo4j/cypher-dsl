@@ -291,27 +291,12 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	Set<Token> getAllLabels(Node node) {
+	private static Set<Token> getAllLabels(Node node) {
 		Set<Token> result = new TreeSet<>();
 		if (node.getLabels().isEmpty()) {
-			node.accept(new Visitor() {
-				@Override
-				public void enter(Visitable segment) {
-					if (segment instanceof LabelExpression l) {
-						collectLabels(l, null);
-					}
-				}
-
-				void collectLabels(LabelExpression l, LabelExpression.Type parent) {
-					if (l == null) {
-						return;
-					}
-					var current = l.type();
-					collectLabels(l.lhs(), current);
-					if (current == LabelExpression.Type.LEAF) {
-						l.value().stream().map(Token::label).forEach(result::add);
-					}
-					collectLabels(l.rhs(), current);
+			node.accept(segment -> {
+				if (segment instanceof LabelExpression l) {
+					collectLabels(l, null, result);
 				}
 			});
 		} else {
@@ -321,6 +306,18 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 				.forEach(result::add);
 		}
 		return result;
+	}
+
+	private static void collectLabels(LabelExpression l, LabelExpression.Type parent, Set<Token> labels) {
+		if (l == null) {
+			return;
+		}
+		var current = l.type();
+		collectLabels(l.lhs(), current, labels);
+		if (current == LabelExpression.Type.LEAF) {
+			l.value().stream().map(Token::label).forEach(labels::add);
+		}
+		collectLabels(l.rhs(), current, labels);
 	}
 
 	void enter(Parameter<?> parameter) {
@@ -378,6 +375,10 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		if (currentCondition instanceof HasLabelCondition hasLabelCondition) {
 			this.currentHasLabelCondition.get().add(Token.label(label));
 		}
+	}
+
+	void enter(LabelExpression labelExpression) {
+		collectLabels(labelExpression, null, tokens);
 	}
 
 	void enter(Relationship.Details details) {
