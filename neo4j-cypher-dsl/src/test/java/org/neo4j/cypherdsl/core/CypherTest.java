@@ -43,8 +43,9 @@ class CypherTest {
 		SortItem sortItem = Cypher.sort(Cypher.literalFalse(), SortItem.Direction.ASC);
 		sortItem.accept(segment -> {
 
-			if (segment instanceof SortItem.Direction) {
-				assertThat(segment).extracting("name").isEqualTo("ASC");
+			if (segment instanceof SortItem.Direction direction) {
+				assertThat(direction)
+					.extracting(SortItem.Direction::getSymbol).isEqualTo("ASC");
 			}
 		});
 	}
