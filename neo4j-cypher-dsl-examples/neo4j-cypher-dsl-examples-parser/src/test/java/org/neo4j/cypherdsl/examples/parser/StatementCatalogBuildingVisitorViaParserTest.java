@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
@@ -96,5 +95,67 @@ class StatementCatalogBuildingVisitorViaParserTest {
 
 		assertThat(labelsAndProperties)
 			.containsExactly(Map.entry("Movie", List.of("title")), Map.entry("Actor,Person", List.of("b", "born")));
+	}
+
+	@Test // GH-674
+	void retrievalOfRelationshipsAndTargetSourcesShouldWork() {
+		var input = """
+			MATCH (m:`Movie` {title: 'The Matrix'})<-[a:`ACTED_IN`]-(p:`Person`|Actor {b:true})
+			MATCH () -[:WHATEVER]-> (m)
+			MATCH (x:X) -[:UNDIRECTED]- (y:Y)
+			MATCH (m) -[:UNDIRECTED]- (y)
+			WHERE p.born >= $born
+			  AND a.starring = true
+			WITH m
+			MATCH (m) -[:FOO]->(f:FooNode)
+			CALL {
+				MATCH (:LabelA) -[:A_REL]-> (n:X)
+			}
+			RETURN p
+			""";
+		var statement = CypherParser.parse(input);
+
+		var catalog = statement.getCatalog();
+
+		assertThat(catalog.getOutgoingRelations(StatementCatalog.label("Person")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("ACTED_IN"));
+		assertThat(catalog.getOutgoingRelations(StatementCatalog.label("Movie")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("FOO"));
+		assertThat(catalog.getOutgoingRelations(StatementCatalog.label("Actor")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("ACTED_IN"));
+		assertThat(catalog.getOutgoingRelations(StatementCatalog.label("LabelA")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("A_REL"));
+
+		assertThat(catalog.getIncomingRelations(StatementCatalog.label("Movie")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("ACTED_IN"), StatementCatalog.type("WHATEVER"));
+		assertThat(catalog.getIncomingRelations(StatementCatalog.label("FooNode")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("FOO"));
+		assertThat(catalog.getIncomingRelations(StatementCatalog.label("X")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("A_REL"));
+
+		assertThat(catalog.getUndirectedRelations(StatementCatalog.label("X")))
+			.containsExactlyInAnyOrder(StatementCatalog.type("UNDIRECTED"));
+
+		assertThat(catalog.getTargetNodes(StatementCatalog.type("ACTED_IN")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("Movie"));
+		assertThat(catalog.getTargetNodes(StatementCatalog.type("FOO")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("FooNode"));
+		assertThat(catalog.getTargetNodes(StatementCatalog.type("A_REL")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("X"));
+		assertThat(catalog.getTargetNodes(StatementCatalog.type("WHATEVER")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("Movie"));
+		assertThat(catalog.getTargetNodes(StatementCatalog.type("UNDIRECTED")))
+			.isEmpty();
+
+		assertThat(catalog.getSourceNodes(StatementCatalog.type("ACTED_IN")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("Person"), StatementCatalog.label("Actor"));
+		assertThat(catalog.getSourceNodes(StatementCatalog.type("FOO")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("Movie"));
+		assertThat(catalog.getSourceNodes(StatementCatalog.type("A_REL")))
+			.containsExactlyInAnyOrder(StatementCatalog.label("LabelA"));
+		assertThat(catalog.getSourceNodes(StatementCatalog.type("WHATEVER")))
+			.isEmpty();
+		assertThat(catalog.getSourceNodes(StatementCatalog.type("UNDIRECTED")))
+			.isEmpty();
 	}
 }
