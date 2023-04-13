@@ -119,25 +119,58 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 			.collect(Collectors.toUnmodifiableSet());
 	}
 
-	//record Relationship(Set<Token> left, Set<Token> right)
+	/**
+	 * This method can be used with any token returned from {@link #getNodeLabels()} to retrieve relationships that
+	 * have a node with the given token as start node.
+	 * Alternative, use {@link StatementCatalog#label(String)} to build labels to query this method.
+	 *
+	 * @param label The label to retrieve outgoing relations for
+	 * @return A set of tokens describing relations
+	 * @since 2023.2.1
+	 */
+	Collection<Token> getOutgoingRelations(Token label);
 
-	default Collection<Token> getOutgoingRelationshipTypes(Token label) {
-		return Set.of();
-	}
+	/**
+	 * This method can be used with any token returned from {@link #getRelationshipTypes()} to retrieve target nodes
+	 * of that relationship. Alternative, use {@link StatementCatalog#type(String)} to build types to query this method.
+	 *
+	 * @param type The type of relationship to retrieve target nodes
+	 * @return A set of tokens describing labels
+	 * @since 2023.2.1
+	 */
+	Collection<Token> getTargetNodes(Token type);
 
-	default Collection<Token> getTargetNodeLabels(Token type) {
-		return Set.of();
-	}
+	/**
+	 * This method can be used with any token returned from {@link #getNodeLabels()} to retrieve relationships that
+	 * have a node with the given token as end node.
+	 * Alternative, use {@link StatementCatalog#label(String)} to build labels to query this method.
+	 *
+	 * @param label The label to retrieve incoming relations for
+	 * @return A set of tokens describing relations
+	 * @since 2023.2.1
+	 */
+	Collection<Token> getIncomingRelations(Token label);
 
-	default Collection<Token> getIncomingRelationshipTypes(Token label) {
-		return Set.of();
-	}
+	/**
+	 * This method can be used with any token returned from {@link #getRelationshipTypes()} to retrieve source nodes
+	 * of that relationship. Alternative, use {@link StatementCatalog#type(String)} to build types to query this method.
+	 *
+	 * @param type The type of relationship to retrieve source nodes
+	 * @return A set of tokens describing labels
+	 * @since 2023.2.1
+	 */
+	Collection<Token> getSourceNodes(Token type);
 
-	default Collection<Token> getSourceNodeLabels(Token type) {
-		return Set.of();
-	}
-
-
+	/**
+	 * This method can be used with any token returned from {@link #getNodeLabels()} to retrieve relationships that
+	 * are connected to nodes with the given token.
+	 * Alternative, use {@link StatementCatalog#label(String)} to build labels to query this method.
+	 *
+	 * @param label The label to retrieve relations for
+	 * @return A set of tokens describing relations
+	 * @since 2023.2.1
+	 */
+	Collection<Token> getUndirectedRelations(Token label);
 
 	/**
 	 * Returns a collection of all properties resolved in the analyzed statement.

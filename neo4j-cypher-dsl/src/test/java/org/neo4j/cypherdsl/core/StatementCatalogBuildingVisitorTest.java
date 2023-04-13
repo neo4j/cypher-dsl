@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.util.Set;
 
@@ -104,5 +105,74 @@ class StatementCatalogBuildingVisitorTest {
 			.map(StatementCatalog.LabelFilter.class::cast)
 			.containsExactlyInAnyOrderElementsOf(expectedLabelFilters);
 		assertThat(catalog.getAllLabelFilters()).containsExactlyInAnyOrderElementsOf(expectedLabelFilters);
+	}
+
+	@Test // GH-674
+	void shouldThrowWhenAskingWithTypeForTypes() {
+
+		var n = Cypher.node("Person").withProperties("name", Cypher.literalOf("John Doe")).named("n");
+		var m = Cypher.node("Person").named("m");
+
+		var catalog = Cypher.match(n.relationshipTo(m, "IS_FRIEND_WITH"))
+			.where(n.hasLabels("Active")).and(m.hasLabels("Kind", "Positive").and(m.property("name").eq(Cypher.literalOf("Jane"))))
+			.returning(Cypher.asterisk())
+			.build().getCatalog();
+
+		var aType = StatementCatalog.Token.type("whatever");
+		var expectedMessage = "Token[type=RELATIONSHIP_TYPE, value=whatever] must be a node label, not a relationship type";
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> catalog.getIncomingRelations(aType))
+			.withMessage(expectedMessage);
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> catalog.getOutgoingRelations(aType))
+			.withMessage(expectedMessage);
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> catalog.getUndirectedRelations(aType))
+			.withMessage(expectedMessage);
+	}
+
+	@Test // GH-674
+	void shouldThrowWhenAskingWithLabelForLabels() {
+
+		var n = Cypher.node("Person").withProperties("name", Cypher.literalOf("John Doe")).named("n");
+		var m = Cypher.node("Person").named("m");
+
+		var catalog = Cypher.match(n.relationshipTo(m, "IS_FRIEND_WITH"))
+			.where(n.hasLabels("Active")).and(m.hasLabels("Kind", "Positive").and(m.property("name").eq(Cypher.literalOf("Jane"))))
+			.returning(Cypher.asterisk())
+			.build().getCatalog();
+
+		var aLabel = StatementCatalog.Token.label("whatever");
+		var expectedMessage = "Token[type=NODE_LABEL, value=whatever] must be a relationship type, not a node label";
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> catalog.getTargetNodes(aLabel))
+			.withMessage(expectedMessage);
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> catalog.getSourceNodes(aLabel))
+			.withMessage(expectedMessage);
+	}
+
+	@Test // GH-674
+	void retrievalOfRelationshipsShouldWork() {
+
+		var n = Cypher.node("Person").withProperties("name", Cypher.literalOf("John Doe")).named("n");
+		var m = Cypher.node("Person").named("m");
+
+		var catalog = Cypher.match(n.relationshipTo(m, "IS_FRIEND_WITH"))
+			.where(n.hasLabels("Active")).and(m.hasLabels("Kind", "Positive").and(m.property("name").eq(Cypher.literalOf("Jane"))))
+			.returning(Cypher.asterisk())
+			.build().getCatalog();
+
+		var isFriendWith = StatementCatalog.Token.type("IS_FRIEND_WITH");
+		assertThat(catalog.getTargetNodes(isFriendWith))
+			.isNotEmpty();
+		assertThat(catalog.getSourceNodes(isFriendWith))
+			.isNotEmpty();
+
+		var person = StatementCatalog.Token.label("Person");
+		assertThat(catalog.getIncomingRelations(person))
+			.containsExactlyInAnyOrder(isFriendWith);
+		assertThat(catalog.getOutgoingRelations(person))
+			.containsExactlyInAnyOrder(isFriendWith);
 	}
 }

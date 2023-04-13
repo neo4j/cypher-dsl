@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -31,8 +30,8 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.ParameterCollectingVisitor.ParameterInformation;
@@ -105,6 +104,10 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 	private final ParameterCollectingVisitor allParameters;
 
+	private final Map<Node, Set<Token>> currentUndirectedRelations = new HashMap<>();
+	private final Map<Node, Set<Token>> currentIncomingRelations = new HashMap<>();
+	private final Map<Node, Set<Token>> currentOutgoingRelations = new HashMap<>();
+
 	StatementCatalogBuildingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 
 		this.statementContext = statementContext;
@@ -119,13 +122,17 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	}
 
 	private Map<SymbolicName, PatternElement> createNewScope(Collection<IdentifiableElement> imports) {
+		addRelationsInCurrentScope();
+
 		Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? Collections.emptyMap() : patternLookup.peek();
 		Map<SymbolicName, PatternElement> newScope = new HashMap<>();
 		copyIdentifiableElements(imports, currentScope, newScope);
+
 		return newScope;
 	}
 
 	private void importIntoCurrentScope(Collection<IdentifiableElement> exports) {
+
 		Map<SymbolicName, PatternElement> previousScope = patternLookup.pop();
 		Map<SymbolicName, PatternElement> currentScope = patternLookup.isEmpty() ? new HashMap<>() : patternLookup.peek();
 		copyIdentifiableElements(exports, previousScope, currentScope);
@@ -141,30 +148,60 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	StatementCatalog getResult() {
-		var parameterInformation = allParameters.getResult();
+	/**
+	 * A holder for the relationship types connected to node labels
+	 * @param outgoing Outgoing types
+	 * @param incoming Incoming types
+	 * @param undirected Undirected connections
+	 */
+	record Relationships(Set<Token> outgoing, Set<Token> incoming, Set<Token> undirected) {
 
-		var currentScope = patternLookup.peek();
-		/*incoming.forEach((k,v) -> {
-			System.out.println("INCOMING TO " + k );
-			for(Node node : v) {
-				var x = getAllLabels((Node) node.getSymbolicName().map(this::lookup).orElse(node));
-				System.out.println(x);
-			}
-		});*/
-		outgoing.forEach((k,v) -> {
-			System.out.println("OUTGOING FROM " + k );
-			for(Node node : v) {
-				var x = getAllLabels((Node) node.getSymbolicName().map(this::lookup).orElse(node));
-				System.out.println(x);
-			}
-		});
+		static Relationships empty() {
+			return new Relationships(Set.of(), Set.of(), Set.of());
+		}
 
+		Relationships() {
+			this(new HashSet<>(), new HashSet<>(), new HashSet<>());
+		}
 
-		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables(), parameterInformation);
+		Relationships copy() {
+			return new Relationships(Set.copyOf(this.outgoing), Set.copyOf(this.incoming), Set.copyOf(this.undirected));
+		}
 	}
 
+	private final Map<Token, Relationships> relationships = new HashMap<>();
 
+
+	StatementCatalog getResult() {
+
+		addRelationsInCurrentScope();
+		var parameterInformation = allParameters.getResult();
+		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables(), parameterInformation, relationships);
+	}
+
+	void addRelationsInCurrentScope() {
+
+		finish(currentOutgoingRelations, Relationships::outgoing);
+		finish(currentIncomingRelations, Relationships::incoming);
+		finish(currentUndirectedRelations, Relationships::undirected);
+	}
+
+	/**
+	 * Finishes up the relationship's storage (retrieval of actual labels from the nodes)
+	 *
+	 * @param nodesToRelations The map to process
+	 * @param targetProvider   The target where to store the tokens
+	 */
+	private void finish(Map<Node, Set<Token>> nodesToRelations, Function<Relationships, Set<Token>> targetProvider) {
+		nodesToRelations.forEach((k, v) -> {
+			var labels = getAllLabels((Node) k.getSymbolicName().map(this::lookup).orElse(k));
+			labels.forEach(t -> {
+				var rels = relationships.computeIfAbsent(t, unused -> new Relationships());
+				targetProvider.apply(rels).addAll(v);
+			});
+		});
+		nodesToRelations.clear();
+	}
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
@@ -259,9 +296,6 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		currentPatternElement.removeFirstOccurrence(node);
 	}
 
-	Map<Token, List<Node>> outgoing = new HashMap<>();
-	Map<Token, List<Node>> incoming = new HashMap<>();
-
 	void enter(Relationship relationship) {
 
 		relationship.getSymbolicName().ifPresent(s -> store(s, relationship));
@@ -269,25 +303,35 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		var types = relationship.getDetails().getTypes().stream().map(Token::type).toList();
 		tokens.addAll(types);
 
-		var left = relationship.getLeft();
-		var right = relationship.getRight();
+		storeRelations(relationship.getLeft(), relationship.getRight(), types, relationship.getDetails().getDirection());
+	}
 
-		switch (relationship.getDetails().getDirection()) {
-			case UNI:
-				break;
-			case LTR:
-				types.forEach(type -> incoming.computeIfAbsent(type, unused -> new ArrayList<>()).add(left));
-				types.forEach(type -> outgoing.computeIfAbsent(type, unused -> new ArrayList<>()).add(right));
-				break;
-			case RTL:
-				types.forEach(type -> incoming.computeIfAbsent(type, unused -> new ArrayList<>()).add(right));
-				types.forEach(type -> outgoing.computeIfAbsent(type, unused -> new ArrayList<>()).add(left));
-				break;
+	/**
+	 * Stores the source and target of this relationships in incoming/outgoing and undirected lists for processing
+	 * after leaving the scope / statement (when all labels are known).
+	 *
+	 * @param left      Left hand side of the relation
+	 * @param right     Right hand side of the relation
+	 * @param types     Types of the relation
+	 * @param direction Direction of the relation
+	 */
+	private void storeRelations(Node left, Node right, List<Token> types, Relationship.Direction direction) {
+
+		final Function<Node, Set<Token>> targetSupplier = unused -> new HashSet<>();
+		switch (direction) {
+			case UNI -> {
+				currentUndirectedRelations.computeIfAbsent(left, targetSupplier).addAll(types);
+				currentUndirectedRelations.computeIfAbsent(right, targetSupplier).addAll(types);
+			}
+			case LTR -> {
+				currentOutgoingRelations.computeIfAbsent(left, targetSupplier).addAll(types);
+				currentIncomingRelations.computeIfAbsent(right, targetSupplier).addAll(types);
+			}
+			case RTL -> {
+				currentIncomingRelations.computeIfAbsent(left, targetSupplier).addAll(types);
+				currentOutgoingRelations.computeIfAbsent(right, targetSupplier).addAll(types);
+			}
 		}
-
-		System.out.println(right);
-		System.out.println("---");
-
 	}
 
 	void leave(Relationship relationship) {
@@ -468,8 +512,9 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 			throw new IllegalStateException("Invalid scope");
 		}
 		var currentScope = patternLookup.peek();
-		// Don't overwrite in same scope or when imported
-		if (currentScope.containsKey(s) || scopingStrategy.getCurrentImports().contains(s)) {
+		// Don't overwrite in same scope or when imported,
+		// size == 1 catering for with clauses on top level
+		if (currentScope.containsKey(s) && (scopingStrategy.getCurrentImports().contains(s) || patternLookup.size() == 1)) {
 			return;
 		}
 		currentScope.put(s, patternElement);
@@ -501,13 +546,16 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 		private final ParameterInformation parameterInformation;
 
+		private final Map<Token, Relationships> relationships;
+
 		DefaultStatementCatalog(
 			Set<Token> tokens,
 			Set<LabelFilter> labelFilters,
 			Set<Property> properties,
 			Map<Property, Set<PropertyFilter>> propertyFilters,
 			Collection<Expression> identifiableExpressions,
-			ParameterInformation parameterInformation
+			ParameterInformation parameterInformation,
+			Map<Token, Relationships> relationships
 		) {
 			this.tokens = Set.copyOf(tokens);
 			this.labelFilters = Set.copyOf(labelFilters);
@@ -518,6 +566,9 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 			this.identifiableExpressions = Set.copyOf(identifiableExpressions);
 			this.parameterInformation = parameterInformation;
+
+			this.relationships = relationships.entrySet().stream()
+				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
 		}
 
 		@Override
@@ -558,6 +609,62 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		@Override
 		public Map<String, String> getRenamedParameters() {
 			return parameterInformation.renames;
+		}
+
+		@Override
+		public Collection<Token> getOutgoingRelations(Token label) {
+
+			return extractRelations(label, Relationships::outgoing);
+		}
+
+		private Collection<Token> extractRelations(Token label, Function<Relationships, Set<Token>> tokenProvider) {
+			if (label.type() != Token.Type.NODE_LABEL) {
+				throw new IllegalArgumentException(label + " must be a node label, not a relationship type");
+			}
+
+			return tokenProvider.apply(relationships.getOrDefault(label, Relationships.empty()));
+		}
+
+		@Override
+		public Collection<Token> getTargetNodes(Token type) {
+
+			if (type.type() != Token.Type.RELATIONSHIP_TYPE) {
+				throw new IllegalArgumentException(type + " must be a relationship type, not a node label");
+			}
+
+			return relationships
+				.entrySet()
+				.stream()
+				.filter(e -> e.getValue().incoming().contains(type))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toSet());
+		}
+
+		@Override
+		public Collection<Token> getIncomingRelations(Token label) {
+
+			return extractRelations(label, Relationships::incoming);
+		}
+
+		@Override
+		public Collection<Token> getSourceNodes(Token type) {
+
+			if (type.type() != Token.Type.RELATIONSHIP_TYPE) {
+				throw new IllegalArgumentException(type + " must be a relationship type, not a node label");
+			}
+
+			return relationships
+				.entrySet()
+				.stream()
+				.filter(e -> e.getValue().outgoing().contains(type))
+				.map(Map.Entry::getKey)
+				.collect(Collectors.toSet());
+		}
+
+		@Override
+		public Collection<Token> getUndirectedRelations(Token label) {
+
+			return extractRelations(label, Relationships::undirected);
 		}
 	}
 }
