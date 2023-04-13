@@ -126,7 +126,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 *
 	 * @param label The label to retrieve outgoing relations for
 	 * @return A set of tokens describing relations
-	 * @since 2023.2.1
+	 * @since 2023.3.0
 	 */
 	Collection<Token> getOutgoingRelations(Token label);
 
@@ -136,7 +136,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 *
 	 * @param type The type of relationship to retrieve target nodes
 	 * @return A set of tokens describing labels
-	 * @since 2023.2.1
+	 * @since 2023.3.0
 	 */
 	Collection<Token> getTargetNodes(Token type);
 
@@ -147,7 +147,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 *
 	 * @param label The label to retrieve incoming relations for
 	 * @return A set of tokens describing relations
-	 * @since 2023.2.1
+	 * @since 2023.3.0
 	 */
 	Collection<Token> getIncomingRelations(Token label);
 
@@ -157,7 +157,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 *
 	 * @param type The type of relationship to retrieve source nodes
 	 * @return A set of tokens describing labels
-	 * @since 2023.2.1
+	 * @since 2023.3.0
 	 */
 	Collection<Token> getSourceNodes(Token type);
 
@@ -168,7 +168,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 *
 	 * @param label The label to retrieve relations for
 	 * @return A set of tokens describing relations
-	 * @since 2023.2.1
+	 * @since 2023.3.0
 	 */
 	Collection<Token> getUndirectedRelations(Token label);
 
