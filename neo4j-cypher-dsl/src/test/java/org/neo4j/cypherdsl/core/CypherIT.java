@@ -37,6 +37,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -47,6 +48,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 class CypherIT {
 
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+	public static final Configuration NEO5J_CONFIG = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
 	private final Node bikeNode = Cypher.node("Bike").named("b");
 	private final Node userNode = Cypher.node("User").named("u");
 
@@ -3682,16 +3684,17 @@ class CypherIT {
 				statement = Cypher.match(n)
 					.returning(n.project("__internalNeo4jId__", Functions.elementId(n), "name"))
 					.build();
-				assertThat(cypherRenderer.render(statement))
+				var renderer = Renderer.getRenderer(NEO5J_CONFIG);
+				assertThat(renderer.render(statement))
 					.isEqualTo(
-						"MATCH (n) RETURN n{__internalNeo4jId__: id(n), .name}");
+						"MATCH (n) RETURN n{__internalNeo4jId__: elementId(n), .name}");
 
 				statement = Cypher.match(n)
 					.returning(n.project("name", "__internalNeo4jId__", Functions.elementId(n)))
 					.build();
-				assertThat(cypherRenderer.render(statement))
+				assertThat(renderer.render(statement))
 					.isEqualTo(
-						"MATCH (n) RETURN n{.name, __internalNeo4jId__: id(n)}");
+						"MATCH (n) RETURN n{.name, __internalNeo4jId__: elementId(n)}");
 			}
 
 			@Test
@@ -3743,9 +3746,9 @@ class CypherIT {
 							m.project("title", "__internalNeo4jId__", Functions.elementId(m))
 						))
 					.build();
-				assertThat(cypherRenderer.render(statement))
+				assertThat(Renderer.getRenderer(NEO5J_CONFIG).render(statement))
 					.isEqualTo(
-						"MATCH (p:`Person`)-[:`ACTED_IN`]->(m:`Movie`) RETURN p{__internalNeo4jId__: id(p), .name, nested: m{.title, __internalNeo4jId__: id(m)}}");
+						"MATCH (p:`Person`)-[:`ACTED_IN`]->(m:`Movie`) RETURN p{__internalNeo4jId__: elementId(p), .name, nested: m{.title, __internalNeo4jId__: elementId(m)}}");
 			}
 
 			@Test
@@ -3792,9 +3795,9 @@ class CypherIT {
 						.and("a", p.property("x"))
 					)
 					.build();
-				assertThat(cypherRenderer.render(statement))
+				assertThat(Renderer.getRenderer(NEO5J_CONFIG).render(statement))
 					.isEqualTo(
-						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN p{__internalNeo4jId__: id(p), .name, r, m, .foo, a: p.x}");
+						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN p{__internalNeo4jId__: elementId(p), .name, r, m, .foo, a: p.x}");
 			}
 		}
 
@@ -3815,9 +3818,9 @@ class CypherIT {
 							"__internalNeo4jId__", Functions.elementId(rel), "roles"
 						))
 					.build();
-				assertThat(cypherRenderer.render(statement))
+				assertThat(Renderer.getRenderer(NEO5J_CONFIG).render(statement))
 					.isEqualTo(
-						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN r{__internalNeo4jId__: id(r), .roles}");
+						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN r{__internalNeo4jId__: elementId(r), .roles}");
 			}
 
 			@Test
@@ -3838,9 +3841,9 @@ class CypherIT {
 						)
 					)
 					.build();
-				assertThat(cypherRenderer.render(statement))
+				assertThat(Renderer.getRenderer(NEO5J_CONFIG).render(statement))
 					.isEqualTo(
-						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN m{.title, roles: r{__internalNeo4jId__: id(r), .roles}}");
+						"MATCH (p:`Person`)-[r:`ACTED_IN`]->(m:`Movie`) RETURN m{.title, roles: r{__internalNeo4jId__: elementId(r), .roles}}");
 			}
 
 			@Test
@@ -3873,16 +3876,11 @@ class CypherIT {
 		@SuppressWarnings("ResultOfMethodCallIgnored") @Test
 		void invalid() {
 
-			String expectedMessage = "FunctionInvocation{cypher=id(n)} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";
-			assertThatIllegalArgumentException().isThrownBy(() -> {
-				Node n = Cypher.anyNode("n");
-				n.project(Functions.elementId(n));
-			}).withMessage(expectedMessage);
+			String expectedMessage = "FunctionInvocation{cypher=elementId(n)} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";
+			Node n = Cypher.anyNode("n");
 
-			assertThatIllegalArgumentException().isThrownBy(() -> {
-				Node n = Cypher.anyNode("n");
-				n.project("a", Cypher.mapOf("a", Cypher.literalOf("b")), Functions.elementId(n));
-			}).withMessage(expectedMessage);
+			assertThatIllegalArgumentException().isThrownBy(() -> n.project(Functions.elementId(n))).withMessage(expectedMessage);
+			assertThatIllegalArgumentException().isThrownBy(() -> n.project("a", Cypher.mapOf("a", Cypher.literalOf("b")), Functions.elementId(n))).withMessage(expectedMessage);
 		}
 	}
 
