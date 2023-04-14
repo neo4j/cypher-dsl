@@ -3273,7 +3273,7 @@ class CypherIT {
 			Node node = Cypher.node("Person").named("p");
 			//noinspection ResultOfMethodCallIgnored
 			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(node)
-				.returning(node.project("__internalNeo4jId__", Functions.id(node), "name")
+				.returning(node.project("__internalNeo4jId__", Functions.elementId(node), "name")
 					.and(node.property("home.location", "y"))
 				)
 				.build()).withMessage("Cannot project nested properties!");
@@ -3680,14 +3680,14 @@ class CypherIT {
 				Node n = Cypher.anyNode("n");
 
 				statement = Cypher.match(n)
-					.returning(n.project("__internalNeo4jId__", Functions.id(n), "name"))
+					.returning(n.project("__internalNeo4jId__", Functions.elementId(n), "name"))
 					.build();
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
 						"MATCH (n) RETURN n{__internalNeo4jId__: id(n), .name}");
 
 				statement = Cypher.match(n)
-					.returning(n.project("name", "__internalNeo4jId__", Functions.id(n)))
+					.returning(n.project("name", "__internalNeo4jId__", Functions.elementId(n)))
 					.build();
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
@@ -3739,8 +3739,8 @@ class CypherIT {
 				statement = Cypher.match(n.relationshipTo(m, "ACTED_IN"))
 					.returning(
 						n.project(
-							"__internalNeo4jId__", Functions.id(n), "name", "nested",
-							m.project("title", "__internalNeo4jId__", Functions.id(m))
+							"__internalNeo4jId__", Functions.elementId(n), "name", "nested",
+							m.project("title", "__internalNeo4jId__", Functions.elementId(m))
 						))
 					.build();
 				assertThat(cypherRenderer.render(statement))
@@ -3785,7 +3785,7 @@ class CypherIT {
 				Relationship rel = p.relationshipTo(m, "ACTED_IN").named("r");
 
 				statement = Cypher.match(rel)
-					.returning(p.project("__internalNeo4jId__", Functions.id(p), "name")
+					.returning(p.project("__internalNeo4jId__", Functions.elementId(p), "name")
 						.and(rel)
 						.and(m)
 						.and(p.property("foo"))
@@ -3812,7 +3812,7 @@ class CypherIT {
 				statement = Cypher.match(rel)
 					.returning(
 						rel.project(
-							"__internalNeo4jId__", Functions.id(rel), "roles"
+							"__internalNeo4jId__", Functions.elementId(rel), "roles"
 						))
 					.build();
 				assertThat(cypherRenderer.render(statement))
@@ -3833,7 +3833,7 @@ class CypherIT {
 						m.project(
 							"title", "roles",
 							rel.project(
-								"__internalNeo4jId__", Functions.id(rel), "roles"
+								"__internalNeo4jId__", Functions.elementId(rel), "roles"
 							)
 						)
 					)
@@ -3876,12 +3876,12 @@ class CypherIT {
 			String expectedMessage = "FunctionInvocation{cypher=id(n)} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";
 			assertThatIllegalArgumentException().isThrownBy(() -> {
 				Node n = Cypher.anyNode("n");
-				n.project(Functions.id(n));
+				n.project(Functions.elementId(n));
 			}).withMessage(expectedMessage);
 
 			assertThatIllegalArgumentException().isThrownBy(() -> {
 				Node n = Cypher.anyNode("n");
-				n.project("a", Cypher.mapOf("a", Cypher.literalOf("b")), Functions.id(n));
+				n.project("a", Cypher.mapOf("a", Cypher.literalOf("b")), Functions.elementId(n));
 			}).withMessage(expectedMessage);
 		}
 	}

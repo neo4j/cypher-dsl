@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -31,7 +32,9 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
  */
 class RendererBridge {
 
-	private static final Configuration CONFIGURATION = Configuration.newConfig().alwaysEscapeNames(false).build();
+	private static final Configuration CONFIGURATION = Configuration.newConfig()
+		.withDialect(Dialect.NEO4J_5)
+		.alwaysEscapeNames(false).build();
 
 	static String render(Visitable visitable) {
 		String name;
