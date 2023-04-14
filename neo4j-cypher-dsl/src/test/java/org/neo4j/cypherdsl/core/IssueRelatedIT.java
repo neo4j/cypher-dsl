@@ -109,7 +109,7 @@ class IssueRelatedIT {
 		final Relationship aFl = app.relationshipFrom(locStart, "PART_OF").length(0, 3);
 		final Relationship lFr = locStart.relationshipFrom(resume, "IN", "IN_ANALYTICS");
 
-		Statement statement = Cypher.match(aFl, lFr)
+		@SuppressWarnings("deprecation") Statement statement = Cypher.match(aFl, lFr)
 			.withDistinct(resume, locStart, app)
 			.match(resume
 				.relationshipTo(offer.withProperties("is_valid", Cypher.literalTrue()), "IN_COHORT_OF")
@@ -1396,7 +1396,7 @@ class IssueRelatedIT {
 
 		Operation removeOp = Operations.remove(node, "Drink");
 		List<Expression> propertyExpressions = Collections.singletonList(removeOp);
-		StatementBuilder.OngoingReadingWithWhere ongoingReadingWithWhere = Cypher.match(node)
+		@SuppressWarnings("deprecation") StatementBuilder.OngoingReadingWithWhere ongoingReadingWithWhere = Cypher.match(node)
 			.where(Functions.id(node).isEqualTo(Cypher.literalOf(1)));
 
 		String expectedMessage = "REMOVE operations are not supported in a SET clause";
@@ -1412,7 +1412,7 @@ class IssueRelatedIT {
 			.isThrownBy(() -> Cypher.match(node).set(removeOp))
 			.withMessage(expectedMessage);
 
-		String correctQuery = ongoingReadingWithWhere
+		@SuppressWarnings("deprecation") String correctQuery = ongoingReadingWithWhere
 			.remove(node, "Drink")
 			.returning(Functions.id(node).as("id"))
 			.build()

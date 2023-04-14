@@ -240,6 +240,7 @@ class FunctionsIT {
 			.literalOf(4)));
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
+		@SuppressWarnings("deprecation") var idOfRel = Functions.id(r);
 		return Stream.of(
 			Arguments.of(Functions.left(null, null), "RETURN left(NULL, NULL)"),
 			Arguments.of(Functions.left(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN left('hello', 3)"),
@@ -252,8 +253,7 @@ class FunctionsIT {
 			Arguments.of(Functions.substring(Cypher.literalOf("hello"), Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN substring('hello', 1, 3)"),
 			Arguments.of(Functions.substring(Cypher.literalOf("hello"), Cypher.literalOf(2), null), "RETURN substring('hello', 2)"),
 			Arguments.of(Functions.toStringOrNull(Cypher.literalOf("hello")), "RETURN toStringOrNull('hello')"),
-			Arguments.of(Functions.id(n), "RETURN id(n)"),
-			Arguments.of(Functions.id(r), "RETURN id(r)"),
+			Arguments.of(idOfRel, "RETURN id(r)"),
 			Arguments.of(Functions.elementId(n), "RETURN toString(id(n))"),
 			Arguments.of(Functions.elementId(r), "RETURN toString(id(r))"),
 			Arguments.of(Functions.keys(n), "RETURN keys(n)"),

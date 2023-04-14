@@ -50,8 +50,12 @@ public final class Functions {
 	 *
 	 * @param node The node for which the internal id should be retrieved
 	 * @return A function call for {@code id()} on a node.
+	 * @deprecated see {@link #elementId(Node)} for a replacement. Neo4j the database will remove support for {@code id(n)}
+	 * at some point.
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated(since = "2023.3.0")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
 	public static FunctionInvocation id(@NotNull Node node) {
 
 		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
@@ -65,8 +69,12 @@ public final class Functions {
 	 *
 	 * @param relationship The relationship for which the internal id should be retrieved
 	 * @return A function call for {@code id()} on a relationship.
+	 * @deprecated see {@link #elementId(Relationship)} for a replacement. Neo4j the database will remove support for
+	 * {@code id(n)} at some point.
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated(since = "2023.3.0")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
 	public static FunctionInvocation id(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
