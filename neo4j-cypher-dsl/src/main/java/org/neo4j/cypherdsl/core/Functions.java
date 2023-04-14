@@ -55,6 +55,7 @@ public final class Functions {
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated(since = "2023.3.0")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
 	public static FunctionInvocation id(@NotNull Node node) {
 
 		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
@@ -73,6 +74,7 @@ public final class Functions {
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated(since = "2023.3.0")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
 	public static FunctionInvocation id(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
