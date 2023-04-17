@@ -124,7 +124,7 @@
 		<archunit.version>1.0.1</archunit.version>
 		<asciidoctor-maven-plugin.version>2.2.3</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.2.7</asciidoctorj-diagram.version>
-		<asciidoctorj.version>2.5.7</asciidoctorj.version>
+		<asciidoctorj.version>2.5.8</asciidoctorj.version>
 		<asm.version>9.5</asm.version>
 		<assertj.version>3.24.2</assertj.version>
 		<auto-common.version>0.11</auto-common.version>
