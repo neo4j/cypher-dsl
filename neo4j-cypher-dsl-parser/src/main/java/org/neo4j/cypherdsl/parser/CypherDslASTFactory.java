@@ -148,7 +148,8 @@ final class CypherDslASTFactory implements ASTFactory<
 		EntityType,
 		NULL,
 		PatternAtom,
-		DatabaseName> {
+		DatabaseName,
+		NULL> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
 
@@ -561,7 +562,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternElement everyPathPattern(List<PatternAtom> atoms) {
+	public PatternElement pathPattern(List<PatternAtom> atoms, NULL aNull) {
 
 		if (atoms.isEmpty()) {
 			throw new IllegalArgumentException(
@@ -603,6 +604,31 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 
 		return (PatternElement) relationshipPattern;
+	}
+
+	@Override
+	public NULL anyPathSelector(String count, InputPosition countPosition, InputPosition position) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL allPathSelector(InputPosition position) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL anyShortestPathSelector(String count, InputPosition countPosition, InputPosition position) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL allShortestPathSelector(InputPosition position) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL shortestGroupsSelector(String count, InputPosition countPosition, InputPosition position) {
+		throw new UnsupportedOperationException();
 	}
 
 	private static ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern, PathLength length) {
@@ -876,7 +902,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement alterDatabase(InputPosition inputPosition, DatabaseName databaseName, boolean b, AccessType accessType, Integer integer, Integer integer1, Map<String, Expression> map, java.util.Set<String> set) {
+	public Statement alterDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, AccessType accessType, Integer topologyPrimaries, Integer topologySecondaries, Map<String, Expression> newOptions, java.util.Set<String> optionsToRemove, NULL aNull) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1083,41 +1109,41 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public LabelExpression labelConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
+	public LabelExpression labelConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
 
 		return lhs.and(rhs);
 	}
 
 	@Override
-	public LabelExpression labelDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
+	public LabelExpression labelDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
 
 		return lhs.or(rhs);
 	}
 
 	@Override
-	public LabelExpression labelNegation(InputPosition p, LabelExpression e) {
+	public LabelExpression labelNegation(InputPosition p, LabelExpression e, boolean containsIs) {
 
 		return e.negate();
 	}
 
 	@Override
-	public LabelExpression labelWildcard(InputPosition p) {
+	public LabelExpression labelWildcard(InputPosition p, boolean containsIs) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public LabelExpression labelLeaf(InputPosition p, String e, EntityType entityType) {
+	public LabelExpression labelLeaf(InputPosition p, String e, EntityType entityType, boolean containsIs) {
 		return new LabelExpression(e);
 	}
 
 	@Override
-	public LabelExpression labelColonConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
+	public LabelExpression labelColonConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
 
 		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_CONJUNCTION);
 	}
 
 	@Override
-	public LabelExpression labelColonDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs) {
+	public LabelExpression labelColonDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
 
 		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_DISJUNCTION);
 	}
