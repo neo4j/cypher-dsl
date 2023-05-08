@@ -1664,4 +1664,35 @@ class IssueRelatedIT {
 		assertThat(l)
 			.hasToString("MapLiteral{cypher={a: 1, b: 'c', whatever: 1}}");
 	}
+
+	@Test // GH-694
+	@SuppressWarnings("deprecation")
+	void fullTextCallShouldWork() {
+
+
+		var city = Cypher.anyNode("city");
+		var node = Cypher.name("node");
+		var score = Cypher.name("score");
+		var statement = Cypher.match(Cypher.path("path").definedBy(Cypher.node("Person").named("p").relationshipTo(city, "TRAVELED_TO")))
+			.where(
+				Predicates.exists(
+					Cypher.call("db.index.fulltext.queryNodes").withArgs(Cypher.literalOf("City"), Cypher.literalOf("ham*"))
+						.yield(node, score)
+						.with(Cypher.asterisk())
+						.where(Functions.id(Cypher.anyNode(node)).eq(Functions.id(city)))
+						.returning(node, score)
+						.build()
+				)
+			).returning(Cypher.name("path")).build();
+		assertThat(statement.getCypher()).isEqualTo("""
+			MATCH path = (p:`Person`)-[:`TRAVELED_TO`]->(city)
+			WHERE EXISTS {
+			CALL db.index.fulltext.queryNodes('City', 'ham*')
+			YIELD node, score
+			WITH *
+			WHERE id(node) = id(city)
+			RETURN node, score
+			}
+			RETURN path""".replace("\n", " "));
+	}
 }
