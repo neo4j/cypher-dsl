@@ -149,6 +149,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		NULL,
 		PatternAtom,
 		DatabaseName,
+		NULL,
 		NULL> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
@@ -347,7 +348,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause matchClause(InputPosition p, boolean optional, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where whereIn) {
+	public Clause matchClause(InputPosition p, boolean optional, NULL matchMode, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where whereIn) {
 
 		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
 		Condition condition = Conditions.noCondition();
@@ -713,6 +714,16 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public NULL starPathQuantifier(InputPosition p) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL repeatableElements(InputPosition p) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL differentRelationships(InputPosition p) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1421,7 +1432,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression existsExpression(InputPosition p, List<PatternElement> patternElements, Statement q, Where where) {
+	public Expression existsExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
 
 		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
 		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(elementsAndWhere.elements());
@@ -1481,7 +1492,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression countExpression(InputPosition p, List<PatternElement> patternElements, Statement q, Where where) {
+	public Expression countExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
 
 		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
 		Expression condition = null;

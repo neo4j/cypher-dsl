@@ -175,7 +175,7 @@
 		<mockito.version>5.3.1</mockito.version>
 		<moditect-maven-plugin.version>1.0.0.Final</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>5.9.0</neo4j-java-driver.version>
-		<neo4j.version>5.7.0</neo4j.version>
+		<neo4j.version>5.8.0</neo4j.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>5.0.0</querydsl.version>
