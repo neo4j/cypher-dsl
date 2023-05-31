@@ -1695,4 +1695,29 @@ class IssueRelatedIT {
 			}
 			RETURN path""".replace("\n", " "));
 	}
+
+	@Test // GH-712
+	void relationshipChainsMustActivelyEnterRelationshipsDuringVisit() {
+
+		var tom = Cypher.node("Person").named("person0")
+			.withProperties("name", Cypher.literalOf("Tom Hanks"));
+		var movie = Cypher.node("Movie").named("movie0");
+		var coActors = Cypher.node("Person").named("person1");
+		var path0 = Cypher.path("path0");
+		var path1 = Cypher.path("path1");
+
+		var statement = Cypher
+			.match(path0.definedBy(tom.relationshipTo(movie, "ACTED_IN").named("acted_in0").relationshipFrom(coActors, "ACTED_IN")))
+			.match(path1.definedBy(tom.relationshipTo(movie, "ACTED_IN").named("acted_in0").relationshipFrom(coActors, "ACTED_IN")))
+			.returning("path0", "path1")
+			.build();
+
+		var cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
+		assertThat(cypher).isEqualTo("""
+			MATCH path0 = (person0:Person {
+			  name: 'Tom Hanks'
+			})-[acted_in0:ACTED_IN]->(movie0:Movie)<-[:ACTED_IN]-(person1:Person)
+			MATCH path1 = (person0)-[acted_in0]->(movie0)<-[:ACTED_IN]-(person1)
+			RETURN path0, path1""");
+	}
 }

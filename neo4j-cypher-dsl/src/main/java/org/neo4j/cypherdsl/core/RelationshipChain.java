@@ -221,8 +221,10 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		Node lastNode = null;
 		for (Relationship relationship : relationships) {
 
+			visitor.enter(relationship);
 			relationship.getLeft().accept(visitor);
 			relationship.getDetails().accept(visitor);
+			visitor.leave(relationship);
 
 			lastNode = relationship.getRight();
 		}
