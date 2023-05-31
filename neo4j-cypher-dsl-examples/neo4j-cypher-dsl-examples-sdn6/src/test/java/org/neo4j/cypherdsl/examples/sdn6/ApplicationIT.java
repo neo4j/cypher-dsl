@@ -164,7 +164,7 @@ class ApplicationIT {
 	void findPeopleBornInThe70tiesOrShouldWork1(@Autowired TestRestTemplate restTemplate) {
 
 		var exchange = restTemplate
-			.exchange("/api/people/findPeopleBornInThe70tiesOr/", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+			.exchange("/api/people/findPeopleBornInThe70tiesOr", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
 			});
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
