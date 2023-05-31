@@ -1,5 +1,31 @@
 == 2023.3
 
+=== 2023.3.2
+
+==== 🐛 Bug Fixes
+
+* Relationship chains didn't explicitly enter their elements. (#718)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump spring-boot-starter-parent from 3.0.6 to 3.1.0 (#711)
+** Bump neo4j-cypher-javacc-parser from 5.7.0 to 5.8.0 (#709)
+** Bump guava from 31.1-jre to 32.0.0-jre (#714)
+** Bump checkstyle from 10.11.0 to 10.12.0 (#717)
+** Bump asciidoctor-maven-plugin from 2.2.3 to 2.2.4 (#716)
+** Bump maven-checkstyle-plugin from 3.2.2 to 3.3.0 (#715)
+** Bump neo4j-java-driver from 5.8.0 to 5.9.0 (#713)
+** Bump jackson-bom from 2.15.0 to 2.15.1 (#710)
+** Bump maven-source-plugin from 3.2.1 to 3.3.0 (#708)
+** Bump testcontainers.version from 1.18.0 to 1.18.1 (#704)
+** Bump native-maven-plugin from 0.9.21 to 0.9.22 (#707)
+** Bump reactor-bom from 2022.0.6 to 2022.0.7 (#706)
+** Bump asciidoctorj-diagram from 2.2.7 to 2.2.8 (#705)
+** Bump checkstyle from 10.10.0 to 10.11.0 (#703)
+** Bump flatten-maven-plugin from 1.4.1 to 1.5.0 (#702)
+** Bump spring-data-neo4j from 7.0.5 to 7.1.0 (#701)
+
 === 2023.3.1
 
 ==== 📖 Documentation
