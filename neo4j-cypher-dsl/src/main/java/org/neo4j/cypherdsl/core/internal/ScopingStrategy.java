@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -113,7 +114,7 @@ public final class ScopingStrategy {
 	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
 
 	private ScopingStrategy() {
-		this.dequeOfVisitedNamed.push(new HashSet<>());
+		this.dequeOfVisitedNamed.push(new LinkedHashSet<>());
 	}
 
 	/**
@@ -150,12 +151,12 @@ public final class ScopingStrategy {
 		Set<IdentifiableElement> scopeSeed = dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek();
 		if (hasLocalScope(visitable)) {
 			notify = true;
-			dequeOfVisitedNamed.push(new HashSet<>(scopeSeed));
+			dequeOfVisitedNamed.push(new LinkedHashSet<>(scopeSeed));
 		}
 
 		if (hasImplicitScope(visitable)) {
 			notify = true;
-			implicitScope.push(new HashSet<>(scopeSeed));
+			implicitScope.push(new LinkedHashSet<>(scopeSeed));
 		}
 
 		if (notify) {
@@ -238,9 +239,9 @@ public final class ScopingStrategy {
 		// We keep properties only around when they have been actually returned
 		if (!(previous instanceof Return || previous instanceof YieldItems)) {
 			this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
-				.collect(Collectors.toSet());
+				.collect(Collectors.toCollection(LinkedHashSet::new));
 		} else {
-			this.afterStatement = new HashSet<>(lastScope);
+			this.afterStatement = new LinkedHashSet<>(lastScope);
 		}
 
 		// A procedure call doesn't change scope.
@@ -395,7 +396,7 @@ public final class ScopingStrategy {
 			.stream()
 			.filter(allNamedElementsHaveResolvedNames)
 			.map(IdentifiableElement::asExpression)
-			.collect(Collectors.collectingAndThen(Collectors.toSet(), Collections::unmodifiableSet));
+			.collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
 	}
 
 	/**

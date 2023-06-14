@@ -24,6 +24,8 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,13 +72,13 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	 */
 	private final Deque<PatternElement> currentPatternElement = new ArrayDeque<>();
 
-	private final Set<Token> tokens = new HashSet<>();
+	private final Set<Token> tokens = new LinkedHashSet<>();
 
-	private final Set<StatementCatalog.Property> properties = new HashSet<>();
+	private final Set<StatementCatalog.Property> properties = new LinkedHashSet<>();
 
-	private final Set<StatementCatalog.LabelFilter> labelFilters = new HashSet<>();
+	private final Set<StatementCatalog.LabelFilter> labelFilters = new LinkedHashSet<>();
 
-	private final Map<StatementCatalog.Property, Set<PropertyFilter>> propertyFilters = new HashMap<>();
+	private final Map<StatementCatalog.Property, Set<PropertyFilter>> propertyFilters = new LinkedHashMap<>();
 
 	/**
 	 * Scoped lookup tables from symbolic name to pattern elements (nodes or relationships).
@@ -557,18 +559,18 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 			ParameterInformation parameterInformation,
 			Map<Token, Relationships> relationships
 		) {
-			this.tokens = Set.copyOf(tokens);
-			this.labelFilters = Set.copyOf(labelFilters);
+			this.tokens = Collections.unmodifiableSet(tokens);
+			this.labelFilters = Collections.unmodifiableSet(labelFilters);
 
-			this.properties = Set.copyOf(properties);
+			this.properties = Collections.unmodifiableSet(properties);
 			this.propertyFilters = propertyFilters.entrySet().stream()
-				.collect(Collectors.collectingAndThen(Collectors.toMap(Map.Entry::getKey, e -> Set.copyOf(e.getValue())), Map::copyOf));
+				.collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, e -> Collections.unmodifiableSet(e.getValue())));
 
-			this.identifiableExpressions = Set.copyOf(identifiableExpressions);
+			this.identifiableExpressions = identifiableExpressions instanceof Set<Expression> s ? Collections.unmodifiableSet(s) : Set.copyOf(identifiableExpressions);
 			this.parameterInformation = parameterInformation;
 
 			this.relationships = relationships.entrySet().stream()
-				.collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().copy()));
+				.collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, e -> e.getValue().copy()));
 		}
 
 		@Override
