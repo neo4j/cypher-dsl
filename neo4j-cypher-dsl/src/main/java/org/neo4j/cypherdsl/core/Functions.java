@@ -2186,7 +2186,7 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-names">graph.names</a>.
 	 *
 	 * @return A function call for {@code graph.names()}.
-	 * @since 2023.3.3
+	 * @since 2023.4.0
 	 */
 	@NotNull
 	@Contract(pure = true)
@@ -2202,7 +2202,7 @@ public final class Functions {
 	 *
 	 * @param name The name of the graph
 	 * @return A function call for {@code graph.propertiesByName()}.
-	 * @since 2023.3.3
+	 * @since 2023.4.0
 	 */
 	@NotNull
 	@Contract(pure = true)
@@ -2218,7 +2218,7 @@ public final class Functions {
 	 *
 	 * @param name The name of the graph
 	 * @return A function call for {@code graph.byName()}.
-	 * @since 2023.3.3
+	 * @since 2023.4.0
 	 */
 	@NotNull
 	@Contract(pure = true)

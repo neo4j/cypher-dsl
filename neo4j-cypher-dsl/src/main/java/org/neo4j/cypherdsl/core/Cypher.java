@@ -1272,7 +1272,7 @@ public final class Cypher {
 	 * @since 2023.0.0
 	 * @deprecated Use {@link #use(Expression, Statement)}
 	 */
-	@Deprecated(forRemoval = true, since = "2023.3.3")
+	@Deprecated(forRemoval = true, since = "2023.4.0")
 	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
 	public static UseStatement use(SymbolicName target, Statement statement) {
 		return use((Expression) target, statement);
@@ -1286,7 +1286,7 @@ public final class Cypher {
 	 * @param target    The name of a variable pointing to the graph or constituent
 	 * @param statement The statement to decorate
 	 * @return The new buildable statement
-	 * @since 2023.3.3
+	 * @since 2023.4.0
 	 */
 	public static UseStatement use(Expression target, Statement statement) {
 		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
