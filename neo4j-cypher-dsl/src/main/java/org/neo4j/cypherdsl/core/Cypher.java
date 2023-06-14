@@ -1264,13 +1264,29 @@ public final class Cypher {
 
 	/**
 	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
+	 * utilize {@code graph.byName} to resolve the target database.
+	 *
+	 * @param target    The name of a variable pointing to the graph or constituent
+	 * @param statement The statement to decorate
+	 * @return The new buildable statement
+	 * @since 2023.0.0
+	 * @deprecated Use {@link #use(Expression, Statement)}
+	 */
+	@Deprecated(forRemoval = true, since = "2023.3.3")
+	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
+	public static UseStatement use(SymbolicName target, Statement statement) {
+		return use((Expression) target, statement);
+	}
+
+	/**
+	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
 	 * utilize {@code graph.byName} to resolve the target database unless {@link Functions#graphByName(Expression)} has
 	 * already been used.
 	 *
 	 * @param target    The name of a variable pointing to the graph or constituent
 	 * @param statement The statement to decorate
 	 * @return The new buildable statement
-	 * @since 2023.0.0
+	 * @since 2023.3.3
 	 */
 	public static UseStatement use(Expression target, Statement statement) {
 		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
