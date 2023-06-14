@@ -96,7 +96,7 @@ class UseIT {
 		var innerStatement = Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build();
 		var cypher = Cypher.unwind(Cypher.literalOf(List.of("cineasts.latest", "cineasts.upcoming")))
 			.as("graphName")
-			.call(Cypher.use(Cypher.name("graphName"), innerStatement))
+			.call(Cypher.use((Expression) Cypher.name("graphName"), innerStatement))
 			.returning(Cypher.name("movie").property("title").as("title")).build().getCypher();
 		assertThat(cypher).isEqualTo(expected);
 	}
