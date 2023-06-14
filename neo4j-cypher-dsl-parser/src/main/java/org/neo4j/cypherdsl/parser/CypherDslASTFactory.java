@@ -1013,7 +1013,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, String v, ParameterType type) {
-		return Cypher.parameter(v);
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(Cypher.name(v)));
 	}
 
 	@Override
@@ -1027,11 +1027,14 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@NotNull
-	static Parameter<?> parameterFromSymbolicName(Expression v) {
+	Parameter<?> parameterFromSymbolicName(Expression v) {
 		var symbolicName = assertSymbolicName(v);
-		return symbolicName == null ?
-			Cypher.anonParameter(Cypher.literalNull()) :
-			Cypher.parameter(symbolicName.getValue());
+		if (symbolicName == null) {
+			return Cypher.anonParameter(Cypher.literalNull());
+		}
+
+		var name = symbolicName.getValue();
+		return options.getParameterValues().containsKey(name) ? Cypher.parameter(name, options.getParameterValues().get(name)) : Cypher.parameter(name);
 	}
 
 	@Override

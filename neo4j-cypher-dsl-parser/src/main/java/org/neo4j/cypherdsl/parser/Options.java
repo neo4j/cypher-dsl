@@ -87,6 +87,8 @@ public final class Options {
 
 		private Function<MatchDefinition, Match> matchClauseFactory;
 
+		private Map<String, Object> parameterValues = Map.of();
+
 		private boolean createSortedMaps = false;
 
 		private Builder() {
@@ -214,6 +216,21 @@ public final class Options {
 		}
 
 		/**
+		 * Defines a lookup table for parameters. Everytime a parameter is parsed, we do check if a value in this table exists.
+		 * If so, the parameter will be created as a named parameter carrying that value.
+		 * <p>
+		 * Any previous lookup table will be overwritten when using this method multiple times.
+		 *
+		 * @param newParameterValues A new lookup table. Use an empty map or {@literal null} to clear any lookups in the config
+		 * @return This builder
+		 * @since 2023.3.3
+		 */
+		public Builder withParameterValues(Map<String, Object> newParameterValues) {
+			this.parameterValues = newParameterValues == null ? Map.of() : Map.copyOf(newParameterValues);
+			return this;
+		}
+
+		/**
 		 * @return A new, unmodifiable {@link Options options instance}.
 		 */
 		public Options build() {
@@ -235,6 +252,8 @@ public final class Options {
 
 	private final boolean createSortedMaps;
 
+	private final Map<String, Object> parameterValues;
+
 	private Options(Builder builder) {
 
 		this.labelFilter = builder.labelFilter;
@@ -255,7 +274,6 @@ public final class Options {
 					returnDefinition.getOptionalSortItems(),
 					returnDefinition.getOptionalSkip(), returnDefinition.getOptionalLimit());
 
-
 		this.matchClauseFactory = builder.matchClauseFactory != null ?
 			builder.matchClauseFactory :
 			returnDefinition -> (Match) Clauses
@@ -263,6 +281,7 @@ public final class Options {
 					returnDefinition.optionalWhere(), returnDefinition.optionalHints());
 
 		this.createSortedMaps = builder.createSortedMaps;
+		this.parameterValues = builder.parameterValues;
 	}
 
 	BiFunction<LabelParsedEventType, Collection<String>, Collection<String>> getLabelFilter() {
@@ -298,5 +317,9 @@ public final class Options {
 	 */
 	boolean areDefault() {
 		return this == DEFAULT_OPTIONS;
+	}
+
+	Map<String, Object> getParameterValues() {
+		return parameterValues;
 	}
 }

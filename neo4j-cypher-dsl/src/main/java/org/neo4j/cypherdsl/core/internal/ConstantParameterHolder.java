@@ -36,7 +36,7 @@ public final class ConstantParameterHolder {
 	private final String literalValue;
 
 	/**
-	 * New instance for a reference to a constant parameter. An additional literal for the paramter will be generated.
+	 * New instance for a reference to a constant parameter. An additional literal for the parameter will be generated.
 	 *
 	 * @param value the value of the constant parameter
 	 */

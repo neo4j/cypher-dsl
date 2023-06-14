@@ -64,14 +64,18 @@ class CypherDslASTFactoryTest {
 
 	@Test
 	void parameterLiteralNullExpressionShouldWork() {
-		var parameter = CypherDslASTFactory.parameterFromSymbolicName(null);
+
+		var factory = CypherDslASTFactory.getInstance(null);
+		var parameter = factory.parameterFromSymbolicName(null);
 		assertThat(parameter).isNotNull();
 		assertThat(parameter.isAnon()).isTrue();
 	}
 
 	@Test
 	void parameterFromExpressionShouldWork() {
-		var parameter = CypherDslASTFactory.parameterFromSymbolicName(CypherParser.parseExpression("a"));
+
+		var factory = CypherDslASTFactory.getInstance(null);
+		var parameter = factory.parameterFromSymbolicName(CypherParser.parseExpression("a"));
 		assertThat(parameter).isNotNull();
 		assertThat(parameter.isAnon()).isFalse();
 	}

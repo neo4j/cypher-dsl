@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,6 +45,7 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
+import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.Where;
@@ -527,5 +529,57 @@ class CypherParserTest {
 						}
 					}
 				} AS this""");
+	}
+
+	@Test // GH-729
+	void fillingParametersOfParsedCypherManual() {
+
+		var oidValue = "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --";
+		String userProvidedCypher =
+			"MATCH (p:`confignode` {oid: $oid}) " +
+			"CALL apoc.path.subgraphAll(p, {relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY', minLevel: 1, maxLevel: 3}) " +
+			"YIELD nodes, relationships " +
+			"FOREACH(node in nodes |detach delete node)" +
+			"RETURN nodes";
+
+		var options = Options.newOptions().withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Parameter.class, newExpression -> {
+			var p = (Parameter<?>) newExpression;
+			if ("oid".equals(p.getName())) {
+				return Cypher.parameter(p.getName(), oidValue);
+			}
+			return p;
+		}).build();
+
+		var userStatement = CypherParser.parse(userProvidedCypher, options);
+
+		var prettyPrintingRenderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		assertThat(prettyPrintingRenderer.render(userStatement))
+			.isEqualTo("""
+				MATCH (p:confignode {
+				  oid: $oid
+				}) CALL apoc.path.subgraphAll(p, {
+				  relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY',
+				  minLevel: 1,
+				  maxLevel: 3
+				}) YIELD nodes, relationships FOREACH (node IN nodes | DETACH DELETE node)
+				RETURN nodes""");
+
+		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid", "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
+	}
+
+	@Test // GH-729
+	void fillingParametersOfParsedCypher() {
+
+		var oidValue = "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --";
+		String userProvidedCypher =
+			"MATCH (p:`confignode` {oid: $oid}) " +
+			"CALL apoc.path.subgraphAll(p, {relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY', minLevel: 1, maxLevel: 3}) " +
+			"YIELD nodes, relationships " +
+			"FOREACH(node in nodes |detach delete node)" +
+			"RETURN nodes";
+
+		var options = Options.newOptions().withParameterValues(Map.of("oid", oidValue)).build();
+		var userStatement = CypherParser.parse(userProvidedCypher, options);
+		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid", "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
 	}
 }
