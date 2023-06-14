@@ -223,7 +223,7 @@ public final class Options {
 		 *
 		 * @param newParameterValues A new lookup table. Use an empty map or {@literal null} to clear any lookups in the config
 		 * @return This builder
-		 * @since 2023.3.3
+		 * @since 2023.4.0
 		 */
 		public Builder withParameterValues(Map<String, Object> newParameterValues) {
 			this.parameterValues = newParameterValues == null ? Map.of() : Map.copyOf(newParameterValues);

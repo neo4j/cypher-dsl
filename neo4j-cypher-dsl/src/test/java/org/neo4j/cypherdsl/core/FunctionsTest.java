@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import static org.mockito.Mockito.mock;
 
 import java.lang.reflect.Method;
+import java.util.Locale;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Named;
@@ -94,9 +95,13 @@ class FunctionsTest {
 	@MethodSource("functionsToTest")
 	void functionInvocationsShouldBeCreated(Method method) {
 
+		var expectedValue = method.getName().replace("Distinct", "");
+		if (expectedValue.startsWith("graph")) {
+			expectedValue = "graph." + expectedValue.substring(5, 6).toLowerCase(Locale.ROOT) + expectedValue.substring(6);
+		}
+
 		FunctionInvocation invocation = (FunctionInvocation) TestUtils
 			.invokeMethod(method, null, mock(method.getParameterTypes()[0], Answers.RETURNS_DEEP_STUBS));
-		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD,
-			method.getName().replace("Distinct", ""));
+		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, expectedValue);
 	}
 }

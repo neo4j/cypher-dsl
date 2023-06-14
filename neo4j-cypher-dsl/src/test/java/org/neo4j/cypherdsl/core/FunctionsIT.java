@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.lang.reflect.InvocationTargetException;
@@ -27,7 +28,6 @@ import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -57,7 +57,7 @@ class FunctionsIT {
 		String query = cypherRenderer.render(
 			Cypher.match(source).create(copy).set(copy, p).returning(copy).build()
 		);
-		Assertions.assertThat(query).isEqualTo(
+		assertThat(query).isEqualTo(
 			"MATCH (src:`Movie` {title: 'The Matrix'}) CREATE (copy:`MovieCopy`) SET copy = properties(src) RETURN copy");
 	}
 
@@ -82,7 +82,7 @@ class FunctionsIT {
 					.withInitialValueOf(emptyList)
 			).build();
 
-			Assertions.assertThat(cypherRenderer.render(statement))
+			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN reduce(x = [], n IN relationships(patternPath) | (x + n))");
 		}
 
@@ -106,7 +106,7 @@ class FunctionsIT {
 						.accumulateOn(totalAge)
 						.withInitialValueOf(Cypher.literalOf(0)).as("reduction")
 				).build();
-			Assertions.assertThat(cypherRenderer.render(statement))
+			assertThat(cypherRenderer.render(statement))
 					.isEqualTo("MATCH p = (a)-->(b)-->(c) "
 							+ "WHERE (a.name = 'Alice' AND b.name = 'Bob' AND c.name = 'Daniel') "
 							+ "RETURN reduce(totalAge = 0, n IN nodes(p) | (totalAge + n.age)) AS reduction");
@@ -130,7 +130,7 @@ class FunctionsIT {
 					.withInitialValueOf(Cypher.literalOf(0.0)).as("result"))
 				.build();
 
-			Assertions.assertThat(cypherRenderer.render(statement))
+			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"RETURN reduce(totalAge = 0.0, n IN [x IN range(0, 10) WHERE (x % 2) = 0 | x^3] | (totalAge + n)) AS result");
 		}
@@ -158,7 +158,7 @@ class FunctionsIT {
 				}
 				FunctionInvocation f = (FunctionInvocation) m.invoke(null, arg1, vargs);
 				expected.append(");");
-				Assertions.assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
+				assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
 					.isEqualTo(expected.toString());
 			}
 		} else {
@@ -180,7 +180,7 @@ class FunctionsIT {
 
 			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
 			FunctionInvocation f = (FunctionInvocation) m.invoke(null, (Object[]) args);
-			Assertions.assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
+			assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
 				.isEqualTo(expected.toString());
 		}
 	}
@@ -188,14 +188,14 @@ class FunctionsIT {
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("functionsToTest")
 	void functionShouldBeRenderedAsExpected(FunctionInvocation functionInvocation, String expected) {
-		Assertions.assertThat(cypherRenderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
+		assertThat(cypherRenderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
 	}
 
 	@ParameterizedTest(name = "{0}")
 	@MethodSource("neo5jSpecificFunctions")
 	void neo5jSpecificFunctionsShouldWork(FunctionInvocation functionInvocation, String expected) {
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
-		Assertions.assertThat(renderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
+		assertThat(renderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
 	}
 
 	@Test
@@ -393,5 +393,36 @@ class FunctionsIT {
 			Arguments.of(Functions.cartesian(2.3, 4.5), "RETURN point({x: 2.3, y: 4.5})"),
 			Arguments.of(Functions.coordinate(56.7, 12.78), "RETURN point({longitude: 56.7, latitude: 12.78})")
 		);
+	}
+
+	@Nested // GH-728
+	class Graphs {
+
+		@Test
+		void namesShouldWork() {
+			assertThat(Cypher.returning(Functions.graphNames().as("name")).build().getCypher()).isEqualTo("RETURN graph.names() AS name");
+		}
+
+		@Test
+		void propertiesByNameShouldWork() {
+			var name = Cypher.name("name");
+			var stmnt = Cypher.unwind(Functions.graphNames()).as(name)
+				.returning(name, Functions.graphPropertiesByName(name).as("props"))
+				.build();
+			assertThat(stmnt.getCypher()).isEqualTo("UNWIND graph.names() AS name RETURN name, graph.propertiesByName(name) AS props");
+		}
+
+		@Test
+		void byNameShouldWork() {
+			var name = Cypher.name("graphName");
+			var stmnt = Cypher.unwind(Functions.graphNames()).as(name)
+				.call(Cypher.use(
+					Functions.graphByName(name),
+					Cypher.match(Cypher.anyNode("n")).returning(Cypher.name("n")).build())
+				)
+				.returning(Cypher.name("n"))
+				.build();
+			assertThat(stmnt.getCypher()).isEqualTo("UNWIND graph.names() AS graphName CALL {USE graph.byName(graphName) MATCH (n) RETURN n} RETURN n");
+		}
 	}
 }
