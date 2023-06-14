@@ -1264,14 +1264,15 @@ public final class Cypher {
 
 	/**
 	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
-	 * utilize {@code graph.byName} to resolve the target database.
+	 * utilize {@code graph.byName} to resolve the target database unless {@link Functions#graphByName(Expression)} has
+	 * already been used.
 	 *
 	 * @param target    The name of a variable pointing to the graph or constituent
 	 * @param statement The statement to decorate
 	 * @return The new buildable statement
 	 * @since 2023.0.0
 	 */
-	public static UseStatement use(SymbolicName target, Statement statement) {
+	public static UseStatement use(Expression target, Statement statement) {
 		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
 	}
 

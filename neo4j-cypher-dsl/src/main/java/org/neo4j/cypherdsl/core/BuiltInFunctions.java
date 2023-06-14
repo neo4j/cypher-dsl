@@ -52,6 +52,24 @@ final class BuiltInFunctions {
 		}
 	}
 
+	enum Graph implements FunctionDefinition {
+
+		NAMES("names"),
+		PROPERTIES_BY_NAME("propertiesByName"),
+		BY_NAME("byName");
+
+		private final String implementationName;
+
+		Graph(String implementationName) {
+			this.implementationName = "graph." + implementationName;
+		}
+
+		@Override
+		public String getImplementationName() {
+			return implementationName;
+		}
+	}
+
 	enum Scalars implements FunctionDefinition {
 
 		COALESCE("coalesce"),

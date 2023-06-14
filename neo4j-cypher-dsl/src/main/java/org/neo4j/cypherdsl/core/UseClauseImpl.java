@@ -44,7 +44,7 @@ record UseClauseImpl(Expression target, boolean dynamic) implements Use {
 	}
 
 	static Use of(Expression target) {
-		return new UseClauseImpl(target, true);
+		return new UseClauseImpl(target, !(target instanceof FunctionInvocation fi) || !"graph.byName".equals(fi.getFunctionName()));
 	}
 
 	@Override

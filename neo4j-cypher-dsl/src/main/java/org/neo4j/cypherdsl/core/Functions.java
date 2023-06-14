@@ -2166,7 +2166,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code length{}}.
+	 * Creates a function invocation for {@code length()}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-length">length</a>.
 	 *
 	 * @param path The path for which the length should be retrieved
@@ -2180,6 +2180,54 @@ public final class Functions {
 		return FunctionInvocation.create(Scalars.LENGTH,
 			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
+
+	/**
+	 * Creates a function invocation for {@code graph.names()}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-names">graph.names</a>.
+	 *
+	 * @return A function call for {@code graph.names()}.
+	 * @since 2023.3.3
+	 */
+	@NotNull
+	@Contract(pure = true)
+	@Neo4jVersion(minimum = "5.0.0")
+	public static FunctionInvocation graphNames() {
+
+		return FunctionInvocation.create(BuiltInFunctions.Graph.NAMES);
+	}
+
+	/**
+	 * Creates a function invocation for {@code graph.propertiesByName()}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-propertiesByName">graph.propertiesByName</a>.
+	 *
+	 * @param name The name of the graph
+	 * @return A function call for {@code graph.propertiesByName()}.
+	 * @since 2023.3.3
+	 */
+	@NotNull
+	@Contract(pure = true)
+	@Neo4jVersion(minimum = "5.0.0")
+	public static FunctionInvocation graphPropertiesByName(Expression name) {
+
+		return FunctionInvocation.create(BuiltInFunctions.Graph.PROPERTIES_BY_NAME, name);
+	}
+
+	/**
+	 * Creates a function invocation for {@code graph.byName()}.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-byname">graph.byName</a>.
+	 *
+	 * @param name The name of the graph
+	 * @return A function call for {@code graph.byName()}.
+	 * @since 2023.3.3
+	 */
+	@NotNull
+	@Contract(pure = true)
+	@Neo4jVersion(minimum = "5.0.0")
+	public static FunctionInvocation graphByName(Expression name) {
+
+		return FunctionInvocation.create(BuiltInFunctions.Graph.BY_NAME, name);
+	}
+
 
 	private Functions() {
 	}
