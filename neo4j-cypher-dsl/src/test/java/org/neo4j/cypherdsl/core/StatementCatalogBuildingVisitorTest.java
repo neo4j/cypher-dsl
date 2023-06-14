@@ -23,7 +23,11 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.util.Set;
 
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * @author Michael J. Simons
@@ -174,5 +178,35 @@ class StatementCatalogBuildingVisitorTest {
 			.containsExactlyInAnyOrder(isFriendWith);
 		assertThat(catalog.getOutgoingRelations(person))
 			.containsExactlyInAnyOrder(isFriendWith);
+	}
+
+
+	@RepeatedTest(value = 20)
+	void random_order_test() {
+		var rendererConfig = Configuration.newConfig().withDialect(Dialect.NEO4J_5).withPrettyPrint(true).build();
+		var renderer = Renderer.getRenderer(rendererConfig);
+		var person = Cypher.node("Person").named("n");
+		var movie = Cypher.node("Movie").named("m");
+		var rel = person.relationshipTo(movie).named("r");
+		var innerStatement = Cypher.match(rel)
+			.returning(person, rel, movie)
+			.build();
+
+		var graph_name = Cypher.name("__graph__name__");
+		var graphNames = Cypher.raw("graph.names()");
+		var statement = Cypher.unwind(graphNames).as(graph_name)
+			.call(Cypher.use(graph_name, innerStatement))
+			.returning(innerStatement.getCatalog().getIdentifiableExpressions())
+			.build();
+
+		assertThat(renderer.render(statement))
+			.isEqualTo("""
+				UNWIND graph.names() AS __graph__name__
+				CALL {
+				  USE graph.byName(__graph__name__)
+				  MATCH (n:Person)-[r]->(m:Movie)
+				  RETURN n, r, m
+				}
+				RETURN n, r, m""");
 	}
 }
