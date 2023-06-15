@@ -43,8 +43,8 @@ class DialectIT {
 
 	static Stream<Arguments> nPropExists() {
 		return Stream.of(
-			Arguments.of(Dialect.DEFAULT, false, "MATCH (n:`Movie`) WHERE exists(n.title) RETURN n"),
-			Arguments.of(Dialect.DEFAULT, true, "MATCH (n:`Movie`) WHERE NOT (exists(n.title)) RETURN n"),
+			Arguments.of(Dialect.NEO4J_4, false, "MATCH (n:`Movie`) WHERE exists(n.title) RETURN n"),
+			Arguments.of(Dialect.NEO4J_4, true, "MATCH (n:`Movie`) WHERE NOT (exists(n.title)) RETURN n"),
 			Arguments.of(Dialect.NEO4J_5, false, "MATCH (n:`Movie`) WHERE n.title IS NOT NULL RETURN n"),
 			Arguments.of(Dialect.NEO4J_5, true, "MATCH (n:`Movie`) WHERE n.title IS NULL RETURN n")
 		);
@@ -67,7 +67,7 @@ class DialectIT {
 
 	static Stream<Arguments> distanceFunction() {
 		return Stream.of(
-			Arguments.of(Dialect.DEFAULT, "MATCH (n) RETURN distance(n.a, n.b)"),
+			Arguments.of(Dialect.NEO4J_4, "MATCH (n) RETURN distance(n.a, n.b)"),
 			Arguments.of(Dialect.NEO4J_5, "MATCH (n) RETURN point.distance(n.a, n.b)")
 		);
 	}
@@ -86,7 +86,7 @@ class DialectIT {
 
 	static Stream<Arguments> elementId() {
 		return Stream.of(
-			Arguments.of(Dialect.DEFAULT, "MATCH (n) RETURN toString(id(n))"),
+			Arguments.of(Dialect.NEO4J_4, "MATCH (n) RETURN toString(id(n))"),
 			Arguments.of(Dialect.NEO4J_5, "MATCH (n) RETURN elementId(n)")
 		);
 	}
