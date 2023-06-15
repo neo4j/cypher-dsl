@@ -20,6 +20,10 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -31,6 +35,28 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 @API(status = STABLE, since = "1.0")
 public final class Set implements UpdatingClause {
+
+	/**
+	 * Creates a {@literal SET} clause based on the given updates. No runtime checks are whether those expressions are
+	 * actually updates. Please be mindful here.
+	 *
+	 * @param update The update to apply
+	 * @param more additional updates
+	 * @return A {@link Set} clause
+	 * @since 2023.4.0
+	 */
+	static Set set(Expression update, Expression... more) {
+
+		if (more == null || more.length == 0) {
+			return new Set(new ExpressionList(Collections.singletonList(update)));
+		}
+
+		List<Expression> finalExpressionList = new ArrayList<>();
+		finalExpressionList.add(update);
+		Collections.addAll(finalExpressionList, more);
+
+		return new Set(new ExpressionList(finalExpressionList));
+	}
 
 	private final ExpressionList setItems;
 
