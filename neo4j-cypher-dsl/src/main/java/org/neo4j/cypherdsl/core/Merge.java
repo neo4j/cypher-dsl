@@ -45,17 +45,12 @@ public final class Merge extends AbstractClause implements UpdatingClause {
 	static final Literal<String> BLANK = new LiteralBase<>(" ") {
 		@Override
 		public String asString() {
-			return super.getContent();
+			return content;
 		}
 	};
 
 	private final Pattern pattern;
 	private final List<Visitable> onCreateOrMatchEvents;
-
-	Merge(Pattern pattern) {
-		this.pattern = pattern;
-		this.onCreateOrMatchEvents = Collections.emptyList();
-	}
 
 	Merge(Pattern pattern, List<MergeAction> mergeActions) {
 		this.pattern = pattern;
