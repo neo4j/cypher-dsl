@@ -1052,7 +1052,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override public Expression newOctalInteger(InputPosition p, String image, boolean negated) {
-		return Cypher.literalOf(Long.parseUnsignedLong(image, 8) * (negated ? -1 : 1));
+		return Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1));
 	}
 
 	@Override
