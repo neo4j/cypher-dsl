@@ -18,9 +18,19 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import org.junit.jupiter.api.Test;
+
 /**
  * @author Michael J. Simons
- * @since 1.0
  */
-public interface UpdatingClause extends Clause {
+class DeleteTest {
+
+	@Test
+	void buildingDeleteClauseWithMultipleElements() {
+
+		var delete = Delete.delete(Cypher.name("n"), Cypher.name("b"));
+		assertThat(delete).hasToString("Delete{cypher=DELETE n, b}");
+	}
 }
