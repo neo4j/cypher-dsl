@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1686814519435">
+<licensePluginReport goal="CHECK" timestamp="1686828095309">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -214,6 +214,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/CypherIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/CypherTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DefaultStatementBuilderTest.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/DeleteTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DialectIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DriverValueAdapterTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DurationLiteralTest.java" result="PRESENT"/>
