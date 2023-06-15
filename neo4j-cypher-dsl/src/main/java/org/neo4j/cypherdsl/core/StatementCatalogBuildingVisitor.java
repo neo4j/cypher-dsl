@@ -560,6 +560,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 		private final Set<Literal<?>> literals;
 
+		@SuppressWarnings("squid:S107") // Totally fine with that number of args.
 		DefaultStatementCatalog(
 			Set<Token> tokens,
 			Set<LabelFilter> labelFilters,

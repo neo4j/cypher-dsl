@@ -255,7 +255,9 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 
 	/**
 	 * @return A collection of all literals used in a statement.
+	 * @since 2023.4.0
 	 */
+	@SuppressWarnings("squid:S1452") // Generic items, this is exactly what we want here
 	Collection<Literal<?>> getLiterals();
 
 	/**
