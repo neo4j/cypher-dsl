@@ -52,8 +52,4 @@ public final class Namespace implements Literal<String[]> {
 
 		return String.join(".", content);
 	}
-
-	String[] getContent() {
-		return content;
-	}
 }

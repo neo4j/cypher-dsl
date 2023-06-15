@@ -56,7 +56,7 @@ final class RawLiteral implements Expression {
 		@NotNull
 		public String asString() {
 
-			return super.getContent();
+			return content;
 		}
 
 		private static String unescapeEscapedPlaceholders(String content) {

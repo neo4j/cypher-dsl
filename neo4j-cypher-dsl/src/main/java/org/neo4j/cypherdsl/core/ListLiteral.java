@@ -44,7 +44,7 @@ public final class ListLiteral extends LiteralBase<Iterable<Literal<?>>> {
 	@Override
 	public String asString() {
 
-		return StreamSupport.stream(getContent().spliterator(), false).map(Literal::asString).collect(
+		return StreamSupport.stream(content.spliterator(), false).map(Literal::asString).collect(
 			Collectors.joining(", ", "[", "]"));
 	}
 }

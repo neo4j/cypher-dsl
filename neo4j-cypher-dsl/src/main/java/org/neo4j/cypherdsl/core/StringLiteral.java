@@ -75,4 +75,8 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 		return Optional.of(buffer.toString());
 	}
 
+	@Override
+	public CharSequence getContent() {
+		return content;
+	}
 }

@@ -244,7 +244,7 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 		@Override
 		@NotNull
 		public String asString() {
-			return this.getContent().entrySet().stream()
+			return content.entrySet().stream()
 				.map(e -> e.getKey() + ": " + e.getValue())
 				.collect(Collectors.joining(", ", "point({", "})"));
 		}

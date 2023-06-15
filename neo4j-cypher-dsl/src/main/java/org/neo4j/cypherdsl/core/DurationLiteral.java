@@ -39,9 +39,13 @@ final class DurationLiteral extends LiteralBase<Duration> {
 	}
 
 	@Override
+	public Duration getContent() {
+		return content;
+	}
+
+	@Override
 	@NotNull
 	public String asString() {
-		var content = super.getContent();
 		var result = new StringBuilder();
 		result.append("duration('P");
 		if (content.toDaysPart() != 0L) {

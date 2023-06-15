@@ -44,7 +44,7 @@ public final class Asterisk extends LiteralBase<String> implements IdentifiableE
 	@NotNull
 	@Override
 	public String asString() {
-		return super.getContent();
+		return content;
 	}
 
 	@Override

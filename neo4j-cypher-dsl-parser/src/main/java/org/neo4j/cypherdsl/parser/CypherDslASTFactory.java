@@ -67,7 +67,6 @@ import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.LabelExpression;
-import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.Match;
@@ -1039,50 +1038,50 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression newDouble(InputPosition p, String image) {
-		return Cypher.literalOf(Double.parseDouble(image));
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Double.parseDouble(image)));
 	}
 
 	@Override
 	public Expression newDecimalInteger(InputPosition p, String image, boolean negated) {
-		return Cypher.literalOf(Long.parseUnsignedLong(image) * (negated ? -1 : 1));
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image) * (negated ? -1 : 1)));
 	}
 
 	@Override public Expression newHexInteger(InputPosition p, String image, boolean negated) {
-		return Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0x", ""), 16) * (negated ? -1 : 1));
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0x", ""), 16) * (negated ? -1 : 1)));
 	}
 
 	@Override public Expression newOctalInteger(InputPosition p, String image, boolean negated) {
-		return Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1));
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1)));
 	}
 
 	@Override
-	public Literal<String> newString(InputPosition p, String image) {
-		return Cypher.literalOf(image);
+	public Expression newString(InputPosition p, String image) {
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(image));
 	}
 
 	@Override
 	public Expression newTrueLiteral(InputPosition p) {
-		return Cypher.literalTrue();
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalTrue());
 	}
 
 	@Override
 	public Expression newFalseLiteral(InputPosition p) {
-		return Cypher.literalFalse();
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalFalse());
 	}
 
 	@Override
 	public Expression newInfinityLiteral(InputPosition p) {
-		return InfinityLiteral.INSTANCE;
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, InfinityLiteral.INSTANCE);
 	}
 
 	@Override
 	public Expression newNaNLiteral(InputPosition p) {
-		return NaNLiteral.INSTANCE;
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, NaNLiteral.INSTANCE);
 	}
 
 	@Override
 	public Expression newNullLiteral(InputPosition p) {
-		return Cypher.literalOf(null);
+		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalNull());
 	}
 
 	@Override

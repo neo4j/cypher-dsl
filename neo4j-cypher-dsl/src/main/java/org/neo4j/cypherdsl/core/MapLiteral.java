@@ -42,7 +42,7 @@ public final class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 	@NotNull
 	@Override
 	public String asString() {
-		return getContent().entrySet().stream()
+		return content.entrySet().stream()
 			.map(entry -> entry.getKey() + ": " + entry.getValue().asString())
 			.collect(Collectors.joining(", ", "{", "}"));
 	}

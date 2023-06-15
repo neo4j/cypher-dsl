@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -87,7 +86,7 @@ public final class ProcedureName implements Visitable {
 
 		String namespace = "";
 		if (this.optionalNamespace != null) {
-			namespace = Arrays.stream(this.optionalNamespace.getContent()).collect(Collectors.joining(".", "", "."));
+			namespace = this.optionalNamespace.asString() + ".";
 		}
 		return namespace + this.value;
 	}
