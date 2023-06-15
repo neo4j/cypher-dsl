@@ -4556,6 +4556,102 @@ class CypherIT {
 	}
 
 	@Nested
+	class Foreach {
+
+		@Test
+		void basic() {
+
+			var start = Cypher.anyNode("start");
+			var finish = Cypher.anyNode("finish");
+			var p = Cypher.path("p").definedBy(start.relationshipTo(finish).unbounded());
+			var n = Cypher.name("n");
+			var stmnt = Cypher.match(p)
+				.where(start.property("name").eq(Cypher.literalOf("A")).and(finish.property("name").eq(Cypher.literalOf("D"))))
+				.foreach(n)
+				.in(Functions.nodes(p))
+				.apply(Set.set(n.property("marked").to(Cypher.literalTrue())))
+				.build();
+			assertThat(stmnt.getCypher()).isEqualTo(
+				"MATCH p = (start)-[*]->(finish) " +
+				"WHERE (start.name = 'A' AND finish.name = 'D') " +
+				"FOREACH (n IN nodes(p) | SET n.marked = true)");
+		}
+
+		@Test
+		void mixedWithOtherClauses() {
+
+			var start = Cypher.anyNode("start");
+			var finish = Cypher.anyNode("finish");
+			var p = Cypher.path("p").definedBy(start.relationshipTo(finish).unbounded());
+			var n = Cypher.name("n");
+			var stmnt = Cypher.match(p)
+				.where(start.property("name").eq(Cypher.literalOf("A")).and(finish.property("name").eq(Cypher.literalOf("D"))))
+				.set(start.property("x").to(Cypher.literalTrue()))
+				.foreach(n)
+					.in(Functions.nodes(p))
+					.apply(Set.set(
+						n.property("marked").to(Cypher.literalTrue()),
+						n.property("foo").to(Cypher.literalOf("bar"))
+					))
+				.delete(finish)
+				.build();
+			assertThat(stmnt.getCypher()).isEqualTo(
+				"MATCH p = (start)-[*]->(finish) " +
+				"WHERE (start.name = 'A' AND finish.name = 'D') " +
+				"SET start.x = true " +
+				"FOREACH (n IN nodes(p) | SET n.marked = true, n.foo = 'bar') " +
+				"DELETE finish");
+		}
+
+		@Test
+		void withWith() {
+
+			var start = Cypher.anyNode("start");
+			var n = Cypher.name("n");
+			var stmnt = Cypher.match(start)
+				.with(start)
+				.foreach(n)
+				.in(Cypher.listOf(start.asExpression()))
+				.apply(Delete.delete(n))
+				.build();
+			// Probably the worst way to delete a graph I ever wrote down
+			assertThat(stmnt.getCypher()).isEqualTo("MATCH (start) WITH start FOREACH (n IN [start] | DELETE n)");
+		}
+
+		@Test
+		void inComplexStatement() {
+
+			var configNode = Cypher.node("confignode").withProperties("oid", Cypher.parameter("oid")).named("p");
+			var nodes = Cypher.name("nodes");
+			var node = Cypher.name("node");
+			var relationships = Cypher.name("relationships");
+			var stmnt = Cypher.match(configNode)
+				.call("apoc.path.subgraphAll").withArgs(
+					configNode.getRequiredSymbolicName(),
+					Cypher.mapOf("relationshipFilter", Cypher.literalOf("BELONGS_TO_ARRAY|IN|IN_ARRAY"), "minLevel", Cypher.literalOf(1), "maxLevel", Cypher.literalOf(3))
+				)
+				.yield(nodes, relationships)
+				.foreach(node)
+				.in(nodes)
+				.apply(Delete.detachDelete(node))
+				.returning(nodes)
+				.build();
+
+			var prettyPrintingRenderer = Renderer.getRenderer(Configuration.prettyPrinting());
+			assertThat(prettyPrintingRenderer.render(stmnt))
+				.isEqualTo("""
+				MATCH (p:confignode {
+				  oid: $oid
+				}) CALL apoc.path.subgraphAll(p, {
+				  relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY',
+				  minLevel: 1,
+				  maxLevel: 3
+				}) YIELD nodes, relationships FOREACH (node IN nodes | DETACH DELETE node)
+				RETURN nodes""");
+		}
+	}
+
+	@Nested
 	class PrettyPrinting {
 
 		private final Statement statement;

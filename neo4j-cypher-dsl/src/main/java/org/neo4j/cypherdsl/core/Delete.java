@@ -21,6 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -32,6 +36,51 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 @API(status = STABLE, since = "1.0")
 public final class Delete extends AbstractClause implements UpdatingClause {
+
+	/**
+	 * Creates a {@literal DELETE} clause deleting the given items.
+	 *
+	 * @param toBeDeleted The item to be deleted
+	 * @param more        More items to be deleted
+	 * @return A {@link Delete} clause
+	 * @since 2023.4.0
+	 */
+	static Delete delete(Expression toBeDeleted, Expression... more) {
+		return delete(false, toBeDeleted, more);
+	}
+
+	/**
+	 * Creates a {@literal DELETE} clause deleting the given items.
+	 *
+	 * @param detach      Set to {@literal true} for {@literal DELETE} clause detaching all items
+	 * @param toBeDeleted The item to be deleted
+	 * @param more        More items to be deleted
+	 * @return A {@link Delete} clause
+	 * @since 2023.4.0
+	 */
+	static Delete delete(boolean detach, Expression toBeDeleted, Expression... more) {
+		if (more == null || more.length == 0) {
+			return new Delete(new ExpressionList(List.of(toBeDeleted)), detach);
+		}
+
+		List<Expression> finalExpressionList = new ArrayList<>();
+		finalExpressionList.add(toBeDeleted);
+		Collections.addAll(finalExpressionList, more);
+
+		return new Delete(new ExpressionList(finalExpressionList), detach);
+	}
+
+	/**
+	 * Creates a detaching {@literal DELETE} clause deleting the given items.
+	 *
+	 * @param toBeDeleted The item to be deleted
+	 * @param more        More items to be deleted
+	 * @return A {@link Delete} clause
+	 * @since 2023.4.0
+	 */
+	static Delete detachDelete(Expression toBeDeleted, Expression... more) {
+		return delete(true, toBeDeleted, more);
+	}
 
 	private final ExpressionList deleteItems;
 

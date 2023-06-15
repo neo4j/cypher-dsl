@@ -22,5 +22,5 @@ package org.neo4j.cypherdsl.core;
  * @author Michael J. Simons
  * @since 1.0
  */
-interface UpdatingClause extends Clause {
+public interface UpdatingClause extends Clause {
 }

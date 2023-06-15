@@ -530,11 +530,62 @@ public interface StatementBuilder
 	}
 
 	/**
+	 * Steps for building a {@link Foreach} clause.
+	 * @since 2023.4.0
+	 */
+	interface ExposesForeach {
+
+		/**
+		 * Starts defining a {@link Foreach} clause
+		 *
+		 * @param variable the variable to use in the iterator
+		 * @return A step for selecting the source of iteration
+		 * @since 2023.4.0
+		 */
+		@NotNull
+		@Contract(pure = true)
+		ForeachSourceStep foreach(SymbolicName variable);
+	}
+
+	/**
+	 * Initial step of defining a {@link Foreach FOREACH-clause}.
+	 *
+	 * @since 2023.4.0
+	 */
+	sealed interface ForeachSourceStep permits DefaultStatementBuilder.ForeachBuilder {
+
+		/**
+		 * Defines the source to be iterated by {@code FOREACH}. Must evaluate to something iterable, for example something like
+		 * {@link Functions#nodes(NamedPath)} for
+		 *
+		 * @param list The expression to iterate on
+		 * @return The next step.
+		 */
+		ForeachUpdateStep in(Expression list);
+	}
+
+	/**
+	 * Second step of defining a {@link Foreach FOREACH-clause} in which the updating clause is defined.
+	 *
+	 * @since 2023.4.0
+	 */
+	sealed interface ForeachUpdateStep permits DefaultStatementBuilder.ForeachBuilder {
+
+		/**
+		 * Defines the updating clause that to will be applied to every item in the source expression.
+		 *
+		 * @param updatingClauses The updating clauses to apply
+		 * @return The final {@link Foreach} clause
+		 */
+		OngoingUpdate apply(UpdatingClause... updatingClauses);
+	}
+
+	/**
 	 * A step providing all the supported updating clauses (DELETE, SET)
 	 *
 	 * @since 1.0
 	 */
-	interface ExposesUpdatingClause extends ExposesDelete, ExposesMerge, ExposesSetAndRemove {
+	interface ExposesUpdatingClause extends ExposesDelete, ExposesMerge, ExposesSetAndRemove, ExposesForeach {
 	}
 
 	/**
@@ -901,7 +952,7 @@ public interface StatementBuilder
 		OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk);
 
 		/**
-		 * Convenience method to yield all items of this standalon call.
+		 * Convenience method to yield all items of this standalone call.
 		 * @return The ongoing standalone call to be configured.
 		 * @since 2022.8.0
 		 */
@@ -994,6 +1045,6 @@ public interface StatementBuilder
 	 * An in-query call exposing where and return clauses.
 	 */
 	interface OngoingInQueryCallWithReturnFields extends
-		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesWith, ExposesSubqueryCall {
+		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesWith, ExposesSubqueryCall, ExposesForeach {
 	}
 }
