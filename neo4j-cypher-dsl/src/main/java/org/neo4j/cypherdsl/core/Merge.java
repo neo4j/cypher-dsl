@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apiguardian.api.API;
