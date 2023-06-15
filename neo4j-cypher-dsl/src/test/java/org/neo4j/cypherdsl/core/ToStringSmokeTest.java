@@ -64,6 +64,7 @@ class ToStringSmokeTest {
 				return;
 			}
 			try {
+
 				boolean hasOverwrittenToString = (segment.getClass().getMethod("toString").getDeclaringClass() != Object.class);
 				assertThat(hasOverwrittenToString).isTrue();
 				assertThatNoException().isThrownBy(segment::toString);

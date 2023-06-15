@@ -74,7 +74,11 @@ public enum ExpressionCreatedEventType {
 	/**
 	 * Fired when preparing a {@code DELETE x, y, z} clause.
 	 */
-	ON_DELETE_ITEM(Expression.class);
+	ON_DELETE_ITEM(Expression.class),
+	/**
+	 * Fired when new literals are created.
+	 */
+	ON_NEW_LITERAL(Expression.class);
 
 	private final Class<? extends Expression> typeProduced;
 

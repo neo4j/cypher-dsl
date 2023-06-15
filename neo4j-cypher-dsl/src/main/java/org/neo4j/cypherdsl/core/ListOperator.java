@@ -46,7 +46,7 @@ public final class ListOperator implements Expression, Visitable {
 		@NotNull
 		@Override
 		public String asString() {
-			return super.getContent();
+			return content;
 		}
 	};
 

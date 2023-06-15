@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -43,6 +44,7 @@ import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Parameter;
@@ -581,5 +583,24 @@ class CypherParserTest {
 		var options = Options.newOptions().withParameterValues(Map.of("oid", oidValue)).build();
 		var userStatement = CypherParser.parse(userProvidedCypher, options);
 		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid", "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
+	}
+
+	@Test // GH-739
+	void literalCallbacks() {
+
+		var literals = new LinkedHashSet<Literal<?>>();
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_NEW_LITERAL, Expression.class, l -> {
+				literals.add((Literal<?>) l);
+				return l;
+			})
+			.build();
+
+		CypherParser.parse("RETURN NULL, 1.0 as d, 100 as l, 0x13af as h, 0o1372 as o, 'Hallo' as s, true, false, Inf, NaN", options);
+
+		assertThat(literals.stream().map(Literal::getClass).distinct()).hasSize(6);
+		assertThat(literals)
+			.map(Literal::asString)
+			.containsExactly("NULL", "1.0", "100", "5039", "762", "'Hallo'", "true", "false", "Infinity", "NaN");
 	}
 }

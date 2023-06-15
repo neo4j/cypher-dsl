@@ -39,9 +39,13 @@ final class PeriodLiteral extends LiteralBase<Period> {
 	}
 
 	@Override
+	public Period getContent() {
+		return content;
+	}
+
+	@Override
 	@NotNull
 	public String asString() {
-		var content = super.getContent();
 		var result = new StringBuilder();
 		result.append("duration('P");
 

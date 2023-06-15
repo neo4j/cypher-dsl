@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -45,17 +44,12 @@ public final class Merge extends AbstractClause implements UpdatingClause {
 	static final Literal<String> BLANK = new LiteralBase<>(" ") {
 		@Override
 		public String asString() {
-			return super.getContent();
+			return content;
 		}
 	};
 
 	private final Pattern pattern;
 	private final List<Visitable> onCreateOrMatchEvents;
-
-	Merge(Pattern pattern) {
-		this.pattern = pattern;
-		this.onCreateOrMatchEvents = Collections.emptyList();
-	}
 
 	Merge(Pattern pattern, List<MergeAction> mergeActions) {
 		this.pattern = pattern;

@@ -39,4 +39,9 @@ public final class NumberLiteral extends LiteralBase<Number> {
 
 		return String.valueOf(getContent());
 	}
+
+	@Override
+	public Number getContent() {
+		return content;
+	}
 }

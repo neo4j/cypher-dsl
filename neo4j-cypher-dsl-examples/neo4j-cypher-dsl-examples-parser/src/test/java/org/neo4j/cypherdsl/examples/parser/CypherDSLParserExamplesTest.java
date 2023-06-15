@@ -42,6 +42,7 @@ import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
+import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
@@ -50,6 +51,7 @@ import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Return;
+import org.neo4j.cypherdsl.core.StringLiteral;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -511,5 +513,22 @@ class CypherDSLParserExamplesTest {
 
 		var cypher = CypherParser.parse(query, options).getCypher();
 		assertThat(cypher).isEqualTo("MATCH (m:`Movie`)<-[:`ACTED_IN`]-(p:`Person`) WHERE (m.title = 'The Matrix' AND m.releaseYear IS NOT NULL AND p.born = 1964 AND p.name = 'Keanu Reeves') RETURN m");
+	}
+
+	@Test // GH-739
+	void rewritingStringLiterals() {
+
+		var query = "MATCH (m:Movie {title: 'The Matrix'}) <-[r:ACTED_IN] - (p:Person {born: 1964}) WHERE m.releaseYear IS NOT NULL AND p.name = 'Keanu Reeves' RETURN m";
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_NEW_LITERAL, Expression.class, l -> {
+				if(l instanceof StringLiteral sl) {
+					return Cypher.anonParameter(sl.getContent());
+				}
+				return l;
+			})
+			.build();
+		var stmt = CypherParser.parse(query, options);
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (m:`Movie` {title: $pcdsl01})<-[r:`ACTED_IN`]-(p:`Person` {born: 1964}) WHERE (m.releaseYear IS NOT NULL AND p.name = $pcdsl02) RETURN m");
+		assertThat(stmt.getCatalog().getParameters()).containsValues("The Matrix", "Keanu Reeves");
 	}
 }

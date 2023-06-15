@@ -45,6 +45,16 @@ public interface Literal<T> extends Expression {
 	String asString();
 
 	/**
+	 * Retrieves the actual content of this literal, might not be supported by all literals.
+	 *
+	 * @return the actual content of this literal
+	 * @since 2023.4.0
+	 */
+	default T getContent() {
+		throw new UnsupportedOperationException("Retrieving content not supported");
+	}
+
+	/**
 	 * Thrown when a given object cannot be used as a Cypher-DSL-Literal.
 	 *
 	 * @since 2021.1.0

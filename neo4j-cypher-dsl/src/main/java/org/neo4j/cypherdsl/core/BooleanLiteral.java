@@ -55,4 +55,9 @@ public final class BooleanLiteral extends LiteralBase<Boolean> {
 	public String asString() {
 		return getContent().toString();
 	}
+
+	@Override
+	public Boolean getContent() {
+		return content;
+	}
 }

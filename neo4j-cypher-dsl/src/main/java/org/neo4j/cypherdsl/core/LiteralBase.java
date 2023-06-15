@@ -37,7 +37,7 @@ abstract class LiteralBase<T> implements Literal<T> {
 	/**
 	 * The content of this literal.
 	 */
-	private final T content;
+	protected final T content;
 
 	/**
 	 * Creates a new literal from the given content
@@ -45,13 +45,6 @@ abstract class LiteralBase<T> implements Literal<T> {
 	 */
 	protected LiteralBase(T content) {
 		this.content = content;
-	}
-
-	/**
-	 * @return The content of this literal, may be {@literal null}
-	 */
-	public final T getContent() {
-		return content;
 	}
 
 	@Override
