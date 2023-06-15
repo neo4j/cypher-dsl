@@ -40,8 +40,7 @@ public final class Foreach implements UpdatingClause {
 
 	private final Collection<UpdatingClause> updatingClauses;
 
-	Foreach(SymbolicName v, Expression list,
-		Collection<UpdatingClause> updatingClauses) {
+	Foreach(SymbolicName v, Expression list, Collection<UpdatingClause> updatingClauses) {
 		this.variable = v;
 		this.list = list;
 		this.updatingClauses = updatingClauses;

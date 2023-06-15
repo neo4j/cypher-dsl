@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -586,6 +587,43 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
+	@Override
+	public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingUpdate();
+
+		return new ForeachBuilder(variable);
+	}
+
+	final class ForeachBuilder implements ForeachSourceStep, ForeachUpdateStep {
+
+		private final SymbolicName variable;
+
+		private Expression list;
+
+		ForeachBuilder(SymbolicName variable) {
+			this.variable = variable;
+		}
+
+		@Override
+		public ForeachUpdateStep in(@NotNull Expression newVariableList) {
+
+			this.list = Objects.requireNonNull(newVariableList);
+			return this;
+		}
+
+		@Override
+		public OngoingUpdate apply(UpdatingClause... updatingClauses) {
+			if (Arrays.stream(updatingClauses).anyMatch(Foreach.class::isInstance)) {
+				throw new IllegalArgumentException("FOREACH clauses may not be nested");
+			}
+
+			DefaultStatementBuilder.this.addUpdatingClause(new Foreach(this.variable, this.list, Arrays.asList(updatingClauses)));
+			return DefaultStatementBuilder.this;
+		}
+	}
+
 	protected class DefaultStatementWithReturnBuilder
 		implements OngoingReadingAndReturn, TerminalOngoingOrderDefinition, OngoingMatchAndReturnWithOrder {
 
@@ -1087,6 +1125,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 			DefaultStatementBuilder $this = DefaultStatementBuilder.this.addWith(buildWith());
 			return new DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl(from, withHeaders, $this);
 		}
+
+		@Override
+		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.foreach(variable);
+		}
 	}
 
 	/**
@@ -1515,6 +1561,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.buildImpl(null);
 		}
+
+		@Override
+		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return DefaultStatementBuilder.this.foreach(variable);
+		}
 	}
 
 	// Static builder and support classes
@@ -1932,6 +1985,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public VoidCall withoutResults() {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this;
+		}
+
+		@Override
+		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.foreach(variable);
 		}
 	}
 

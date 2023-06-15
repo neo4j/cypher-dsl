@@ -4557,6 +4557,101 @@ class CypherIT {
 	}
 
 	@Nested
+	class Foreach {
+
+		@Test
+		void basic() {
+
+			Node start = Cypher.anyNode("start");
+			Node finish = Cypher.anyNode("finish");
+			NamedPath p = Cypher.path("p").definedBy(start.relationshipTo(finish).unbounded());
+			SymbolicName n = Cypher.name("n");
+			Statement stmnt = Cypher.match(p)
+				.where(start.property("name").eq(Cypher.literalOf("A")).and(finish.property("name").eq(Cypher.literalOf("D"))))
+				.foreach(n)
+				.in(Functions.nodes(p))
+				.apply(Set.set(n.property("marked").to(Cypher.literalTrue())))
+				.build();
+			assertThat(stmnt.getCypher()).isEqualTo(
+				"MATCH p = (start)-[*]->(finish) " +
+				"WHERE (start.name = 'A' AND finish.name = 'D') " +
+				"FOREACH (n IN nodes(p) | SET n.marked = true)");
+		}
+
+		@Test
+		void mixedWithOtherClauses() {
+
+			Node start = Cypher.anyNode("start");
+			Node finish = Cypher.anyNode("finish");
+			NamedPath p = Cypher.path("p").definedBy(start.relationshipTo(finish).unbounded());
+			SymbolicName n = Cypher.name("n");
+			Statement stmnt = Cypher.match(p)
+				.where(start.property("name").eq(Cypher.literalOf("A")).and(finish.property("name").eq(Cypher.literalOf("D"))))
+				.set(start.property("x").to(Cypher.literalTrue()))
+				.foreach(n)
+					.in(Functions.nodes(p))
+					.apply(Set.set(
+						n.property("marked").to(Cypher.literalTrue()),
+						n.property("foo").to(Cypher.literalOf("bar"))
+					))
+				.delete(finish)
+				.build();
+			assertThat(stmnt.getCypher()).isEqualTo(
+				"MATCH p = (start)-[*]->(finish) " +
+				"WHERE (start.name = 'A' AND finish.name = 'D') " +
+				"SET start.x = true " +
+				"FOREACH (n IN nodes(p) | SET n.marked = true, n.foo = 'bar') " +
+				"DELETE finish");
+		}
+
+		@Test
+		void withWith() {
+
+			Node start = Cypher.anyNode("start");
+			SymbolicName n = Cypher.name("n");
+			Statement stmnt = Cypher.match(start)
+				.with(start)
+				.foreach(n)
+				.in(Cypher.listOf(start.asExpression()))
+				.apply(Delete.delete(n))
+				.build();
+			// Probably the worst way to delete a graph I ever wrote down
+			assertThat(stmnt.getCypher()).isEqualTo("MATCH (start) WITH start FOREACH (n IN [start] | DELETE n)");
+		}
+
+		@Test
+		void inComplexStatement() {
+
+			Node configNode = Cypher.node("confignode").withProperties("oid", Cypher.parameter("oid")).named("p");
+			SymbolicName nodes = Cypher.name("nodes");
+			SymbolicName node = Cypher.name("node");
+			SymbolicName relationships = Cypher.name("relationships");
+			ResultStatement stmnt = Cypher.match(configNode)
+				.call("apoc.path.subgraphAll").withArgs(
+					configNode.getRequiredSymbolicName(),
+					Cypher.mapOf("relationshipFilter", Cypher.literalOf("BELONGS_TO_ARRAY|IN|IN_ARRAY"), "minLevel", Cypher.literalOf(1), "maxLevel", Cypher.literalOf(3))
+				)
+				.yield(nodes, relationships)
+				.foreach(node)
+				.in(nodes)
+				.apply(Delete.detachDelete(node))
+				.returning(nodes)
+				.build();
+
+			Renderer prettyPrintingRenderer = Renderer.getRenderer(Configuration.prettyPrinting());
+			assertThat(prettyPrintingRenderer.render(stmnt))
+				.isEqualTo("MATCH (p:confignode {\n"
+					+ "  oid: $oid\n"
+					+ "}) CALL apoc.path.subgraphAll(p, {\n"
+					+ "  relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY',\n"
+					+ "  minLevel: 1,\n"
+					+ "  maxLevel: 3\n"
+					+ "}) YIELD nodes, relationships FOREACH (node IN nodes | DETACH DELETE node)\n"
+					+ "RETURN nodes");
+		}
+	}
+
+	@Nested
 	class PrettyPrinting {
 
 		private final Statement statement;
