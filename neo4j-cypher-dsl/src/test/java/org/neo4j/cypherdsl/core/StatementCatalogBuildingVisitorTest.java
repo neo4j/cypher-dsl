@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
+import java.net.URI;
 import java.util.Set;
 
 import org.junit.jupiter.api.RepeatedTest;
@@ -154,6 +155,39 @@ class StatementCatalogBuildingVisitorTest {
 		assertThatIllegalArgumentException()
 			.isThrownBy(() -> catalog.getSourceNodes(aLabel))
 			.withMessage(expectedMessage);
+	}
+
+	@Test // GH-738
+	void literalRetrievalShouldWork() {
+
+		var literals = Cypher.match(Cypher.anyNode("n")).returning(Cypher.asterisk()).build().getCatalog().getLiterals();
+		assertThat(literals).isEmpty();
+
+		literals = Cypher.match(Cypher.anyNode("n").withProperties(Cypher.mapOf("a", Cypher.literalOf("A"))))
+			.where(Cypher.name("n").property("prop").eq(Cypher.literalOf(42)))
+			.and(Cypher.name("n").property("b").isFalse())
+			.returning(Cypher.asterisk()).build().getCatalog().getLiterals();
+
+		assertThat(literals)
+			.map(Literal::asString)
+			.containsExactlyInAnyOrder("'A'", "42", "false");
+
+		var x = Cypher.name("x");
+		var stmt = Cypher.usingPeriodicCommit()
+			.loadCSV(URI.create("https://test.com/test.csv"))
+			.as("x")
+			.with("x")
+			.merge(Cypher.anyNode("n").withProperties("x", x))
+			.onCreate().set(x.property("y").to(Cypher.literalNull()), x.property("a").to(Cypher.literalOf("Hallo")))
+			.onCreate().set(x.property("b").to(
+					Cypher.subList(Cypher.listOf(Cypher.literalTrue()), 1, 2)
+				)
+			).returning(Cypher.raw("x"))
+			.build();
+		assertThat(stmt.getCypher()).isEqualTo("USING PERIODIC COMMIT LOAD CSV FROM 'https://test.com/test.csv' AS x WITH x MERGE (n {x: x}) ON CREATE SET x.y = NULL, x.a = 'Hallo' ON CREATE SET x.b = [true][1..2] RETURN x");
+		assertThat(stmt.getCatalog().getLiterals())
+			.map(Literal::asString)
+			.containsExactlyInAnyOrder("1", "2", "NULL", "true", "'Hallo'");
 	}
 
 	@Test // GH-674

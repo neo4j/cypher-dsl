@@ -254,6 +254,11 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	Map<String, String> getRenamedParameters();
 
 	/**
+	 * @return A collection of all literals used in a statement.
+	 */
+	Collection<Literal<?>> getLiterals();
+
+	/**
 	 * A token can either describe a node label or a relationship type.
 	 *
 	 * @param type  The type of this token

@@ -42,7 +42,7 @@ public final class ListOperator implements Expression, Visitable {
 	/**
 	 * A literal for the dots.
 	 */
-	private static final Literal<String> DOTS = new LiteralBase<String>("..") {
+	static final Literal<String> DOTS = new LiteralBase<>("..") {
 		@NotNull
 		@Override
 		public String asString() {

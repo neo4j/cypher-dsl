@@ -42,8 +42,9 @@ public final class Merge extends AbstractClause implements UpdatingClause {
 	/**
 	 * A literal for the blank.
 	 */
-	private static final Literal<String> BLANK = new LiteralBase<String>(" ") {
-		@Override public String asString() {
+	static final Literal<String> BLANK = new LiteralBase<>(" ") {
+		@Override
+		public String asString() {
 			return super.getContent();
 		}
 	};

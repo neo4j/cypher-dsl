@@ -29,6 +29,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.StatementCatalog;
 import org.neo4j.cypherdsl.parser.CypherParser;
 
@@ -157,5 +159,14 @@ class StatementCatalogBuildingVisitorViaParserTest {
 			.isEmpty();
 		assertThat(catalog.getSourceNodes(StatementCatalog.type("UNDIRECTED")))
 			.isEmpty();
+	}
+
+	@Test // GH-738
+	void literalsOnParsedStatement() {
+
+		var stmt = CypherParser.parse("LOAD CSV FROM 'https://test.com/test.csv' AS x WITH x MERGE (n {x: x}) ON CREATE SET x.y = NULL, x.a = 'Hallo' ON CREATE SET x.b = [true][1..2] RETURN x");
+		assertThat(stmt.getCatalog().getLiterals())
+			.map(Literal::asString)
+			.containsExactlyInAnyOrder("1", "2", "NULL", "true", "'Hallo'");
 	}
 }
