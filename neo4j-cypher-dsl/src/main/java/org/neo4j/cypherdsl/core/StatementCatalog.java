@@ -254,6 +254,13 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	Map<String, String> getRenamedParameters();
 
 	/**
+	 * @return A collection of all literals used in a statement.
+	 * @since 2023.4.0
+	 */
+	@SuppressWarnings("squid:S1452") // Generic items, this is exactly what we want here
+	Collection<Literal<?>> getLiterals();
+
+	/**
 	 * A token can either describe a node label or a relationship type.
 	 *
 	 * @param type  The type of this token

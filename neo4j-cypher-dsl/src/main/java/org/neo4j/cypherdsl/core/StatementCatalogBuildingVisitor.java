@@ -110,6 +110,10 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	private final Map<Node, Set<Token>> currentIncomingRelations = new HashMap<>();
 	private final Map<Node, Set<Token>> currentOutgoingRelations = new HashMap<>();
 
+	private final Map<Token, Relationships> relationships = new HashMap<>();
+
+	private final Set<Literal<?>> literals = new LinkedHashSet<>();
+
 	StatementCatalogBuildingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters) {
 
 		this.statementContext = statementContext;
@@ -171,14 +175,11 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	private final Map<Token, Relationships> relationships = new HashMap<>();
-
-
 	StatementCatalog getResult() {
 
 		addRelationsInCurrentScope();
 		var parameterInformation = allParameters.getResult();
-		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables(), parameterInformation, relationships);
+		return new DefaultStatementCatalog(this.tokens, this.labelFilters, this.properties, this.propertyFilters, scopingStrategy.getIdentifiables(), parameterInformation, relationships, literals);
 	}
 
 	void addRelationsInCurrentScope() {
@@ -491,6 +492,13 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 	}
 
+	void enter(Literal<?> literal) {
+		if (literal instanceof Asterisk || literal instanceof PeriodLiteral || literal instanceof RawLiteral.RawElement || literal == Merge.BLANK || literal == ListOperator.DOTS) {
+			return;
+		}
+		this.literals.add(literal);
+	}
+
 	void leave(org.neo4j.cypherdsl.core.Condition condition) {
 		if (TYPE_OF_COMPOUND_CONDITION.equals(condition.getClass().getName())) {
 			return;
@@ -550,6 +558,9 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 		private final Map<Token, Relationships> relationships;
 
+		private final Set<Literal<?>> literals;
+
+		@SuppressWarnings("squid:S107") // Totally fine with that number of args.
 		DefaultStatementCatalog(
 			Set<Token> tokens,
 			Set<LabelFilter> labelFilters,
@@ -557,7 +568,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 			Map<Property, Set<PropertyFilter>> propertyFilters,
 			Collection<Expression> identifiableExpressions,
 			ParameterInformation parameterInformation,
-			Map<Token, Relationships> relationships
+			Map<Token, Relationships> relationships,
+			Set<Literal<?>> literals
 		) {
 			this.tokens = Collections.unmodifiableSet(tokens);
 			this.labelFilters = Collections.unmodifiableSet(labelFilters);
@@ -571,6 +583,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 			this.relationships = relationships.entrySet().stream()
 				.collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, e -> e.getValue().copy()));
+
+			this.literals = Collections.unmodifiableSet(literals);
 		}
 
 		@Override
@@ -667,6 +681,11 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		public Collection<Token> getUndirectedRelations(Token label) {
 
 			return extractRelations(label, Relationships::undirected);
+		}
+
+		@Override
+		public Set<Literal<?>> getLiterals() {
+			return literals;
 		}
 	}
 }

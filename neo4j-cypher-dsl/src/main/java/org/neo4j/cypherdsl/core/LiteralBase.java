@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.Objects;
+
 import org.apiguardian.api.API;
 
 /**
@@ -55,6 +57,23 @@ abstract class LiteralBase<T> implements Literal<T> {
 	@Override
 	public String toString() {
 		return RendererBridge.render(this);
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		LiteralBase<?> that = (LiteralBase<?>) o;
+		return content.equals(that.content);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(content);
 	}
 }
 
