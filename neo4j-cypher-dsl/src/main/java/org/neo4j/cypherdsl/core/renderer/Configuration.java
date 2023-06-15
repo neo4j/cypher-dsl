@@ -147,7 +147,7 @@ public final class Configuration {
 		private IndentStyle indentStyle = IndentStyle.SPACE;
 		private int indentSize = 2;
 		private boolean alwaysEscapeNames = true;
-		private Dialect dialect = Dialect.DEFAULT;
+		private Dialect dialect = Dialect.NEO4J_4;
 		private Set<GeneratedNames> generatedNames = EnumSet.noneOf(GeneratedNames.class);
 
 		private Builder() {
@@ -230,8 +230,8 @@ public final class Configuration {
 		}
 
 		/**
-		 * Use a configuration with a dialect fitting your target database if the {@link Dialect#DEFAULT default dialect}
-		 * leads to incompatible results with your version of Neo4j.
+		 * Use a configuration with a dialect fitting your target database if the default dialect for
+		 * {@link Dialect#NEO4J_4 Neo4j 4.x and earlier} leads to incompatible results with your version of Neo4j.
 		 *
 		 * @param dialect The new dialect
 		 * @return This builder. You can both use the original or this instance.
@@ -255,7 +255,7 @@ public final class Configuration {
 		this.alwaysEscapeNames = builder.alwaysEscapeNames;
 		this.indentStyle = builder.indentStyle;
 		this.indentSize = builder.indentSize;
-		this.dialect = builder.dialect == null ? Dialect.DEFAULT : builder.dialect;
+		this.dialect = builder.dialect == null ? Dialect.NEO4J_4 : builder.dialect;
 		this.generatedNames = builder.generatedNames;
 	}
 

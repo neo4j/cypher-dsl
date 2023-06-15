@@ -32,7 +32,7 @@ class ConfigurationTest {
 	void dialectShouldBeIncludedInEquals() {
 
 		Configuration cfg0 = Configuration.newConfig().build();
-		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.DEFAULT).build();
+		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.NEO4J_4).build();
 		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
 
 		assertThat(cfg0)
@@ -44,7 +44,7 @@ class ConfigurationTest {
 	void dialectShouldBeIncludedInHash() {
 
 		Configuration cfg0 = Configuration.newConfig().build();
-		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.DEFAULT).build();
+		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.NEO4J_4).build();
 		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
 
 		assertThat(cfg0)
