@@ -1,0 +1,43 @@
+== 2023.4
+
+=== 2023.4.0
+
+2023.4.0 comes with a whole list of new features.
+As we deprecated two things (the `DEFAULT` dialect and `org.neo4j.cypherdsl.core.Cypher.use(org.neo4j.cypherdsl.core.SymbolicName, org.neo4j.cypherdsl.core.Statement)`), your project might break depending on your warning settings. The `DEFAULT` dialect is now `org.neo4j.cypherdsl.core.renderer.Dialect.NEO4J_4` (which keeps on being the default) and the `use` method has a new overload taking in an expression. You might need to explicitly cast here until we remove the deprecated method for good. This change was necessary to be able to put all functions in the `graph.*` namespace to use.
+
+Thanks to our reporters, contributors and supporters @xdelox, @ikwattro, @nmervaillie and Rohan Kharwar.
+
+==== 🚀 Features
+
+* Introduce event to capture parsed literals. (#742)
+* Allow retrieval of literals. (#741)
+* Add builder methods for `FOREACH`. (#740)
+* Provide all functions in the `graph.*` namespaces. (#734)
+* Provide a way to fill parsed parameters with values. (#732)
+
+==== 🐛 Bug Fixes
+
+* Strip off octal prefix.
+
+==== 🔄️ Refactorings
+
+* Replace `DEFAULT` dialect with explicit `NEO4J_4` dialect. (#736)
+* Use sorted sets everywhere to keep orders of identifiables in the catalog close to users expectations. (#733)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j-cypher-javacc-parser from 5.8.0 to 5.9.0 (#743)
+** Bump reactor-bom from 2022.0.7 to 2022.0.8 (#748)
+** Bump mockito.version from 5.3.1 to 5.4.0 (#747)
+** Bump spring-data-neo4j from 7.1.0 to 7.1.1 (#746)
+** Bump native-maven-plugin from 0.9.22 to 0.9.23 (#745)
+** Bump maven-shade-plugin from 3.4.1 to 3.5.0 (#744)
+** Bump guava from 32.0.0-jre to 32.0.1-jre (#726)
+** Bump maven-surefire-plugin from 3.1.0 to 3.1.2 (#725)
+** Bump maven-failsafe-plugin from 3.1.0 to 3.1.2 (#724)
+** Bump asciidoctorj-diagram from 2.2.8 to 2.2.9 (#723)
+** Bump jackson-bom from 2.15.1 to 2.15.2 (#722)
+** Bump testcontainers.version from 1.18.1 to 1.18.3 (#721)
+** Bump checker-qual from 3.34.0 to 3.35.0 (#720)
+** Bump asciidoctorj from 2.5.8 to 2.5.10 (#719)
