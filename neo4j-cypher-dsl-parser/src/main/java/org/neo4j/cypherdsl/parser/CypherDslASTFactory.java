@@ -48,6 +48,7 @@ import org.neo4j.cypher.internal.ast.factory.ConstraintVersion;
 import org.neo4j.cypher.internal.ast.factory.CreateIndexTypes;
 import org.neo4j.cypher.internal.ast.factory.HintIndexType;
 import org.neo4j.cypher.internal.ast.factory.ParameterType;
+import org.neo4j.cypher.internal.ast.factory.ParserCypherTypeName;
 import org.neo4j.cypher.internal.ast.factory.ScopeType;
 import org.neo4j.cypher.internal.ast.factory.ShowCommandFilterTypes;
 import org.neo4j.cypher.internal.ast.factory.SimpleEither;
@@ -877,6 +878,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public Statement showSupportedPrivileges(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Statement showAllPrivileges(InputPosition p, boolean asCommand, boolean asRevoke, Clause yieldExpr, Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
@@ -1310,6 +1316,16 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public Expression isTyped(InputPosition p, Expression e, ParserCypherTypeName typeName) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Expression isNotTyped(InputPosition p, Expression e, ParserCypherTypeName typeName) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Expression listLookup(Expression list, Expression index) {
 		return Cypher.valueAt(list, index);
 	}
@@ -1637,10 +1653,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace,
-		boolean ifNotExists, String constraintName, Expression expression, StringPos<InputPosition> label,
-		List<Property> properties, SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions, boolean containsOn,
-		ConstraintVersion constraintVersion) {
+	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace, boolean ifNotExists, String constraintName, Expression expression, StringPos<InputPosition> label, List<Property> properties, ParserCypherTypeName propertyType, SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions, boolean containsOn, ConstraintVersion constraintVersion) {
 		throw new UnsupportedOperationException();
 	}
 
