@@ -42,6 +42,7 @@ import org.neo4j.cypherdsl.core.StatementCatalog.PropertyFilter;
 import org.neo4j.cypherdsl.core.StatementCatalog.Token;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.Namespace;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
 
@@ -493,7 +494,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	}
 
 	void enter(Literal<?> literal) {
-		if (literal instanceof Asterisk || literal instanceof PeriodLiteral || literal instanceof RawLiteral.RawElement || literal == Merge.BLANK || literal == ListOperator.DOTS) {
+		if (literal instanceof Asterisk || literal instanceof PeriodLiteral || literal instanceof RawLiteral.RawElement || literal == Merge.BLANK || literal == ListOperator.DOTS || literal instanceof Namespace) {
 			return;
 		}
 		this.literals.add(literal);

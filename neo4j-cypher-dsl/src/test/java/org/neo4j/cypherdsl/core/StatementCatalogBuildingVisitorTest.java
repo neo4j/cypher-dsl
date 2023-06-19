@@ -190,6 +190,15 @@ class StatementCatalogBuildingVisitorTest {
 			.containsExactlyInAnyOrder("1", "2", "NULL", "true", "'Hallo'");
 	}
 
+	@Test // GH-738
+	void procedureNamesMustNotAppearAsLiterals() {
+
+		var stmt = Cypher.call("dbms.routing.getRoutingTable").withArgs(Cypher.parameter("routingContext"), Cypher.parameter("databaseName"))
+			.yieldStar()
+			.build();
+		assertThat(stmt.getCatalog().getLiterals()).isEmpty();
+	}
+
 	@Test // GH-674
 	void retrievalOfRelationshipsShouldWork() {
 
