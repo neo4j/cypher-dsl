@@ -64,7 +64,7 @@ public final class MergeAction implements Visitable {
 	 * Creates a new merge action. Mostly useful when building the AST outside the fluent DSL.
 	 *
 	 * @param type The type of the action
-	 * @param set  The corresponding set clause
+	 * @param set  The corresponding updating clause
 	 * @return An immutable action
 	 * @since 2021.3.0
 	 */
@@ -73,9 +73,9 @@ public final class MergeAction implements Visitable {
 	}
 
 	private final Type type;
-	private final Set set;
+	private final UpdatingClause set;
 
-	private MergeAction(Type type, Set set) {
+	private MergeAction(Type type, UpdatingClause set) {
 		this.type = type;
 		this.set = set;
 	}

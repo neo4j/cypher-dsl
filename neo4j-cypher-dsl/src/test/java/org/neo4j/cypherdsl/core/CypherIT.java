@@ -2652,6 +2652,87 @@ class CypherIT {
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p1 = 'v1' WITH u RETURN u");
 		}
+
+		@Test // GH-750
+		void mergeShouldExposeRemoveLabels() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.remove(n, "OLD_LABEL")
+				.set(n, "NEW_LABEL")
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) REMOVE n:`OLD_LABEL` SET n:`NEW_LABEL`");
+		}
+
+		@Test // GH-750
+		void mergeShouldExposeRemoveProperties() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.remove(n.property("x"))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) REMOVE n.x");
+		}
+
+		@Test // GH-750
+		void mergeShouldExposeSetLabels() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.set(n, "NEW_LABEL")
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) SET n:`NEW_LABEL`");
+		}
+
+		@Test // GH-750
+		void mergeShouldExposeSetProperties() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.set(n.property("x"), Cypher.literalOf("y"))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) SET n.x = 'y'");
+		}
+
+		@Test // GH-750
+		void mergeShouldExposeSetLabelsAfterAction() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.onMatch()
+				.set(n, "NEW_LABEL")
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) ON MATCH SET n:`NEW_LABEL`");
+		}
+
+		@Test // GH-750
+		void mergeShouldExposeSetMultipleLabelsAfterAction() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.onMatch()
+				.set(n, List.of("A", "B"))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) ON MATCH SET n:`A`:`B`");
+		}
+
+		@Test // GH-750
+		void mergeShouldExposeSetPropertiesAfterAction() {
+
+			var n = Cypher.node("LABEL1").named("n");
+			var statement = Cypher.merge(n)
+				.onMatch()
+				.set(n.property("x"), Cypher.literalOf("y"))
+				.build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo("MERGE (n:`LABEL1`) ON MATCH SET n.x = 'y'");
+		}
 	}
 
 	@Nested

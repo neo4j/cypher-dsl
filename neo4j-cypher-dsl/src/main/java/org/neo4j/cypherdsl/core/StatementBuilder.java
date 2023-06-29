@@ -54,7 +54,7 @@ public interface StatementBuilder
 	 *
 	 * @since 2021.0.0
 	 */
-	interface OngoingMerge extends OngoingUpdate, ExposesMergeAction {
+	interface OngoingMerge extends OngoingUpdate, ExposesMergeAction, ExposesSetAndRemove {
 	}
 
 	/**
@@ -589,7 +589,7 @@ public interface StatementBuilder
 	}
 
 	/**
-	 * A step that exposes only the delete clause.
+	 * A step that exposes only the {@code DELETE} clause.
 	 *
 	 * @since 1.0
 	 */
@@ -750,37 +750,46 @@ public interface StatementBuilder
 	}
 
 	/**
-	 * A step that exposes the set clause.
+	 * Exposes node mutations.
 	 *
-	 * @since 1.0
+	 * @param <R> The type of the next step
+	 * @since 2023.5.0
 	 */
-	interface ExposesSetAndRemove extends ExposesSet {
+	interface ExposesSetLabel<R> {
 
 		/**
 		 * Creates {@code SET} clause for setting the given labels to a node.
 		 *
-		 * @param node   The node who's labels are to be changed
+		 * @param node   The node whose labels are to be changed
 		 * @param labels The labels to be set
 		 * @return A match with a SET clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
-		BuildableMatchAndUpdate set(Node node, String... labels);
+		R set(Node node, String... labels);
 
 		/**
 		 * Creates {@code SET} clause for setting the given labels to a node.
 		 *
-		 * @param node   The node who's labels are to be changed
+		 * @param node   The node whose labels are to be changed
 		 * @param labels The labels to be set
 		 * @return A match with a SET clause that can be build now
 		 * @since 2021.2.2
 		 */
 		@NotNull @CheckReturnValue
-		BuildableMatchAndUpdate set(Node node, Collection<String> labels);
+		R set(Node node, Collection<String> labels);
+	}
+
+	/**
+	 * A step that exposes the set clause.
+	 *
+	 * @since 1.0
+	 */
+	interface ExposesSetAndRemove extends ExposesSet, ExposesSetLabel<BuildableMatchAndUpdate> {
 
 		/**
 		 * Creates {@code SET} clause for removing the given labels from a node.
 		 *
-		 * @param node   The node who's labels are to be changed
+		 * @param node   The node whose labels are to be changed
 		 * @param labels The labels to be removed
 		 * @return A match with a REMOVE clause that can be build now
 		 */
@@ -790,7 +799,7 @@ public interface StatementBuilder
 		/**
 		 * Creates {@code SET} clause for removing the given labels from a node.
 		 *
-		 * @param node   The node who's labels are to be changed
+		 * @param node   The node whose labels are to be changed
 		 * @param labels The labels to be removed
 		 * @return A match with a REMOVE clause that can be build now
 		 * @since 2021.2.2
@@ -871,7 +880,7 @@ public interface StatementBuilder
 	 *
 	 * @since 2020.1.2
 	 */
-	interface OngoingMergeAction {
+	interface OngoingMergeAction extends ExposesSetLabel<BuildableOngoingMergeAction> {
 
 		/**
 		 * Adds a {@code SET} clause to the statement. The list of expressions must be even, each pair will be turned into
