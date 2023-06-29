@@ -654,7 +654,7 @@
 								<exclude>org.neo4j.cypherdsl.core.DefaultStatementBuilder$DefaultStatementWithWithBuilder</exclude>
 								<!-- 2023.5.0 and higher, move up an interface, not to be implemented, has not been removed -->
 								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.util.Collection)</exclude>
-								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.util.Collection)</exclude>
+								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.lang.String[]</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
