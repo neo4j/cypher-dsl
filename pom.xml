@@ -652,6 +652,9 @@
 								<exclude>org.neo4j.cypherdsl.core.ExposesWith#with(org.neo4j.cypherdsl.core.Asterisk)</exclude>
 								<!-- 2023.2.0 and higher, internal API being polished -->
 								<exclude>org.neo4j.cypherdsl.core.DefaultStatementBuilder$DefaultStatementWithWithBuilder</exclude>
+								<!-- 2023.5.0 and higher, move up an interface, not to be implemented, has not been removed -->
+								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.util.Collection)</exclude>
+								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.util.Collection)</exclude>
 							</excludes>
 						</parameter>
 					</configuration>

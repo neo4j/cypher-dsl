@@ -68,7 +68,7 @@ public final class MergeAction implements Visitable {
 	 * @return An immutable action
 	 * @since 2021.3.0
 	 */
-	public static MergeAction of(Type type, UpdatingClause set) {
+	public static MergeAction of(Type type, Set set) {
 		return new MergeAction(type, set);
 	}
 
