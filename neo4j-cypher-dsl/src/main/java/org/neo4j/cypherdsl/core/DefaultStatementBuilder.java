@@ -164,6 +164,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 			"MERGE must have been invoked before defining an event.");
 		return new OngoingMergeAction() {
 
+			@Override
+			public @NotNull BuildableOngoingMergeAction set(Node node, String... labels) {
+
+				return this.set(Operations.set(node, labels));
+			}
+
+			@Override
+			public @NotNull BuildableOngoingMergeAction set(Node node, Collection<String> labels) {
+
+				return this.set(Operations.set(node, labels.toArray(new String[0])));
+			}
+
 			@NotNull
 			@Override
 			public BuildableOngoingMergeAction mutate(Expression target, Expression properties) {
@@ -175,6 +187,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			@NotNull
 			@Override
 			public BuildableOngoingMergeAction set(Expression... expressions) {
+
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.SET, expressions);
 				return DefaultStatementBuilder.this;
@@ -308,6 +321,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final BuildableMatchAndUpdate set(Node named, String... labels) {
 
+		this.closeCurrentOngoingUpdate();
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
 	}
 
@@ -331,6 +345,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final BuildableMatchAndUpdate remove(Property... properties) {
 
+		this.closeCurrentOngoingUpdate();
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 	}
 
@@ -345,6 +360,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final BuildableMatchAndUpdate remove(Node named, String... labels) {
 
+		this.closeCurrentOngoingUpdate();
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
 	}
 
@@ -1145,7 +1161,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				for (Expression operation : propertyOperations) {
 					if (((Operation) operation).getOperator() != Operator.MUTATE) {
 						throw new IllegalArgumentException(
-							"Only property operations based on the " + Operator.MUTATE  + " are supported inside a mutating SET.");
+							"Only property operations based on the " + Operator.MUTATE + " are supported inside a mutating SET.");
 					}
 				}
 			} else {
@@ -1163,7 +1179,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 		}
 
-		if (propertyOperations.stream().anyMatch(e -> e instanceof Operation op && op.getOperator() == Operator.REMOVE_LABEL)) {
+		if (updateType != UpdateType.REMOVE && propertyOperations.stream().anyMatch(e -> e instanceof Operation op && op.getOperator() == Operator.REMOVE_LABEL)) {
 			throw new IllegalArgumentException("REMOVE operations are not supported in a SET clause");
 		}
 		return propertyOperations;
