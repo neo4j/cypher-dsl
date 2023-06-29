@@ -753,7 +753,7 @@ public interface StatementBuilder
 	 * Exposes node mutations.
 	 *
 	 * @param <R> The type of the next step
-	 * @since 2023.4.1
+	 * @since 2023.5.0
 	 */
 	interface ExposesSetLabel<R> {
 
