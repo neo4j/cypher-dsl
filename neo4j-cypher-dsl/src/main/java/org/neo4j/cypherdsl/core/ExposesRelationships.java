@@ -63,4 +63,22 @@ public interface ExposesRelationships<T extends RelationshipPattern & ExposesPat
 	 */
 	@NotNull @Contract(pure = true)
 	T relationshipBetween(Node other, String... types);
+
+	/**
+	 * A convenience method for creating relationships between nodes avoiding going through the fluent API by allowing
+	 * to pass in the type directly.
+	 *
+	 * @param other The other end of the relationship
+	 * @param direction The direction of the relationship, seen from {@code this} node
+	 * @param types The type of the relationship to create or the types to match
+	 * @return An ongoing relationship definition, that can be used to specify details of the relationship
+	 * @since 2023.5.0
+	 */
+	default T relationshipWith(Node other, Relationship.Direction direction, String... types) {
+		return switch (direction) {
+			case LTR -> this.relationshipTo(other, types);
+			case RTL -> this.relationshipFrom(other, types);
+			case UNI -> this.relationshipBetween(other, types);
+		};
+	}
 }
