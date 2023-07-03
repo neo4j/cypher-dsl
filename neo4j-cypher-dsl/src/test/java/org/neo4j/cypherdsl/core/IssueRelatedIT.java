@@ -1720,4 +1720,18 @@ class IssueRelatedIT {
 			MATCH path1 = (person0)-[acted_in0]->(movie0)<-[:ACTED_IN]-(person1)
 			RETURN path0, path1""");
 	}
+
+	@Test // GH-749
+	void nonBuilderRelationshipMethodShouldWork() {
+
+		var n1 = Cypher.node("N1");
+		var n2 = Cypher.node("N2");
+
+		assertThat(Cypher.match(n1.relationshipWith(n2, Relationship.Direction.LTR, "X").named("x")).returning(Cypher.asterisk()).build().getCypher())
+			.isEqualTo("MATCH (:`N1`)-[x:`X`]->(:`N2`) RETURN *");
+		assertThat(Cypher.match(n1.relationshipWith(n2, Relationship.Direction.RTL, "X").named("x")).returning(Cypher.asterisk()).build().getCypher())
+			.isEqualTo("MATCH (:`N1`)<-[x:`X`]-(:`N2`) RETURN *");
+		assertThat(Cypher.match(n1.relationshipWith(n2, Relationship.Direction.UNI, "X").named("x")).returning(Cypher.asterisk()).build().getCypher())
+			.isEqualTo("MATCH (:`N1`)-[x:`X`]-(:`N2`) RETURN *");
+	}
 }
