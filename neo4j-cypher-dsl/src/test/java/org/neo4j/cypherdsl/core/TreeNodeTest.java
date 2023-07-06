@@ -85,18 +85,18 @@ class TreeNodeTest {
 		ROOT.printTo(buffer::append, node -> node.getValue().toString());
 		assertThat(buffer)
 			.hasToString("""
-				└── 10
-				    ├── 2
-				    │   ├── 77
-				    │   └── 88
-				    ├── 34
-				    ├── 56
-				    │   └── 1
-				    │       └── 23
-				    └── 100
-				        ├── 7
-				        ├── 8
-				        └── 9
+				10
+				├── 2
+				│   ├── 77
+				│   └── 88
+				├── 34
+				├── 56
+				│   └── 1
+				│       └── 23
+				└── 100
+				    ├── 7
+				    ├── 8
+				    └── 9
 				""");
 	}
 }

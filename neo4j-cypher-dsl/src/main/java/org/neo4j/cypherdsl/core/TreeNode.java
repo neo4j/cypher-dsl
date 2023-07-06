@@ -158,12 +158,14 @@ public final class TreeNode<E> {
 
 		var localValue = toString.apply(node);
 		var connector = isTail ? "└── " : "├── ";
-
+		if (this == node) {
+			connector = "";
+		}
 		target.accept(prefix + connector + localValue + "\n");
 
+		var newPrefix = prefix + (isTail ? " ".repeat(connector.length()) : "│   ");
 		for (int i = 0; i < node.children.size(); ++i) {
 			var child = node.children.get(i);
-			var newPrefix = prefix + (isTail ? " ".repeat(connector.length()) : "│   ");
 			printTo0(target, toString, child, newPrefix, i + 1 == node.getChildren().size());
 		}
 	}

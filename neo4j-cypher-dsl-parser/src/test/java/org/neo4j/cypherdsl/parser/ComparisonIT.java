@@ -566,61 +566,61 @@ class ComparisonIT {
 		assertThat(target)
 			.hasToString(
 				"""
-				└── MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
-				    ├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
-				    │   └── Pattern{cypher=(n:Person {name: 'Tom Hanks'})}
-				    │       └── InternalNodeImpl{cypher=(n:Person {name: 'Tom Hanks'})}
-				    │           ├── SymbolicName{cypher=n}
-				    │           ├── NodeLabel{value='Person'}
-				    │           └── Properties{cypher={name: 'Tom Hanks'}}
-				    │               └── MapExpression{cypher={name: 'Tom Hanks'}}
-				    │                   └── KeyValueMapEntry{cypher=name: 'Tom Hanks'}
-				    │                       └── StringLiteral{cypher='Tom Hanks'}
-				    ├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
-				    │   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
-				    │       ├── With{cypher=WITH n}
-				    │       │   └── ExpressionList{cypher=n}
-				    │       │       └── SymbolicName{cypher=n}
-				    │       ├── Match{cypher=MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956)}
-				    │       │   ├── Pattern{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
-				    │       │   │   └── InternalRelationshipImpl{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
-				    │       │   │       ├── InternalNodeImpl{cypher=(m:Movie)}
-				    │       │   │       │   ├── SymbolicName{cypher=m}
-				    │       │   │       │   └── NodeLabel{value='Movie'}
-				    │       │   │       ├── Details{cypher=<-[:ACTED_IN]-}
-				    │       │   │       │   └── RelationshipTypes{values=[ACTED_IN]}
-				    │       │   │       └── InternalNodeImpl{cypher=(n)}
-				    │       │   │           └── SymbolicName{cypher=n}
-				    │       │   └── Where{cypher=WHERE (m.released >= 1900 AND n.born = 1956)}
-				    │       │       └── CompoundCondition{cypher=(m.released >= 1900 AND n.born = 1956)}
-				    │       │           ├── Comparison{cypher=m.released >= 1900}
-				    │       │           │   ├── InternalPropertyImpl{cypher=m.released}
-				    │       │           │   │   ├── SymbolicName{cypher=m}
-				    │       │           │   │   └── PropertyLookup{cypher=.released}
-				    │       │           │   │       └── SymbolicName{cypher=released}
-				    │       │           │   ├── Operator{cypher=>=}
-				    │       │           │   └── NumberLiteral{cypher=1900}
-				    │       │           ├── Operator{cypher=AND}
-				    │       │           └── Comparison{cypher=n.born = 1956}
-				    │       │               ├── InternalPropertyImpl{cypher=n.born}
-				    │       │               │   ├── SymbolicName{cypher=n}
-				    │       │               │   └── PropertyLookup{cypher=.born}
-				    │       │               │       └── SymbolicName{cypher=born}
-				    │       │               ├── Operator{cypher==}
-				    │       │               └── NumberLiteral{cypher=1956}
-				    │       └── Return{cypher=RETURN m}
-				    │           └── ExpressionList{cypher=m}
-				    │               └── SymbolicName{cypher=m}
-				    └── Return{cypher=RETURN n.name, m.title}
-				        └── ExpressionList{cypher=n.name, m.title}
-				            ├── InternalPropertyImpl{cypher=n.name}
-				            │   ├── SymbolicName{cypher=n}
-				            │   └── PropertyLookup{cypher=.name}
-				            │       └── SymbolicName{cypher=name}
-				            └── InternalPropertyImpl{cypher=m.title}
-				                ├── SymbolicName{cypher=m}
-				                └── PropertyLookup{cypher=.title}
-				                    └── SymbolicName{cypher=title}
+				MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
+				├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
+				│   └── Pattern{cypher=(n:Person {name: 'Tom Hanks'})}
+				│       └── InternalNodeImpl{cypher=(n:Person {name: 'Tom Hanks'})}
+				│           ├── SymbolicName{cypher=n}
+				│           ├── NodeLabel{value='Person'}
+				│           └── Properties{cypher={name: 'Tom Hanks'}}
+				│               └── MapExpression{cypher={name: 'Tom Hanks'}}
+				│                   └── KeyValueMapEntry{cypher=name: 'Tom Hanks'}
+				│                       └── StringLiteral{cypher='Tom Hanks'}
+				├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
+				│   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
+				│       ├── With{cypher=WITH n}
+				│       │   └── ExpressionList{cypher=n}
+				│       │       └── SymbolicName{cypher=n}
+				│       ├── Match{cypher=MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956)}
+				│       │   ├── Pattern{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
+				│       │   │   └── InternalRelationshipImpl{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
+				│       │   │       ├── InternalNodeImpl{cypher=(m:Movie)}
+				│       │   │       │   ├── SymbolicName{cypher=m}
+				│       │   │       │   └── NodeLabel{value='Movie'}
+				│       │   │       ├── Details{cypher=<-[:ACTED_IN]-}
+				│       │   │       │   └── RelationshipTypes{values=[ACTED_IN]}
+				│       │   │       └── InternalNodeImpl{cypher=(n)}
+				│       │   │           └── SymbolicName{cypher=n}
+				│       │   └── Where{cypher=WHERE (m.released >= 1900 AND n.born = 1956)}
+				│       │       └── CompoundCondition{cypher=(m.released >= 1900 AND n.born = 1956)}
+				│       │           ├── Comparison{cypher=m.released >= 1900}
+				│       │           │   ├── InternalPropertyImpl{cypher=m.released}
+				│       │           │   │   ├── SymbolicName{cypher=m}
+				│       │           │   │   └── PropertyLookup{cypher=.released}
+				│       │           │   │       └── SymbolicName{cypher=released}
+				│       │           │   ├── Operator{cypher=>=}
+				│       │           │   └── NumberLiteral{cypher=1900}
+				│       │           ├── Operator{cypher=AND}
+				│       │           └── Comparison{cypher=n.born = 1956}
+				│       │               ├── InternalPropertyImpl{cypher=n.born}
+				│       │               │   ├── SymbolicName{cypher=n}
+				│       │               │   └── PropertyLookup{cypher=.born}
+				│       │               │       └── SymbolicName{cypher=born}
+				│       │               ├── Operator{cypher==}
+				│       │               └── NumberLiteral{cypher=1956}
+				│       └── Return{cypher=RETURN m}
+				│           └── ExpressionList{cypher=m}
+				│               └── SymbolicName{cypher=m}
+				└── Return{cypher=RETURN n.name, m.title}
+				    └── ExpressionList{cypher=n.name, m.title}
+				        ├── InternalPropertyImpl{cypher=n.name}
+				        │   ├── SymbolicName{cypher=n}
+				        │   └── PropertyLookup{cypher=.name}
+				        │       └── SymbolicName{cypher=name}
+				        └── InternalPropertyImpl{cypher=m.title}
+				            ├── SymbolicName{cypher=m}
+				            └── PropertyLookup{cypher=.title}
+				                └── SymbolicName{cypher=title}
 				""");
 	}
 
