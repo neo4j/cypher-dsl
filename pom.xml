@@ -152,7 +152,7 @@
 		<jetbrains-annotations.version>24.0.1</jetbrains-annotations.version>
 		<joda-time.version>2.12.5</joda-time.version>
 		<jsr305.version>3.0.2</jsr305.version>
-		<junit-jupiter.version>5.9.3</junit-jupiter.version>
+		<junit-jupiter.version>5.10.0</junit-jupiter.version>
 		<license-maven-plugin.version>4.2.rc2</license-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.3.0</maven-checkstyle-plugin.version>
 		<maven-compiler-plugin.version>3.8.1</maven-compiler-plugin.version>
