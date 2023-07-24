@@ -36,6 +36,7 @@ import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Return;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -82,6 +83,9 @@ public final class Options {
 
 		private final Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> onNewPatternElementCallbacks
 			= new EnumMap<>(PatternElementCreatedEventType.class);
+
+		private final Map<InvocationCreatedEventType, List<UnaryOperator<Visitable>>> onNewInvocationCallbacks
+			= new EnumMap<>(InvocationCreatedEventType.class);
 
 		private Function<ReturnDefinition, Return> returnClauseFactory;
 
@@ -165,6 +169,33 @@ public final class Options {
 		}
 
 		/**
+		 * Adds a callback for when either a CALL-Procedure clause or a function-invocation expression is created.
+		 * For one type of event one or more callbacks can be declared which will be called in order in which they have been declared.
+		 * Callbacks can just collect or actually visit the elements created, or they are free to create new ones, effectively rewriting the query.
+		 * <p>
+		 * Parsing will be aborted when a callback throws a {@link RuntimeException}.
+		 *
+		 * @param invocationCreatedEventType The event type
+		 * @param callback A callback
+		 * @param <T> The type of the result, must match the one of the event
+		 * @return this builder
+		 * @since 2022.8.6
+		 */
+		@SuppressWarnings("unchecked")
+		public <T extends Visitable> Builder withCallback(InvocationCreatedEventType invocationCreatedEventType, Class<T> resultingType, UnaryOperator<T> callback) {
+
+			if (!invocationCreatedEventType.getTypeProduced().isAssignableFrom(resultingType)) {
+				throw new IllegalArgumentException(
+					"The type that is produced by '" + invocationCreatedEventType
+					+ "' is not compatible with " + resultingType);
+			}
+			var callbacks = this.onNewInvocationCallbacks
+				.computeIfAbsent(invocationCreatedEventType, k -> new ArrayList<>());
+			callbacks.add((UnaryOperator<Visitable>) callback);
+			return this;
+		}
+
+		/**
 		 * Configures the factory for return clauses. The idea here is that you might intercept what is being returned
 		 * or how it is sorted, limited and the like. The {@link ReturnDefinition definition} passed to the factory contains
 		 * all necessary information for delegating to the {@link org.neo4j.cypherdsl.core.Clauses#returning(boolean, List, List, Expression, Expression)}
@@ -194,6 +225,8 @@ public final class Options {
 
 	private final Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> onNewPatternElementCallbacks;
 
+	private final Map<InvocationCreatedEventType, List<UnaryOperator<Visitable>>> onNewInvocationCallbacks;
+
 	private final Function<ReturnDefinition, Return> returnClauseFactory;
 
 	private Options(Builder builder) {
@@ -208,6 +241,10 @@ public final class Options {
 		Map<PatternElementCreatedEventType, List<UnaryOperator<PatternElement>>> tmp2 = new EnumMap<>(PatternElementCreatedEventType.class);
 		builder.onNewPatternElementCallbacks.forEach((k, v) -> tmp2.put(k, List.copyOf(v)));
 		this.onNewPatternElementCallbacks = Map.copyOf(tmp2);
+
+		Map<InvocationCreatedEventType, List<UnaryOperator<Visitable>>> tmp3 = new EnumMap<>(InvocationCreatedEventType.class);
+		builder.onNewInvocationCallbacks.forEach((k, v) -> tmp3.put(k, List.copyOf(v)));
+		this.onNewInvocationCallbacks = Map.copyOf(tmp3);
 
 		this.returnClauseFactory = builder.returnClauseFactory != null ?
 			builder.returnClauseFactory :
@@ -235,6 +272,10 @@ public final class Options {
 
 	Function<ReturnDefinition, Return> getReturnClauseFactory() {
 		return returnClauseFactory;
+	}
+
+	Map<InvocationCreatedEventType, List<UnaryOperator<Visitable>>> getOnNewInvocationCallbacks() {
+		return onNewInvocationCallbacks;
 	}
 
 	/**
