@@ -150,7 +150,8 @@ final class CypherDslASTFactory implements ASTFactory<
 		PatternAtom,
 		DatabaseName,
 		NULL,
-		NULL> {
+		NULL,
+		PatternElement> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
 
@@ -538,6 +539,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public PatternElement patternWithSelector(NULL aNull, PatternElement patternPart) {
+		return null;
+	}
+
+	@Override
 	public PatternElement namedPattern(Expression v, PatternElement patternElement) {
 		return Cypher.path(assertSymbolicName(v)).definedBy(patternElement);
 	}
@@ -563,7 +569,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternElement pathPattern(List<PatternAtom> atoms, NULL aNull) {
+	public PatternElement pathPattern(PatternElement patternElement) {
+		return patternElement;
+	}
+
+	@Override
+	public PatternElement patternElement(List<PatternAtom> atoms) {
 
 		if (atoms.isEmpty()) {
 			throw new IllegalArgumentException(
