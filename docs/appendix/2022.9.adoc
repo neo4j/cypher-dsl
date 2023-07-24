@@ -1,0 +1,14 @@
+== 2022.9
+
+=== 2022.9.0
+
+==== 🚀 Features
+
+* Add callbacks for function and procedure invocations. (#758)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Update Spring Data Neo4j from 6.3.5 to 6.3.14
+** Update Neo4j from 4.4.12 to 4.4.23
+** Update Neo4j Java Driver from 4.4.9 to 4.4.12
