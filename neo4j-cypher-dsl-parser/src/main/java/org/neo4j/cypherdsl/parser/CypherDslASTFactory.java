@@ -247,12 +247,12 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 	}
 
-	private <T extends Expression> T applyCallbackFor(ExpressionCreatedEventType type, T newExpression) {
-		return applyCallbackFor(type, List.of(newExpression)).get(0);
+	private <T extends Expression> T applyCallbacksFor(ExpressionCreatedEventType type, T newExpression) {
+		return applyCallbacksFor(type, List.of(newExpression)).get(0);
 	}
 
 	@SuppressWarnings("unchecked")
-	private <T extends Expression> List<T> applyCallbackFor(ExpressionCreatedEventType type, List<T> expressions) {
+	private <T extends Expression> List<T> applyCallbacksFor(ExpressionCreatedEventType type, List<T> expressions) {
 
 		var callbacks = this.options.getOnNewExpressionCallbacks().getOrDefault(type, List.of());
 		if (callbacks.isEmpty()) {
@@ -261,6 +261,21 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var chainedCallbacks = callbacks.stream().reduce(Function.identity(), Function::andThen);
 		return expressions.stream().map(e -> (T) chainedCallbacks.apply(e)).toList();
+	}
+
+	@SuppressWarnings("unchecked")
+	private <T extends Visitable> T applyCallbacksFor(InvocationCreatedEventType type, T newExpression) {
+
+		var callbacks = this.options.getOnNewInvocationCallbacks().getOrDefault(type, List.of());
+		if (callbacks.isEmpty()) {
+			return newExpression;
+		}
+
+		Visitable result = newExpression;
+		for (UnaryOperator<Visitable> callback : callbacks) {
+			result = callback.apply(result);
+		}
+		return (T) result;
 	}
 
 	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
@@ -325,12 +340,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Expression newReturnItem(InputPosition p, Expression e, Expression v) {
 
 		var s = assertSymbolicName(v);
-		return applyCallbackFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e.as(s));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e.as(s));
 	}
 
 	@Override
 	public Expression newReturnItem(InputPosition p, Expression e, int eStartOffset, int eEndOffset) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e);
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e);
 	}
 
 	@Override
@@ -444,18 +459,18 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Operation setProperty(Property property, Expression value) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_PROPERTY, property.to(value));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_PROPERTY, property.to(value));
 	}
 
 	@Override
 	public Operation setVariable(Expression v, Expression value) {
 
-		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Operations.set(v, value));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Operations.set(v, value));
 	}
 
 	@Override
 	public Operation addAndSetVariable(Expression v, Expression value) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_ADD_AND_SET_VARIABLE, Operations.mutate(v, value));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_ADD_AND_SET_VARIABLE, Operations.mutate(v, value));
 	}
 
 	@Override
@@ -463,7 +478,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
-		return applyCallbackFor(ExpressionCreatedEventType.ON_SET_LABELS, Operations.set(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, Operations.set(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -473,7 +488,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression removeProperty(Property property) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_REMOVE_PROPERTY, property);
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_PROPERTY, property);
 	}
 
 	@Override
@@ -481,12 +496,12 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
-		return applyCallbackFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operations.remove(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operations.remove(Cypher.anyNode(s), labels));
 	}
 
 	@Override
 	public Clause deleteClause(InputPosition p, boolean detach, List<Expression> expressions) {
-		return Clauses.delete(detach, applyCallbackFor(ExpressionCreatedEventType.ON_DELETE_ITEM, expressions));
+		return Clauses.delete(detach, applyCallbacksFor(ExpressionCreatedEventType.ON_DELETE_ITEM, expressions));
 	}
 
 	@Override
@@ -525,8 +540,9 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Clause callClause(InputPosition p, InputPosition namespacePosition, InputPosition procedureNamePosition,
 		InputPosition procedureResultPosition, List<String> namespace, String name, List<Expression> arguments,
 		boolean yieldAll, List<Expression> resultItems, Where where) {
-		return Clauses.callClause(namespace, name, arguments,
+		var intermediateResult = Clauses.callClause(namespace, name, arguments,
 			yieldAll && resultItems == null ? List.of(Cypher.asterisk()) : resultItems, where);
+		return applyCallbacksFor(InvocationCreatedEventType.ON_CALL, intermediateResult);
 	}
 
 	@Override
@@ -1019,17 +1035,17 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression newVariable(InputPosition p, String name) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_VARIABLE, Cypher.name(name));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_VARIABLE, Cypher.name(name));
 	}
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, Expression v, ParameterType type) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(v));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(v));
 	}
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, String v, ParameterType type) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(Cypher.name(v)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(Cypher.name(v)));
 	}
 
 	@Override
@@ -1055,50 +1071,50 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression newDouble(InputPosition p, String image) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Double.parseDouble(image)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Double.parseDouble(image)));
 	}
 
 	@Override
 	public Expression newDecimalInteger(InputPosition p, String image, boolean negated) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image) * (negated ? -1 : 1)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image) * (negated ? -1 : 1)));
 	}
 
 	@Override public Expression newHexInteger(InputPosition p, String image, boolean negated) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0x", ""), 16) * (negated ? -1 : 1)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0x", ""), 16) * (negated ? -1 : 1)));
 	}
 
 	@Override public Expression newOctalInteger(InputPosition p, String image, boolean negated) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1)));
 	}
 
 	@Override
 	public Expression newString(InputPosition p, String image) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(image));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(image));
 	}
 
 	@Override
 	public Expression newTrueLiteral(InputPosition p) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalTrue());
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalTrue());
 	}
 
 	@Override
 	public Expression newFalseLiteral(InputPosition p) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalFalse());
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalFalse());
 	}
 
 	@Override
 	public Expression newInfinityLiteral(InputPosition p) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, InfinityLiteral.INSTANCE);
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, InfinityLiteral.INSTANCE);
 	}
 
 	@Override
 	public Expression newNaNLiteral(InputPosition p) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, NaNLiteral.INSTANCE);
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, NaNLiteral.INSTANCE);
 	}
 
 	@Override
 	public Expression newNullLiteral(InputPosition p) {
-		return applyCallbackFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalNull());
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalNull());
 	}
 
 	@Override
@@ -1360,7 +1376,8 @@ final class CypherDslASTFactory implements ASTFactory<
 			parts[i] = namespace.get(i);
 		}
 		parts[parts.length - 1] = name;
-		return Cypher.call(parts).withArgs(arguments.toArray(Expression[]::new)).asFunction(distinct);
+		var expression = Cypher.call(parts).withArgs(arguments.toArray(Expression[]::new)).asFunction(distinct);
+		return applyCallbacksFor(InvocationCreatedEventType.ON_INVOCATION, expression);
 	}
 
 	@Override

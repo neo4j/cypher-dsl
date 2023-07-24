@@ -22,6 +22,8 @@ package org.neo4j.cypherdsl.parser;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatRuntimeException;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -29,6 +31,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -40,10 +43,12 @@ import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.AliasedExpression;
+import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
@@ -602,5 +607,74 @@ class CypherParserTest {
 		assertThat(literals)
 			.map(Literal::asString)
 			.containsExactly("NULL", "1.0", "100", "5039", "762", "'Hallo'", "true", "false", "Infinity", "NaN");
+	}
+
+	@Nested
+	class InvocationCallbacks {
+
+		@Test
+		void onNewFunctionCallbacksShouldBeInvoked() {
+
+			var functions = new AtomicInteger(0);
+			var options = Options.newOptions()
+				// The best: doing nothing
+				.withCallback(InvocationCreatedEventType.ON_INVOCATION, Expression.class, e -> {
+					assertThat(functions.compareAndSet(0, 1)).isTrue();
+					return e;
+				})
+				// Example of rewriting a function
+				.withCallback(InvocationCreatedEventType.ON_INVOCATION, FunctionInvocation.class, e -> {
+					assertThat(functions.compareAndSet(1, 2)).isTrue();
+					if ("asString".equals(e.getFunctionName())) {
+						AtomicReference<Expression> args = new AtomicReference<>();
+						e.accept(segment -> {
+							if (!(segment instanceof FunctionInvocation) && segment instanceof Expression expression) {
+								args.compareAndSet(null, expression);
+							}
+						});
+						return (FunctionInvocation) Cypher.call("toString").withArgs(args.get()).asFunction();
+					}
+					return e;
+				}).build();
+
+			var statement = CypherParser.parseStatement("RETURN asString(1) AS x", options);
+			assertThat(functions.get()).isEqualTo(2);
+			assertThat(statement.getCypher()).isEqualTo("RETURN toString(1) AS x");
+		}
+
+		@Test
+		void onNewProcedureCallbacksShouldBeInvoked() {
+
+			var procedures = new AtomicInteger(0);
+			var options = Options.newOptions()
+				.withCallback(InvocationCreatedEventType.ON_CALL, Clause.class, e -> {
+					assertThat(procedures.compareAndSet(0, 1)).isTrue();
+					return e;
+				})
+				.withCallback(InvocationCreatedEventType.ON_CALL, Clause.class, e -> {
+					assertThat(procedures.compareAndSet(1, 2)).isTrue();
+					return e;
+				}).build();
+
+			var statement = CypherParser.parseStatement("call { call dbms.showCurrentUser() yield username return username} return username", options);
+			assertThat(procedures.get()).isEqualTo(2);
+			assertThat(statement.getCypher()).isEqualTo("CALL {CALL dbms.showCurrentUser() YIELD username RETURN username} RETURN username");
+		}
+
+		@Test
+		void preventingProcedureCalls() {
+			var options = Options.newOptions()
+				.withCallback(InvocationCreatedEventType.ON_CALL, Clause.class, e -> {
+					throw new RuntimeException("Procedure calls are not allowed!");
+				}).build();
+
+			assertThatRuntimeException()
+				.isThrownBy(() -> CypherParser.parseStatement("call { call dbms.showCurrentUser() yield username return username} return username", options))
+				.withRootCauseInstanceOf(RuntimeException.class)
+				.withStackTraceContaining("Procedure calls are not allowed!");
+
+			assertThatNoException()
+				.isThrownBy(() -> CypherParser.parseStatement("call {match (n:Movie) return n.title as title} return title", options));
+		}
 	}
 }
