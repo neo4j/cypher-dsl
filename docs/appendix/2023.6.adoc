@@ -1,0 +1,26 @@
+== 2023.6
+
+=== 2023.6.0
+
+==== 🚀 Features
+
+* Add callbacks for function and procedure invocations. (#764, #758, also backported as 2022.9.0, thanks to @ClemDoum for your input here)
+
+==== 🔄️ Refactorings
+
+* Make TreeNode pretty printing prettier.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump com.google.guava:guava (#769)
+** Bump org.checkerframework:checker-qual (#768)
+** Bump com.puppycrawl.tools:checkstyle (#767)
+** Bump org.asciidoctor:asciidoctorj-diagram (#766)
+** Bump org.neo4j.driver:neo4j-java-driver (#765)
+** Bump org.neo4j:neo4j-cypher-javacc-parser from 5.9.0 to 5.10.0 (#761)
+** Bump checker-qual from 3.35.0 to 3.36.0 (#757)
+** Bump spring-data-neo4j from 7.1.1 to 7.1.2 (#759)
+** Bump reactor-bom from 2022.0.8 to 2022.0.9 (#760)
+** Bump org.junit:junit-bom from 5.9.3 to 5.10.0 (#762)
+** Bump org.springframework.boot:spring-boot-starter-parent (#763)
