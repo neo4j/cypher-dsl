@@ -35,7 +35,7 @@
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.graalvm</java-module-name>
-		<native-maven-plugin.version>0.9.24</native-maven-plugin.version>
+		<native-maven-plugin.version>0.9.25</native-maven-plugin.version>
 	</properties>
 
 	<dependencies>
