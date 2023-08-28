@@ -38,7 +38,8 @@ final class BuiltInFunctions {
 		ANY("any"),
 		EXISTS("exists"),
 		NONE("none"),
-		SINGLE("single");
+		SINGLE("single"),
+		IS_EMPTY("isEmpty");
 
 		private final String implementationName;
 

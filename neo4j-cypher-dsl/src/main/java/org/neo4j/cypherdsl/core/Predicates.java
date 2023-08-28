@@ -184,6 +184,21 @@ public final class Predicates {
 	}
 
 	/**
+	 * Creates a new condition based on a function invocation for the {@code isEmpty()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-isempty">isEmpty</a>.
+	 * <p>
+	 * The argument {@code e} must refer to an expression that evaluates to a list for {@code isEmpty()} to work
+	 *
+	 * @param e An expression refering to a list
+	 * @return A function call for {@code isEmpty()} for a list
+	 * @since 2023.6.1
+	 */
+	public static  Condition isEmpty(Expression e) {
+
+		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.IS_EMPTY, e));
+	}
+
+	/**
 	 * Allows to define the source of the list predicate.
 	 */
 	public interface OngoingListBasedPredicateFunction {
