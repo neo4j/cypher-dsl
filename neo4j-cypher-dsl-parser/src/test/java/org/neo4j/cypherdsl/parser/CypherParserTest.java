@@ -24,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatRuntimeException;
+import static org.assertj.core.api.Assertions.in;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -675,6 +676,28 @@ class CypherParserTest {
 
 			assertThatNoException()
 				.isThrownBy(() -> CypherParser.parseStatement("call {match (n:Movie) return n.title as title} return title", options));
+		}
+
+		@Test
+		void preventingFunctionCalls() {
+			var options = Options.newOptions()
+				.withCallback(InvocationCreatedEventType.ON_INVOCATION, FunctionInvocation.class, functionInvocation -> {
+					if("id".equals(functionInvocation.getFunctionName())) {
+						throw new RuntimeException("id must not be used anymore");
+					}
+					return functionInvocation;
+				}).build();
+
+			for(String invalidQuery : List.of("MATCH (n) RETURN id(n)", "MATCH (n) WHERE id(n) = $id RETURN n, {__id: id(n), __labels: labels(n)} AS __node__")) {
+				CypherParser.parseExpression(invalidQuery, options);
+				assertThatRuntimeException()
+					.isThrownBy(() -> CypherParser.parseStatement(invalidQuery, options))
+					.withRootCauseInstanceOf(RuntimeException.class)
+					.withStackTraceContaining("id must not be used anymore");
+			}
+
+			assertThatNoException()
+				.isThrownBy(() -> CypherParser.parseStatement("MATCH (n) RETURN elementId(n)", options));
 		}
 	}
 }
