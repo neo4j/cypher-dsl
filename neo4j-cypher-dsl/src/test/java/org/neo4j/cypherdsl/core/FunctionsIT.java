@@ -395,6 +395,20 @@ class FunctionsIT {
 		);
 	}
 
+	@Test // GH-777
+	void isEmptyShouldWork() {
+
+		var p = Cypher.node("Person").named("p");
+		var stmt = Cypher.match(p)
+			.where(Conditions.not(Predicates.isEmpty(p.property("nationality"))))
+			.returning(p.property("name"), p.property("nationality"))
+			.build().getCypher();
+
+		assertThat(stmt).isEqualTo("MATCH (p:`Person`) " +
+			"WHERE NOT (isEmpty(p.nationality)) " +
+			"RETURN p.name, p.nationality");
+	}
+
 	@Nested // GH-728
 	class Graphs {
 
