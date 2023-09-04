@@ -20,7 +20,10 @@
 package org.neo4j.cypherdsl.parser;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.junit.jupiter.api.Test;
@@ -45,5 +48,13 @@ class OptionsTest {
 		assertThat(options.getOnNewPatternElementCallbacks())
 			.containsKey(PatternElementCreatedEventType.ON_CREATE);
 		assertThat(options.getOnNewPatternElementCallbacks().get(PatternElementCreatedEventType.ON_CREATE)).hasSize(2);
+	}
+
+	@Test // GH-785
+	void optionsMustAllowNullParameterValues() {
+		Map<String, Object> wurst = new HashMap<>();
+		wurst.put("salat", null);
+		var builder = Options.newOptions();
+		assertThatNoException().isThrownBy(() -> builder.withParameterValues(wurst));
 	}
 }
