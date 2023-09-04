@@ -1,5 +1,40 @@
 == 2023.6
 
+=== 2023.6.1
+
+==== 🚀 Features
+
+* Add `isEmpty()`. (#784)
+
+==== 🐛 Bug Fixes
+
+* Use unmodifiable maps instead of copyOf to allow `null` parameters. (#789)
+
+==== 🔄️ Refactorings
+
+* Add tests demonstrating prevention of function calls.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#788)
+** Bump org.neo4j.driver:neo4j-java-driver (#787)
+** Bump org.checkerframework:checker-qual (#786)
+** Bump org.springframework.boot:spring-boot-starter-parent (#783)
+** Bump com.puppycrawl.tools:checkstyle (#782)
+** Bump mockito.version from 5.4.0 to 5.5.0 (#781)
+** Bump org.graalvm.buildtools:native-maven-plugin (#780)
+** Bump testcontainers.version from 1.18.3 to 1.19.0 (#779)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#778)
+** Bump org.springframework.data:spring-data-neo4j (#775)
+** Bump org.neo4j:neo4j-cypher-javacc-parser (#774)
+** Bump io.projectreactor:reactor-bom (#773)
+** Bump com.tngtech.archunit:archunit from 1.0.1 to 1.1.0 (#772)
+** Bump org.asciidoctor:asciidoctorj-diagram (#771)
+** Bump org.graalvm.buildtools:native-maven-plugin (#770)
+
+Thanks to @zakjan for a great bug-report again and ofc @ikwattro for your ongoing support and feedback.
+
 === 2023.6.0
 
 ==== 🚀 Features
