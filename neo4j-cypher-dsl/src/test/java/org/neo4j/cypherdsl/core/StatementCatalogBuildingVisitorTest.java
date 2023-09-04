@@ -251,4 +251,13 @@ class StatementCatalogBuildingVisitorTest {
 				}
 				RETURN n, r, m""");
 	}
+
+	@Test // GH-785
+	void nullParametersMustBeAllowed() {
+
+		var statement = Cypher.match(Cypher.anyNode("n")).where(Cypher.property("n", "whatever").isEqualTo(Cypher.parameter("foo", null))).returning(Cypher.asterisk()).build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE n.whatever = $foo RETURN *");
+		assertThat(statement.getCatalog().getParameters())
+			.containsEntry("foo", null);
+	}
 }

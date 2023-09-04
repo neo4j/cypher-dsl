@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
@@ -433,7 +434,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 		 */
 		public PropertyFilter {
 			parameterNames = Set.copyOf(parameterNames);
-			parameters = Map.copyOf(parameters);
+			parameters = Collections.unmodifiableMap(new HashMap<>(parameters));
 		}
 	}
 

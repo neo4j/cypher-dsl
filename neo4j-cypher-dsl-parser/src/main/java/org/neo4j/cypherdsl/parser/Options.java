@@ -23,7 +23,9 @@ import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -257,7 +259,7 @@ public final class Options {
 		 * @since 2023.4.0
 		 */
 		public Builder withParameterValues(Map<String, Object> newParameterValues) {
-			this.parameterValues = newParameterValues == null ? Map.of() : Map.copyOf(newParameterValues);
+			this.parameterValues = newParameterValues == null ? Map.of() : Collections.unmodifiableMap(new HashMap<>(newParameterValues));
 			return this;
 		}
 
