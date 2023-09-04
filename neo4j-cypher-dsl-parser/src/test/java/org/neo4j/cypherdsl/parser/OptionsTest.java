@@ -57,4 +57,20 @@ class OptionsTest {
 		var builder = Options.newOptions();
 		assertThatNoException().isThrownBy(() -> builder.withParameterValues(wurst));
 	}
+
+	@Test // Grrr aaargh sonar, that code was there before, but alas, here's your 75%.
+	void nullParameterShouldResetThings() {
+
+		Map<String, Object> wurst = new HashMap<>();
+		wurst.put("salat", null);
+		var builder = Options.newOptions();
+		builder.withParameterValues(wurst);
+		Options options = builder.build();
+		assertThat(options.getParameterValues()).containsEntry("salat", null);
+		builder.withParameterValues(null);
+		options = builder.build();
+		assertThat(options.getParameterValues()).isEmpty();
+	}
+
+
 }
