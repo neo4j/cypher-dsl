@@ -77,6 +77,7 @@ import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operations;
 import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Predicates;
@@ -597,6 +598,10 @@ final class CypherDslASTFactory implements ASTFactory<
 				"Cannot create a PatternElement from an empty list of patterns.");
 		}
 
+		if (atoms.size() == 1 && atoms.get(0) instanceof ParenthesizedPathPatternAtom atom) {
+			return ParenthesizedPathPattern.of(atom.getPatternElement());
+		}
+
 		var nodes = atoms.stream()
 			.filter(NodeAtom.class::isInstance).map(NodeAtom.class::cast).toList();
 		var relationships = atoms.stream()
@@ -756,7 +761,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, NULL aNull) {
-		throw new UnsupportedOperationException();
+		return ParenthesizedPathPatternAtom.of(internalPattern);
 	}
 
 	@Override
@@ -768,8 +773,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Clause loadCsvClause(InputPosition p, boolean headers, Expression source, Expression v,
 		String fieldTerminator) {
 
-		isInstanceOf(StringLiteral.class, source,
-			"Only string literals are supported as source for the LOAD CSV clause.");
+		isInstanceOf(StringLiteral.class, source, "Only string literals are supported as source for the LOAD CSV clause.");
 		return Clauses.loadCSV(headers, (StringLiteral) source, assertSymbolicName(v), fieldTerminator);
 	}
 
