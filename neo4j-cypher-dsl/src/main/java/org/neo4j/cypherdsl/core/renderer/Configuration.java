@@ -18,9 +18,14 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -77,6 +82,47 @@ public final class Configuration {
 	}
 
 	/**
+	 * Simple definition of a known / schema relationship.
+	 *
+	 * @param sourceLabel The source label
+	 * @param type The type of the relationship
+	 * @param targetLabel The target label
+	 */
+	public record RelationshipDefinition(String sourceLabel, String type, String targetLabel) {
+
+		public RelationshipDefinition {
+			sourceLabel = sourceLabel.trim();
+			type = type.trim();
+			targetLabel = targetLabel.trim();
+		}
+
+		private static RelationshipDefinition of(String definition) {
+			var tuple = Objects.requireNonNull(definition)
+				.replace("(", "").replace(")", "")
+				.split(",");
+
+			if (tuple.length != 3) {
+				throw new IllegalArgumentException("Invalid relationship definition " + definition);
+			}
+			return new RelationshipDefinition(tuple[0], tuple[1], tuple[2]);
+		}
+
+		boolean selfReferential() {
+			return this.sourceLabel.equals(this.targetLabel);
+		}
+	}
+
+	/**
+	 * Creates a new relationship definition from a string in the form {@code (sourceLabel, TYPE, targetLabel)}.
+	 *
+	 * @param definition The literal definition of the relationship
+	 * @return A new relationship definition
+	 */
+	public static RelationshipDefinition relationshipDefinition(String definition) {
+		return RelationshipDefinition.of(definition);
+	}
+
+	/**
 	 * Set to {@literal true} to enable pretty printing.
 	 */
 	private final boolean prettyPrint;
@@ -111,6 +157,16 @@ public final class Configuration {
 	 * The dialect to use when rendering a statement. The default dialect works well with Neo4j 4.4 and prior.
 	 */
 	private final Dialect dialect;
+
+	/**
+	 * A flag of the renderer should be instructed to enforce a schema.
+	 */
+	private final boolean enforceSchema;
+
+	/**
+	 * The map of known relationship definitions. The key is the relationship type.
+	 */
+	private final Map<String, List<RelationshipDefinition>> relationshipDefinitions;
 
 	/**
 	 * Cypher is not pretty printed by default. No indentation settings apply.
@@ -149,6 +205,8 @@ public final class Configuration {
 		private boolean alwaysEscapeNames = true;
 		private Dialect dialect = Dialect.NEO4J_4;
 		private Set<GeneratedNames> generatedNames = EnumSet.noneOf(GeneratedNames.class);
+		private boolean enforceSchema = false;
+		private Map<String, List<RelationshipDefinition>> relationshipDefinitions = new HashMap<>();
 
 		private Builder() {
 		}
@@ -206,6 +264,7 @@ public final class Configuration {
 
 		/**
 		 * Configure whether variable names should be always generated.
+		 *
 		 * @param useGeneratedNames Set to {@literal true} to use generated symbolic names, parameter names and aliases
 		 * @return this builder
 		 */
@@ -243,6 +302,37 @@ public final class Configuration {
 		}
 
 		/**
+		 * Adds a new relationship definition to the current schema.
+		 *
+		 * @param relationshipDefinition A new relationship definition
+		 * @return this builder
+		 * @since 2023.7.0
+		 */
+		@API(status = EXPERIMENTAL, since = "2023.7.0")
+		public Builder withRelationshipDefinition(RelationshipDefinition relationshipDefinition) {
+			if (relationshipDefinition == null) {
+				return this;
+			}
+			var relationships = this.relationshipDefinitions.computeIfAbsent(relationshipDefinition.type,
+				k -> new ArrayList<>());
+			relationships.add(relationshipDefinition);
+			return this;
+		}
+
+		/**
+		 * Configure whether to enforce a schema or not.
+		 *
+		 * @param enforceSchema Set to {@literal true} to enforce the schema defined by known {@link #withRelationshipDefinition(RelationshipDefinition) relationship definitions}.
+		 * @return this builder
+		 * @since 2023.7.0
+		 */
+		@API(status = EXPERIMENTAL, since = "2023.7.0")
+		public Builder withEnforceSchema(boolean enforceSchema) {
+			this.enforceSchema = enforceSchema;
+			return this;
+		}
+
+		/**
 		 * @return a new immutable configuration
 		 */
 		public Configuration build() {
@@ -257,6 +347,11 @@ public final class Configuration {
 		this.indentSize = builder.indentSize;
 		this.dialect = builder.dialect == null ? Dialect.NEO4J_4 : builder.dialect;
 		this.generatedNames = builder.generatedNames;
+		this.enforceSchema = builder.enforceSchema;
+
+		Map<String, List<RelationshipDefinition>> mutableRelationshipDefinitions = new HashMap<>();
+		builder.relationshipDefinitions.forEach((k, v) -> mutableRelationshipDefinitions.put(k, List.copyOf(v)));
+		this.relationshipDefinitions = Map.copyOf(mutableRelationshipDefinitions);
 	}
 
 	/**
@@ -310,6 +405,24 @@ public final class Configuration {
 		return dialect;
 	}
 
+	/**
+	 * @return {@literal true} if a schema should be enforced
+	 * @since 2023.7.0
+	 */
+	@API(status = EXPERIMENTAL, since = "2023.7.0")
+	public boolean isEnforceSchema() {
+		return enforceSchema;
+	}
+
+	/**
+	 * @return A map of predefined relationships
+	 * @since 2023.7.0
+	 */
+	@API(status = EXPERIMENTAL, since = "2023.7.0")
+	public Map<String, List<RelationshipDefinition>> getRelationshipDefinitions() {
+		return relationshipDefinitions;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -321,12 +434,14 @@ public final class Configuration {
 		Configuration that = (Configuration) o;
 		return prettyPrint == that.prettyPrint && indentSize == that.indentSize && indentStyle == that.indentStyle &&
 			alwaysEscapeNames == that.alwaysEscapeNames && dialect == that.dialect &&
-			generatedNames.equals(that.generatedNames);
+			generatedNames.equals(that.generatedNames) && enforceSchema == that.enforceSchema &&
+			relationshipDefinitions.equals(that.relationshipDefinitions);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect, generatedNames);
+		return Objects.hash(prettyPrint, indentStyle, indentSize, alwaysEscapeNames, dialect, generatedNames,
+			enforceSchema, relationshipDefinitions);
 	}
 
 	@Override

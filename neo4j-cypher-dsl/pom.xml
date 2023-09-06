@@ -145,8 +145,7 @@
 						--add-reads org.neo4j.cypherdsl.core=org.neo4j.driver
 						--add-modules com.querydsl.core
 						--add-reads org.neo4j.cypherdsl.core=com.querydsl.core
-						--add-opens java.base/java.lang=ALL-UNNAMED
-					</argLine>
+						--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
 				</configuration>
 			</plugin>
 			<plugin>

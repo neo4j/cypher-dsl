@@ -42,7 +42,6 @@ import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
-import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
@@ -57,9 +56,7 @@ import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
-// tag::main-entry-point[]
- import org.neo4j.cypherdsl.parser.CypherParser;
- // end::main-entry-point[]
+import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.MatchDefinition;
 import org.neo4j.cypherdsl.parser.Options;

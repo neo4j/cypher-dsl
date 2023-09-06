@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core.internal;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Deque;
@@ -39,6 +40,7 @@ import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
+import org.neo4j.cypherdsl.core.renderer.SchemaEnforcementFailedException;
 
 /**
  * This is a convenience class implementing a {@link Visitor} and it takes care of choosing the right methods
@@ -196,6 +198,10 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 			try {
 				handle.invoke(this, onVisitable);
 			} catch (Throwable throwable) {
+				if (throwable instanceof InvocationTargetException ite
+					&& ite.getCause() instanceof SchemaEnforcementFailedException sefe) {
+					throw sefe;
+				}
 				throw new HandlerException(throwable);
 			}
 		});
