@@ -105,7 +105,7 @@ class CypherDslASTFactoryTest {
 		@ParameterizedTest
 		@ValueSource(strings = {"showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
 			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias", "intervalPathQuantifier", "fixedPathQuantifier", "plusPathQuantifier",
-			"starPathQuantifier", "parenthesizedPathPattern", "quantifiedRelationship", "useGraph", "setOwnPassword",
+			"starPathQuantifier", "quantifiedRelationship", "useGraph", "setOwnPassword",
 			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
 			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter",
 			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",

@@ -61,6 +61,7 @@ import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Properties;
@@ -939,6 +940,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			builder.append(")");
 		}
 		builder.append(" ");
+	}
+
+	void enter(ParenthesizedPathPattern parenthesizedPathPattern) {
+		builder.append("(");
+	}
+
+	void leave(ParenthesizedPathPattern parenthesizedPathPattern) {
+		builder.append(")");
 	}
 
 	@Override
