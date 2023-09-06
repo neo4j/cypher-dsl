@@ -455,3 +455,4 @@ RETURN a, [(a)-[:`ACTED_IN`]->(m) | m.title] AS movies"
 "MATCH ()-[:ACTED_IN]->(a:Person:Actor)
 RETURN a, count(*)","(Person, FOLLOWS, Person), (Person, ACTED_IN, Movie), (Person, REVIEWED, Movie), (Person, WROTE, Movie), (Person, DIRECTED, Movie), (Movie, IN_GENRE, Genre), (Person, RATED, Movie), (Actor, ACTED_IN, Movie)","MATCH ()<-[:ACTED_IN]-(a:Person:Actor)
 RETURN a, count(*)"
+"MATCH (n:Person) <- [:REVIEWED] - (:Movie) RETURN n","(Person, KNOWS, Movie)",

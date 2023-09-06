@@ -37,5 +37,6 @@ public final class SchemaEnforcementFailedException extends RuntimeException {
 	private static final long serialVersionUID = 5473466301617398078L;
 
 	public SchemaEnforcementFailedException() {
+		// Make the Java module system happy.
 	}
 }

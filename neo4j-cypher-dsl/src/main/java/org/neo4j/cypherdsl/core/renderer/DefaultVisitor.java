@@ -669,7 +669,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		for (String type : details.getTypes()) {
 			outer:
 			if (relationshipDefinitions.containsKey(type)) {
-
 				var knownRelationships = relationshipDefinitions.get(type).stream().toList();
 				for (var knownRelationship : knownRelationships) {
 					if (knownRelationship.selfReferential() && (sourceLabels.isEmpty() || targetLabels.isEmpty())) {
@@ -687,7 +686,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 						return Relationship.Direction.LTR;
 					}
 				}
-
+			}
+			if (!sourceLabels.isEmpty() && !targetLabels.isEmpty()) {
 				throw new SchemaEnforcementFailedException();
 			}
 		}
