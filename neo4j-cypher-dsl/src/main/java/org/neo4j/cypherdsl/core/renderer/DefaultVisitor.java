@@ -162,6 +162,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private final NameResolvingStrategy nameResolvingStrategy;
 
+	private final boolean enforceSchema;
+
+	private final Map<String, List<Configuration.RelationshipDefinition>> relationshipDefinitions;
+
 	/**
 	 * The current level in the tree of cypher elements.
 	 */
@@ -202,6 +206,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private boolean inEntity;
 	private boolean inPropertyLookup;
 
+	private Relationship.Direction directionOverride;
+
 	DefaultVisitor(StatementContext statementContext) {
 		this(statementContext, false);
 	}
@@ -223,6 +229,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
 		this.dialect = configuration.getDialect();
+		this.enforceSchema = configuration.isEnforceSchema();
+		this.relationshipDefinitions = configuration.getRelationshipDefinitions();
 	}
 
 	private void enableSeparator(int level, boolean on) {
@@ -618,14 +626,88 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 	}
 
-	void enter(Relationship relationship) {
 
+	void enter(Relationship relationship) {
 		skipRelationshipContent = scopingStrategy.hasVisitedBefore(relationship);
+		if (enforceSchema && relationship.getDetails().getDirection() != Relationship.Direction.UNI) {
+			directionOverride = computeDirectionOverride(relationship);
+		}
+	}
+
+	/**
+	 * Helper to retrieve a nodes label
+	 *
+	 * @param node the node
+	 * @return A set of labels
+	 */
+	private java.util.Set<String> getLabels(Node node) {
+		var nl = node.getLabels();
+		if (nl.isEmpty()) {
+			var patternElement = scopingStrategy.lookup(node);
+			if (patternElement instanceof Node boundNode) {
+				nl = boundNode.getLabels();
+			}
+		}
+		return nl.stream().map(NodeLabel::getValue).collect(Collectors.toSet());
+	}
+
+	/**
+	 * Computes an overwrite for enforcing a schema
+	 * @param relationship the relationship to potentially override
+	 * @return A new direction
+	 */
+	Relationship.Direction computeDirectionOverride(Relationship relationship) {
+		var sourceLabels = getLabels(relationship.getLeft());
+		var targetLabels = getLabels(relationship.getRight());
+		var details = relationship.getDetails();
+
+		// Bail out on equal labels
+		if (sourceLabels.equals(targetLabels)) {
+			return details.getDirection();
+		}
+
+		for (String type : details.getTypes()) {
+			outer:
+			if (relationshipDefinitions.containsKey(type)) {
+
+				var knownRelationships = relationshipDefinitions.get(type).stream().toList();
+				for (var knownRelationship : knownRelationships) {
+					if (knownRelationship.selfReferential() && (sourceLabels.isEmpty() || targetLabels.isEmpty())) {
+						break outer;
+					}
+					if (
+						sourceLabels.contains(knownRelationship.targetLabel()) && (targetLabels.isEmpty() || targetLabels.contains(knownRelationship.sourceLabel())) ||
+						targetLabels.contains(knownRelationship.sourceLabel()) && (sourceLabels.isEmpty() || sourceLabels.contains(knownRelationship.sourceLabel()))
+					) {
+						return Relationship.Direction.RTL;
+					} else if (
+						sourceLabels.contains(knownRelationship.sourceLabel()) && (targetLabels.isEmpty() || targetLabels.contains(knownRelationship.targetLabel())) ||
+						targetLabels.contains(knownRelationship.targetLabel()) && (sourceLabels.isEmpty() || sourceLabels.contains(knownRelationship.sourceLabel()))
+					) {
+						return Relationship.Direction.LTR;
+					}
+				}
+
+				throw new SchemaEnforcementFailedException();
+			}
+		}
+		if (details.getTypes().isEmpty()) {
+			var knownRelationships = this.relationshipDefinitions.values().stream().flatMap(List::stream).toList();
+			for (var knownRelationship : knownRelationships) {
+				if (sourceLabels.contains(knownRelationship.targetLabel()) && targetLabels.contains(knownRelationship.sourceLabel())) {
+					return Relationship.Direction.RTL;
+				} else if (sourceLabels.contains(knownRelationship.sourceLabel()) && targetLabels.contains(knownRelationship.targetLabel())) {
+					return Relationship.Direction.LTR;
+				}
+			}
+		}
+
+		return details.getDirection();
 	}
 
 	void enter(Relationship.Details details) {
 
-		Relationship.Direction direction = details.getDirection();
+		Relationship.Direction direction = Optional.ofNullable(directionOverride).orElseGet(details::getDirection);
 		builder.append(direction.getSymbolLeft());
 		if (details.hasContent()) {
 			builder.append("[");
@@ -678,7 +760,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(Relationship.Details details) {
 
-		Relationship.Direction direction = details.getDirection();
+		Relationship.Direction direction = Optional.ofNullable(directionOverride).orElseGet(details::getDirection);
 		if (details.hasContent()) {
 			builder.append("]");
 		}
@@ -691,6 +773,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void leave(Relationship relationship) {
 
 		skipRelationshipContent = false;
+		directionOverride = null;
 	}
 
 	void enter(Parameter<?> parameter) {

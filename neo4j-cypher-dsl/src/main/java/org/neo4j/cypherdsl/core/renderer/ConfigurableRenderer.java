@@ -100,6 +100,8 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 					write.lock();
 					renderedContent = renderOp.apply(new RenderingConfig(statement.getContext(), statement.isRenderConstantsAsParameters()), statement);
 					renderedStatementCache.put(key, renderedContent);
+				} catch (SchemaEnforcementFailedException e) {
+					renderedContent = "";
 				} finally {
 					write.unlock();
 				}

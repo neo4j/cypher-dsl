@@ -37,6 +37,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.CountExpression;
@@ -48,6 +49,7 @@ import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.PatternComprehension;
+import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Return;
@@ -258,32 +260,49 @@ public final class ScopingStrategy {
 
 	private boolean hasVisitedInScope(Collection<IdentifiableElement> visited, Named needle) {
 
+		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
+			.filter(byHasAName())
+			.map(ScopingStrategy::extractIdentifier)
+			.filter(Objects::nonNull)
+			.anyMatch(identifiedBy(needle));
+	}
+
+	@NotNull
+	private static Predicate<IdentifiableElement> byHasAName() {
 		Predicate<IdentifiableElement> hasAName = Named.class::isInstance;
 		hasAName = hasAName.or(AliasedExpression.class::isInstance);
 		hasAName = hasAName.or(SymbolicName.class::isInstance);
-		return visited.contains(needle) || needle.getSymbolicName().isPresent() && visited.stream()
-			.filter(hasAName)
-			.map(i -> {
-				String value;
-				if (i instanceof Named named) {
-					value = named.getSymbolicName().map(SymbolicName::getValue).orElse(null);
-				} else if (i instanceof Aliased aliased) {
-					value = aliased.getAlias();
-				} else if (i instanceof SymbolicName symbolicName) {
-					value = symbolicName.getValue();
-				} else {
-					value = null;
-				}
-				return value;
-			})
-			.filter(Objects::nonNull)
-			.anyMatch(i -> {
-				boolean result = i.equals(needle.getRequiredSymbolicName().getValue());
-				if (result && inSubquery) {
-					return Optional.ofNullable(currentImports.get()).orElseGet(Set::of).contains(i);
-				}
-				return result;
-			});
+		return hasAName;
+	}
+
+	/**
+	 * Extracts an identifier from an {@link IdentifiableElement identifiable element}.
+	 * @param i The identifiable element
+	 * @return The identifier
+	 */
+	private static String extractIdentifier(IdentifiableElement i) {
+		String value;
+		if (i instanceof Named named) {
+			value = named.getSymbolicName().map(SymbolicName::getValue).orElse(null);
+		} else if (i instanceof Aliased aliased) {
+			value = aliased.getAlias();
+		} else if (i instanceof SymbolicName symbolicName) {
+			value = symbolicName.getValue();
+		} else {
+			value = null;
+		}
+		return value;
+	}
+
+	@NotNull
+	private Predicate<String> identifiedBy(Named needle) {
+		return i -> {
+			boolean result = i.equals(needle.getRequiredSymbolicName().getValue());
+			if (result && inSubquery) {
+				return Optional.ofNullable(currentImports.get()).orElseGet(Set::of).contains(i);
+			}
+			return result;
+		};
 	}
 
 	private static boolean hasLocalScope(Visitable visitable) {
@@ -397,6 +416,26 @@ public final class ScopingStrategy {
 			.filter(allNamedElementsHaveResolvedNames)
 			.map(IdentifiableElement::asExpression)
 			.collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
+	}
+
+	public PatternElement lookup(Named node) {
+
+		if (!hasScope() || node.getSymbolicName().isEmpty()) {
+			return null;
+		}
+
+		var scope = dequeOfVisitedNamed.peek();
+		var identifiedBy = identifiedBy(node);
+		return scope.stream()
+			.filter(byHasAName())
+			.filter(PatternElement.class::isInstance)
+			.filter(i -> {
+				var identifier = extractIdentifier(i);
+				return identifier != null && identifiedBy.test(identifier);
+			})
+			.map(PatternElement.class::cast)
+			.findFirst()
+			.orElse(null);
 	}
 
 	/**
