@@ -33,7 +33,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 final class PathAtom implements PatternAtom {
 
 	static PathAtom of(SymbolicName name, PathLength length, boolean left, boolean right,
-		String[] relTypes, MapExpression properties) {
+		String[] relTypes, MapExpression properties, boolean negatedType) {
 
 		if (left && right) {
 			throw new IllegalArgumentException("Only left-to-right, right-to-left or unidirectional path elements are supported.");
@@ -48,7 +48,7 @@ final class PathAtom implements PatternAtom {
 			direction = Direction.UNI;
 		}
 
-		return new PathAtom(name, length, direction, relTypes, properties);
+		return new PathAtom(name, length, direction, negatedType, relTypes, properties);
 	}
 
 	private final SymbolicName name;
@@ -57,15 +57,18 @@ final class PathAtom implements PatternAtom {
 
 	private final Direction direction;
 
+	private final boolean negatedType;
+
 	private final String[] types;
 
 	private final MapExpression properties;
 
-	private PathAtom(SymbolicName name, PathLength length, Direction direction, String[] types,
+	private PathAtom(SymbolicName name, PathLength length, Direction direction, boolean negatedType, String[] types,
 		MapExpression properties) {
 		this.name = name;
 		this.length = length;
 		this.direction = direction;
+		this.negatedType = negatedType;
 		this.types = types;
 		this.properties = properties;
 	}
@@ -76,6 +79,10 @@ final class PathAtom implements PatternAtom {
 
 	public Direction getDirection() {
 		return direction;
+	}
+
+	public boolean isNegatedType() {
+		return negatedType;
 	}
 
 	public String[] getTypes() {
