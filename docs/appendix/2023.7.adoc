@@ -1,0 +1,9 @@
+== 2023.7
+
+=== 2023.7.0
+
+==== 🚀 Features
+
+* Add basic schema enforcement when rendering statements.
+* Add basic support for parsing negated types.
+* Add basic support for parenthesized path patterns.
