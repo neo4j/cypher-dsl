@@ -211,7 +211,7 @@ final class CypherDslASTFactory implements ASTFactory<
 			return new String[0];
 		}
 
-		if (inputTypes.negated() || inputTypes.type() == LabelExpression.Type.CONJUNCTION) {
+		if ((inputTypes.negated() && inputTypes.value().size() > 1) || inputTypes.type() == LabelExpression.Type.CONJUNCTION) {
 			throw new UnsupportedOperationException("Expressions for relationship types are not supported in Cypher-DSL");
 		}
 
@@ -720,7 +720,9 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v, LabelExpression relTypes, PathLength pathLength, Expression properties, Expression predicate) {
-		return PathAtom.of(assertSymbolicName(v), pathLength, left, right, computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties);
+		return PathAtom.of(assertSymbolicName(v), pathLength, left, right,
+			computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties,
+			relTypes != null && relTypes.negated());
 	}
 
 	@Override
