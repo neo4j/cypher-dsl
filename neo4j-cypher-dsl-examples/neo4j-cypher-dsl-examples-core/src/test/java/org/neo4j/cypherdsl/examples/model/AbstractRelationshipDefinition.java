@@ -36,6 +36,7 @@ public abstract class AbstractRelationshipDefinition<S extends AbstractNodeDefin
 
 	public static final String $DEFAULT_TYPE = "COOP_REL";
 
+	@SuppressWarnings("this-escape")
 	public final Property CREATED_AT = this.property("createdAt");
 
 	protected AbstractRelationshipDefinition(S start, E end, String... additionalTypes) {

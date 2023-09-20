@@ -60,7 +60,8 @@ class SDN6AnnotationProcessorTest {
 		Object[] defaultOptions;
 
 		if (ToolProvider.getSystemJavaCompiler().isSupportedOption("--release") >= 0) {
-			defaultOptions = new Object[] { ts, "--release", "8" };
+			// release 8 deprecated since Java 21, surpressed with -options
+			defaultOptions = new Object[] { "-Xlint:-options", ts, "--release", "8" };
 		} else {
 			defaultOptions = new Object[] { ts, "-source", "8", "-target", "8" };
 		}

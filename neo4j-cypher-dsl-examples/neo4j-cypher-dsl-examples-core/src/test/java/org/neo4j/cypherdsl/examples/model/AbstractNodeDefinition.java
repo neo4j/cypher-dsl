@@ -34,8 +34,10 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  */
 public abstract class AbstractNodeDefinition<T extends AbstractNodeDefinition<T>> extends NodeBase<T> {
 
+	@SuppressWarnings("this-escape")
 	public final Property ID = this.property("id");
 
+	@SuppressWarnings("this-escape")
 	public final Property NAME = this.property("name");
 
 	protected AbstractNodeDefinition(String... additionalLabel) {

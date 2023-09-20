@@ -128,6 +128,7 @@
 		<asm.version>9.5</asm.version>
 		<assertj.version>3.24.2</assertj.version>
 		<auto-common.version>0.11</auto-common.version>
+		<byte-buddy.version>1.14.8</byte-buddy.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.38.0</checker-qual.version>
@@ -335,6 +336,13 @@
 				<groupId>io.projectreactor</groupId>
 				<artifactId>reactor-bom</artifactId>
 				<version>${reactor.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>net.bytebuddy</groupId>
+				<artifactId>byte-buddy-parent</artifactId>
+				<version>${byte-buddy.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
