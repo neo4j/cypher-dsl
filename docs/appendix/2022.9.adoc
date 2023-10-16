@@ -1,5 +1,11 @@
 == 2022.9
 
+=== 2022.9.1
+
+==== 🐛 Bug Fixes
+
+* Apply the correct includesAll and includesAny semantics (#819)
+
 === 2022.9.0
 
 ==== 🚀 Features

@@ -1,5 +1,48 @@
 == 2023.7
 
+=== 2023.7.1
+
+Thanks to @jrsperry for a great bug-report and the fix for `includesAll` and `includesAny`.
+
+==== 🐛 Bug Fixes
+
+* Apply the correct includesAll and includesAny semantics (#819)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump mockito.version from 5.5.0 to 5.6.0 (#812)
+** Bump org.springframework.data:spring-data-neo4j (#817)
+** Bump com.google.guava:guava (#816)
+** Bump org.checkerframework:checker-qual (#809)
+** Bump net.bytebuddy:byte-buddy-parent from 1.14.8 to 1.14.9 (#818)
+** Bump io.projectreactor:reactor-bom (#815)
+** Bump com.fasterxml.jackson:jackson-bom (#814)
+** Bump org.neo4j.driver:neo4j-java-driver (#811)
+** Bump testcontainers.version from 1.19.0 to 1.19.1 (#810)
+** Bump com.puppycrawl.tools:checkstyle (#807)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#808)
+** Bump org.ow2.asm:asm from 9.5 to 9.6 (#806)
+** Bump com.mycila:license-maven-plugin from 4.2.rc2 to 4.3 (#805)
+** Bump org.springframework.boot:spring-boot-starter-parent (#804)
+** Bump org.apache.maven.plugins:maven-shade-plugin (#803)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#802)
+** Bump org.graalvm.buildtools:native-maven-plugin (#800)
+** Bump io.projectreactor:reactor-bom (#799)
+** Bump org.neo4j:neo4j-cypher-javacc-parser (#798)
+** Bump org.springframework.data:spring-data-neo4j (#797)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#796)
+** Bump org.asciidoctor:asciidoctorj-diagram (#795)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#794)
+** Bump com.opencsv:opencsv from 5.7.1 to 5.8 (#793)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#792)
+** Bump org.graalvm.buildtools:native-maven-plugin (#791)
+
+==== 🛠 Build
+
+* Upgrade Maven wrapper to ASF wrapper 3.2.0 and Maven 3.9.4
+* Build and release with Java 21 targeting Java 17. (#801)
+
 === 2023.7.0
 
 ==== 🚀 Features
