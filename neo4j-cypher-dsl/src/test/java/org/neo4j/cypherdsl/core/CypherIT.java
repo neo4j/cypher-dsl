@@ -1170,7 +1170,7 @@ class CypherIT {
 				.build();
 
 
-			assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE all(x IN n.l WHERE x IN ['A', 'B']) RETURN n");
+			assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE all(x IN ['A', 'B'] WHERE x IN n.l) RETURN n");
 			assertThat(statement2.getCypher()).isEqualTo(statement.getCypher());
 		}
 
@@ -1191,7 +1191,7 @@ class CypherIT {
 				.build();
 
 
-			assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE any(x IN n.l WHERE x IN ['A', 'B']) RETURN n");
+			assertThat(statement.getCypher()).isEqualTo("MATCH (n) WHERE any(x IN ['A', 'B'] WHERE x IN n.l) RETURN n");
 			assertThat(statement2.getCypher()).isEqualTo(statement.getCypher());
 		}
 
