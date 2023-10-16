@@ -46,7 +46,7 @@ public final class Conditions {
 	 */
 	static Condition includesAll(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
-		return Predicates.all(x).in(lhs).where(x.in(rhs));
+		return Predicates.all(x).in(rhs).where(x.in(lhs));
 	}
 
 	/**
@@ -58,7 +58,7 @@ public final class Conditions {
 	 */
 	static Condition includesAny(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
-		return Predicates.any(x).in(lhs).where(x.in(rhs));
+		return Predicates.any(x).in(rhs).where(x.in(lhs));
 	}
 
 	/**
