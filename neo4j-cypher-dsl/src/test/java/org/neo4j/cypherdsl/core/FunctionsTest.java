@@ -21,9 +21,11 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Named;
@@ -100,8 +102,13 @@ class FunctionsTest {
 			expectedValue = "graph." + expectedValue.substring(5, 6).toLowerCase(Locale.ROOT) + expectedValue.substring(6);
 		}
 
+		Class<?> parameterType = method.getParameterTypes()[0];
+		Object mock = mock(parameterType, Answers.RETURNS_DEEP_STUBS);
+		if (mock instanceof Relationship relationship) {
+			when(relationship.getSymbolicName()).thenReturn(Optional.of(SymbolicName.of("x")));
+		}
 		FunctionInvocation invocation = (FunctionInvocation) TestUtils
-			.invokeMethod(method, null, mock(method.getParameterTypes()[0], Answers.RETURNS_DEEP_STUBS));
+			.invokeMethod(method, null, mock);
 		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, expectedValue);
 	}
 }
