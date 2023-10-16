@@ -1,5 +1,11 @@
 == 2023.0
 
+=== 2023.0.5
+
+==== 🐛 Bug Fixes
+
+* Apply the correct includesAll and includesAny semantics (#819)
+
 === 2023.0.4
 
 2023.0.4 is a bug fix release and fully compatible with 2023.0.3.
