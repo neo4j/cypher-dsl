@@ -128,7 +128,7 @@
 		<asm.version>9.6</asm.version>
 		<assertj.version>3.24.2</assertj.version>
 		<auto-common.version>0.11</auto-common.version>
-		<byte-buddy.version>1.14.8</byte-buddy.version>
+		<byte-buddy.version>1.14.9</byte-buddy.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.38.0</checker-qual.version>
