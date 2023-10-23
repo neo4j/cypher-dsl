@@ -1757,7 +1757,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL databasePrivilege(InputPosition p, NULL aNull, List<NULL> scope, List<NULL> qualifier, boolean immutable) {
+	public NULL databasePrivilege(InputPosition p, NULL aNull, NULL aNull2, List<NULL> qualifier, boolean immutable) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1767,7 +1767,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL graphPrivilege(InputPosition p, NULL aNull, List<NULL> scope, NULL aNull2, List<NULL> qualifier, boolean immutable) {
+	public NULL loadPrivilege(InputPosition inputPosition, SimpleEither<String, Parameter<?>> simpleEither,
+		SimpleEither<String, Parameter<?>> simpleEither1, boolean b) {
+		return null;
+	}
+
+	@Override
+	public NULL graphPrivilege(InputPosition inputPosition, NULL aNull, NULL aNull2, NULL aNull3, List<NULL> qualifier, boolean immutable) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1827,6 +1833,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public NULL patternQualifier(List<NULL> list, Expression expression, Expression expression2) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public NULL allLabelsQualifier(InputPosition p) {
 		throw new UnsupportedOperationException();
 	}
@@ -1872,12 +1883,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public List<NULL> graphScopes(InputPosition p, List<DatabaseName> graphNames, ScopeType scopeType) {
+	public NULL graphScope(InputPosition inputPosition, List<DatabaseName> graphNames, ScopeType scopeType) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public List<NULL> databaseScopes(InputPosition p, List<DatabaseName> databaseNames, ScopeType scopeType) {
+	public NULL databaseScope(InputPosition inputPosition, List<DatabaseName> databaseNames, ScopeType scopeType) {
 		throw new UnsupportedOperationException();
 	}
 
