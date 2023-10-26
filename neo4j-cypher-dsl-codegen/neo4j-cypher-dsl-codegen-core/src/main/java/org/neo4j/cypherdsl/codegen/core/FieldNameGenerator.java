@@ -24,6 +24,7 @@ package org.neo4j.cypherdsl.codegen.core;
  * @author Michael J. Simons
  * @since 2021.1.0
  */
+@FunctionalInterface
 public interface FieldNameGenerator {
 
 	/**
@@ -33,46 +34,46 @@ public interface FieldNameGenerator {
 		/**
 		 * Singleton holder.
 		 */
-		INSTANCE
+		INSTANCE;
+
+		@Override
+		public String generate(String name) {
+			StringBuilder sb = new StringBuilder();
+
+			int codePoint;
+			int previousIndex = 0;
+			boolean prevWasLower = false;
+			boolean nextIsLower = false;
+			int i = 0;
+			while (i < name.length()) {
+				codePoint = name.codePointAt(i);
+				if (Identifiers.isValidAt(i, codePoint)) {
+					if (nextIsLower || Character.isLowerCase(codePoint)) {
+						prevWasLower = true;
+						nextIsLower = false;
+						if (!(sb.isEmpty() || Character.isLetter(name.codePointAt(previousIndex)))) {
+							sb.append("_");
+						}
+						codePoint = Character.toUpperCase(codePoint);
+					} else if (!sb.isEmpty() && (prevWasLower || i + 1 < name.length() && Character.isLowerCase(
+						name.codePointAt(i + 1)))) {
+						sb.append("_");
+						nextIsLower = true;
+					}
+					sb.append(Character.toChars(codePoint));
+				}
+				previousIndex = i;
+				i += Character.charCount(codePoint);
+			}
+			return sb.toString();
+		}
 	}
 
 	/**
-	 * Generate a new name for constant field
+	 * Generates a new name for constant field.
 	 *
-	 * @param name The name of a node or relationship
-	 * @return A valid constant field name
+	 * @param name the name of a node or relationship
+	 * @return a valid constant field name
 	 */
-	default String generate(String name) {
-
-		StringBuilder sb = new StringBuilder();
-
-		int codePoint;
-		int previousIndex = 0;
-		boolean prevWasLower = false;
-		boolean nextIsLower = false;
-		int i = 0;
-		while (i < name.length()) {
-			codePoint = name.codePointAt(i);
-			if (Identifiers.isValidAt(i, codePoint)) {
-				if (nextIsLower || Character.isLowerCase(codePoint)) {
-					prevWasLower = true;
-					nextIsLower = false;
-					if (sb.length() > 0 && !Character.isLetter(name.codePointAt(previousIndex))) {
-						sb.append("_");
-					}
-					codePoint = Character.toUpperCase(codePoint);
-				} else if (sb.length() > 0 && (
-					prevWasLower ||
-					i + 1 < name.length() && Character.isLowerCase(name.codePointAt(i + 1))
-				)) {
-					sb.append("_");
-					nextIsLower = true;
-				}
-				sb.append(Character.toChars(codePoint));
-			}
-			previousIndex = i;
-			i += Character.charCount(codePoint);
-		}
-		return sb.toString();
-	}
+	String generate(String name);
 }

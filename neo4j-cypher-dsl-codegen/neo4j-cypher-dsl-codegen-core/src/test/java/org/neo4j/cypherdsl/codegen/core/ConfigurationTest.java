@@ -65,4 +65,12 @@ class ConfigurationTest {
 			assertThat(configuration.getTypeNameDecorator().apply("v")).isEqualTo("vs");
 		}
 	}
+
+	@Test // GH-829
+	void fieldNameGeneratorShouldBeConfigurable() {
+		Configuration configuration = Configuration.newConfig()
+			.withFieldNameGenerator(name -> "Wurst" + name)
+			.build();
+		assertThat(configuration.getConstantFieldNameGenerator().generate("salat")).isEqualTo("Wurstsalat");
+	}
 }
