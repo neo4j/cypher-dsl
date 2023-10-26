@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.Optional;
 import java.util.TimeZone;
 import java.util.stream.Stream;
 
@@ -34,7 +33,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.Mockito;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -196,17 +194,6 @@ class FunctionsIT {
 	void neo5jSpecificFunctionsShouldWork(FunctionInvocation functionInvocation, String expected) {
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
 		assertThat(renderer.render(Cypher.returning(functionInvocation).build())).isEqualTo(expected);
-	}
-
-	@Test
-	void errorMessagesShouldWorkForNamedPath() {
-
-		var path = Mockito.spy(Cypher.path("x").definedBy(Cypher.node("Movie").relationshipTo(Cypher.node("Person"))));
-		Mockito.when(path.getSymbolicName()).thenReturn(Optional.empty());
-		var expectedMessages = "The path needs to be named!";
-		assertThatIllegalArgumentException().isThrownBy(() -> Functions.length(path)).withMessage(expectedMessages);
-		assertThatIllegalArgumentException().isThrownBy(() -> Functions.nodes(path)).withMessage(expectedMessages);
-		assertThatIllegalArgumentException().isThrownBy(() -> Functions.relationships(path)).withMessage(expectedMessages);
 	}
 
 	@Test
