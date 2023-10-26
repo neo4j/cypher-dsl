@@ -21,11 +21,10 @@ package org.neo4j.cypherdsl.core;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Named;
@@ -35,7 +34,6 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.platform.commons.util.ReflectionUtils;
-import org.mockito.Answers;
 
 /**
  * @author Michael J. Simons
@@ -99,16 +97,27 @@ class FunctionsTest {
 
 		var expectedValue = method.getName().replace("Distinct", "");
 		if (expectedValue.startsWith("graph")) {
-			expectedValue = "graph." + expectedValue.substring(5, 6).toLowerCase(Locale.ROOT) + expectedValue.substring(6);
+			expectedValue =
+				"graph." + expectedValue.substring(5, 6).toLowerCase(Locale.ROOT) + expectedValue.substring(6);
 		}
 
 		Class<?> parameterType = method.getParameterTypes()[0];
-		Object mock = mock(parameterType, Answers.RETURNS_DEEP_STUBS);
-		if (mock instanceof Relationship relationship) {
-			when(relationship.getSymbolicName()).thenReturn(Optional.of(SymbolicName.of("x")));
+		Object parameter;
+		if (parameterType == SymbolicName.class) {
+			parameter = SymbolicName.of("undef");
+		} else if (parameterType == MapExpression.class) {
+			parameter = MapExpression.create(Map.of());
+		} else if (parameterType == org.neo4j.cypherdsl.core.Named.class || parameterType == Node.class) {
+			parameter = Cypher.node("Undef");
+		} else if (parameterType == Relationship.class || parameterType == RelationshipPattern.class) {
+			parameter = Cypher.node("Undef").relationshipTo(Cypher.anyNode()).named("r");
+		} else if (parameterType == Expression.class) {
+			parameter = SymbolicName.of("Undef");
+		} else {
+			throw new IllegalArgumentException("Cannot test a function with parameter type " + parameterType);
 		}
 		FunctionInvocation invocation = (FunctionInvocation) TestUtils
-			.invokeMethod(method, null, mock);
+			.invokeMethod(method, null, parameter);
 		assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, expectedValue);
 	}
 }
