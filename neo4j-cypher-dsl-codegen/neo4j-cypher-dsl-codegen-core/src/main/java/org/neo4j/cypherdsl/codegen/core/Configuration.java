@@ -175,6 +175,7 @@ public final class Configuration {
 
 		private ClassNameGenerator nodeNameGenerator = new NodeNameGenerator();
 		private ClassNameGenerator relationshipNameGenerator = new RelationshipNameGenerator();
+		private FieldNameGenerator fieldNameGenerator = FieldNameGenerator.Default.INSTANCE;
 		private JavaVersion target = JavaVersion.RELEASE_11;
 		private String defaultPackage = "";
 		private Path path;
@@ -223,6 +224,22 @@ public final class Configuration {
 				throw new IllegalArgumentException("A class name generator for relationships is required.");
 			}
 			this.relationshipNameGenerator = relationshipNameGenerator;
+			return this;
+		}
+
+		/**
+		 * Changes the field name generator
+		 *
+		 * @param fieldNameGenerator A new generator
+		 * @return This builder
+		 * @since 2023.7.2
+		 */
+		public Builder withFieldNameGenerator(FieldNameGenerator fieldNameGenerator) {
+
+			if (fieldNameGenerator == null) {
+				throw new IllegalArgumentException("A field name generator is required.");
+			}
+			this.fieldNameGenerator = fieldNameGenerator;
 			return this;
 		}
 
@@ -365,7 +382,7 @@ public final class Configuration {
 				clock = Clock.fixed(z.toInstant(), z.getZone());
 			}
 			return new Configuration(typeNameDecorator, nodeNameGenerator, relationshipNameGenerator,
-				FieldNameGenerator.Default.INSTANCE, target, defaultPackage, path, indent, clock, addAtGenerated);
+				fieldNameGenerator, target, defaultPackage, path, indent, clock, addAtGenerated);
 		}
 	}
 
