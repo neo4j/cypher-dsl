@@ -1734,4 +1734,27 @@ class IssueRelatedIT {
 		assertThat(Cypher.match(n1.relationshipWith(n2, Relationship.Direction.UNI, "X").named("x")).returning(Cypher.asterisk()).build().getCypher())
 			.isEqualTo("MATCH (:`N1`)-[x:`X`]-(:`N2`) RETURN *");
 	}
+
+	@Test // GH-826
+	void identifiablesCreatedInSubqueriesMustBeRecognizedAsSeenToo() {
+
+		var n1 = Cypher.node("Foo").named("n1");
+		var n2 = Cypher.node("Bar").named("n2");
+		var resultStatement = Cypher
+			.create(n1)
+			.with(n1)
+			.call(
+				Cypher.with(n1)
+					.merge(n2.withProperties("foo", Cypher.literalOf("x")))
+					.create(n1.relationshipTo(n2, "NESTED"))
+					.returning(Functions.count(n2).as("foo_2"))
+					.build()
+			)
+			.returning(Cypher.literalTrue())
+			.build();
+
+		assertThat(resultStatement.getCypher())
+			.isEqualTo(
+				"CREATE (n1:`Foo`) WITH n1 CALL {WITH n1 MERGE (n2:`Bar` {foo: 'x'}) CREATE (n1)-[:`NESTED`]->(n2) RETURN count(n2) AS foo_2} RETURN true");
+	}
 }

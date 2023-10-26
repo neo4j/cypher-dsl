@@ -111,6 +111,7 @@ public final class ScopingStrategy {
 	private boolean inSubquery = false;
 
 	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
+	private final Deque<Set<String>> definedInSubquery = new ArrayDeque<>();
 
 	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
 	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
@@ -137,6 +138,7 @@ public final class ScopingStrategy {
 
 		if (visitable instanceof Subquery) {
 			this.inSubquery = true;
+			this.definedInSubquery.push(new LinkedHashSet<>());
 		}
 
 		if (this.inSubquery && visitable instanceof With with) {
@@ -194,6 +196,12 @@ public final class ScopingStrategy {
 		if (visitable instanceof IdentifiableElement identifiableElement && !inOrder && (!inProperty || visitable instanceof Property)) {
 
 			dequeOfVisitedNamed.peek().add(identifiableElement);
+			if (inSubquery) {
+				var identifier = extractIdentifier(identifiableElement);
+				if (identifier != null) {
+					this.definedInSubquery.peek().add(identifier);
+				}
+			}
 		}
 
 		boolean notify = false;
@@ -216,6 +224,7 @@ public final class ScopingStrategy {
 		if (visitable instanceof Subquery) {
 			this.inSubquery = false;
 			this.currentImports.set(null);
+			this.definedInSubquery.pop();
 		}
 
 		if (hasImplicitScope(visitable)) {
@@ -299,7 +308,8 @@ public final class ScopingStrategy {
 		return i -> {
 			boolean result = i.equals(needle.getRequiredSymbolicName().getValue());
 			if (result && inSubquery) {
-				return Optional.ofNullable(currentImports.get()).orElseGet(Set::of).contains(i);
+				var imported = Optional.ofNullable(currentImports.get()).orElseGet(Set::of).contains(i);
+				return imported || this.definedInSubquery.peek().contains(i);
 			}
 			return result;
 		};
