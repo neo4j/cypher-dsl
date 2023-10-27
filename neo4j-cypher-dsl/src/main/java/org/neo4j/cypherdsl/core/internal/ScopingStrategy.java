@@ -40,9 +40,7 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
-import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
@@ -55,6 +53,7 @@ import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.Subquery;
+import org.neo4j.cypherdsl.core.SubqueryExpression;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
@@ -241,7 +240,7 @@ public final class ScopingStrategy {
 	}
 
 	private static boolean hasImplicitScope(Visitable visitable) {
-		return visitable instanceof CountExpression || visitable instanceof ExistentialSubquery || visitable instanceof Statement.UnionQuery;
+		return visitable instanceof SubqueryExpression || visitable instanceof Statement.UnionQuery;
 	}
 
 	private void leaveStatement(Visitable visitable) {

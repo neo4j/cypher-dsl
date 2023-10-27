@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
+import org.neo4j.cypherdsl.core.CollectExpression;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.CountExpression;
 import org.neo4j.cypherdsl.core.Create;
@@ -965,6 +966,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			builder.append("COUNT");
 		} else if (subquery instanceof ExistentialSubquery) {
 			builder.append("EXISTS");
+		} else if (subquery instanceof CollectExpression) {
+			builder.append("COLLECT");
 		}
 		builder.append(" { ");
 	}

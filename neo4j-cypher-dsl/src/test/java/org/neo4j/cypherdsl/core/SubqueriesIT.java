@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 import java.net.URI;
 
@@ -465,6 +466,197 @@ class SubqueriesIT {
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label CALL {WITH label MATCH (n2) WHERE n2.name = label RETURN n2} IN TRANSACTIONS RETURN n2");
+		}
+	}
+
+	@Nested
+	class CollectSubqueries {
+
+		private final Node person = Cypher.node("Person").named("person");
+		private final Property personName = person.property("name");
+		private final Node dog = Cypher.node("Dog").named("dog");
+		private final Property dogName = dog.property("name");
+		private final Relationship hasDog = person.relationshipTo(dog, "HAS_DOG");
+		private final Node cat = Cypher.node("Cat").named("cat");
+
+		@Test
+		void shouldCheckForReturnStatement() {
+
+			var nonReturnStatement = Cypher.create(Cypher.node("Foo")).build();
+			assertThatIllegalArgumentException().isThrownBy(() -> Expressions.collect(nonReturnStatement))
+				.withMessage(
+					"The final RETURN clause in a subquery used with COLLECT is mandatory and the RETURN clause must return exactly one column.");
+		}
+
+		@Test
+		void simple() {
+
+			var inner = Cypher.match(person.relationshipTo(dog, "HAS_DOG")).returning(dogName)
+				.build();
+			var stmt = Cypher.match(person)
+				.where(Cypher.literalOf("Ozzy").in(Expressions.collect(inner)))
+				.returning(person.property("name").as("name"))
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) WHERE 'Ozzy' IN COLLECT { MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`) RETURN dog.name } RETURN person.name AS name");
+		}
+
+		@Test
+		void withWhereClause() {
+
+			var r = this.hasDog.named("r");
+			var inner = Cypher.match(r)
+				.where(r.property("since").gt(Cypher.literalOf(2017)))
+				.returning(dogName)
+				.build();
+			var stmt = Cypher.match(person)
+				.returning(person.property("name").as("name"), Expressions.collect(inner).as("youngDogs"))
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) "
+					+ "RETURN person.name AS name, COLLECT {"
+					+ " MATCH (person)-[r:`HAS_DOG`]->(dog:`Dog`)"
+					+ " WHERE r.since > 2017"
+					+ " RETURN dog.name "
+					+ "} AS youngDogs");
+		}
+
+		@Test
+		void withAUnion() {
+
+			var hasCat = person.relationshipTo(cat, "HAS_CAT");
+			var inner =
+				Cypher.union(
+					Cypher.match(hasDog).returning(dogName.as("petName")).build(),
+					Cypher.match(hasCat).returning(cat.property("name").as("petName")).build()
+				);
+
+			var stmt = Cypher.match(person)
+				.returning(person.property("name").as("name"), Expressions.collect(inner).as("petNames"))
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) "
+					+ "RETURN person.name AS name, "
+					+ "COLLECT {"
+					+ " MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`)"
+					+ " RETURN dog.name AS petName"
+					+ " UNION"
+					+ " MATCH (person)-[:`HAS_CAT`]->(cat:`Cat`)"
+					+ " RETURN cat.name AS petName "
+					+ "} AS petNames");
+		}
+
+		@Test
+		void withWith() {
+
+			var r = this.hasDog.named("r");
+			var yearOfTheDog = Cypher.literalOf(2018).as("yearOfTheDog");
+			var inner = Cypher.match(r)
+				.where(r.property("since").eq(yearOfTheDog))
+				.returning(dogName)
+				.build();
+			var stmt = Cypher.match(person)
+				.returning(person.property("name").as("name"),
+					Expressions.with(yearOfTheDog).collect(inner).as("dogsOfTheYear")
+				)
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) "
+					+ "RETURN person.name AS name, COLLECT {"
+					+ " WITH 2018 AS yearOfTheDog"
+					+ " MATCH (person)-[r:`HAS_DOG`]->(dog:`Dog`)"
+					+ " WHERE r.since = yearOfTheDog"
+					+ " RETURN dog.name "
+					+ "} AS dogsOfTheYear");
+		}
+
+		@Test
+		void inReturn() {
+
+			var toy = Cypher.node("Toy").named("t");
+			var inner = Cypher.match(hasDog)
+				.match(dog.relationshipTo(toy, "HAS_TOY"))
+				.returning(toy.property("name"))
+				.build();
+			var stmt = Cypher.match(person)
+				.returning(person.property("name"),
+					Expressions.collect(inner).as("toyNames")
+				)
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) "
+					+ "RETURN person.name, "
+					+ "COLLECT {"
+					+ " MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`)"
+					+ " MATCH (dog)-[:`HAS_TOY`]->(t:`Toy`)"
+					+ " RETURN t.name "
+					+ "} AS toyNames");
+		}
+
+		@Test
+		void collectInSet() {
+
+			var inner = Cypher.match(hasDog)
+				.returning(dogName)
+				.build();
+			var stmt = Cypher.match(person)
+				.where(person.property("name").eq(Cypher.literalOf("Peter")))
+				.set(person.property("dogNames").to(Expressions.collect(inner)))
+				.returning(person.property("dogNames").as("dogNames"))
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) WHERE person.name = 'Peter' "
+					+ "SET person.dogNames = COLLECT { MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`) RETURN dog.name } "
+					+ "RETURN person.dogNames AS dogNames");
+		}
+
+		@Test
+		void inCase() {
+
+			var inner = Cypher.match(hasDog)
+				.returning(dogName)
+				.build();
+			var stmt = Cypher.match(person)
+				.returning(
+					Cypher.caseExpression().when(Expressions.collect(inner).eq(Cypher.listOf()))
+						.then(Cypher.literalOf("No Dogs ").concat(personName))
+						.elseDefault(personName).as("result")
+				)
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) "
+					+ "RETURN "
+					+ "CASE "
+					+ "WHEN COLLECT { MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`) RETURN dog.name } = [] THEN ('No Dogs ' + person.name) "
+					+ "ELSE person.name "
+					+ "END AS result");
+		}
+
+		@Test
+		void asGroupingKey() {
+
+			var inner = Cypher.match(hasDog)
+				.returning(dogName)
+				.build();
+			var stmt = Cypher.match(person)
+				.returning(
+					Expressions.collect(inner).as("dogNames"),
+					Functions.avg(person.property("age")).as("averageAge")
+				).orderBy(Cypher.name("dogNames"))
+				.build();
+			assertThat(stmt.getCypher())
+				.isEqualTo(
+					"MATCH (person:`Person`) "
+					+ "RETURN COLLECT { MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`) RETURN dog.name } AS dogNames,"
+					+ " avg(person.age) AS averageAge "
+					+ "ORDER BY dogNames");
 		}
 	}
 }

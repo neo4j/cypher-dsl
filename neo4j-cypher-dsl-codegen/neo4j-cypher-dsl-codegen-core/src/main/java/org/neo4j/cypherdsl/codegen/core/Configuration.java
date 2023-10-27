@@ -232,7 +232,7 @@ public final class Configuration {
 		 *
 		 * @param fieldNameGenerator A new generator
 		 * @return This builder
-		 * @since 2023.7.2
+		 * @since 2023.8.0
 		 */
 		public Builder withFieldNameGenerator(FieldNameGenerator fieldNameGenerator) {
 
