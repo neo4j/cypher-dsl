@@ -61,6 +61,20 @@ public final class Expressions {
 		 */
 		@NotNull
 		CountExpression count(UnionQuery union);
+
+		/**
+		 * Creates a {@literal COLLECT} subquery from a statement, including  its filters and conditions. The statement must
+		 * return exactly one column. It must however not contain any updates. While it would render syntactically
+		 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
+		 * <p>
+		 * To avoid confusion, shadowing of imported variables is not allowed. An outside scope variable is shadowed when
+		 * a newly introduced variable within the inner scope is defined with the same variable.
+		 *
+		 * @param statement the statement to be passed to {@code COLLECT{}}
+		 * @return a collecting sub-query.
+		 * @since 2023.8.0
+		 */
+		CollectExpression collect(Statement statement);
 	}
 
 	/**
@@ -136,7 +150,32 @@ public final class Expressions {
 			public CountExpression count(UnionQuery union) {
 				return CountExpression.count(with, union);
 			}
+
+			@Override
+			public CollectExpression collect(Statement statement) {
+				return CollectExpression.collect(with, statement);
+			}
 		};
+	}
+
+	/**
+	 * Creates a {@literal COLLECT} subquery from a statement, including  its filters and conditions. The statement must
+	 * return exactly one column. It must however not contain any updates. While it would render syntactically
+	 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
+	 *
+	 * @param statement the statement to be passed to {@code COLLECT{}}
+	 * @return a collecting sub-query.
+	 * @since 2023.8.0
+	 */
+	@NotNull
+	public static Expression collect(Statement statement) {
+
+		if (!statement.doesReturnOrYield()) {
+			throw new IllegalArgumentException(
+				"The final RETURN clause in a subquery used with COLLECT is mandatory and the RETURN clause must return exactly one column.");
+		}
+
+		return CollectExpression.collect(statement);
 	}
 
 	/**
@@ -174,7 +213,7 @@ public final class Expressions {
 			StringBuilder ref = new StringBuilder();
 			expression.accept(segment -> {
 				if (segment instanceof SymbolicName symbolicName) {
-					if (ref.length() > 0) {
+					if (!ref.isEmpty()) {
 						ref.append(".");
 					}
 					ref.append(symbolicName.getValue());

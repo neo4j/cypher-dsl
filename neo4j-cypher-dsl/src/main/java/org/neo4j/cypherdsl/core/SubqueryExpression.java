@@ -26,5 +26,5 @@ package org.neo4j.cypherdsl.core;
  * @since 2023.0.0
  * @soundtrack In Flames - The Jester Race
  */
-public sealed interface SubqueryExpression extends Expression permits ExistentialSubquery, CountExpression {
+public sealed interface SubqueryExpression extends Expression permits ExistentialSubquery, CountExpression, CollectExpression {
 }
