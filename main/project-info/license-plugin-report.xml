@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1698351122628">
+<licensePluginReport goal="CHECK" timestamp="1698395374394">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -20,6 +20,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/Clause.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Clauses.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ClausesBasedStatement.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/CollectExpression.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Comparison.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/CompoundCondition.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Condition.java" result="PRESENT"/>
