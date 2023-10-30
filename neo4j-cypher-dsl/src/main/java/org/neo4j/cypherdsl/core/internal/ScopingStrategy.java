@@ -239,6 +239,12 @@ public final class ScopingStrategy {
 		}
 	}
 
+	/**
+	 * Anything that might import variables from the outside, without using an explicit {@code WITH} clause.
+	 *
+	 * @param visitable the element to be checked whether it implicitly imports named elements.
+	 * @return {@literal true} if named elements are imported
+	 */
 	private static boolean hasImplicitScope(Visitable visitable) {
 		return visitable instanceof SubqueryExpression || visitable instanceof Statement.UnionQuery;
 	}
@@ -317,6 +323,7 @@ public final class ScopingStrategy {
 	private static boolean hasLocalScope(Visitable visitable) {
 		return visitable instanceof PatternComprehension ||
 			visitable instanceof Subquery ||
+			visitable instanceof SubqueryExpression ||
 			visitable instanceof Foreach;
 	}
 

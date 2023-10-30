@@ -691,16 +691,17 @@ class IssueRelatedIT {
 			.build();
 
 		String cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
-		assertThat(cypher).isEqualTo("MATCH (node:Node)\n"
-			+ "CALL {\n"
-			+ "  WITH node\n"
-			+ "  WITH node AS this\n"
-			+ "  MATCH (this)-[:LINK]-(o:Other) RETURN o AS result\n"
-			+ "}\n"
-			+ "RETURN result {\n"
-			+ "  .foo,\n"
-			+ "  .bar\n"
-			+ "}");
+		assertThat(cypher).isEqualTo("""
+			MATCH (node:Node)
+			CALL {
+			  WITH node
+			  WITH node AS this
+			  MATCH (this)-[:LINK]-(o:Other) RETURN o AS result
+			}
+			RETURN result {
+			  .foo,
+			  .bar
+			}""");
 	}
 
 	@Test // GH-190
@@ -910,13 +911,13 @@ class IssueRelatedIT {
 			"MATCH (node:Division) WITH DISTINCT node WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {rel_property: true}]->(:Department)-[:EMPLOYS]->(:Employee) RETURN *");
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(q))
-			.isEqualTo(
-				"MATCH (node:Division)\n" +
-				"WITH DISTINCT node\n" +
-				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {\n" +
-				"  rel_property: true\n" +
-				"}]->(:Department)-[:EMPLOYS]->(:Employee)\n" +
-				"RETURN *"
+			.isEqualTo("""
+				MATCH (node:Division)
+				WITH DISTINCT node
+				WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {
+				  rel_property: true
+				}]->(:Department)-[:EMPLOYS]->(:Employee)
+				RETURN *"""
 			);
 	}
 
@@ -940,13 +941,13 @@ class IssueRelatedIT {
 			"MATCH (node:Division) WITH DISTINCT node WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {rel_property: true}]->(:Department)-[:EMPLOYS]->(:Employee) RETURN *");
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(q))
-			.isEqualTo(
-				"MATCH (node:Division)\n" +
-				"WITH DISTINCT node\n" +
-				"WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {\n" +
-				"  rel_property: true\n" +
-				"}]->(:Department)-[:EMPLOYS]->(:Employee)\n" +
-				"RETURN *"
+			.isEqualTo("""
+				MATCH (node:Division)
+				WITH DISTINCT node
+				WHERE NOT (node)-[:IN]->(:Department)-[:INSIDE {
+				  rel_property: true
+				}]->(:Department)-[:EMPLOYS]->(:Employee)
+				RETURN *"""
 			);
 	}
 
@@ -1012,17 +1013,17 @@ class IssueRelatedIT {
 
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
 		String cypher = renderer.render(completeStatement);
-		String expected = ""
-			+ "MATCH p = (:lookingType)<-[:specifiedRelation]-()\n"
-			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
-			+ "CALL {\n"
-			+ "  WITH nodes\n"
-			+ "  UNWIND nodes AS n\n"
-			+ "  WITH n\n"
-			+ "  MATCH second_p = (n)-[second_relations:otherRelation]->(second_nodes)\n"
-			+ "  RETURN second_nodes, second_relations\n"
-			+ "}\n"
-			+ "RETURN nodes, relations, collect(second_nodes), collect(second_relations)";
+		String expected = """
+			MATCH p = (:lookingType)<-[:specifiedRelation]-()
+			WITH nodes(p) AS nodes, relationships(p) AS relations
+			CALL {
+			  WITH nodes
+			  UNWIND nodes AS n
+			  WITH n
+			  MATCH second_p = (n)-[second_relations:otherRelation]->(second_nodes)
+			  RETURN second_nodes, second_relations
+			}
+			RETURN nodes, relations, collect(second_nodes), collect(second_relations)""";
 		assertThat(cypher).isEqualTo(expected);
 	}
 
@@ -1047,15 +1048,15 @@ class IssueRelatedIT {
 
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
 		String cypher = renderer.render(completeStatement);
-		String expected = ""
-			+ "MATCH p = (:Target)<-[:REL]-()\n"
-			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
-			+ "CALL {\n"
-			+ "  WITH nodes\n"
-			+ "  WITH nodes AS x\n"
-			+ "  RETURN x\n"
-			+ "}\n"
-			+ "RETURN *";
+		String expected = """
+			MATCH p = (:Target)<-[:REL]-()
+			WITH nodes(p) AS nodes, relationships(p) AS relations
+			CALL {
+			  WITH nodes
+			  WITH nodes AS x
+			  RETURN x
+			}
+			RETURN *""";
 		assertThat(cypher).isEqualTo(expected);
 	}
 
@@ -1080,13 +1081,13 @@ class IssueRelatedIT {
 
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
 		String cypher = renderer.render(completeStatement);
-		String expected = ""
-			+ "MATCH p = (:Target)<-[:REL]-()\n"
-			+ "WITH nodes(p) AS nodes, relationships(p) AS relations\n"
-			+ "CALL {\n"
-			+ "  RETURN 1\n"
-			+ "}\n"
-			+ "RETURN true";
+		String expected = """
+			MATCH p = (:Target)<-[:REL]-()
+			WITH nodes(p) AS nodes, relationships(p) AS relations
+			CALL {
+			  RETURN 1
+			}
+			RETURN true""";
 		assertThat(cypher).isEqualTo(expected);
 	}
 
@@ -1245,17 +1246,17 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
-			.isEqualTo(""
-				+ "MERGE (existingNode:CordraObject {\n"
-				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
-				+ "})\n"
-				+ "SET existingNode = {\n"
-				+ "  _id: 'test/55de0539eb1e14f26a04',\n"
-				+ "  _type: 'Movie',\n"
-				+ "  title: 'Top Gun',\n"
-				+ "  released: 1986\n"
-				+ "}\n"
-				+ "RETURN existingNode");
+			.isEqualTo("""
+				MERGE (existingNode:CordraObject {
+				  _id: 'test/55de0539eb1e14f26a04'
+				})
+				SET existingNode = {
+				  _id: 'test/55de0539eb1e14f26a04',
+				  _type: 'Movie',
+				  title: 'Top Gun',
+				  released: 1986
+				}
+				RETURN existingNode""");
 	}
 
 	@Test // GH-388
@@ -1276,17 +1277,18 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
-			.isEqualTo(""
-				+ "MERGE (existingNode:CordraObject {\n"
-				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
-				+ "})\n"
-				+ "SET existingNode = {\n"
-				+ "  _id: 'test/55de0539eb1e14f26a04',\n"
-				+ "  _type: 'Movie',\n"
-				+ "  title: 'Top Gun',\n"
-				+ "  released: 1986\n"
-				+ "}\n"
-				+ "RETURN existingNode");
+			.isEqualTo("""
+				MERGE (existingNode:CordraObject {
+				  _id: 'test/55de0539eb1e14f26a04'
+				})
+				SET existingNode = {
+				  _id: 'test/55de0539eb1e14f26a04',
+				  _type: 'Movie',
+				  title: 'Top Gun',
+				  released: 1986
+				}
+				RETURN existingNode"""
+			);
 	}
 
 	@Test // GH-388
@@ -1302,12 +1304,13 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(statement))
-			.isEqualTo(""
-				+ "MERGE (existingNode:CordraObject {\n"
-				+ "  _id: 'test/55de0539eb1e14f26a04'\n"
-				+ "})\n"
-				+ "SET existingNode = $aNewMap\n"
-				+ "RETURN existingNode");
+			.isEqualTo("""
+				MERGE (existingNode:CordraObject {
+				  _id: 'test/55de0539eb1e14f26a04'
+				})
+				SET existingNode = $aNewMap
+				RETURN existingNode"""
+			);
 	}
 
 	@Test // GH-419
@@ -1333,18 +1336,20 @@ class IssueRelatedIT {
 		String cypher = Renderer.getRenderer(
 			Configuration.newConfig().withPrettyPrint(true).alwaysEscapeNames(true).build()).render(statement);
 		assertThat(cypher)
-			.isEqualTo("MATCH (oi:`ObjectInstance`)\n"
-				+ "WITH {\n"
-				+ "  oi: oi\n"
-				+ "} AS collection\n"
-				+ "UNWIND $attributes AS attributeTypeAndValue\n"
-				+ "WITH attributeTypeAndValue, collection\n"
-				+ "MATCH (att:`AttributeType` {\n"
-				+ "  name: attributeTypeAndValue.name\n"
-				+ "})<-[:`OF_TYPE`]-(at:`Attribute`)\n"
-				+ "WITH at, collection.oi AS oi\n"
-				+ "MATCH (oi)-[:`IS_IDENTIFIED_BY`]->(at)\n"
-				+ "RETURN at");
+			.isEqualTo("""
+				MATCH (oi:`ObjectInstance`)
+				WITH {
+				  oi: oi
+				} AS collection
+				UNWIND $attributes AS attributeTypeAndValue
+				WITH attributeTypeAndValue, collection
+				MATCH (att:`AttributeType` {
+				  name: attributeTypeAndValue.name
+				})<-[:`OF_TYPE`]-(at:`Attribute`)
+				WITH at, collection.oi AS oi
+				MATCH (oi)-[:`IS_IDENTIFIED_BY`]->(at)
+				RETURN at"""
+			);
 	}
 
 	@Test
@@ -1756,5 +1761,31 @@ class IssueRelatedIT {
 		assertThat(resultStatement.getCypher())
 			.isEqualTo(
 				"CREATE (n1:`Foo`) WITH n1 CALL {WITH n1 MERGE (n2:`Bar` {foo: 'x'}) CREATE (n1)-[:`NESTED`]->(n2) RETURN count(n2) AS foo_2} RETURN true");
+	}
+
+	@Test // GH-832
+	void sequentialExistingSubqueriesShouldNotHaveScopingIssues() {
+
+		var n1 = Cypher.node("Foo").named("n1");
+		var n2 = Cypher.node("Bar").named("n2");
+		var resultStatement = Cypher.match(n1)
+			.where(
+				Cypher.match(n1.relationshipTo(n2)).where(n2.property("bar").isFalse()).asCondition()
+					.or(Cypher.match(n1.relationshipTo(n2)).where(n2.property("foo").isTrue()).asCondition())
+			)
+			.returning(Cypher.literalTrue())
+			.build();
+
+		assertThat(resultStatement.getCypher())
+			.isEqualTo("MATCH (n1:`Foo`) "
+					+ "WHERE (EXISTS {"
+					+ " MATCH (n1)-->(n2:`Bar`)"
+					+ " WHERE n2.bar = false "
+					+ "} "
+					+ "OR EXISTS {"
+					+ " MATCH (n1)-->(n2:`Bar`)"
+					+ " WHERE n2.foo = true "
+					+ "}) "
+					+ "RETURN true");
 	}
 }
