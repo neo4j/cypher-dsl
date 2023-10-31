@@ -1,0 +1,34 @@
+== 2023.8
+
+=== 2023.8.0
+
+This minor release is drop-in compatible with 2023.7, but it adds support for using `COLLECT {}` sub-queries, which required enhancing some interfaces (that only we should implement, but still, it's a minor upgrade then).
+
+The price for finding the most bugs in the scoping strategy applied for sub-queries in this release goes to @Andy2003, thank you!
+
+==== 🚀 Features
+
+* Add support for `COLLECT` subqueries. (#831)
+* Make fieldname generator configurable. (#830)
+
+==== 🐛 Bug Fixes
+
+* Make sure local scope is cleared after leaving subquery expressions. (#837)
+* Recognize entities defined in sub-queries correctly. (#827)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#836)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#835)
+** Bump org.apache.maven.plugins:maven-checkstyle-plugin (#834)
+** Bump org.neo4j.driver:neo4j-java-driver (#833)
+** Bump org.neo4j:neo4j-cypher-javacc-parser from 5.12.0 to 5.13.0 (#821)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#823)
+** Bump org.graalvm.buildtools:native-maven-plugin (#824)
+** Bump org.jacoco:jacoco-maven-plugin from 0.8.10 to 0.8.11 (#822)
+** Bump org.springframework.boot:spring-boot-starter-parent (#820)
+
+==== 🛠 Build
+
+* Remove explicit management of bytebuddy. (#828)
