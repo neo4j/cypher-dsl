@@ -1788,4 +1788,81 @@ class IssueRelatedIT {
 					+ "}) "
 					+ "RETURN true");
 	}
+
+	@Test // GH-838
+	void aliasMustBeIncludedInSubqueries1() {
+		var n1 = Cypher.node("Foo").named("n1");
+		var point = Cypher.name("point");
+		var resultStatement = Cypher.match(n1)
+			.returning(n1.project("points", Expressions.collect(
+				Cypher.unwind(n1.property("points")).as(point)
+					.returning(Cypher.listOf(point.property("x"), point.property("y")))
+					.build()
+			)))
+			.build();
+
+		assertThat(resultStatement.getCypher())
+			.isEqualTo("MATCH (n1:`Foo`) "
+					+ "RETURN n1{"
+					+ "points: COLLECT {"
+					+ " UNWIND n1.points AS point"
+					+ " RETURN [point.x, point.y]"
+					+ " }"
+					+ "}");
+	}
+
+	@Test // GH-838
+	void aliasMustBeIncludedInSubqueries2() {
+		var n1 = Cypher.node("Foo").named("n1");
+		var point = Cypher.name("point");
+		var points = Cypher.name("points");
+		var resultStatement = Cypher.match(n1)
+			.returning(n1.project("points", org.neo4j.cypherdsl.core.Expressions.collect(
+				Cypher
+					.with(n1.property("points").as(points))
+					.unwind(points).as(point)
+					.returning(Cypher.listOf(point.property("x"), point.property("y")))
+					.build()
+			)))
+			.build();
+
+		assertThat(resultStatement.getCypher())
+			.isEqualTo("MATCH (n1:`Foo`) "
+					   + "RETURN n1{"
+					   + "points: COLLECT {"
+					   + " WITH n1.points AS points"
+					   + " UNWIND points AS point"
+					   + " RETURN [point.x, point.y]"
+					   + " }"
+					   + "}");
+	}
+
+	@Test // GH-838
+	void aliasMustBeIncludedInSubqueries3() {
+		var n1 = Cypher.node("Foo").named("n1");
+		var n2 = Cypher.node("Bar").named("n2");
+		var point = Cypher.name("point");
+		var resultStatement = Cypher.match(n1)
+			.returning(n1.project("points", Expressions.collect(
+				Cypher.unwind(n1.property("points")).as(point)
+					.match(n2)
+					.where(n2.property("loc").eq(point))
+					.returning(
+						n2.project(n2.property("y").as("x"), Expressions.collect(Cypher.match(Cypher.node("FooBar").named("fb")).returning(Cypher.name("fb").as("foo")).build()).as("y"))
+					)
+					.build()
+			)))
+			.build();
+
+		assertThat(resultStatement.getCypher())
+			.isEqualTo("MATCH (n1:`Foo`) "
+					   + "RETURN n1{"
+					   + "points: COLLECT {"
+					   + " UNWIND n1.points AS point"
+					   + " MATCH (n2:`Bar`)"
+					   + " WHERE n2.loc = point"
+					   + " RETURN n2{x: n2.y, y: COLLECT { MATCH (fb:`FooBar`) RETURN fb AS foo }}"
+					   + " }"
+					   + "}");
+	}
 }

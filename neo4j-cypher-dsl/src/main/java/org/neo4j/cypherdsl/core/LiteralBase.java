@@ -35,6 +35,16 @@ import org.apiguardian.api.API;
 abstract class LiteralBase<T> implements Literal<T> {
 
 	/**
+	 * A literal for the blank.
+	 */
+	static final Literal<String> BLANK = new LiteralBase<>(" ") {
+		@Override
+		public String asString() {
+			return content;
+		}
+	};
+
+	/**
 	 * The content of this literal.
 	 */
 	protected final T content;

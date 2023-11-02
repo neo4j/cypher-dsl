@@ -494,7 +494,7 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 	}
 
 	void enter(Literal<?> literal) {
-		if (literal instanceof Asterisk || literal instanceof PeriodLiteral || literal instanceof RawLiteral.RawElement || literal == Merge.BLANK || literal == ListOperator.DOTS || literal instanceof Namespace) {
+		if (literal instanceof Asterisk || literal instanceof PeriodLiteral || literal instanceof RawLiteral.RawElement || literal == LiteralBase.BLANK || literal == ListOperator.DOTS || literal instanceof Namespace) {
 			return;
 		}
 		this.literals.add(literal);
