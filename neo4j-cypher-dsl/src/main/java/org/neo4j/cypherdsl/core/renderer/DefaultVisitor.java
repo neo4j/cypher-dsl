@@ -150,13 +150,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private final Deque<AliasedExpression> currentAliasedElements = new ArrayDeque<>();
 
 	/**
-	 * A flag if we can skip aliasing. This is currently the case in exactly one scenario: A aliased expression passed
-	 * to a map project. In that case, the alias is already defined by the key to use in the projected map and we
-	 * cannot define him in `AS xxx` fragment.
-	 */
-	private boolean skipAliasing = false;
-
-	/**
 	 * A cache of delegates, avoiding unnecessary object creation.
 	 */
 	private final Map<Class<? extends Visitor>, Visitor> delegateCache = new ConcurrentHashMap<>();
@@ -260,7 +253,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		if (visitable instanceof MapProjection) {
-			this.skipAliasing = true;
+			//this.skipAliasing = true;
 		}
 
 		int nextLevel = ++currentLevel + 1;
@@ -323,10 +316,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		if (currentAliasedElements.peek() == visitable) {
 			currentAliasedElements.pop();
-		}
-
-		if (visitable instanceof MapProjection) {
-			this.skipAliasing = false;
 		}
 
 		if (visitable instanceof AliasedExpression aliasedExpression) {
@@ -445,7 +434,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(AliasedExpression aliased) {
 
-		if (!(this.visitableToAliased.contains(aliased) || skipAliasing)) {
+		if (!(this.visitableToAliased.contains(aliased) || scopingStrategy.isSkipAliasing())) {
 			builder.append(" AS ").append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, true, inLastReturn())));
 		}
 	}

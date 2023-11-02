@@ -38,16 +38,6 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = STABLE, since = "1.0")
 public final class Merge extends AbstractClause implements UpdatingClause {
 
-	/**
-	 * A literal for the blank.
-	 */
-	static final Literal<String> BLANK = new LiteralBase<>(" ") {
-		@Override
-		public String asString() {
-			return content;
-		}
-	};
-
 	private final Pattern pattern;
 	private final List<Visitable> onCreateOrMatchEvents;
 
@@ -55,7 +45,7 @@ public final class Merge extends AbstractClause implements UpdatingClause {
 		this.pattern = pattern;
 
 		this.onCreateOrMatchEvents = new ArrayList<>();
-		this.onCreateOrMatchEvents.add(BLANK);
+		this.onCreateOrMatchEvents.add(LiteralBase.BLANK);
 		this.onCreateOrMatchEvents.addAll(mergeActions);
 	}
 

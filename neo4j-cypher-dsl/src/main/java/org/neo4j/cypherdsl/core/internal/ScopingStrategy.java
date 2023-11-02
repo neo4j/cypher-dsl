@@ -44,6 +44,7 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
+import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.PatternComprehension;
@@ -115,6 +116,13 @@ public final class ScopingStrategy {
 	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
 	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
 
+	/**
+	 * A flag if we can skip aliasing. This is currently the case in exactly one scenario: A aliased expression passed
+	 * to a map project. In that case, the alias is already defined by the key to use in the projected map, and we
+	 * cannot define him in `AS xxx` fragment.
+	 */
+	private final Deque<Boolean> skipAliasing = new ArrayDeque<>();
+
 	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new LinkedHashSet<>());
 	}
@@ -150,6 +158,12 @@ public final class ScopingStrategy {
 			this.currentImports.compareAndSet(null, imports);
 		}
 
+		if (visitable instanceof MapProjection) {
+			this.skipAliasing.push(true);
+		} else if (visitable instanceof SubqueryExpression) {
+			this.skipAliasing.push(false);
+		}
+
 		boolean notify = false;
 		Set<IdentifiableElement> scopeSeed = dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek();
 		if (hasLocalScope(visitable)) {
@@ -165,6 +179,10 @@ public final class ScopingStrategy {
 		if (notify) {
 			this.onScopeEntered.forEach(c -> c.accept(visitable, scopeSeed));
 		}
+	}
+
+	public boolean isSkipAliasing() {
+		return Optional.ofNullable(this.skipAliasing.peek()).orElse(false);
 	}
 
 	/**
@@ -224,6 +242,10 @@ public final class ScopingStrategy {
 			this.inSubquery = false;
 			this.currentImports.set(null);
 			this.definedInSubquery.pop();
+		}
+
+		if (visitable instanceof MapProjection || visitable instanceof SubqueryExpression) {
+			this.skipAliasing.pop();
 		}
 
 		if (hasImplicitScope(visitable)) {
