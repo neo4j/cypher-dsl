@@ -51,7 +51,6 @@ import org.neo4j.cypherdsl.core.ListComprehension;
 import org.neo4j.cypherdsl.core.ListExpression;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
@@ -250,10 +249,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		if (visitable instanceof AliasedExpression aliasedExpression) {
 			currentAliasedElements.push(aliasedExpression);
-		}
-
-		if (visitable instanceof MapProjection) {
-			//this.skipAliasing = true;
 		}
 
 		int nextLevel = ++currentLevel + 1;
