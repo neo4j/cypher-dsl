@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.codegen.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,12 +54,16 @@ import com.squareup.javapoet.WildcardTypeName;
 final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipModelBuilder> implements RelationshipModelBuilder {
 
 	private static final ClassName TYPE_NAME_RELATIONSHIP_BASE = ClassName.get(RelationshipBase.class);
-	private static final TypeVariableName S = TypeVariableName.get("S", ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
-	private static final TypeVariableName E = TypeVariableName.get("E", ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+	private static final TypeVariableName S = TypeVariableName.get("S",
+		ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+	private static final TypeVariableName E = TypeVariableName.get("E",
+		ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
 
-	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType, String alternateClassNameSuggestion) {
+	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType,
+		String alternateClassNameSuggestion) {
 
-		String className = configuration.getRelationshipNameGenerator().generate(alternateClassNameSuggestion != null ?  alternateClassNameSuggestion : relationshipType);
+		String className = configuration.getRelationshipNameGenerator()
+			.generate(alternateClassNameSuggestion != null ? alternateClassNameSuggestion : relationshipType);
 		String usedPackageName = packageName == null ? configuration.getDefaultPackage() : packageName;
 		RelationshipImplBuilder builder = new RelationshipImplBuilder(
 			configuration,
@@ -81,59 +86,74 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 	 */
 	private TypeName parameterizedTypeName;
 
+	private final RelationTypes legacyRelation = new RelationTypes(S, E);
 	/**
-	 * Type of the start node. A generic placeholder by default.
+	 * The possible start- and end-node connections
 	 */
-	private TypeName startNode = S;
+	private final List<RelationTypes> relations = new ArrayList<>();
 
-	/**
-	 * Type of the end node. A generic placeholder by default.
-	 */
-	private TypeName endNode = E;
-
-	private RelationshipImplBuilder(Configuration configuration, String relationshipType, ClassName className, String fieldName) {
-		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(), configuration.getIndent());
+	private RelationshipImplBuilder(Configuration configuration, String relationshipType, ClassName className,
+		String fieldName) {
+		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
+			configuration.getIndent());
 
 		if (relationshipType == null) {
 			throw new IllegalStateException("Cannot build a RelationshipImpl without a single relationship type!");
 		}
 
 		this.relationshipTypeField = FieldSpec
-			.builder(String.class, configuration.getConstantFieldNameGenerator().generate("$TYPE"), Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
+			.builder(String.class, configuration.getConstantFieldNameGenerator().generate("$TYPE"), Modifier.PUBLIC,
+				Modifier.FINAL, Modifier.STATIC)
 			.initializer("$S", relationshipType)
 			.build();
 		this.parameterizedTypeName = className;
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public RelationshipModelBuilder setStartNode(NodeModelBuilder newStartNode) {
 
 		return callOnlyWithoutJavaFilePresent(() -> {
-			this.startNode = extractClassName(newStartNode);
+			this.legacyRelation.startNode = extractClassName(newStartNode);
+			if (!relations.contains(legacyRelation)) {
+				this.relations.add(legacyRelation);
+			}
 			return this;
 		});
 	}
 
 	@Override
+	@SuppressWarnings("removal")
 	public RelationshipModelBuilder setEndNode(NodeModelBuilder newEndNode) {
 
 		return callOnlyWithoutJavaFilePresent(() -> {
-			this.endNode = extractClassName(newEndNode);
+			legacyRelation.endNode = extractClassName(newEndNode);
+			if (!relations.contains(legacyRelation)) {
+				this.relations.add(legacyRelation);
+			}
 			return this;
 		});
 	}
 
-	private MethodSpec buildDefaultConstructor() {
-
-		ParameterSpec startNodeParam = ParameterSpec.builder(startNode, "start").build();
-		ParameterSpec endNodeParam = ParameterSpec.builder(endNode, "end").build();
-
+	private MethodSpec buildConstructor(RelationTypes relation) {
+		ParameterSpec startNodeParam = ParameterSpec.builder(relation.startNode, "start").build();
+		ParameterSpec endNodeParam = ParameterSpec.builder(relation.endNode, "end").build();
 		return MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(startNodeParam)
 			.addParameter(endNodeParam)
 			.addStatement("super($N, $N, $N)", startNodeParam, relationshipTypeField, endNodeParam)
 			.build();
+	}
+
+	@Override
+	public RelationshipModelBuilder addRelationship(NodeModelBuilder newStartNode, NodeModelBuilder newEndNode) {
+		return callOnlyWithoutJavaFilePresent(() -> {
+			var startNode = newStartNode == null ? S : extractClassName(newStartNode);
+			var endNode = newEndNode == null ? E : extractClassName(newEndNode);
+			this.relations.add(new RelationTypes(startNode, endNode));
+			return this;
+		});
 	}
 
 	private MethodSpec buildCopyConstructor() {
@@ -179,12 +199,19 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 	}
 
 	private List<FieldSpec> buildFields() {
-
-		return Stream.concat(Stream.of(relationshipTypeField), generateFieldSpecsFromProperties()).collect(Collectors.toList());
+		return Stream.concat(Stream.of(relationshipTypeField), generateFieldSpecsFromProperties()).toList();
 	}
 
 	@Override
 	protected JavaFile buildJavaFile() {
+		if (relations.isEmpty()) {
+			relations.add(legacyRelation);
+		}
+
+		var startNodes = relations.stream().map(relationTypes -> relationTypes.startNode).collect(Collectors.toSet());
+		var endNodes = relations.stream().map(relationTypes -> relationTypes.endNode).collect(Collectors.toSet());
+		var startNode = startNodes.size() == 1 && !startNodes.contains(S) ? startNodes.iterator().next() : S;
+		var endNode = endNodes.size() == 1 && !startNodes.contains(E) ? endNodes.iterator().next() : E;
 
 		TypeSpec.Builder builder = TypeSpec.classBuilder(super.className);
 		if (startNode == S && endNode == E) {
@@ -200,18 +227,48 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 		} else {
 			parameterizedTypeName = super.className;
 		}
-
-		TypeSpec newType = addGenerated(builder)
+		addGenerated(builder)
 			.superclass(ParameterizedTypeName.get(TYPE_NAME_RELATIONSHIP_BASE, startNode, endNode,
 				parameterizedTypeName))
 			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-			.addFields(buildFields())
-			.addMethod(buildDefaultConstructor())
+			.addFields(buildFields());
+
+		relations.stream().map(this::buildConstructor).forEach(builder::addMethod);
+
+		TypeSpec newType = builder
 			.addMethod(buildCopyConstructor())
 			.addMethod(buildNamedMethod())
 			.addMethod(buildWithPropertiesMethod())
 			.build();
 
 		return prepareFileBuilder(newType).build();
+	}
+
+	public TypeName getTypeName(TypeName startNode, TypeName endNode) {
+		var startNodes = relations.stream().map(relationTypes -> relationTypes.startNode).collect(Collectors.toSet());
+		var endNodes = relations.stream().map(relationTypes -> relationTypes.endNode).collect(Collectors.toSet());
+
+		var expectedStartNode = startNodes.size() == 1 && !startNodes.contains(S) ? startNodes.iterator().next() : S;
+		var expectedEndNode = endNodes.size() == 1 && !startNodes.contains(E) ? endNodes.iterator().next() : E;
+
+		if (expectedStartNode == S && expectedEndNode == E) {
+			return ParameterizedTypeName.get(super.className, startNode, endNode);
+		} else if (expectedStartNode == S) {
+			return ParameterizedTypeName.get(super.className, startNode);
+		} else if (expectedEndNode == E) {
+			return ParameterizedTypeName.get(super.className, endNode);
+		} else {
+			return super.className;
+		}
+	}
+
+	private static class RelationTypes {
+		private RelationTypes(TypeName startNode, TypeName endNode) {
+			this.startNode = startNode;
+			this.endNode = endNode;
+		}
+
+		TypeName startNode;
+		TypeName endNode;
 	}
 }

@@ -42,6 +42,7 @@ import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
+import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 /**
@@ -63,6 +64,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 	private final Set<String> labels = new LinkedHashSet<>();
 
 	private final Set<RelationshipPropertyDefinition> relationshipDefinitions = new LinkedHashSet<>();
+	private final Set<RelationshipMethodDefinition> relationshipMethodDefinitions = new LinkedHashSet<>();
 
 	static NodeModelBuilder create(Configuration configuration, String packageName, String suggestedTypeName) {
 
@@ -77,7 +79,8 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 	}
 
 	private NodeImplBuilder(Configuration configuration, ClassName className, String fieldName) {
-		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(), configuration.getIndent());
+		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
+			configuration.getIndent());
 	}
 
 	@Override
@@ -103,6 +106,16 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 		return callOnlyWithoutJavaFilePresent(() -> {
 			if (definition != null) {
 				this.relationshipDefinitions.add(definition);
+			}
+			return this;
+		});
+	}
+
+	@Override
+	public NodeModelBuilder addRelationshipMethod(RelationshipMethodDefinition definition) {
+		return callOnlyWithoutJavaFilePresent(() -> {
+			if (definition != null) {
+				this.relationshipMethodDefinitions.add(definition);
 			}
 			return this;
 		});
@@ -179,18 +192,27 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 
 		Stream<FieldSpec> properties = generateFieldSpecsFromProperties();
 
-		Stream<FieldSpec> relationships = relationshipDefinitions.stream().filter(NodeImplBuilder::isNotSelfReferential).map(p -> {
+		Stream<FieldSpec> relationships = relationshipDefinitions.stream().filter(NodeImplBuilder::isNotSelfReferential)
+			.map(p -> {
 
-			String fieldName = fieldNameGenerator.generate(p.getNameInDomain() == null ? p.getType() : p.getNameInDomain());
-			ClassName relationshipClassName = extractClassName(p.getRelationshipBuilder());
-			FieldSpec.Builder builder = FieldSpec.builder(relationshipClassName, fieldName, Modifier.PUBLIC, Modifier.FINAL);
-			if (this == p.getStart()) {
-				builder.initializer("new $T(this, $T.$N)", relationshipClassName, extractClassName(p.getEnd()), p.getEnd().getFieldName());
-			} else {
-				builder.initializer("new $T($T.$N, this)", relationshipClassName, extractClassName(p.getStart()), p.getStart().getFieldName());
-			}
-			return builder.build();
-		});
+				String fieldName = fieldNameGenerator.generate(
+					p.getNameInDomain() == null ? p.getType() : p.getNameInDomain());
+				ClassName startClass = extractClassName(p.getStart());
+				ClassName endClass = extractClassName(p.getEnd());
+
+				var relationshipClassName = getRelationTypeWithParameters(p.getRelationshipBuilder(), startClass,
+					endClass);
+				FieldSpec.Builder builder = FieldSpec.builder(relationshipClassName, fieldName, Modifier.PUBLIC,
+					Modifier.FINAL);
+				if (this == p.getStart()) {
+					builder.initializer("new $T(this, $T.$N)", relationshipClassName, endClass,
+						p.getEnd().getFieldName());
+				} else {
+					builder.initializer("new $T($T.$N, this)", relationshipClassName, startClass,
+						p.getStart().getFieldName());
+				}
+				return builder.build();
+			});
 
 		return Stream.concat(Stream.of(defaultInstance), Stream.concat(properties, relationships)).toList();
 	}
@@ -228,12 +250,44 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 			.addMethod(buildNamedMethod())
 			.addMethod(buildWithPropertiesMethod());
 
-		relationshipDefinitions.stream().filter(NodeImplBuilder::isSelfReferential).map(buildSelfReferentialAccessor()).forEach(builder::addMethod);
+		relationshipDefinitions.stream().filter(NodeImplBuilder::isSelfReferential).map(buildSelfReferentialAccessor())
+			.forEach(builder::addMethod);
 
+		relationshipMethodDefinitions.forEach(p -> {
+			ClassName startClass = extractClassName(p.getStart());
+			ClassName endClass = extractClassName(p.getEnd());
+
+			TypeName relationshipClassName = getRelationTypeWithParameters(p.getRelationshipBuilder(), startClass,
+				endClass);
+			var b = MethodSpec.methodBuilder(p.getNameInDomain())
+				.addModifiers(Modifier.PUBLIC)
+				.returns(relationshipClassName);
+			if (this == p.getStart()) {
+				ParameterSpec param = ParameterSpec.builder(endClass, "end").build();
+				b.addParameter(param)
+					.addStatement("return new $T(this, $N)", relationshipClassName, param);
+			} else {
+				ParameterSpec param = ParameterSpec.builder(startClass, "start").build();
+				b.addParameter(param)
+					.addStatement("return new $T($N, this)", relationshipClassName, param);
+			}
+			builder.addMethod(b.build());
+		});
 		TypeSpec newType = builder
 			.build();
 
 		return prepareFileBuilder(newType).build();
+	}
+
+	private TypeName getRelationTypeWithParameters(RelationshipModelBuilder relationshipBuilder, TypeName startClass,
+		ClassName endClass) {
+		TypeName relationshipClassName;
+		if (relationshipBuilder instanceof RelationshipImplBuilder impl) {
+			relationshipClassName = impl.getTypeName(startClass, endClass);
+		} else {
+			relationshipClassName = extractClassName(relationshipBuilder);
+		}
+		return relationshipClassName;
 	}
 
 	private Function<RelationshipPropertyDefinition, MethodSpec> buildSelfReferentialAccessor() {

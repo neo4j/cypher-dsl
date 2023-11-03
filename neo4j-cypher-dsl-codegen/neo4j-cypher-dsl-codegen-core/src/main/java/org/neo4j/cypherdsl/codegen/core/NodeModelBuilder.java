@@ -69,4 +69,12 @@ public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
 	 */
 	NodeModelBuilder addRelationshipDefinition(RelationshipPropertyDefinition definition);
+
+	/**
+	 * Adds a factory method for a relationship to this builder
+	 * @param definition The definition of the relationship
+	 * @return This builder
+	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 */
+	NodeModelBuilder addRelationshipMethod(RelationshipMethodDefinition definition);
 }

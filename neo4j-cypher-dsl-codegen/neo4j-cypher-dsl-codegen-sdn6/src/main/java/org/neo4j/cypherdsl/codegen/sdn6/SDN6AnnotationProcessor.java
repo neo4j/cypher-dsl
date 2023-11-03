@@ -494,8 +494,7 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 				RelationshipPropertyDefinition definition = definitions.get(0).getValue();
 
 				relationshipBuilder = RelationshipModelBuilder.create(configuration, owner.getPackageName(), type);
-				relationshipBuilder.setStartNode(definition.getStart());
-				relationshipBuilder.setEndNode(definition.getEnd());
+				relationshipBuilder.addRelationship(definition.getStart(), definition.getEnd());
 				relationshipBuilder.addProperties(definition.getProperties());
 			} else {
 				Set<NodeModelBuilder> owners = definitions.stream().map(Map.Entry::getKey).collect(Collectors.toSet());
@@ -512,9 +511,9 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 						relationshipBuilder = RelationshipModelBuilder.create(configuration, owner.getPackageName(), type);
 						relationshipBuilder.addProperties(definitions.get(0).getValue().getProperties());
 						if (ownerAtStartOrEnd.get(true).isEmpty()) {
-							relationshipBuilder.setEndNode(owner);
+							relationshipBuilder.addRelationship(null, owner);
 						} else if (ownerAtStartOrEnd.get(false).isEmpty()) {
-							relationshipBuilder.setStartNode(owner);
+							relationshipBuilder.addRelationship(owner, null);
 						}
 					} else {
 						List<RelationshipModelBuilder> newBuilders = new ArrayList<>();
@@ -529,11 +528,9 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 							);
 							newBuilder.addProperties(propertyDefinition.getProperties());
 							if (ownerAtStartOrEnd.get(true).isEmpty()) {
-								newBuilder.setStartNode(propertyDefinition.getStart());
-								newBuilder.setEndNode(owner);
+								newBuilder.addRelationship(propertyDefinition.getStart(), owner);
 							} else if (ownerAtStartOrEnd.get(false).isEmpty()) {
-								newBuilder.setStartNode(owner);
-								newBuilder.setEndNode(propertyDefinition.getEnd());
+								newBuilder.addRelationship(owner, propertyDefinition.getEnd());
 							}
 
 							definition.getKey().addRelationshipDefinition(propertyDefinition.withBuilder(newBuilder));
@@ -547,9 +544,9 @@ public final class SDN6AnnotationProcessor extends AbstractProcessor {
 
 					relationshipBuilder = RelationshipModelBuilder.create(configuration, owners.stream().findFirst().get().getPackageName(), type);
 					if (startNodes.size() == 1) {
-						relationshipBuilder.setStartNode(startNodes.get(0));
+						relationshipBuilder.addRelationship(startNodes.get(0), null);
 					} else if (endNodes.size() == 1) {
-						relationshipBuilder.setStartNode(endNodes.get(0));
+						relationshipBuilder.addRelationship(endNodes.get(0), null);
 					}
 				}
 			}

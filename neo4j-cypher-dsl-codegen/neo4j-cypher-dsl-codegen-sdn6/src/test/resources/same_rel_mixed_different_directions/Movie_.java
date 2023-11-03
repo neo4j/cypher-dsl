@@ -19,7 +19,7 @@ public final class Movie_ extends NodeBase<Movie_> {
 
 	public final Property TITLE = this.property("title");
 
-	public final Wrote_ WRITTEN_BY = new Wrote_(Person_.PERSON, this);
+	public final Wrote_<Person_, Movie_> WRITTEN_BY = new Wrote_<Person_, Movie_>(Person_.PERSON, this);
 
 	public Movie_() {
 		super("Movie");

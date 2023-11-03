@@ -72,7 +72,10 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	 * @param startNode The new start node, may be null
 	 * @return This builder
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @deprecated use {@link #addRelationship(NodeModelBuilder, NodeModelBuilder)} instead
 	 */
+	@Deprecated(forRemoval = true, since = "2023.9.0")
+	@SuppressWarnings({ "squid:S1133" })
 	RelationshipModelBuilder setStartNode(NodeModelBuilder startNode);
 
 	/**
@@ -85,6 +88,21 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	 * @param endNode The new start node, may be null
 	 * @return This builder
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @deprecated use {@link #addRelationship(NodeModelBuilder, NodeModelBuilder)} instead
 	 */
+	@Deprecated(forRemoval = true, since = "2023.9.0")
+	@SuppressWarnings({ "squid:S1133" })
 	RelationshipModelBuilder setEndNode(NodeModelBuilder endNode);
+
+
+	/**
+	 * Registers a relationship between start and end node with this builder. This is an optional operation and required
+	 * for the builder to create valid classes.
+	 *
+	 * @param startNode The new start node, may be null
+	 * @param endNode The new start node, may be null
+	 * @return This builder
+	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 */
+	RelationshipModelBuilder addRelationship(NodeModelBuilder startNode, NodeModelBuilder endNode);
 }
