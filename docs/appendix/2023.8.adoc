@@ -1,5 +1,21 @@
 == 2023.8
 
+=== 2023.8.1
+
+==== 🐛 Bug Fixes
+
+* Including aliasing in scoping strategy, too. (#839)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.moditect:moditect-maven-plugin (#843)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#845)
+** Bump com.tngtech.archunit:archunit from 1.1.0 to 1.2.0 (#846)
+** Bump org.checkerframework:checker-qual (#844)
+** Bump mockito.version from 5.6.0 to 5.7.0 (#842)
+** Bump org.junit:junit-bom from 5.10.0 to 5.10.1 (#841)
+
 === 2023.8.0
 
 This minor release is drop-in compatible with 2023.7, but it adds support for using `COLLECT {}` sub-queries, which required enhancing some interfaces (that only we should implement, but still, it's a minor upgrade then).
