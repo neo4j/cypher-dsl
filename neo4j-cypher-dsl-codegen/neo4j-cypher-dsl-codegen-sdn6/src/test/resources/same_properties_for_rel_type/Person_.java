@@ -21,9 +21,9 @@ public final class Person_ extends NodeBase<Person_> {
 
 	public final Property BORN = this.property("born");
 
-	public final ActedIn_ MOVIES = new ActedIn_(this, Movie_.MOVIE);
+	public final ActedIn_<Movie_> MOVIES = new ActedIn_<Movie_>(this, Movie_.MOVIE);
 
-	public final ActedIn_ PLAYS = new ActedIn_(this, Play_.PLAY);
+	public final ActedIn_<Play_> PLAYS = new ActedIn_<Play_>(this, Play_.PLAY);
 
 	public Person_() {
 		super("Person");

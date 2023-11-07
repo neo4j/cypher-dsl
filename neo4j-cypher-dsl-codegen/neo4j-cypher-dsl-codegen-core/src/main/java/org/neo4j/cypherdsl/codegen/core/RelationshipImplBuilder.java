@@ -20,7 +20,10 @@ package org.neo4j.cypherdsl.codegen.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -53,12 +56,16 @@ import com.squareup.javapoet.WildcardTypeName;
 final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipModelBuilder> implements RelationshipModelBuilder {
 
 	private static final ClassName TYPE_NAME_RELATIONSHIP_BASE = ClassName.get(RelationshipBase.class);
-	private static final TypeVariableName S = TypeVariableName.get("S", ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
-	private static final TypeVariableName E = TypeVariableName.get("E", ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+	private static final TypeVariableName S = TypeVariableName.get("S",
+		ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+	private static final TypeVariableName E = TypeVariableName.get("E",
+		ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
 
-	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType, String alternateClassNameSuggestion) {
+	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType,
+		String alternateClassNameSuggestion) {
 
-		String className = configuration.getRelationshipNameGenerator().generate(alternateClassNameSuggestion != null ?  alternateClassNameSuggestion : relationshipType);
+		String className = configuration.getRelationshipNameGenerator()
+			.generate(alternateClassNameSuggestion != null ? alternateClassNameSuggestion : relationshipType);
 		String usedPackageName = packageName == null ? configuration.getDefaultPackage() : packageName;
 		RelationshipImplBuilder builder = new RelationshipImplBuilder(
 			configuration,
@@ -75,41 +82,32 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 	private final FieldSpec relationshipTypeField;
 
 	/**
-	 * This will be the final type name used as return type of various methods. It is not necessary the same as the initial
-	 * {@code ClassName} passed to this builder. The actual type is decided during the build process, depending on the
-	 * presence of the start and end node types.
+	 * The possible start- and end-node connections
 	 */
-	private TypeName parameterizedTypeName;
+	private final Deque<Edge> edges = new ArrayDeque<>();
 
-	/**
-	 * Type of the start node. A generic placeholder by default.
-	 */
-	private TypeName startNode = S;
-
-	/**
-	 * Type of the end node. A generic placeholder by default.
-	 */
-	private TypeName endNode = E;
-
-	private RelationshipImplBuilder(Configuration configuration, String relationshipType, ClassName className, String fieldName) {
-		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(), configuration.getIndent());
+	private RelationshipImplBuilder(Configuration configuration, String relationshipType, ClassName className,
+		String fieldName) {
+		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
+			configuration.getIndent());
 
 		if (relationshipType == null) {
 			throw new IllegalStateException("Cannot build a RelationshipImpl without a single relationship type!");
 		}
 
 		this.relationshipTypeField = FieldSpec
-			.builder(String.class, configuration.getConstantFieldNameGenerator().generate("$TYPE"), Modifier.PUBLIC, Modifier.FINAL, Modifier.STATIC)
+			.builder(String.class, configuration.getConstantFieldNameGenerator().generate("$TYPE"), Modifier.PUBLIC,
+				Modifier.FINAL, Modifier.STATIC)
 			.initializer("$S", relationshipType)
 			.build();
-		this.parameterizedTypeName = className;
 	}
 
 	@Override
 	public RelationshipModelBuilder setStartNode(NodeModelBuilder newStartNode) {
 
 		return callOnlyWithoutJavaFilePresent(() -> {
-			this.startNode = extractClassName(newStartNode);
+			var lastRelation = getOrCreateLastDefinedRelationType();
+			lastRelation.start = extractClassName(newStartNode);
 			return this;
 		});
 	}
@@ -118,22 +116,40 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 	public RelationshipModelBuilder setEndNode(NodeModelBuilder newEndNode) {
 
 		return callOnlyWithoutJavaFilePresent(() -> {
-			this.endNode = extractClassName(newEndNode);
+			var lastRelation = getOrCreateLastDefinedRelationType();
+			lastRelation.end = extractClassName(newEndNode);
 			return this;
 		});
 	}
 
-	private MethodSpec buildDefaultConstructor() {
+	private Edge getOrCreateLastDefinedRelationType() {
+		var lastRelation = this.edges.peek();
+		if (lastRelation == null) {
+			lastRelation = new Edge(S, E);
+			this.edges.push(lastRelation);
+		}
+		return lastRelation;
+	}
 
-		ParameterSpec startNodeParam = ParameterSpec.builder(startNode, "start").build();
-		ParameterSpec endNodeParam = ParameterSpec.builder(endNode, "end").build();
-
+	private MethodSpec buildConstructor(Edge relation) {
+		ParameterSpec startNodeParam = ParameterSpec.builder(relation.start, "start").build();
+		ParameterSpec endNodeParam = ParameterSpec.builder(relation.end, "end").build();
 		return MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(startNodeParam)
 			.addParameter(endNodeParam)
 			.addStatement("super($N, $N, $N)", startNodeParam, relationshipTypeField, endNodeParam)
 			.build();
+	}
+
+	@Override
+	public RelationshipModelBuilder addRelationship(NodeModelBuilder newStartNode, NodeModelBuilder newEndNode) {
+		return callOnlyWithoutJavaFilePresent(() -> {
+			var startNode = newStartNode == null ? S : extractClassName(newStartNode);
+			var endNode = newEndNode == null ? E : extractClassName(newEndNode);
+			this.edges.add(new Edge(startNode, endNode));
+			return this;
+		});
 	}
 
 	private MethodSpec buildCopyConstructor() {
@@ -150,68 +166,111 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 	}
 
-	private MethodSpec buildNamedMethod() {
+	private MethodSpec buildNamedMethod(TypeName typeName) {
 
 		ParameterSpec newSymbolicName = ParameterSpec.builder(TYPE_NAME_SYMBOLIC_NAME, "newSymbolicName").build();
 		return MethodSpec.methodBuilder("named")
 			.addAnnotation(Override.class)
 			.addModifiers(Modifier.PUBLIC)
-			.returns(parameterizedTypeName)
+			.returns(typeName)
 			.addParameter(newSymbolicName)
 			.addStatement("return new $T$L($N, getLeft(), getDetails().getProperties(), getRight())",
-				super.className, parameterizedTypeName == super.className ? "" : "<>", newSymbolicName)
+				super.className, typeName == super.className ? "" : "<>", newSymbolicName)
 			.build();
 	}
 
-	private MethodSpec buildWithPropertiesMethod() {
+	private MethodSpec buildWithPropertiesMethod(TypeName typeName) {
 
 		ParameterSpec newProperties = ParameterSpec.builder(TYPE_NAME_MAP_EXPRESSION, "newProperties")
 			.build();
 		return MethodSpec.methodBuilder("withProperties")
 			.addAnnotation(Override.class)
 			.addModifiers(Modifier.PUBLIC)
-			.returns(parameterizedTypeName)
+			.returns(typeName)
 			.addParameter(newProperties)
 			.addStatement(
 				"return new $T$L(getSymbolicName().orElse(null), getLeft(), Properties.create($N), getRight())",
-				super.className, parameterizedTypeName == super.className ? "" : "<>", newProperties)
+				super.className, typeName == super.className ? "" : "<>", newProperties)
 			.build();
 	}
 
 	private List<FieldSpec> buildFields() {
-
-		return Stream.concat(Stream.of(relationshipTypeField), generateFieldSpecsFromProperties()).collect(Collectors.toList());
+		return Stream.concat(Stream.of(relationshipTypeField), generateFieldSpecsFromProperties()).toList();
 	}
 
 	@Override
 	protected JavaFile buildJavaFile() {
 
-		TypeSpec.Builder builder = TypeSpec.classBuilder(super.className);
-		if (startNode == S && endNode == E) {
-			parameterizedTypeName = ParameterizedTypeName.get(super.className, S, E);
-			builder.addTypeVariable(S);
-			builder.addTypeVariable(E);
-		} else if (startNode == S) {
-			parameterizedTypeName = ParameterizedTypeName.get(super.className, S);
-			builder.addTypeVariable(S);
-		} else if (endNode == E) {
-			parameterizedTypeName = ParameterizedTypeName.get(super.className, E);
-			builder.addTypeVariable(E);
-		} else {
-			parameterizedTypeName = super.className;
+		var expectedTypes = pickDefault(edges);
+		var builder = TypeSpec.classBuilder(super.className);
+		var typeName = getTypeName(expectedTypes);
+		if (typeName instanceof ParameterizedTypeName pt) {
+			for (TypeName t : pt.typeArguments) {
+				if (t instanceof TypeVariableName tn) {
+					builder.addTypeVariable(tn);
+				}
+			}
 		}
 
-		TypeSpec newType = addGenerated(builder)
-			.superclass(ParameterizedTypeName.get(TYPE_NAME_RELATIONSHIP_BASE, startNode, endNode,
-				parameterizedTypeName))
+		addGenerated(builder)
+			.superclass(ParameterizedTypeName.get(TYPE_NAME_RELATIONSHIP_BASE, expectedTypes.start, expectedTypes.end,
+				typeName))
 			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-			.addFields(buildFields())
-			.addMethod(buildDefaultConstructor())
+			.addFields(buildFields());
+
+		(edges.isEmpty() ? Stream.of(new Edge(S, E)) : edges.stream())
+			.map(this::buildConstructor).forEach(builder::addMethod);
+
+		var newType = builder
 			.addMethod(buildCopyConstructor())
-			.addMethod(buildNamedMethod())
-			.addMethod(buildWithPropertiesMethod())
+			.addMethod(buildNamedMethod(typeName))
+			.addMethod(buildWithPropertiesMethod(typeName))
 			.build();
 
 		return prepareFileBuilder(newType).build();
+	}
+
+	private TypeName getTypeName(Edge expectedTypes) {
+		return getTypeName(expectedTypes, null, null);
+	}
+
+	TypeName getTypeName(TypeName concreteStartType, TypeName concreteEndType) {
+		return getTypeName(pickDefault(this.edges), concreteStartType, concreteEndType);
+	}
+
+	private TypeName getTypeName(Edge expectedEdge, TypeName concreteStartType, TypeName concreteEndType) {
+
+		var concreteOrDefaultStart = concreteStartType == null ? S : concreteStartType;
+		var concreteOrDefaultEnd = concreteEndType == null ? E : concreteEndType;
+		if (expectedEdge.start == S && expectedEdge.end == E) {
+			return ParameterizedTypeName.get(super.className, concreteOrDefaultStart, concreteOrDefaultEnd);
+		} else if (expectedEdge.start == S) {
+			return ParameterizedTypeName.get(super.className, concreteOrDefaultStart);
+		} else if (expectedEdge.end == E) {
+			return ParameterizedTypeName.get(super.className, concreteOrDefaultEnd);
+		} else {
+			return super.className;
+		}
+	}
+
+	private static class Edge {
+		private Edge(TypeName start, TypeName end) {
+			this.start = start;
+			this.end = end;
+		}
+
+		TypeName start;
+		TypeName end;
+	}
+
+	static Edge pickDefault(Collection<Edge> relations) {
+		var startNodes = relations.stream().map(edge -> edge.start)
+			.collect(Collectors.toSet());
+		var endNodes = relations.stream().map(edge -> edge.end)
+			.collect(Collectors.toSet());
+
+		var expectedStartNode = startNodes.size() == 1 ? startNodes.iterator().next() : S;
+		var expectedEndNode = endNodes.size() == 1 ? endNodes.iterator().next() : E;
+		return new Edge(expectedStartNode, expectedEndNode);
 	}
 }

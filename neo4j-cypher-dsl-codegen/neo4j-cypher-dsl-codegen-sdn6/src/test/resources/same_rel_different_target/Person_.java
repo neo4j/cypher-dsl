@@ -19,9 +19,9 @@ public final class Person_ extends NodeBase<Person_> {
 
 	public final Property NAME = this.property("name");
 
-	public final Wrote_ WRITTEN_MOVIES = new Wrote_(this, Movie_.MOVIE);
+	public final Wrote_<Movie_> WRITTEN_MOVIES = new Wrote_<Movie_>(this, Movie_.MOVIE);
 
-	public final Wrote_ WRITTEN_BOOKS = new Wrote_(this, Book_.BOOK);
+	public final Wrote_<Book_> WRITTEN_BOOKS = new Wrote_<Book_>(this, Book_.BOOK);
 
 	public Person_() {
 		super("Person");

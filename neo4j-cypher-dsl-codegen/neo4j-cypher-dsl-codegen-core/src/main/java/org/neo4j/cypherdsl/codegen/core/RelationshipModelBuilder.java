@@ -63,8 +63,9 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	}
 
 	/**
-	 * Registers the start node of the relationship with this builder. This is an optional operation and required for
-	 * the builder to create valid classes.
+	 * Registers the start node of a relationship with this builder. Will add a new relationship to this builder if none
+	 * is present, will modify the last one if this method or {@link #setEndNode(NodeModelBuilder)} or
+	 * {@link #addRelationship(NodeModelBuilder, NodeModelBuilder)} has already been used.
 	 * <p>
 	 * A wild card will be emitted for the generated class instead of a concrete class so that this relationship model
 	 * suites several different relationships with the same type.
@@ -76,8 +77,9 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	RelationshipModelBuilder setStartNode(NodeModelBuilder startNode);
 
 	/**
-	 * Registers the end node of the relationship with this builder. This is an optional operation and required for
-	 * the builder to create valid classes.
+	 * Registers the end node of the relationship with this builder. Will add a new relationship to this builder if none
+	 * is present, will modify the last one if this method or {@link #setStartNode(NodeModelBuilder)} or
+	 * {@link #addRelationship(NodeModelBuilder, NodeModelBuilder)} has already been used.
 	 * <p>
 	 * A wild card will be emitted for the generated class instead of a concrete class so that this relationship model
 	 * suites several different relationships with the same type.
@@ -87,4 +89,15 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
 	 */
 	RelationshipModelBuilder setEndNode(NodeModelBuilder endNode);
+
+	/**
+	 * Registers a relationship between start and end node with this builder.
+	 *
+	 * @param startNode The new start node, may be null
+	 * @param endNode The new start node, may be null
+	 * @return This builder
+	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @since 2023.9.0
+	 */
+	RelationshipModelBuilder addRelationship(NodeModelBuilder startNode, NodeModelBuilder endNode);
 }
