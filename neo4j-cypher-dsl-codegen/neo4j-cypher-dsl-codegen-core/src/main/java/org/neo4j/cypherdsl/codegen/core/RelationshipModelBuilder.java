@@ -97,6 +97,7 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	 * @param endNode The new start node, may be null
 	 * @return This builder
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @since 2023.9.0
 	 */
 	RelationshipModelBuilder addRelationship(NodeModelBuilder startNode, NodeModelBuilder endNode);
 }
