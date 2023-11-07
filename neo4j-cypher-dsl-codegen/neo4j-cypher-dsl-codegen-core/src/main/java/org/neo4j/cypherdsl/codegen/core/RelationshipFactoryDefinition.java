@@ -23,13 +23,13 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import org.apiguardian.api.API;
 
 /**
- * This represents a method in the static metamodel to create a relationship.
+ * This represents a method in the static metamodel that creates a relationship.
  *
  * @author Andreas Berger
  * @since 2023.9.0
  */
 @API(status = EXPERIMENTAL, since = "2023.9.0")
-public final class RelationshipMethodDefinition {
+public final class RelationshipFactoryDefinition {
 
 	/**
 	 * Creates a new definition
@@ -39,9 +39,9 @@ public final class RelationshipMethodDefinition {
 	 * @param end          Builder for the end node in the domain
 	 * @return A valid definition
 	 */
-	public static RelationshipMethodDefinition create(String nameInDomain, NodeModelBuilder start,
+	public static RelationshipFactoryDefinition create(String nameInDomain, NodeModelBuilder start,
 		NodeModelBuilder end) {
-		return new RelationshipMethodDefinition(nameInDomain, null, start, end);
+		return new RelationshipFactoryDefinition(nameInDomain, null, start, end);
 	}
 
 	/**
@@ -64,7 +64,7 @@ public final class RelationshipMethodDefinition {
 	 */
 	private final RelationshipModelBuilder relationshipBuilder;
 
-	private RelationshipMethodDefinition(String nameInDomain,
+	private RelationshipFactoryDefinition(String nameInDomain,
 		RelationshipModelBuilder relationshipBuilder, NodeModelBuilder start, NodeModelBuilder end) {
 		this.nameInDomain = nameInDomain;
 		this.start = start;
@@ -78,8 +78,8 @@ public final class RelationshipMethodDefinition {
 	 * @param newBuilder The new builder to use
 	 * @return A new instance, {@literal this} won't change
 	 */
-	public RelationshipMethodDefinition withBuilder(RelationshipModelBuilder newBuilder) {
-		return new RelationshipMethodDefinition(nameInDomain, newBuilder, start, end);
+	public RelationshipFactoryDefinition withBuilder(RelationshipModelBuilder newBuilder) {
+		return new RelationshipFactoryDefinition(nameInDomain, newBuilder, start, end);
 	}
 
 	/**

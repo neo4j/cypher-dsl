@@ -41,14 +41,12 @@ class ModelBuilderTest {
 			.addRelationship(a, c)
 			.addRelationship(c, b);
 
-		a.addRelationshipDefinition(
-			RelationshipPropertyDefinition.create("BELONGS_TO", null, "belongsTo", a, b, null).withBuilder(rel));
-		a.addRelationshipMethod(RelationshipMethodDefinition.create("belongsTo", a, b).withBuilder(rel));
-		a.addRelationshipMethod(RelationshipMethodDefinition.create("belongsTo", a, c).withBuilder(rel));
+		a.addRelationshipDefinition(RelationshipPropertyDefinition.create("BELONGS_TO", null, "belongsTo", a, b, null).withBuilder(rel))
+			.addRelationshipFactory(RelationshipFactoryDefinition.create("belongsTo", a, b).withBuilder(rel))
+			.addRelationshipFactory(RelationshipFactoryDefinition.create("belongsTo", a, c).withBuilder(rel));
 
-		b.addRelationshipDefinition(
-			RelationshipPropertyDefinition.create("BELONGS_TO", null, "belongsTo", a, b, null).withBuilder(rel));
-		b.addRelationshipMethod(RelationshipMethodDefinition.create("belongsTo", a, b).withBuilder(rel));
+		b.addRelationshipDefinition(RelationshipPropertyDefinition.create("BELONGS_TO", null, "belongsTo", a, b, null).withBuilder(rel))
+			.addRelationshipFactory(RelationshipFactoryDefinition.create("belongsTo", a, b).withBuilder(rel));
 
 		assertThat(a.writeToString()).isEqualTo("""
 			import java.util.List;

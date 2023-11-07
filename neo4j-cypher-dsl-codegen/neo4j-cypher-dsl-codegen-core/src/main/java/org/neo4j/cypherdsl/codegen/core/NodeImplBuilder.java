@@ -64,7 +64,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 	private final Set<String> labels = new LinkedHashSet<>();
 
 	private final Set<RelationshipPropertyDefinition> relationshipDefinitions = new LinkedHashSet<>();
-	private final Set<RelationshipMethodDefinition> relationshipMethodDefinitions = new LinkedHashSet<>();
+	private final Set<RelationshipFactoryDefinition> relationshipMethodDefinitions = new LinkedHashSet<>();
 
 	static NodeModelBuilder create(Configuration configuration, String packageName, String suggestedTypeName) {
 
@@ -112,7 +112,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 	}
 
 	@Override
-	public NodeModelBuilder addRelationshipMethod(RelationshipMethodDefinition definition) {
+	public NodeModelBuilder addRelationshipFactory(RelationshipFactoryDefinition definition) {
 		return callOnlyWithoutJavaFilePresent(() -> {
 			if (definition != null) {
 				this.relationshipMethodDefinitions.add(definition);
@@ -253,26 +253,9 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 		relationshipDefinitions.stream().filter(NodeImplBuilder::isSelfReferential).map(buildSelfReferentialAccessor())
 			.forEach(builder::addMethod);
 
-		relationshipMethodDefinitions.forEach(p -> {
-			ClassName startClass = extractClassName(p.getStart());
-			ClassName endClass = extractClassName(p.getEnd());
+		relationshipMethodDefinitions.stream().map(buildRelationshipFactoryMethod())
+			.forEach(builder::addMethod);
 
-			TypeName relationshipClassName = getRelationTypeWithParameters(p.getRelationshipBuilder(), startClass,
-				endClass);
-			var b = MethodSpec.methodBuilder(p.getNameInDomain())
-				.addModifiers(Modifier.PUBLIC)
-				.returns(relationshipClassName);
-			if (this == p.getStart()) {
-				ParameterSpec param = ParameterSpec.builder(endClass, "end").build();
-				b.addParameter(param)
-					.addStatement("return new $T(this, $N)", relationshipClassName, param);
-			} else {
-				ParameterSpec param = ParameterSpec.builder(startClass, "start").build();
-				b.addParameter(param)
-					.addStatement("return new $T($N, this)", relationshipClassName, param);
-			}
-			builder.addMethod(b.build());
-		});
 		TypeSpec newType = builder
 			.build();
 
@@ -300,6 +283,29 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> imple
 				.addParameter(end)
 				.addStatement("return new $T(this, $N)", relationshipClassName, end)
 				.build();
+		};
+	}
+
+	private Function<RelationshipFactoryDefinition, MethodSpec> buildRelationshipFactoryMethod() {
+		return p -> {
+			ClassName startClass = extractClassName(p.getStart());
+			ClassName endClass = extractClassName(p.getEnd());
+
+			TypeName relationshipClassName = getRelationTypeWithParameters(p.getRelationshipBuilder(), startClass,
+				endClass);
+			var b = MethodSpec.methodBuilder(p.getNameInDomain())
+				.addModifiers(Modifier.PUBLIC)
+				.returns(relationshipClassName);
+			if (this == p.getStart()) {
+				ParameterSpec param = ParameterSpec.builder(endClass, "end").build();
+				b.addParameter(param)
+					.addStatement("return new $T(this, $N)", relationshipClassName, param);
+			} else {
+				ParameterSpec param = ParameterSpec.builder(startClass, "start").build();
+				b.addParameter(param)
+					.addStatement("return new $T($N, this)", relationshipClassName, param);
+			}
+			return b.build();
 		};
 	}
 }
