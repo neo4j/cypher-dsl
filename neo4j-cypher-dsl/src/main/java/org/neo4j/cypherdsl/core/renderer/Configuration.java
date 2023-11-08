@@ -90,6 +90,13 @@ public final class Configuration {
 	 */
 	public record RelationshipDefinition(String sourceLabel, String type, String targetLabel) {
 
+		/**
+		 * Will make sure all parameters are trimmed.
+		 *
+		 * @param sourceLabel The source label
+		 * @param type        The type of the relationship
+		 * @param targetLabel The target label
+		 */
 		public RelationshipDefinition {
 			sourceLabel = sourceLabel.trim();
 			type = type.trim();

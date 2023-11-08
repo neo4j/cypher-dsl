@@ -187,8 +187,9 @@ public final class Options {
 		 * <p>
 		 * Parsing will be aborted when a callback throws a {@link RuntimeException}.
 		 *
-		 * @param invocationCreatedEventType The event type
-		 * @param callback A callback
+		 * @param invocationCreatedEventType the event type
+		 * @param resultingType the reified type being produced
+		 * @param callback a callback
 		 * @param <T> The type of the result, must match the one of the event
 		 * @return this builder
 		 * @since 2022.8.6

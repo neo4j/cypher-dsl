@@ -178,21 +178,10 @@
 									<artifact>*:*</artifact>
 									<excludes>
 										<exclude>META-INF/*</exclude>
+										<exclude>module-info.class</exclude>
 										<exclude>library.properties</exclude>
-										<exclude>LICENSE</exclude>
+										<exclude>LICENSE.txt</exclude>
 										<exclude>rootdoc.txt</exclude>
-									</excludes>
-								</filter>
-								<filter>
-									<artifact>org.neo4j:cypher-ast-factory</artifact>
-									<excludes>
-										<exclude>module-info.class</exclude>
-									</excludes>
-								</filter>
-								<filter>
-									<artifact>org.neo4j:neo4j-cypher-javacc-parser</artifact>
-									<excludes>
-										<exclude>module-info.class</exclude>
 									</excludes>
 								</filter>
 							</filters>
