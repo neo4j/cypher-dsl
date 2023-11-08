@@ -207,8 +207,9 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	Map<Property, Collection<PropertyFilter>> getAllPropertyFilters();
 
 	/**
-	 * Returns a collection of all property based filters in the statement involving the resolved properties.
+	 * Returns a collection of all filters applied on a specific property.
 	 *
+	 * @param property The property for which filter should be retrieved
 	 * @return A collection of all conditions involving properties resolved in the statement
 	 */
 	default Collection<PropertyFilter> getFilters(Property property) {
@@ -388,6 +389,13 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 * @param value        The set of tokens that made up this filter
 	 */
 	record LabelFilter(String symbolicName, Set<Token> value) implements Filter {
+
+		/**
+		 * Makes sure the values are stored in an unmutable fashion.
+		 *
+		 * @param symbolicName The symbolic name used when creating the filter
+		 * @param value        The set of tokens that made up this filter
+		 */
 		public LabelFilter {
 			value = Set.copyOf(value);
 		}

@@ -26,6 +26,12 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  */
 public final class ParenthesizedPathPattern implements PatternElement {
 
+	/**
+	 * Creates a new {@link ParenthesizedPathPattern} based on a {@link PatternElement}.
+	 *
+	 * @param patternElement The pattern element to be wrapped
+	 * @return A new patter element
+	 */
 	public static ParenthesizedPathPattern of(PatternElement patternElement) {
 		return new ParenthesizedPathPattern(patternElement);
 	}

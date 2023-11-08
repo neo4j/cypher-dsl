@@ -223,6 +223,9 @@
 									<includes>
 										<include>**/SchemaNames*class</include>
 									</includes>
+									<excludes>
+										<exclude>module-info.class</exclude>
+									</excludes>
 								</filter>
 							</filters>
 						</configuration>

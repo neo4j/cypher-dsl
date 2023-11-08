@@ -36,6 +36,9 @@ public final class SchemaEnforcementFailedException extends RuntimeException {
 	@Serial
 	private static final long serialVersionUID = 5473466301617398078L;
 
+	/**
+	 * Creates a new instance, not to be used by client code.
+	 */
 	public SchemaEnforcementFailedException() {
 		// Make the Java module system happy.
 	}
