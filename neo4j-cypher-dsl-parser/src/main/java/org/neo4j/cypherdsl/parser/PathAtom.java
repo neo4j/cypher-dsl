@@ -33,6 +33,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  */
 final class PathAtom implements PatternAtom {
 
+	@SuppressWarnings("squid:S107") // Totally fine with that number of args for this internal API.
 	static PathAtom of(SymbolicName name, PathLength length, boolean left, boolean right,
 		String[] relTypes, MapExpression properties, boolean negatedType, Expression predicate) {
 
