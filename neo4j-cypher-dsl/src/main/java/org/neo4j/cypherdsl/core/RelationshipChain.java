@@ -26,6 +26,7 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
@@ -122,6 +123,20 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 		Relationship lastElement = this.relationships.getLast();
 		return this.replaceLast(lastElement.named(newSymbolicName));
+	}
+
+	/**
+	 * Replaces the last element of this chains with a copy of the relationship if {@code predicate} was not {@literal null}
+	 *
+	 * @param predicate the predicate to the last element of the chain
+	 * @return A new chain
+	 * @since 2023.9.0
+	 */
+	@NotNull @Contract(pure = true)
+	public RelationshipChain where(@Nullable Expression predicate) {
+
+		Relationship lastElement = this.relationships.getLast();
+		return this.replaceLast(lastElement.where(predicate));
 	}
 
 	/**

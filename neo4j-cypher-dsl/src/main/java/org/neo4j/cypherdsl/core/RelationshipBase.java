@@ -25,6 +25,7 @@ import java.util.Optional;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -288,5 +289,10 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	@Override
 	public String toString() {
 		return RendererBridge.render(this);
+	}
+
+	@Override
+	public @NotNull Relationship where(@Nullable Expression predicate) {
+		return new InternalRelationshipImpl(this.left, this.details.where(predicate), this.right);
 	}
 }

@@ -138,7 +138,7 @@ public final class Cypher {
 	 */
 	@NotNull @Contract(pure = true)
 	public static Node node(LabelExpression labelExpression) {
-		return new InternalNodeImpl(Objects.requireNonNull(labelExpression));
+		return new InternalNodeImpl(Objects.requireNonNull(labelExpression), null);
 	}
 
 	/**

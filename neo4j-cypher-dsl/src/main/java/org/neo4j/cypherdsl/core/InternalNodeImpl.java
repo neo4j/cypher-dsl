@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -40,16 +41,16 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	InternalNodeImpl() {
 	}
 
-	InternalNodeImpl(LabelExpression labelExpression) {
-		super(null, null, labelExpression, null);
+	InternalNodeImpl(LabelExpression labelExpression, Where innerPredicate) {
+		super(null, null, labelExpression, null, innerPredicate);
 	}
 
 	InternalNodeImpl(String primaryLabel, String... additionalLabels) {
 		super(primaryLabel, additionalLabels);
 	}
 
-	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties) {
-		super(symbolicName, labels, labelExpression, properties);
+	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties, Where innerPredicate) {
+		super(symbolicName, labels, labelExpression, properties, innerPredicate);
 	}
 
 	InternalNodeImpl(SymbolicName symbolicName, String primaryLabel,
@@ -62,7 +63,7 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	public InternalNodeImpl named(SymbolicName newSymbolicName) {
 
 		Assertions.notNull(newSymbolicName, "Symbolic name is required.");
-		return new InternalNodeImpl(newSymbolicName, labels, labelExpression, properties);
+		return new InternalNodeImpl(newSymbolicName, labels, labelExpression, properties, innerPredicate);
 
 	}
 
@@ -70,6 +71,17 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	@Override
 	public InternalNodeImpl withProperties(MapExpression newProperties) {
 
-		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, Properties.create(newProperties));
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, Properties.create(newProperties), innerPredicate);
+	}
+
+	@NotNull
+	@Override
+	public Node where(@Nullable Expression predicate) {
+		if (predicate == null) {
+			return this;
+		}
+
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, properties,
+			Where.from(predicate));
 	}
 }

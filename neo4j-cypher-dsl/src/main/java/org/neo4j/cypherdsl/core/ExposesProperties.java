@@ -34,7 +34,7 @@ import org.jetbrains.annotations.NotNull;
 public interface ExposesProperties<T extends ExposesProperties<?> & PropertyContainer> {
 
 	/**
-	 * Creates a a copy of this property container with additional properties.
+	 * Creates a copy of this property container with additional properties.
 	 * Creates a property container without properties when no properties are passed to this method.
 	 *
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
@@ -44,7 +44,7 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	T withProperties(MapExpression newProperties);
 
 	/**
-	 * Creates a a copy of this property container with additional properties.
+	 * Creates a copy of this property container with additional properties.
 	 * Creates a property container without properties when no properties are passed to this method.
 	 *
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
@@ -54,7 +54,7 @@ public interface ExposesProperties<T extends ExposesProperties<?> & PropertyCont
 	T withProperties(Object... keysAndValues);
 
 	/**
-	 * Creates a a copy of this property container with additional properties.
+	 * Creates a copy of this property container with additional properties.
 	 *
 	 * @param newProperties A map with the new properties
 	 * @return The new property container.

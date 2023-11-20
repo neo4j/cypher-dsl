@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -111,6 +112,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 
 		private final Properties properties;
 
+		private final Where innerPredicate;
+
 		static Details create(Direction direction, SymbolicName symbolicName, String... types) {
 
 			List<String> listOfTypes = Arrays.stream(types)
@@ -121,14 +124,15 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 
 		static Details create(Direction direction, SymbolicName symbolicName, RelationshipTypes types) {
 
-			return new Details(direction, symbolicName, types, null, null);
+			return new Details(direction, symbolicName, types, null, null, null);
 		}
 
 		private Details(Direction direction,
 			SymbolicName symbolicName,
 			RelationshipTypes types,
 			RelationshipLength length,
-			Properties properties
+			Properties properties,
+			Where innerPredicate
 		) {
 
 			this.direction = Optional.ofNullable(direction).orElse(Direction.UNI);
@@ -136,6 +140,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			this.types = types;
 			this.length = length;
 			this.properties = properties;
+			this.innerPredicate = innerPredicate;
 		}
 
 		/**
@@ -150,17 +155,17 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		Details named(SymbolicName newSymbolicName) {
 
 			Assertions.notNull(newSymbolicName, "Symbolic name is required.");
-			return new Details(this.direction, newSymbolicName, this.types, this.length, this.properties);
+			return new Details(this.direction, newSymbolicName, this.types, this.length, this.properties, this.innerPredicate);
 		}
 
 		Details with(Properties newProperties) {
 
-			return new Details(this.direction, this.symbolicName, this.types, this.length, newProperties);
+			return new Details(this.direction, this.symbolicName, this.types, this.length, newProperties, this.innerPredicate);
 		}
 
 		Details unbounded() {
 
-			return new Details(this.direction, this.symbolicName, this.types, RelationshipLength.unbounded(), this.properties);
+			return new Details(this.direction, this.symbolicName, this.types, RelationshipLength.unbounded(), this.properties, this.innerPredicate);
 		}
 
 		Details inverse() {
@@ -168,7 +173,15 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			if (this.direction == Direction.UNI) {
 				return this;
 			}
-			return new Details(this.direction == Direction.LTR ? Direction.RTL : Direction.LTR, null, this.types, this.length, this.properties);
+			return new Details(this.direction == Direction.LTR ? Direction.RTL : Direction.LTR, null, this.types, this.length, this.properties, this.innerPredicate);
+		}
+
+		Details where(Expression predicate) {
+
+			if (predicate == null) {
+				return this;
+			}
+			return new Details(this.direction, this.symbolicName, this.types, this.length, this.properties, Where.from(predicate));
 		}
 
 		Details min(Integer minimum) {
@@ -181,7 +194,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 				.map(l -> RelationshipLength.of(minimum, l.getMaximum()))
 				.orElseGet(() -> RelationshipLength.of(minimum, null));
 
-			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
+			return new Details(this.direction, this.symbolicName, this.types, newLength, properties, this.innerPredicate);
 		}
 
 		Details max(Integer maximum) {
@@ -194,7 +207,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 				.map(l -> RelationshipLength.of(l.getMinimum(), maximum))
 				.orElseGet(() -> RelationshipLength.of(null, maximum));
 
-			return new Details(this.direction, this.symbolicName, this.types, newLength, properties);
+			return new Details(this.direction, this.symbolicName, this.types, newLength, properties, this.innerPredicate);
 		}
 
 		/**
@@ -248,6 +261,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			Visitable.visitIfNotNull(this.types, visitor);
 			Visitable.visitIfNotNull(this.length, visitor);
 			Visitable.visitIfNotNull(this.properties, visitor);
+			Visitable.visitIfNotNull(this.innerPredicate, visitor);
 			visitor.leave(this);
 		}
 
@@ -304,4 +318,16 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 */
 	@NotNull @Contract(pure = true)
 	Relationship inverse();
+
+	/**
+	 * Creates a new {@link Relationship node pattern} which including an additional filter. Returns {@code this} relationship
+	 * when {@code predicate} is literal {@code null}
+	 * @param predicate the predicate to filter on
+	 * @return a new relationship or this instance if the predicate to this method was literal {@code null}
+	 * @since 2023.9.0
+	 */
+	@NotNull @Contract(pure = true)
+	default Relationship where(@Nullable Expression predicate) {
+		throw new UnsupportedOperationException();
+	}
 }

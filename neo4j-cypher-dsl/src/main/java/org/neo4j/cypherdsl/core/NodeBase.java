@@ -43,6 +43,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
+@SuppressWarnings("deprecation") // IDEA is stupid.
 public abstract class NodeBase<SELF extends Node> extends AbstractNode implements Node {
 
 	@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
@@ -53,6 +54,8 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	final LabelExpression labelExpression;
 
 	final Properties properties;
+
+	final Where innerPredicate;
 
 	// ------------------------------------------------------------------------
 	// Public API to be used by the static meta model.
@@ -79,7 +82,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 */
 	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
 
-		this(symbolicName, new ArrayList<>(labels), null, properties);
+		this(symbolicName, new ArrayList<>(labels), null, properties, null);
 	}
 
 	@Override
@@ -183,12 +186,13 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 		this(symbolicName, assertLabels(primaryLabel, additionalLabels), Properties.create(properties));
 	}
 
-	NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties) {
+	NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties, Where innerPredicate) {
 
 		this.symbolicName = symbolicName;
 		this.labels = labels;
 		this.labelExpression = labelExpression;
 		this.properties = properties;
+		this.innerPredicate = innerPredicate;
 	}
 
 	@Override
@@ -201,6 +205,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 		}
 		Visitable.visitIfNotNull(this.labelExpression, visitor);
 		Visitable.visitIfNotNull(this.properties, visitor);
+		Visitable.visitIfNotNull(this.innerPredicate, visitor);
 		visitor.leave(this);
 	}
 
