@@ -368,41 +368,20 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Clause matchClause(InputPosition p, boolean optional, NULL matchMode, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where whereIn) {
 
 		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
-		Condition condition = Conditions.noCondition();
 		List<PatternElement> openForTransformation = new ArrayList<>();
 		for (PatternElement patternElement : patternElements) {
 			if (patternElement instanceof NodeAtom nodeAtom) {
 				openForTransformation.add(nodeAtom.value());
-				if (nodeAtom.predicate() != null) {
-					condition = condition.and(nodeAtom.predicate().asCondition());
-				}
 			} else {
 				openForTransformation.add(patternElement);
 			}
 		}
 		var transformedPatternElements = transformIfPossible(patternElementCallbacks, openForTransformation);
-		Where where = computeFinalWhere(whereIn, condition);
 
-		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, where, hints));
+		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, whereIn, hints));
 	}
 
-	private static Where computeFinalWhere(Where whereIn, Condition condition) {
 
-		if (condition == Conditions.noCondition()) {
-			return whereIn;
-		}
-		if (whereIn == null) {
-			return Where.from(condition);
-		}
-
-		AtomicReference<Condition> capturedCondition = new AtomicReference<>();
-		whereIn.accept(segment -> {
-			if (segment instanceof Condition inner) {
-				capturedCondition.compareAndSet(null, inner);
-			}
-		});
-		return Where.from(capturedCondition.get().and(condition));
-	}
 
 	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
 		List<PatternElement> patternElements) {
@@ -513,7 +492,6 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Clause mergeClause(InputPosition p, PatternElement patternElementIn, List<Clause> setClauses,
 		List<MergeActionType> actionTypes, List<InputPosition> positions) {
-
 
 		var patternElement = patternElementIn instanceof NodeAtom n ? n.value() : patternElementIn;
 		var mergeActions = new ArrayList<MergeAction>();
@@ -633,6 +611,8 @@ final class CypherDslASTFactory implements ASTFactory<
 
 			relationshipPattern = applyOptionalProperties(relationshipPattern, pathAtom);
 
+			relationshipPattern = applyOptionalPredicate(relationshipPattern, pathAtom);
+
 			relationshipPattern = applyOptionalLength(relationshipPattern, length);
 		}
 
@@ -675,23 +655,36 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	private static ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		if (pathAtom.getProperties() == null) {
+		var properties = pathAtom.getProperties();
+		if (properties == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof ExposesProperties<?> exposesProperties) {
-			return (ExposesRelationships<?>) exposesProperties.withProperties(pathAtom.getProperties());
+			return (ExposesRelationships<?>) exposesProperties.withProperties(properties);
 		}
-		return ((RelationshipChain) relationshipPattern).properties(pathAtom.getProperties());
+		return ((RelationshipChain) relationshipPattern).properties(properties);
 	}
 
 	private static ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		if (pathAtom.getName() == null) {
+		var name = pathAtom.getName();
+		if (name == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.named(pathAtom.getName());
+			return relationship.named(name);
 		}
-		return ((RelationshipChain) relationshipPattern).named(pathAtom.getName());
+		return ((RelationshipChain) relationshipPattern).named(name);
+	}
+
+	private static ExposesRelationships<?> applyOptionalPredicate(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
+		var predicate = pathAtom.getPredicate();
+		if (predicate == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof Relationship relationship) {
+			return relationship.where(predicate);
+		}
+		return ((RelationshipChain) relationshipPattern).where(predicate);
 	}
 
 	@Override
@@ -715,14 +708,17 @@ final class CypherDslASTFactory implements ASTFactory<
 		if (properties != null) {
 			node = node.withProperties((MapExpression) properties);
 		}
-		return new NodeAtom(node, predicate);
+		if (predicate != null) {
+			node = node.where(predicate);
+		}
+		return new NodeAtom(node);
 	}
 
 	@Override
 	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v, LabelExpression relTypes, PathLength pathLength, Expression properties, Expression predicate) {
 		return PathAtom.of(assertSymbolicName(v), pathLength, left, right,
 			computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties,
-			relTypes != null && relTypes.negated());
+			relTypes != null && relTypes.negated(), predicate);
 	}
 
 	@Override

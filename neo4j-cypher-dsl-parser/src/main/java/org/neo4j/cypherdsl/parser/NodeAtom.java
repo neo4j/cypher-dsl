@@ -19,7 +19,6 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.PatternElement;
 
@@ -28,8 +27,7 @@ import org.neo4j.cypherdsl.core.PatternElement;
  *
  * @author Michael J. Simons
  * @param value The actual node
- * @param predicate An optional predicate to capture node pattern predicates.
  * @since 2023.0.0
  */
-record NodeAtom(Node value, Expression predicate) implements PatternAtom, PatternElement {
+record NodeAtom(Node value) implements PatternAtom, PatternElement {
 }

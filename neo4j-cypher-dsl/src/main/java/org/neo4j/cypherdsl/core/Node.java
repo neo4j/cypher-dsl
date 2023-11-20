@@ -25,6 +25,7 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/NodePattern.html">NodePattern</a>.
@@ -150,4 +151,16 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 */
 	@NotNull @Contract(pure = true)
 	FunctionInvocation labels();
+
+	/**
+	 * Creates a new {@link Node node pattern} which including an additional filter. Returns {@code this} node when
+	 * {@code predicate} is literal {@code null}
+	 * @param predicate the predicate to filter on
+	 * @return a new node or this instance if the predicate to this method was literal {@code null}
+	 * @since 2023.9.0
+	 */
+	@NotNull @Contract(pure = true)
+	default Node where(@Nullable Expression predicate) {
+		throw new UnsupportedOperationException();
+	}
 }

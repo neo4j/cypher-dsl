@@ -462,10 +462,10 @@ class CypherParserTest {
 
 	@ParameterizedTest
 	@CsvSource(textBlock = """
-		MATCH (n:Person WHERE n.name = 'Tom Hanks') RETURN n,MATCH (n:Person) WHERE n.name = 'Tom Hanks' RETURN n
-		MATCH (n:Person WHERE n.name = 'Tom Hanks' OR n.name = 'Bud Spencer') RETURN n,MATCH (n:Person) WHERE (n.name = 'Tom Hanks' OR n.name = 'Bud Spencer') RETURN n
-		MATCH (n:Person WHERE n.name = 'Tom Hanks') WHERE n.born <= 2000 RETURN n,MATCH (n:Person) WHERE (n.born <= 2000 AND n.name = 'Tom Hanks') RETURN n
-		MATCH (n:Person WHERE n.name = 'Tom Hanks' OR n.name = 'Bud Spencer') WHERE n.born <= 2000 RETURN n,MATCH (n:Person) WHERE (n.born <= 2000 AND (n.name = 'Tom Hanks' OR n.name = 'Bud Spencer')) RETURN n
+		MATCH (n:Person WHERE n.name = 'Tom Hanks') RETURN n,MATCH (n:Person WHERE n.name = 'Tom Hanks') RETURN n
+		MATCH (n:Person WHERE n.name = 'Tom Hanks' OR n.name = 'Bud Spencer') RETURN n,MATCH (n:Person WHERE (n.name = 'Tom Hanks' OR n.name = 'Bud Spencer')) RETURN n
+		MATCH (n:Person WHERE n.name = 'Tom Hanks') WHERE n.born <= 2000 RETURN n,MATCH (n:Person WHERE n.name = 'Tom Hanks') WHERE n.born <= 2000 RETURN n
+		MATCH (n:Person WHERE n.name = 'Tom Hanks' OR n.name = 'Bud Spencer') WHERE n.born <= 2000 RETURN n,MATCH (n:Person WHERE (n.name = 'Tom Hanks' OR n.name = 'Bud Spencer')) WHERE n.born <= 2000 RETURN n
 		""")
 	void whereInMatch(String statement, String expected) {
 

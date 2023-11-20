@@ -5029,4 +5029,26 @@ class CypherIT {
 					RETURN node""");
 		}
 	}
+
+	// GH-858
+	@Nested
+	class ConditionalPatterns {
+
+		@Test
+		void nodesWithWhere() {
+
+			var node = Cypher.node("Movie").withProperties(Map.of("title", "The Matrix")).named("n");
+			var cypher = Cypher.match(node.where(node.property("released").eq(Cypher.literalOf(1999)))).returning(node).build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (n:`Movie` {title: 'The Matrix'} WHERE n.released = 1999) RETURN n");
+		}
+
+		@Test
+		void relationshipsWithWhere() {
+
+			var node = Cypher.node("Movie").withProperties(Map.of("title", "The Matrix")).named("n");
+			var actor = Cypher.node("Actor");
+			var cypher = Cypher.match(node.relationshipFrom(actor, "ACTED_IN").named("r").where(Cypher.property("r", "role").eq(Cypher.literalOf("Neo4j")))).returning(Cypher.asterisk()).build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (n:`Movie` {title: 'The Matrix'})<-[r:`ACTED_IN` WHERE r.role = 'Neo4j']-(:`Actor`) RETURN *");
+		}
+	}
 }
