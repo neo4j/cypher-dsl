@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -77,7 +78,7 @@ import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operations;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
+import org.neo4j.cypherdsl.core.Quantifier;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Predicates;
@@ -94,6 +95,7 @@ import org.neo4j.cypherdsl.core.StatementBuilder;
 import org.neo4j.cypherdsl.core.StringLiteral;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -147,7 +149,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		NULL,
 		InputPosition,
 		EntityType,
-		NULL,
+	Quantifier,
 		PatternAtom,
 		DatabaseName,
 		NULL,
@@ -568,6 +570,19 @@ final class CypherDslASTFactory implements ASTFactory<
 		return patternElement;
 	}
 
+	static class Patterns extends TypedSubtree<PatternElement> implements PatternElement {
+		Patterns(Collection<PatternElement> children) {
+			super(children);
+		}
+
+		@Override
+		public String separator() {
+			return " ";
+		}
+	}
+
+
+
 	@Override
 	public PatternElement patternElement(List<PatternAtom> atoms) {
 
@@ -577,46 +592,58 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 
 		if (atoms.size() == 1 && atoms.get(0) instanceof ParenthesizedPathPatternAtom atom) {
-			return ParenthesizedPathPattern.of(atom.getPatternElement());
+			return atom.asPatternElement();
 		}
 
-		var nodes = atoms.stream()
-			.filter(NodeAtom.class::isInstance).map(NodeAtom.class::cast).toList();
-		var relationships = atoms.stream()
-			.filter(PathAtom.class::isInstance).map(PathAtom.class::cast).toList();
+		List<PatternElement> patternElements = new ArrayList<>();
+		NodeAtom lastNodeAtom = null;
+		PathAtom lastPathAtom = null;
+		ExposesRelationships<?> relationshipPattern = null;
+		for (PatternAtom atom : atoms) {
 
-		if (nodes.size() == 1 && relationships.isEmpty()) {
-			return nodes.get(0);
+			if (atom instanceof ParenthesizedPathPatternAtom specificAtom) {
+				if (lastNodeAtom != null) {
+					patternElements.add(lastNodeAtom.value());
+				}
+				if (relationshipPattern != null) {
+					patternElements.add((PatternElement) relationshipPattern);
+				}
+				lastNodeAtom = null;
+				lastPathAtom = null;
+				relationshipPattern = null;
+				patternElements.add(specificAtom.asPatternElement());
+			} else if (atom instanceof NodeAtom nodeAtom) {
+				if (lastNodeAtom == null) {
+					lastNodeAtom = nodeAtom;
+				} else {
+					if (relationshipPattern == null) {
+						relationshipPattern = lastNodeAtom.value();
+					}
+
+					var node = nodeAtom.value();
+					relationshipPattern = switch (lastPathAtom.getDirection()) {
+						case LTR -> relationshipPattern.relationshipTo(node, lastPathAtom.getTypes());
+						case RTL -> relationshipPattern.relationshipFrom(node, lastPathAtom.getTypes());
+						case UNI -> relationshipPattern.relationshipBetween(node, lastPathAtom.getTypes());
+					};
+
+					relationshipPattern = applyOptionalName(relationshipPattern, lastPathAtom);
+					relationshipPattern = applyOptionalProperties(relationshipPattern, lastPathAtom);
+					relationshipPattern = applyOptionalPredicate(relationshipPattern, lastPathAtom);
+					relationshipPattern = applyOptionalLength(relationshipPattern, lastPathAtom.getLength());
+				}
+			} else if (atom instanceof PathAtom pathAtom) {
+				lastPathAtom = pathAtom;
+			}
 		}
 
-		if (nodes.size() != relationships.size() + 1) {
-			throw new IllegalArgumentException(
-				"Something weird has happened. Got " + nodes.size() + " nodes and " + relationships.size()
-				+ " path details.");
+		if (relationshipPattern != null) {
+			patternElements.add((PatternElement) relationshipPattern);
+		} else if (lastNodeAtom != null) {
+			patternElements.add(lastNodeAtom.value());
 		}
 
-		ExposesRelationships<?> relationshipPattern = nodes.get(0).value();
-		for (int i = 1; i < nodes.size(); i++) {
-			Node node = nodes.get(i).value();
-			PathAtom pathAtom = relationships.get(i - 1);
-			PathLength length = pathAtom.getLength();
-
-			relationshipPattern = switch (pathAtom.getDirection()) {
-				case LTR -> relationshipPattern.relationshipTo(node, pathAtom.getTypes());
-				case RTL -> relationshipPattern.relationshipFrom(node, pathAtom.getTypes());
-				case UNI -> relationshipPattern.relationshipBetween(node, pathAtom.getTypes());
-			};
-
-			relationshipPattern = applyOptionalName(relationshipPattern, pathAtom);
-
-			relationshipPattern = applyOptionalProperties(relationshipPattern, pathAtom);
-
-			relationshipPattern = applyOptionalPredicate(relationshipPattern, pathAtom);
-
-			relationshipPattern = applyOptionalLength(relationshipPattern, length);
-		}
-
-		return (PatternElement) relationshipPattern;
+		return patternElements.size() == 1 ? patternElements.get(0) : new Patterns(patternElements);
 	}
 
 	@Override
@@ -728,22 +755,25 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
+	public Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
+
+		var _lowerBound = lowerBound == null ? null : Integer.parseInt(lowerBound);
+		var _upperBound = upperBound == null ? null : Integer.parseInt(upperBound);
+		return Quantifier.interval(_lowerBound, _upperBound);
+	}
+
+	@Override
+	public Quantifier fixedPathQuantifier(InputPosition p, InputPosition valuePos, String value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public NULL fixedPathQuantifier(InputPosition p, InputPosition valuePos, String value) {
+	public Quantifier plusPathQuantifier(InputPosition p) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public NULL plusPathQuantifier(InputPosition p) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public NULL starPathQuantifier(InputPosition p) {
+	public Quantifier starPathQuantifier(InputPosition p) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -758,12 +788,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, NULL aNull) {
-		return ParenthesizedPathPatternAtom.of(internalPattern);
+	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, Quantifier pathPatternQuantifier) {
+		return new ParenthesizedPathPatternAtom((RelationshipPattern) internalPattern, pathPatternQuantifier);
 	}
 
 	@Override
-	public PatternAtom quantifiedRelationship(PathAtom rel, NULL aNull) {
+	public PatternAtom quantifiedRelationship(PathAtom rel, Quantifier pathPatternQuantifier) {
 		throw new UnsupportedOperationException();
 	}
 

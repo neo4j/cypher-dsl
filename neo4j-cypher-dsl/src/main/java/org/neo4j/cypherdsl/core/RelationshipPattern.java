@@ -65,4 +65,15 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 */
 	@NotNull @Contract(pure = true)
 	Condition asCondition();
+
+	/**
+	 * Quantifies this pattern.
+	 *
+	 * @param quantifier the quantifier to use
+	 * @return a quantified path pattern.
+	 * @since 2023.9.0
+	 */
+	default QuantifiedPathPattern quantified(Quantifier quantifier) {
+		return QuantifiedPathPattern.of(this, quantifier);
+	}
 }

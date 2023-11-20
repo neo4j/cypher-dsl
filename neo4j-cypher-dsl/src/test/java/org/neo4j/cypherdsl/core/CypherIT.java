@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -5049,6 +5050,90 @@ class CypherIT {
 			var actor = Cypher.node("Actor");
 			var cypher = Cypher.match(node.relationshipFrom(actor, "ACTED_IN").named("r").where(Cypher.property("r", "role").eq(Cypher.literalOf("Neo4j")))).returning(Cypher.asterisk()).build().getCypher();
 			assertThat(cypher).isEqualTo("MATCH (n:`Movie` {title: 'The Matrix'})<-[r:`ACTED_IN` WHERE r.role = 'Neo4j']-(:`Actor`) RETURN *");
+		}
+	}
+
+	@Nested
+	class Qualifiers {
+
+		RelationshipPattern relationshipPattern = Cypher.node("A").named("a")
+			.relationshipTo(Cypher.node("B").named("b"), "X");
+
+		@Test
+		void betweenMAndNIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(1, 3)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,3} RETURN *");
+		}
+
+		@Test
+		void oneOrMoreIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(1, null)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,} RETURN *");
+		}
+
+		@Test
+		void zeroOrMoreIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(0, null)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){0,} RETURN *");
+		}
+
+		@Test
+		void nIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(1,1)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,1} RETURN *");
+		}
+
+		@Test
+		void zeroOrMore() {
+
+			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(null, null)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){0,} RETURN *");
+		}
+
+		@Test
+		void between0AndNIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(null, 3)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){0,3} RETURN *");
+		}
+
+		@Test
+		void invalidLower() {
+
+			assertThatIllegalArgumentException().isThrownBy(
+				() -> Quantifier.interval(-1, null)
+			).withMessage("Lower bound must be greater than or equal to zero");
+		}
+
+		@Test
+		void invalidLower1() {
+
+			assertThatIllegalArgumentException().isThrownBy(
+				() -> Quantifier.interval(null, 0)
+			).withMessage("Upper bound must be greater than zero");
+		}
+
+		@Test
+		void invalidLower2() {
+
+			assertThatIllegalArgumentException().isThrownBy(() -> Quantifier.interval(2, 1)).withMessage("Upper bound must be greater than or equal to 2");
+			assertThatNoException().isThrownBy(() -> Quantifier.interval(2, 2));
 		}
 	}
 }
