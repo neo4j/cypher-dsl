@@ -125,18 +125,28 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		return this.replaceLast(lastElement.named(newSymbolicName));
 	}
 
-	/**
-	 * Replaces the last element of this chains with a copy of the relationship if {@code predicate} was not {@literal null}
-	 *
-	 * @param predicate the predicate to the last element of the chain
-	 * @return A new chain
-	 * @since 2023.9.0
-	 */
-	@NotNull @Contract(pure = true)
+	@NotNull
+	@Override
 	public RelationshipChain where(@Nullable Expression predicate) {
 
-		Relationship lastElement = this.relationships.getLast();
-		return this.replaceLast(lastElement.where(predicate));
+		if (predicate == null) {
+			return this;
+		}
+
+		var lastElement = this.relationships.getLast();
+		return this.replaceLast((Relationship) lastElement.where(predicate));
+	}
+
+	@NotNull
+	@Override
+	public RelationshipPattern quantified(@Nullable Quantifier quantifier) {
+
+		if (quantifier == null) {
+			return this;
+		}
+
+		var lastElement = this.relationships.getLast();
+		return this.replaceLast((Relationship) lastElement.quantified(quantifier));
 	}
 
 	/**
@@ -239,6 +249,7 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 			visitor.enter(relationship);
 			relationship.getLeft().accept(visitor);
 			relationship.getDetails().accept(visitor);
+			Visitable.visitIfNotNull(relationship.getQuantifier(), visitor);
 			visitor.leave(relationship);
 
 			lastNode = relationship.getRight();

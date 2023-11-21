@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -33,13 +36,17 @@ public final class ParenthesizedPathPattern implements PatternElement {
 	 * @return A new patter element
 	 */
 	public static ParenthesizedPathPattern of(PatternElement patternElement) {
-		return new ParenthesizedPathPattern(patternElement);
+		return new ParenthesizedPathPattern(patternElement, null);
 	}
 
 	private final PatternElement delegate;
 
-	private ParenthesizedPathPattern(PatternElement delegate) {
+	@Nullable
+	private final Where innerPredicate;
+
+	private ParenthesizedPathPattern(PatternElement delegate, @Nullable Where innerPredicate) {
 		this.delegate = delegate;
+		this.innerPredicate = innerPredicate;
 	}
 
 	@Override
@@ -47,6 +54,26 @@ public final class ParenthesizedPathPattern implements PatternElement {
 
 		visitor.enter(this);
 		this.delegate.accept(visitor);
+		Visitable.visitIfNotNull(this.innerPredicate, visitor);
 		visitor.leave(this);
+	}
+
+	@Override
+	public @NotNull PatternElement where(@Nullable Expression predicate) {
+		if (predicate == null) {
+			return this;
+		}
+		return new ParenthesizedPathPattern(this.delegate, Where.from(predicate));
+	}
+
+	/**
+	 * Quantifies this pattern.
+	 *
+	 * @param quantifier the quantifier to use
+	 * @return a quantified path pattern.
+	 * @since 2023.9.0
+	 */
+	public PatternElement quantified(Quantifier quantifier) {
+		return QuantifiedPathPattern.of(this, quantifier);
 	}
 }

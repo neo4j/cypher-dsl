@@ -26,6 +26,7 @@ import java.util.Optional;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -50,6 +51,9 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	final Details details;
 
+	@Nullable
+	final Quantifier quantifier;
+
 	// ------------------------------------------------------------------------
 	// Public API to be used by the static meta model.
 	// Non-final methods are ok to be overwritten.
@@ -65,7 +69,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 */
 	protected RelationshipBase(S start, String type, E end, String... additionalTypes) {
 
-		this(null, start, Direction.LTR, end, mergeTypesIfNecessary(type, additionalTypes));
+		this(null, start, Direction.LTR, null, end, mergeTypesIfNecessary(type, additionalTypes));
 	}
 
 	private static String[] mergeTypesIfNecessary(String type, String... additionalTypes) {
@@ -94,7 +98,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end,
 		String... additionalTypes) {
 
-		this(symbolicName, start, Direction.LTR, properties, end, mergeTypesIfNecessary(type, additionalTypes));
+		this(symbolicName, start, Direction.LTR, properties, null, end, mergeTypesIfNecessary(type, additionalTypes));
 	}
 
 	/**
@@ -107,7 +111,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 * @param type         type of the relationship
 	 */
 	protected RelationshipBase(SymbolicName symbolicName, String type, Node start, Properties properties, Node end) {
-		this(symbolicName, start, Direction.LTR, properties, end, type);
+		this(symbolicName, start, Direction.LTR, properties, null, end, type);
 	}
 
 	@NotNull
@@ -166,6 +170,12 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		return right;
 	}
 
+	@Nullable
+	@Override
+	public final Quantifier getQuantifier() {
+		return quantifier;
+	}
+
 	@NotNull
 	@Override
 	public final Details getDetails() {
@@ -176,35 +186,35 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	@Override
 	public final Relationship unbounded() {
 
-		return new InternalRelationshipImpl(this.left, this.details.unbounded(), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.unbounded(), this.quantifier, this.right);
 	}
 
 	@NotNull
 	@Override
 	public final Relationship min(Integer minimum) {
 
-		return new InternalRelationshipImpl(this.left, this.details.min(minimum), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.min(minimum), this.quantifier, this.right);
 	}
 
 	@NotNull
 	@Override
 	public final Relationship max(Integer maximum) {
 
-		return new InternalRelationshipImpl(this.left, this.details.max(maximum), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.max(maximum), this.quantifier, this.right);
 	}
 
 	@NotNull
 	@Override
 	public final Relationship length(Integer minimum, Integer maximum) {
 
-		return new InternalRelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.quantifier, this.right);
 	}
 
 	@NotNull
 	@Override
 	public final Relationship inverse() {
 
-		return new InternalRelationshipImpl(this.right, this.details.inverse(), this.left);
+		return new InternalRelationshipImpl(this.right, this.details.inverse(), this.quantifier, this.left);
 	}
 
 	@NotNull
@@ -253,17 +263,17 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	// Internal API.
 	// ------------------------------------------------------------------------
 
-	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Node right, String... types) {
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Quantifier quantifier, Node right, String... types) {
 
-		this(symbolicName, left, direction, null, right, types);
+		this(symbolicName, left, direction, null, quantifier, right, types);
 	}
 
-	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties, Node right, String... types) {
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties, Quantifier quantifier, Node right, String... types) {
 
-		this(left, Details.create(direction, symbolicName, types).with(properties), right);
+		this(left, Details.create(direction, symbolicName, types).with(properties), quantifier, right);
 	}
 
-	RelationshipBase(Node left, Details details, Node right) {
+	RelationshipBase(Node left, Details details, Quantifier quantifier, Node right) {
 
 		Assertions.notNull(left, "Left node is required.");
 		Assertions.notNull(details, "Details are required.");
@@ -272,6 +282,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		this.left = left;
 		this.right = right;
 		this.details = details;
+		this.quantifier = quantifier;
 	}
 
 	@Override
@@ -281,6 +292,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 		left.accept(visitor);
 		details.accept(visitor);
+		Visitable.visitIfNotNull(this.quantifier, visitor);
 		right.accept(visitor);
 
 		visitor.leave(this);
@@ -293,6 +305,19 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	@Override
 	public @NotNull Relationship where(@Nullable Expression predicate) {
-		return new InternalRelationshipImpl(this.left, this.details.where(predicate), this.right);
+		if (predicate == null) {
+			return this;
+		}
+		return new InternalRelationshipImpl(this.left, this.details.where(predicate), this.quantifier, this.right);
+	}
+
+	@NotNull
+	@Override
+	public RelationshipPattern quantified(@Nullable Quantifier quantifier) {
+		if (quantifier == null) {
+			return this;
+		}
+
+		return new InternalRelationshipImpl(this.left, this.details, quantifier, this.right);
 	}
 }

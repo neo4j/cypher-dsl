@@ -26,11 +26,22 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @author Michael J. Simons
  * @since 2023.9.0
  */
+@Neo4jVersion(minimum = "5.9")
 public sealed interface Quantifier extends Visitable {
 
 	static Quantifier interval(Integer lowerBound, Integer upperBound) {
 
-		return new IntervalPathQuantifier(lowerBound, upperBound);
+		return new IntervalQuantifier(lowerBound, upperBound);
+	}
+
+	static Quantifier plus() {
+
+		return PlusQuantifier.INSTANCE;
+	}
+
+	static Quantifier star() {
+
+		return StarQuantifier.INSTANCE;
 	}
 
 	/**
@@ -39,9 +50,9 @@ public sealed interface Quantifier extends Visitable {
 	 * @param lowerBound the lower bound to use
 	 * @param upperBound the upper bound to use
 	 */
-	record IntervalPathQuantifier(Integer lowerBound, Integer upperBound) implements Quantifier {
+	record IntervalQuantifier(Integer lowerBound, Integer upperBound) implements Quantifier {
 
-		public IntervalPathQuantifier {
+		public IntervalQuantifier {
 			if (lowerBound != null && lowerBound < 0) {
 				throw new IllegalArgumentException("Lower bound must be greater than or equal to zero");
 			}
@@ -52,5 +63,19 @@ public sealed interface Quantifier extends Visitable {
 				throw new IllegalArgumentException("Upper bound must be greater than or equal to " + lowerBound);
 			}
 		}
+	}
+
+	/**
+	 * Specialized quantifier for 1 or more iterations ({@literal +} quantifier).
+	 */
+	enum PlusQuantifier implements Quantifier {
+		INSTANCE
+	}
+
+	/**
+	 * Specialized quantifier for
+	 */
+	enum StarQuantifier implements Quantifier {
+		INSTANCE
 	}
 }

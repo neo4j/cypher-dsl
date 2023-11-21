@@ -18,20 +18,24 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Michael J. Simons
  * @since 2023.9.0
  */
-public final class QuantifiedPathPattern implements PatternElement {
+final class QuantifiedPathPattern implements PatternElement {
 
-	private final PatternElement delegate;
+	private final ParenthesizedPathPattern delegate;
 
 	private final Quantifier quantifier;
 
 	static QuantifiedPathPattern of(PatternElement patternElement, Quantifier quantifier) {
 
+		Assertions.notNull(quantifier, "Quantifier must not be null");
 		var delegate = patternElement instanceof ParenthesizedPathPattern ppp ? ppp : ParenthesizedPathPattern.of(patternElement);
 
 		return new QuantifiedPathPattern(delegate, quantifier);
@@ -48,5 +52,13 @@ public final class QuantifiedPathPattern implements PatternElement {
 		this.delegate.accept(visitor);
 		this.quantifier.accept(visitor);
 		visitor.leave(this);
+	}
+
+	@Override
+	public @NotNull PatternElement where(@Nullable Expression predicate) {
+		if (predicate == null) {
+			return this;
+		}
+		return of(delegate.where(predicate), quantifier);
 	}
 }

@@ -59,7 +59,84 @@ class QPPTest {
 					RETURN d.departs AS departureTime, a.arrives AS arrivalTime
 					""")*/
 			Arguments.of("match (:A) (()-[r:R]->()){2,3} (:B) return *", "MATCH (:A) (()-[r:R]->()){2,3} (:B) RETURN *"),
-			Arguments.of("MATCH p = ((person:`Person`)-[:`DIRECTED`]->(movie:`Movie`)) WHERE person.name = 'Walt Disney' RETURN p", "MATCH p = ((person:Person)-[:DIRECTED]->(movie:Movie)) WHERE person.name = 'Walt Disney' RETURN p")
+			Arguments.of("match (:A) (()-[r:R]->())+ (:B) return *", "MATCH (:A) (()-[r:R]->())+ (:B) RETURN *"),
+			Arguments.of("match (:A) (()-[r:R]->())* (:B) return *", "MATCH (:A) (()-[r:R]->())* (:B) RETURN *"),
+			Arguments.of("MATCH p = ((person:`Person`)-[:`DIRECTED`]->(movie:`Movie`)) WHERE person.name = 'Walt Disney' RETURN p", "MATCH p = ((person:Person)-[:DIRECTED]->(movie:Movie)) WHERE person.name = 'Walt Disney' RETURN p"),
+			Arguments.of("MATCH ((:Station {name: 'Denmark Hill'})-[l:LINK]-(s:Station)){1,4} RETURN *", "MATCH ((:Station {name: 'Denmark Hill'})-[l:LINK]-(s:Station)){1,4} RETURN *"),
+			Arguments.of("""
+				MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-())+ (:Station {name: 'Gatwick Airport'})
+				RETURN reduce(acc = 0.0, l IN link | round(acc + l.distance, 2)) AS total,
+				  [n in nodes(p) | n.name] AS stations
+				ORDER BY total
+				LIMIT 1
+				""",
+				"""
+					MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-())+ (:Station {name: 'Gatwick Airport'})
+					RETURN reduce(acc = 0.0, l IN link | round((acc + l.distance), 2)) AS total,
+					[n IN nodes(p) | n.name] AS stations
+					ORDER BY total ASC
+					LIMIT 1"""),
+				Arguments.of("""
+					MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-()){1,28}\s
+					            (:Station {name: 'Gatwick Airport'})
+					RETURN size(relationships(p)) AS numStations, count(*) AS numRoutes
+					ORDER BY numStations""",
+					"""
+						MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-()){1,28} (:Station {name: 'Gatwick Airport'})
+						RETURN size(relationships(p)) AS numStations, count(*) AS numRoutes
+						ORDER BY numStations ASC
+						"""),
+			Arguments.of("""
+				MATCH (gtw:Station {name: 'Gatwick Airport'})
+				MATCH p = (:Station {name: 'Denmark Hill'})\s
+				          ((l)-[link:LINK]-(r) WHERE point.distance(r.location, gtw.location)\s
+				             - point.distance(l.location, gtw.location) < 1000)+ (gtw)
+				RETURN reduce(acc = 0.0, l IN link | round(acc + l.distance, 2)) AS total,\s
+				 [n in nodes(p) | n.name] AS stations
+				ORDER BY total
+				LIMIT 1
+				""", """
+				MATCH (gtw:Station {name: 'Gatwick Airport'})
+				MATCH p = (:Station {name: 'Denmark Hill'}) ((l)-[link:LINK]-(r) WHERE (point.distance(r.location, gtw.location) - point.distance(l.location, gtw.location)) < 1000)+ (gtw)
+				RETURN reduce(acc = 0.0, l IN link | round((acc + l.distance), 2)) AS total,
+				[n IN nodes(p) | n.name] AS stations
+				ORDER BY total ASC
+				LIMIT 1
+				"""),
+			Arguments.of("""
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+
+				        (l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+
+				        (l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+				""",
+				"""
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+(l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+(l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})"""),
+			Arguments.of("""
+				MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(r:CallingPoint)
+				(()-[:NEXT]->())+
+				(:CallingPoint)-[:CALLS_AT]->(:Station {name: 'Gatwick Airport'})
+				RETURN r.routeName AS route
+				""",
+				"""
+					MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(r:CallingPoint)
+					(()-[:NEXT]->())+
+					(:CallingPoint)-[:CALLS_AT]->(:Station {name: 'Gatwick Airport'})
+					RETURN r.routeName AS route"""),
+			Arguments.of("""
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1:CallingPoint)
+				(()-[:NEXT]->())+
+				(:CallingPoint)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2:CallingPoint)
+				(()-[:NEXT]->())+
+				(:CallingPoint)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+				RETURN l1.routeName AS leg1, x.name AS changeAt, l2.routeName AS leg2
+				""",
+				"""
+					MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1:CallingPoint)
+					(()-[:NEXT]->())+
+					(:CallingPoint)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2:CallingPoint)
+					(()-[:NEXT]->())+
+					(:CallingPoint)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+					RETURN l1.routeName AS leg1, x.name AS changeAt, l2.routeName AS leg2
+					""")
 		);
 	}
 
@@ -75,6 +152,9 @@ class QPPTest {
 	@MethodSource("f")
 	void parsingAndRenderingOfQPPShouldWork(String input, String expected) {
 		var renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
-		Assertions.assertThat(renderer.render(CypherParser.parse(input))).isEqualTo(expected.replace("\n", " ").trim());
+		 //renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		var cypher = renderer.render(CypherParser.parse(input));
+		System.out.println(cypher);
+		Assertions.assertThat(cypher).isEqualTo(expected.replace("\n", " ").trim());
 	}
 }

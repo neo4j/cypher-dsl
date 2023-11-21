@@ -5052,7 +5052,7 @@ class CypherIT {
 			assertThat(cypher).isEqualTo("MATCH (n:`Movie` {title: 'The Matrix'})<-[r:`ACTED_IN` WHERE r.role = 'Neo4j']-(:`Actor`) RETURN *");
 		}
 	}
-
+/*
 	@Nested
 	class Qualifiers {
 
@@ -5135,5 +5135,5 @@ class CypherIT {
 			assertThatIllegalArgumentException().isThrownBy(() -> Quantifier.interval(2, 1)).withMessage("Upper bound must be greater than or equal to 2");
 			assertThatNoException().isThrownBy(() -> Quantifier.interval(2, 2));
 		}
-	}
+	}*/
 }

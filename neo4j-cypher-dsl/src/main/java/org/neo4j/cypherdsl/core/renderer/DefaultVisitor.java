@@ -64,7 +64,7 @@ import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
 import org.neo4j.cypherdsl.core.Quantifier;
-import org.neo4j.cypherdsl.core.Quantifier.IntervalPathQuantifier;
+import org.neo4j.cypherdsl.core.Quantifier.IntervalQuantifier;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Properties;
@@ -1032,7 +1032,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Quantifier quantifier) {
 
-		if (quantifier instanceof IntervalPathQuantifier i) {
+		if (quantifier instanceof IntervalQuantifier i) {
 			builder.append("{");
 			builder.append(i.lowerBound() == null ? "0" : i.lowerBound());
 			builder.append(",");
@@ -1040,6 +1040,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 				builder.append(i.upperBound());
 			}
 			builder.append("}");
+		} else if(quantifier instanceof Quantifier.PlusQuantifier) {
+			builder.append("+");
+		} else if(quantifier instanceof Quantifier.StarQuantifier) {
+			builder.append("*");
 		}
 	}
 

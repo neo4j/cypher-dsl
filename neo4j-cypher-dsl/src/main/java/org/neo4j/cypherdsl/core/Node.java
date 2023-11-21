@@ -151,16 +151,4 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 */
 	@NotNull @Contract(pure = true)
 	FunctionInvocation labels();
-
-	/**
-	 * Creates a new {@link Node node pattern} which including an additional filter. Returns {@code this} node when
-	 * {@code predicate} is literal {@code null}
-	 * @param predicate the predicate to filter on
-	 * @return a new node or this instance if the predicate to this method was literal {@code null}
-	 * @since 2023.9.0
-	 */
-	@NotNull @Contract(pure = true)
-	default Node where(@Nullable Expression predicate) {
-		throw new UnsupportedOperationException();
-	}
 }

@@ -19,9 +19,15 @@
  */
 package org.neo4j.cypherdsl.parser;
 
+import org.neo4j.cypherdsl.core.ExposesPatternLengthAccessors;
+import org.neo4j.cypherdsl.core.ExposesProperties;
+import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.MapExpression;
+import org.neo4j.cypherdsl.core.Quantifier;
+import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Relationship.Direction;
+import org.neo4j.cypherdsl.core.RelationshipChain;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
@@ -50,7 +56,7 @@ final class PathAtom implements PatternAtom {
 			direction = Direction.UNI;
 		}
 
-		return new PathAtom(name, length, direction, negatedType, relTypes, properties, predicate);
+		return new PathAtom(name, length, direction, negatedType, relTypes, properties, predicate, null);
 	}
 
 	private final SymbolicName name;
@@ -67,8 +73,10 @@ final class PathAtom implements PatternAtom {
 
 	private final Expression predicate;
 
+	private final Quantifier quantifier;
+
 	private PathAtom(SymbolicName name, PathLength length, Direction direction, boolean negatedType, String[] types,
-		MapExpression properties, Expression predicate) {
+		MapExpression properties, Expression predicate, Quantifier quantifier) {
 		this.name = name;
 		this.length = length;
 		this.direction = direction;
@@ -76,6 +84,77 @@ final class PathAtom implements PatternAtom {
 		this.types = types;
 		this.properties = properties;
 		this.predicate = predicate;
+		this.quantifier = quantifier;
+	}
+
+	ExposesRelationships<?> asRelationshipBetween(ExposesRelationships<?> previous, NodeAtom nodeAtom) {
+		var node = nodeAtom.value();
+		ExposesRelationships<?> relationshipPattern = switch (this.getDirection()) {
+			case LTR -> previous.relationshipTo(node, this.getTypes());
+			case RTL -> previous.relationshipFrom(node, this.getTypes());
+			case UNI -> previous.relationshipBetween(node, this.getTypes());
+		};
+
+		relationshipPattern = applyOptionalName(relationshipPattern);
+		relationshipPattern = applyOptionalProperties(relationshipPattern);
+		relationshipPattern = applyOptionalPredicate(relationshipPattern);
+		relationshipPattern = applyOptionalLength(relationshipPattern);
+		return applyOptionalQuantifier(relationshipPattern);
+	}
+
+	private ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern) {
+		var length = getLength();
+		if (length == null) {
+			return relationshipPattern;
+		}
+		if (length.isUnbounded()) {
+			return ((ExposesPatternLengthAccessors<?>) relationshipPattern).unbounded();
+		}
+		return ((ExposesPatternLengthAccessors<?>) relationshipPattern).length(length.getMinimum(), length.getMaximum());
+	}
+
+	private ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern) {
+		var properties = getProperties();
+		if (properties == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof ExposesProperties<?> exposesProperties) {
+			return (ExposesRelationships<?>) exposesProperties.withProperties(properties);
+		}
+		return ((RelationshipChain) relationshipPattern).properties(properties);
+	}
+
+	private ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern) {
+		var name = getName();
+		if (name == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof Relationship relationship) {
+			return relationship.named(name);
+		}
+		return ((RelationshipChain) relationshipPattern).named(name);
+	}
+
+	private ExposesRelationships<?> applyOptionalPredicate(ExposesRelationships<?> relationshipPattern) {
+		var predicate = getPredicate();
+		if (predicate == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof Relationship relationship) {
+			return (ExposesRelationships<?>) relationship.where(predicate);
+		}
+		return ((RelationshipChain) relationshipPattern).where(predicate);
+	}
+
+	private ExposesRelationships<?> applyOptionalQuantifier(ExposesRelationships<?> relationshipPattern) {
+		var predicate = getQuantifier();
+		if (predicate == null) {
+			return relationshipPattern;
+		}
+		if (relationshipPattern instanceof Relationship relationship) {
+			return relationship.quantified(predicate);
+		}
+		return ((RelationshipChain) relationshipPattern).quantified(predicate);
 	}
 
 	public PathLength getLength() {
@@ -104,5 +183,15 @@ final class PathAtom implements PatternAtom {
 
 	public Expression getPredicate() {
 		return predicate;
+	}
+
+	public Quantifier getQuantifier() {
+		return quantifier;
+	}
+
+	public PathAtom wihQuantifier(Quantifier quantifier) {
+		return quantifier == null ?
+			this :
+			new PathAtom(name, length, direction, negatedType, types, properties, predicate, quantifier);
 	}
 }

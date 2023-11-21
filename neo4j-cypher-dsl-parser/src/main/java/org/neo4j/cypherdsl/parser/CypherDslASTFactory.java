@@ -59,8 +59,6 @@ import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.ExposesPatternLengthAccessors;
-import org.neo4j.cypherdsl.core.ExposesProperties;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Expressions;
@@ -84,8 +82,6 @@ import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Predicates;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.PropertyLookup;
-import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.RelationshipChain;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
@@ -613,24 +609,16 @@ final class CypherDslASTFactory implements ASTFactory<
 				relationshipPattern = null;
 				patternElements.add(specificAtom.asPatternElement());
 			} else if (atom instanceof NodeAtom nodeAtom) {
-				if (lastNodeAtom == null) {
+				if(relationshipPattern != null) {
+					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom);
+				} else if (lastNodeAtom == null) {
 					lastNodeAtom = nodeAtom;
 				} else {
-					if (relationshipPattern == null) {
-						relationshipPattern = lastNodeAtom.value();
-					}
-
-					var node = nodeAtom.value();
-					relationshipPattern = switch (lastPathAtom.getDirection()) {
-						case LTR -> relationshipPattern.relationshipTo(node, lastPathAtom.getTypes());
-						case RTL -> relationshipPattern.relationshipFrom(node, lastPathAtom.getTypes());
-						case UNI -> relationshipPattern.relationshipBetween(node, lastPathAtom.getTypes());
-					};
-
-					relationshipPattern = applyOptionalName(relationshipPattern, lastPathAtom);
-					relationshipPattern = applyOptionalProperties(relationshipPattern, lastPathAtom);
-					relationshipPattern = applyOptionalPredicate(relationshipPattern, lastPathAtom);
-					relationshipPattern = applyOptionalLength(relationshipPattern, lastPathAtom.getLength());
+					relationshipPattern = lastNodeAtom.value();
+					lastNodeAtom = null;
+					// Will be added to the pattern elements either on the occurrence of a parenthesized pattern or
+					// after iterating all atoms.
+					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom);
 				}
 			} else if (atom instanceof PathAtom pathAtom) {
 				lastPathAtom = pathAtom;
@@ -671,49 +659,6 @@ final class CypherDslASTFactory implements ASTFactory<
 		throw new UnsupportedOperationException();
 	}
 
-	private static ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern, PathLength length) {
-		if (length == null) {
-			return relationshipPattern;
-		}
-		if (length.isUnbounded()) {
-			return ((ExposesPatternLengthAccessors<?>) relationshipPattern).unbounded();
-		}
-		return ((ExposesPatternLengthAccessors<?>) relationshipPattern).length(length.getMinimum(), length.getMaximum());
-	}
-
-	private static ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		var properties = pathAtom.getProperties();
-		if (properties == null) {
-			return relationshipPattern;
-		}
-		if (relationshipPattern instanceof ExposesProperties<?> exposesProperties) {
-			return (ExposesRelationships<?>) exposesProperties.withProperties(properties);
-		}
-		return ((RelationshipChain) relationshipPattern).properties(properties);
-	}
-
-	private static ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		var name = pathAtom.getName();
-		if (name == null) {
-			return relationshipPattern;
-		}
-		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.named(name);
-		}
-		return ((RelationshipChain) relationshipPattern).named(name);
-	}
-
-	private static ExposesRelationships<?> applyOptionalPredicate(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		var predicate = pathAtom.getPredicate();
-		if (predicate == null) {
-			return relationshipPattern;
-		}
-		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.where(predicate);
-		}
-		return ((RelationshipChain) relationshipPattern).where(predicate);
-	}
-
 	@Override
 	public NodeAtom nodePattern(InputPosition p, Expression v, LabelExpression labels, Expression properties, Expression predicate) {
 
@@ -736,7 +681,7 @@ final class CypherDslASTFactory implements ASTFactory<
 			node = node.withProperties((MapExpression) properties);
 		}
 		if (predicate != null) {
-			node = node.where(predicate);
+			node = (Node) node.where(predicate);
 		}
 		return new NodeAtom(node);
 	}
@@ -769,12 +714,12 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Quantifier plusPathQuantifier(InputPosition p) {
-		throw new UnsupportedOperationException();
+		return Quantifier.plus();
 	}
 
 	@Override
 	public Quantifier starPathQuantifier(InputPosition p) {
-		throw new UnsupportedOperationException();
+		return Quantifier.star();
 	}
 
 	@Override
@@ -789,12 +734,12 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, Quantifier pathPatternQuantifier) {
-		return new ParenthesizedPathPatternAtom((RelationshipPattern) internalPattern, pathPatternQuantifier);
+		return new ParenthesizedPathPatternAtom((RelationshipPattern) internalPattern, pathPatternQuantifier, where);
 	}
 
 	@Override
 	public PatternAtom quantifiedRelationship(PathAtom rel, Quantifier pathPatternQuantifier) {
-		throw new UnsupportedOperationException();
+		return rel.wihQuantifier(pathPatternQuantifier);
 	}
 
 	@Override
