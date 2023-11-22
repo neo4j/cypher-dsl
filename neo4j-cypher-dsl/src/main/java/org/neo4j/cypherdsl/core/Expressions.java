@@ -21,9 +21,11 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Arrays;
+import java.util.List;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Statement.UnionQuery;
 
 /**
@@ -115,6 +117,20 @@ public final class Expressions {
 	@NotNull
 	public static CountExpression count(Statement statement, IdentifiableElement... imports) {
 		return CountExpression.count(statement, imports);
+	}
+
+	/**
+	 * Creates a {@literal COUNT} expression based on a list of pattern
+	 *
+	 * @param pattern the list of patterns that shall be counted
+	 * @param where an optional where-clause
+	 *
+	 * @return a count expression.
+	 * @since 2023.9.0
+	 */
+	public static CountExpression count(List<PatternElement> pattern, @Nullable Where where) {
+
+		return CountExpression.count(pattern, where);
 	}
 
 	/**

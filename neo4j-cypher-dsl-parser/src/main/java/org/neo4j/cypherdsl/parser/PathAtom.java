@@ -103,7 +103,6 @@ final class PathAtom implements PatternAtom {
 	}
 
 	private ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern) {
-		var length = getLength();
 		if (length == null) {
 			return relationshipPattern;
 		}
@@ -114,7 +113,6 @@ final class PathAtom implements PatternAtom {
 	}
 
 	private ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern) {
-		var properties = getProperties();
 		if (properties == null) {
 			return relationshipPattern;
 		}
@@ -125,7 +123,6 @@ final class PathAtom implements PatternAtom {
 	}
 
 	private ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern) {
-		var name = getName();
 		if (name == null) {
 			return relationshipPattern;
 		}
@@ -136,7 +133,6 @@ final class PathAtom implements PatternAtom {
 	}
 
 	private ExposesRelationships<?> applyOptionalPredicate(ExposesRelationships<?> relationshipPattern) {
-		var predicate = getPredicate();
 		if (predicate == null) {
 			return relationshipPattern;
 		}
@@ -147,26 +143,17 @@ final class PathAtom implements PatternAtom {
 	}
 
 	private ExposesRelationships<?> applyOptionalQuantifier(ExposesRelationships<?> relationshipPattern) {
-		var predicate = getQuantifier();
-		if (predicate == null) {
+		if (quantifier == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.quantified(predicate);
+			return relationship.quantified(quantifier);
 		}
-		return ((RelationshipChain) relationshipPattern).quantified(predicate);
-	}
-
-	public PathLength getLength() {
-		return length;
+		return ((RelationshipChain) relationshipPattern).quantified(quantifier);
 	}
 
 	public Direction getDirection() {
 		return direction;
-	}
-
-	public boolean isNegatedType() {
-		return negatedType;
 	}
 
 	public String[] getTypes() {
@@ -181,17 +168,9 @@ final class PathAtom implements PatternAtom {
 		return name;
 	}
 
-	public Expression getPredicate() {
-		return predicate;
-	}
-
-	public Quantifier getQuantifier() {
-		return quantifier;
-	}
-
-	public PathAtom wihQuantifier(Quantifier quantifier) {
-		return quantifier == null ?
+	public PathAtom withQuantifier(Quantifier newQuantifier) {
+		return newQuantifier == null ?
 			this :
-			new PathAtom(name, length, direction, negatedType, types, properties, predicate, quantifier);
+			new PathAtom(name, length, direction, negatedType, types, properties, predicate, newQuantifier);
 	}
 }

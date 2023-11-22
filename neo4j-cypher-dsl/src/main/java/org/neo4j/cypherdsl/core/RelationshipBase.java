@@ -313,11 +313,11 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	@NotNull
 	@Override
-	public RelationshipPattern quantified(@Nullable Quantifier quantifier) {
-		if (quantifier == null) {
+	public RelationshipPattern quantified(@Nullable Quantifier newQuantifier) {
+		if (newQuantifier == null) {
 			return this;
 		}
 
-		return new InternalRelationshipImpl(this.left, this.details, quantifier, this.right);
+		return new InternalRelationshipImpl(this.left, this.details, newQuantifier, this.right);
 	}
 }

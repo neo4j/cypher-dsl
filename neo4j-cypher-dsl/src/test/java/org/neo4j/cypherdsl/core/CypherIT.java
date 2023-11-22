@@ -5052,7 +5052,7 @@ class CypherIT {
 			assertThat(cypher).isEqualTo("MATCH (n:`Movie` {title: 'The Matrix'})<-[r:`ACTED_IN` WHERE r.role = 'Neo4j']-(:`Actor`) RETURN *");
 		}
 	}
-/*
+
 	@Nested
 	class Qualifiers {
 
@@ -5065,7 +5065,7 @@ class CypherIT {
 			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(1, 3)))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
-			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,3} RETURN *");
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{1,3}(b:`B`) RETURN *");
 		}
 
 		@Test
@@ -5074,7 +5074,7 @@ class CypherIT {
 			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(1, null)))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
-			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,} RETURN *");
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{1,}(b:`B`) RETURN *");
 		}
 
 		@Test
@@ -5083,7 +5083,7 @@ class CypherIT {
 			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(0, null)))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
-			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){0,} RETURN *");
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{0,}(b:`B`) RETURN *");
 		}
 
 		@Test
@@ -5092,7 +5092,7 @@ class CypherIT {
 			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(1,1)))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
-			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,1} RETURN *");
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{1,1}(b:`B`) RETURN *");
 		}
 
 		@Test
@@ -5101,7 +5101,7 @@ class CypherIT {
 			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(null, null)))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
-			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){0,} RETURN *");
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{0,}(b:`B`) RETURN *");
 		}
 
 		@Test
@@ -5110,7 +5110,7 @@ class CypherIT {
 			var cypher = Cypher.match(relationshipPattern.quantified(Quantifier.interval(null, 3)))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
-			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){0,3} RETURN *");
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{0,3}(b:`B`) RETURN *");
 		}
 
 		@Test
@@ -5135,5 +5135,5 @@ class CypherIT {
 			assertThatIllegalArgumentException().isThrownBy(() -> Quantifier.interval(2, 1)).withMessage("Upper bound must be greater than or equal to 2");
 			assertThatNoException().isThrownBy(() -> Quantifier.interval(2, 2));
 		}
-	}*/
+	}
 }

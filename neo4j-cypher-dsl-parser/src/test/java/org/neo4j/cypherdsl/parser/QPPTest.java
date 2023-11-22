@@ -19,12 +19,12 @@
  */
 package org.neo4j.cypherdsl.parser;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.stream.Stream;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -136,7 +136,66 @@ class QPPTest {
 					(()-[:NEXT]->())+
 					(:CallingPoint)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
 					RETURN l1.routeName AS leg1, x.name AS changeAt, l2.routeName AS leg2
-					""")
+					"""),
+			Arguments.of("""
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+
+				        (l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+
+				        (l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+				MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+				        WHERE time('09:30') < s1.departs < time('10:00')
+				MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+				        WHERE s2.arrives < s3.departs < s2.arrives + duration('PT15M')
+				RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+				         s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+				         duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+				ORDER BY leg2Arrive\s
+				LIMIT 5
+				""", """
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+(l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+(l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+				MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+				WHERE (time('09:30') < s1.departs AND s1.departs < time('10:00'))
+				MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+				WHERE (s2.arrives < s3.departs AND s3.departs < (s2.arrives + duration('PT15M')))
+				RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+				s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+				duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+				ORDER BY leg2Arrive ASC
+				LIMIT 5
+				"""),
+			Arguments.of("""
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)
+				        (()-[:NEXT]->(n)\s
+				          WHERE NOT EXISTS { (n)-[:CALLS_AT]->(:Station:LondonGroup) })+
+				        (l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)
+				        (()-[:NEXT]->(m)
+				          WHERE NOT EXISTS { (m)-[:CALLS_AT]->(:Station:LondonGroup) })+
+				        (l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+				MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+				WHERE time('09:30') < s1.departs < time('10:00')
+				MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+				WHERE s2.arrives < s3.departs < s2.arrives + duration('PT15M')
+				RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+				        s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+				        duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+				ORDER BY leg2Arrive\s
+				LIMIT 5""",
+				"""
+				MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)
+				(()-[:NEXT]->(n)
+				WHERE NOT (EXISTS { (n)-[:CALLS_AT]->(:Station:LondonGroup) }))+
+				(l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)
+				(()-[:NEXT]->(m)
+				WHERE NOT (EXISTS { (m)-[:CALLS_AT]->(:Station:LondonGroup) }))+
+				(l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+				MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+				WHERE (time('09:30') < s1.departs AND s1.departs < time('10:00'))
+				MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+				WHERE (s2.arrives < s3.departs AND s3.departs < (s2.arrives + duration('PT15M')))
+				RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+				s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+				duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+				ORDER BY leg2Arrive ASC
+				LIMIT 5""")
 		);
 	}
 
@@ -152,9 +211,8 @@ class QPPTest {
 	@MethodSource("f")
 	void parsingAndRenderingOfQPPShouldWork(String input, String expected) {
 		var renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
-		 //renderer = Renderer.getRenderer(Configuration.prettyPrinting());
 		var cypher = renderer.render(CypherParser.parse(input));
-		System.out.println(cypher);
-		Assertions.assertThat(cypher).isEqualTo(expected.replace("\n", " ").trim());
+		assertThat(cypher).isEqualTo(expected.replace("\n", " ").trim());
+		assertThat(renderer.render(CypherParser.parse(cypher))).isEqualTo(cypher);
 	}
 }

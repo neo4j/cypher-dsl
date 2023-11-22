@@ -1040,9 +1040,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 				builder.append(i.upperBound());
 			}
 			builder.append("}");
-		} else if(quantifier instanceof Quantifier.PlusQuantifier) {
+		} else if (quantifier instanceof Quantifier.PlusQuantifier) {
 			builder.append("+");
-		} else if(quantifier instanceof Quantifier.StarQuantifier) {
+		} else if (quantifier instanceof Quantifier.StarQuantifier) {
 			builder.append("*");
 		}
 	}
