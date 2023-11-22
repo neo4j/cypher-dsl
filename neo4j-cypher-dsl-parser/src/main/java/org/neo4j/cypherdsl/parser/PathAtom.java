@@ -24,7 +24,7 @@ import org.neo4j.cypherdsl.core.ExposesProperties;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.MapExpression;
-import org.neo4j.cypherdsl.core.Quantifier;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Relationship.Direction;
 import org.neo4j.cypherdsl.core.RelationshipChain;
@@ -73,10 +73,10 @@ final class PathAtom implements PatternAtom {
 
 	private final Expression predicate;
 
-	private final Quantifier quantifier;
+	private final QuantifiedPathPattern.Quantifier quantifier;
 
 	private PathAtom(SymbolicName name, PathLength length, Direction direction, boolean negatedType, String[] types,
-		MapExpression properties, Expression predicate, Quantifier quantifier) {
+		MapExpression properties, Expression predicate, QuantifiedPathPattern.Quantifier quantifier) {
 		this.name = name;
 		this.length = length;
 		this.direction = direction;
@@ -147,9 +147,9 @@ final class PathAtom implements PatternAtom {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.quantified(quantifier);
+			return (ExposesRelationships<?>) relationship.quantifyRelationship(quantifier);
 		}
-		return ((RelationshipChain) relationshipPattern).quantified(quantifier);
+		return ((RelationshipChain) relationshipPattern).quantifyRelationship(quantifier);
 	}
 
 	public Direction getDirection() {
@@ -168,7 +168,7 @@ final class PathAtom implements PatternAtom {
 		return name;
 	}
 
-	public PathAtom withQuantifier(Quantifier newQuantifier) {
+	public PathAtom withQuantifier(QuantifiedPathPattern.Quantifier newQuantifier) {
 		return newQuantifier == null ?
 			this :
 			new PathAtom(name, length, direction, negatedType, types, properties, predicate, newQuantifier);

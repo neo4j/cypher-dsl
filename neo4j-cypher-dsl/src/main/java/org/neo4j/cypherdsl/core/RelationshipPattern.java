@@ -68,14 +68,26 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	Condition asCondition();
 
 	/**
-	 * Quantifies this pattern.
+	 * Quantifies the relationship.
 	 *
 	 * @param quantifier the quantifier to use
-	 * @return a quantified path pattern.
+	 * @return a quantified relationship
 	 * @since 2023.9.0
 	 */
 	@NotNull @Contract(pure = true)
-	default RelationshipPattern quantified(@Nullable Quantifier quantifier) {
+	default PatternElement quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Quantifies the pattern.
+	 *
+	 * @param quantifier the quantifier to use
+	 * @return a quantified path pattern
+	 * @since 2023.9.0
+	 */
+	@NotNull @Contract(pure = true)
+	default PatternElement quantify(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
 		throw new UnsupportedOperationException();
 	}
 }

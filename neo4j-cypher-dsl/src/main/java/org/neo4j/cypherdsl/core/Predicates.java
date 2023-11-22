@@ -85,6 +85,36 @@ public final class Predicates {
 	/**
 	 * Creates                  a                 new                  condition                 via                  an
 	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
+	 * sub-query</a> based on the list of patterns
+	 *
+	 * @param pattern the pattern that must exists
+	 *
+	 * @return An existential sub-query.
+	 * @since 2023.9.0
+	 */
+	public static Condition exists(PatternElement pattern) {
+
+		return ExistentialSubquery.exists(List.of(pattern), null);
+	}
+
+	/**
+	 * Creates                  a                 new                  condition                 via                  an
+	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
+	 * sub-query</a> based on the list of patterns
+	 *
+	 * @param pattern the list of patterns that must exists
+	 *
+	 * @return An existential sub-query.
+	 * @since 2023.9.0
+	 */
+	public static Condition exists(List<PatternElement> pattern) {
+
+		return ExistentialSubquery.exists(pattern, null);
+	}
+
+	/**
+	 * Creates                  a                 new                  condition                 via                  an
+	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
 	 * sub-query</a> based on the list of patterns and an optional {@link Where where-clause}.
 	 *
 	 * @param pattern the list of patterns that must exists

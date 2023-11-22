@@ -139,14 +139,21 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 	@NotNull
 	@Override
-	public RelationshipPattern quantified(@Nullable Quantifier quantifier) {
+	public RelationshipPattern quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
 
 		if (quantifier == null) {
 			return this;
 		}
 
 		var lastElement = this.relationships.getLast();
-		return this.replaceLast((Relationship) lastElement.quantified(quantifier));
+		return this.replaceLast((Relationship) lastElement.quantifyRelationship(quantifier));
+	}
+
+	@NotNull
+	@Override
+	public QuantifiedPathPattern quantify(@Nullable QuantifiedPathPattern.Quantifier newQuantifier) {
+
+		return QuantifiedPathPattern.of(this, newQuantifier);
 	}
 
 	/**

@@ -290,7 +290,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * {@return the quantifier of this relationship if any}
 	 */
 	@Nullable @Contract(pure = true)
-	Quantifier getQuantifier();
+	QuantifiedPathPattern.Quantifier getQuantifier();
 
 	/**
 	 * Creates a copy of this relationship with a new symbolic name.

@@ -35,16 +35,16 @@ import org.jetbrains.annotations.NotNull;
 final class InternalRelationshipImpl extends RelationshipBase<NodeBase<?>, NodeBase<?>, InternalRelationshipImpl> {
 
 	InternalRelationshipImpl(SymbolicName symbolicName, Node left,
-		Direction direction, Quantifier quantifier, Node right, String... types) {
+		Direction direction, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
 		super(symbolicName, left, direction, quantifier, right, types);
 	}
 
 	InternalRelationshipImpl(SymbolicName symbolicName, Node left,
-		Direction direction, Properties properties, Quantifier quantifier, Node right, String... types) {
+		Direction direction, Properties properties, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
 		super(symbolicName, left, direction, properties, quantifier, right, types);
 	}
 
-	InternalRelationshipImpl(Node left, Details details, Quantifier quantifier, Node right) {
+	InternalRelationshipImpl(Node left, Details details, QuantifiedPathPattern.Quantifier quantifier, Node right) {
 		super(left, details, quantifier, right);
 	}
 

@@ -20,23 +20,18 @@
 package org.neo4j.cypherdsl.parser;
 
 import org.neo4j.cypherdsl.core.Expression;
-import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
-import org.neo4j.cypherdsl.core.Quantifier;
 import org.neo4j.cypherdsl.core.PatternElement;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 
 /**
  * @author Michael J. Simons
  */
-record ParenthesizedPathPatternAtom(RelationshipPattern patternElement, Quantifier quantifier, Expression predicate)
+record ParenthesizedPathPatternAtom(RelationshipPattern patternElement, QuantifiedPathPattern.Quantifier quantifier, Expression predicate)
 	implements PatternAtom {
 
 	PatternElement asPatternElement() {
 
-		var result = ParenthesizedPathPattern.of(patternElement());
-		if (quantifier != null) {
-			return result.quantified(quantifier).where(predicate);
-		}
-		return result.where(predicate);
+		return patternElement.quantify(quantifier).where(predicate);
 	}
 }

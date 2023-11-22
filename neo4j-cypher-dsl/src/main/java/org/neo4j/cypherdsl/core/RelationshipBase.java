@@ -52,7 +52,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	final Details details;
 
 	@Nullable
-	final Quantifier quantifier;
+	final QuantifiedPathPattern.Quantifier quantifier;
 
 	// ------------------------------------------------------------------------
 	// Public API to be used by the static meta model.
@@ -172,7 +172,7 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	@Nullable
 	@Override
-	public final Quantifier getQuantifier() {
+	public final QuantifiedPathPattern.Quantifier getQuantifier() {
 		return quantifier;
 	}
 
@@ -263,17 +263,17 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	// Internal API.
 	// ------------------------------------------------------------------------
 
-	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Quantifier quantifier, Node right, String... types) {
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
 
 		this(symbolicName, left, direction, null, quantifier, right, types);
 	}
 
-	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties, Quantifier quantifier, Node right, String... types) {
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
 
 		this(left, Details.create(direction, symbolicName, types).with(properties), quantifier, right);
 	}
 
-	RelationshipBase(Node left, Details details, Quantifier quantifier, Node right) {
+	RelationshipBase(Node left, Details details, QuantifiedPathPattern.Quantifier quantifier, Node right) {
 
 		Assertions.notNull(left, "Left node is required.");
 		Assertions.notNull(details, "Details are required.");
@@ -313,11 +313,18 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	@NotNull
 	@Override
-	public RelationshipPattern quantified(@Nullable Quantifier newQuantifier) {
+	public RelationshipPattern quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier newQuantifier) {
 		if (newQuantifier == null) {
 			return this;
 		}
 
 		return new InternalRelationshipImpl(this.left, this.details, newQuantifier, this.right);
+	}
+
+	@NotNull
+	@Override
+	public QuantifiedPathPattern quantify(@Nullable QuantifiedPathPattern.Quantifier newQuantifier) {
+
+		return QuantifiedPathPattern.of(this, newQuantifier);
 	}
 }

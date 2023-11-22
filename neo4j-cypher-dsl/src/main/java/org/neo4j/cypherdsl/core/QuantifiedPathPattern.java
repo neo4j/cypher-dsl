@@ -18,30 +18,67 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
+import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
-import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * @author Michael J. Simons
  * @since 2023.9.0
  */
-final class QuantifiedPathPattern implements PatternElement {
+@Neo4jVersion(minimum = "5.9")
+@API(status = STABLE, since = "2023.9.0")
+public final class QuantifiedPathPattern implements PatternElement {
 
-	private final ParenthesizedPathPattern delegate;
+	/**
+	 * Quantifier for path patterns.
+	 */
+	public sealed interface Quantifier extends Visitable {
+	}
+
+	/**
+	 * Creates an interval quantifier
+	 * @param lowerBound lower bound, must be greater than or equal to 0
+	 * @param upperBound upper bound, must be greater than or equal to the lower bound
+	 * @return a quantifier
+	 */
+	public static Quantifier interval(Integer lowerBound, Integer upperBound) {
+
+		return new IntervalQuantifier(lowerBound, upperBound);
+	}
+
+	/**
+	 * {@return the <code>+</code> quantifier}
+	 */
+	public static Quantifier plus() {
+
+		return PlusQuantifier.INSTANCE;
+	}
+
+	/**
+	 * {@return the <code>*</code> quantifier}
+	 */
+	public static Quantifier star() {
+
+		return StarQuantifier.INSTANCE;
+	}
+
+	private final TargetPattern delegate;
 
 	private final Quantifier quantifier;
 
-	static QuantifiedPathPattern of(PatternElement patternElement, Quantifier quantifier) {
+	static QuantifiedPathPattern of(PatternElement patternElement, @Nullable Quantifier quantifier) {
 
-		Assertions.notNull(quantifier, "Quantifier must not be null");
-		var delegate = patternElement instanceof ParenthesizedPathPattern ppp ? ppp : ParenthesizedPathPattern.of(patternElement);
+		var delegate = patternElement instanceof TargetPattern ppp ? ppp : new TargetPattern(patternElement, null);
 
 		return new QuantifiedPathPattern(delegate, quantifier);
 	}
 
-	private QuantifiedPathPattern(ParenthesizedPathPattern delegate, Quantifier quantifier) {
+	private QuantifiedPathPattern(TargetPattern delegate, Quantifier quantifier) {
 		this.delegate = delegate;
 		this.quantifier = quantifier;
 	}
@@ -50,7 +87,7 @@ final class QuantifiedPathPattern implements PatternElement {
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
 		this.delegate.accept(visitor);
-		this.quantifier.accept(visitor);
+		Visitable.visitIfNotNull(quantifier, visitor);
 		visitor.leave(this);
 	}
 
@@ -60,5 +97,96 @@ final class QuantifiedPathPattern implements PatternElement {
 			return this;
 		}
 		return of(delegate.where(predicate), quantifier);
+	}
+
+	/**
+	 * Synthetic element for the Cypher-DSL AST.
+	 */
+	@API(status = API.Status.INTERNAL)
+	public static final class TargetPattern implements PatternElement {
+
+		private final PatternElement delegate;
+
+		@Nullable
+		private final Where innerPredicate;
+
+		private TargetPattern(PatternElement delegate, @Nullable Where innerPredicate) {
+			this.delegate = delegate;
+			this.innerPredicate = innerPredicate;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+
+			visitor.enter(this);
+			this.delegate.accept(visitor);
+			Visitable.visitIfNotNull(this.innerPredicate, visitor);
+			visitor.leave(this);
+		}
+
+		@Override
+		public @NotNull PatternElement where(@Nullable Expression predicate) {
+			if (predicate == null) {
+				return this;
+			}
+			return new TargetPattern(this.delegate, Where.from(predicate));
+		}
+	}
+
+	/**
+	 * Qualifier for an interval.
+	 *
+	 * @param lowerBound the lower bound to use
+	 * @param upperBound the upper bound to use
+	 */
+	private record IntervalQuantifier(Integer lowerBound, Integer upperBound) implements Quantifier {
+
+		public IntervalQuantifier {
+			if (lowerBound != null && lowerBound < 0) {
+				throw new IllegalArgumentException("Lower bound must be greater than or equal to zero");
+			}
+			if (upperBound != null && upperBound <= 0) {
+				throw new IllegalArgumentException("Upper bound must be greater than zero");
+			}
+			if (lowerBound != null && upperBound != null && upperBound < lowerBound) {
+				throw new IllegalArgumentException("Upper bound must be greater than or equal to " + lowerBound);
+			}
+		}
+
+		@Override
+		public String toString() {
+			var result = "{";
+			result += (lowerBound() == null ? "0" : lowerBound());
+			result += ",";
+			if (upperBound() != null) {
+				result += upperBound();
+			}
+			result += "}";
+			return result;
+		}
+	}
+
+	/**
+	 * Specialized quantifier for 1 or more iterations ({@literal +} quantifier).
+	 */
+	private enum PlusQuantifier implements Quantifier {
+		INSTANCE;
+
+		@Override
+		public String toString() {
+			return "+";
+		}
+	}
+
+	/**
+	 * Specialized quantifier for 0 or more iterations ({@literal *} quantifier).
+	 */
+	private enum StarQuantifier implements Quantifier {
+		INSTANCE;
+
+		@Override
+		public String toString() {
+			return "*";
+		}
 	}
 }

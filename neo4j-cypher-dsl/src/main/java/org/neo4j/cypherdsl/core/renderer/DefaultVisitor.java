@@ -62,9 +62,7 @@ import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
-import org.neo4j.cypherdsl.core.Quantifier;
-import org.neo4j.cypherdsl.core.Quantifier.IntervalQuantifier;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Properties;
@@ -1022,29 +1020,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
-	void enter(ParenthesizedPathPattern parenthesizedPathPattern) {
+	void enter(QuantifiedPathPattern.TargetPattern qpp) {
 		builder.append("(");
 	}
 
-	void leave(ParenthesizedPathPattern parenthesizedPathPattern) {
+	void leave(QuantifiedPathPattern.TargetPattern qpp) {
 		builder.append(")");
 	}
 
-	void enter(Quantifier quantifier) {
+	void enter(QuantifiedPathPattern.Quantifier quantifier) {
 
-		if (quantifier instanceof IntervalQuantifier i) {
-			builder.append("{");
-			builder.append(i.lowerBound() == null ? "0" : i.lowerBound());
-			builder.append(",");
-			if (i.upperBound() != null) {
-				builder.append(i.upperBound());
-			}
-			builder.append("}");
-		} else if (quantifier instanceof Quantifier.PlusQuantifier) {
-			builder.append("+");
-		} else if (quantifier instanceof Quantifier.StarQuantifier) {
-			builder.append("*");
-		}
+		builder.append(quantifier.toString());
 	}
 
 	@Override

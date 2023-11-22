@@ -72,7 +72,7 @@ import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operations;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.Quantifier;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Predicates;
@@ -139,7 +139,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		NULL,
 		InputPosition,
 		EntityType,
-	Quantifier,
+	QuantifiedPathPattern.Quantifier,
 		PatternAtom,
 		DatabaseName,
 		NULL,
@@ -694,26 +694,26 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
+	public QuantifiedPathPattern.Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
 
 		var _lowerBound = lowerBound == null ? null : Integer.parseInt(lowerBound);
 		var _upperBound = upperBound == null ? null : Integer.parseInt(upperBound);
-		return Quantifier.interval(_lowerBound, _upperBound);
+		return QuantifiedPathPattern.interval(_lowerBound, _upperBound);
 	}
 
 	@Override
-	public Quantifier fixedPathQuantifier(InputPosition p, InputPosition valuePos, String value) {
+	public QuantifiedPathPattern.Quantifier fixedPathQuantifier(InputPosition p, InputPosition valuePos, String value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Quantifier plusPathQuantifier(InputPosition p) {
-		return Quantifier.plus();
+	public QuantifiedPathPattern.Quantifier plusPathQuantifier(InputPosition p) {
+		return QuantifiedPathPattern.plus();
 	}
 
 	@Override
-	public Quantifier starPathQuantifier(InputPosition p) {
-		return Quantifier.star();
+	public QuantifiedPathPattern.Quantifier starPathQuantifier(InputPosition p) {
+		return QuantifiedPathPattern.star();
 	}
 
 	@Override
@@ -727,12 +727,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, Quantifier pathPatternQuantifier) {
+	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, QuantifiedPathPattern.Quantifier pathPatternQuantifier) {
 		return new ParenthesizedPathPatternAtom((RelationshipPattern) internalPattern, pathPatternQuantifier, where);
 	}
 
 	@Override
-	public PatternAtom quantifiedRelationship(PathAtom rel, Quantifier pathPatternQuantifier) {
+	public PatternAtom quantifiedRelationship(PathAtom rel, QuantifiedPathPattern.Quantifier pathPatternQuantifier) {
 		return rel.withQuantifier(pathPatternQuantifier);
 	}
 
@@ -1457,7 +1457,6 @@ final class CypherDslASTFactory implements ASTFactory<
 			return Predicates.exists(q);
 		}
 	}
-
 
 	@Override
 	public Expression countExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {

@@ -33,7 +33,7 @@ class QPPTest {
 
 	static Stream<Arguments> f() {
 		return Stream.of(
-			/*
+		Arguments.of("MATCH ((n:A)-[:R]->(:B) WHERE EXISTS { (n)-->+(:X) }){2,3}", "MATCH ((n:A)-[:R]->(:B) WHERE EXISTS { (n)-->+(:X) }){2,3}"),
 			Arguments.of("""
 					MATCH (n:Station {name: 'London Euston'})<-[:CALLS_AT]-(s1:Stop)
 					  -[:NEXT]->(s2:Stop)-[:CALLS_AT]->(:Station {name: 'Coventry'})
@@ -44,8 +44,7 @@ class QPPTest {
 				"""
 					MATCH (n:Station {name: 'London Euston'})<-[:CALLS_AT]-(s1:Stop)-[:NEXT]->(s2:Stop)-[:CALLS_AT]->(:Station {name: 'Coventry'})<-[:CALLS_AT]-(s3:Stop)-[:NEXT]->(s4:Stop)-[:CALLS_AT]->(n)
 					RETURN ((s1.departs + '-') + s2.departs) AS outbound, ((s3.departs + '-') + s4.departs) AS return
-					"""),*/
-			/*
+					"""),
 			Arguments.of("""
 					MATCH (:Station { name: 'Denmark Hill' })<-[:X]-(d:Stop)
 					      ((:Stop)-[:NEXT]->(:Stop)){1,3}
@@ -53,11 +52,11 @@ class QPPTest {
 					RETURN d.departs AS departureTime, a.arrives AS arrivalTime
 					""",
 				"""
-					MATCH (:Station { name: 'Denmark Hill' })<-[:CALLS_AT]-(d:Stop)
-					      ((:Stop)-[:NEXT]->(:Stop)){1,3}
-					      (a:Stop)-[:CALLS_AT]->(:Station { name: 'Clapham Junction' })
+					MATCH (:Station {name: 'Denmark Hill'})<-[:X]-(d:Stop)
+					((:Stop)-[:NEXT]->(:Stop)){1,3}
+					(a:Stop)-[:Y]->(:Station {name: 'Clapham Junction'})
 					RETURN d.departs AS departureTime, a.arrives AS arrivalTime
-					""")*/
+					"""),
 			Arguments.of("match (:A) (()-[r:R]->()){2,3} (:B) return *", "MATCH (:A) (()-[r:R]->()){2,3} (:B) RETURN *"),
 			Arguments.of("match (:A) (()-[r:R]->())+ (:B) return *", "MATCH (:A) (()-[r:R]->())+ (:B) RETURN *"),
 			Arguments.of("match (:A) (()-[r:R]->())* (:B) return *", "MATCH (:A) (()-[r:R]->())* (:B) RETURN *"),
