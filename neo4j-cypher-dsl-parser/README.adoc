@@ -571,6 +571,7 @@ CALL {
   RETURN max(x) AS xMax
 }
 RETURN x, xMax;
+MATCH (person:`Person`) WHERE 'Ozzy' IN COLLECT { MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`) RETURN dog.name } RETURN person.name AS name;
 ----
 
 [[statements-output-subqueries]]
@@ -582,6 +583,7 @@ CALL {MATCH (p:`Person`) RETURN p ORDER BY p.age ASC LIMIT 1 UNION MATCH (p:`Per
 CALL {MATCH (p:`Person`)-[:`FRIEND_OF`]->(other:`Person`) RETURN p, other UNION MATCH (p:`Child`)-[:`CHILD_OF`]->(other:`Parent`) RETURN p, other} RETURN DISTINCT p.name, count(other)
 MATCH (p:`Person`) CALL {UNWIND range(1, 5) AS i CREATE (c:`Clone`) RETURN count(c) AS numberOfClones} RETURN p.name, numberOfClones
 UNWIND [0, 1, 2] AS x CALL {WITH x RETURN max(x) AS xMax} RETURN x, xMax
+MATCH (person:`Person`) WHERE 'Ozzy' IN COLLECT { MATCH (person)-[:`HAS_DOG`]->(dog:`Dog`) RETURN dog.name } RETURN person.name AS name
 ----
 
 === Original test suite

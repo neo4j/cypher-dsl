@@ -109,7 +109,7 @@ class CypherDslASTFactoryTest {
 			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
 			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter",
 			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",
-			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith", "alterDatabase", "settingQualifier", "showSettingsClause", "collectExpression",
+			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith", "alterDatabase", "settingQualifier", "showSettingsClause",
 			"anyPathSelector", "allPathSelector", "anyShortestPathSelector", "allShortestPathSelector", "shortestGroupsSelector", "repeatableElements", "differentRelationships",
 			"createConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {

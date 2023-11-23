@@ -1467,7 +1467,8 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression collectExpression(InputPosition inputPosition, Statement statement) {
-		throw new UnsupportedOperationException();
+
+		return Expressions.collect(statement);
 	}
 
 	@Override
