@@ -571,8 +571,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 	}
 
-
-
+	@SuppressWarnings("squid:S3776") // Yep, it's complex
 	@Override
 	public PatternElement patternElement(List<PatternAtom> atoms) {
 
@@ -696,9 +695,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public QuantifiedPathPattern.Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
 
-		var _lowerBound = lowerBound == null ? null : Integer.parseInt(lowerBound);
-		var _upperBound = upperBound == null ? null : Integer.parseInt(upperBound);
-		return QuantifiedPathPattern.interval(_lowerBound, _upperBound);
+		return QuantifiedPathPattern.interval(lowerBound == null ? null : Integer.parseInt(lowerBound), upperBound == null ? null : Integer.parseInt(upperBound));
 	}
 
 	@Override

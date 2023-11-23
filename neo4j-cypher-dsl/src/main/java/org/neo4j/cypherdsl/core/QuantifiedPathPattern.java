@@ -169,6 +169,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 	/**
 	 * Specialized quantifier for 1 or more iterations ({@literal +} quantifier).
 	 */
+	@SuppressWarnings("squid:S6548") // I do like enums as singletons, deal with it,
 	private enum PlusQuantifier implements Quantifier {
 		INSTANCE;
 
@@ -181,6 +182,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 	/**
 	 * Specialized quantifier for 0 or more iterations ({@literal *} quantifier).
 	 */
+	@SuppressWarnings("squid:S6548") // I do like enums as singletons, deal with it,
 	private enum StarQuantifier implements Quantifier {
 		INSTANCE;
 
