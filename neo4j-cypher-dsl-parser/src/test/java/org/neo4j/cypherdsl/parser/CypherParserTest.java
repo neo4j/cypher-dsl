@@ -24,7 +24,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatRuntimeException;
-import static org.assertj.core.api.Assertions.in;
 
 import java.util.Arrays;
 import java.util.EnumSet;
@@ -36,6 +35,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -699,5 +699,20 @@ class CypherParserTest {
 			assertThatNoException()
 				.isThrownBy(() -> CypherParser.parseStatement("MATCH (n) RETURN elementId(n)", options));
 		}
+	}
+
+	@ParameterizedTest
+	@CsvSource(delimiterString = "%%", textBlock = """
+		MATCH (statement) WHERE EXISTS { MATCH (statement)-[:FOO WHERE true]->(m) WHERE false } RETURN statement %% MATCH (statement) WHERE EXISTS { MATCH (statement)-[:FOO WHERE true]->(m) WHERE false } RETURN statement
+		MATCH (patternWithWhere) WHERE EXISTS { (patternWithWhere)-[:FOO WHERE true]->(m) WHERE false } RETURN statement %% MATCH (patternWithWhere) WHERE EXISTS { (patternWithWhere)-[:FOO WHERE true]->(m) WHERE false } RETURN statement
+		MATCH (person:Person) WHERE COUNT { (person)-[:HAS_DOG]->(:Dog) } > 1 RETURN person.name AS name %% MATCH (person:Person) WHERE COUNT { (person)-[:HAS_DOG]->(:Dog) } > 1 RETURN person.name AS name
+		MATCH (person:Person) WHERE COUNT { MATCH (person)-[:HAS_DOG]->(:Dog) } > 1 RETURN person.name AS name %% MATCH (person:Person) WHERE COUNT { MATCH (person)-[:HAS_DOG]->(:Dog) } > 1 RETURN person.name AS name
+		MATCH (person:Person) WHERE COUNT { MATCH (person)-[d:HAS_DOG WHERE d.since > 10]->(:Dog) } > 1 RETURN person.name AS name %% MATCH (person:Person) WHERE COUNT { MATCH (person)-[d:HAS_DOG WHERE d.since > 10]->(:Dog) } > 1 RETURN person.name AS name
+		MATCH (person:Person) WHERE COUNT { MATCH (person)-[d:HAS_DOG WHERE d.since > 10]->(:Dog) WHERE false} > 1 RETURN person.name AS name %% MATCH (person:Person) WHERE COUNT { MATCH (person)-[d:HAS_DOG WHERE d.since > 10]->(:Dog) WHERE false } > 1 RETURN person.name AS name
+		""")
+	void existAndCountSubqueriesWithPatternOrStatements(String input, String expected) {
+		var renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
+		var cypher = renderer.render(CypherParser.parse(input));
+		Assertions.assertThat(cypher).isEqualTo(expected.trim());
 	}
 }

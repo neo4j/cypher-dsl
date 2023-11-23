@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNoException;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -5049,6 +5050,117 @@ class CypherIT {
 			var actor = Cypher.node("Actor");
 			var cypher = Cypher.match(node.relationshipFrom(actor, "ACTED_IN").named("r").where(Cypher.property("r", "role").eq(Cypher.literalOf("Neo4j")))).returning(Cypher.asterisk()).build().getCypher();
 			assertThat(cypher).isEqualTo("MATCH (n:`Movie` {title: 'The Matrix'})<-[r:`ACTED_IN` WHERE r.role = 'Neo4j']-(:`Actor`) RETURN *");
+		}
+	}
+
+	@Nested
+	class QuantifiedPathPatterns {
+
+		RelationshipPattern relationshipPattern = Cypher.node("A").named("a")
+			.relationshipTo(Cypher.node("B").named("b"), "X");
+
+		@Test
+		void quantifyShouldWork() {
+
+			var cypher = Cypher.match(relationshipPattern.quantify(
+					QuantifiedPathPattern.interval(1, 3)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((a:`A`)-[:`X`]->(b:`B`)){1,3} RETURN *");
+		}
+
+		@Test
+		void nestingInBooleanExpressionIsAllowed() {
+
+			var pattern = Cypher.anyNode("n").relationshipTo(Cypher.node("X")).quantifyRelationship(QuantifiedPathPattern.plus());
+			var innerRel = Cypher.node("A").named("n").relationshipTo(Cypher.anyNode().withProperties(Map.of("p", 30)), "R")
+				.quantify(QuantifiedPathPattern.interval(2,3))
+				.where(Predicates.exists(pattern));
+			var cypher = Cypher.match(innerRel).returning(Cypher.asterisk()).build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH ((n:`A`)-[:`R`]->( {p: 30}) WHERE EXISTS { (n)-->+(:`X`) }){2,3} RETURN *");
+		}
+
+		@Test
+		void betweenMAndNIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantifyRelationship(
+					QuantifiedPathPattern.interval(1, 3)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{1,3}(b:`B`) RETURN *");
+		}
+
+		@Test
+		void oneOrMoreIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantifyRelationship(
+					QuantifiedPathPattern.interval(1, null)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{1,}(b:`B`) RETURN *");
+		}
+
+		@Test
+		void zeroOrMoreIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantifyRelationship(
+					QuantifiedPathPattern.interval(0, null)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{0,}(b:`B`) RETURN *");
+		}
+
+		@Test
+		void nIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantifyRelationship(
+					QuantifiedPathPattern.interval(1,1)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{1,1}(b:`B`) RETURN *");
+		}
+
+		@Test
+		void zeroOrMore() {
+
+			var cypher = Cypher.match(relationshipPattern.quantifyRelationship(
+					QuantifiedPathPattern.interval(null, null)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{0,}(b:`B`) RETURN *");
+		}
+
+		@Test
+		void between0AndNIterations() {
+
+			var cypher = Cypher.match(relationshipPattern.quantifyRelationship(
+					QuantifiedPathPattern.interval(null, 3)))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+			assertThat(cypher).isEqualTo("MATCH (a:`A`)-[:`X`]->{0,3}(b:`B`) RETURN *");
+		}
+
+		@Test
+		void invalidLower() {
+
+			assertThatIllegalArgumentException().isThrownBy(
+				() -> QuantifiedPathPattern.interval(-1, null)
+			).withMessage("Lower bound must be greater than or equal to zero");
+		}
+
+		@Test
+		void invalidLower1() {
+
+			assertThatIllegalArgumentException().isThrownBy(
+				() -> QuantifiedPathPattern.interval(null, 0)
+			).withMessage("Upper bound must be greater than zero");
+		}
+
+		@Test
+		void invalidLower2() {
+
+			assertThatIllegalArgumentException().isThrownBy(() -> QuantifiedPathPattern.interval(2, 1)).withMessage("Upper bound must be greater than or equal to 2");
+			assertThatNoException().isThrownBy(() -> QuantifiedPathPattern.interval(2, 2));
 		}
 	}
 }

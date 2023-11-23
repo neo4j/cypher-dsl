@@ -1,0 +1,59 @@
+Input,Expected,Num results,Is a counting query?
+"MATCH ()
+ RETURN count(*) AS numNodes","MATCH () RETURN count(*) AS numNodes",18,true
+"MATCH (:Stop)
+ RETURN count(*) AS numStops","MATCH (:Stop) RETURN count(*) AS numStops",10,true
+"MATCH (s:Stop)-[:CALLS_AT]->(:Station {name: 'Denmark Hill'})
+ RETURN s.arrives AS arrivalTime","MATCH (s:Stop)-[:CALLS_AT]->(:Station {name: 'Denmark Hill'})
+                                   RETURN s.arrives AS arrivalTime",2,false
+"MATCH (n:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-
+         (s:Stop WHERE s.departs = time('22:37'))-[:NEXT]->
+         (:Stop)-[:CALLS_AT]->(d:Station)
+ RETURN d.name AS nextCallingPoint","MATCH (n:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(s:Stop WHERE s.departs = time('22:37'))-[:NEXT]->(:Stop)-[:CALLS_AT]->(d:Station)
+                                     RETURN d.name AS nextCallingPoint",1,false
+"MATCH (:Station {name: 'Peckham Rye'})-[link:LINK]-+
+         (:Station {name: 'Clapham Junction'})
+ RETURN reduce(acc = 0.0, l IN link | round(acc + l.distance, 2)) AS
+          totalDistance","MATCH (:Station {name: 'Peckham Rye'})-[link:LINK]-+(:Station {name: 'Clapham Junction'})
+                          RETURN reduce(acc = 0.0, l IN link | round((acc + l.distance), 2)) AS totalDistance",2,false
+"MATCH (:Station {name: 'Peckham Rye'})
+       (()-[link:LINK]-(s) WHERE link.distance <= 2)+
+       (:Station {name: 'London Victoria'})
+ UNWIND s AS station
+ RETURN station.name AS callingPoint","MATCH (:Station {name: 'Peckham Rye'}) (()-[link:LINK]-(s) WHERE link.distance <= 2)+ (:Station {name: 'London Victoria'})
+                                       UNWIND s AS station
+                                       RETURN station.name AS callingPoint",5,false
+"MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(s1:Stop)-[:NEXT]->+
+         (sN:Stop WHERE NOT EXISTS { (sN)-[:NEXT]->(:Stop) })-[:CALLS_AT]->
+         (d:Station)
+ RETURN s1.departs AS departure, sN.arrives AS arrival,
+        d.name AS finalDestination","MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(s1:Stop)-[:NEXT]->+(sN:Stop WHERE NOT (EXISTS { (sN)-[:NEXT]->(:Stop) }))-[:CALLS_AT]->(d:Station)
+                                     RETURN s1.departs AS departure, sN.arrives AS arrival,
+                                            d.name AS finalDestination",2,false
+"MATCH (:Station {name: 'Peckham Rye'})<-[:CALLS_AT]-(:Stop)
+       (()-[:NEXT]->(s:Stop))+
+       ()-[:CALLS_AT]->(:Station {name: 'Battersea Park'})
+ UNWIND s AS stop
+ MATCH (stop)-[:CALLS_AT]->(station:Station)
+ RETURN stop.arrives AS arrival, station.name AS callingPoint","MATCH (:Station {name: 'Peckham Rye'})<-[:CALLS_AT]-(:Stop) (()-[:NEXT]->(s:Stop))+ ()-[:CALLS_AT]->(:Station {name: 'Battersea Park'})
+                                                                UNWIND s AS stop
+                                                                MATCH (stop)-[:CALLS_AT]->(station:Station)
+                                                                RETURN stop.arrives AS arrival, station.name AS callingPoint",4,false
+"MATCH (n:Station)-[:LINK]-+(n)
+ RETURN DISTINCT n.name AS station","MATCH (n:Station)-[:LINK]-+(n)
+                                     RETURN DISTINCT n.name AS station",6,false
+"MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-
+         (s1:Stop)-[:NEXT]->+(s2:Stop)-[:CALLS_AT]->
+         (c:Station)<-[:CALLS_AT]-(x:Stop),
+        (:Station {name: 'Clapham Junction'})<-[:CALLS_AT]-
+          (t1:Stop)-[:NEXT]->+(x)-[:NEXT]->+(:Stop)-[:CALLS_AT]->
+          (:Station {name: 'London Victoria'})
+ WHERE t1.departs = time('22:46')
+       AND s2.arrives < x.departs
+ RETURN s1.departs AS departure, s2.arrives AS changeArrival,
+        c.name AS changeAt","MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(s1:Stop)-[:NEXT]->+(s2:Stop)-[:CALLS_AT]->(c:Station)<-[:CALLS_AT]-(x:Stop),
+                                    (:Station {name: 'Clapham Junction'})<-[:CALLS_AT]-(t1:Stop)-[:NEXT]->+(x)-[:NEXT]->+(:Stop)-[:CALLS_AT]->(:Station {name: 'London Victoria'})
+                             WHERE (t1.departs = time('22:46')
+                                   AND s2.arrives < x.departs)
+                             RETURN s1.departs AS departure, s2.arrives AS changeArrival,
+                                    c.name AS changeAt",1,false

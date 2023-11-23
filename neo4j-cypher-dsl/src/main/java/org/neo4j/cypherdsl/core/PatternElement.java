@@ -21,6 +21,9 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Contract;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
@@ -31,4 +34,23 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  */
 @API(status = STABLE, since = "1.0")
 public interface PatternElement extends Visitable {
+
+	/**
+	 * Creates a new {@link PatternElement} which including an additional filter. Returns {@code this} pattern.
+	 * when {@code predicate} is literal {@code null}.
+	 * <p>
+	 * The pattern might be a {@link Node node pattern} or a {@link RelationshipPattern relationship pattern}.
+	 * <p>
+	 * A {@code WHERE} on a pattern is only supported from Neo4j 5.0 onwards.
+	 *
+	 * @param predicate the predicate to filter on
+	 * @return a new pattern element or this instance if the predicate to this method was literal {@code null}
+	 * @throws UnsupportedOperationException In cases the underlying element does not support a {@code WHERE} clause
+	 * @since 2023.9.0
+	 */
+	@Neo4jVersion(minimum = "5.0")
+	@NotNull @Contract(pure = true)
+	default PatternElement where(@Nullable Expression predicate) {
+		throw new UnsupportedOperationException();
+	}
 }

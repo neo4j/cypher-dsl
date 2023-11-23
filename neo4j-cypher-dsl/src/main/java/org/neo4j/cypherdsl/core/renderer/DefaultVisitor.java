@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
@@ -61,7 +62,7 @@ import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Properties;
@@ -116,21 +117,25 @@ import org.neo4j.cypherdsl.core.internal.YieldItems;
  * @author Gerrit Meier
  * @since 1.0
  */
-@SuppressWarnings({"unused", "squid:S1172"})
+@SuppressWarnings({ "unused", "squid:S1172" })
 @RegisterForReflection
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
-	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
+	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS,
+		Operator.UNARY_PLUS);
 
 	/**
 	 * Target of all rendering.
 	 */
 	protected final StringBuilder builder = new StringBuilder();
 
+	record SeparatorAndSupplier(AtomicReference<String> seperator, Supplier<String> supplier) {
+	}
+
 	/**
 	 * This keeps track on which level of the tree a separator is needed.
 	 */
-	private final Map<Integer, AtomicReference<String>> separatorOnLevel = new ConcurrentHashMap<>();
+	private final Map<Integer, SeparatorAndSupplier> separatorOnLevel = new ConcurrentHashMap<>();
 
 	/**
 	 * Keeps track of scoped, named variables.
@@ -209,7 +214,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this(statementContext, renderConstantsAsParameters, Configuration.newConfig().alwaysEscapeNames(true).build());
 	}
 
-	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
+	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters,
+		Configuration configuration) {
 		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ?
 			NameResolvingStrategy.useGeneratedNames(statementContext, configuration.getGeneratedNames()) :
 			NameResolvingStrategy.useGivenNames(statementContext);
@@ -226,15 +232,16 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this.relationshipDefinitions = configuration.getRelationshipDefinitions();
 	}
 
-	private void enableSeparator(int level, boolean on) {
+	private void enableSeparator(int level, boolean on, Supplier<String> supplier) {
 		if (on) {
-			separatorOnLevel.put(level, new AtomicReference<>(""));
+			separatorOnLevel.put(level,
+				new SeparatorAndSupplier(new AtomicReference<>(""), supplier == null ? () -> "" : supplier));
 		} else {
 			separatorOnLevel.remove(level);
 		}
 	}
 
-	private Optional<AtomicReference<String>> separatorOnCurrentLevel() {
+	private Optional<SeparatorAndSupplier> separatorOnCurrentLevel() {
 
 		return Optional.ofNullable(separatorOnLevel.get(currentLevel));
 	}
@@ -252,11 +259,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		int nextLevel = ++currentLevel + 1;
-		if (visitable instanceof TypedSubtree) {
-			enableSeparator(nextLevel, true);
+		if (visitable instanceof TypedSubtree<?> ts) {
+			enableSeparator(nextLevel, true, ts::separator);
 		}
 
-		separatorOnCurrentLevel().ifPresent(ref -> builder.append(ref.getAndSet("")));
+		separatorOnCurrentLevel().ifPresent(ref -> builder.append(ref.seperator().getAndSet("")));
 
 		if (visitable instanceof ProvidesAffixes providesAffixes) {
 			providesAffixes.getPrefix().ifPresent(this::doWithPrefix);
@@ -299,14 +306,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		scopingStrategy.doLeave(visitable);
 
-		separatorOnCurrentLevel().ifPresent(ref -> ref.set(", "));
+		separatorOnCurrentLevel().ifPresent(ref -> ref.seperator().set(ref.supplier().get()));
 
 		if (visitable instanceof ProvidesAffixes providesAffixes) {
 			providesAffixes.getSuffix().ifPresent(this::doWithSuffix);
 		}
 
 		if (visitable instanceof TypedSubtree) {
-			enableSeparator(currentLevel + 1, false);
+			enableSeparator(currentLevel + 1, false, null);
 		}
 
 		if (currentAliasedElements.peek() == visitable) {
@@ -383,6 +390,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	boolean inReturn;
+
 	void enter(Return returning) {
 
 		inReturn = true;
@@ -1012,12 +1020,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(" ");
 	}
 
-	void enter(ParenthesizedPathPattern parenthesizedPathPattern) {
+	void enter(QuantifiedPathPattern.TargetPattern qpp) {
 		builder.append("(");
 	}
 
-	void leave(ParenthesizedPathPattern parenthesizedPathPattern) {
+	void leave(QuantifiedPathPattern.TargetPattern qpp) {
 		builder.append(")");
+	}
+
+	void enter(QuantifiedPathPattern.Quantifier quantifier) {
+
+		builder.append(quantifier.toString());
 	}
 
 	@Override

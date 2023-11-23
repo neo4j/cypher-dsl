@@ -20,7 +20,10 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.List;
+
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -46,17 +49,31 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 		return new ExistentialSubquery(statement, imports);
 	}
 
-	private final Visitable fragment;
+	static Condition exists(List<PatternElement> patternElements, @Nullable Where innerWhere) {
+		return new ExistentialSubquery(patternElements, innerWhere);
+	}
+
 	private final ImportingWith importingWith;
+	private final List<Visitable> fragments;
+	@Nullable
+	private  final Where innerWhere;
+
+	ExistentialSubquery(List<PatternElement> fragments, @Nullable Where innerWhere) {
+		this.fragments = List.copyOf(fragments);
+		this.importingWith = new ImportingWith();
+		this.innerWhere = innerWhere;
+	}
 
 	ExistentialSubquery(Match fragment) {
-		this.fragment = fragment;
+		this.fragments = List.of(fragment);
 		this.importingWith = new ImportingWith();
+		this.innerWhere = null;
 	}
 
 	ExistentialSubquery(Statement statement, IdentifiableElement... imports) {
-		this.fragment = statement;
+		this.fragments = List.of(statement);
 		this.importingWith = ImportingWith.of(imports);
+		this.innerWhere = null;
 	}
 
 	@Override
@@ -64,7 +81,8 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 
 		visitor.enter(this);
 		importingWith.accept(visitor);
-		fragment.accept(visitor);
+		fragments.forEach(v -> v.accept(visitor));
+		Visitable.visitIfNotNull(innerWhere, visitor);
 		visitor.leave(this);
 	}
 }

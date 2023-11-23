@@ -23,14 +23,13 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
@@ -55,11 +54,8 @@ import org.neo4j.cypher.internal.ast.factory.SimpleEither;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
-import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.ExposesPatternLengthAccessors;
-import org.neo4j.cypherdsl.core.ExposesProperties;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Expressions;
@@ -70,32 +66,28 @@ import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.LabelExpression;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.MapProjection;
-import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.NamedPath;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operations;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.ParenthesizedPathPattern;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Predicates;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.PropertyLookup;
-import org.neo4j.cypherdsl.core.Relationship;
-import org.neo4j.cypherdsl.core.RelationshipChain;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement;
-import org.neo4j.cypherdsl.core.StatementBuilder;
 import org.neo4j.cypherdsl.core.StringLiteral;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * An implementation of Neo4j's {@link ASTFactory} that creates Cypher-DSL AST elements that can be used for creating
@@ -147,7 +139,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		NULL,
 		InputPosition,
 		EntityType,
-		NULL,
+	QuantifiedPathPattern.Quantifier,
 		PatternAtom,
 		DatabaseName,
 		NULL,
@@ -568,6 +560,18 @@ final class CypherDslASTFactory implements ASTFactory<
 		return patternElement;
 	}
 
+	static class Patterns extends TypedSubtree<PatternElement> implements PatternElement {
+		Patterns(Collection<PatternElement> children) {
+			super(children);
+		}
+
+		@Override
+		public String separator() {
+			return " ";
+		}
+	}
+
+	@SuppressWarnings("squid:S3776") // Yep, it's complex
 	@Override
 	public PatternElement patternElement(List<PatternAtom> atoms) {
 
@@ -577,46 +581,50 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 
 		if (atoms.size() == 1 && atoms.get(0) instanceof ParenthesizedPathPatternAtom atom) {
-			return ParenthesizedPathPattern.of(atom.getPatternElement());
+			return atom.asPatternElement();
 		}
 
-		var nodes = atoms.stream()
-			.filter(NodeAtom.class::isInstance).map(NodeAtom.class::cast).toList();
-		var relationships = atoms.stream()
-			.filter(PathAtom.class::isInstance).map(PathAtom.class::cast).toList();
+		List<PatternElement> patternElements = new ArrayList<>();
+		NodeAtom lastNodeAtom = null;
+		PathAtom lastPathAtom = null;
+		ExposesRelationships<?> relationshipPattern = null;
+		for (PatternAtom atom : atoms) {
 
-		if (nodes.size() == 1 && relationships.isEmpty()) {
-			return nodes.get(0);
+			if (atom instanceof ParenthesizedPathPatternAtom specificAtom) {
+				if (lastNodeAtom != null) {
+					patternElements.add(lastNodeAtom.value());
+				}
+				if (relationshipPattern != null) {
+					patternElements.add((PatternElement) relationshipPattern);
+				}
+				lastNodeAtom = null;
+				lastPathAtom = null;
+				relationshipPattern = null;
+				patternElements.add(specificAtom.asPatternElement());
+			} else if (atom instanceof NodeAtom nodeAtom) {
+				if (relationshipPattern != null) {
+					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom);
+				} else if (lastNodeAtom == null) {
+					lastNodeAtom = nodeAtom;
+				} else {
+					relationshipPattern = lastNodeAtom.value();
+					lastNodeAtom = null;
+					// Will be added to the pattern elements either on the occurrence of a parenthesized pattern or
+					// after iterating all atoms.
+					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom);
+				}
+			} else if (atom instanceof PathAtom pathAtom) {
+				lastPathAtom = pathAtom;
+			}
 		}
 
-		if (nodes.size() != relationships.size() + 1) {
-			throw new IllegalArgumentException(
-				"Something weird has happened. Got " + nodes.size() + " nodes and " + relationships.size()
-				+ " path details.");
+		if (relationshipPattern != null) {
+			patternElements.add((PatternElement) relationshipPattern);
+		} else if (lastNodeAtom != null) {
+			patternElements.add(lastNodeAtom.value());
 		}
 
-		ExposesRelationships<?> relationshipPattern = nodes.get(0).value();
-		for (int i = 1; i < nodes.size(); i++) {
-			Node node = nodes.get(i).value();
-			PathAtom pathAtom = relationships.get(i - 1);
-			PathLength length = pathAtom.getLength();
-
-			relationshipPattern = switch (pathAtom.getDirection()) {
-				case LTR -> relationshipPattern.relationshipTo(node, pathAtom.getTypes());
-				case RTL -> relationshipPattern.relationshipFrom(node, pathAtom.getTypes());
-				case UNI -> relationshipPattern.relationshipBetween(node, pathAtom.getTypes());
-			};
-
-			relationshipPattern = applyOptionalName(relationshipPattern, pathAtom);
-
-			relationshipPattern = applyOptionalProperties(relationshipPattern, pathAtom);
-
-			relationshipPattern = applyOptionalPredicate(relationshipPattern, pathAtom);
-
-			relationshipPattern = applyOptionalLength(relationshipPattern, length);
-		}
-
-		return (PatternElement) relationshipPattern;
+		return patternElements.size() == 1 ? patternElements.get(0) : new Patterns(patternElements);
 	}
 
 	@Override
@@ -644,49 +652,6 @@ final class CypherDslASTFactory implements ASTFactory<
 		throw new UnsupportedOperationException();
 	}
 
-	private static ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern, PathLength length) {
-		if (length == null) {
-			return relationshipPattern;
-		}
-		if (length.isUnbounded()) {
-			return ((ExposesPatternLengthAccessors<?>) relationshipPattern).unbounded();
-		}
-		return ((ExposesPatternLengthAccessors<?>) relationshipPattern).length(length.getMinimum(), length.getMaximum());
-	}
-
-	private static ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		var properties = pathAtom.getProperties();
-		if (properties == null) {
-			return relationshipPattern;
-		}
-		if (relationshipPattern instanceof ExposesProperties<?> exposesProperties) {
-			return (ExposesRelationships<?>) exposesProperties.withProperties(properties);
-		}
-		return ((RelationshipChain) relationshipPattern).properties(properties);
-	}
-
-	private static ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		var name = pathAtom.getName();
-		if (name == null) {
-			return relationshipPattern;
-		}
-		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.named(name);
-		}
-		return ((RelationshipChain) relationshipPattern).named(name);
-	}
-
-	private static ExposesRelationships<?> applyOptionalPredicate(ExposesRelationships<?> relationshipPattern, PathAtom pathAtom) {
-		var predicate = pathAtom.getPredicate();
-		if (predicate == null) {
-			return relationshipPattern;
-		}
-		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.where(predicate);
-		}
-		return ((RelationshipChain) relationshipPattern).where(predicate);
-	}
-
 	@Override
 	public NodeAtom nodePattern(InputPosition p, Expression v, LabelExpression labels, Expression properties, Expression predicate) {
 
@@ -709,7 +674,7 @@ final class CypherDslASTFactory implements ASTFactory<
 			node = node.withProperties((MapExpression) properties);
 		}
 		if (predicate != null) {
-			node = node.where(predicate);
+			node = (Node) node.where(predicate);
 		}
 		return new NodeAtom(node);
 	}
@@ -728,23 +693,24 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
+	public QuantifiedPathPattern.Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
+
+		return QuantifiedPathPattern.interval(lowerBound == null ? null : Integer.parseInt(lowerBound), upperBound == null ? null : Integer.parseInt(upperBound));
+	}
+
+	@Override
+	public QuantifiedPathPattern.Quantifier fixedPathQuantifier(InputPosition p, InputPosition valuePos, String value) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public NULL fixedPathQuantifier(InputPosition p, InputPosition valuePos, String value) {
-		throw new UnsupportedOperationException();
+	public QuantifiedPathPattern.Quantifier plusPathQuantifier(InputPosition p) {
+		return QuantifiedPathPattern.plus();
 	}
 
 	@Override
-	public NULL plusPathQuantifier(InputPosition p) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public NULL starPathQuantifier(InputPosition p) {
-		throw new UnsupportedOperationException();
+	public QuantifiedPathPattern.Quantifier starPathQuantifier(InputPosition p) {
+		return QuantifiedPathPattern.star();
 	}
 
 	@Override
@@ -758,13 +724,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, NULL aNull) {
-		return ParenthesizedPathPatternAtom.of(internalPattern);
+	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, QuantifiedPathPattern.Quantifier pathPatternQuantifier) {
+		return new ParenthesizedPathPatternAtom((RelationshipPattern) internalPattern, pathPatternQuantifier, where);
 	}
 
 	@Override
-	public PatternAtom quantifiedRelationship(PathAtom rel, NULL aNull) {
-		throw new UnsupportedOperationException();
+	public PatternAtom quantifiedRelationship(PathAtom rel, QuantifiedPathPattern.Quantifier pathPatternQuantifier) {
+		return rel.withQuantifier(pathPatternQuantifier);
 	}
 
 	@Override
@@ -1482,85 +1448,21 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Expression existsExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
 
-		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
-		StatementBuilder.OngoingReadingWithoutWhere match = Cypher.match(elementsAndWhere.elements());
-		if (elementsAndWhere.where() == null) {
-			return match.asCondition();
+		if (q == null) {
+			return Predicates.exists(patternElements, where);
+		} else {
+			return Predicates.exists(q);
 		}
-		var capturedCondition = new AtomicReference<Condition>();
-		elementsAndWhere.where.accept(segment -> {
-			if (segment instanceof Condition condition) {
-				capturedCondition.compareAndSet(null, condition);
-			}
-		});
-		return match.where(capturedCondition.get()).asCondition();
-	}
-
-	record ElementsAndWhere(List<PatternElement> elements, Where where) {
-	}
-
-	private ElementsAndWhere extractElementsAndWhere(List<PatternElement> patternElements, Statement q, Where where) {
-
-		Where where0 = where;
-		List<PatternElement> patternElements0 = patternElements;
-
-		if (patternElements0 == null && q != null) {
-			AtomicReference<Where> capturedWhere = new AtomicReference<>();
-			AtomicBoolean inMatch = new AtomicBoolean();
-			AtomicReference<PatternElement> inPattern = new AtomicReference<>();
-			List<PatternElement> capturedElements = new ArrayList<>();
-			q.accept(new Visitor() {
-				@Override
-				public void enter(Visitable segment) {
-					inMatch.compareAndSet(false, segment instanceof Match);
-					if (!inMatch.get() || capturedWhere.get() != null) {
-						return;
-					}
-
-					if (segment instanceof Where innerWhere) {
-						capturedWhere.compareAndSet(null, innerWhere);
-					} else if (segment instanceof PatternElement patternElement && inPattern.compareAndSet(null, patternElement)) {
-						capturedElements.add(patternElement);
-					}
-				}
-
-				@Override
-				public void leave(Visitable segment) {
-					inMatch.compareAndSet(true, !(segment instanceof Match));
-					if (segment instanceof PatternElement patternElement) {
-						inPattern.compareAndSet(patternElement, null);
-					}
-				}
-			});
-			patternElements0 = capturedElements;
-			where0 = capturedWhere.get();
-		}
-
-		return new ElementsAndWhere(patternElements0, where0);
 	}
 
 	@Override
 	public Expression countExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
 
-		var elementsAndWhere = extractElementsAndWhere(patternElements, q, where);
-		Expression condition = null;
-		if (elementsAndWhere.where() != null) {
-			var capturedCondition = new AtomicReference<Condition>();
-			elementsAndWhere.where.accept(segment -> {
-				if (segment instanceof Condition nestedCondition) {
-					capturedCondition.compareAndSet(null, nestedCondition);
-				}
-			});
-			condition = capturedCondition.get();
+		if (q == null) {
+			return Expressions.count(patternElements, where);
+		} else {
+			return Expressions.count(q);
 		}
-
-
-		var elements = elementsAndWhere.elements();
-		var count = Expressions.count(elements.get(0), elements.subList(1, elements.size()).toArray(PatternElement[]::new));
-		if (condition == null) {
-			return count;
-		}
-		return count.where(condition.asCondition());
 	}
 
 	@Override

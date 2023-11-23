@@ -144,6 +144,13 @@ class TckTest {
 	}
 
 	@SuppressWarnings("unused")
+	void qppShouldWork(Renderer renderer, String input, String expected) {
+
+		var cypher = renderer.render(CypherParser.parseStatement(input));
+		assertThat(cypher).isEqualTo(expected.replaceAll("\\s{2,}|\n", " "));
+	}
+
+	@SuppressWarnings("unused")
 	void unsupportedShouldWork(Renderer renderer, String input, String expected) {
 
 		assertThatExceptionOfType(UnsupportedCypherException.class).isThrownBy(() -> CypherParser.parse(input))
@@ -177,12 +184,8 @@ class TckTest {
 						Arrays.asList(block.getSource().split(";")) :
 						block.getLines();
 					switch (id[1]) {
-						case "input":
-							test.input.addAll(lines);
-							break;
-						case "output":
-							test.expected.addAll(lines);
-							break;
+						case "input" -> test.input.addAll(lines);
+						case "output" -> test.expected.addAll(lines);
 					}
 				});
 

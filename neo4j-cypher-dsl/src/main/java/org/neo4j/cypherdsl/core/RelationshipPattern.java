@@ -23,6 +23,7 @@ import static org.apiguardian.api.API.Status.STABLE;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
@@ -65,4 +66,28 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 */
 	@NotNull @Contract(pure = true)
 	Condition asCondition();
+
+	/**
+	 * Quantifies the relationship.
+	 *
+	 * @param quantifier the quantifier to use
+	 * @return a quantified relationship
+	 * @since 2023.9.0
+	 */
+	@NotNull @Contract(pure = true)
+	default PatternElement quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Quantifies the pattern.
+	 *
+	 * @param quantifier the quantifier to use
+	 * @return a quantified path pattern
+	 * @since 2023.9.0
+	 */
+	@NotNull @Contract(pure = true)
+	default PatternElement quantify(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
+		throw new UnsupportedOperationException();
+	}
 }

@@ -23,7 +23,9 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 /**
  * @author Michael J. Simons
  * @since 2023.7.0
+ * @deprecated Use {@link QuantifiedPathPattern} instead.
  */
+@Deprecated(forRemoval = true, since = "2023.9.0")
 public final class ParenthesizedPathPattern implements PatternElement {
 
 	/**
@@ -32,6 +34,7 @@ public final class ParenthesizedPathPattern implements PatternElement {
 	 * @param patternElement The pattern element to be wrapped
 	 * @return A new patter element
 	 */
+	@Deprecated(forRemoval = true, since = "2023.9.0")
 	public static ParenthesizedPathPattern of(PatternElement patternElement) {
 		return new ParenthesizedPathPattern(patternElement);
 	}

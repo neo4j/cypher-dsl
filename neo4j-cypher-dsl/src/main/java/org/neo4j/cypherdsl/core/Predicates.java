@@ -20,9 +20,12 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.List;
+
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
@@ -77,6 +80,52 @@ public final class Predicates {
 	public static Condition exists(Statement statement, IdentifiableElement... imports) {
 
 		return ExistentialSubquery.exists(statement, imports);
+	}
+
+	/**
+	 * Creates                  a                 new                  condition                 via                  an
+	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
+	 * sub-query</a> based on the list of patterns
+	 *
+	 * @param pattern the pattern that must exists
+	 *
+	 * @return An existential sub-query.
+	 * @since 2023.9.0
+	 */
+	public static Condition exists(PatternElement pattern) {
+
+		return ExistentialSubquery.exists(List.of(pattern), null);
+	}
+
+	/**
+	 * Creates                  a                 new                  condition                 via                  an
+	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
+	 * sub-query</a> based on the list of patterns
+	 *
+	 * @param pattern the list of patterns that must exists
+	 *
+	 * @return An existential sub-query.
+	 * @since 2023.9.0
+	 */
+	public static Condition exists(List<PatternElement> pattern) {
+
+		return ExistentialSubquery.exists(pattern, null);
+	}
+
+	/**
+	 * Creates                  a                 new                  condition                 via                  an
+	 * <a     href="https://neo4j.com/docs/cypher-manual/current/syntax/expressions/#existential-subqueries">existential
+	 * sub-query</a> based on the list of patterns and an optional {@link Where where-clause}.
+	 *
+	 * @param pattern the list of patterns that must exists
+	 * @param where an optional where-clause
+	 *
+	 * @return An existential sub-query.
+	 * @since 2023.9.0
+	 */
+	public static Condition exists(List<PatternElement> pattern, @Nullable Where where) {
+
+		return ExistentialSubquery.exists(pattern, where);
 	}
 
 	/**

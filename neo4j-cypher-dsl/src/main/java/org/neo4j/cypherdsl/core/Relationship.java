@@ -177,10 +177,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		}
 
 		Details where(Expression predicate) {
-
-			if (predicate == null) {
-				return this;
-			}
 			return new Details(this.direction, this.symbolicName, this.types, this.length, this.properties, Where.from(predicate));
 		}
 
@@ -291,6 +287,12 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	Node getRight();
 
 	/**
+	 * {@return the quantifier of this relationship if any}
+	 */
+	@Nullable @Contract(pure = true)
+	QuantifiedPathPattern.Quantifier getQuantifier();
+
+	/**
 	 * Creates a copy of this relationship with a new symbolic name.
 	 *
 	 * @param newSymbolicName the new symbolic name.
@@ -318,16 +320,4 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 */
 	@NotNull @Contract(pure = true)
 	Relationship inverse();
-
-	/**
-	 * Creates a new {@link Relationship node pattern} which including an additional filter. Returns {@code this} relationship
-	 * when {@code predicate} is literal {@code null}
-	 * @param predicate the predicate to filter on
-	 * @return a new relationship or this instance if the predicate to this method was literal {@code null}
-	 * @since 2023.9.0
-	 */
-	@NotNull @Contract(pure = true)
-	default Relationship where(@Nullable Expression predicate) {
-		throw new UnsupportedOperationException();
-	}
 }

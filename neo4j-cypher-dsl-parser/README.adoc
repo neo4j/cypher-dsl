@@ -525,7 +525,7 @@ LOAD CSV FROM 'file:///artists.csv' AS line RETURN DISTINCT file() AS path
 
 === Subqueries
 
-Executing subqueries requires at least Neo4j 4.0, but you can of course parse and modifiy those queries:
+Executing subqueries requires at least Neo4j 4.0, but you can of course parse and modify those queries:
 
 [[statements-input-subqueries]]
 .Input
@@ -765,6 +765,160 @@ l[1..2]
 [x IN range(0, 10) | x^3]
 [(a)-->(b) WHERE b:`Movie` | b.released]
 (a XOR b)
+----
+
+=== Quantified path patterns
+
+Most queries in this test are from Finbar Goods blog post https://medium.com/neo4j/getting-from-denmark-hill-to-gatwick-airport-with-quantified-path-patterns-bed38da27ca1["Getting From Denmark Hill to Gatwick Airport With Quantified Path Patterns].
+Finbar provides the UK Railway dataset at https://github.com/dogofbrian/ukrailway, in case you wanna load the data and follow the examples.
+
+[[qpp-input-qpp]]
+.Input
+[source,cypher,separated=true,alwaysEscape=false]
+----
+MATCH (:Station)--()<--(m WHERE m.departs > time('12:00'))-->()-[:NEXT]->(n) RETURN *;
+MATCH ((n:A)-[:R]->(:B) WHERE EXISTS { (n)-->+(:X) }){2,3};
+MATCH (n:Station {name: 'London Euston'})<-[:CALLS_AT]-(s1:Stop)
+  -[:NEXT]->(s2:Stop)-[:CALLS_AT]->(:Station {name: 'Coventry'})
+  <-[:CALLS_AT]-(s3:Stop)-[:NEXT]->(s4:Stop)-[:CALLS_AT]->(n)
+RETURN s1.departs+'-'+s2.departs AS outbound,
+  s3.departs+'-'+s4.departs AS `return`;
+MATCH (:Station { name: 'Denmark Hill' })<-[:X]-(d:Stop)
+      ((:Stop)-[:NEXT]->(:Stop)){1,3}
+      (a:Stop)-[:Y]->(:Station { name: 'Clapham Junction' })
+RETURN d.departs AS departureTime, a.arrives AS arrivalTime;
+match (:A) (()-[r:R]->()){2,3} (:B) return *;
+match (:A) (()-[r:R]->())+ (:B) return *;
+match (:A) (()-[r:R]->())* (:B) return *;
+MATCH p = ((person:`Person`)-[:`DIRECTED`]->(movie:`Movie`)) WHERE person.name = 'Walt Disney' RETURN p;
+MATCH ((:Station {name: 'Denmark Hill'})-[l:LINK]-(s:Station)){1,4} RETURN *;
+MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-())+ (:Station {name: 'Gatwick Airport'})
+RETURN reduce(acc = 0.0, l IN link | round(acc + l.distance, 2)) AS total,
+  [n in nodes(p) | n.name] AS stations
+ORDER BY total
+LIMIT 1;
+MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-()){1,28}
+            (:Station {name: 'Gatwick Airport'})
+RETURN size(relationships(p)) AS numStations, count(*) AS numRoutes
+ORDER BY numStations;
+MATCH (gtw:Station {name: 'Gatwick Airport'})
+MATCH p = (:Station {name: 'Denmark Hill'})
+          ((l)-[link:LINK]-(r) WHERE point.distance(r.location, gtw.location)
+             - point.distance(l.location, gtw.location) < 1000)+ (gtw)
+RETURN reduce(acc = 0.0, l IN link | round(acc + l.distance, 2)) AS total,
+ [n in nodes(p) | n.name] AS stations
+ORDER BY total
+LIMIT 1;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+
+        (l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+
+        (l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'});
+MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(r:CallingPoint)
+(()-[:NEXT]->())+
+(:CallingPoint)-[:CALLS_AT]->(:Station {name: 'Gatwick Airport'})
+RETURN r.routeName AS route;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1:CallingPoint)
+(()-[:NEXT]->())+
+(:CallingPoint)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2:CallingPoint)
+(()-[:NEXT]->())+
+(:CallingPoint)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+RETURN l1.routeName AS leg1, x.name AS changeAt, l2.routeName AS leg2;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+
+        (l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+
+        (l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+        WHERE time('09:30') < s1.departs < time('10:00')
+MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+        WHERE s2.arrives < s3.departs < s2.arrives + duration('PT15M')
+RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+         s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+         duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+ORDER BY leg2Arrive
+LIMIT 5;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)
+        (()-[:NEXT]->(n)
+          WHERE NOT EXISTS { (n)-[:CALLS_AT]->(:Station:LondonGroup) })+
+        (l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)
+        (()-[:NEXT]->(m)
+          WHERE NOT EXISTS { (m)-[:CALLS_AT]->(:Station:LondonGroup) })+
+        (l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+WHERE time('09:30') < s1.departs < time('10:00')
+MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+WHERE s2.arrives < s3.departs < s2.arrives + duration('PT15M')
+RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+        s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+        duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+ORDER BY leg2Arrive
+LIMIT 5;
+----
+
+[[qpp-output-qpp]]
+.Input
+[source,cypher,separated=true,alwaysEscape=false]
+----
+MATCH (:Station)--()<--(m WHERE m.departs > time('12:00'))-->()-[:NEXT]->(n) RETURN *;
+MATCH ((n:A)-[:R]->(:B) WHERE EXISTS { (n)-->+(:X) }){2,3};
+MATCH (n:Station {name: 'London Euston'})<-[:CALLS_AT]-(s1:Stop)-[:NEXT]->(s2:Stop)-[:CALLS_AT]->(:Station {name: 'Coventry'})<-[:CALLS_AT]-(s3:Stop)-[:NEXT]->(s4:Stop)-[:CALLS_AT]->(n) RETURN ((s1.departs + '-') + s2.departs) AS outbound, ((s3.departs + '-') + s4.departs) AS return;
+MATCH (:Station {name: 'Denmark Hill'})<-[:X]-(d:Stop)
+      ((:Stop)-[:NEXT]->(:Stop)){1,3}
+      (a:Stop)-[:Y]->(:Station {name: 'Clapham Junction'})
+RETURN d.departs AS departureTime, a.arrives AS arrivalTime;
+MATCH (:A) (()-[r:R]->()){2,3} (:B) RETURN *;
+MATCH (:A) (()-[r:R]->())+ (:B) RETURN *;
+MATCH (:A) (()-[r:R]->())* (:B) RETURN *;
+MATCH p = ((person:Person)-[:DIRECTED]->(movie:Movie)) WHERE person.name = 'Walt Disney' RETURN p;
+MATCH ((:Station {name: 'Denmark Hill'})-[l:LINK]-(s:Station)){1,4} RETURN *;
+MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-())+ (:Station {name: 'Gatwick Airport'})
+RETURN reduce(acc = 0.0, l IN link | round((acc + l.distance), 2)) AS total,
+[n IN nodes(p) | n.name] AS stations
+ORDER BY total ASC
+LIMIT 1;
+MATCH p = (:Station {name: 'Denmark Hill'}) (()-[link:LINK]-()){1,28} (:Station {name: 'Gatwick Airport'})
+RETURN size(relationships(p)) AS numStations, count(*) AS numRoutes
+ORDER BY numStations ASC;
+MATCH (gtw:Station {name: 'Gatwick Airport'})
+MATCH p = (:Station {name: 'Denmark Hill'}) ((l)-[link:LINK]-(r) WHERE (point.distance(r.location, gtw.location) - point.distance(l.location, gtw.location)) < 1000)+ (gtw)
+RETURN reduce(acc = 0.0, l IN link | round((acc + l.distance), 2)) AS total,
+[n IN nodes(p) | n.name] AS stations
+ORDER BY total ASC
+LIMIT 1;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+(l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+(l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'});
+MATCH (:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(r:CallingPoint)
+(()-[:NEXT]->())+
+(:CallingPoint)-[:CALLS_AT]->(:Station {name: 'Gatwick Airport'})
+RETURN r.routeName AS route;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1:CallingPoint)
+(()-[:NEXT]->())+
+(:CallingPoint)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2:CallingPoint)
+(()-[:NEXT]->())+
+(:CallingPoint)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+RETURN l1.routeName AS leg1, x.name AS changeAt, l2.routeName AS leg2;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)-[:NEXT]->+(l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)-[:NEXT]->+(l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+WHERE (time('09:30') < s1.departs AND s1.departs < time('10:00'))
+MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+WHERE (s2.arrives < s3.departs AND s3.departs < (s2.arrives + duration('PT15M')))
+RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+ORDER BY leg2Arrive ASC
+LIMIT 5;
+MATCH (dmk:Station {name: 'Denmark Hill'})<-[:CALLS_AT]-(l1a:CallingPoint)
+(()-[:NEXT]->(n)
+WHERE NOT (EXISTS { (n)-[:CALLS_AT]->(:Station:LondonGroup) }))+
+(l1b)-[:CALLS_AT]->(x:Station)<-[:CALLS_AT]-(l2a:CallingPoint)
+(()-[:NEXT]->(m)
+WHERE NOT (EXISTS { (m)-[:CALLS_AT]->(:Station:LondonGroup) }))+
+(l2b)-[:CALLS_AT]->(gtw:Station {name: 'Gatwick Airport'})
+MATCH (l1a)-[:HAS]->(s1:Stop)-[:NEXT]->+(s2)<-[:HAS]-(l1b)
+WHERE (time('09:30') < s1.departs AND s1.departs < time('10:00'))
+MATCH (l2a)-[:HAS]->(s3:Stop)-[:NEXT]->+(s4)<-[:HAS]-(l2b)
+WHERE (s2.arrives < s3.departs AND s3.departs < (s2.arrives + duration('PT15M')))
+RETURN s1.departs AS leg1Departs, s2.arrives AS leg1Arrives, x.name AS changeAt,
+s3.departs AS leg2Departs, s4.arrives AS leg2Arrive,
+duration.between(s1.departs, s4.arrives).minutes AS journeyTime
+ORDER BY leg2Arrive ASC
+LIMIT 5;
 ----
 
 === Unsupported operations

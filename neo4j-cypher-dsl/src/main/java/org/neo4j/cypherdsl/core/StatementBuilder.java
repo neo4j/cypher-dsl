@@ -79,7 +79,7 @@ public interface StatementBuilder
 	/**
 	 * A match that exposes {@code returning} and {@code where} methods to add required information.
 	 * While the where clause is optional, a returning clause needs to be specified before the
-	 * statement can be build.
+	 * statement can be built.
 	 *
 	 * @since 1.0
 	 */

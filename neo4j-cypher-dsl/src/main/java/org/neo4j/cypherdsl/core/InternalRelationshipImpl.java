@@ -25,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * An internal implementation of the {@link RelationshipBase}. It's primary purpose is to have {@link RelationshipBase#named(SymbolicName)}
- * and {@link RelationshipBase#withProperties(MapExpression)} abstract method to enforce the correct return type. Otherwise one
+ * and {@link RelationshipBase#withProperties(MapExpression)} abstract method to enforce the correct return type. Otherwise, one
  * could extend {@link RelationshipBase} without overriding those, ignoring unchecked casts and eventually running into a {@link ClassCastException}.
  *
  * @author Michael J. Simons
@@ -35,30 +35,30 @@ import org.jetbrains.annotations.NotNull;
 final class InternalRelationshipImpl extends RelationshipBase<NodeBase<?>, NodeBase<?>, InternalRelationshipImpl> {
 
 	InternalRelationshipImpl(SymbolicName symbolicName, Node left,
-		Direction direction, Node right, String... types) {
-		super(symbolicName, left, direction, right, types);
+		Direction direction, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
+		super(symbolicName, left, direction, quantifier, right, types);
 	}
 
 	InternalRelationshipImpl(SymbolicName symbolicName, Node left,
-		Direction direction, Properties properties, Node right, String... types) {
-		super(symbolicName, left, direction, properties, right, types);
+		Direction direction, Properties properties, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
+		super(symbolicName, left, direction, properties, quantifier, right, types);
 	}
 
-	InternalRelationshipImpl(Node left, Details details, Node right) {
-		super(left, details, right);
+	InternalRelationshipImpl(Node left, Details details, QuantifiedPathPattern.Quantifier quantifier, Node right) {
+		super(left, details, quantifier, right);
 	}
 
 	@NotNull
 	@Override
 	public InternalRelationshipImpl named(SymbolicName newSymbolicName) {
 
-		return new InternalRelationshipImpl(this.left, this.details.named(newSymbolicName), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.named(newSymbolicName), quantifier, this.right);
 	}
 
 	@NotNull
 	@Override
 	public InternalRelationshipImpl withProperties(MapExpression newProperties) {
 
-		return new InternalRelationshipImpl(this.left, this.details.with(Properties.create(newProperties)), this.right);
+		return new InternalRelationshipImpl(this.left, this.details.with(Properties.create(newProperties)), quantifier, this.right);
 	}
 }
