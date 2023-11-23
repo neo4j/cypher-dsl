@@ -141,6 +141,7 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @since 2022.6.0
 	 */
 	@NotNull @Contract(pure = true)
+	@SuppressWarnings("deprecation")
 	default FunctionInvocation elementId() {
 		return Functions.elementId(this);
 	}

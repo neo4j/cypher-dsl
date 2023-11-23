@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.ArrayList;
@@ -50,6 +51,7 @@ public final class MapProjection implements Expression {
 	 * @return A new map projection
 	 * @since 2021.2.3
 	 */
+	@API(status = INTERNAL, since = "2023.9.0")
 	public static MapProjection create(SymbolicName name, Object... content) {
 
 		return new MapProjection(name, MapExpression.withEntries(createNewContent(content)));
@@ -79,6 +81,7 @@ public final class MapProjection implements Expression {
 		visitor.leave(this);
 	}
 
+	@SuppressWarnings("deprecation")
 	private static Object contentAt(Object[] content, int i) {
 
 		Object currentObject = content[i];

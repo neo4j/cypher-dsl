@@ -44,6 +44,7 @@ public interface ExposesReturning {
 	 * @return A build step with a defined list of things to return.
 	 */
 	@NotNull @CheckReturnValue
+	@SuppressWarnings("deprecation")
 	default StatementBuilder.OngoingReadingAndReturn returning(String... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -55,6 +56,7 @@ public interface ExposesReturning {
 	 * @return A build step with a defined list of things to return.
 	 */
 	@NotNull @CheckReturnValue
+	@SuppressWarnings("deprecation")
 	default StatementBuilder.OngoingReadingAndReturn returning(Named... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -88,6 +90,7 @@ public interface ExposesReturning {
 	 * @return A build step with a defined list of things to return.
 	 */
 	@NotNull @CheckReturnValue
+	@SuppressWarnings("deprecation")
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(String... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
@@ -99,6 +102,7 @@ public interface ExposesReturning {
 	 * @return A build step with a defined list of things to return.
 	 */
 	@NotNull @CheckReturnValue
+	@SuppressWarnings("deprecation")
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Named... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}

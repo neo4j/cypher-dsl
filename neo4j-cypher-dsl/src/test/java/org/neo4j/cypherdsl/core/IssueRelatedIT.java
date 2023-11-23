@@ -77,8 +77,8 @@ class IssueRelatedIT {
 					Cypher.literalOf("<label_filter>")))
 			.yield(p)
 			.returningDistinct(nodes.getRequiredSymbolicName(),
-				Functions.collect(Functions.relationships(p)).as("rels"),
-				Functions.collect(Functions.nodes(p)).as("nodes")).build();
+				Cypher.collect(Cypher.relationships(p)).as("rels"),
+				Cypher.collect(Cypher.nodes(p)).as("nodes")).build();
 
 		assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (node:`Node` {id: 'node_42'}) "
@@ -133,7 +133,7 @@ class IssueRelatedIT {
 		Statement s = Cypher.match(r.relationshipTo(o, "FOR"))
 			.where(r.hasLabels("LastResume").not())
 			.and(
-				Functions.coalesce(o.property("valid_only"), Cypher.literalFalse()).isEqualTo(Cypher.literalFalse())
+				Cypher.coalesce(o.property("valid_only"), Cypher.literalFalse()).isEqualTo(Cypher.literalFalse())
 					.and(r.hasLabels("InvalidStatus").not())
 					.or(o.property("valid_only").isTrue()
 						.and(r.hasLabels("InvalidStatus"))))
@@ -154,16 +154,16 @@ class IssueRelatedIT {
 		Statement s = Cypher.match(r.relationshipFrom(u, "HAS"))
 			.where(r.hasLabels("LastResume").not())
 			.and(
-				Functions.coalesce(o.property("valid_only"), Cypher.literalFalse()).isEqualTo(Cypher.literalFalse())
+				Cypher.coalesce(o.property("valid_only"), Cypher.literalFalse()).isEqualTo(Cypher.literalFalse())
 					.and(r.hasLabels("InvalidStatus").not())
 					.or(o.property("valid_only").isTrue()
 						.and(r.hasLabels("ValidStatus")))
 			)
 			.and(r.property("is_internship").isTrue()
-				.and(Functions.size(r.relationshipTo(Cypher.anyNode(), "PART_OF")).isEmpty())
+				.and(Cypher.size(r.relationshipTo(Cypher.anyNode(), "PART_OF")).isEmpty())
 				.not())
 			.and(r.property("is_sandwich_training").isTrue()
-				.and(Functions.size(r.relationshipTo(Cypher.anyNode(), "PART_OF")).isEmpty())
+				.and(Cypher.size(r.relationshipTo(Cypher.anyNode(), "PART_OF")).isEmpty())
 				.not())
 			.returningDistinct(r, o)
 			.build();
@@ -190,7 +190,7 @@ class IssueRelatedIT {
 		final Node u = Cypher.node("UserSearchable").named("u");
 
 		Statement s = Cypher.match(r.relationshipFrom(u, "HAS"))
-			.where(Conditions.not(Predicates.exists(r.relationshipTo(u, "EXCLUDES"))))
+			.where(Cypher.not(Cypher.exists(r.relationshipTo(u, "EXCLUDES"))))
 			.returningDistinct(r)
 			.build();
 
@@ -205,7 +205,7 @@ class IssueRelatedIT {
 		final Node u = Cypher.node("User").named("u");
 
 		Statement s = Cypher.match(r.relationshipFrom(u, "HAS"))
-			.with(Functions.head(Functions.collect(r.getRequiredSymbolicName())).as("r"))
+			.with(Cypher.head(Cypher.collect(r.getRequiredSymbolicName())).as("r"))
 			.returning(r)
 			.build();
 
@@ -219,7 +219,7 @@ class IssueRelatedIT {
 		final Node u = Cypher.node("User").named("u");
 
 		Statement s = Cypher.match(r.relationshipFrom(u, "HAS"))
-			.returning(Functions.countDistinct(r.getRequiredSymbolicName()).as("r"))
+			.returning(Cypher.countDistinct(r.getRequiredSymbolicName()).as("r"))
 			.build();
 
 		assertThat(cypherRenderer.render(s))
@@ -231,7 +231,7 @@ class IssueRelatedIT {
 
 		// avg
 		Statement s = Cypher.match(person)
-			.returning(Functions.avg(person.property("age")))
+			.returning(Cypher.avg(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (person:`Person`) RETURN avg(person.age)");
@@ -246,22 +246,22 @@ class IssueRelatedIT {
 			Cypher.literalOf("1"),
 			Cypher.literalOf("99"));
 		s = Cypher.unwind(list).as("val")
-			.returning(Functions.max(Cypher.name("val"))).build();
+			.returning(Cypher.max(Cypher.name("val"))).build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("UNWIND [1, 'a', NULL, 0.2, 'b', '1', '99'] AS val RETURN max(val)");
 		s = Cypher.unwind(list).as("val")
-			.returning(Functions.min(Cypher.name("val"))).build();
+			.returning(Cypher.min(Cypher.name("val"))).build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("UNWIND [1, 'a', NULL, 0.2, 'b', '1', '99'] AS val RETURN min(val)");
 
 		// percentileCont/percentileDisc
 		s = Cypher.match(person)
-			.returning(Functions.percentileCont(person.property("age"), 0.4))
+			.returning(Cypher.percentileCont(person.property("age"), 0.4))
 			.build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (person:`Person`) RETURN percentileCont(person.age, 0.4)");
 		s = Cypher.match(person)
-			.returning(Functions.percentileDisc(person.property("age"), 0.5))
+			.returning(Cypher.percentileDisc(person.property("age"), 0.5))
 			.build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (person:`Person`) RETURN percentileDisc(person.age, 0.5)");
@@ -270,14 +270,14 @@ class IssueRelatedIT {
 		s = Cypher.match(person)
 			.where(person.property("name").in(
 				Cypher.listOf(Cypher.literalOf("A"), Cypher.literalOf("B"), Cypher.literalOf("C"))))
-			.returning(Functions.stDev(person.property("age")))
+			.returning(Cypher.stDev(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (person:`Person`) WHERE person.name IN ['A', 'B', 'C'] RETURN stDev(person.age)");
 		s = Cypher.match(person)
 			.where(person.property("name").in(
 				Cypher.listOf(Cypher.literalOf("A"), Cypher.literalOf("B"), Cypher.literalOf("C"))))
-			.returning(Functions.stDevP(person.property("age")))
+			.returning(Cypher.stDevP(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (person:`Person`) WHERE person.name IN ['A', 'B', 'C'] RETURN stDevP(person.age)");
@@ -286,9 +286,9 @@ class IssueRelatedIT {
 		s = Cypher.match(person)
 			.with(Cypher.listOf(Cypher.mapOf(
 				"type", person.getRequiredSymbolicName(),
-				"nb", Functions.sum(person.getRequiredSymbolicName())))
+				"nb", Cypher.sum(person.getRequiredSymbolicName())))
 				.as("counts"))
-			.returning(Functions.sum(person.property("age")))
+			.returning(Cypher.sum(person.property("age")))
 			.build();
 		assertThat(cypherRenderer.render(s))
 			.isEqualTo("MATCH (person:`Person`) WITH [{type: person, nb: sum(person)}] AS counts RETURN sum(person.age)");
@@ -342,7 +342,7 @@ class IssueRelatedIT {
 
 		Node n = Cypher.anyNode("n");
 		Statement statement = Cypher.match(n)
-			.returning(Functions.collectDistinct(n).as("distinctNodes"))
+			.returning(Cypher.collectDistinct(n).as("distinctNodes"))
 			.build();
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("MATCH (n) RETURN collect(DISTINCT n) AS distinctNodes");
@@ -427,7 +427,7 @@ class IssueRelatedIT {
 	@Test // GH-123
 	void propertiesOfFunctions() {
 
-		Statement statement = Cypher.returning(Cypher.property(Functions.datetime(), "epochSeconds")).build();
+		Statement statement = Cypher.returning(Cypher.property(Cypher.datetime(), "epochSeconds")).build();
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("RETURN datetime().epochSeconds");
 	}
@@ -435,10 +435,10 @@ class IssueRelatedIT {
 	@Test // GH-123
 	void propertiesOfFunctionsInsideQuery() {
 
-		var collectedThings = Functions.collect(Cypher.name("n")).as("collectedThings");
+		var collectedThings = Cypher.collect(Cypher.name("n")).as("collectedThings");
 		Statement statement = Cypher.match(Cypher.anyNode().named("n"))
 			.with(collectedThings)
-			.returning(Cypher.property(Functions.last(collectedThings), "name")).build();
+			.returning(Cypher.property(Cypher.last(collectedThings), "name")).build();
 		assertThat(cypherRenderer.render(statement))
 			.isEqualTo("MATCH (n) WITH collect(n) AS collectedThings RETURN last(collectedThings).name");
 	}
@@ -482,7 +482,7 @@ class IssueRelatedIT {
 		SymbolicName cond = Cypher.name("cond");
 		StatementBuilder.OngoingReadingAndReturn cypher = Cypher
 				.match(company)
-				.where(Predicates.any(cond).in(Cypher
+				.where(Cypher.any(cond).in(Cypher
 						.listBasedOn(company.relationshipTo(person, "WORKS_AT"))
 						.returning(person.property("name").isEqualTo(Cypher.parameter("name"))))
 						.where(cond.asCondition())
@@ -564,11 +564,11 @@ class IssueRelatedIT {
 		Parameter<?> location = Cypher.parameter("location");
 		Property distance = Cypher.property(location, "distance");
 
-		Expression point = Functions.point(Cypher.property(location, "point"));
+		Expression point = Cypher.point(Cypher.property(location, "point"));
 
 		Statement statement = Cypher
 			.match(person)
-			.where(Functions.distance(person.property("location"), point).isEqualTo(distance))
+			.where(Cypher.distance(person.property("location"), point).isEqualTo(distance))
 			.returning(person).build();
 
 		assertThat(cypherRenderer.render(statement))
@@ -585,7 +585,7 @@ class IssueRelatedIT {
 
 		Statement statement = Cypher
 			.match(person)
-			.where(Functions.distance(person.property("location"), point).isEqualTo(distance))
+			.where(Cypher.distance(person.property("location"), point).isEqualTo(distance))
 			.returning(person).build();
 
 		assertThat(cypherRenderer.render(statement))
@@ -758,7 +758,7 @@ class IssueRelatedIT {
 		Node node = Cypher.node("Node").named("node");
 		Expression someExpression = Cypher.literalFalse();
 
-		String cypher = Cypher.match(node).withDistinct(someExpression.as("f"), Functions.date().as("aDate"))
+		String cypher = Cypher.match(node).withDistinct(someExpression.as("f"), Cypher.date().as("aDate"))
 			.returning(Cypher.asterisk()).build().getCypher();
 		assertThat(cypher).isEqualTo(
 			"MATCH (node:`Node`) WITH DISTINCT false AS f, date() AS aDate RETURN *");
@@ -770,7 +770,7 @@ class IssueRelatedIT {
 		Node node = Cypher.node("Node").named("node");
 		Expression someExpression = Cypher.literalFalse();
 
-		String cypher = Cypher.match(node).with(Cypher.name("n"), someExpression.as("f"), Functions.date().as("aDate"))
+		String cypher = Cypher.match(node).with(Cypher.name("n"), someExpression.as("f"), Cypher.date().as("aDate"))
 			.returning(Cypher.asterisk()).build().getCypher();
 		assertThat(cypher).isEqualTo(
 			"MATCH (node:`Node`) WITH n, false AS f, date() AS aDate RETURN *");
@@ -812,7 +812,7 @@ class IssueRelatedIT {
 			.match(g.relationshipTo(a, "GROUPS").relationshipFrom(Cypher.node("Deploy"), "ON")
 				.relationshipFrom(d, "SCHEDULED"))
 			.where(a.property("asset_id").isEqualTo(Cypher.property(node, "asset_id")))
-			.withDistinct(Functions.collect(d.project(d.property("sigfox_id"), a)).as("assetdata"))
+			.withDistinct(Cypher.collect(d.project(d.property("sigfox_id"), a)).as("assetdata"))
 			.returning("assetdata").build().getCypher();
 		assertThat(cypher).isEqualTo(
 			"CALL db.index.fulltext.queryNodes('livesearch', '*a*') "
@@ -837,7 +837,7 @@ class IssueRelatedIT {
 				.match(g.relationshipTo(a, "GROUPS").relationshipFrom(Cypher.node("Deploy"), "ON")
 					.relationshipFrom(d, "SCHEDULED"))
 				.where(a.property("asset_id").isEqualTo(Cypher.property(node, "asset_id")))
-				.withDistinct(Functions.collect(d.project(d.property("sigfox_id"), a)).as("assetdata"))
+				.withDistinct(Cypher.collect(d.project(d.property("sigfox_id"), a)).as("assetdata"))
 				.returning("assetdata").build().getCypher();
 		assertThat(cypher).isEqualTo(
 			"WITH $p AS nameOfIndex CALL db.index.fulltext.queryNodes(nameOfIndex, '*a*') "
@@ -897,7 +897,7 @@ class IssueRelatedIT {
 		Node node = Cypher.node("Division").named("node");
 		Statement q = Cypher.match(node)
 			.withDistinct(node)
-			.where(Conditions
+			.where(Cypher
 				.not(Cypher.anyNode(node.getRequiredSymbolicName()).relationshipTo(Cypher.node("Department"), "IN")
 					.relationshipTo(Cypher.node("Department"), "INSIDE")
 					.properties("rel_property", Cypher.literalTrue())
@@ -927,7 +927,7 @@ class IssueRelatedIT {
 		Node node = Cypher.node("Division").named("node");
 		Statement q = Cypher.match(node)
 			.withDistinct(node)
-			.where(Conditions
+			.where(Cypher
 				.not(node.relationshipTo(Cypher.node("Department"), "IN")
 					.relationshipTo(Cypher.node("Department"), "INSIDE")
 					.properties("rel_property", Cypher.literalTrue())
@@ -1006,9 +1006,9 @@ class IssueRelatedIT {
 		Statement completeStatement =
 			Cypher
 				.match(first_path)
-				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
+				.with(Cypher.nodes(first_path).as(nodes), Cypher.relationships(first_path).as(relations))
 				.call(inner, nodes)
-				.returning(nodes, relations, Functions.collect(second_nodes), Functions.collect(second_relations))
+				.returning(nodes, relations, Cypher.collect(second_nodes), Cypher.collect(second_relations))
 			.build();
 
 		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
@@ -1041,7 +1041,7 @@ class IssueRelatedIT {
 		Statement completeStatement =
 			Cypher
 				.match(first_path)
-				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
+				.with(Cypher.nodes(first_path).as(nodes), Cypher.relationships(first_path).as(relations))
 				.call(Cypher.returning(Cypher.name("x")).build(), nodes.as("x"))
 				.returning(Cypher.asterisk())
 				.build();
@@ -1074,7 +1074,7 @@ class IssueRelatedIT {
 		Statement completeStatement =
 			Cypher
 				.match(first_path)
-				.with(Functions.nodes(first_path).as(nodes), Functions.relationships(first_path).as(relations))
+				.with(Cypher.nodes(first_path).as(nodes), Cypher.relationships(first_path).as(relations))
 				.call(Cypher.returning(Cypher.literalOf(1)).build())
 				.returning(Cypher.literalTrue())
 				.build();
@@ -1096,7 +1096,7 @@ class IssueRelatedIT {
 		Node n = Cypher.anyNode("n");
 		ResultStatement statement = Cypher.match(n)
 			.call("apoc.util.validate")
-				.withArgs(Predicates.exists(n.property("foo")), Cypher.literalOf("Error"), Cypher.listOf())
+				.withArgs(Cypher.exists(n.property("foo")), Cypher.literalOf("Error"), Cypher.listOf())
 			.withoutResults()
 			.returning(n)
 			.build();
@@ -1142,9 +1142,9 @@ class IssueRelatedIT {
 	public static Statement createSomewhatComplexStatement() {
 		Node this0 = Cypher.node("Movie").named("this0");
 
-		Condition validationCondition = Predicates.any("r")
+		Condition validationCondition = Cypher.any("r")
 			.in(Cypher.listOf(Cypher.literalOf("admin")))
-			.where(Predicates.any("rr").in(Cypher.parameter("$auth.roles")).where(SymbolicName.of("r").eq(SymbolicName.of("rr"))));
+			.where(Cypher.any("rr").in(Cypher.parameter("$auth.roles")).where(SymbolicName.of("r").eq(SymbolicName.of("rr"))));
 
 		Node g = Cypher.node("Genre").named("this0_genres_connectOrCreate0")
 			.withProperties(Cypher.mapOf("name", Cypher.parameter("this0_genres_connectOrCreate0_node_name")));
@@ -1156,7 +1156,7 @@ class IssueRelatedIT {
 			.merge(g)
 			.onCreate().set(g.property("name").to(Cypher.parameter("this0_genres_connectOrCreate0_on_create_name")))
 			.merge(this0.relationshipTo(g, "IN_GENRE").named("this0_relationship_this0_genres_connectOrCreate0"))
-			.returning(Functions.count(Cypher.asterisk()))
+			.returning(Cypher.count(Cypher.asterisk()))
 			.build();
 
 		Statement subquery = Cypher.create(this0)
@@ -1178,17 +1178,17 @@ class IssueRelatedIT {
 		Node n = Cypher.node("Node").named("n");
 		Node p = Cypher.anyNode("p");
 		SymbolicName x = Cypher.name("x");
-		Condition cond1 = Predicates.none(p.getRequiredSymbolicName()).in(x)
+		Condition cond1 = Cypher.none(p.getRequiredSymbolicName()).in(x)
 			.where(
 				p.relationshipTo(Cypher.anyNode(), "Y").asCondition()
 					.or(p.relationshipTo(Cypher.anyNode(), "Z").asCondition())
 			);
-		Condition cond2 = Predicates.any(p.getRequiredSymbolicName()).in(x)
+		Condition cond2 = Cypher.any(p.getRequiredSymbolicName()).in(x)
 			.where(p.property("bar").eq(Cypher.literalTrue()));
 		Statement s = Cypher.match(n)
-			.with(Functions.collect(n).as(x))
+			.with(Cypher.collect(n).as(x))
 			.where(cond1.and(cond2))
-			.returning(Functions.count(n))
+			.returning(Cypher.count(n))
 			.build();
 		assertThat(s.getCypher()).isEqualTo("MATCH (n:`Node`) WITH collect(n) AS x WHERE (none(p IN x WHERE ((p)-[:`Y`]->() OR (p)-[:`Z`]->())) AND any(p IN x WHERE p.bar = true)) RETURN count(n)");
 	}
@@ -1196,7 +1196,7 @@ class IssueRelatedIT {
 	@Test // GH-350
 	void compoundConditionShouldBeImmutableAsStatedInTheDocs() {
 		Node n = Cypher.anyNode("n");
-		Condition a = org.neo4j.cypherdsl.core.Conditions.noCondition();
+		Condition a = org.neo4j.cypherdsl.core.Cypher.noCondition();
 		a = a.and(n.property("b").eq(Cypher.literalOf(1)));
 		Condition temp = a;
 		a = a.and(n.property("c").eq(Cypher.literalOf(2)));
@@ -1211,7 +1211,7 @@ class IssueRelatedIT {
 	@Test // GH-389
 	void shouldRenderCorrectDateTimeCall() {
 
-		Expression datetime = Functions
+		Expression datetime = Cypher
 			.datetime(toMap(ZonedDateTime.parse("2022-06-19T15:47:38.590917308Z[UTC]")));
 		assertThat(Cypher.returning(datetime).build().getCypher()).isEqualTo(
 			"RETURN datetime({year: 2022, month: 6, day: 19, hour: 15, minute: 47, second: 38, nanosecond: 590917308, timezone: 'UTC'})");
@@ -1356,12 +1356,12 @@ class IssueRelatedIT {
 	void bbBoxManual() {
 
 		Node location = Cypher.node("Location").named("loc");
-		Expression sw = Functions.point(Cypher.mapOf("longitude", Cypher.literalOf(2.592773), "latitude", Cypher.literalOf(46.346928)));
-		Expression ne = Functions.point(Cypher.mapOf("longitude", Cypher.literalOf(18.654785), "latitude", Cypher.literalOf(55.714735)));
+		Expression sw = Cypher.point(Cypher.mapOf("longitude", Cypher.literalOf(2.592773), "latitude", Cypher.literalOf(46.346928)));
+		Expression ne = Cypher.point(Cypher.mapOf("longitude", Cypher.literalOf(18.654785), "latitude", Cypher.literalOf(55.714735)));
 		Expression withinBBox = Cypher.call("point.withinBBox")
 			.withArgs(location.property("coordinates"), sw, ne).asFunction();
 
-		Condition conditions = Conditions.noCondition();
+		Condition conditions = Cypher.noCondition();
 		conditions = conditions.and(withinBBox.asCondition());
 
 		String stmt = Cypher.match(location).where(conditions).returning(location).build().getCypher();
@@ -1372,11 +1372,11 @@ class IssueRelatedIT {
 	void bbBox() {
 
 		Node location = Cypher.node("Location").named("loc");
-		Expression sw = Functions.coordinate(2.592773, 46.346928);
-		Expression ne = Functions.coordinate(18.654785, 55.714735);
-		Expression withinBBox = Functions.withinBBox(location.property("coordinates"), sw, ne);
+		Expression sw = Cypher.coordinate(2.592773, 46.346928);
+		Expression ne = Cypher.coordinate(18.654785, 55.714735);
+		Expression withinBBox = Cypher.withinBBox(location.property("coordinates"), sw, ne);
 
-		Condition conditions = Conditions.noCondition();
+		Condition conditions = Cypher.noCondition();
 		conditions = conditions.and(withinBBox.asCondition());
 
 		String stmt = Cypher.match(location).where(conditions).returning(location).build().getCypher();
@@ -1399,7 +1399,7 @@ class IssueRelatedIT {
 	void testLabelRemoval() {
 		Node node = Cypher.node("Wine").named("n");
 
-		Operation removeOp = Operations.remove(node, "Drink");
+		Operation removeOp = Cypher.removeLabel(node, "Drink");
 		List<Expression> propertyExpressions = Collections.singletonList(removeOp);
 		@SuppressWarnings("deprecation") StatementBuilder.OngoingReadingWithWhere ongoingReadingWithWhere = Cypher.match(node)
 			.where(Functions.id(node).isEqualTo(Cypher.literalOf(1)));
@@ -1445,7 +1445,7 @@ class IssueRelatedIT {
 	void mixedBagOfWith() {
 
 		var cypher = Cypher.match(person)
-			.with(person, Expressions.count(person.relationshipTo(Cypher.anyNode(), "ACTED_IN")).as("actedInDegree"))
+			.with(person, Cypher.count(person.relationshipTo(Cypher.anyNode(), "ACTED_IN")).as("actedInDegree"))
 			.returning(Cypher.asterisk())
 			.build().getCypher();
 		assertThat(cypher).isEqualTo("MATCH (person:`Person`) WITH person, COUNT { (person)-[:`ACTED_IN`]->() } AS actedInDegree RETURN *");
@@ -1535,7 +1535,7 @@ class IssueRelatedIT {
 				.call(
 					Cypher.with(movie)
 						.match(movie.relationshipFrom(actor, "ACTED_IN"))
-						.returning(Functions.collect(actor).as(actors))
+						.returning(Cypher.collect(actor).as(actors))
 						.build()
 				)
 				.returning(movie.project(
@@ -1588,7 +1588,7 @@ class IssueRelatedIT {
 			.returning(
 				Cypher.listWith(x)
 					.in(n.property("roles"))
-					.where(x.in(rolesToAdd).and(Conditions.not(x.in(rolesToRemove))))
+					.where(x.in(rolesToAdd).and(Cypher.not(x.in(rolesToRemove))))
 					.returning().add(rolesToAdd)
 			)
 			.build()
@@ -1602,15 +1602,15 @@ class IssueRelatedIT {
 		var p = Cypher.path("p").definedBy(Cypher.node("Movie").relationshipFrom(Cypher.anyNode()).named("r"));
 		var x = Cypher.name("x");
 		var relationTypeCast = Cypher.listWith(x)
-			.in(Functions.relationships(p))
-			.returning(Functions.type(x));
+			.in(Cypher.relationships(p))
+			.returning(Cypher.type(x));
 
 		assertThat(Cypher.match(p).returning(relationTypeCast).build().getCypher())
 			.isEqualTo("MATCH p = (:`Movie`)<-[r]-() RETURN [x IN relationships(p) | type(x)]");
 
 		// Current workaround
 		var relationTypeCast2 = Cypher.listWith(x)
-			.in(Functions.relationships(p))
+			.in(Cypher.relationships(p))
 			.returning(Cypher.call("type").withArgs(x).asFunction());
 		assertThat(Cypher.match(p).returning(relationTypeCast2).build().getCypher())
 			.isEqualTo("MATCH p = (:`Movie`)<-[r]-() RETURN [x IN relationships(p) | type(x)]");
@@ -1628,9 +1628,9 @@ class IssueRelatedIT {
 
 		// The worst query ever to retrieve those labels. Don't do this at home.
 		assertThat(Cypher.match(p)
-			.with(Functions.nodes(p).as(nodes))
+			.with(Cypher.nodes(p).as(nodes))
 			.unwind(nodes).as(node)
-			.with(Functions.labels(node).as(labels))
+			.with(Cypher.labels(node).as(labels))
 			.unwind(labels).as(label)
 			.returningDistinct(label).build().getCypher())
 			.isEqualTo("MATCH p = (:`Movie`)<-[r]-() WITH nodes(p) AS nodes UNWIND nodes AS node WITH labels(node) AS labels UNWIND labels AS label RETURN DISTINCT label");
@@ -1642,8 +1642,8 @@ class IssueRelatedIT {
 		var this0 = Cypher.node("User").named("this");
 		var x = Cypher.name("x");
 		var stmt = Cypher.match(this0)
-			.call(Cypher.with(Cypher.asterisk()).with(this0.as("x")).returning(Functions.count(Cypher.asterisk()).as(x)).build())
-			.returning(x, Functions.count(Cypher.asterisk()))
+			.call(Cypher.with(Cypher.asterisk()).with(this0.as("x")).returning(Cypher.count(Cypher.asterisk()).as(x)).build())
+			.returning(x, Cypher.count(Cypher.asterisk()))
 			.build();
 
 		var expected = "MATCH (this:`User`) CALL {WITH * WITH this AS x RETURN count(*) AS x} RETURN x, count(*)";
@@ -1654,7 +1654,7 @@ class IssueRelatedIT {
 	void withAllAndThenSome() {
 
 		var stmt = Cypher.match(Cypher.anyNode("n"))
-			.with(Cypher.asterisk(), Functions.count(Cypher.asterisk()).as("count"))
+			.with(Cypher.asterisk(), Cypher.count(Cypher.asterisk()).as("count"))
 			.returning(Cypher.asterisk())
 			.build();
 
@@ -1680,7 +1680,7 @@ class IssueRelatedIT {
 		var score = Cypher.name("score");
 		var statement = Cypher.match(Cypher.path("path").definedBy(Cypher.node("Person").named("p").relationshipTo(city, "TRAVELED_TO")))
 			.where(
-				Predicates.exists(
+				Cypher.exists(
 					Cypher.call("db.index.fulltext.queryNodes").withArgs(Cypher.literalOf("City"), Cypher.literalOf("ham*"))
 						.yield(node, score)
 						.with(Cypher.asterisk())
@@ -1752,7 +1752,7 @@ class IssueRelatedIT {
 				Cypher.with(n1)
 					.merge(n2.withProperties("foo", Cypher.literalOf("x")))
 					.create(n1.relationshipTo(n2, "NESTED"))
-					.returning(Functions.count(n2).as("foo_2"))
+					.returning(Cypher.count(n2).as("foo_2"))
 					.build()
 			)
 			.returning(Cypher.literalTrue())
@@ -1794,7 +1794,7 @@ class IssueRelatedIT {
 		var n1 = Cypher.node("Foo").named("n1");
 		var point = Cypher.name("point");
 		var resultStatement = Cypher.match(n1)
-			.returning(n1.project("points", Expressions.collect(
+			.returning(n1.project("points", Cypher.collect(
 				Cypher.unwind(n1.property("points")).as(point)
 					.returning(Cypher.listOf(point.property("x"), point.property("y")))
 					.build()
@@ -1817,7 +1817,7 @@ class IssueRelatedIT {
 		var point = Cypher.name("point");
 		var points = Cypher.name("points");
 		var resultStatement = Cypher.match(n1)
-			.returning(n1.project("points", org.neo4j.cypherdsl.core.Expressions.collect(
+			.returning(n1.project("points", org.neo4j.cypherdsl.core.Cypher.collect(
 				Cypher
 					.with(n1.property("points").as(points))
 					.unwind(points).as(point)
@@ -1843,12 +1843,12 @@ class IssueRelatedIT {
 		var n2 = Cypher.node("Bar").named("n2");
 		var point = Cypher.name("point");
 		var resultStatement = Cypher.match(n1)
-			.returning(n1.project("points", Expressions.collect(
+			.returning(n1.project("points", Cypher.collect(
 				Cypher.unwind(n1.property("points")).as(point)
 					.match(n2)
 					.where(n2.property("loc").eq(point))
 					.returning(
-						n2.project(n2.property("y").as("x"), Expressions.collect(Cypher.match(Cypher.node("FooBar").named("fb")).returning(Cypher.name("fb").as("foo")).build()).as("y"))
+						n2.project(n2.property("y").as("x"), Cypher.collect(Cypher.match(Cypher.node("FooBar").named("fb")).returning(Cypher.name("fb").as("foo")).build()).as("y"))
 					)
 					.build()
 			)))

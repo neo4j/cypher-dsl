@@ -36,7 +36,7 @@ class LoadCSVIT {
 		Statement statement = Cypher.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.create(Cypher.node("Artist")
-				.withProperties("name", Cypher.valueAt(l, 1), "year", Functions.toInteger(Cypher.valueAt(l, 2))))
+				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
 		assertThat(statement.getCypher()).isEqualTo("LOAD CSV FROM 'file:///artists.csv' AS line "
@@ -50,7 +50,7 @@ class LoadCSVIT {
 		Statement statement = Cypher.loadCSV(URI.create("file:///artists.csv"), true)
 			.as(l)
 			.create(Cypher.node("Artist")
-				.withProperties("name", Cypher.valueAt(l, 1), "year", Functions.toInteger(Cypher.valueAt(l, 2))))
+				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
 		assertThat(statement.getCypher()).isEqualTo("LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line "
@@ -65,7 +65,7 @@ class LoadCSVIT {
 			.as(l)
 			.withFieldTerminator(";")
 			.create(Cypher.node("Artist")
-				.withProperties("name", Cypher.valueAt(l, 1), "year", Functions.toInteger(Cypher.valueAt(l, 2))))
+				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
 		assertThat(statement.getCypher()).isEqualTo(
@@ -82,7 +82,7 @@ class LoadCSVIT {
 			.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.create(Cypher.node("Artist")
-				.withProperties("name", Cypher.valueAt(l, 1), "year", Functions.toInteger(Cypher.valueAt(l, 2))))
+				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
 		assertThat(statement.getCypher())
@@ -100,7 +100,7 @@ class LoadCSVIT {
 			.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.create(Cypher.node("Artist")
-				.withProperties("name", Cypher.valueAt(l, 1), "year", Functions.toInteger(Cypher.valueAt(l, 2))))
+				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
 		assertThat(statement.getCypher())
@@ -116,7 +116,7 @@ class LoadCSVIT {
 		Statement statement = Cypher
 			.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
-			.returning(Functions.linenumber().as("number"), l)
+			.returning(Cypher.linenumber().as("number"), l)
 			.build();
 
 		assertThat(statement.getCypher())
@@ -130,7 +130,7 @@ class LoadCSVIT {
 		Statement statement = Cypher
 			.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
-			.returning(Functions.file().as("path"))
+			.returning(Cypher.file().as("path"))
 			.build();
 
 		assertThat(statement.getCypher())
@@ -148,8 +148,8 @@ class LoadCSVIT {
 			.withFieldTerminator(";")
 			.create(Cypher.node("Artist")
 				.withProperties(
-					"name", Cypher.valueAt(l, 1), "year", Functions.toInteger(Cypher.valueAt(l, 2)),
-					"source", Functions.file().concat(Cypher.literalOf("@")).concat(Functions.linenumber())
+					"name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2)),
+					"source", Cypher.file().concat(Cypher.literalOf("@")).concat(Cypher.linenumber())
 				))
 			.build();
 
@@ -187,7 +187,7 @@ class LoadCSVIT {
 			.loadCSV(URI.create("file:///companies.csv"), true)
 			.as(row)
 			.merge(Cypher.node("Company").named("c").withProperties("companyId", id, "hqLocation",
-				Functions.coalesce(row.property("Location"), Cypher.literalOf("Unknown"))))
+				Cypher.coalesce(row.property("Location"), Cypher.literalOf("Unknown"))))
 			.build();
 
 		assertThat(statement.getCypher())
@@ -210,7 +210,7 @@ class LoadCSVIT {
 			.as(row)
 			.merge(node)
 			.set(node.property("emailAddress")
-				.to(Cypher.caseExpression(Functions.trim(email)).when(Cypher.literalOf("")).then(NullLiteral.INSTANCE)
+				.to(Cypher.caseExpression(Cypher.trim(email)).when(Cypher.literalOf("")).then(NullLiteral.INSTANCE)
 					.elseDefault(
 						email)))
 			.build();
@@ -239,7 +239,7 @@ class LoadCSVIT {
 			.as(row)
 			.merge(e)
 			.with(e, row)
-			.unwind(Functions.split(row.property("Skills"), Cypher.literalOf(":"))).as(skill)
+			.unwind(Cypher.split(row.property("Skills"), Cypher.literalOf(":"))).as(skill)
 			.merge(s)
 			.merge(e.relationshipTo(s, "HAS_EXPERIENCE").named("r"))
 			.build();

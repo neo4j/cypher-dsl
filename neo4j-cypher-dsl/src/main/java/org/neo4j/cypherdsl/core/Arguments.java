@@ -42,6 +42,7 @@ final class Arguments extends TypedSubtree<Expression> implements ProvidesAffixe
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	protected Visitable prepareVisit(Expression child) {
 		return Expressions.nameOrExpression(child);
 	}

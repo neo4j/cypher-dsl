@@ -101,6 +101,7 @@ public final class Operation implements Expression {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);

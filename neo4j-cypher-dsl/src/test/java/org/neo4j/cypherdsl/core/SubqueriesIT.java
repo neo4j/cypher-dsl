@@ -95,9 +95,9 @@ class SubqueriesIT {
 			Node person = Cypher.node("Person").named("p");
 			Node clone = Cypher.node("Clone").named("c");
 			Statement statement = Cypher.match(person)
-				.call(Cypher.unwind(Functions.range(1, 5)).as("i")
+				.call(Cypher.unwind(Cypher.range(1, 5)).as("i")
 					.create(clone)
-					.returning(Functions.count(clone).as("numberOfClones")).build())
+					.returning(Cypher.count(clone).as("numberOfClones")).build())
 				.returning(person.property("name"), Cypher.name("numberOfClones")).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -113,7 +113,7 @@ class SubqueriesIT {
 			Statement statement = Cypher.match(person)
 				.call(Cypher.with(person)
 					.match(other).where(other.property("age").lt(person.property("age")))
-					.returning(Functions.count(other).as("youngerPersonsCount")).build())
+					.returning(Cypher.count(other).as("youngerPersonsCount")).build())
 				.returning(person.property("name"), Cypher.name("youngerPersonsCount")).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -230,7 +230,7 @@ class SubqueriesIT {
 
 			Node p = Cypher.node("Person").named("person");
 			Statement inner = Cypher.match(p.relationshipTo(Cypher.node("Dog"), "HAS_DOG")).returning(p.property("name")).build();
-			Statement outer = Cypher.match(p).where(Predicates.exists(inner)).returning(p.property("name").as("name")).build();
+			Statement outer = Cypher.match(p).where(Cypher.exists(inner)).returning(p.property("name").as("name")).build();
 
 			String cypher = outer.getCypher();
 			assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE EXISTS { MATCH (person)-[:`HAS_DOG`]->(:`Dog`) RETURN person.name } RETURN person.name AS name");
@@ -243,7 +243,7 @@ class SubqueriesIT {
 			Node d = Cypher.node("Dog").named("d");
 			SymbolicName dogName = Cypher.name("dogName");
 			Statement inner = Cypher.match(p.relationshipTo(d, "HAS_DOG")).where(d.property("name").eq(dogName)).returning(p.property("name")).build();
-			Statement outer = Cypher.match(p).where(Predicates.exists(inner, Cypher.literalOf("Ozzy").as(dogName))).returning(p.property("name").as("name")).build();
+			Statement outer = Cypher.match(p).where(Cypher.exists(inner, Cypher.literalOf("Ozzy").as(dogName))).returning(p.property("name").as("name")).build();
 
 			String cypher = outer.getCypher();
 			assertThat(cypher).isEqualTo("MATCH (person:`Person`) WHERE EXISTS { WITH 'Ozzy' AS dogName MATCH (person)-[:`HAS_DOG`]->(d:`Dog`) WHERE d.name = dogName RETURN person.name } RETURN person.name AS name");
@@ -277,7 +277,7 @@ class SubqueriesIT {
 			Statement statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(company.property("name").startsWith(Cypher.literalOf("Company")))
 				.and(Cypher.match(p.relationshipTo(t, "LIKES"))
-					.where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
+					.where(Cypher.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
 					.asCondition())
 				.returning(p.property("name").as("person"), company.property("name").as("company"))
 				.build();
@@ -287,7 +287,7 @@ class SubqueriesIT {
 
 			statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(Cypher.match(p.relationshipTo(t, "LIKES"))
-					.where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
+					.where(Cypher.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
 					.asCondition())
 				.and(company.property("name").startsWith(Cypher.literalOf("Company")))
 				.returning(p.property("name").as("person"), company.property("name").as("company"))
@@ -299,7 +299,7 @@ class SubqueriesIT {
 			statement = Cypher.match(p.relationshipTo(company, "WORKS_FOR"))
 				.where(
 					Cypher.match(p.relationshipTo(t, "LIKES"))
-						.where(Functions.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
+						.where(Cypher.size(t.relationshipFrom(Cypher.anyNode(), "LIKES")).gte(Cypher.literalOf(3)))
 						.asCondition().and(company.property("name").startsWith(Cypher.literalOf("Company")))
 				)
 				.returning(p.property("name").as("person"), company.property("name").as("company"))
@@ -321,7 +321,7 @@ class SubqueriesIT {
 				.callInTransactions(Cypher.with("line").create(Cypher.node("Person")
 					.withProperties(
 						"name", Cypher.valueAt(line, 1),
-						"age", Functions.toInteger(Cypher.valueAt(line, 2))
+						"age", Cypher.toInteger(Cypher.valueAt(line, 2))
 					)).build()
 				)
 				.build();
@@ -338,7 +338,7 @@ class SubqueriesIT {
 				.callInTransactions(Cypher.with("line").create(Cypher.node("Person")
 					.withProperties(
 						"name", Cypher.valueAt(line, 1),
-						"age", Functions.toInteger(Cypher.valueAt(line, 2))
+						"age", Cypher.toInteger(Cypher.valueAt(line, 2))
 					)).build(), 2
 				)
 				.build();
@@ -483,7 +483,7 @@ class SubqueriesIT {
 		void shouldCheckForReturnStatement() {
 
 			var nonReturnStatement = Cypher.create(Cypher.node("Foo")).build();
-			assertThatIllegalArgumentException().isThrownBy(() -> Expressions.collect(nonReturnStatement))
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.collect(nonReturnStatement))
 				.withMessage(
 					"The final RETURN clause in a subquery used with COLLECT is mandatory and the RETURN clause must return exactly one column.");
 		}
@@ -494,7 +494,7 @@ class SubqueriesIT {
 			var inner = Cypher.match(person.relationshipTo(dog, "HAS_DOG")).returning(dogName)
 				.build();
 			var stmt = Cypher.match(person)
-				.where(Cypher.literalOf("Ozzy").in(Expressions.collect(inner)))
+				.where(Cypher.literalOf("Ozzy").in(Cypher.collect(inner)))
 				.returning(person.property("name").as("name"))
 				.build();
 			assertThat(stmt.getCypher())
@@ -511,7 +511,7 @@ class SubqueriesIT {
 				.returning(dogName)
 				.build();
 			var stmt = Cypher.match(person)
-				.returning(person.property("name").as("name"), Expressions.collect(inner).as("youngDogs"))
+				.returning(person.property("name").as("name"), Cypher.collect(inner).as("youngDogs"))
 				.build();
 			assertThat(stmt.getCypher())
 				.isEqualTo(
@@ -534,7 +534,7 @@ class SubqueriesIT {
 				);
 
 			var stmt = Cypher.match(person)
-				.returning(person.property("name").as("name"), Expressions.collect(inner).as("petNames"))
+				.returning(person.property("name").as("name"), Cypher.collect(inner).as("petNames"))
 				.build();
 			assertThat(stmt.getCypher())
 				.isEqualTo(
@@ -560,7 +560,7 @@ class SubqueriesIT {
 				.build();
 			var stmt = Cypher.match(person)
 				.returning(person.property("name").as("name"),
-					Expressions.with(yearOfTheDog).collect(inner).as("dogsOfTheYear")
+					Cypher.subqueryWith(yearOfTheDog).collect(inner).as("dogsOfTheYear")
 				)
 				.build();
 			assertThat(stmt.getCypher())
@@ -584,7 +584,7 @@ class SubqueriesIT {
 				.build();
 			var stmt = Cypher.match(person)
 				.returning(person.property("name"),
-					Expressions.collect(inner).as("toyNames")
+					Cypher.collect(inner).as("toyNames")
 				)
 				.build();
 			assertThat(stmt.getCypher())
@@ -606,7 +606,7 @@ class SubqueriesIT {
 				.build();
 			var stmt = Cypher.match(person)
 				.where(person.property("name").eq(Cypher.literalOf("Peter")))
-				.set(person.property("dogNames").to(Expressions.collect(inner)))
+				.set(person.property("dogNames").to(Cypher.collect(inner)))
 				.returning(person.property("dogNames").as("dogNames"))
 				.build();
 			assertThat(stmt.getCypher())
@@ -624,7 +624,7 @@ class SubqueriesIT {
 				.build();
 			var stmt = Cypher.match(person)
 				.returning(
-					Cypher.caseExpression().when(Expressions.collect(inner).eq(Cypher.listOf()))
+					Cypher.caseExpression().when(Cypher.collect(inner).eq(Cypher.listOf()))
 						.then(Cypher.literalOf("No Dogs ").concat(personName))
 						.elseDefault(personName).as("result")
 				)
@@ -647,8 +647,8 @@ class SubqueriesIT {
 				.build();
 			var stmt = Cypher.match(person)
 				.returning(
-					Expressions.collect(inner).as("dogNames"),
-					Functions.avg(person.property("age")).as("averageAge")
+					Cypher.collect(inner).as("dogNames"),
+					Cypher.avg(person.property("age")).as("averageAge")
 				).orderBy(Cypher.name("dogNames"))
 				.build();
 			assertThat(stmt.getCypher())

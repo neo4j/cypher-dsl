@@ -149,7 +149,7 @@ class ProcedureCallsIT {
 		Statement call = Cypher
 			.call("db.labels")
 			.yield(label)
-			.returning(Functions.count(label).as("numLabels"))
+			.returning(Cypher.count(label).as("numLabels"))
 			.build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL db.labels() YIELD label RETURN count(label) AS numLabels");
@@ -163,7 +163,7 @@ class ProcedureCallsIT {
 			.call("db.labels")
 			.yield(label)
 			.with(label)
-			.returning(Functions.count(label).as("numLabels"))
+			.returning(Cypher.count(label).as("numLabels"))
 			.build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");
@@ -186,7 +186,7 @@ class ProcedureCallsIT {
 			.call("db.labels")
 			.yield(label)
 			.with(label)
-			.returning(Functions.count(label).as("numLabels"))
+			.returning(Cypher.count(label).as("numLabels"))
 			.build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");

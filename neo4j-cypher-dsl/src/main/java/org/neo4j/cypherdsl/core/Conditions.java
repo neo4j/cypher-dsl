@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -33,8 +33,10 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Gerrit Meier
  * @author Aakash Sorathiya
  * @since 1.0
+ * @deprecated use {@link org.neo4j.cypherdsl.core.Cypher} instead.
  */
-@API(status = STABLE, since = "1.0")
+@API(status = INTERNAL, since = "2023.9.0")
+@Deprecated(since = "2023.9.0")
 public final class Conditions {
 
 	/**
@@ -46,7 +48,7 @@ public final class Conditions {
 	 */
 	static Condition includesAll(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
-		return Predicates.all(x).in(rhs).where(x.in(lhs));
+		return Cypher.all(x).in(rhs).where(x.in(lhs));
 	}
 
 	/**
@@ -58,7 +60,7 @@ public final class Conditions {
 	 */
 	static Condition includesAny(Expression lhs, Expression rhs) {
 		SymbolicName x = SymbolicName.of("x");
-		return Predicates.any(x).in(rhs).where(x.in(lhs));
+		return Cypher.any(x).in(rhs).where(x.in(lhs));
 	}
 
 	/**
