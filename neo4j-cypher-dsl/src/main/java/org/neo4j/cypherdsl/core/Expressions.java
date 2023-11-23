@@ -108,7 +108,9 @@ public final class Expressions {
 	 * @param identifiableElements The identifiable elements to import
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.0.0
+	 * @deprecated use {@link Cypher#subqueryWith(String...)} instead.
 	 */
+	@Deprecated
 	public static SubqueryExpressionBuilder with(String... identifiableElements) {
 
 		return with(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));

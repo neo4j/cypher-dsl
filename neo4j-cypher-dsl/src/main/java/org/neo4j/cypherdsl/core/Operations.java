@@ -155,7 +155,9 @@ public final class Operations {
 	 * @param label  The labels to be added
 	 * @return A set operation
 	 * @since 2021.2.3
+	 * @deprecated use {@link Cypher#setLabel(Node, String...)} instead.
 	 */
+	@Deprecated
 	public static Operation set(Node target, String... label) {
 
 		return Operation.create(target, Operator.SET_LABEL, label);
@@ -168,7 +170,9 @@ public final class Operations {
 	 * @param label  The labels to be removed
 	 * @return A remove operation
 	 * @since 2021.2.3
+	 * @deprecated use {@link Cypher#removeLabel(Node, String...)} instead.
 	 */
+	@Deprecated
 	public static Operation remove(Node target, String... label) {
 
 		return Operation.create(target, Operator.REMOVE_LABEL, label);
