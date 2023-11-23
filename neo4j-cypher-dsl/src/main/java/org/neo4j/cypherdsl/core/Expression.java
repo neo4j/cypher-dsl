@@ -443,7 +443,8 @@ public interface Expression extends Visitable {
 	@NotNull @Contract(pure = true)
 	@SuppressWarnings("deprecation")
 	default Condition isEmpty() {
-		return Conditions.isEmpty(this);
+
+		return Functions.size(this).isEqualTo(Cypher.literalOf(0L));
 	}
 
 	/**

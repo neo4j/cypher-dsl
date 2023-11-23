@@ -38,7 +38,6 @@ import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Condition;
-import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
@@ -492,7 +491,7 @@ class CypherDSLParserExamplesTest {
 		var collectingPropertyReferences = new ConditionExtractingMatchFactory() {
 			@Override
 			Match apply0(MatchDefinition matchDefinition) {
-				var newConditions = Conditions.noCondition();
+				var newConditions = Cypher.noCondition();
 				for (Condition value : nodeConditions.values().stream().flatMap(Collection::stream).toList()) {
 					newConditions = newConditions.and(value);
 				}

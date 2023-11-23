@@ -82,7 +82,7 @@ class PackageAndAPIStructureTest {
 			.and().arePublic()
 			.and().areTopLevelClasses()
 			.and(not(modifier(JavaModifier.ABSTRACT)))
-			.and(new DescribedPredicate<JavaClass>("Is internal API") {
+			.and(new DescribedPredicate<>("Is internal API") {
 				@Override
 				public boolean test(JavaClass input) {
 					API.Status status = input.getAnnotationOfType(API.class).status();

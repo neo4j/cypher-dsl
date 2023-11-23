@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import java.util.TimeZone;
 
@@ -40,10 +40,12 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Gerrit Meier
  * @author Romain Rossi
  * @since 1.0
- * @deprecated use {@link org.neo4j.cypherdsl.core.Cypher} instead.
+ * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
+ * be accessible.
  */
-@API(status = INTERNAL, since = "2023.9.0")
+@API(status = DEPRECATED, since = "2023.9.0")
 @Deprecated(since = "2023.9.0")
+@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
 public final class Functions {
 
 	/**
