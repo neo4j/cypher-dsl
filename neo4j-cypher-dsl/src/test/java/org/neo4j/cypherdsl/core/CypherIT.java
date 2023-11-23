@@ -4575,6 +4575,18 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (person:`Person`) RETURN person{livesIn: [(person)-[:`LIVES_IN`]->(personLivesIn:`Location`) | personLivesIn{.name}][$personLivedInOffset..($personLivedInOffset + $personLivedInFirst)]}");
 		}
+
+		@Test
+		void propertiesShouldBeAccessibleOnResolvedNodes() {
+
+			var nodes = Cypher.name("nodes");
+			var cypher = Cypher.match(Cypher.node("Foo").named("n"))
+				.with(Functions.collect(Cypher.name("n")).as("nodes"))
+				.returning(Cypher.property(Cypher.valueAt(nodes, 0), "foo"))
+				.build().getCypher();
+			assertThat(cypher)
+				.isEqualTo("MATCH (n:`Foo`) WITH collect(n) AS nodes RETURN nodes[0].foo");
+		}
 	}
 
 	@Nested
