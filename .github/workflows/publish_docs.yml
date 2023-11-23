@@ -17,11 +17,11 @@ jobs:
         run: >
           echo "refName=${GITHUB_REF##*/}" >> $GITHUB_ENV
       - name: Checkout relevant branch
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ env.refName }}
       - name: Checkout gh-pages
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
           path: target/gh-pages
