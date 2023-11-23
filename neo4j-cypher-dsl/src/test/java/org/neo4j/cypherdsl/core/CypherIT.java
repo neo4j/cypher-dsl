@@ -4576,7 +4576,7 @@ class CypherIT {
 
 			var nodes = Cypher.name("nodes");
 			var cypher = Cypher.match(Cypher.node("Foo").named("n"))
-				.with(Functions.collect(Cypher.name("n")).as("nodes"))
+				.with(Cypher.collect(Cypher.name("n")).as("nodes"))
 				.returning(Cypher.property(Cypher.valueAt(nodes, 0), "foo"))
 				.build().getCypher();
 			assertThat(cypher)
