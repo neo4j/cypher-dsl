@@ -445,7 +445,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, Cypher.set(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, Cypher.setLabel(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -463,7 +463,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Cypher.remove(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Cypher.removeLabel(Cypher.anyNode(s), labels));
 	}
 
 	@Override
