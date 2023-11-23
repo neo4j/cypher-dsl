@@ -394,8 +394,7 @@ class CypherIT {
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
 			}
 
 			@Test
@@ -404,8 +403,7 @@ class CypherIT {
 					.orderBy(userNode.property("name").ascending()).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
 			}
 
 			@Test
@@ -414,8 +412,7 @@ class CypherIT {
 					.orderBy(userNode.property("name").ascending()).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
 			}
 
 			@Test
@@ -424,8 +421,7 @@ class CypherIT {
 					.orderBy(userNode.property("name").descending()).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name DESC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC");
 			}
 
 			@Test
@@ -436,8 +432,7 @@ class CypherIT {
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
 			}
 
 			@Test
