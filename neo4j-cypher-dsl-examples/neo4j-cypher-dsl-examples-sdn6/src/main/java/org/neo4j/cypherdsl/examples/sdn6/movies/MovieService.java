@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -63,7 +62,7 @@ final class MovieService {
 			.with(p)
 			.optionalMatch(new ActedIn_(p, a))
 			.optionalMatch(new Directed_(p, d))
-			.with(Functions.collect(a).add(Functions.collect(d))
+			.with(Cypher.collect(a).add(Cypher.collect(d))
 				.as("movies"))
 			.unwind("movies").as(m)
 			.returningDistinct(m)

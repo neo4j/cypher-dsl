@@ -38,7 +38,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.ResultStatement;
 import org.neo4j.cypherdsl.core.executables.ExecutableStatement;
 import org.neo4j.cypherdsl.core.executables.ReactiveExecutableStatement;
@@ -286,14 +285,14 @@ class ExecutableStatementsIT {
 
 		// tag::periodic-commit-statement[]
 		var row = Cypher.name("row");
-		var a = Cypher.node("Author").withProperties("name", Functions.trim(Cypher.name("author"))).named("a");
+		var a = Cypher.node("Author").withProperties("name", Cypher.trim(Cypher.name("author"))).named("a");
 		var m = Cypher.node("Book").withProperties("name", row.property("Title")).named("b");
 
 		var statement = ReactiveExecutableStatement.of(Cypher.usingPeriodicCommit(10)
 			.loadCSV(URI.create("file:///books.csv"), true).as(row).withFieldTerminator(";")
 			.create(m)
 			.with(m.getRequiredSymbolicName(), row)
-			.unwind(Functions.split(row.property("Authors"), "&")).as("author")
+			.unwind(Cypher.split(row.property("Authors"), "&")).as("author")
 			.merge(a)
 			.create(a.relationshipTo(m, "WROTE").named("r"))
 			.returningDistinct(m.property("name").as("name"))

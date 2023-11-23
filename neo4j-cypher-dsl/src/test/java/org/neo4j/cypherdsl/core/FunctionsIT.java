@@ -49,7 +49,7 @@ class FunctionsIT {
 	void propertiesInvocationShouldBeReusable() {
 
 		Node source = Cypher.node("Movie", Cypher.mapOf("title", Cypher.literalOf("The Matrix"))).named("src");
-		FunctionInvocation p = Functions.properties(source);
+		FunctionInvocation p = Cypher.properties(source);
 		Node copy = Cypher.node("MovieCopy").named("copy");
 
 		String query = cypherRenderer.render(
@@ -70,10 +70,10 @@ class FunctionsIT {
 
 			SymbolicName x = Cypher.name("x");
 			ListExpression emptyList = Cypher.listOf();
-			FunctionInvocation listToReduce = Functions.relationships(namedPath);
+			FunctionInvocation listToReduce = Cypher.relationships(namedPath);
 			SymbolicName n = Cypher.name("n");
 			Statement statement = Cypher.returning(
-				Functions.reduce(n)
+				Cypher.reduce(n)
 					.in(listToReduce)
 					.map(x.add(n))
 					.accumulateOn(x)
@@ -98,8 +98,8 @@ class FunctionsIT {
 				.and(b.property("name").isEqualTo(Cypher.literalOf("Bob")))
 				.and(c.property("name").isEqualTo(Cypher.literalOf("Daniel")))
 				.returning(
-					Functions.reduce(n)
-						.in(Functions.nodes(p))
+					Cypher.reduce(n)
+						.in(Cypher.nodes(p))
 						.map(totalAge.add(Cypher.property(n, "age")))
 						.accumulateOn(totalAge)
 						.withInitialValueOf(Cypher.literalOf(0)).as("reduction")
@@ -117,9 +117,9 @@ class FunctionsIT {
 			SymbolicName totalAge = Cypher.name("totalAge");
 			SymbolicName x = Cypher.name("x");
 			Statement statement = Cypher.returning(
-				Functions.reduce(n)
+				Cypher.reduce(n)
 					.in(Cypher.listWith(x)
-						.in(Functions.range(0, 10))
+						.in(Cypher.range(0, 10))
 						.where(x.remainder(Cypher.literalOf(2)).isEqualTo(Cypher.literalOf(0)))
 						.returning(x.pow(Cypher.literalOf(3)))
 					)
@@ -143,7 +143,7 @@ class FunctionsIT {
 			Class<?>[] argTypes = new Class<?>[2];
 			argTypes[0] = Expression.class;
 			argTypes[1] = Expression[].class;
-			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			@SuppressWarnings("deprecation") Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
 
 			Expression arg1 = Cypher.literalOf(1);
 			for (int n = 0; n <= function.getMaxArgs() - function.getMinArgs(); ++n) {
@@ -176,7 +176,7 @@ class FunctionsIT {
 			}
 			expected.append(");");
 
-			Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			@SuppressWarnings("deprecation") Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
 			FunctionInvocation f = (FunctionInvocation) m.invoke(null, (Object[]) args);
 			assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
 				.isEqualTo(expected.toString());
@@ -199,9 +199,9 @@ class FunctionsIT {
 	@Test
 	void assortedErrors() {
 		var literalExpression = Cypher.literalOf("something");
-		assertThatIllegalArgumentException().isThrownBy(() -> Functions.left(literalExpression, null)).withMessage("length might not be null when the expression is not null");
-		assertThatIllegalArgumentException().isThrownBy(() -> Functions.right(literalExpression, null)).withMessage("length might not be null when the expression is not null");
-		assertThatIllegalArgumentException().isThrownBy(() -> Functions.substring(literalExpression, null, null)).withMessage("start is required");
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.left(literalExpression, null)).withMessage("length might not be null when the expression is not null");
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.right(literalExpression, null)).withMessage("length might not be null when the expression is not null");
+		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.substring(literalExpression, null, null)).withMessage("start is required");
 	}
 
 	private static Stream<Arguments> neo5jSpecificFunctions() {
@@ -210,8 +210,8 @@ class FunctionsIT {
 		Relationship r = n.relationshipTo(m).named("r");
 
 		return Stream.of(
-			Arguments.of(Functions.elementId(n), "RETURN elementId(n)"),
-			Arguments.of(Functions.elementId(r), "RETURN elementId(r)")
+			Arguments.of(Cypher.elementId(n), "RETURN elementId(n)"),
+			Arguments.of(Cypher.elementId(r), "RETURN elementId(r)")
 		);
 	}
 
@@ -221,110 +221,110 @@ class FunctionsIT {
 		Relationship r = n.relationshipTo(m).named("r");
 		Expression e1 = Cypher.name("e1");
 		Expression e2 = Cypher.name("e2");
-		FunctionInvocation p1 = Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(1), "longitude", Cypher
+		FunctionInvocation p1 = Cypher.point(Cypher.mapOf("latitude", Cypher.literalOf(1), "longitude", Cypher
 			.literalOf(2)));
-		FunctionInvocation p2 = Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(3), "longitude", Cypher
+		FunctionInvocation p2 = Cypher.point(Cypher.mapOf("latitude", Cypher.literalOf(3), "longitude", Cypher
 			.literalOf(4)));
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
 		@SuppressWarnings("deprecation") var idOfRel = Functions.id(r);
 		return Stream.of(
-			Arguments.of(Functions.left(null, null), "RETURN left(NULL, NULL)"),
-			Arguments.of(Functions.left(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN left('hello', 3)"),
-			Arguments.of(Functions.ltrim(Cypher.literalOf("   hello")), "RETURN ltrim('   hello')"),
-			Arguments.of(Functions.replace(Cypher.literalOf("hello"), Cypher.literalOf("l"), Cypher.literalOf("w")), "RETURN replace('hello', 'l', 'w')"),
-			Arguments.of(Functions.reverse(Cypher.literalOf("hello")), "RETURN reverse('hello')"),
-			Arguments.of(Functions.right(null, null), "RETURN right(NULL, NULL)"),
-			Arguments.of(Functions.right(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN right('hello', 3)"),
-			Arguments.of(Functions.rtrim(Cypher.literalOf("   hello  ")), "RETURN rtrim('   hello  ')"),
-			Arguments.of(Functions.substring(Cypher.literalOf("hello"), Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN substring('hello', 1, 3)"),
-			Arguments.of(Functions.substring(Cypher.literalOf("hello"), Cypher.literalOf(2), null), "RETURN substring('hello', 2)"),
-			Arguments.of(Functions.toStringOrNull(Cypher.literalOf("hello")), "RETURN toStringOrNull('hello')"),
+			Arguments.of(Cypher.left(null, null), "RETURN left(NULL, NULL)"),
+			Arguments.of(Cypher.left(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN left('hello', 3)"),
+			Arguments.of(Cypher.ltrim(Cypher.literalOf("   hello")), "RETURN ltrim('   hello')"),
+			Arguments.of(Cypher.replace(Cypher.literalOf("hello"), Cypher.literalOf("l"), Cypher.literalOf("w")), "RETURN replace('hello', 'l', 'w')"),
+			Arguments.of(Cypher.reverse(Cypher.literalOf("hello")), "RETURN reverse('hello')"),
+			Arguments.of(Cypher.right(null, null), "RETURN right(NULL, NULL)"),
+			Arguments.of(Cypher.right(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN right('hello', 3)"),
+			Arguments.of(Cypher.rtrim(Cypher.literalOf("   hello  ")), "RETURN rtrim('   hello  ')"),
+			Arguments.of(Cypher.substring(Cypher.literalOf("hello"), Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN substring('hello', 1, 3)"),
+			Arguments.of(Cypher.substring(Cypher.literalOf("hello"), Cypher.literalOf(2), null), "RETURN substring('hello', 2)"),
+			Arguments.of(Cypher.toStringOrNull(Cypher.literalOf("hello")), "RETURN toStringOrNull('hello')"),
 			Arguments.of(idOfRel, "RETURN id(r)"),
-			Arguments.of(Functions.elementId(n), "RETURN toString(id(n))"),
-			Arguments.of(Functions.elementId(r), "RETURN toString(id(r))"),
-			Arguments.of(Functions.keys(n), "RETURN keys(n)"),
-			Arguments.of(Functions.keys(r), "RETURN keys(r)"),
-			Arguments.of(Functions.keys(e1), "RETURN keys(e1)"),
-			Arguments.of(Functions.labels(n), "RETURN labels(n)"),
-			Arguments.of(Functions.type(r), "RETURN type(r)"),
-			Arguments.of(Functions.count(n), "RETURN count(n)"),
-			Arguments.of(Functions.countDistinct(n), "RETURN count(DISTINCT n)"),
-			Arguments.of(Functions.count(e1), "RETURN count(e1)"),
-			Arguments.of(Functions.countDistinct(e1), "RETURN count(DISTINCT e1)"),
-			Arguments.of(Functions.coalesce(e1, e2), "RETURN coalesce(e1, e2)"),
-			Arguments.of(Functions.toLower(e1), "RETURN toLower(e1)"),
-			Arguments.of(Functions.toUpper(e1), "RETURN toUpper(e1)"),
-			Arguments.of(Functions.trim(e1), "RETURN trim(e1)"),
-			Arguments.of(Functions.split(e1, Cypher.literalOf(",")), "RETURN split(e1, ',')"),
-			Arguments.of(Functions.size(e1), "RETURN size(e1)"),
-			Arguments.of(Functions.size(r), "RETURN size((n:`Node`)-[r]->(m:`Node2`))"),
-			Arguments.of(Functions.exists(e1), "RETURN exists(e1)"),
-			Arguments.of(Functions.distance(p1, p2),
+			Arguments.of(Cypher.elementId(n), "RETURN toString(id(n))"),
+			Arguments.of(Cypher.elementId(r), "RETURN toString(id(r))"),
+			Arguments.of(Cypher.keys(n), "RETURN keys(n)"),
+			Arguments.of(Cypher.keys(r), "RETURN keys(r)"),
+			Arguments.of(Cypher.keys(e1), "RETURN keys(e1)"),
+			Arguments.of(Cypher.labels(n), "RETURN labels(n)"),
+			Arguments.of(Cypher.type(r), "RETURN type(r)"),
+			Arguments.of(Cypher.count(n), "RETURN count(n)"),
+			Arguments.of(Cypher.countDistinct(n), "RETURN count(DISTINCT n)"),
+			Arguments.of(Cypher.count(e1), "RETURN count(e1)"),
+			Arguments.of(Cypher.countDistinct(e1), "RETURN count(DISTINCT e1)"),
+			Arguments.of(Cypher.coalesce(e1, e2), "RETURN coalesce(e1, e2)"),
+			Arguments.of(Cypher.toLower(e1), "RETURN toLower(e1)"),
+			Arguments.of(Cypher.toUpper(e1), "RETURN toUpper(e1)"),
+			Arguments.of(Cypher.trim(e1), "RETURN trim(e1)"),
+			Arguments.of(Cypher.split(e1, Cypher.literalOf(",")), "RETURN split(e1, ',')"),
+			Arguments.of(Cypher.size(e1), "RETURN size(e1)"),
+			Arguments.of(Cypher.size(r), "RETURN size((n:`Node`)-[r]->(m:`Node2`))"),
+			Arguments.of(Cypher.exists(e1), "RETURN exists(e1)"),
+			Arguments.of(Cypher.distance(p1, p2),
 				"RETURN distance(point({latitude: 1, longitude: 2}), point({latitude: 3, longitude: 4}))"),
-			Arguments.of(Functions.avg(e1), "RETURN avg(e1)"),
-			Arguments.of(Functions.avgDistinct(e1), "RETURN avg(DISTINCT e1)"),
-			Arguments.of(Functions.collect(e1), "RETURN collect(e1)"),
-			Arguments.of(Functions.collectDistinct(e1), "RETURN collect(DISTINCT e1)"),
-			Arguments.of(Functions.collect(n), "RETURN collect(n)"),
-			Arguments.of(Functions.collectDistinct(n), "RETURN collect(DISTINCT n)"),
-			Arguments.of(Functions.max(e1), "RETURN max(e1)"),
-			Arguments.of(Functions.maxDistinct(e1), "RETURN max(DISTINCT e1)"),
-			Arguments.of(Functions.min(e1), "RETURN min(e1)"),
-			Arguments.of(Functions.minDistinct(e1), "RETURN min(DISTINCT e1)"),
-			Arguments.of(Functions.percentileCont(e1, 0.4), "RETURN percentileCont(e1, 0.4)"),
-			Arguments.of(Functions.percentileContDistinct(e1, 0.4), "RETURN percentileCont(DISTINCT e1, 0.4)"),
-			Arguments.of(Functions.percentileDisc(e1, 0.4), "RETURN percentileDisc(e1, 0.4)"),
-			Arguments.of(Functions.percentileDiscDistinct(e1, 0.4), "RETURN percentileDisc(DISTINCT e1, 0.4)"),
-			Arguments.of(Functions.stDev(e1), "RETURN stDev(e1)"),
-			Arguments.of(Functions.stDevDistinct(e1), "RETURN stDev(DISTINCT e1)"),
-			Arguments.of(Functions.stDevP(e1), "RETURN stDevP(e1)"),
-			Arguments.of(Functions.stDevPDistinct(e1), "RETURN stDevP(DISTINCT e1)"),
-			Arguments.of(Functions.sum(e1), "RETURN sum(e1)"),
-			Arguments.of(Functions.sumDistinct(e1), "RETURN sum(DISTINCT e1)"),
-			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN range(1, 3)"),
-			Arguments.of(Functions.range(Cypher.literalOf(1), Cypher.literalOf(3), Cypher.literalOf(2)),
+			Arguments.of(Cypher.avg(e1), "RETURN avg(e1)"),
+			Arguments.of(Cypher.avgDistinct(e1), "RETURN avg(DISTINCT e1)"),
+			Arguments.of(Cypher.collect(e1), "RETURN collect(e1)"),
+			Arguments.of(Cypher.collectDistinct(e1), "RETURN collect(DISTINCT e1)"),
+			Arguments.of(Cypher.collect(n), "RETURN collect(n)"),
+			Arguments.of(Cypher.collectDistinct(n), "RETURN collect(DISTINCT n)"),
+			Arguments.of(Cypher.max(e1), "RETURN max(e1)"),
+			Arguments.of(Cypher.maxDistinct(e1), "RETURN max(DISTINCT e1)"),
+			Arguments.of(Cypher.min(e1), "RETURN min(e1)"),
+			Arguments.of(Cypher.minDistinct(e1), "RETURN min(DISTINCT e1)"),
+			Arguments.of(Cypher.percentileCont(e1, 0.4), "RETURN percentileCont(e1, 0.4)"),
+			Arguments.of(Cypher.percentileContDistinct(e1, 0.4), "RETURN percentileCont(DISTINCT e1, 0.4)"),
+			Arguments.of(Cypher.percentileDisc(e1, 0.4), "RETURN percentileDisc(e1, 0.4)"),
+			Arguments.of(Cypher.percentileDiscDistinct(e1, 0.4), "RETURN percentileDisc(DISTINCT e1, 0.4)"),
+			Arguments.of(Cypher.stDev(e1), "RETURN stDev(e1)"),
+			Arguments.of(Cypher.stDevDistinct(e1), "RETURN stDev(DISTINCT e1)"),
+			Arguments.of(Cypher.stDevP(e1), "RETURN stDevP(e1)"),
+			Arguments.of(Cypher.stDevPDistinct(e1), "RETURN stDevP(DISTINCT e1)"),
+			Arguments.of(Cypher.sum(e1), "RETURN sum(e1)"),
+			Arguments.of(Cypher.sumDistinct(e1), "RETURN sum(DISTINCT e1)"),
+			Arguments.of(Cypher.range(Cypher.literalOf(1), Cypher.literalOf(3)), "RETURN range(1, 3)"),
+			Arguments.of(Cypher.range(Cypher.literalOf(1), Cypher.literalOf(3), Cypher.literalOf(2)),
 				"RETURN range(1, 3, 2)"),
-			Arguments.of(Functions.head(e1), "RETURN head(e1)"),
-			Arguments.of(Functions.last(e1), "RETURN last(e1)"),
-			Arguments.of(Functions.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
-			Arguments.of(Functions.length(Cypher.path("p").definedBy(r)), "RETURN length(p)"),
-			Arguments.of(Functions.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
-			Arguments.of(Functions.properties(n), "RETURN properties(n)"),
-			Arguments.of(Functions.properties(r), "RETURN properties(r)"),
-			Arguments.of(Functions.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})"),
-			Arguments.of(Functions.relationships(Cypher.path("p").definedBy(r)), "RETURN relationships(p)"),
-			Arguments.of(Functions.startNode(r), "RETURN startNode(r)"),
-			Arguments.of(Functions.endNode(r), "RETURN endNode(r)"),
-			Arguments.of(Functions.date(), "RETURN date()"),
-			Arguments.of(Functions.calendarDate(2020, 9, 21), "RETURN date({year: 2020, month: 9, day: 21})"),
-			Arguments.of(Functions.weekDate(1984, 10, 3), "RETURN date({year: 1984, week: 10, dayOfWeek: 3})"),
-			Arguments.of(Functions.weekDate(1984, 10, null), "RETURN date({year: 1984, week: 10})"),
-			Arguments.of(Functions.weekDate(1984, null, null), "RETURN date({year: 1984})"),
+			Arguments.of(Cypher.head(e1), "RETURN head(e1)"),
+			Arguments.of(Cypher.last(e1), "RETURN last(e1)"),
+			Arguments.of(Cypher.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
+			Arguments.of(Cypher.length(Cypher.path("p").definedBy(r)), "RETURN length(p)"),
+			Arguments.of(Cypher.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
+			Arguments.of(Cypher.properties(n), "RETURN properties(n)"),
+			Arguments.of(Cypher.properties(r), "RETURN properties(r)"),
+			Arguments.of(Cypher.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})"),
+			Arguments.of(Cypher.relationships(Cypher.path("p").definedBy(r)), "RETURN relationships(p)"),
+			Arguments.of(Cypher.startNode(r), "RETURN startNode(r)"),
+			Arguments.of(Cypher.endNode(r), "RETURN endNode(r)"),
+			Arguments.of(Cypher.date(), "RETURN date()"),
+			Arguments.of(Cypher.calendarDate(2020, 9, 21), "RETURN date({year: 2020, month: 9, day: 21})"),
+			Arguments.of(Cypher.weekDate(1984, 10, 3), "RETURN date({year: 1984, week: 10, dayOfWeek: 3})"),
+			Arguments.of(Cypher.weekDate(1984, 10, null), "RETURN date({year: 1984, week: 10})"),
+			Arguments.of(Cypher.weekDate(1984, null, null), "RETURN date({year: 1984})"),
 			Arguments
-				.of(Functions.quarterDate(1984, 10, 45), "RETURN date({year: 1984, quarter: 10, dayOfQuarter: 45})"),
-			Arguments.of(Functions.quarterDate(1984, 10, null), "RETURN date({year: 1984, quarter: 10})"),
-			Arguments.of(Functions.quarterDate(1984, null, null), "RETURN date({year: 1984})"),
-			Arguments.of(Functions.ordinalDate(1984, 202), "RETURN date({year: 1984, ordinalDay: 202})"),
-			Arguments.of(Functions.ordinalDate(1984, null), "RETURN date({year: 1984})"),
-			Arguments.of(Functions.date(Cypher.mapOf("year", Cypher.literalOf(2020))), "RETURN date({year: 2020})"),
-			Arguments.of(Functions.date("2020-09-15"), "RETURN date('2020-09-15')"),
-			Arguments.of(Functions.date(Cypher.parameter("$myDateParameter")), "RETURN date($myDateParameter)"),
-			Arguments.of(Functions.datetime(), "RETURN datetime()"),
-			Arguments.of(Functions.datetime(
+				.of(Cypher.quarterDate(1984, 10, 45), "RETURN date({year: 1984, quarter: 10, dayOfQuarter: 45})"),
+			Arguments.of(Cypher.quarterDate(1984, 10, null), "RETURN date({year: 1984, quarter: 10})"),
+			Arguments.of(Cypher.quarterDate(1984, null, null), "RETURN date({year: 1984})"),
+			Arguments.of(Cypher.ordinalDate(1984, 202), "RETURN date({year: 1984, ordinalDay: 202})"),
+			Arguments.of(Cypher.ordinalDate(1984, null), "RETURN date({year: 1984})"),
+			Arguments.of(Cypher.date(Cypher.mapOf("year", Cypher.literalOf(2020))), "RETURN date({year: 2020})"),
+			Arguments.of(Cypher.date("2020-09-15"), "RETURN date('2020-09-15')"),
+			Arguments.of(Cypher.date(Cypher.parameter("$myDateParameter")), "RETURN date($myDateParameter)"),
+			Arguments.of(Cypher.datetime(), "RETURN datetime()"),
+			Arguments.of(Cypher.datetime(
 				Cypher.mapOf("year", Cypher.literalOf(1984), "month", Cypher.literalOf(10), "day",
 					Cypher.literalOf(11), "hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "timezone",
 					Cypher.literalOf("Europe/Stockholm")
 				)
 			), "RETURN datetime({year: 1984, month: 10, day: 11, hour: 12, minute: 31, timezone: 'Europe/Stockholm'})"),
 			Arguments
-				.of(Functions.datetime("2015-07-21T21:40:32.142+0100"),
+				.of(Cypher.datetime("2015-07-21T21:40:32.142+0100"),
 					"RETURN datetime('2015-07-21T21:40:32.142+0100')"),
-			Arguments.of(Functions.datetime(Cypher.parameter("$myDateParameter")), "RETURN datetime($myDateParameter)"),
-			Arguments.of(Functions.datetime(TimeZone.getTimeZone("America/Los_Angeles")),
+			Arguments.of(Cypher.datetime(Cypher.parameter("$myDateParameter")), "RETURN datetime($myDateParameter)"),
+			Arguments.of(Cypher.datetime(TimeZone.getTimeZone("America/Los_Angeles")),
 				"RETURN datetime({timezone: 'America/Los_Angeles'})"),
-			Arguments.of(Functions.localdatetime(), "RETURN localdatetime()"),
-			Arguments.of(Functions.localdatetime(
+			Arguments.of(Cypher.localdatetime(), "RETURN localdatetime()"),
+			Arguments.of(Cypher.localdatetime(
 				Cypher.mapOf("year", Cypher.literalOf(1984), "month", Cypher.literalOf(10), "day",
 					Cypher.literalOf(11), "hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "second",
 					Cypher.literalOf(14), "millisecond", Cypher.literalOf(123), "microsecond", Cypher.literalOf(456),
@@ -333,14 +333,14 @@ class FunctionsIT {
 				),
 				"RETURN localdatetime({year: 1984, month: 10, day: 11, hour: 12, minute: 31, second: 14, millisecond: 123, microsecond: 456, nanosecond: 789})"),
 			Arguments
-				.of(Functions.localdatetime("2015-07-21T21:40:32.142"),
+				.of(Cypher.localdatetime("2015-07-21T21:40:32.142"),
 					"RETURN localdatetime('2015-07-21T21:40:32.142')"),
-			Arguments.of(Functions.localdatetime(Cypher.parameter("$myDateParameter")),
+			Arguments.of(Cypher.localdatetime(Cypher.parameter("$myDateParameter")),
 				"RETURN localdatetime($myDateParameter)"),
-			Arguments.of(Functions.localdatetime(TimeZone.getTimeZone("America/Los_Angeles")),
+			Arguments.of(Cypher.localdatetime(TimeZone.getTimeZone("America/Los_Angeles")),
 				"RETURN localdatetime({timezone: 'America/Los_Angeles'})"),
-			Arguments.of(Functions.localtime(), "RETURN localtime()"),
-			Arguments.of(Functions.localtime(
+			Arguments.of(Cypher.localtime(), "RETURN localtime()"),
+			Arguments.of(Cypher.localtime(
 				Cypher.mapOf("hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "second",
 					Cypher.literalOf(14), "millisecond", Cypher.literalOf(123), "microsecond", Cypher.literalOf(456),
 					"nanosecond", Cypher.literalOf(789)
@@ -348,37 +348,37 @@ class FunctionsIT {
 				),
 				"RETURN localtime({hour: 12, minute: 31, second: 14, millisecond: 123, microsecond: 456, nanosecond: 789})"),
 			Arguments
-				.of(Functions.localtime("21:40:32.142"), "RETURN localtime('21:40:32.142')"),
+				.of(Cypher.localtime("21:40:32.142"), "RETURN localtime('21:40:32.142')"),
 			Arguments
-				.of(Functions.localtime(Cypher.parameter("$myDateParameter")), "RETURN localtime($myDateParameter)"),
-			Arguments.of(Functions.localtime(TimeZone.getTimeZone("America/Los_Angeles")),
+				.of(Cypher.localtime(Cypher.parameter("$myDateParameter")), "RETURN localtime($myDateParameter)"),
+			Arguments.of(Cypher.localtime(TimeZone.getTimeZone("America/Los_Angeles")),
 				"RETURN localtime({timezone: 'America/Los_Angeles'})"),
-			Arguments.of(Functions.time(), "RETURN time()"),
-			Arguments.of(Functions.time(
+			Arguments.of(Cypher.time(), "RETURN time()"),
+			Arguments.of(Cypher.time(
 				Cypher.mapOf("hour", Cypher.literalOf(12), "minute", Cypher.literalOf(31), "second",
 					Cypher.literalOf(14), "millisecond", Cypher.literalOf(123), "microsecond", Cypher.literalOf(456),
 					"nanosecond", Cypher.literalOf(789)
 				)
 			), "RETURN time({hour: 12, minute: 31, second: 14, millisecond: 123, microsecond: 456, nanosecond: 789})"),
 			Arguments
-				.of(Functions.time("21:40:32.142"), "RETURN time('21:40:32.142')"),
-			Arguments.of(Functions.time(Cypher.parameter("$myDateParameter")), "RETURN time($myDateParameter)"),
-			Arguments.of(Functions.time(TimeZone.getTimeZone("America/Los_Angeles")),
+				.of(Cypher.time("21:40:32.142"), "RETURN time('21:40:32.142')"),
+			Arguments.of(Cypher.time(Cypher.parameter("$myDateParameter")), "RETURN time($myDateParameter)"),
+			Arguments.of(Cypher.time(TimeZone.getTimeZone("America/Los_Angeles")),
 				"RETURN time({timezone: 'America/Los_Angeles'})"),
-			Arguments.of(Functions.duration(
+			Arguments.of(Cypher.duration(
 				Cypher
 					.mapOf("days", Cypher.literalOf(14), "hours", Cypher.literalOf(16), "minutes", Cypher.literalOf(12))
 			), "RETURN duration({days: 14, hours: 16, minutes: 12})"),
 			Arguments
-				.of(Functions.duration("P14DT16H12M"), "RETURN duration('P14DT16H12M')"),
-			Arguments.of(Functions.duration(Cypher.parameter("$myDateParameter")), "RETURN duration($myDateParameter)"),
-			Arguments.of(Functions.toInteger(Cypher.literalOf("23")), "RETURN toInteger('23')"),
-			Arguments.of(Functions.toString(Cypher.literalOf(23)), "RETURN toString(23)"),
-			Arguments.of(Functions.toFloat(Cypher.literalOf("23.42")), "RETURN toFloat('23.42')"),
-			Arguments.of(Functions.toBoolean(Cypher.literalOf("false")), "RETURN toBoolean('false')"),
-			Arguments.of(Functions.randomUUID(), "RETURN randomUUID()"),
-			Arguments.of(Functions.cartesian(2.3, 4.5), "RETURN point({x: 2.3, y: 4.5})"),
-			Arguments.of(Functions.coordinate(56.7, 12.78), "RETURN point({longitude: 56.7, latitude: 12.78})")
+				.of(Cypher.duration("P14DT16H12M"), "RETURN duration('P14DT16H12M')"),
+			Arguments.of(Cypher.duration(Cypher.parameter("$myDateParameter")), "RETURN duration($myDateParameter)"),
+			Arguments.of(Cypher.toInteger(Cypher.literalOf("23")), "RETURN toInteger('23')"),
+			Arguments.of(Cypher.toString(Cypher.literalOf(23)), "RETURN toString(23)"),
+			Arguments.of(Cypher.toFloat(Cypher.literalOf("23.42")), "RETURN toFloat('23.42')"),
+			Arguments.of(Cypher.toBoolean(Cypher.literalOf("false")), "RETURN toBoolean('false')"),
+			Arguments.of(Cypher.randomUUID(), "RETURN randomUUID()"),
+			Arguments.of(Cypher.cartesian(2.3, 4.5), "RETURN point({x: 2.3, y: 4.5})"),
+			Arguments.of(Cypher.coordinate(56.7, 12.78), "RETURN point({longitude: 56.7, latitude: 12.78})")
 		);
 	}
 
@@ -387,7 +387,7 @@ class FunctionsIT {
 
 		var p = Cypher.node("Person").named("p");
 		var stmt = Cypher.match(p)
-			.where(Conditions.not(Predicates.isEmpty(p.property("nationality"))))
+			.where(Cypher.not(Cypher.isEmpty(p.property("nationality"))))
 			.returning(p.property("name"), p.property("nationality"))
 			.build().getCypher();
 
@@ -401,14 +401,14 @@ class FunctionsIT {
 
 		@Test
 		void namesShouldWork() {
-			assertThat(Cypher.returning(Functions.graphNames().as("name")).build().getCypher()).isEqualTo("RETURN graph.names() AS name");
+			assertThat(Cypher.returning(Cypher.graphNames().as("name")).build().getCypher()).isEqualTo("RETURN graph.names() AS name");
 		}
 
 		@Test
 		void propertiesByNameShouldWork() {
 			var name = Cypher.name("name");
-			var stmnt = Cypher.unwind(Functions.graphNames()).as(name)
-				.returning(name, Functions.graphPropertiesByName(name).as("props"))
+			var stmnt = Cypher.unwind(Cypher.graphNames()).as(name)
+				.returning(name, Cypher.graphPropertiesByName(name).as("props"))
 				.build();
 			assertThat(stmnt.getCypher()).isEqualTo("UNWIND graph.names() AS name RETURN name, graph.propertiesByName(name) AS props");
 		}
@@ -416,9 +416,9 @@ class FunctionsIT {
 		@Test
 		void byNameShouldWork() {
 			var name = Cypher.name("graphName");
-			var stmnt = Cypher.unwind(Functions.graphNames()).as(name)
+			var stmnt = Cypher.unwind(Cypher.graphNames()).as(name)
 				.call(Cypher.use(
-					Functions.graphByName(name),
+					Cypher.graphByName(name),
 					Cypher.match(Cypher.anyNode("n")).returning(Cypher.name("n")).build())
 				)
 				.returning(Cypher.name("n"))

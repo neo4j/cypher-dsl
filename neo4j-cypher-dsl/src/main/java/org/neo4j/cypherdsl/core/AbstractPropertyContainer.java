@@ -58,24 +58,28 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final Operation mutate(Parameter<?> parameter) {
 		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), parameter);
 	}
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final Operation mutate(MapExpression properties) {
 		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), properties);
 	}
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final Operation set(Parameter<?> parameter) {
 		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), parameter);
 	}
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final Operation set(MapExpression properties) {
 		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), properties);
 	}

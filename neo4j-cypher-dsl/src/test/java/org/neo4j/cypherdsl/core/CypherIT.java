@@ -321,7 +321,7 @@ class CypherIT {
 				Statement statement = Cypher
 					.match(Cypher.anyNode("a"))
 					.where(Cypher.property("a", "name").isEqualTo(Cypher.literalOf("Alice")))
-					.returning(Functions.size(Cypher.anyNode("a").relationshipTo(Cypher.anyNode())).as("fof"))
+					.returning(Cypher.size(Cypher.anyNode("a").relationshipTo(Cypher.anyNode())).as("fof"))
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -335,7 +335,7 @@ class CypherIT {
 					.match(Cypher.anyNode("a"))
 					.where(Cypher.property("a", "name").isEqualTo(Cypher.literalOf("Alice")))
 					.returning(
-						Functions.size(
+						Cypher.size(
 							Cypher.anyNode("a").relationshipTo(Cypher.anyNode()).relationshipTo(Cypher.anyNode()))
 							.as("fof"))
 					.build();
@@ -394,8 +394,7 @@ class CypherIT {
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
 			}
 
 			@Test
@@ -404,8 +403,7 @@ class CypherIT {
 					.orderBy(userNode.property("name").ascending()).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
 			}
 
 			@Test
@@ -414,8 +412,7 @@ class CypherIT {
 					.orderBy(userNode.property("name").ascending()).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
 			}
 
 			@Test
@@ -424,8 +421,7 @@ class CypherIT {
 					.orderBy(userNode.property("name").descending()).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name DESC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC");
 			}
 
 			@Test
@@ -436,8 +432,7 @@ class CypherIT {
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo(
-						"MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC, u.age ASC");
 			}
 
 			@Test
@@ -613,7 +608,7 @@ class CypherIT {
 			Node m = Cypher.node("Movie").named("m");
 			Statement statement = Cypher
 				.match(m).with(m).skip(1)
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -621,7 +616,7 @@ class CypherIT {
 
 			statement = Cypher
 				.match(m).with(m).skip(Cypher.parameter("skip"))
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -633,7 +628,7 @@ class CypherIT {
 			Node m = Cypher.node("Movie").named("m");
 			Statement statement = Cypher
 				.match(m).with(m).limit(23)
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -641,7 +636,7 @@ class CypherIT {
 
 			statement = Cypher
 				.match(m).with(m).limit(Cypher.parameter("limit"))
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -653,7 +648,7 @@ class CypherIT {
 			Node m = Cypher.node("Movie").named("m");
 			Statement statement = Cypher
 				.match(m).with(m).skip(1).limit(23)
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -661,7 +656,7 @@ class CypherIT {
 
 			statement = Cypher
 				.match(m).with(m).skip(Cypher.parameter("skip")).limit(Cypher.parameter("limit"))
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -673,7 +668,7 @@ class CypherIT {
 			Node m = Cypher.node("Movie").named("m");
 			Statement statement = Cypher
 				.match(m).with(m).skip((Number) null).limit((Number) null)
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			String expected = "MATCH (m:`Movie`) WITH m RETURN count(m)";
@@ -682,7 +677,7 @@ class CypherIT {
 
 			statement = Cypher
 				.match(m).with(m).skip((Expression) null).limit((Expression) null)
-				.returning(Functions.count(m))
+				.returning(Cypher.count(m))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1012,7 +1007,7 @@ class CypherIT {
 
 		@Test
 		void inReturnClause() {
-			Statement statement = Cypher.match(userNode).returning(Functions.count(userNode)).build();
+			Statement statement = Cypher.match(userNode).returning(Cypher.count(userNode)).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1021,7 +1016,7 @@ class CypherIT {
 
 		@Test // GH-195
 		void inReturnClauseBasedOnExpressionCollection() {
-			Statement statement = Cypher.match(userNode).returning(Collections.singleton(Functions.count(userNode))).build();
+			Statement statement = Cypher.match(userNode).returning(Collections.singleton(Cypher.count(userNode))).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1030,7 +1025,7 @@ class CypherIT {
 
 		@Test // GH-195
 		void inDistinctReturnClauseBasedOnExpressionCollection() {
-			Statement statement = Cypher.match(userNode).returningDistinct(Collections.singleton(Functions.count(userNode))).build();
+			Statement statement = Cypher.match(userNode).returningDistinct(Collections.singleton(Cypher.count(userNode))).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1039,7 +1034,7 @@ class CypherIT {
 
 		@Test
 		void inReturnClauseWithDistinct() {
-			Statement statement = Cypher.match(userNode).returning(Functions.countDistinct(userNode)).build();
+			Statement statement = Cypher.match(userNode).returning(Cypher.countDistinct(userNode)).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1048,7 +1043,7 @@ class CypherIT {
 
 		@Test
 		void aliasedInReturnClause() {
-			Statement statement = Cypher.match(userNode).returning(Functions.count(userNode).as("cnt")).build();
+			Statement statement = Cypher.match(userNode).returning(Cypher.count(userNode).as("cnt")).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1059,7 +1054,7 @@ class CypherIT {
 		void shouldSupportMoreThanOneArgument() {
 			Statement statement = Cypher.match(userNode)
 				.returning(
-					Functions.coalesce(userNode.property("a"), userNode.property("b"), Cypher.literalOf("¯\\_(ツ)_/¯")))
+					Cypher.coalesce(userNode.property("a"), userNode.property("b"), Cypher.literalOf("¯\\_(ツ)_/¯")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1070,7 +1065,7 @@ class CypherIT {
 		@Test
 		void literalsShouldDealWithNull() {
 			Statement statement = Cypher.match(userNode)
-				.returning(Functions.coalesce(Cypher.literalOf(null), userNode.property("field")).as("p"))
+				.returning(Cypher.coalesce(Cypher.literalOf(null), userNode.property("field")).as("p"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1161,7 +1156,7 @@ class CypherIT {
 
 			Node node = Cypher.anyNode().named("n");
 			Statement statement = Cypher.match(node)
-				.where(org.neo4j.cypherdsl.core.Conditions.includesAll(
+				.where(Cypher.includesAll(
 					node.property("l"), Cypher.literalOf(new String[] { "A", "B" })
 				))
 				.returning(node)
@@ -1182,7 +1177,7 @@ class CypherIT {
 
 			Node node = Cypher.anyNode().named("n");
 			Statement statement = Cypher.match(node)
-				.where(org.neo4j.cypherdsl.core.Conditions.includesAny(
+				.where(Cypher.includesAny(
 					node.property("l"), Cypher.literalOf(new String[] { "A", "B" })
 				))
 				.returning(node)
@@ -1202,8 +1197,8 @@ class CypherIT {
 		void nestedConditions() {
 			Statement statement;
 
-			Condition isTrue = org.neo4j.cypherdsl.core.Conditions.isTrue();
-			Condition isFalse = org.neo4j.cypherdsl.core.Conditions.isFalse();
+			Condition isTrue = Cypher.isTrue();
+			Condition isFalse = Cypher.isFalse();
 			statement = Cypher.match(userNode)
 				.where(
 					isTrue.or(isFalse).and(isTrue)
@@ -1311,27 +1306,27 @@ class CypherIT {
 		@Test // GH-110
 		void multipleEmptyConditionsMustCollapse() {
 
-			Supplier<Condition> no = org.neo4j.cypherdsl.core.Conditions::noCondition; // Just aliased due to the qualified import
+			var no = Cypher.noCondition();
 			String expected = "MATCH (u:`User`) RETURN u";
 
 			Statement statement;
 			statement = Cypher.match(userNode)
-				.where(no.get().or(no.get()))
-				.and(no.get().and(no.get()).or(no.get()))
+				.where(no.or(no))
+				.and(no.and(no).or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().or(no.get()))
+				.where(no.or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().and(no.get()).or(no.get()))
+				.where(no.and(no).or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
@@ -1341,35 +1336,35 @@ class CypherIT {
 		@Test // GH-110
 		void multipleEmptyConditionsMustCollapse2() {
 
-			Supplier<Condition> no = org.neo4j.cypherdsl.core.Conditions::noCondition; // Just aliased due to the qualified import
+			var no = Cypher.noCondition();
 			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
 			String expected = "MATCH (u:`User`) WHERE u.a = true RETURN u";
 
 			Statement statement;
 			statement = Cypher.match(userNode)
-				.where(no.get().and(t.get()).or(no.get()))
-				.and(no.get().and(no.get()).or(no.get()))
+				.where(no.and(t.get()).or(no))
+				.and(no.and(no).or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().or(no.get()).or(t.get()))
+				.where(no.or(no).or(t.get()))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().and(t.get()).or(no.get()))
+				.where(no.and(t.get()).or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().or(no.get()))
+				.where(no.or(no))
 				.and(t.get())
 				.returning(userNode)
 				.build();
@@ -1380,29 +1375,29 @@ class CypherIT {
 		@Test // GH-110
 		void multipleEmptyConditionsMustCollapse3() {
 
-			Supplier<Condition> no = org.neo4j.cypherdsl.core.Conditions::noCondition; // Just aliased due to the qualified import
+			var no = Cypher.noCondition();
 			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
 			Supplier<Condition> f = () -> userNode.property("b").isEqualTo(Cypher.literalFalse());
 			String expected = "MATCH (u:`User`) WHERE (u.a = true AND u.b = false) RETURN u";
 
 			Statement statement;
 			statement = Cypher.match(userNode)
-				.where(no.get().and(t.get()).or(no.get()))
-				.and(no.get().and(f.get()).or(no.get()))
+				.where(no.and(t.get()).or(no))
+				.and(no.and(f.get()).or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().or(no.get()).or(t.get()).and(f.get()))
+				.where(no.or(no).or(t.get()).and(f.get()))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
 			statement = Cypher.match(userNode)
-				.where(no.get().and(t.get()).or(no.get())).and(f.get().or(no.get()))
+				.where(no.and(t.get()).or(no)).and(f.get().or(no))
 				.returning(userNode)
 				.build();
 			assertThat(cypherRenderer.render(statement))
@@ -1635,7 +1630,7 @@ class CypherIT {
 		void noConditionShouldNotBeRendered() {
 			Statement statement;
 			statement = Cypher.match(userNode)
-				.where(org.neo4j.cypherdsl.core.Conditions.noCondition())
+				.where(Cypher.noCondition())
 				.returning(userNode)
 				.build();
 
@@ -1645,8 +1640,8 @@ class CypherIT {
 
 			statement = Cypher.match(userNode)
 				.where(userNode.property("name").isEqualTo(Cypher.literalOf("test")))
-				.and(org.neo4j.cypherdsl.core.Conditions.noCondition()).or(
-					org.neo4j.cypherdsl.core.Conditions.noCondition())
+				.and(Cypher.noCondition()).or(
+					Cypher.noCondition())
 				.returning(userNode)
 				.build();
 
@@ -1770,7 +1765,7 @@ class CypherIT {
 				Statement statement;
 
 				statement = Cypher.match(person, peter)
-					.where(org.neo4j.cypherdsl.core.Conditions.not(person.relationshipTo(peter)))
+					.where(Cypher.not(person.relationshipTo(peter)))
 					.returning(person.property("name"), person.property("age"))
 					.build();
 
@@ -1821,8 +1816,8 @@ class CypherIT {
 				Relationship pathPattern = person.relationshipTo(Cypher.anyNode()).named("r");
 				statement = Cypher.match(pathPattern)
 					.where(person.property("name").isEqualTo(Cypher.literalOf("Andy")))
-					.and(Functions.type(pathPattern).matches("K.*"))
-					.returning(Functions.type(pathPattern), pathPattern.property("since"))
+					.and(Cypher.type(pathPattern).matches("K.*"))
+					.returning(Cypher.type(pathPattern), pathPattern.property("since"))
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -3169,8 +3164,8 @@ class CypherIT {
 		@SuppressWarnings("unused") // This the source of test parameters
 		private Stream<Arguments> operatorsToTest() {
 			return Stream.of(
-				Arguments.of("Unary minus", Operations.minus(Cypher.literalOf(1)), "RETURN -1"),
-				Arguments.of("Unary plus", Operations.plus(Cypher.literalOf(1)), "RETURN +1")
+				Arguments.of("Unary minus", Cypher.minus(Cypher.literalOf(1)), "RETURN -1"),
+				Arguments.of("Unary plus", Cypher.plus(Cypher.literalOf(1)), "RETURN +1")
 			);
 		}
 
@@ -3243,7 +3238,7 @@ class CypherIT {
 			Statement statement;
 			statement = Cypher.match(Cypher.anyNode("n"))
 				.returning(
-					Functions.point(
+					Cypher.point(
 						Cypher.mapOf(
 							"latitude", Cypher.parameter("latitude"),
 							"longitude", Cypher.parameter("longitude"),
@@ -3263,7 +3258,7 @@ class CypherIT {
 			Statement statement;
 			Node n = Cypher.anyNode("n");
 			statement = Cypher.match(n)
-				.where(Functions.distance(n.property("location"), Functions.point(Cypher.parameter("point.point")))
+				.where(Cypher.distance(n.property("location"), Cypher.point(Cypher.parameter("point.point")))
 					.gt(Cypher.parameter("point.distance")))
 				.returning(n)
 				.build();
@@ -3322,7 +3317,7 @@ class CypherIT {
 		void chainedAndFancy() {
 			Node node = Cypher.node("Person").named("p");
 
-			Statement statement = Cypher.create(node.withProperties(Cypher.mapOf("home.location", Functions.point(Cypher.mapOf("latitude", Cypher.literalOf(50.751), "longitude", Cypher.literalOf(6.179))))))
+			Statement statement = Cypher.create(node.withProperties(Cypher.mapOf("home.location", Cypher.point(Cypher.mapOf("latitude", Cypher.literalOf(50.751), "longitude", Cypher.literalOf(6.179))))))
 				.returning(node).build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3357,7 +3352,7 @@ class CypherIT {
 			Node node = Cypher.node("Person").named("p");
 			//noinspection ResultOfMethodCallIgnored
 			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(node)
-				.returning(node.project("__internalNeo4jId__", Functions.elementId(node), "name")
+				.returning(node.project("__internalNeo4jId__", Cypher.elementId(node), "name")
 					.and(node.property("home.location", "y"))
 				)
 				.build()).withMessage("Cannot project nested properties!");
@@ -3515,7 +3510,7 @@ class CypherIT {
 				.where(rootNode.internalId().isEqualTo(Cypher.literalOf(1)))
 				.unwind(rootNode.labels()).as("label")
 				.with(label).where(label.in(Cypher.parameter("fixedLabels")).not())
-				.returning(Functions.collect(label).as("labels")).build();
+				.returning(Cypher.collect(label).as("labels")).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -3578,7 +3573,7 @@ class CypherIT {
 		@Test
 		void shouldRenderUnwind() {
 
-			AliasedExpression collected = Functions.collect(bikeNode).as("collected");
+			AliasedExpression collected = Cypher.collect(bikeNode).as("collected");
 			Statement statement = Cypher.match(bikeNode)
 				.with(collected)
 				.unwind(collected).as("x")
@@ -3764,7 +3759,7 @@ class CypherIT {
 				Node n = Cypher.anyNode("n");
 
 				statement = Cypher.match(n)
-					.returning(n.project("__internalNeo4jId__", Functions.elementId(n), "name"))
+					.returning(n.project("__internalNeo4jId__", Cypher.elementId(n), "name"))
 					.build();
 				var renderer = Renderer.getRenderer(NEO5J_CONFIG);
 				assertThat(renderer.render(statement))
@@ -3772,7 +3767,7 @@ class CypherIT {
 						"MATCH (n) RETURN n{__internalNeo4jId__: elementId(n), .name}");
 
 				statement = Cypher.match(n)
-					.returning(n.project("name", "__internalNeo4jId__", Functions.elementId(n)))
+					.returning(n.project("name", "__internalNeo4jId__", Cypher.elementId(n)))
 					.build();
 				assertThat(renderer.render(statement))
 					.isEqualTo(
@@ -3792,7 +3787,7 @@ class CypherIT {
 					.match(
 						actor.withProperties("name", Cypher.literalOf("Tom Hanks")).relationshipTo(movie, "ACTED_IN"))
 					.returning(actor
-						.project("name", "realName", "movies", Functions.collect(movie.project("title", "released"))))
+						.project("name", "realName", "movies", Cypher.collect(movie.project("title", "released"))))
 					.build();
 				assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 
@@ -3800,7 +3795,7 @@ class CypherIT {
 					.match(
 						actor.withProperties("name", Cypher.literalOf("Tom Hanks")).relationshipTo(movie, "ACTED_IN"))
 					.returning(actor.project("name", "realName", "movies",
-						Functions.collect(movie.project(movie.property("title"), movie.property("released")))))
+						Cypher.collect(movie.project(movie.property("title"), movie.property("released")))))
 					.build();
 				assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 
@@ -3808,7 +3803,7 @@ class CypherIT {
 					.match(
 						actor.withProperties("name", Cypher.literalOf("Tom Hanks")).relationshipTo(movie, "ACTED_IN"))
 					.returning(actor.project("name", "realName", "movies",
-						Functions.collect(movie.project("title", "year", movie.property("released")))))
+						Cypher.collect(movie.project("title", "year", movie.property("released")))))
 					.build();
 				assertThat(cypherRenderer.render(statement)).isEqualTo(
 					"MATCH (actor:`Person` {name: 'Tom Hanks'})-[:`ACTED_IN`]->(movie:`Movie`) RETURN actor{.name, .realName, movies: collect(movie{.title, year: movie.released})}");
@@ -3824,8 +3819,8 @@ class CypherIT {
 				statement = Cypher.match(n.relationshipTo(m, "ACTED_IN"))
 					.returning(
 						n.project(
-							"__internalNeo4jId__", Functions.elementId(n), "name", "nested",
-							m.project("title", "__internalNeo4jId__", Functions.elementId(m))
+							"__internalNeo4jId__", Cypher.elementId(n), "name", "nested",
+							m.project("title", "__internalNeo4jId__", Cypher.elementId(m))
 						))
 					.build();
 				assertThat(Renderer.getRenderer(NEO5J_CONFIG).render(statement))
@@ -3870,7 +3865,7 @@ class CypherIT {
 				Relationship rel = p.relationshipTo(m, "ACTED_IN").named("r");
 
 				statement = Cypher.match(rel)
-					.returning(p.project("__internalNeo4jId__", Functions.elementId(p), "name")
+					.returning(p.project("__internalNeo4jId__", Cypher.elementId(p), "name")
 						.and(rel)
 						.and(m)
 						.and(p.property("foo"))
@@ -3897,7 +3892,7 @@ class CypherIT {
 				statement = Cypher.match(rel)
 					.returning(
 						rel.project(
-							"__internalNeo4jId__", Functions.elementId(rel), "roles"
+							"__internalNeo4jId__", Cypher.elementId(rel), "roles"
 						))
 					.build();
 				assertThat(Renderer.getRenderer(NEO5J_CONFIG).render(statement))
@@ -3918,7 +3913,7 @@ class CypherIT {
 						m.project(
 							"title", "roles",
 							rel.project(
-								"__internalNeo4jId__", Functions.elementId(rel), "roles"
+								"__internalNeo4jId__", Cypher.elementId(rel), "roles"
 							)
 						)
 					)
@@ -3961,8 +3956,8 @@ class CypherIT {
 			String expectedMessage = "FunctionInvocation{cypher=elementId(n)} of type class org.neo4j.cypherdsl.core.FunctionInvocation cannot be used with an implicit name as map entry.";
 			Node n = Cypher.anyNode("n");
 
-			assertThatIllegalArgumentException().isThrownBy(() -> n.project(Functions.elementId(n))).withMessage(expectedMessage);
-			assertThatIllegalArgumentException().isThrownBy(() -> n.project("a", Cypher.mapOf("a", Cypher.literalOf("b")), Functions.elementId(n))).withMessage(expectedMessage);
+			assertThatIllegalArgumentException().isThrownBy(() -> n.project(Cypher.elementId(n))).withMessage(expectedMessage);
+			assertThatIllegalArgumentException().isThrownBy(() -> n.project("a", Cypher.mapOf("a", Cypher.literalOf("b")), Cypher.elementId(n))).withMessage(expectedMessage);
 		}
 	}
 
@@ -3985,7 +3980,7 @@ class CypherIT {
 				baseStatementSupplier.get().orderBy(Arrays.asList(byTitle, byName)) }
 			) {
 				Statement statement = orderedStatement.returning(Cypher.property("m", "title").as("movie"),
-					Functions.collect(Cypher.property("p", "name")).as("actors")).build();
+					Cypher.collect(Cypher.property("p", "name")).as("actors")).build();
 				String expected = "MATCH (m:`Movie`)<-[r:`ACTED_IN`]-(p:`Person`) WITH m, p ORDER BY m.title, p.name RETURN m.title AS movie, collect(p.name) AS actors";
 				assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 			}
@@ -4000,7 +3995,7 @@ class CypherIT {
 				.with(Cypher.name("m"), Cypher.name("p")).orderBy(Cypher.property("m", "title")).ascending()
 				.and(Cypher.property("p", "name")).ascending()
 				.returning(Cypher.property("m", "title").as("movie"),
-					Functions.collect(Cypher.property("p", "name")).as("actors")).build();
+					Cypher.collect(Cypher.property("p", "name")).as("actors")).build();
 
 			String expected = "MATCH (m:`Movie`)<-[r:`ACTED_IN`]-(p:`Person`) WITH m, p ORDER BY m.title ASC, p.name ASC RETURN m.title AS movie, collect(p.name) AS actors";
 			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
@@ -4085,7 +4080,7 @@ class CypherIT {
 
 			statement = Cypher.returning(
 				Cypher.listWith(name)
-					.in(Functions.range(Cypher.literalOf(0), Cypher.literalOf(10)))
+					.in(Cypher.range(Cypher.literalOf(0), Cypher.literalOf(10)))
 					.where(name.remainder(Cypher.literalOf(2)).isEqualTo(Cypher.literalOf(0)))
 					.returning(name.pow(Cypher.literalOf(3))).as("result")).build();
 			assertThat(cypherRenderer.render(statement))
@@ -4093,7 +4088,7 @@ class CypherIT {
 
 			statement = Cypher.returning(
 				Cypher.listWith(name)
-					.in(Functions.range(Cypher.literalOf(0), Cypher.literalOf(10)))
+					.in(Cypher.range(Cypher.literalOf(0), Cypher.literalOf(10)))
 					.where(name.remainder(Cypher.literalOf(2)).isEqualTo(Cypher.literalOf(0)))
 					.returning().as("result")).build();
 			assertThat(cypherRenderer.render(statement))
@@ -4101,7 +4096,7 @@ class CypherIT {
 
 			statement = Cypher.returning(
 				Cypher.listWith(name)
-					.in(Functions.range(Cypher.literalOf(0), Cypher.literalOf(10)))
+					.in(Cypher.range(Cypher.literalOf(0), Cypher.literalOf(10)))
 					.returning(name.pow(Cypher.literalOf(3))).as("result")).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN [x IN range(0, 10) | x^3] AS result");
@@ -4420,7 +4415,7 @@ class CypherIT {
 			Statement statement = Cypher.match(p)
 				.where(Cypher.property("a", "name").isEqualTo(Cypher.literalOf("Alice")))
 				.and(Cypher.property("b", "name").isEqualTo(Cypher.literalOf("Daniel")))
-				.and(Predicates.all("x").in(Functions.nodes(p))
+				.and(Cypher.all("x").in(Cypher.nodes(p))
 					.where(Cypher.property("x", "age").gt(Cypher.literalOf(30))))
 				.returning(p).build();
 
@@ -4435,7 +4430,7 @@ class CypherIT {
 			Node a = Cypher.anyNode("a");
 			Statement statement = Cypher.match(a)
 				.where(Cypher.property("a", "name").isEqualTo(Cypher.literalOf("Eskil")))
-				.and(Predicates.any("x").in(a.property("array"))
+				.and(Cypher.any("x").in(a.property("array"))
 					.where(Cypher.name("x").isEqualTo(Cypher.literalOf("one"))))
 				.returning(a.property("name"), a.property("array")).build();
 
@@ -4451,8 +4446,8 @@ class CypherIT {
 				.definedBy(Cypher.anyNode("a").relationshipTo(Cypher.anyNode("b")).min(1).max(3));
 			Statement statement = Cypher.match(p)
 				.where(Cypher.property("a", "name").isEqualTo(Cypher.literalOf("Alice")))
-				.and(Predicates
-					.none("x").in(Functions.nodes(p))
+				.and(Cypher
+					.none("x").in(Cypher.nodes(p))
 					.where(Cypher.property("x", "age").isEqualTo(Cypher.literalOf(25))))
 				.returning(p).build();
 
@@ -4467,7 +4462,7 @@ class CypherIT {
 			NamedPath p = Cypher.path("p").definedBy(Cypher.anyNode("n").relationshipTo(Cypher.anyNode("b")));
 			Statement statement = Cypher.match(p)
 				.where(Cypher.property("n", "name").isEqualTo(Cypher.literalOf("Alice")))
-				.and(Predicates.single("var").in(Functions.nodes(p)).where(
+				.and(Cypher.single("var").in(Cypher.nodes(p)).where(
 					Cypher.property("var", "eyes").isEqualTo(Cypher.literalOf("blue"))))
 				.returning(p).build();
 
@@ -4483,7 +4478,7 @@ class CypherIT {
 		@Test
 		void valueAtShouldWork() {
 
-			Statement statement = Cypher.returning(Cypher.valueAt(Functions.range(0, 10), 3)).build();
+			Statement statement = Cypher.returning(Cypher.valueAt(Cypher.range(0, 10), 3)).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[3]");
 		}
@@ -4491,7 +4486,7 @@ class CypherIT {
 		@Test
 		void subListUntilShouldWork() {
 
-			Statement statement = Cypher.returning(Cypher.subListUntil(Functions.range(0, 10), 3)).build();
+			Statement statement = Cypher.returning(Cypher.subListUntil(Cypher.range(0, 10), 3)).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[..3]");
 		}
@@ -4499,7 +4494,7 @@ class CypherIT {
 		@Test
 		void subListFromShouldWork() {
 
-			Statement statement = Cypher.returning(Cypher.subListFrom(Functions.range(0, 10), -3)).build();
+			Statement statement = Cypher.returning(Cypher.subListFrom(Cypher.range(0, 10), -3)).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[-3..]");
 		}
@@ -4507,7 +4502,7 @@ class CypherIT {
 		@Test
 		void subListShouldWork() {
 
-			Statement statement = Cypher.returning(Cypher.subList(Functions.range(0, 10), 2, 4)).build();
+			Statement statement = Cypher.returning(Cypher.subList(Cypher.range(0, 10), 2, 4)).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[2..4]");
 		}
@@ -4515,14 +4510,14 @@ class CypherIT {
 		@Test
 		void subListUntilExpressionShouldWork() {
 
-			Statement statement = Cypher.returning(Cypher.subListUntil(Functions.range(0, 10), Cypher.parameter("end"))).build();
+			Statement statement = Cypher.returning(Cypher.subListUntil(Cypher.range(0, 10), Cypher.parameter("end"))).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[..$end]");
 		}
 
 		@Test
 		void subListFromExpressionShouldWork() {
-			Statement statement = Cypher.returning(Cypher.subListFrom(Functions.range(0, 10), Cypher.parameter("start"))).build();
+			Statement statement = Cypher.returning(Cypher.subListFrom(Cypher.range(0, 10), Cypher.parameter("start"))).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[$start..]");
 		}
@@ -4530,7 +4525,7 @@ class CypherIT {
 		@Test
 		void subListExpressionShouldWork() {
 
-			Statement statement = Cypher.returning(Cypher.subList(Functions.range(0, 10), Cypher.parameter("start"), Cypher.parameter("end"))).build();
+			Statement statement = Cypher.returning(Cypher.subList(Cypher.range(0, 10), Cypher.parameter("start"), Cypher.parameter("end"))).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("RETURN range(0, 10)[$start..$end]");
 		}
@@ -4581,7 +4576,7 @@ class CypherIT {
 
 			var nodes = Cypher.name("nodes");
 			var cypher = Cypher.match(Cypher.node("Foo").named("n"))
-				.with(Functions.collect(Cypher.name("n")).as("nodes"))
+				.with(Cypher.collect(Cypher.name("n")).as("nodes"))
 				.returning(Cypher.property(Cypher.valueAt(nodes, 0), "foo"))
 				.build().getCypher();
 			assertThat(cypher)
@@ -4613,7 +4608,7 @@ class CypherIT {
 			Node li = Cypher.node("LineItem").named("li");
 			Relationship hasLineItems = o.relationshipTo(li).named("h");
 
-			var netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
+			var netAmount = Cypher.sum(li.property("price").multiply(li.property("quantity")))
 				.as("netAmount");
 			var totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
 				.as("totalAmount");
@@ -4636,7 +4631,7 @@ class CypherIT {
 			Node li = Cypher.node("LineItem").named("li");
 			Relationship hasLineItems = o.relationshipTo(li).named("h");
 
-			var netAmount = Functions.sum(li.property("price").multiply(li.property("quantity")))
+			var netAmount = Cypher.sum(li.property("price").multiply(li.property("quantity")))
 				.as("netAmount");
 			var totalAmount = netAmount.multiply(Cypher.literalOf(1).add(Cypher.parameter("taxRate")))
 				.as("totalAmount");
@@ -4662,7 +4657,7 @@ class CypherIT {
 			var stmnt = Cypher.match(p)
 				.where(start.property("name").eq(Cypher.literalOf("A")).and(finish.property("name").eq(Cypher.literalOf("D"))))
 				.foreach(n)
-				.in(Functions.nodes(p))
+				.in(Cypher.nodes(p))
 				.apply(Set.set(n.property("marked").to(Cypher.literalTrue())))
 				.build();
 			assertThat(stmnt.getCypher()).isEqualTo(
@@ -4682,7 +4677,7 @@ class CypherIT {
 				.where(start.property("name").eq(Cypher.literalOf("A")).and(finish.property("name").eq(Cypher.literalOf("D"))))
 				.set(start.property("x").to(Cypher.literalTrue()))
 				.foreach(n)
-					.in(Functions.nodes(p))
+					.in(Cypher.nodes(p))
 					.apply(Set.set(
 						n.property("marked").to(Cypher.literalTrue()),
 						n.property("foo").to(Cypher.literalOf("bar"))
@@ -4818,8 +4813,8 @@ class CypherIT {
 		void configurationOfIndentWithShouldWork() {
 
 			assertThat(Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentSize(5).build())
-				.render(Cypher.match(Cypher.node("Node")).where(org.neo4j.cypherdsl.core.Conditions.isTrue()).and(
-					org.neo4j.cypherdsl.core.Conditions.isFalse()).returning(Cypher.asterisk()).build()))
+				.render(Cypher.match(Cypher.node("Node")).where(Cypher.isTrue()).and(
+					Cypher.isFalse()).returning(Cypher.asterisk()).build()))
 				.isEqualTo("""
 					MATCH (:Node)
 					WHERE (true
@@ -5087,7 +5082,7 @@ class CypherIT {
 			var pattern = Cypher.anyNode("n").relationshipTo(Cypher.node("X")).quantifyRelationship(QuantifiedPathPattern.plus());
 			var innerRel = Cypher.node("A").named("n").relationshipTo(Cypher.anyNode().withProperties(Map.of("p", 30)), "R")
 				.quantify(QuantifiedPathPattern.interval(2,3))
-				.where(Predicates.exists(pattern));
+				.where(Cypher.exists(pattern));
 			var cypher = Cypher.match(innerRel).returning(Cypher.asterisk()).build().getCypher();
 			assertThat(cypher).isEqualTo("MATCH ((n:`A`)-[:`R`]->( {p: 30}) WHERE EXISTS { (n)-->+(:`X`) }){2,3} RETURN *");
 		}

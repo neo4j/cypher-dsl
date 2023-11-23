@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import java.util.TimeZone;
 
@@ -40,8 +40,12 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Gerrit Meier
  * @author Romain Rossi
  * @since 1.0
+ * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
+ * be accessible.
  */
-@API(status = STABLE, since = "1.0")
+@API(status = DEPRECATED, since = "2023.9.0")
+@Deprecated(since = "2023.9.0")
+@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
 public final class Functions {
 
 	/**
@@ -55,7 +59,7 @@ public final class Functions {
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated(since = "2023.3.0")
-	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
+	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some point, but not yet.
 	public static FunctionInvocation id(@NotNull Node node) {
 
 		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
@@ -74,7 +78,7 @@ public final class Functions {
 	 */
 	@NotNull @Contract(pure = true)
 	@Deprecated(since = "2023.3.0")
-	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed at some point, but not yet.
+	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some point, but not yet.
 	public static FunctionInvocation id(@NotNull Relationship relationship) {
 
 		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
@@ -337,7 +341,7 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">left</a>.
 	 *
 	 * @param expression An expression resolving to a string
-	 * @param length desired length
+	 * @param length     desired length
 	 * @return A function call for {@code left()}
 	 * @since 2023.0.2
 	 */
@@ -373,15 +377,16 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">replace</a>.
 	 *
 	 * @param original An expression that returns a string
-	 * @param search An expression that specifies the string to be replaced in {@code original}.
-	 * @param replace An expression that specifies the replacement string.
+	 * @param search   An expression that specifies the string to be replaced in {@code original}.
+	 * @param replace  An expression that specifies the replacement string.
 	 * @return A function call for {@code replace()}
 	 * @since 2023.0.2
 	 */
 	@NotNull @Contract(pure = true)
 	public static FunctionInvocation replace(Expression original, Expression search, Expression replace) {
 
-		return FunctionInvocation.create(Strings.REPLACE, expressionOrNullLit(original), expressionOrNullLit(search), expressionOrNullLit(replace));
+		return FunctionInvocation.create(Strings.REPLACE, expressionOrNullLit(original), expressionOrNullLit(search),
+			expressionOrNullLit(replace));
 	}
 
 	/**
@@ -404,7 +409,7 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">right</a>.
 	 *
 	 * @param expression An expression resolving to a string
-	 * @param length desired length
+	 * @param length     desired length
 	 * @return A function call for {@code right()}
 	 * @since 2023.0.2
 	 */
@@ -440,8 +445,8 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-substring">rtrim</a>.
 	 *
 	 * @param original An expression resolving to a string
-	 * @param start An expression that returns a positive integer, denoting the position at which the substring will begin.
-	 * @param length An expression that returns a positive integer, denoting how many characters of original will be returned.
+	 * @param start    An expression that returns a positive integer, denoting the position at which the substring will begin.
+	 * @param length   An expression that returns a positive integer, denoting how many characters of original will be returned.
 	 * @return A function call for {@code substring()}
 	 * @since 2023.0.2
 	 */
@@ -508,7 +513,7 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-split">split</a>.
 	 *
 	 * @param expression An expression resolving to a string that should be split
-	 * @param delimiter The delimiter on which to split
+	 * @param delimiter  The delimiter on which to split
 	 * @return A function call for {@code split()}
 	 * @since 2021.2.1
 	 */
@@ -525,7 +530,7 @@ public final class Functions {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-split">split</a>.
 	 *
 	 * @param expression An expression resolving to a string that should be split
-	 * @param delimiter The delimiter on which to split
+	 * @param delimiter  The delimiter on which to split
 	 * @return A function call for {@code split()}
 	 * @since 2021.2.1
 	 */
@@ -644,6 +649,7 @@ public final class Functions {
 
 	/**
 	 * Convenience method for creating a 2d cartesian point
+	 *
 	 * @param x The x coordinate
 	 * @param y The y coordinate
 	 * @return A function call for {@code point()}
@@ -657,8 +663,9 @@ public final class Functions {
 
 	/**
 	 * Convenience method for creating a 2d coordinate in the WGS 84 coordinate system
+	 *
 	 * @param longitude The longitude
-	 * @param latitude The latitude
+	 * @param latitude  The latitude
 	 * @return A function call for {@code point()}
 	 * @since 2022.7.3
 	 */
@@ -672,8 +679,8 @@ public final class Functions {
 	 * Creates a function invocation for the {@code point.withinBBox} function.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-withinBBox">point.withinBBox</a>.
 	 *
-	 * @param point The point to check
-	 * @param lowerLeft The lower left point of the bounding box (south-west coordinate)
+	 * @param point      The point to check
+	 * @param lowerLeft  The lower left point of the bounding box (south-west coordinate)
 	 * @param upperRight The upper right point of the bounding box (north-east coordinate)
 	 * @return A function call for {@code point.withinBBox}
 	 * @since 2022.7.3
@@ -1068,7 +1075,8 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for nodes is required.");
 		return FunctionInvocation.create(Lists.NODES,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(
+				Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
@@ -1099,7 +1107,8 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(
+				Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
@@ -1766,7 +1775,7 @@ public final class Functions {
 	 * Creates a function invocation for {@code round({})}.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-round">round</a>.
 	 *
-	 * @param value The value to round
+	 * @param value      The value to round
 	 * @param expression Additional parameters, length must be 0, 1 or 2:
 	 *                   First entry is the precision, second is the rounding mode
 	 * @return A function call for {@code round({})}.
@@ -2178,7 +2187,8 @@ public final class Functions {
 
 		Assertions.notNull(path, "The path for length is required.");
 		return FunctionInvocation.create(Scalars.LENGTH,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
+			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(
+				Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
@@ -2227,7 +2237,6 @@ public final class Functions {
 
 		return FunctionInvocation.create(BuiltInFunctions.Graph.BY_NAME, name);
 	}
-
 
 	private Functions() {
 	}

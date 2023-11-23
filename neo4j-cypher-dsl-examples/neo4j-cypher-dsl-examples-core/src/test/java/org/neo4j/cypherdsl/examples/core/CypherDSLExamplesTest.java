@@ -27,10 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
-import org.neo4j.cypherdsl.core.Predicates;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -187,7 +184,7 @@ class CypherDSLExamplesTest {
 		var relatedTo = people.relationshipBetween(cloudAtlas).named("relatedTo");
 		statement = Cypher
 			.match(relatedTo)
-			.returning(people.property("name"), Functions.type(relatedTo), relatedTo.getRequiredSymbolicName())
+			.returning(people.property("name"), Cypher.type(relatedTo), relatedTo.getRequiredSymbolicName())
 			.build();
 
 		assertThat(cypherRenderer.render(statement))
@@ -219,14 +216,14 @@ class CypherDSLExamplesTest {
 		var tom = Cypher.node("Person").named("tom").withProperties("name", Cypher.literalOf("Tom Hanks"));
 		var coActors = Cypher.anyNode("coActors");
 		var cocoActors = Cypher.anyNode("cocoActors");
-		var strength = Functions.count(Cypher.asterisk()).as("Strength");
+		var strength = Cypher.count(Cypher.asterisk()).as("Strength");
 		var statement = Cypher
 			.match(
 				tom.relationshipTo(Cypher.anyNode("m"), "ACTED_IN").relationshipFrom(coActors, "ACTED_IN"),
 				coActors.relationshipTo(Cypher.anyNode("m2"), "ACTED_IN").relationshipFrom(cocoActors, "ACTED_IN")
 			)
 			.where(
-				Conditions.not(tom.relationshipTo(Cypher.anyNode(), "ACTED_IN").relationshipFrom(cocoActors, "ACTED_IN")))
+				Cypher.not(tom.relationshipTo(Cypher.anyNode(), "ACTED_IN").relationshipFrom(cocoActors, "ACTED_IN")))
 			.and(tom.isNotEqualTo(cocoActors))
 			.returning(
 				cocoActors.property("name").as("Recommended"),
@@ -339,7 +336,7 @@ class CypherDSLExamplesTest {
 		var key = Cypher.name("key");
 		var cypher = Cypher.call("apoc.meta.schema")
 			.yield("value").with("value")
-			.unwind(Functions.keys(Cypher.name("value"))).as(key)
+			.unwind(Cypher.keys(Cypher.name("value"))).as(key)
 			.returning(
 				key,
 				Cypher.raw("value[$E]", key).as("value") // <.>
@@ -366,7 +363,7 @@ class CypherDSLExamplesTest {
 		var dynamicProperty = m.property(orderBy);
 
 		var statement = Cypher.match(m)
-			.where(Predicates.exists(dynamicProperty))
+			.where(Cypher.exists(dynamicProperty))
 			.returning(m.project(Cypher.asterisk()))
 			.orderBy(dynamicProperty.sorted(direction))
 			.skip(Integer.parseInt(skip))
@@ -389,7 +386,7 @@ class CypherDSLExamplesTest {
 		var dynamicProperty = m.property(Cypher.anonParameter(orderBy));
 
 		var statement = Cypher.match(m)
-			.where(Predicates.exists(dynamicProperty))
+			.where(Cypher.exists(dynamicProperty))
 			.returning(m.project(Cypher.asterisk()))
 			.orderBy(dynamicProperty.sorted(direction))
 			.skip(Cypher.anonParameter(Integer.parseInt(skip)))

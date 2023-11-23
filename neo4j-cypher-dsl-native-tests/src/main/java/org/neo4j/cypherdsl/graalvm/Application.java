@@ -27,7 +27,6 @@ import java.util.stream.Collectors;
 
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
-import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -60,6 +59,7 @@ public class Application {
 		System.out.println(cypherRenderer.render(generateComplexQuery()));
 		System.out.println(CypherParser.parse("MATCH (p:Parser) RETURN p").getCypher());
 		try {
+			//noinspection ResultOfMethodCallIgnored
 			Cypher.returning((Expression) null);
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
@@ -134,6 +134,6 @@ public class Application {
 		Node n = Cypher.anyNode("n");
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
 		return renderer.render(
-			Cypher.match(n).returning(Functions.distance(n.property("a"), n.property("b"))).build());
+			Cypher.match(n).returning(Cypher.distance(n.property("a"), n.property("b"))).build());
 	}
 }

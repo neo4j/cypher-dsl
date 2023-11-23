@@ -34,7 +34,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIf;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.examples.sdn6.movies.GenreRepository;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Genre_;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Movie;
@@ -232,7 +231,7 @@ class ApplicationIT {
 			.withProperties(Genre_.GENRE.NAME, Cypher.literalOf("Comedy"));
 		var byStatment = Cypher.merge(genreModel)
 			.onCreate()
-			.set(genreModel.ID.to(Functions.randomUUID()))
+			.set(genreModel.ID.to(Cypher.randomUUID()))
 			.returning(genreModel)
 			.build();
 		var newGenre = genreRepository.findOne(byStatment);

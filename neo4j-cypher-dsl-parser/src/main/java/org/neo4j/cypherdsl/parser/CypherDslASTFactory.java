@@ -54,13 +54,10 @@ import org.neo4j.cypher.internal.ast.factory.SimpleEither;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
-import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
-import org.neo4j.cypherdsl.core.Expressions;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
-import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
 import org.neo4j.cypherdsl.core.LabelExpression;
@@ -70,14 +67,12 @@ import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.NamedPath;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Operation;
-import org.neo4j.cypherdsl.core.Operations;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
-import org.neo4j.cypherdsl.core.Predicates;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.PropertyLookup;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
@@ -437,12 +432,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Operation setVariable(Expression v, Expression value) {
 
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Operations.set(v, value));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Cypher.set(v, value));
 	}
 
 	@Override
 	public Operation addAndSetVariable(Expression v, Expression value) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_ADD_AND_SET_VARIABLE, Operations.mutate(v, value));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_ADD_AND_SET_VARIABLE, Cypher.mutate(v, value));
 	}
 
 	@Override
@@ -450,7 +445,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, Operations.set(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, Cypher.setLabel(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -468,7 +463,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Operations.remove(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Cypher.removeLabel(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -1182,13 +1177,13 @@ final class CypherDslASTFactory implements ASTFactory<
 				values.addAll(current.value());
 				current = current.rhs();
 			}
-			return Conditions.hasLabelsOrType(symbolicName, values.toArray(String[]::new));
+			return Cypher.hasLabelsOrType(symbolicName, values.toArray(String[]::new));
 		}
 	}
 
 	@Override
 	public Expression ands(List<Expression> exprs) {
-		return exprs.stream().reduce(Conditions.noCondition(), (l, r) -> l.asCondition().and(r.asCondition()));
+		return exprs.stream().reduce(Cypher.noCondition(), (l, r) -> l.asCondition().and(r.asCondition()));
 	}
 
 	@Override
@@ -1227,17 +1222,17 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override public Expression unaryPlus(Expression e) {
-		return Operations.plus(e);
+		return Cypher.plus(e);
 	}
 
 	@Override
 	public Expression unaryPlus(InputPosition inputPosition, Expression expression) {
-		return Operations.plus(expression);
+		return Cypher.plus(expression);
 	}
 
 	@Override
 	public Expression unaryMinus(InputPosition inputPosition, Expression expression) {
-		return Operations.minus(expression);
+		return Cypher.minus(expression);
 	}
 
 	@Override
@@ -1332,7 +1327,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression newCountStar(InputPosition p) {
-		return Functions.count(Cypher.asterisk());
+		return Cypher.count(Cypher.asterisk());
 	}
 
 	@Override
@@ -1396,7 +1391,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		if (variable == null) {
 			throw new IllegalArgumentException("A variable to be reduced must be present.");
 		}
-		return Functions.reduce(variable)
+		return Cypher.reduce(variable)
 			.in(list)
 			.map(innerExpr)
 			.accumulateOn(assertSymbolicName(acc))
@@ -1407,28 +1402,28 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Expression allExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		notNull(where, "all(...) requires a WHERE predicate");
-		return Predicates.all(assertSymbolicName(v)).in(list).where(where.asCondition());
+		return Cypher.all(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression anyExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		notNull(where, "any(...) requires a WHERE predicate");
-		return Predicates.any(assertSymbolicName(v)).in(list).where(where.asCondition());
+		return Cypher.any(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression noneExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		notNull(where, "none(...) requires a WHERE predicate");
-		return Predicates.none(assertSymbolicName(v)).in(list).where(where.asCondition());
+		return Cypher.none(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
 	public Expression singleExpression(InputPosition p, Expression v, Expression list, Expression where) {
 
 		notNull(where, "single(...) requires a WHERE predicate");
-		return Predicates.single(assertSymbolicName(v)).in(list).where(where.asCondition());
+		return Cypher.single(assertSymbolicName(v)).in(list).where(where.asCondition());
 	}
 
 	@Override
@@ -1449,9 +1444,9 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Expression existsExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
 
 		if (q == null) {
-			return Predicates.exists(patternElements, where);
+			return Cypher.exists(patternElements, where);
 		} else {
-			return Predicates.exists(q);
+			return Cypher.exists(q);
 		}
 	}
 
@@ -1459,16 +1454,16 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Expression countExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
 
 		if (q == null) {
-			return Expressions.count(patternElements, where);
+			return Cypher.count(patternElements, where);
 		} else {
-			return Expressions.count(q);
+			return Cypher.count(q);
 		}
 	}
 
 	@Override
 	public Expression collectExpression(InputPosition inputPosition, Statement statement) {
 
-		return Expressions.collect(statement);
+		return Cypher.collect(statement);
 	}
 
 	@Override

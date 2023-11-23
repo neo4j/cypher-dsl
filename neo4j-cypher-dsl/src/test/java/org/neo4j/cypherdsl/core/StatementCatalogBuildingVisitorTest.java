@@ -236,8 +236,8 @@ class StatementCatalogBuildingVisitorTest {
 			.build();
 
 		var graph_name = Cypher.name("__graph__name__");
-		var statement = Cypher.unwind(Functions.graphNames()).as(graph_name)
-			.call(Cypher.use(Functions.graphByName(graph_name), innerStatement))
+		var statement = Cypher.unwind(Cypher.graphNames()).as(graph_name)
+			.call(Cypher.use(Cypher.graphByName(graph_name), innerStatement))
 			.returning(innerStatement.getCatalog().getIdentifiableExpressions())
 			.build();
 

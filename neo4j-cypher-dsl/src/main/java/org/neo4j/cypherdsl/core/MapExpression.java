@@ -107,6 +107,7 @@ public final class MapExpression extends TypedSubtree<Expression> implements Exp
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	protected Visitable prepareVisit(Expression child) {
 		return Expressions.nameOrExpression(child);
 	}

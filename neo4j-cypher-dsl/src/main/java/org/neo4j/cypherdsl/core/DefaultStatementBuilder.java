@@ -165,12 +165,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new OngoingMergeAction() {
 
 			@Override
+			@SuppressWarnings("deprecation")
 			public @NotNull BuildableOngoingMergeAction set(Node node, String... labels) {
 
 				return this.set(Operations.set(node, labels));
 			}
 
 			@Override
+			@SuppressWarnings("deprecation")
 			public @NotNull BuildableOngoingMergeAction set(Node node, Collection<String> labels) {
 
 				return this.set(Operations.set(node, labels.toArray(new String[0])));
@@ -319,6 +321,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final BuildableMatchAndUpdate set(Node named, String... labels) {
 
 		this.closeCurrentOngoingUpdate();
@@ -334,6 +337,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 		DefaultStatementWithUpdateBuilder result = new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
@@ -358,6 +362,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public final BuildableMatchAndUpdate remove(Node named, String... labels) {
 
 		this.closeCurrentOngoingUpdate();
@@ -1127,6 +1132,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	 * @param possibleSetOperations A mixed list of expressions (property and list operations)
 	 * @return A reified list of expressions that all target properties
 	 */
+	@SuppressWarnings("deprecation")
 	private static List<Expression> prepareSetExpressions(UpdateType updateType,
 		List<Expression> possibleSetOperations) {
 
@@ -1349,6 +1355,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		@SuppressWarnings("deprecation")
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
@@ -1366,6 +1373,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		@SuppressWarnings("deprecation")
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
@@ -1376,6 +1384,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
+		@SuppressWarnings("deprecation")
 		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,

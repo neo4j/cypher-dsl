@@ -13,9 +13,7 @@ jobs:
     outputs:
       revision: ${{ steps.revision_step.outputs.revision }}
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0 # Required for JQAssistant
+      - uses: actions/checkout@v4
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -75,7 +73,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:
@@ -98,7 +96,7 @@ jobs:
     steps:
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Download artifacts
         uses: actions/download-artifact@v1
         with:

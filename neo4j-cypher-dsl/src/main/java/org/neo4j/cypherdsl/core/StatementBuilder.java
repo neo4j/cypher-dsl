@@ -556,7 +556,7 @@ public interface StatementBuilder
 
 		/**
 		 * Defines the source to be iterated by {@code FOREACH}. Must evaluate to something iterable, for example something like
-		 * {@link Functions#nodes(NamedPath)} for
+		 * {@link Cypher#nodes(NamedPath)} for
 		 *
 		 * @param list The expression to iterate on
 		 * @return The next step.
@@ -603,6 +603,7 @@ public interface StatementBuilder
 		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
+		@SuppressWarnings("deprecation")
 		default OngoingUpdate delete(String... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
@@ -615,6 +616,7 @@ public interface StatementBuilder
 		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
+		@SuppressWarnings("deprecation")
 		default OngoingUpdate delete(Named... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
@@ -646,6 +648,7 @@ public interface StatementBuilder
 		 * @return A match with a {@literal DETACH DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
+		@SuppressWarnings("deprecation")
 		default OngoingUpdate detachDelete(String... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
@@ -658,6 +661,7 @@ public interface StatementBuilder
 		 * @return A match with a {@literal DETACH DELETE} clause that can be build now
 		 */
 		@NotNull @CheckReturnValue
+		@SuppressWarnings("deprecation")
 		default OngoingUpdate detachDelete(Named... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}

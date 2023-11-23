@@ -47,7 +47,7 @@ class PredicatesTest {
 	@MethodSource("predicatesToTest")
 	void preconditionsShouldBeAsserted(String predicateName, Class<?> argumentType) {
 
-		Method method = TestUtils.findMethod(Predicates.class, predicateName, argumentType);
+		@SuppressWarnings("deprecation") Method method = TestUtils.findMethod(Predicates.class, predicateName, argumentType);
 		assertThatIllegalArgumentException()
 			.isThrownBy(() -> TestUtils.invokeMethod(method, null, (Expression) null))
 			.withMessageEndingWith("is required.");
@@ -57,7 +57,7 @@ class PredicatesTest {
 	@MethodSource("predicatesToTest")
 	void functionInvocationsShouldBeCreated(String functionName, Class<?> argumentType) {
 
-		Method method = TestUtils.findMethod(Predicates.class, functionName, argumentType);
+		@SuppressWarnings("deprecation") Method method = TestUtils.findMethod(Predicates.class, functionName, argumentType);
 		BooleanFunctionCondition invocation = (BooleanFunctionCondition) TestUtils.invokeMethod(method, null, mock(argumentType));
 		assertThat(invocation).extracting("delegate")
 			.hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, functionName);

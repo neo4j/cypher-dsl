@@ -49,24 +49,25 @@ class FunctionsTest {
 		void preconditionsShouldBeAsserted() {
 
 			String message = "The expression for coalesce() is required.";
-			assertThatIllegalArgumentException().isThrownBy(() -> Functions.coalesce((Expression[]) null))
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.coalesce((Expression[]) null))
 				.withMessage(message);
 
-			assertThatIllegalArgumentException().isThrownBy(() -> Functions.coalesce(new Expression[0]))
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.coalesce(new Expression[0]))
 				.withMessage(message);
 
-			assertThatIllegalArgumentException().isThrownBy(() -> Functions.coalesce(new Expression[] { null }))
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.coalesce(new Expression[] { null }))
 				.withMessage(message);
 		}
 
 		@Test
 		void shouldCreateCorrectInvocation() {
 
-			FunctionInvocation invocation = Functions.coalesce(mock(Expression.class));
+			FunctionInvocation invocation = Cypher.coalesce(mock(Expression.class));
 			assertThat(invocation).hasFieldOrPropertyWithValue(FUNCTION_NAME_FIELD, "coalesce");
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private static Stream<Arguments> functionsToTest() {
 
 		return ReflectionUtils

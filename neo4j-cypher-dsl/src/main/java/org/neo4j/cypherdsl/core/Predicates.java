@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import java.util.List;
 
@@ -26,8 +26,8 @@ import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
  * Factory methods for creating predicates.
@@ -35,8 +35,12 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
  * @author Michael J. Simons
  * @soundtrack Mine &amp; Fatoni - Alle Liebe nachträglich
  * @since 1.0
+ * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
+ * be accessible.
  */
-@API(status = STABLE, since = "1.0")
+@API(status = DEPRECATED, since = "2023.9.0")
+@Deprecated(since = "2023.9.0")
+@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
 public final class Predicates {
 
 	/**
@@ -238,11 +242,11 @@ public final class Predicates {
 	 * <p>
 	 * The argument {@code e} must refer to an expression that evaluates to a list for {@code isEmpty()} to work
 	 *
-	 * @param e An expression refering to a list
+	 * @param e An expression referring to a list
 	 * @return A function call for {@code isEmpty()} for a list
 	 * @since 2023.6.1
 	 */
-	public static  Condition isEmpty(Expression e) {
+	public static Condition isEmpty(Expression e) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.IS_EMPTY, e));
 	}

@@ -37,6 +37,7 @@ public final class NestedExpression implements Expression {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);

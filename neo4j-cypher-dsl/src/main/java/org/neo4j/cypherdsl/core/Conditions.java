@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -33,8 +33,12 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Gerrit Meier
  * @author Aakash Sorathiya
  * @since 1.0
+ * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
+ * be accessible.
  */
-@API(status = STABLE, since = "1.0")
+@API(status = DEPRECATED, since = "2023.9.0")
+@Deprecated(since = "2023.9.0")
+@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
 public final class Conditions {
 
 	/**
@@ -244,7 +248,9 @@ public final class Conditions {
 	 *
 	 * @param expression The expression to test for emptiness.
 	 * @return A new condition.
+	 * @deprecated since 2023.9.0, no replacement plan, use something like {@code Functions.size(exp).isEqualTo(Cypher.literalOf(0L))}
 	 */
+	@Deprecated(forRemoval = true)
 	static Condition isEmpty(Expression expression) {
 
 		return Functions.size(expression).isEqualTo(Cypher.literalOf(0L));
