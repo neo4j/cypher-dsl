@@ -56,7 +56,7 @@ class DialectIT {
 
 		Node n = Cypher.node("Movie").named("n");
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
-		Condition condition = Predicates.exists(n.property("title"));
+		Condition condition = Cypher.exists(n.property("title"));
 		if (negate) {
 			condition = condition.not();
 		}
@@ -79,7 +79,7 @@ class DialectIT {
 		Node n = Cypher.anyNode("n");
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
 		String cypher = renderer.render(
-			Cypher.match(n).returning(Functions.distance(n.property("a"), n.property("b"))).build());
+			Cypher.match(n).returning(Cypher.distance(n.property("a"), n.property("b"))).build());
 		assertThat(cypher).isEqualTo(expected);
 	}
 
@@ -109,8 +109,8 @@ class DialectIT {
 		var screen = Cypher.node("ScreenStateNode").named("screen");
 		var id = Cypher.literalOf("4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2");
 		var statement = Cypher.match(screen)
-			.where(Functions.elementId(screen).eq(id))
-			.returning(Functions.elementId(screen))
+			.where(Cypher.elementId(screen).eq(id))
+			.returning(Cypher.elementId(screen))
 			.build();
 		// Config and renderer is thread safe, you can store it somewhere global
 		var rendererConfig = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();

@@ -73,6 +73,7 @@ public final class Comparison implements Condition {
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		EnterResult result = visitor.enterWithResult(this);

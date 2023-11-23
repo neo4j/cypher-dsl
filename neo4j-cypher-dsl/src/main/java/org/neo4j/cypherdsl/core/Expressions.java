@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,57 +33,25 @@ import org.neo4j.cypherdsl.core.Statement.UnionQuery;
  *
  * @author Michael J. Simons
  * @since 1.0
+ * @deprecated use {@link org.neo4j.cypherdsl.core.Cypher} instead.
  */
-@API(status = STABLE, since = "1.0")
+@API(status = INTERNAL, since = "2023.9.0")
+@Deprecated(since = "2023.9.0")
 public final class Expressions {
 
 	/**
-	 * Something that can build counting sub-queries. Might be used in the future for existential sub-queries, too.
-	 *
-	 * @since 2023.0.0
+	 * @deprecated use {@link org.neo4j.cypherdsl.core.SubqueryExpressionBuilder} instead.
 	 */
-	public interface SubqueryExpressionBuilder {
-
-		/**
-		 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
-		 *
-		 * @param requiredPattern One pattern is required
-		 * @param patternElement Optional pattern
-		 * @return The immutable {@link CountExpression}
-		 */
-		@NotNull
-		CountExpression count(PatternElement requiredPattern, PatternElement... patternElement);
-
-		/**
-		 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
-		 *
-		 * @param union The union that will be the source of the {@literal COUNT} sub-query
-		 * @return The immutable {@link CountExpression}
-		 * @since 2023.0.0
-		 */
-		@NotNull
-		CountExpression count(UnionQuery union);
-
-		/**
-		 * Creates a {@literal COLLECT} subquery from a statement, including  its filters and conditions. The statement must
-		 * return exactly one column. It must however not contain any updates. While it would render syntactically
-		 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
-		 * <p>
-		 * To avoid confusion, shadowing of imported variables is not allowed. An outside scope variable is shadowed when
-		 * a newly introduced variable within the inner scope is defined with the same variable.
-		 *
-		 * @param statement the statement to be passed to {@code COLLECT{}}
-		 * @return a collecting sub-query.
-		 * @since 2023.8.0
-		 */
-		CollectExpression collect(Statement statement);
+	@API(status = INTERNAL, since = "2023.9.0")
+	@Deprecated(since = "2023.9.0")
+	public interface SubqueryExpressionBuilder extends org.neo4j.cypherdsl.core.SubqueryExpressionBuilder {
 	}
 
 	/**
 	 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
 	 *
 	 * @param requiredPattern One pattern is required
-	 * @param patternElement Optional pattern
+	 * @param patternElement  Optional pattern
 	 * @return The immutable {@link CountExpression}
 	 * @since 2023.0.0
 	 */
@@ -123,8 +91,7 @@ public final class Expressions {
 	 * Creates a {@literal COUNT} expression based on a list of pattern
 	 *
 	 * @param pattern the list of patterns that shall be counted
-	 * @param where an optional where-clause
-	 *
+	 * @param where   an optional where-clause
 	 * @return a count expression.
 	 * @since 2023.9.0
 	 */
@@ -139,7 +106,9 @@ public final class Expressions {
 	 * @param identifiableElements The identifiable elements to import
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.0.0
+	 * @deprecated use {@link Cypher#subqueryWith(String...)} instead.
 	 */
+	@Deprecated
 	public static SubqueryExpressionBuilder with(String... identifiableElements) {
 
 		return with(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));
@@ -151,10 +120,13 @@ public final class Expressions {
 	 * @param identifiableElements The identifiable elements to import
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.0.0
+	 * @deprecated use {@link Cypher#subqueryWith(IdentifiableElement...)} instead.
 	 */
+	@Deprecated
 	public static SubqueryExpressionBuilder with(IdentifiableElement... identifiableElements) {
 
-		var returnItems = new ExpressionList(Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
+		var returnItems = new ExpressionList(
+			Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
 		var with = new With(false, returnItems, null, null, null, null);
 		return new SubqueryExpressionBuilder() {
 			@Override @NotNull

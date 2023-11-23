@@ -40,7 +40,7 @@ class ToStringSmokeTest {
 			Arguments.of(Cypher.node("Person").named("n"), "(n:Person)"),
 			Arguments.of(Cypher.node("Person").named("p").relationshipTo(Cypher.node("Movie").named("m"), "PLAYED_IN").named("r"), "(p:Person)-[r:PLAYED_IN]->(m:Movie)"),
 			Arguments.of(Cypher.node("Person").named("p").relationshipTo(Cypher.node("Movie").named("m"), "PLAYED_IN").named("r").relationshipFrom(Cypher.node("Person").named("d"), "DIRECTED"), "(p:Person)-[r:PLAYED_IN]->(m:Movie)<-[:DIRECTED]-(d:Person)"),
-			Arguments.of(Functions.elementId(Cypher.anyNode("n")), "elementId(n)"),
+			Arguments.of(Cypher.elementId(Cypher.anyNode("n")), "elementId(n)"),
 			Arguments.of(Cypher.call("db.labels").asFunction(), "db.labels()"),
 			Arguments.of(Cypher.literalOf("aString"), "'aString'"),
 			Arguments.of(Cypher.literalOf(1), "1"),

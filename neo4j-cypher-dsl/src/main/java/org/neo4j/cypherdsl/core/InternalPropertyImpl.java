@@ -132,6 +132,7 @@ final class InternalPropertyImpl implements Property {
 
 	@NotNull
 	@Override
+	@SuppressWarnings("deprecation")
 	public Operation to(Expression expression) {
 		return Operations.set(this, expression);
 	}

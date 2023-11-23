@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.List;
 
@@ -35,8 +35,10 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
  * @author Michael J. Simons
  * @soundtrack Mine &amp; Fatoni - Alle Liebe nachträglich
  * @since 1.0
+ * @deprecated use {@link org.neo4j.cypherdsl.core.Cypher} instead.
  */
-@API(status = STABLE, since = "1.0")
+@API(status = INTERNAL, since = "2023.9.0")
+@Deprecated(since = "2023.9.0")
 public final class Predicates {
 
 	/**
