@@ -3770,19 +3770,6 @@ public final class Cypher {
 	}
 
 	/**
-	 * Creates an operation adding one or more labels from a given {@link Node node}.
-	 *
-	 * @param target The target of the new labels
-	 * @param label  The labels to be added
-	 * @return A set operation
-	 * @since 2023.9.0
-	 */
-	@SuppressWarnings("deprecation")
-	public static Operation set(Node target, String... label) {
-		return Operations.set(target, label);
-	}
-
-	/**
 	 * Creates a {@code +=} operation. The left hand side must resolve to a container (either a node or a relationship)
 	 * of properties and the right hand side must be a map of new or updated properties
 	 *
@@ -3832,7 +3819,7 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
-	public static Operation remove(Node target, String... label) {
+	public static Operation removeLabel(Node target, String... label) {
 		return Operations.remove(target, label);
 	}
 
