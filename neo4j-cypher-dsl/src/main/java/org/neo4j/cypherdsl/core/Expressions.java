@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import java.util.Arrays;
 import java.util.List;
@@ -33,16 +33,18 @@ import org.neo4j.cypherdsl.core.Statement.UnionQuery;
  *
  * @author Michael J. Simons
  * @since 1.0
- * @deprecated use {@link org.neo4j.cypherdsl.core.Cypher} instead.
+ * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
+ * be accessible.
  */
-@API(status = INTERNAL, since = "2023.9.0")
+@API(status = DEPRECATED, since = "2023.9.0")
 @Deprecated(since = "2023.9.0")
+@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
 public final class Expressions {
 
 	/**
 	 * @deprecated use {@link org.neo4j.cypherdsl.core.SubqueryExpressionBuilder} instead.
 	 */
-	@API(status = INTERNAL, since = "2023.9.0")
+	@API(status = DEPRECATED, since = "2023.9.0")
 	@Deprecated(since = "2023.9.0")
 	public interface SubqueryExpressionBuilder extends org.neo4j.cypherdsl.core.SubqueryExpressionBuilder {
 	}
@@ -106,9 +108,7 @@ public final class Expressions {
 	 * @param identifiableElements The identifiable elements to import
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.0.0
-	 * @deprecated use {@link Cypher#subqueryWith(String...)} instead.
 	 */
-	@Deprecated
 	public static SubqueryExpressionBuilder with(String... identifiableElements) {
 
 		return with(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));

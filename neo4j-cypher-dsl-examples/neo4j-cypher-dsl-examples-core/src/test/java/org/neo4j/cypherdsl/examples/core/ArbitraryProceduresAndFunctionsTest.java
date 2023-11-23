@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -92,7 +91,7 @@ class ArbitraryProceduresAndFunctionsTest {
 		var statement = Cypher
 			.match(Cypher.anyNode().named("n")).with("n")
 			.call("db.labels").yield(label).with(label)
-			.returning(Functions.count(label).as("numLabels"))
+			.returning(Cypher.count(label).as("numLabels"))
 			.build();
 		assertThat(cypherRenderer.render(statement)).isEqualTo(
 			"MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");

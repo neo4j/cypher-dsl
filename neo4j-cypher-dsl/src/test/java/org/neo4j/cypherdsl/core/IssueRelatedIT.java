@@ -1399,7 +1399,7 @@ class IssueRelatedIT {
 	void testLabelRemoval() {
 		Node node = Cypher.node("Wine").named("n");
 
-		Operation removeOp = Cypher.removeLabel(node, "Drink");
+		Operation removeOp = Cypher.remove(node, "Drink");
 		List<Expression> propertyExpressions = Collections.singletonList(removeOp);
 		@SuppressWarnings("deprecation") StatementBuilder.OngoingReadingWithWhere ongoingReadingWithWhere = Cypher.match(node)
 			.where(Functions.id(node).isEqualTo(Cypher.literalOf(1)));

@@ -1328,7 +1328,7 @@ public final class Cypher {
 	 * @param lhs Argument that is tested whether it contains all values in {@code rhs} or not
 	 * @param rhs The reference collection
 	 * @return An "includesAll" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition includesAll(Expression lhs, Expression rhs) {
@@ -1341,7 +1341,7 @@ public final class Cypher {
 	 * @param lhs Argument that is tested whether it contains any values in {@code rhs} or not
 	 * @param rhs The reference collection
 	 * @return A "not_includes" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition includesAny(Expression lhs, Expression rhs) {
@@ -1351,7 +1351,7 @@ public final class Cypher {
 	/**
 	 * @param relationshipPattern The pattern being evaluated in a condition
 	 * @return A new condition matching the given pattern
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition matching(RelationshipPattern relationshipPattern) {
@@ -1365,7 +1365,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return A "matches" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition matches(Expression lhs, Expression rhs) {
@@ -1378,7 +1378,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return An "equals" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isEqualTo(Expression lhs, Expression rhs) {
@@ -1391,7 +1391,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return An "not equals" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isNotEqualTo(Expression lhs, Expression rhs) {
@@ -1404,7 +1404,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return An "less than" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition lt(Expression lhs, Expression rhs) {
@@ -1417,7 +1417,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return An "less than or equal" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition lte(Expression lhs, Expression rhs) {
@@ -1430,7 +1430,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return An "greater than or equal" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition gte(Expression lhs, Expression rhs) {
@@ -1443,7 +1443,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return An "greater than" comparison
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition gt(Expression lhs, Expression rhs) {
@@ -1455,7 +1455,7 @@ public final class Cypher {
 	 *
 	 * @param condition The condition to negate. Must not be null.
 	 * @return The negated condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1468,7 +1468,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The pattern to negate. Must not be null.
 	 * @return A condition that evaluates to true when the pattern does not match.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1482,7 +1482,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return A new condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition startsWith(Expression lhs, Expression rhs) {
@@ -1495,7 +1495,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return A new condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition contains(Expression lhs, Expression rhs) {
@@ -1508,7 +1508,7 @@ public final class Cypher {
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
 	 * @return A new condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition endsWith(Expression lhs, Expression rhs) {
@@ -1520,7 +1520,7 @@ public final class Cypher {
 	 * conditions together.
 	 *
 	 * @return A placeholder condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1533,7 +1533,7 @@ public final class Cypher {
 	 *
 	 * @param expression The expression to check for {@literal null}
 	 * @return A new condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isNull(Expression expression) {
@@ -1545,7 +1545,7 @@ public final class Cypher {
 	 *
 	 * @param expression The expression to check for {@literal null}
 	 * @return A new condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isNotNull(Expression expression) {
@@ -1557,16 +1557,16 @@ public final class Cypher {
 	 *
 	 * @param expression The expression to test for emptiness.
 	 * @return A new condition.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isEmpty(Expression expression) {
-		return Conditions.isEmpty(expression);
+		return Predicates.isEmpty(expression);
 	}
 
 	/**
 	 * @return a condition that is always true.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isTrue() {
@@ -1575,7 +1575,7 @@ public final class Cypher {
 
 	/**
 	 * @return a condition that is always false.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition isFalse() {
@@ -1586,7 +1586,7 @@ public final class Cypher {
 	 * @param symbolicName  Reference to the entity that should be checked for labels or types
 	 * @param labelsOrTypes the list of labels or types to check for
 	 * @return A condition that checks whether a node has a set of given labels or a relationship a set of given types.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
@@ -1599,7 +1599,7 @@ public final class Cypher {
 	 * @param requiredPattern One pattern is required
 	 * @param patternElement  Optional pattern
 	 * @return The immutable {@link CountExpression}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@NotNull
 	@SuppressWarnings("deprecation")
@@ -1612,7 +1612,7 @@ public final class Cypher {
 	 *
 	 * @param union The union that will be the source of the {@literal COUNT} sub-query
 	 * @return The immutable {@link CountExpression}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@NotNull
 	@SuppressWarnings("deprecation")
@@ -1628,7 +1628,7 @@ public final class Cypher {
 	 * @param statement The statement to be passed to {@code count{}}
 	 * @param imports   Optional imports to be used in the statement (will be imported with {@literal WITH})
 	 * @return A counting sub-query.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@NotNull
 	@SuppressWarnings("deprecation")
@@ -1642,7 +1642,7 @@ public final class Cypher {
 	 * @param pattern the list of patterns that shall be counted
 	 * @param where   an optional where-clause
 	 * @return a count expression.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static CountExpression count(List<PatternElement> pattern, @Nullable Where where) {
@@ -1656,7 +1656,7 @@ public final class Cypher {
 	 *
 	 * @param statement the statement to be passed to {@code COLLECT{}}
 	 * @return a collecting sub-query.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	@NotNull public static Expression collect(Statement statement) {
@@ -1666,7 +1666,7 @@ public final class Cypher {
 	/**
 	 * @param expression Possibly named with a non-empty symbolic name.
 	 * @return The name of the expression if the expression is named or the expression itself.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static <T extends Expression> Expression nameOrExpression(T expression) {
@@ -1688,7 +1688,7 @@ public final class Cypher {
 	 *
 	 * @param node The node for which the element id should be retrieved
 	 * @return A function call for {@code elementId()} on a node.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1702,7 +1702,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship for which the element id should be retrieved
 	 * @return A function call for {@code elementId()} on a relationship.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1717,7 +1717,7 @@ public final class Cypher {
 	 *
 	 * @param node The node which keys should be returned.
 	 * @return A function call for {@code keys()} on an expression.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1731,7 +1731,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship which keys should be returned.
 	 * @return A function call for {@code keys()} on an expression.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1745,7 +1745,7 @@ public final class Cypher {
 	 *
 	 * @param expression The expressions which keys should be returned. Must resolve to a node, relationship or map.
 	 * @return A function call for {@code keys()} on an expression.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1759,7 +1759,7 @@ public final class Cypher {
 	 *
 	 * @param node The node for which the labels should be retrieved
 	 * @return A function call for {@code labels()} on a node.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1775,7 +1775,7 @@ public final class Cypher {
 	 *
 	 * @param node The node for which the labels should be retrieved
 	 * @return A function call for {@code labels()} on a node.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1789,7 +1789,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship for which the type should be retrieved
 	 * @return A function call for {@code type()} on a relationship.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1805,7 +1805,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship for which the type should be retrieved
 	 * @return A function call for {@code type()} on a relationship.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1817,7 +1817,7 @@ public final class Cypher {
 	 * @param node The named node to be counted
 	 * @return A function call for {@code count()} for one named node
 	 * @see #count(Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1831,7 +1831,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression describing the things to count.
 	 * @return A function call for {@code count()} for an expression like {@link Cypher#asterisk()} etc.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1845,7 +1845,7 @@ public final class Cypher {
 	 * @param node The named node to be counted
 	 * @return A function call for {@code count()} for one named node
 	 * @see #countDistinct(Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1859,7 +1859,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression describing the things to count.
 	 * @return A function call for {@code count()} for an expression like {@link Cypher#asterisk()} etc.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1872,7 +1872,7 @@ public final class Cypher {
 	 *
 	 * @param node The node who's properties should be returned.
 	 * @return A function call for {@code properties())}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1885,7 +1885,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship who's properties should be returned.
 	 * @return A function call for {@code properties())}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1898,7 +1898,7 @@ public final class Cypher {
 	 *
 	 * @param map The map who's properties should be returned.
 	 * @return A function call for {@code properties())}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1912,7 +1912,7 @@ public final class Cypher {
 	 *
 	 * @param expressions One or more expressions to be coalesced
 	 * @return A function call for {@code coalesce}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1927,7 +1927,7 @@ public final class Cypher {
 	 * @param expression An expression resolving to a string
 	 * @param length     desired length
 	 * @return A function call for {@code left()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1941,7 +1941,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code ltrim()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1957,7 +1957,7 @@ public final class Cypher {
 	 * @param search   An expression that specifies the string to be replaced in {@code original}.
 	 * @param replace  An expression that specifies the replacement string.
 	 * @return A function call for {@code replace()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1972,7 +1972,7 @@ public final class Cypher {
 	 *
 	 * @param original An expression that returns a string
 	 * @return A function call for {@code reverse()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -1987,7 +1987,7 @@ public final class Cypher {
 	 * @param expression An expression resolving to a string
 	 * @param length     desired length
 	 * @return A function call for {@code right()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2001,7 +2001,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code rtrim()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2017,7 +2017,7 @@ public final class Cypher {
 	 * @param start    An expression that returns a positive integer, denoting the position at which the substring will begin.
 	 * @param length   An expression that returns a positive integer, denoting how many characters of original will be returned.
 	 * @return A function call for {@code substring()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2032,7 +2032,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code toLower()} for one expression
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2046,7 +2046,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code toLower()} for one expression
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2060,7 +2060,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression resolving to a string
 	 * @return A function call for {@code trim()} for one expression
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2075,7 +2075,7 @@ public final class Cypher {
 	 * @param expression An expression resolving to a string that should be split
 	 * @param delimiter  The delimiter on which to split
 	 * @return A function call for {@code split()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2091,7 +2091,7 @@ public final class Cypher {
 	 * @param expression An expression resolving to a string that should be split
 	 * @param delimiter  The delimiter on which to split
 	 * @return A function call for {@code split()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2109,7 +2109,7 @@ public final class Cypher {
 	 *
 	 * @param expression The expression who's size is to be returned
 	 * @return A function call for {@code size()} for one expression
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2125,7 +2125,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The pattern for which {@code size()} should be invoked.
 	 * @return A function call for {@code size()} for a pattern
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2139,7 +2139,7 @@ public final class Cypher {
 	 *
 	 * @param expression The expression who's existence is to be evaluated
 	 * @return A function call for {@code exists()} for one expression
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2155,7 +2155,7 @@ public final class Cypher {
 	 * @param point1 Point 1
 	 * @param point2 Point 2
 	 * @return A function call for {@code distance()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2170,7 +2170,7 @@ public final class Cypher {
 	 *
 	 * @param parameterMap The map of parameters for {@code point()}
 	 * @return A function call for {@code point()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2186,7 +2186,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression resolving to a valid map of parameters for {@code point()}
 	 * @return A function call for {@code point()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2200,7 +2200,7 @@ public final class Cypher {
 	 *
 	 * @param parameter A parameter referencing a {@code point()}
 	 * @return A function call for {@code point()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2214,7 +2214,7 @@ public final class Cypher {
 	 * @param x The x coordinate
 	 * @param y The y coordinate
 	 * @return A function call for {@code point()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2228,7 +2228,7 @@ public final class Cypher {
 	 * @param longitude The longitude
 	 * @param latitude  The latitude
 	 * @return A function call for {@code point()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2244,7 +2244,7 @@ public final class Cypher {
 	 * @param lowerLeft  The lower left point of the bounding box (south-west coordinate)
 	 * @param upperRight The upper right point of the bounding box (north-east coordinate)
 	 * @return A function call for {@code point.withinBBox}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static FunctionInvocation withinBBox(Expression point, Expression lowerLeft, Expression upperRight) {
@@ -2257,7 +2257,7 @@ public final class Cypher {
 	 *
 	 * @param expression The things to average
 	 * @return A function call for {@code avg()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2271,7 +2271,7 @@ public final class Cypher {
 	 *
 	 * @param expression The things to average
 	 * @return A function call for {@code avg()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2285,7 +2285,7 @@ public final class Cypher {
 	 * @param variable The named thing to collect
 	 * @return A function call for {@code collect()}
 	 * @see #collect(Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2299,7 +2299,7 @@ public final class Cypher {
 	 * @param variable The named thing to collect
 	 * @return A function call for {@code collect()}
 	 * @see #collect(Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2313,7 +2313,7 @@ public final class Cypher {
 	 *
 	 * @param expression The things to collect
 	 * @return A function call for {@code collect()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2327,7 +2327,7 @@ public final class Cypher {
 	 *
 	 * @param expression The things to collect
 	 * @return A function call for {@code collect()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2341,7 +2341,7 @@ public final class Cypher {
 	 *
 	 * @param expression A list from which the maximum element value is returned
 	 * @return A function call for {@code max()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2355,7 +2355,7 @@ public final class Cypher {
 	 *
 	 * @param expression A list from which the maximum element value is returned
 	 * @return A function call for {@code max()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2369,7 +2369,7 @@ public final class Cypher {
 	 *
 	 * @param expression A list from which the minimum element value is returned
 	 * @return A function call for {@code min()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2383,7 +2383,7 @@ public final class Cypher {
 	 *
 	 * @param expression A list from which the minimum element value is returned
 	 * @return A function call for {@code min()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2398,7 +2398,7 @@ public final class Cypher {
 	 * @param expression A numeric expression
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileCont()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2414,7 +2414,7 @@ public final class Cypher {
 	 * @param expression A numeric expression
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileCont()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2430,7 +2430,7 @@ public final class Cypher {
 	 * @param expression A numeric expression
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileDisc()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2446,7 +2446,7 @@ public final class Cypher {
 	 * @param expression A numeric expression
 	 * @param percentile A numeric value between 0.0 and 1.0
 	 * @return A function call for {@code percentileDisc()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2461,7 +2461,7 @@ public final class Cypher {
 	 *
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDev()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2475,7 +2475,7 @@ public final class Cypher {
 	 *
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDev()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2489,7 +2489,7 @@ public final class Cypher {
 	 *
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDevP()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2503,7 +2503,7 @@ public final class Cypher {
 	 *
 	 * @param expression A numeric expression
 	 * @return A function call for {@code stDevP()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2517,7 +2517,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression returning a set of numeric values
 	 * @return A function call for {@code sum()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2531,7 +2531,7 @@ public final class Cypher {
 	 *
 	 * @param expression An expression returning a set of numeric values
 	 * @return A function call for {@code sum()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2544,7 +2544,7 @@ public final class Cypher {
 	 * @param end   the range's end
 	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2557,7 +2557,7 @@ public final class Cypher {
 	 * @param end   the range's end
 	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2575,7 +2575,7 @@ public final class Cypher {
 	 * @param step  the range's step
 	 * @return A function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2592,7 +2592,7 @@ public final class Cypher {
 	 * @param end   the range's end
 	 * @param step  the range's step
 	 * @return A function call for {@code range()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2607,7 +2607,7 @@ public final class Cypher {
 	 *
 	 * @param expression A list from which the head element is returned
 	 * @return A function call for {@code head()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2621,7 +2621,7 @@ public final class Cypher {
 	 *
 	 * @param expression A list from which the last element is returned
 	 * @return A function call for {@code last()}
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2635,7 +2635,7 @@ public final class Cypher {
 	 *
 	 * @param path The path for which the number of nodes should be retrieved
 	 * @return A function call for {@code nodes()} on a path.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2649,7 +2649,7 @@ public final class Cypher {
 	 *
 	 * @param symbolicName The symbolic name of a path for which the number of nodes should be retrieved
 	 * @return A function call for {@code nodes{}} on a path represented by a symbolic name.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2663,7 +2663,7 @@ public final class Cypher {
 	 *
 	 * @param path The path for which the relationships should be retrieved
 	 * @return A function call for {@code relationships()} on a path.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2677,7 +2677,7 @@ public final class Cypher {
 	 *
 	 * @param symbolicName The symbolic name of a path for which the relationships should be retrieved
 	 * @return A function call for {@code relationships()} on a path represented by a symbolic name.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2691,7 +2691,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship for which the start node be retrieved
 	 * @return A function call for {@code startNode()} on a path.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2705,7 +2705,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship for which the end node be retrieved
 	 * @return A function call for {@code endNode()} on a path.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2719,7 +2719,7 @@ public final class Cypher {
 	 * This is the most simple form.
 	 *
 	 * @return A function call for {@code date()}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2735,7 +2735,7 @@ public final class Cypher {
 	 * @param month The month
 	 * @param day   The day
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2752,7 +2752,7 @@ public final class Cypher {
 	 * @param week      The optional week
 	 * @param dayOfWeek The optional day of the week
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2769,7 +2769,7 @@ public final class Cypher {
 	 * @param quarter      The optional week
 	 * @param dayOfQuarter The optional day of the week
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2785,7 +2785,7 @@ public final class Cypher {
 	 * @param year       The year
 	 * @param ordinalDay The ordinal day of the year.
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2800,7 +2800,7 @@ public final class Cypher {
 	 *
 	 * @param components The map to pass to {@code date({})}
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2815,7 +2815,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue A string representing a temporal value.
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2830,7 +2830,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue An expression representing a temporal value.
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2843,7 +2843,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
 	 *
 	 * @return A function call for {@code datetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2857,7 +2857,7 @@ public final class Cypher {
 	 *
 	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code datetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2872,7 +2872,7 @@ public final class Cypher {
 	 *
 	 * @param components The map to pass to {@code datetime({})}
 	 * @return A function call for {@code datetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2887,7 +2887,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue A string representing a temporal value.
 	 * @return A function call for {@code datetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2902,7 +2902,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue An expression representing a temporal value.
 	 * @return A function call for {@code date({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2915,7 +2915,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
 	 *
 	 * @return A function call for {@code localdatetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2929,7 +2929,7 @@ public final class Cypher {
 	 *
 	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code localdatetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2944,7 +2944,7 @@ public final class Cypher {
 	 *
 	 * @param components The map to pass to {@code localdatetime({})}
 	 * @return A function call for {@code localdatetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2959,7 +2959,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue A string representing a temporal value.
 	 * @return A function call for {@code localdatetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2974,7 +2974,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue An expression representing a temporal value.
 	 * @return A function call for {@code localdatetime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -2987,7 +2987,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
 	 *
 	 * @return A function call for {@code localtime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3001,7 +3001,7 @@ public final class Cypher {
 	 *
 	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code localtime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3016,7 +3016,7 @@ public final class Cypher {
 	 *
 	 * @param components The map to pass to {@code localtime({})}
 	 * @return A function call for {@code localtime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3031,7 +3031,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue A string representing a temporal value.
 	 * @return A function call for {@code localtime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3046,7 +3046,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue An expression representing a temporal value.
 	 * @return A function call for {@code localtime({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3059,7 +3059,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
 	 *
 	 * @return A function call for {@code time({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3073,7 +3073,7 @@ public final class Cypher {
 	 *
 	 * @param timeZone The timezone to use when creating the temporal instance
 	 * @return A function call for {@code time({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3088,7 +3088,7 @@ public final class Cypher {
 	 *
 	 * @param components The map to pass to {@code time({})}
 	 * @return A function call for {@code time({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3103,7 +3103,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue A string representing a temporal value.
 	 * @return A function call for {@code time({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3118,7 +3118,7 @@ public final class Cypher {
 	 *
 	 * @param temporalValue An expression representing a temporal value.
 	 * @return A function call for {@code time({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3133,7 +3133,7 @@ public final class Cypher {
 	 *
 	 * @param components The map to pass to {@code duration({})}
 	 * @return A function call for {@code duration({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3148,7 +3148,7 @@ public final class Cypher {
 	 *
 	 * @param temporalAmount A string representing a temporal amount.
 	 * @return A function call for {@code duration({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3163,7 +3163,7 @@ public final class Cypher {
 	 *
 	 * @param temporalAmount An expression representing a temporal amount.
 	 * @return A function call for {@code duration({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3176,7 +3176,7 @@ public final class Cypher {
 	 *
 	 * @param relationship The relationship to be passed to {@code shortestPath}.
 	 * @return A function call for {@code shortestPath({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3189,7 +3189,7 @@ public final class Cypher {
 	 *
 	 * @param variable The closure will have a variable introduced in its context. We decide here which variable to use.
 	 * @return An ongoing definition for a function call to {@code reduce({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3204,7 +3204,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code abs({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3218,7 +3218,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code ceil({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3232,7 +3232,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code floor({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3245,7 +3245,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-rand">rand</a>.
 	 *
 	 * @return A function call for {@code rand({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3261,7 +3261,7 @@ public final class Cypher {
 	 * @param expression Additional parameters, length must be 0, 1 or 2:
 	 *                   First entry is the precision, second is the rounding mode
 	 * @return A function call for {@code round({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3275,7 +3275,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code sign({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3288,7 +3288,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-e">e</a>.
 	 *
 	 * @return A function call for {@code e({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3302,7 +3302,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code exp({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3316,7 +3316,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code log({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3330,7 +3330,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code log10({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3344,7 +3344,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code sqrt({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3358,7 +3358,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code acos({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3372,7 +3372,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code asin({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3386,7 +3386,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code atan({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3401,7 +3401,7 @@ public final class Cypher {
 	 * @param y the y value of a point
 	 * @param x the x value of a point
 	 * @return A function call for {@code atan2({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3416,7 +3416,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code cos({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3430,7 +3430,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code cot({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3444,7 +3444,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code degrees({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3458,7 +3458,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code haversin({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3471,7 +3471,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-pi">pi</a>.
 	 *
 	 * @return A function call for {@code pi({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3485,7 +3485,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code radians({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3499,7 +3499,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code sin({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3513,7 +3513,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code tan({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3527,7 +3527,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code toInteger({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3541,7 +3541,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code toString({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3555,7 +3555,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code toStringOrNull({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3569,7 +3569,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code toFloat({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3583,7 +3583,7 @@ public final class Cypher {
 	 *
 	 * @param expression The value to pass to the function.
 	 * @return A function call for {@code toBoolean({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3595,7 +3595,7 @@ public final class Cypher {
 	 * Creates a function invocation for {@code linenumber({})}. Only applicable inside an {@code LOAD CSV} clause.
 	 *
 	 * @return A function call for {@code linenumber({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3607,7 +3607,7 @@ public final class Cypher {
 	 * Creates a function invocation for {@code file({})}. Only applicable inside an {@code LOAD CSV} clause.
 	 *
 	 * @return A function call for {@code file({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3619,7 +3619,7 @@ public final class Cypher {
 	 * Creates a function invocation for {@code randomUUID({})}. Only applicable inside an {@code LOAD CSV} clause.
 	 *
 	 * @return A function call for {@code randomUUID({})}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static FunctionInvocation randomUUID() {
@@ -3632,7 +3632,7 @@ public final class Cypher {
 	 *
 	 * @param path The path for which the length should be retrieved
 	 * @return A function call for {@code length()} on a path.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3645,7 +3645,7 @@ public final class Cypher {
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-names">graph.names</a>.
 	 *
 	 * @return A function call for {@code graph.names()}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3659,7 +3659,7 @@ public final class Cypher {
 	 *
 	 * @param name The name of the graph
 	 * @return A function call for {@code graph.propertiesByName()}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3673,7 +3673,7 @@ public final class Cypher {
 	 *
 	 * @param name The name of the graph
 	 * @return A function call for {@code graph.byName()}.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3688,7 +3688,7 @@ public final class Cypher {
 	 * @param name    The symbolic name of this project
 	 * @param content The projected content
 	 * @return A new map projection
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	public static MapProjection createProjection(SymbolicName name, Object... content) {
 		return MapProjection.create(name, content);
@@ -3700,7 +3700,7 @@ public final class Cypher {
 	 * @param e The expression to which the unary minus should be applied. We don't check if it's a numeric expression,
 	 *          but in hindsight to generate semantically correct Cypher, it's recommended that is one.
 	 * @return An unary minus operation.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Operation minus(Expression e) {
@@ -3713,7 +3713,7 @@ public final class Cypher {
 	 * @param e The expression to which the unary plus should be applied. We don't check if it's a numeric expression,
 	 *          but in hindsight to generate semantically correct Cypher, it's recommended that is one.
 	 * @return An unary plus operation.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Expression plus(Expression e) {
@@ -3762,11 +3762,24 @@ public final class Cypher {
 	 * @param target The target that should be modified
 	 * @param value  The new value of the target
 	 * @return A new operation.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Operation set(Expression target, Expression value) {
 		return Operations.set(target, value);
+	}
+
+	/**
+	 * Creates an operation adding one or more labels from a given {@link Node node}.
+	 *
+	 * @param target The target of the new labels
+	 * @param label  The labels to be added
+	 * @return A set operation
+	 * @since 2023.9.0
+	 */
+	@SuppressWarnings("deprecation")
+	public static Operation set(Node target, String... label) {
+		return Operations.set(target, label);
 	}
 
 	/**
@@ -3776,7 +3789,7 @@ public final class Cypher {
 	 * @param target The target container that should be modified
 	 * @param value  The new properties
 	 * @return A new operation.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Operation mutate(Expression target, MapExpression value) {
@@ -3790,7 +3803,7 @@ public final class Cypher {
 	 * @param target The target container that should be modified
 	 * @param value  The new properties
 	 * @return A new operation.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Operation mutate(Expression target, Expression value) {
@@ -3803,7 +3816,7 @@ public final class Cypher {
 	 * @param target The target of the new labels
 	 * @param label  The labels to be added
 	 * @return A set operation
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Operation setLabel(Node target, String... label) {
@@ -3816,10 +3829,10 @@ public final class Cypher {
 	 * @param target The target of the remove operation
 	 * @param label  The labels to be removed
 	 * @return A remove operation
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
-	public static Operation removeLabel(Node target, String... label) {
+	public static Operation remove(Node target, String... label) {
 		return Operations.remove(target, label);
 	}
 
@@ -3829,7 +3842,7 @@ public final class Cypher {
 	 *
 	 * @param property The property to be passed to {@code exists()}
 	 * @return A function call for {@code exists()} for one property
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3843,7 +3856,7 @@ public final class Cypher {
 	 *
 	 * @param pattern The pattern to be passed to {@code exists()}
 	 * @return A function call for {@code exists()} for one pattern
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3861,7 +3874,7 @@ public final class Cypher {
 	 * @param statement The statement to be passed to {@code exists{}}
 	 * @param imports   Optional imports to be used in the statement (will be imported with {@literal WITH})
 	 * @return An existential sub-query.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition exists(Statement statement, IdentifiableElement... imports) {
@@ -3875,7 +3888,7 @@ public final class Cypher {
 	 *
 	 * @param pattern the pattern that must exists
 	 * @return An existential sub-query.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition exists(PatternElement pattern) {
@@ -3889,7 +3902,7 @@ public final class Cypher {
 	 *
 	 * @param pattern the list of patterns that must exists
 	 * @return An existential sub-query.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition exists(List<PatternElement> pattern) {
@@ -3904,7 +3917,7 @@ public final class Cypher {
 	 * @param pattern the list of patterns that must exists
 	 * @param where   an optional where-clause
 	 * @return An existential sub-query.
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")
 	public static Condition exists(List<PatternElement> pattern, @Nullable Where where) {
@@ -3915,7 +3928,7 @@ public final class Cypher {
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code all()} predicate function
 	 * @see #all(SymbolicName)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3929,7 +3942,7 @@ public final class Cypher {
 	 *
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code all()} predicate function
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3942,7 +3955,7 @@ public final class Cypher {
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code any()} predicate function
 	 * @see #any(SymbolicName)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3956,7 +3969,7 @@ public final class Cypher {
 	 *
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code any()} predicate function
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3969,7 +3982,7 @@ public final class Cypher {
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code none()} predicate function
 	 * @see #none(SymbolicName)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3983,7 +3996,7 @@ public final class Cypher {
 	 *
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code none()} predicate function
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -3996,7 +4009,7 @@ public final class Cypher {
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code single()} predicate function
 	 * @see #single(SymbolicName)
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
@@ -4010,7 +4023,7 @@ public final class Cypher {
 	 *
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code single()} predicate function
-	 * @since 2023.09.0
+	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")

@@ -26,7 +26,6 @@ import java.util.regex.Pattern;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
-import org.neo4j.cypherdsl.core.Functions;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -79,7 +78,7 @@ class PropertiesTest {
 	void propertiesOfExpressions() {
 
 		// tag::properties-on-expressions[]
-		var epochSeconds = Cypher.property(Functions.datetime(), "epochSeconds"); // <.>
+		var epochSeconds = Cypher.property(Cypher.datetime(), "epochSeconds"); // <.>
 		var statement = Cypher.returning(epochSeconds).build();
 		Assertions.assertThat(cypherRenderer.render(statement))
 			.isEqualTo("RETURN datetime().epochSeconds");

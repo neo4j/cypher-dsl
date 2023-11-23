@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import java.util.Set;
 
@@ -30,17 +30,19 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *
  * @author Michael J. Simons
  * @since 1.0
- * @deprecated use {@link org.neo4j.cypherdsl.core.Cypher} instead.
+ * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
+ * be accessible.
  */
-@API(status = INTERNAL, since = "2023.9.0")
+@API(status = DEPRECATED, since = "2023.9.0")
 @Deprecated(since = "2023.9.0")
+@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
 public final class Operations {
 
 	private static final java.util.Set<Class<? extends Expression>> VALID_MUTATORS =
 		Set.of(MapExpression.class, Parameter.class, MapProjection.class, SymbolicName.class, FunctionInvocation.class);
 
 	/**
-	 * Creates an unary minus operation.
+	 * Creates a unary minus operation.
 	 *
 	 * @param e The expression to which the unary minus should be applied. We don't check if it's a numeric expression,
 	 *          but in hindsight to generate semantically correct Cypher, it's recommended that is one.
@@ -153,9 +155,7 @@ public final class Operations {
 	 * @param label  The labels to be added
 	 * @return A set operation
 	 * @since 2021.2.3
-	 * @deprecated use {@link Cypher#setLabel(Node, String...)} instead.
 	 */
-	@Deprecated
 	public static Operation set(Node target, String... label) {
 
 		return Operation.create(target, Operator.SET_LABEL, label);
@@ -168,9 +168,7 @@ public final class Operations {
 	 * @param label  The labels to be removed
 	 * @return A remove operation
 	 * @since 2021.2.3
-	 * @deprecated use {@link Cypher#removeLabel(Node, String...)} instead.
 	 */
-	@Deprecated
 	public static Operation remove(Node target, String... label) {
 
 		return Operation.create(target, Operator.REMOVE_LABEL, label);
