@@ -23,10 +23,8 @@ package org.neo4j.cypherdsl.examples.sdn6.movies;
 import java.util.Optional;
 import java.util.function.Function;
 
-import org.neo4j.cypherdsl.core.Conditions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
-import org.neo4j.cypherdsl.core.Functions;
 // end::using-person-repo[]
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.parser.CypherParser;
@@ -106,7 +104,7 @@ final class PeopleService {
 			person.BORN.gte(Cypher.literalOf(1970)).and(person.BORN.lt(Cypher.literalOf(1980))) // <.>
 				.or(optionalName
 					.map(name -> person.NAME.isEqualTo(Cypher.anonParameter(name))) // <.>
-					.orElseGet(Conditions::noCondition)) // <.>
+					.orElseGet(Cypher::noCondition)) // <.>
 		);
 	}
 
@@ -122,9 +120,9 @@ final class PeopleService {
 			.optionalMatch(Person_.PERSON.relationshipTo(m).relationshipFrom(r, ActedIn_.$TYPE))
 			.returningDistinct(
 				Person_.PERSON.getRequiredSymbolicName(),
-				Functions.collectDistinct(d).as("directed"),
-				Functions.collectDistinct(a).as("actedIn"),
-				Functions.collectDistinct(r).as("related")).build();
+				Cypher.collectDistinct(d).as("directed"),
+				Cypher.collectDistinct(a).as("actedIn"),
+				Cypher.collectDistinct(r).as("related")).build();
 
 		return peopleRepository.findOne(statement, PersonDetails.class); // <.>
 	}

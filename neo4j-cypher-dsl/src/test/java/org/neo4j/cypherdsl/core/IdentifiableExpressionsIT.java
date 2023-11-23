@@ -84,7 +84,7 @@ class IdentifiableExpressionsIT {
 				a.getRequiredSymbolicName(),
 				Cypher.name("c"),
 				Cypher.caseExpression()
-					.when(Cypher.name("c").isNull().or(Conditions.hasLabelsOrType(Cypher.name("c"), "Label")))
+					.when(Cypher.name("c").isNull().or(Cypher.hasLabelsOrType(Cypher.name("c"), "Label")))
 					.then(Cypher.literalTrue())
 					.elseDefault(Cypher.literalFalse())
 					.as("isNullOrLabel")

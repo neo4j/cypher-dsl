@@ -1310,7 +1310,7 @@ public final class Cypher {
 
 	/**
 	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
-	 * utilize {@code graph.byName} to resolve the target database unless {@link Functions#graphByName(Expression)} has
+	 * utilize {@code graph.byName} to resolve the target database unless {@link Cypher#graphByName(Expression)} has
 	 * already been used.
 	 *
 	 * @param target    The name of a variable pointing to the graph or constituent
@@ -1553,10 +1553,13 @@ public final class Cypher {
 	}
 
 	/**
-	 * A condition that evaluates to true if a list or a string represented by {@code expression} is empty or has the length of 0.
+	 * Creates a new condition based on a function invocation for the {@code isEmpty()} function.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-isempty">isEmpty</a>.
+	 * <p>
+	 * The argument {@code e} must refer to an expression that evaluates to a list for {@code isEmpty()} to work
 	 *
-	 * @param expression The expression to test for emptiness.
-	 * @return A new condition.
+	 * @param expression An expression referring to a list
+	 * @return A function call for {@code isEmpty()} for a list
 	 * @since 2023.9.0
 	 */
 	@SuppressWarnings("deprecation")

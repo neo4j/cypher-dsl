@@ -556,7 +556,7 @@ public interface StatementBuilder
 
 		/**
 		 * Defines the source to be iterated by {@code FOREACH}. Must evaluate to something iterable, for example something like
-		 * {@link Functions#nodes(NamedPath)} for
+		 * {@link Cypher#nodes(NamedPath)} for
 		 *
 		 * @param list The expression to iterate on
 		 * @return The next step.

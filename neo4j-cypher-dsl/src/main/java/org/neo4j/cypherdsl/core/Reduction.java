@@ -35,7 +35,7 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
  * @author Gerrit Meier
  * @author Michael J. Simons
  * @soundtrack Metallica - Metallica
- * @see Functions#reduce(SymbolicName)
+ * @see Cypher#reduce(SymbolicName)
  * @since 2020.1.5
  */
 @API(status = STABLE, since = "2020.1.5")

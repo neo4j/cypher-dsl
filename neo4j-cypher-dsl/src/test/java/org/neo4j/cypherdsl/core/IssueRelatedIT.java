@@ -1168,7 +1168,7 @@ class IssueRelatedIT {
 
 		return Cypher
 			.call(subquery)
-			.returning(Cypher.listOf(MapProjection.create(this0.getRequiredSymbolicName(), "title")).as("data"))
+			.returning(Cypher.listOf(Cypher.createProjection(this0.getRequiredSymbolicName(), "title")).as("data"))
 			.build();
 	}
 
