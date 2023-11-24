@@ -1,0 +1,53 @@
+== 2023.9
+
+=== 2023.9.0
+
+2023.9 contains several new features: It brings support for parsing and rendering https://neo4j.com/docs/cypher-manual/current/patterns/concepts/#quantified-path-patterns[Quantified Path Patterns (QPP)], shifts to a single, easy to find main entry point to the DSL via just `Cypher` and makes the static code generator a bit more powerful.
+
+While QPP are a powerful feature (have a look at https://medium.com/neo4j/getting-from-denmark-hill-to-gatwick-airport-with-quantified-path-patterns-bed38da27ca1["Getting From Denmark Hill to Gatwick Airport With Quantified Path Patterns"]) to see what you can do with them, I find them hard to read, with all the parentheses and I did not expect them to really fit in well with our builder. However, it turned out that the elements we need to provide in our own AST to render what we parsed do work well: If you decide to build QPP with Cypher-DSL, you can now quantify relationship patterns as a whole or only the relationship, making up already for many uses cases.
+
+The single entry point to our API makes the whole system a lot more discoverable.
+@lukaseder did create a ticket for that in the beginning of 2023 and if someone knows the importance of that, he is that someone as the creator of jOOQ.
+Thank you, Lukas and of course earlier this week, @Andy2003 for actually doing the work of adding all those methods to `Cypher`.
+
+If you don't care about deprecation warnings, 2023.9.0 will be a drop-in replacement.
+The existing entry points won't go away until the next major release, in which they will be made package private.
+Until then, they are deprecated.
+
+It my sound like a broken record by now, but again: Thank you, @zakjan and @ikwattro for your input on QPP, now we are waiting for your bug-reports.
+
+==== 🚀 Features
+
+* Provide a single DSL API entry point. (#862)
+* Allow parsing of `collect` expression. (#861)
+* Add support for quantified path patterns. (#860)
+* Add support for predicates inside pattern elements. (#859)
+* Add ability to add additional factory methods for relationship models to a node in the static model (#840)
+
+==== 📖 Documentation
+
+* Add example how to access properties of a list element.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump spring-boot-starter-parent from 3.1.5 to 3.2.0
+** Bump auto-common to 1.2.2
+** Bump errorprone from 2.12.1 to 2.23.0
+** Bump sortpom from 2.15.0 to 3.3.0
+** Bump com.opencsv:opencsv from 5.8 to 5.9
+** Bump testcontainers.version from 1.19.2 to 1.19.3
+** Bump testcontainers.version from 1.19.1 to 1.19.2 (#857)
+** Bump org.codehaus.mojo:exec-maven-plugin (#856)
+** Bump io.projectreactor:reactor-bom (#855)
+** Bump com.puppycrawl.tools:checkstyle (#854)
+** Bump com.fasterxml.jackson:jackson-bom (#853)
+** Bump org.jetbrains:annotations from 24.0.1 to 24.1.0 (#852)
+** Bump org.springframework.data:spring-data-neo4j (#851)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#850)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#849)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#848)
+
+==== 🛠 Build
+
+* Address several warnings appearing in the build. (#847)
