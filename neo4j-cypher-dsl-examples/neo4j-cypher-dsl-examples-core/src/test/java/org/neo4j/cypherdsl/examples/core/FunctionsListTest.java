@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.examples.core;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+// tag::functions-list-range-imports[]
 import org.neo4j.cypherdsl.core.Cypher;
+// end::functions-list-range-imports[]
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
