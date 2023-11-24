@@ -52,8 +52,8 @@ import com.squareup.javapoet.WildcardTypeName;
  * @soundtrack Bear McCreary - Battlestar Galactica Season 2
  * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "2021.1.0")
-final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipModelBuilder> implements RelationshipModelBuilder {
+@API(status = INTERNAL, since = "2021.1.0") final class RelationshipImplBuilder
+	extends AbstractModelBuilder<RelationshipModelBuilder> implements RelationshipModelBuilder {
 
 	private static final ClassName TYPE_NAME_RELATIONSHIP_BASE = ClassName.get(RelationshipBase.class);
 	private static final TypeVariableName S = TypeVariableName.get("S",
@@ -131,15 +131,28 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 		return lastRelation;
 	}
 
-	private MethodSpec buildConstructor(Edge relation) {
+	private MethodSpec buildConstructor(Edge relation, Edge expectedTypes) {
 		ParameterSpec startNodeParam = ParameterSpec.builder(relation.start, "start").build();
 		ParameterSpec endNodeParam = ParameterSpec.builder(relation.end, "end").build();
-		return MethodSpec.constructorBuilder()
+		MethodSpec.Builder builder = MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(startNodeParam)
-			.addParameter(endNodeParam)
-			.addStatement("super($N, $N, $N)", startNodeParam, relationshipTypeField, endNodeParam)
-			.build();
+			.addParameter(endNodeParam);
+		if (relation.start != expectedTypes.start) {
+			if (relation.end != expectedTypes.end) {
+				builder.addStatement("super(($T) $N, $N, ($T) $N)", expectedTypes.start, startNodeParam,
+					relationshipTypeField, expectedTypes.end, endNodeParam);
+			} else {
+				builder.addStatement("super(($T) $N, $N, $N)", expectedTypes.start, startNodeParam,
+					relationshipTypeField, endNodeParam);
+			}
+		} else if (relation.end != expectedTypes.end) {
+			builder.addStatement("super($N, $N, ($T) $N)", startNodeParam, relationshipTypeField, expectedTypes.end,
+				endNodeParam);
+		} else {
+			builder.addStatement("super($N, $N, $N)", startNodeParam, relationshipTypeField, endNodeParam);
+		}
+		return builder.build();
 	}
 
 	@Override
@@ -219,7 +232,7 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 			.addFields(buildFields());
 
 		(edges.isEmpty() ? Stream.of(new Edge(S, E)) : edges.stream())
-			.map(this::buildConstructor).forEach(builder::addMethod);
+			.map(relation -> buildConstructor(relation, expectedTypes)).forEach(builder::addMethod);
 
 		var newType = builder
 			.addMethod(buildCopyConstructor())
