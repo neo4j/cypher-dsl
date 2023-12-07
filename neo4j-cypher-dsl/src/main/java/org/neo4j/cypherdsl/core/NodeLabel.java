@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -43,7 +42,6 @@ public final class NodeLabel implements Visitable {
 	/**
 	 * @return The actual value of this label. Needs to be escaped before rendering.
 	 */
-	@API(status = INTERNAL)
 	public String getValue() {
 		return value;
 	}
