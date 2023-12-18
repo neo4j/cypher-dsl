@@ -441,7 +441,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Operation setLabels(Expression v, List<StringPos<InputPosition>> values) {
+	public Expression setLabels(Expression v, List<StringPos<InputPosition>> values, boolean containsIs) {
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
@@ -459,7 +459,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values) {
+	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values, boolean containsIs) {
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
@@ -755,25 +755,25 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause showIndexClause(InputPosition p, ShowCommandFilterTypes indexType, boolean brief, boolean verbose,
-		Where where, boolean hasYield) {
+		Where where, Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause showConstraintClause(InputPosition p, ShowCommandFilterTypes constraintType, boolean brief,
-		boolean verbose, Where where, boolean hasYield) {
+		boolean verbose, Where where, Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause showProcedureClause(InputPosition p, boolean currentUser, String user, Where where,
-		boolean hasYield) {
+		Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause showFunctionClause(InputPosition p, ShowCommandFilterTypes functionType, boolean currentUser,
-		String user, Where where, boolean hasYield) {
+		String user, Where where, Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -940,6 +940,11 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement showAliases(InputPosition p, DatabaseName aliasName, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public void addDeprecatedIdentifierUnicodeNotification(InputPosition p, Character character, String identifier) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1571,12 +1576,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause turnYieldToWith(Clause yieldClause) {
+	public Clause showSettingsClause(InputPosition p, SimpleEither<List<String>, Expression> names, Where where,
+		Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showSettingsClause(InputPosition inputPosition, SimpleEither<List<String>, Expression> simpleEither, Where where, boolean b) {
+	public Clause turnYieldToWith(Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
