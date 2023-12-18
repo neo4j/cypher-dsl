@@ -1,5 +1,34 @@
 == 2023.9
 
+=== 2023.9.1
+
+==== 🐛 Bug Fixes
+
+* for #840 add missing casts in constructor super calls for relations with generic start or / and end node (#866)
+
+==== 🔄️ Refactorings
+
+* Officially allow label value to be accessed.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j.version from 5.14.0 to 5.15.0 (#880)
+** Bump org.checkerframework:checker-qual (#883)
+** Bump io.projectreactor:reactor-bom (#882)
+** Bump org.springframework.data:spring-data-neo4j (#881)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#879)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#878)
+** Bump com.puppycrawl.tools:checkstyle (#876)
+** Bump net.java.dev.jna:jna from 5.13.0 to 5.14.0 (#877)
+** Bump org.checkerframework:checker-qual (#875)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#874)
+** Bump org.neo4j.driver:neo4j-java-driver (#873)
+** Bump com.tngtech.archunit:archunit from 1.2.0 to 1.2.1 (#872)
+** Bump mockito.version from 5.7.0 to 5.8.0 (#871)
+** Bump neo4j.version from 5.13.0 to 5.14.0 (#868)
+** Bump testcontainers.version from 1.19.2 to 1.19.3 (#867)
+
 === 2023.9.0
 
 2023.9 contains several new features: It brings support for parsing and rendering https://neo4j.com/docs/cypher-manual/current/patterns/concepts/#quantified-path-patterns[Quantified Path Patterns (QPP)], shifts to a single, easy to find main entry point to the DSL via just `Cypher` and makes the static code generator a bit more powerful.
