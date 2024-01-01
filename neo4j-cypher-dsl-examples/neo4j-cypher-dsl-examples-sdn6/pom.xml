@@ -57,7 +57,7 @@
 	</licenses>
 
 	<properties>
-		<checkstyle.version>10.12.6</checkstyle.version>
+		<checkstyle.version>10.12.7</checkstyle.version>
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>17</java.version>
 		<license-maven-plugin.version>4.3</license-maven-plugin.version>
