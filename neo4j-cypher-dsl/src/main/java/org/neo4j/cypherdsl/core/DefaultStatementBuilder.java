@@ -473,7 +473,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.closeCurrentOngoingMatch();
 		this.closeCurrentOngoingUpdate();
 
-		this.currentSinglePartElements.add(Subquery.call(statement, true, imports).inTransactionsOf(rows));
+		this.currentSinglePartElements.add(Subquery.call(statement, imports).inTransactionsOf(rows));
 
 		return this;
 	}

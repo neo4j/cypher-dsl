@@ -1865,4 +1865,57 @@ class IssueRelatedIT {
 					   + " }"
 					   + "}");
 	}
+
+	@Test // GH-533
+	void additionalUnitSubqueries() {
+
+		var createThis1 = Cypher.name("create_this1");
+		var createVar0 = Cypher.name("create_var0");
+		var createVar2 = Cypher.name("create_var2");
+		var createThis5 = Cypher.name("create_this5");
+		var createVar3 = Cypher.name("create_var3");
+		var stmt = Cypher.unwind(Cypher.parameter("create_param0")).as(createVar0)
+			.call(
+				Cypher.with(createVar0)
+					.create(Cypher.node("Movie").named(createThis1))
+					.set(createThis1.property("id").to(createVar0.property("id")))
+					.with(createThis1, createVar0)
+					.call(
+						Cypher.with(createThis1, createVar0)
+							.unwind(createVar0.property("actors").property("create")).as(createVar2)
+							.with(createVar2.property("node").as(createVar3), createVar2.property("edge").as("create_var4"),
+								createThis1)
+							.create(Cypher.node("Actor").named(createThis5))
+							.set(createThis5.property("name").to(createVar3.property("name")))
+							.merge(Cypher.anyNode(createThis1).relationshipFrom(Cypher.anyNode(createThis5), "ACTED_IN").named("create_this6"))
+							.build()
+					)
+					.returning(createThis1)
+					.build()
+			).returning(Cypher.collect(createThis1.project("id")).as("data"))
+			.build();
+
+		String cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(stmt);
+		assertThat(cypher)
+			.isEqualTo("""
+				UNWIND $create_param0 AS create_var0
+				CALL {
+				  WITH create_var0
+				  CREATE (create_this1:Movie)
+				  SET create_this1.id = create_var0.id
+				  WITH create_this1, create_var0
+				  CALL {
+				    WITH create_this1, create_var0
+				    UNWIND create_var0.actors.create AS create_var2
+				    WITH create_var2.node AS create_var3, create_var2.edge AS create_var4, create_this1
+				    CREATE (create_this5:Actor)
+				    SET create_this5.name = create_var3.name
+				    MERGE (create_this1)<-[create_this6:ACTED_IN]-(create_this5)
+				  }
+				  RETURN create_this1
+				}
+				RETURN collect(create_this1 {
+				  .id
+				}) AS data""");
+	}
 }
