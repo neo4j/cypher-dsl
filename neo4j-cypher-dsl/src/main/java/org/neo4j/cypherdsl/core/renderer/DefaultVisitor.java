@@ -923,7 +923,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this.inSubquery = false;
 		int l = builder.length() - 1;
 		if (builder.charAt(l) == ' ' && !subquery.doesReturnOrYield()) {
-			builder.replace(l, builder.length(), "}");
+			builder.replace(l, builder.length(), "} ");
 		} else {
 			builder.append("} ");
 		}

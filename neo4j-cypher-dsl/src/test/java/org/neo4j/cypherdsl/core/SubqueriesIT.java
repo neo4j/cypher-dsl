@@ -659,4 +659,20 @@ class SubqueriesIT {
 					+ "ORDER BY dogNames");
 		}
 	}
+
+	@Test // GH-533
+	void unitSubqueries() {
+
+		var p = Cypher.node("Person").named("p");
+		var outer = Cypher.match(p);
+		var inner = Cypher.with(p)
+				.unwind(Cypher.range(1, 5)).as("i")
+				.create(Cypher.node("Person").withProperties("name", p.property("name"))).build();
+
+		var statement = outer.call(inner)
+			.returning(Cypher.count(Cypher.asterisk()))
+			.build();
+		assertThat(statement.getCypher())
+			.isEqualTo("MATCH (p:`Person`) CALL {WITH p UNWIND range(1, 5) AS i CREATE (:`Person` {name: p.name})} RETURN count(*)");
+	}
 }

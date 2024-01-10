@@ -41,34 +41,15 @@ public final class Subquery extends AbstractClause implements Clause {
 	private final Statement statement;
 
 	/**
-	 * The {@code statement} must return elements, either through a {@literal RETURN} or {@literal YIELD} clause.
+	 * The {@code statement} can either be a unit sub-query, used to modify the graph. Those won't impact the amount of
+	 * rows returned by the enclosing query.
+	 * In case it's a statement that returns or yields values it must ensure that it does not return variables with the
+	 * same names as variables in the enclosing query.
 	 *
-	 * @param statement The statement to wrap into a sub-query.
-	 * @param imports   additional imports
+	 * @param statement      The statement to wrap into a sub-query.
 	 * @return A sub-query.
 	 */
 	static Subquery call(Statement statement, IdentifiableElement... imports) {
-		return call(statement, false, imports);
-	}
-
-	/**
-	 * The {@code statement} must return elements, either through a {@literal RETURN} or {@literal YIELD} clause.
-	 *
-	 * @param statement      The statement to wrap into a sub-query.
-	 * @param skipAssertions Set to true to skip assertions about the  statement that should make up the sub-query. This
-	 *                       comes in handy  when building a statement based  on a list of flat clauses  and not through
-	 *                       the fluent api.
-	 * @return A sub-query.
-	 */
-	static Subquery call(Statement statement, boolean skipAssertions, IdentifiableElement... imports) {
-
-		if (!skipAssertions) {
-			boolean validReturn = statement.doesReturnOrYield();
-			if (!validReturn) {
-				throw new IllegalArgumentException("Only a statement that returns elements, either via RETURN or YIELD, can be used in a subquery.");
-			}
-		}
-
 		return new Subquery(ImportingWith.of(imports), statement);
 	}
 
