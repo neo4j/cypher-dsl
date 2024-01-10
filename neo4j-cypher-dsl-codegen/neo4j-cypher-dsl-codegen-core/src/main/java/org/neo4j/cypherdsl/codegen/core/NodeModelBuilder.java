@@ -78,4 +78,22 @@ public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 	 * @since 2023.9.0
 	 */
 	NodeModelBuilder addRelationshipFactory(RelationshipFactoryDefinition definition);
+
+	/**
+	 * Adds a model this model should extend.
+	 * @param baseModel The model to extend
+	 * @return This builder
+	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @since 2023.9.2
+	 */
+	NodeModelBuilder setBaseNodeModel(NodeModelBuilder baseModel);
+
+	/**
+	 * If true, this model will be extensible.
+	 * @param extensible True if this model should be extensible
+	 * @return This builder
+	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @since 2023.9.2
+	 */
+	NodeModelBuilder setExtensible(boolean extensible);
 }
