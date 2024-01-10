@@ -84,7 +84,7 @@ public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 	 * @param baseModel The model to extend
 	 * @return This builder
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
-	 * @since 2024.1.0
+	 * @since 2023.9.2
 	 */
 	NodeModelBuilder setBaseNodeModel(NodeModelBuilder baseModel);
 
@@ -93,7 +93,7 @@ public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 	 * @param extensible True if this model should be extensible
 	 * @return This builder
 	 * @throws IllegalStateException When this builder has already been used to create Java class.
-	 * @since 2024.1.0
+	 * @since 2023.9.2
 	 */
 	NodeModelBuilder setExtensible(boolean extensible);
 }

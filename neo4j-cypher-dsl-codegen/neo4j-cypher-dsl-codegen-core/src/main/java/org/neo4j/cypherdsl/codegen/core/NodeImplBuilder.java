@@ -56,9 +56,11 @@ import com.squareup.javapoet.TypeVariableName;
  * becomes effectively immutable.
  *
  * @author Michael J. Simons
+ * @author Andreas Berger
  * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "2021.1.0") final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
+@API(status = INTERNAL, since = "2021.1.0")
+final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	implements NodeModelBuilder {
 
 	private static final ClassName TYPE_NAME_NODE_LABEL = ClassName.get(NodeLabel.class);
