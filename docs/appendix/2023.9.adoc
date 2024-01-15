@@ -1,5 +1,48 @@
 == 2023.9
 
+=== 2023.9.2
+
+*Please read the updated stance wrt calver/semver in the README. This release is current and the first one in 2024, including some new, additive and non-breaking features contributed by @Andy2003*
+
+==== 🚀 Features
+
+* Add possibility to define inheritance for the static model. (#894)
+
+==== 🔄️ Refactorings
+
+* Allow unit-subqueries. (#895)
+
+==== 📖 Documentation
+
+* Clarify calver and semver wording.
+
+==== 🧰 Tasks
+
+* Extend license header to 2024.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.asciidoctor:asciidoctor-maven-plugin (#902)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#901)
+** Bump mockito.version from 5.8.0 to 5.9.0 (#900)
+** Bump org.codehaus.mojo:flatten-maven-plugin (#899)
+** Bump org.springframework.data:spring-data-neo4j (#898)
+** Bump io.projectreactor:reactor-bom (#897)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#896)
+** Bump org.assertj:assertj-core from 3.25.0 to 3.25.1 (#893)
+** Bump org.neo4j.driver:neo4j-java-driver (#892)
+** Bump joda-time:joda-time from 2.12.5 to 2.12.6 (#891)
+** Bump org.asciidoctor:asciidoctorj-diagram (#890)
+** Bump com.fasterxml.jackson:jackson-bom (#887)
+** Bump org.assertj:assertj-core from 3.24.2 to 3.25.0 (#889)
+** Bump com.puppycrawl.tools:checkstyle (#888)
+** Bump org.asciidoctor:asciidoctorj from 2.5.10 to 2.5.11 (#886)
+** Bump com.google.guava:guava (#885)
+** Bump org.springframework.boot:spring-boot-starter-parent (#884)
+
+==== 🛠 Build
+
 === 2023.9.1
 
 ==== 🐛 Bug Fixes
