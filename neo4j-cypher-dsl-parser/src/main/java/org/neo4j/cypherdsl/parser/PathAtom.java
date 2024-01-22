@@ -24,6 +24,7 @@ import org.neo4j.cypherdsl.core.ExposesProperties;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.MapExpression;
+import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Relationship.Direction;
@@ -87,14 +88,15 @@ final class PathAtom implements PatternAtom {
 		this.quantifier = quantifier;
 	}
 
-	ExposesRelationships<?> asRelationshipBetween(ExposesRelationships<?> previous, NodeAtom nodeAtom) {
+	ExposesRelationships<?> asRelationshipBetween(ExposesRelationships<?> previous, NodeAtom nodeAtom, boolean alwaysLtr) {
 		var node = nodeAtom.value();
 		ExposesRelationships<?> relationshipPattern = switch (this.getDirection()) {
 			case LTR -> previous.relationshipTo(node, this.getTypes());
-			case RTL -> previous.relationshipFrom(node, this.getTypes());
+			case RTL -> alwaysLtr ?
+				node.relationshipTo((Node) previous, this.getTypes()) :
+				previous.relationshipFrom(node, this.getTypes());
 			case UNI -> previous.relationshipBetween(node, this.getTypes());
 		};
-
 		relationshipPattern = applyOptionalName(relationshipPattern);
 		relationshipPattern = applyOptionalProperties(relationshipPattern);
 		relationshipPattern = applyOptionalPredicate(relationshipPattern);

@@ -73,6 +73,7 @@ import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
+import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
@@ -93,53 +94,53 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements ASTFactory<
-		Statement,
-		Statement,
-		Clause,
-		Return,
-		Expression,
-		List<Expression>,
-		SortItem,
-		PatternElement,
-		NodeAtom,
-		PathAtom,
-		PathLength,
-		Clause,
-		Expression,
-		Expression,
-		Expression,
-		Hint,
-		Expression,
-		LabelExpression,
-		Parameter<?>,
-		Expression,
-		Property,
-		Expression,
-		Clause,
-		Statement,
-		Statement,
-		Statement,
-		Clause,
-		Where,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		NULL,
-		InputPosition,
-		EntityType,
+	Statement,
+	Statement,
+	Clause,
+	Return,
+	Expression,
+	List<Expression>,
+	SortItem,
+	PatternElement,
+	NodeAtom,
+	PathAtom,
+	PathLength,
+	Clause,
+	Expression,
+	Expression,
+	Expression,
+	Hint,
+	Expression,
+	LabelExpression,
+	Parameter<?>,
+	Expression,
+	Property,
+	Expression,
+	Clause,
+	Statement,
+	Statement,
+	Statement,
+	Clause,
+	Where,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	InputPosition,
+	EntityType,
 	QuantifiedPathPattern.Quantifier,
-		PatternAtom,
-		DatabaseName,
-		NULL,
-		NULL,
-		PatternElement> {
+	PatternAtom,
+	DatabaseName,
+	NULL,
+	NULL,
+	PatternElement> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
 
@@ -203,7 +204,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 
 		List<String> types = new ArrayList<>();
-			traverseTypeExpression(types, inputTypes);
+		traverseTypeExpression(types, inputTypes);
 
 		return this.options.getTypeFilter()
 			.apply(event, types)
@@ -555,14 +556,20 @@ final class CypherDslASTFactory implements ASTFactory<
 		return patternElement;
 	}
 
-	static class Patterns extends TypedSubtree<PatternElement> implements PatternElement {
-		Patterns(Collection<PatternElement> children) {
+	static class PatternJuxtaposition extends TypedSubtree<PatternElement> implements PatternElement {
+		PatternJuxtaposition(Collection<PatternElement> children) {
 			super(children);
 		}
 
 		@Override
 		public String separator() {
 			return " ";
+		}
+	}
+
+	static class PatternList extends TypedSubtree<PatternElement> implements PatternElement {
+		PatternList(Collection<PatternElement> children) {
+			super(children);
 		}
 	}
 
@@ -583,6 +590,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		NodeAtom lastNodeAtom = null;
 		PathAtom lastPathAtom = null;
 		ExposesRelationships<?> relationshipPattern = null;
+		List<PatternElement> patternList = null;
 		for (PatternAtom atom : atoms) {
 
 			if (atom instanceof ParenthesizedPathPatternAtom specificAtom) {
@@ -592,13 +600,18 @@ final class CypherDslASTFactory implements ASTFactory<
 				if (relationshipPattern != null) {
 					patternElements.add((PatternElement) relationshipPattern);
 				}
+				if (patternList != null) {
+					patternElements.add(new PatternList(patternList));
+				}
 				lastNodeAtom = null;
 				lastPathAtom = null;
 				relationshipPattern = null;
+				patternList = null;
 				patternElements.add(specificAtom.asPatternElement());
 			} else if (atom instanceof NodeAtom nodeAtom) {
 				if (relationshipPattern != null) {
-					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom);
+					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom,
+						options.isAlwaysCreateRelationshipsLTR());
 				} else if (lastNodeAtom == null) {
 					lastNodeAtom = nodeAtom;
 				} else {
@@ -606,7 +619,18 @@ final class CypherDslASTFactory implements ASTFactory<
 					lastNodeAtom = null;
 					// Will be added to the pattern elements either on the occurrence of a parenthesized pattern or
 					// after iterating all atoms.
-					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom);
+					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom,
+						options.isAlwaysCreateRelationshipsLTR());
+					if ((lastPathAtom.getDirection() == Relationship.Direction.RTL || patternList != null)
+						&& options.isAlwaysCreateRelationshipsLTR()) {
+						if (patternList == null) {
+							patternList = new ArrayList<>(Arrays.asList((PatternElement) relationshipPattern));
+						} else {
+							patternList.add(((PatternElement) relationshipPattern));
+						}
+						relationshipPattern = null;
+						lastNodeAtom = nodeAtom;
+					}
 				}
 			} else if (atom instanceof PathAtom pathAtom) {
 				lastPathAtom = pathAtom;
@@ -615,11 +639,13 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		if (relationshipPattern != null) {
 			patternElements.add((PatternElement) relationshipPattern);
+		} else if (patternList != null) {
+			patternElements.add(new PatternList(patternList));
 		} else if (lastNodeAtom != null) {
 			patternElements.add(lastNodeAtom.value());
 		}
 
-		return patternElements.size() == 1 ? patternElements.get(0) : new Patterns(patternElements);
+		return patternElements.size() == 1 ? patternElements.get(0) : new PatternJuxtaposition(patternElements);
 	}
 
 	@Override

@@ -97,6 +97,8 @@ public final class Options {
 
 		private boolean createSortedMaps = false;
 
+		private boolean alwaysCreateRelationshipsLTR = false;
+
 		private Builder() {
 		}
 
@@ -250,6 +252,19 @@ public final class Options {
 		}
 
 		/**
+		 * Instructs the parser to turn relationships that are given as {@code (a:A) <-[:TYPE]- (b:B)} into
+		 * {@code (b:B) -[:TYPE]-> (a:A)}. Multi-hop patterns will be split into a relationship enumeration from left to right
+		 * with all parts pointing from left to right
+		 * @param alwaysCreateRelationshipsLTR A flag whether to only use left-to-right relationships
+		 * @return This builder
+		 * @since 2023.9.3
+		 */
+		public Builder alwaysCreateRelationshipsLTR(boolean alwaysCreateRelationshipsLTR) {
+			this.alwaysCreateRelationshipsLTR = alwaysCreateRelationshipsLTR;
+			return this;
+		}
+
+		/**
 		 * Defines a lookup table for parameters. Everytime a parameter is parsed, we do check if a value in this table exists.
 		 * If so, the parameter will be created as a named parameter carrying that value.
 		 * <p>
@@ -288,6 +303,8 @@ public final class Options {
 
 	private final boolean createSortedMaps;
 
+	private boolean alwaysCreateRelationshipsLTR;
+
 	private final Map<String, Object> parameterValues;
 
 	private Options(Builder builder) {
@@ -321,6 +338,7 @@ public final class Options {
 					returnDefinition.optionalWhere(), returnDefinition.optionalHints());
 
 		this.createSortedMaps = builder.createSortedMaps;
+		this.alwaysCreateRelationshipsLTR = builder.alwaysCreateRelationshipsLTR;
 		this.parameterValues = builder.parameterValues;
 	}
 
@@ -350,6 +368,10 @@ public final class Options {
 
 	boolean isCreateSortedMaps() {
 		return createSortedMaps;
+	}
+
+	boolean isAlwaysCreateRelationshipsLTR() {
+		return alwaysCreateRelationshipsLTR;
 	}
 
 	Map<InvocationCreatedEventType, List<UnaryOperator<Visitable>>> getOnNewInvocationCallbacks() {
