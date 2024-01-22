@@ -1918,4 +1918,23 @@ class IssueRelatedIT {
 				  .id
 				}) AS data""");
 	}
+
+	@Test // GH-903
+	void variablesOfListPredicatesMustNotBeScoped() {
+
+		var expected = """
+			MATCH (this:`Movie`)
+			WHERE single(this0 IN [(this)-[this1:`IN_GENRE`]->(this0:`Genre`) WHERE this0.name = $param0 | 1] WHERE true)
+			RETURN this{.actorCount} AS this""";
+
+
+		var movie = Cypher.node("Movie").named("this");
+		var genre = Cypher.node("Genre").named("this0");
+		var rel = movie.relationshipTo(genre, "IN_GENRE").named("this1");
+		var statement = Cypher.match(movie)
+			.where(Cypher.single("this0").in(Cypher.listBasedOn(rel).where(genre.property("name").eq(Cypher.parameter("param0"))).returning(Cypher.literalOf(1))).where(Cypher.isTrue()))
+			.returning(movie.project("actorCount").as("this")).build();
+		assertThat(statement.getCypher())
+			.isEqualTo(expected.replace("\n", " "));
+	}
 }

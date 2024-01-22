@@ -28,6 +28,7 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -43,6 +44,7 @@ import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
+import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.Named;
@@ -110,6 +112,8 @@ public final class ScopingStrategy {
 
 	private boolean inSubquery = false;
 
+	private boolean inListFunctionPredicate = false;
+
 	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
 	private final Deque<Set<String>> definedInSubquery = new ArrayDeque<>();
 
@@ -146,6 +150,10 @@ public final class ScopingStrategy {
 		if (visitable instanceof Subquery) {
 			this.inSubquery = true;
 			this.definedInSubquery.push(new LinkedHashSet<>());
+		}
+
+		if (isListFunctionPredicate(visitable)) {
+			this.inListFunctionPredicate = true;
 		}
 
 		if (this.inSubquery && visitable instanceof With with) {
@@ -199,6 +207,13 @@ public final class ScopingStrategy {
 		return hasVisitedInScope(scope, namedItem);
 	}
 
+	private boolean isListFunctionPredicate(Visitable visitable) {
+
+		return visitable instanceof FunctionInvocation fi && Set.of("all", "any", "none", "single")
+			.contains(fi.getFunctionName().toLowerCase(
+				Locale.ROOT));
+	}
+
 	/**
 	 * Called when leaving a {@link Visitable}
 	 *
@@ -211,14 +226,21 @@ public final class ScopingStrategy {
 		}
 
 		if (visitable instanceof IdentifiableElement identifiableElement && !inOrder && (!inProperty || visitable instanceof Property)) {
-
-			dequeOfVisitedNamed.peek().add(identifiableElement);
-			if (inSubquery) {
-				var identifier = extractIdentifier(identifiableElement);
-				if (identifier != null) {
-					this.definedInSubquery.peek().add(identifier);
+			if (identifiableElement instanceof SymbolicName && inListFunctionPredicate) {
+				this.inListFunctionPredicate = false;
+			} else {
+				dequeOfVisitedNamed.peek().add(identifiableElement);
+				if (inSubquery) {
+					var identifier = extractIdentifier(identifiableElement);
+					if (identifier != null) {
+						this.definedInSubquery.peek().add(identifier);
+					}
 				}
 			}
+		}
+
+		if (isListFunctionPredicate(visitable)) {
+			this.inListFunctionPredicate = false;
 		}
 
 		boolean notify = false;

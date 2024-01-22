@@ -4009,7 +4009,7 @@ public final class Cypher {
 
 	/**
 	 * Starts building a new condition based on a function invocation for the {@code single()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-single">exists</a>.
+	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-single">single</a>.
 	 *
 	 * @param variable The variable referring to elements of a list
 	 * @return A builder for the {@code single()} predicate function
