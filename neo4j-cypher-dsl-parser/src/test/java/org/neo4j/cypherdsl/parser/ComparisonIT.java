@@ -328,7 +328,7 @@ class ComparisonIT {
 				"MATCH (v0)-[:`FOO`]->(v1:`A`), (v0)-[:`BAR`]->(v2) RETURN *", true),
 			Arguments.of("MATCH (a:A)<-[:FOO]-(b:B)<-[:BAR]-(c:C) RETURN *",
 				"MATCH (v0:`B`)-[:`FOO`]->(v1:`A`), (v2:`C`)-[:`BAR`]->(v0) RETURN *", true)
-		).skip(9);
+		);
 	}
 
 	@ParameterizedTest
