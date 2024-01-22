@@ -47,6 +47,8 @@ import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
  * @author Michael J. Simons
@@ -454,5 +456,26 @@ class CypherParserTest {
 			assertThatNoException()
 				.isThrownBy(() -> CypherParser.parseStatement("call {match (n:Movie) return n.title as title} return title", options));
 		}
+	}
+
+	@Test // GH-903
+	void variablesOfListPredicatesMustNotBeScoped() {
+
+		var cypher = "MATCH (this:Movie)\n" +
+			"WHERE single(this0 IN [(this)-[this1:IN_GENRE]->(this0:Genre) WHERE this0.name = $param0 | 1] WHERE true)\n" +
+			"RETURN this { .actorCount } AS this";
+
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+		var normalized = renderer.render(CypherParser.parse(cypher, Options.defaultOptions()));
+		assertThat(normalized).isEqualTo("MATCH (this:Movie)\n" +
+			"WHERE single(this0 IN [(this)-[this1:IN_GENRE]->(this0:Genre)\n" +
+			"WHERE this0.name = $param0 | 1]\n" +
+			"WHERE true)\n" +
+			"RETURN this {\n" +
+			"  .actorCount\n" +
+			"} AS this");
 	}
 }

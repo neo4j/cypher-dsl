@@ -21,10 +21,12 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -34,6 +36,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
+import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.IdentifiableElement;
 import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.Order;
@@ -72,6 +75,8 @@ public final class ScopingStrategy {
 
 	private boolean inProperty = false;
 
+	private boolean inListFunctionPredicate = false;
+
 	public ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new HashSet<>());
 	}
@@ -87,10 +92,21 @@ public final class ScopingStrategy {
 			this.inProperty = true;
 		}
 
+		if (isListFunctionPredicate(visitable)) {
+			this.inListFunctionPredicate = true;
+		}
+
 		if (hasLocalScope(visitable)) {
 			dequeOfVisitedNamed.push(
 				new HashSet<>(dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek()));
 		}
+	}
+
+	private boolean isListFunctionPredicate(Visitable visitable) {
+
+		return visitable instanceof FunctionInvocation && new HashSet<>(Arrays.asList("all", "any", "none", "single"))
+			.contains(((FunctionInvocation) visitable).getFunctionName().toLowerCase(
+				Locale.ROOT));
 	}
 
 	public void doLeave(Visitable visitable) {
@@ -100,7 +116,9 @@ public final class ScopingStrategy {
 		}
 
 		if (visitable instanceof IdentifiableElement && !inOrder && (!inProperty || visitable instanceof Property)) {
-
+			if (visitable instanceof SymbolicName && inListFunctionPredicate) {
+				this.inListFunctionPredicate = false;
+			}
 			dequeOfVisitedNamed.peek().add((IdentifiableElement) visitable);
 		}
 
