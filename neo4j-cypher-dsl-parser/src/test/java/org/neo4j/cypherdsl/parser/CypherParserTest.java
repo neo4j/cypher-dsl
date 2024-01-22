@@ -714,4 +714,29 @@ class CypherParserTest {
 		var cypher = renderer.render(CypherParser.parse(input));
 		Assertions.assertThat(cypher).isEqualTo(expected.trim());
 	}
+
+	@Test // GH-903
+	void variablesOfListPredicatesMustNotBeScoped() {
+
+		var cypher = """
+			MATCH (this:Movie)
+			WHERE single(this0 IN [(this)-[this1:IN_GENRE]->(this0:Genre) WHERE this0.name = $param0 | 1] WHERE true)
+			RETURN this { .actorCount } AS this""";
+
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+		var parseOptions = Options.newOptions().createSortedMaps(true).build();
+		var normalized = renderer.render(CypherParser.parse(cypher, parseOptions));
+		assertThat(normalized).isEqualTo("""
+			MATCH (v0:Movie)
+			WHERE single(v1 IN [(v0)-[v2:IN_GENRE]->(v3:Genre)
+			WHERE v3.name = $p0 | 1]
+			WHERE true)
+			RETURN v0 {
+			  .actorCount
+			} AS v4""");
+	}
 }

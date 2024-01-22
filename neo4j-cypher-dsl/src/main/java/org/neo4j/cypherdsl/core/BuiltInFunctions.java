@@ -23,7 +23,7 @@ import org.apiguardian.api.API.Status;
 import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
 
 /**
- * A (non exhaustive) list of builtin functions.
+ * A (non-exhaustive) list of builtin functions.
  *
  * @author Michael J. Simons
  * @soundtrack Metallica - ReLoad
