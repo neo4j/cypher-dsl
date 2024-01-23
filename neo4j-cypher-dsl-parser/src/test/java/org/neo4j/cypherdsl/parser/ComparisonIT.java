@@ -55,7 +55,8 @@ class ComparisonIT {
 						(v0:Person {name: 'Charlie Sheen'}),
 						(v1:Person {name: 'Rob Reiner'})
 					CREATE (v1)-[:`TYPE INCLUDING A SPACE`]->(v0)
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -65,7 +66,8 @@ class ComparisonIT {
 				"""
 					MATCH (v0:Person {name: 'Charlie Sheen'})-[:ACTED_IN]->(v1:Movie)
 					RETURN v0{.name, .realName, movies: collect(v1{.title, .year})};
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -81,7 +83,8 @@ class ComparisonIT {
 					match (v0:Movie {title: 'The Matrix'}) where v0.released >= 1900 return v0 as v1
 					}
 					return v0.name
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -105,7 +108,8 @@ class ComparisonIT {
 						RETURN v1
 					}
 					RETURN v0.name, v1.title
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -127,7 +131,8 @@ class ComparisonIT {
 						RETURN v1
 					}
 					RETURN count(*)
-					"""),
+					""",
+				false),
 			Arguments.of(
 				"""
 					MATCH (this:Movie)
@@ -168,7 +173,8 @@ class ComparisonIT {
 							}
 						}
 					} AS v4
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -221,7 +227,8 @@ class ComparisonIT {
 							count: v4
 						}
 					} AS v5
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -274,7 +281,8 @@ class ComparisonIT {
 							count: v4
 						}
 					} AS v5
-					"""
+					""",
+				false
 			),
 			Arguments.of(
 				"""
@@ -301,16 +309,34 @@ class ComparisonIT {
 					WHERE v4 = true
 					RETURN v0 {
 						.content
-					} AS v5"""
-			)
+					} AS v5""",
+				false),
+			Arguments.of("MATCH (n:Movie)<-[:ACTED_IN]-(p:Person)", "MATCH (v0:`Person`)-[:`ACTED_IN`]->(v1:`Movie`)",
+				true),
+			Arguments.of("MATCH (a:A)-[:R]->(b:B)-[:R2]->(c:C) RETURN *",
+				"MATCH (v0:`A`)-[:`R`]->(v1:`B`)-[:`R2`]->(v2:`C`) RETURN *", true),
+			Arguments.of("MATCH (a:A)-[:R]->(b:B)-[:R2]->(c:C), (x) --> (y) RETURN *",
+				"MATCH (v0:`A`)-[:`R`]->(v1:`B`)-[:`R2`]->(v2:`C`), (v3)-->(v4) RETURN *", true),
+			Arguments.of("MATCH (a:A)-[:R]->(b:B), (b)-[:R2]->(c:C) RETURN *",
+				"MATCH (v0:`A`)-[:`R`]->(v1:`B`), (v1)-[:`R2`]->(v2:`C`) RETURN *", true),
+			Arguments.of("MATCH (a:A)<-[:R]-(b:B)-[:R2]->(c:C), (x) --> (y) RETURN *",
+				"MATCH (v0:`B`)-[:`R`]->(v1:`A`), (v0)-[:`R2`]->(v2:`C`), (v3)-->(v4) RETURN *", true),
+			Arguments.of("MATCH (u:U)<-[:R3]-(a:A)<-[:R]-(b:B)-[:R2]->(c:C), (x) --> (y) RETURN *",
+				"MATCH (v0:`A`)-[:`R3`]->(v1:`U`), (v2:`B`)-[:`R`]->(v0), (v2)-[:`R2`]->(v3:`C`), (v4)-->(v5) RETURN *",
+				true),
+			Arguments.of("MATCH (a:A)<-[:FOO]-(b)-[:BAR]->(c) RETURN *",
+				"MATCH (v0)-[:`FOO`]->(v1:`A`), (v0)-[:`BAR`]->(v2) RETURN *", true),
+			Arguments.of("MATCH (a:A)<-[:FOO]-(b:B)<-[:BAR]-(c:C) RETURN *",
+				"MATCH (v0:`B`)-[:`FOO`]->(v1:`A`), (v2:`C`)-[:`BAR`]->(v0) RETURN *", true)
 		);
 	}
 
 	@ParameterizedTest
 	@MethodSource
-	void generatedNamesShouldBeGood(String in, String expected) {
+	void generatedNamesShouldBeGood(String in, String expected, boolean alwaysCreateRelationshipsLTR) {
 		var stmt = Renderer.getRenderer(Configuration.newConfig().withGeneratedNames(true).build())
-			.render(CypherParser.parseStatement(in));
+			.render(CypherParser.parseStatement(in,
+				Options.newOptions().alwaysCreateRelationshipsLTR(alwaysCreateRelationshipsLTR).build()));
 		assertThat(stmt).isEqualTo(CypherParser.parseStatement(expected).getCypher());
 	}
 
@@ -505,7 +531,8 @@ class ComparisonIT {
 	void shouldDetectEquivalentStatements() {
 
 		var stmt1 = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x");
-		var stmt2 = Cypher.match(Cypher.node("Movie").named("y")).where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
+		var stmt2 = Cypher.match(Cypher.node("Movie").named("y"))
+			.where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
 
 		assertThat(areSemanticallyEquivalent(stmt1, stmt2)).isTrue();
 	}
@@ -513,8 +540,12 @@ class ComparisonIT {
 	@Test
 	void shouldDetectEquivalentStatementsWithAnonParameters() {
 
-		var stmt1 = Cypher.match(Cypher.node("Movie").named("x")).where(Cypher.name("x").property("title").eq(Cypher.anonParameter("foo"))).returning(Cypher.name("x")).build();
-		var stmt2 = Cypher.match(Cypher.node("Movie").named("y")).where(Cypher.name("y").property("title").eq(Cypher.anonParameter("bar"))).returning(Cypher.name("y")).build();
+		var stmt1 = Cypher.match(Cypher.node("Movie").named("x"))
+			.where(Cypher.name("x").property("title").eq(Cypher.anonParameter("foo"))).returning(Cypher.name("x"))
+			.build();
+		var stmt2 = Cypher.match(Cypher.node("Movie").named("y"))
+			.where(Cypher.name("y").property("title").eq(Cypher.anonParameter("bar"))).returning(Cypher.name("y"))
+			.build();
 
 		assertThat(areSemanticallyEquivalent(stmt1, stmt2)).isTrue();
 	}
@@ -523,7 +554,8 @@ class ComparisonIT {
 	void shouldDetectNonEquivalentStatements() {
 
 		var stmt1 = CypherParser.parse("Match (x:movie) where x.title = $param1 RETURN x");
-		var stmt2 = Cypher.match(Cypher.node("Movie").named("y")).where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
+		var stmt2 = Cypher.match(Cypher.node("Movie").named("y"))
+			.where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
 
 		assertThat(areSemanticallyEquivalent(stmt1, stmt2)).isFalse();
 	}
@@ -532,18 +564,22 @@ class ComparisonIT {
 	void shouldDetectEquivalentStatementsWithArgs() {
 
 		var stmt1 = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x");
-		var stmt2 = Cypher.match(Cypher.node("Movie").named("y")).where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
+		var stmt2 = Cypher.match(Cypher.node("Movie").named("y"))
+			.where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
 
-		assertThat(areSemanticallyEquivalent(stmt1, Map.of("param1", "The Matrix"), stmt2, Map.of("foo", "The Matrix"))).isTrue();
+		assertThat(areSemanticallyEquivalent(stmt1, Map.of("param1", "The Matrix"), stmt2,
+			Map.of("foo", "The Matrix"))).isTrue();
 	}
 
 	@Test
 	void shouldDetectNonEquivalentStatementsWithArgs() {
 
 		var stmt1 = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x");
-		var stmt2 = Cypher.match(Cypher.node("Movie").named("y")).where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
+		var stmt2 = Cypher.match(Cypher.node("Movie").named("y"))
+			.where(Cypher.name("y").property("title").eq(Cypher.parameter("foo"))).returning(Cypher.name("y")).build();
 
-		assertThat(areSemanticallyEquivalent(stmt1, Map.of("param1", "The Matrix"), stmt2, Map.of("foo", "Matrix Resurrections"))).isFalse();
+		assertThat(areSemanticallyEquivalent(stmt1, Map.of("param1", "The Matrix"), stmt2,
+			Map.of("foo", "Matrix Resurrections"))).isFalse();
 	}
 
 	@Test
@@ -562,66 +598,67 @@ class ComparisonIT {
 			""");
 
 		var target = new StringBuilder();
-		TreeNode.from(stmt).printTo(target::append, node -> node.getValue() instanceof Statement s ? s.getCypher() : node.getValue().toString());
+		TreeNode.from(stmt).printTo(target::append,
+			node -> node.getValue() instanceof Statement s ? s.getCypher() : node.getValue().toString());
 		assertThat(target)
 			.hasToString(
 				"""
-				MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
-				├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
-				│   └── Pattern{cypher=(n:Person {name: 'Tom Hanks'})}
-				│       └── InternalNodeImpl{cypher=(n:Person {name: 'Tom Hanks'})}
-				│           ├── SymbolicName{cypher=n}
-				│           ├── NodeLabel{value='Person'}
-				│           └── Properties{cypher={name: 'Tom Hanks'}}
-				│               └── MapExpression{cypher={name: 'Tom Hanks'}}
-				│                   └── KeyValueMapEntry{cypher=name: 'Tom Hanks'}
-				│                       └── StringLiteral{cypher='Tom Hanks'}
-				├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
-				│   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
-				│       ├── With{cypher=WITH n}
-				│       │   └── ExpressionList{cypher=n}
-				│       │       └── SymbolicName{cypher=n}
-				│       ├── Match{cypher=MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956)}
-				│       │   ├── Pattern{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
-				│       │   │   └── InternalRelationshipImpl{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
-				│       │   │       ├── InternalNodeImpl{cypher=(m:Movie)}
-				│       │   │       │   ├── SymbolicName{cypher=m}
-				│       │   │       │   └── NodeLabel{value='Movie'}
-				│       │   │       ├── Details{cypher=<-[:ACTED_IN]-}
-				│       │   │       │   └── RelationshipTypes{values=[ACTED_IN]}
-				│       │   │       └── InternalNodeImpl{cypher=(n)}
-				│       │   │           └── SymbolicName{cypher=n}
-				│       │   └── Where{cypher=WHERE (m.released >= 1900 AND n.born = 1956)}
-				│       │       └── CompoundCondition{cypher=(m.released >= 1900 AND n.born = 1956)}
-				│       │           ├── Comparison{cypher=m.released >= 1900}
-				│       │           │   ├── InternalPropertyImpl{cypher=m.released}
-				│       │           │   │   ├── SymbolicName{cypher=m}
-				│       │           │   │   └── PropertyLookup{cypher=.released}
-				│       │           │   │       └── SymbolicName{cypher=released}
-				│       │           │   ├── Operator{cypher=>=}
-				│       │           │   └── NumberLiteral{cypher=1900}
-				│       │           ├── Operator{cypher=AND}
-				│       │           └── Comparison{cypher=n.born = 1956}
-				│       │               ├── InternalPropertyImpl{cypher=n.born}
-				│       │               │   ├── SymbolicName{cypher=n}
-				│       │               │   └── PropertyLookup{cypher=.born}
-				│       │               │       └── SymbolicName{cypher=born}
-				│       │               ├── Operator{cypher==}
-				│       │               └── NumberLiteral{cypher=1956}
-				│       └── Return{cypher=RETURN m}
-				│           └── ExpressionList{cypher=m}
-				│               └── SymbolicName{cypher=m}
-				└── Return{cypher=RETURN n.name, m.title}
-				    └── ExpressionList{cypher=n.name, m.title}
-				        ├── InternalPropertyImpl{cypher=n.name}
-				        │   ├── SymbolicName{cypher=n}
-				        │   └── PropertyLookup{cypher=.name}
-				        │       └── SymbolicName{cypher=name}
-				        └── InternalPropertyImpl{cypher=m.title}
-				            ├── SymbolicName{cypher=m}
-				            └── PropertyLookup{cypher=.title}
-				                └── SymbolicName{cypher=title}
-				""");
+					MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
+					├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
+					│   └── Pattern{cypher=(n:Person {name: 'Tom Hanks'})}
+					│       └── InternalNodeImpl{cypher=(n:Person {name: 'Tom Hanks'})}
+					│           ├── SymbolicName{cypher=n}
+					│           ├── NodeLabel{value='Person'}
+					│           └── Properties{cypher={name: 'Tom Hanks'}}
+					│               └── MapExpression{cypher={name: 'Tom Hanks'}}
+					│                   └── KeyValueMapEntry{cypher=name: 'Tom Hanks'}
+					│                       └── StringLiteral{cypher='Tom Hanks'}
+					├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
+					│   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
+					│       ├── With{cypher=WITH n}
+					│       │   └── ExpressionList{cypher=n}
+					│       │       └── SymbolicName{cypher=n}
+					│       ├── Match{cypher=MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956)}
+					│       │   ├── Pattern{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
+					│       │   │   └── InternalRelationshipImpl{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
+					│       │   │       ├── InternalNodeImpl{cypher=(m:Movie)}
+					│       │   │       │   ├── SymbolicName{cypher=m}
+					│       │   │       │   └── NodeLabel{value='Movie'}
+					│       │   │       ├── Details{cypher=<-[:ACTED_IN]-}
+					│       │   │       │   └── RelationshipTypes{values=[ACTED_IN]}
+					│       │   │       └── InternalNodeImpl{cypher=(n)}
+					│       │   │           └── SymbolicName{cypher=n}
+					│       │   └── Where{cypher=WHERE (m.released >= 1900 AND n.born = 1956)}
+					│       │       └── CompoundCondition{cypher=(m.released >= 1900 AND n.born = 1956)}
+					│       │           ├── Comparison{cypher=m.released >= 1900}
+					│       │           │   ├── InternalPropertyImpl{cypher=m.released}
+					│       │           │   │   ├── SymbolicName{cypher=m}
+					│       │           │   │   └── PropertyLookup{cypher=.released}
+					│       │           │   │       └── SymbolicName{cypher=released}
+					│       │           │   ├── Operator{cypher=>=}
+					│       │           │   └── NumberLiteral{cypher=1900}
+					│       │           ├── Operator{cypher=AND}
+					│       │           └── Comparison{cypher=n.born = 1956}
+					│       │               ├── InternalPropertyImpl{cypher=n.born}
+					│       │               │   ├── SymbolicName{cypher=n}
+					│       │               │   └── PropertyLookup{cypher=.born}
+					│       │               │       └── SymbolicName{cypher=born}
+					│       │               ├── Operator{cypher==}
+					│       │               └── NumberLiteral{cypher=1956}
+					│       └── Return{cypher=RETURN m}
+					│           └── ExpressionList{cypher=m}
+					│               └── SymbolicName{cypher=m}
+					└── Return{cypher=RETURN n.name, m.title}
+					    └── ExpressionList{cypher=n.name, m.title}
+					        ├── InternalPropertyImpl{cypher=n.name}
+					        │   ├── SymbolicName{cypher=n}
+					        │   └── PropertyLookup{cypher=.name}
+					        │       └── SymbolicName{cypher=name}
+					        └── InternalPropertyImpl{cypher=m.title}
+					            ├── SymbolicName{cypher=m}
+					            └── PropertyLookup{cypher=.title}
+					                └── SymbolicName{cypher=title}
+					""");
 	}
 
 	static boolean areSemanticallyEquivalent(Statement statement1, Statement statement2) {
@@ -634,7 +671,8 @@ class ComparisonIT {
 		return cypher1.equals(cypher2);
 	}
 
-	static boolean areSemanticallyEquivalent(Statement statement1, Map<String, Object> args1, Statement statement2, Map<String, Object> args2) {
+	static boolean areSemanticallyEquivalent(Statement statement1, Map<String, Object> args1, Statement statement2,
+		Map<String, Object> args2) {
 
 		if (!areSemanticallyEquivalent(statement1, statement2)) {
 			return false;
