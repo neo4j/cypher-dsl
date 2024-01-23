@@ -140,6 +140,22 @@
 					</licenseSets>
 				</configuration>
 			</plugin>
+			<plugin>
+				<!-- This forces the failsafe plugin not to use the byte-code manipulated classes in the full bundle (yep, I know, it kinda
+				defeats the purpose of "IT", thank you very much), otherwise JaCoCo won't be able to actually recognize that classes have
+				been tested. Sure I might be as well just rename the tests and treat them as unit, ok, but at some time another developer
+				will add an integration tests and things will joyfully not work, so better have it here.
+				Ah and yes, please don't change the order, otherwise the source plugin now things thinks have been attached twice.
+				What a madness. -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-failsafe-plugin</artifactId>
+				<configuration combine.self="append">
+					<classesDirectory>${project.build.outputDirectory}</classesDirectory>
+					<classpathDependencyExcludes>
+						<classpathDependencyExclude>org.neo4j:neo4j-cypher-dsl-parser</classpathDependencyExclude>
+					</classpathDependencyExcludes>
+				</configuration>
+			</plugin>
 			<!--
 			Don't change the order of maven-javadoc-plugin, maven-shade-plugin, moditect-maven-plugin:
 			- JavaDoc can't live with a module-info.java that requires automatic modules and mess up class- and module path
