@@ -1,5 +1,26 @@
 == 2023.9
 
+=== 2023.9.3
+
+==== 🚀 Features
+
+* Add a parser option to unify the direction of relationships. (#906)
+
+==== 🐛 Bug Fixes
+
+* Driving symbolic names for list predicate function must not be scoped. (#905)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j.version from 5.15.0 to 5.16.0 (#910)
+** Bump org.assertj:assertj-core from 3.25.1 to 3.25.2 (#914)
+** Bump com.querydsl:querydsl-core from 5.0.0 to 5.1.0 (#913)
+** Bump mockito.version from 5.9.0 to 5.10.0 (#912)
+** Bump com.puppycrawl.tools:checkstyle (#911)
+** Bump testcontainers.version from 1.19.3 to 1.19.4 (#909)
+** Bump org.springframework.boot:spring-boot-starter-parent (#904)
+
 === 2023.9.2
 
 *Please read the updated stance wrt calver/semver in the README. This release is current and the first one in 2024, including some new, additive and non-breaking features contributed by @Andy2003*
@@ -40,8 +61,6 @@
 ** Bump org.asciidoctor:asciidoctorj from 2.5.10 to 2.5.11 (#886)
 ** Bump com.google.guava:guava (#885)
 ** Bump org.springframework.boot:spring-boot-starter-parent (#884)
-
-==== 🛠 Build
 
 === 2023.9.1
 
