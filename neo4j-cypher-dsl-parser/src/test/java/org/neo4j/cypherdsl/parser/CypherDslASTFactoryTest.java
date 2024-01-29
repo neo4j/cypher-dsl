@@ -111,7 +111,7 @@ class CypherDslASTFactoryTest {
 			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",
 			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith", "alterDatabase", "settingQualifier", "showSettingsClause",
 			"anyPathSelector", "allPathSelector", "anyShortestPathSelector", "allShortestPathSelector", "shortestGroupsSelector", "repeatableElements", "differentRelationships",
-			"createConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped"})
+			"createConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped", "functionUseClause"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
 			var methods = factory.getClass().getMethods();
