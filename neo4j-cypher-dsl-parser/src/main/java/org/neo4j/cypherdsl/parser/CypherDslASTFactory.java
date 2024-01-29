@@ -112,6 +112,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	Hint,
 	Expression,
 	LabelExpression,
+	Expression,
 	Parameter<?>,
 	Expression,
 	Property,
@@ -297,7 +298,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause useClause(InputPosition p, Expression e) {
+	public Clause directUseClause(InputPosition p, DatabaseName databaseName) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Clause functionUseClause(InputPosition p, Expression function) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -624,10 +630,9 @@ final class CypherDslASTFactory implements ASTFactory<
 					if ((lastPathAtom.getDirection() == Relationship.Direction.RTL || patternList != null)
 						&& options.isAlwaysCreateRelationshipsLTR()) {
 						if (patternList == null) {
-							patternList = new ArrayList<>(Arrays.asList((PatternElement) relationshipPattern));
-						} else {
-							patternList.add(((PatternElement) relationshipPattern));
+							patternList = new ArrayList<>();
 						}
+						patternList.add(((PatternElement) relationshipPattern));
 						relationshipPattern = null;
 						lastNodeAtom = nodeAtom;
 					}
@@ -1613,12 +1618,16 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace, boolean ifNotExists, String constraintName, Expression expression, StringPos<InputPosition> label, List<Property> properties, ParserCypherTypeName propertyType, SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions, boolean containsOn, ConstraintVersion constraintVersion) {
+	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace,
+		boolean ifNotExists, SimpleEither<String, Parameter<?>> constraintName, Expression expression,
+		StringPos<InputPosition> label, List<Property> properties, ParserCypherTypeName propertyType,
+		SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions, boolean containsOn,
+		ConstraintVersion constraintVersion) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement dropConstraint(InputPosition p, String name, boolean ifExists) {
+	public Statement dropConstraint(InputPosition p, SimpleEither<String, Parameter<?>> name, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1636,27 +1645,28 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement createLookupIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		String indexName, Expression expression, StringPos<InputPosition> functionName, Expression functionParameter,
-		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
+		SimpleEither<String, Parameter<?>> indexName, Expression expression, StringPos<InputPosition> functionName,
+		Expression functionParameter, SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		String indexName, Expression expression, StringPos<InputPosition> label, List<Property> properties,
-		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions, CreateIndexTypes indexType) {
+		SimpleEither<String, Parameter<?>> indexName, Expression expression, StringPos<InputPosition> label,
+		List<Property> properties, SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions,
+		CreateIndexTypes indexType) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createFulltextIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		String indexName, Expression expression, List<StringPos<InputPosition>> labels, List<Property> properties,
-		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
+		SimpleEither<String, Parameter<?>> indexName, Expression expression, List<StringPos<InputPosition>> labels,
+		List<Property> properties, SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement dropIndex(InputPosition p, String name, boolean ifExists) {
+	public Statement dropIndex(InputPosition p, SimpleEither<String, Parameter<?>> name, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
