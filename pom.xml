@@ -752,23 +752,16 @@
 							<rule>APPROVE</rule>
 							<value>Apache 2.0</value>
 						</dependencyPolicy>
+						<dependencyPolicy>
+							<type>LICENSE_NAME</type>
+							<rule>APPROVE</rule>
+							<value>Apache-2.0</value>
+						</dependencyPolicy>
 						<!-- MIT -->
 						<dependencyPolicy>
 							<type>LICENSE_NAME</type>
 							<rule>APPROVE</rule>
 							<value>MIT License</value>
-						</dependencyPolicy>
-						<!-- GPL only for Neo4j things only (the parser module depends on it) -->
-						<dependencyPolicy>
-							<type>ARTIFACT_PATTERN</type>
-							<rule>APPROVE</rule>
-							<value>org.neo4j:neo4j-cypher-javacc-parser*</value>
-						</dependencyPolicy>
-						<!-- This is ourselves, in the native tests -->
-						<dependencyPolicy>
-							<type>ARTIFACT_PATTERN</type>
-							<rule>APPROVE</rule>
-							<value>org.neo4j:neo4j-cypher-dsl-parser*</value>
 						</dependencyPolicy>
 					</dependencyPolicies>
 				</configuration>
