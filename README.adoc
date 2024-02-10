@@ -68,7 +68,7 @@ First, include the dependency to the Neo4j Cypher-DSL under the following coordi
 .Inclusion of the Neo4j Cypher-DSL in a Gradle project
 ----
 dependencies {
-    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version-latest}'
+    compile '{groupId}:{artifactId}:{neo4j-cypher-dsl-version-latest}'
 }
 ----
 
