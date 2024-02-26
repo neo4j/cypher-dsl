@@ -104,5 +104,4 @@ From version 2023.0.0 onwards, the minimal required Java version to use and buil
 
 == Licensing
 
-The Cypher-DSL itself is licenced under the https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0],
-the parser module is licensed under https://www.gnu.org/licenses/gpl-3.0.html[the GNU General Public License 3].
+The Cypher-DSL itself is licenced under the https://www.apache.org/licenses/LICENSE-2.0[Apache License 2.0].
