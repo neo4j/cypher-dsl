@@ -47,6 +47,7 @@ import org.neo4j.cypher.internal.ast.factory.CreateIndexTypes;
 import org.neo4j.cypher.internal.ast.factory.HintIndexType;
 import org.neo4j.cypher.internal.ast.factory.ParameterType;
 import org.neo4j.cypher.internal.ast.factory.ParserCypherTypeName;
+import org.neo4j.cypher.internal.ast.factory.ParserNormalForm;
 import org.neo4j.cypher.internal.ast.factory.ScopeType;
 import org.neo4j.cypher.internal.ast.factory.ShowCommandFilterTypes;
 import org.neo4j.cypher.internal.ast.factory.SimpleEither;
@@ -93,6 +94,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements ASTFactory<
+	Statements,
 	Statement,
 	Statement,
 	Clause,
@@ -275,6 +277,11 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		isInstanceOf(SymbolicName.class, v,  "An invalid type has been generated where a SymbolicName was required. Generated type was " + v.getClass().getName());
 		return (SymbolicName) v;
+	}
+
+	@Override
+	public Statements statements(List<Statement> statements) {
+		return new Statements(statements);
 	}
 
 	@Override
@@ -883,7 +890,8 @@ final class CypherDslASTFactory implements ASTFactory<
 		throw new UnsupportedOperationException();
 	}
 
-	@Override public Expression passwordExpression(InputPosition p, String password) {
+	@Override
+	public Expression passwordExpression(InputPosition s, InputPosition e, String password) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1086,7 +1094,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression newString(InputPosition p, String image) {
+	public Expression newString(InputPosition start, InputPosition end, String image) {
 		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(image));
 	}
 
@@ -1351,6 +1359,16 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public Expression isNormalized(InputPosition p, Expression e, ParserNormalForm normalForm) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Expression isNotNormalized(InputPosition p, Expression e, ParserNormalForm normalForm) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Expression listLookup(Expression list, Expression index) {
 		return Cypher.valueAt(list, index);
 	}
@@ -1459,6 +1477,11 @@ final class CypherDslASTFactory implements ASTFactory<
 
 		notNull(where, "single(...) requires a WHERE predicate");
 		return Cypher.single(assertSymbolicName(v)).in(list).where(where.asCondition());
+	}
+
+	@Override
+	public Expression normalizeExpression(InputPosition p, Expression i, ParserNormalForm normalForm) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
