@@ -38,6 +38,18 @@
 		<native-maven-plugin.version>0.10.1</native-maven-plugin.version>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>com.querydsl</groupId>
@@ -51,7 +63,6 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-parser</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j.driver</groupId>
@@ -85,10 +96,10 @@
 				<version>${native-maven-plugin.version}</version>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
 							<goal>compile-no-fork</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<requiredVersion>22.3</requiredVersion>
 							<mainClass>org.neo4j.cypherdsl.graalvm.Application</mainClass>

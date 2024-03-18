@@ -37,6 +37,18 @@
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.apiguardian</groupId>
@@ -49,7 +61,6 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-schema-name-support</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.querydsl</groupId>
@@ -124,10 +135,10 @@
 				<executions>
 					<execution>
 						<id>remove-shaded-modules</id>
-						<phase>generate-sources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
+						<phase>generate-sources</phase>
 						<configuration>
 							<executable>bin/remove-shaded-modules.sh</executable>
 						</configuration>
@@ -199,10 +210,10 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
 							<goal>shade</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<artifactSet>
 								<includes>
@@ -237,10 +248,10 @@
 				<executions>
 					<execution>
 						<id>add-module-infos</id>
-						<phase>package</phase>
 						<goals>
 							<goal>add-module-info</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<overwriteExistingFiles>true</overwriteExistingFiles>
 							<module>

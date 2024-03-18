@@ -28,28 +28,55 @@
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 
-	<artifactId>neo4j-cypher-dsl-codegen</artifactId>
+	<artifactId>neo4j-cypher-dsl-bom</artifactId>
+
 	<packaging>pom</packaging>
-	<name>Neo4j Cypher DSL (Code Generator)</name>
-
-	<modules>
-		<module>neo4j-cypher-dsl-codegen-core</module>
-		<module>neo4j-cypher-dsl-codegen-sdn6</module>
-	</modules>
-
-	<properties>
-		<java-module-name>org.neo4j.cypherdsl.codegen</java-module-name>
-	</properties>
+	<name>Neo4j Cypher DSL (BOM)</name>
+	<description>The BOM for the Neo4j Cypher DSL.</description>
 
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
 				<groupId>org.neo4j</groupId>
-				<artifactId>neo4j-cypher-dsl-bom</artifactId>
+				<artifactId>neo4j-cypher-dsl</artifactId>
 				<version>${project.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-codegen-core</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-parser</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-schema-name-support</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>flatten-maven-plugin</artifactId>
+				<configuration combine.self="override">
+					<updatePomFile>true</updatePomFile>
+					<flattenMode>bom</flattenMode>
+					<pomElements>
+						<properties>remove</properties>
+					</pomElements>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>
