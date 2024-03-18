@@ -102,15 +102,23 @@ class CypherDslASTFactoryTest {
 	class HandleNewMethods {
 
 		@ParameterizedTest
-		@ValueSource(strings = {"showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
+		@ValueSource(strings = { "showAliases", "createLocalDatabaseAlias", "createRemoteDatabaseAlias",
 			"alterLocalDatabaseAlias", "alterRemoteDatabaseAlias", "fixedPathQuantifier",
 			"useGraph", "setOwnPassword", "addDeprecatedIdentifierUnicodeNotification",
-			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase", "createCompositeDatabase", "dropDatabase",
-			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter", "newSensitiveStringParameter",
-			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters", "subqueryInTransactionsReportParameters",
-			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith", "alterDatabase", "settingQualifier", "showSettingsClause",
-			"anyPathSelector", "allPathSelector", "anyShortestPathSelector", "allShortestPathSelector", "shortestGroupsSelector", "repeatableElements", "differentRelationships",
-			"createConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped", "functionUseClause", "isNormalized", "isNotNormalized", "normalizeExpression"})
+			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase",
+			"createCompositeDatabase", "dropDatabase",
+			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter",
+			"newSensitiveStringParameter",
+			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters",
+			"subqueryInTransactionsReportParameters",
+			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith", "alterDatabase",
+			"settingQualifier", "showSettingsClause",
+			"anyPathSelector", "allPathSelector", "anyShortestPathSelector", "allShortestPathSelector",
+			"shortestGroupsSelector", "repeatableElements", "differentRelationships",
+			"createConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped", "functionUseClause", "isNormalized",
+			"isNotNormalized", "normalizeExpression",
+			"insertClause", "insertPathPattern", "subqueryInTransactionsBatchParameters",
+			"subqueryInTransactionsConcurrencyParameters", "subqueryInTransactionsErrorParameters" })
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
 			var methods = factory.getClass().getMethods();

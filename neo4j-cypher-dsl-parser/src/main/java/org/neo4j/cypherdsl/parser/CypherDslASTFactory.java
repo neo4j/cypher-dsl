@@ -135,6 +135,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	NULL,
 	NULL,
 	NULL,
+	NULL,
 	InputPosition,
 	EntityType,
 	QuantifiedPathPattern.Quantifier,
@@ -433,6 +434,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public Clause insertClause(InputPosition p, List<PatternElement> patternElements) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Clause setClause(InputPosition p, List<Expression> setItems) {
 		return Clauses.set(setItems);
 	}
@@ -566,6 +572,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public PatternElement pathPattern(PatternElement patternElement) {
 		return patternElement;
+	}
+
+	@Override
+	public PatternElement insertPathPattern(List<PatternAtom> patternAtoms) {
+		throw new UnsupportedOperationException();
 	}
 
 	static class PatternJuxtaposition extends TypedSubtree<PatternElement> implements PatternElement {
@@ -781,6 +792,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Clause subqueryClause(InputPosition p, Statement subquery, NULL inTransactions) {
 		return Clauses.callClause(subquery);
+	}
+
+	@Override
+	public NULL subqueryInTransactionsParams(InputPosition p, NULL batchParams, NULL concurrencyParams,
+		NULL errorParams, NULL reportParams) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
@@ -1200,6 +1217,8 @@ final class CypherDslASTFactory implements ASTFactory<
 		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_DISJUNCTION);
 	}
 
+
+
 	@NotNull
 	private static LabelExpression colonJunjction(LabelExpression lhs, LabelExpression rhs, LabelExpression.Type colonDisjunction) {
 		List<String> value = new ArrayList<>();
@@ -1384,8 +1403,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression functionInvocation(InputPosition p, InputPosition functionNamePosition,  List<String> namespace, String name, boolean distinct,
-		List<Expression> arguments) {
+	public Expression functionInvocation(InputPosition p, InputPosition functionNamePosition, List<String> namespace,
+		String name, boolean distinct, List<Expression> arguments, boolean calledFromUseClause) {
 
 		String[] parts = new String[namespace.size() + 1];
 		for (int i = 0; i < namespace.size(); i++) {
@@ -1599,12 +1618,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL subqueryInTransactionsParams(InputPosition p, NULL batchParams, NULL errorParams, NULL reportParams) {
+	public NULL subqueryInTransactionsBatchParameters(InputPosition p, Expression batchSize) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public NULL subqueryInTransactionsBatchParameters(InputPosition p, Expression batchSize) {
+	public NULL subqueryInTransactionsConcurrencyParameters(InputPosition p, Expression concurrency) {
 		throw new UnsupportedOperationException();
 	}
 
