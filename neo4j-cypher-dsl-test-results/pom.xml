@@ -36,26 +36,35 @@
 		<java-module-name>org.neo4j.cypherdsl.test_results</java-module-name>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-codegen-core</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
-			<version>${project.version}</version>
 			<exclusions>
 				<exclusion>
+					<groupId>com.querydsl</groupId>
 					<!-- Depends on com.google.code.findbugs:annotations and so does the neo4j-cypher-javacc-parser, which is actually used in contrast to the Spring QueryDSL integration. -->
 					<artifactId>querydsl-apt</artifactId>
-					<groupId>com.querydsl</groupId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -72,7 +81,6 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-schema-name-support</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 
@@ -96,10 +104,10 @@
 					</execution>
 					<execution>
 						<id>report-aggregate</id>
-						<phase>verify</phase>
 						<goals>
 							<goal>report-aggregate</goal>
 						</goals>
+						<phase>verify</phase>
 						<configuration>
 							<dataFileIncludes>
 								<dataFileInclude>**/jacoco.exec</dataFileInclude>

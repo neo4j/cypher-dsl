@@ -101,6 +101,7 @@
 	</developers>
 
 	<modules>
+		<module>neo4j-cypher-dsl-bom</module>
 		<module>neo4j-cypher-dsl-schema-name-support</module>
 		<module>neo4j-cypher-dsl-build</module>
 		<module>neo4j-cypher-dsl</module>
@@ -194,6 +195,27 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
+				<groupId>com.fasterxml.jackson</groupId>
+				<artifactId>jackson-bom</artifactId>
+				<version>${jackson.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>io.projectreactor</groupId>
+				<artifactId>reactor-bom</artifactId>
+				<version>${reactor.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>${junit-jupiter.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
 				<!-- Testing depends on this directly, which clashes with auto-value's dependencies -->
 				<groupId>com.google.auto</groupId>
 				<artifactId>auto-common</artifactId>
@@ -242,9 +264,9 @@
 				<version>${asciidoctorj.version}</version>
 				<exclusions>
 					<exclusion>
+						<groupId>rubygems</groupId>
 						<!-- Not needed -->
 						<artifactId>test-unit</artifactId>
-						<groupId>rubygems</groupId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -254,8 +276,8 @@
 				<version>${neo4j.version}</version>
 				<exclusions>
 					<exclusion>
-						<artifactId>scala-reflect</artifactId>
 						<groupId>org.scala-lang</groupId>
+						<artifactId>scala-reflect</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -283,29 +305,6 @@
 				<groupId>org.springframework.data</groupId>
 				<artifactId>spring-data-neo4j</artifactId>
 				<version>${spring-data-neo4j.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>neo4j-cypher-dsl</artifactId>
-						<groupId>org.neo4j</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>spring-aop</artifactId>
-						<groupId>org.springframework</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>spring-expression</artifactId>
-						<groupId>org.springframework</groupId>
-					</exclusion>
-					<exclusion>
-						<artifactId>spring-tx</artifactId>
-						<groupId>org.springframework</groupId>
-					</exclusion>
-					<exclusion>
-						<!-- See https://github.com/querydsl/querydsl/issues/3005 -->
-						<artifactId>org.springframework.roo.annotations</artifactId>
-						<groupId>org.springframework.roo</groupId>
-					</exclusion>
-				</exclusions>
 			</dependency>
 			<dependency>
 				<groupId>org.testcontainers</groupId>
@@ -323,27 +322,6 @@
 				<version>${jetbrains-annotations.version}</version>
 				<scope>provided</scope>
 				<optional>true</optional>
-			</dependency>
-			<dependency>
-				<groupId>com.fasterxml.jackson</groupId>
-				<artifactId>jackson-bom</artifactId>
-				<version>${jackson.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>io.projectreactor</groupId>
-				<artifactId>reactor-bom</artifactId>
-				<version>${reactor.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.junit</groupId>
-				<artifactId>junit-bom</artifactId>
-				<version>${junit-jupiter.version}</version>
-				<type>pom</type>
-				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>cglib</groupId>
@@ -370,8 +348,8 @@
 				<scope>test</scope>
 				<exclusions>
 					<exclusion>
-						<artifactId>junit</artifactId>
 						<groupId>junit</groupId>
+						<artifactId>junit</artifactId>
 					</exclusion>
 				</exclusions>
 			</dependency>
@@ -419,6 +397,11 @@
 					<groupId>org.jacoco</groupId>
 					<artifactId>jacoco-maven-plugin</artifactId>
 					<version>${jacoco-maven-plugin.version}</version>
+					<configuration>
+						<includes>
+							<include>**/*</include>
+						</includes>
+					</configuration>
 					<executions>
 						<execution>
 							<id>pre-unit-test</id>
@@ -441,11 +424,11 @@
 						</execution>
 						<execution>
 							<id>report-and-check</id>
-							<phase>post-integration-test</phase>
 							<goals>
 								<goal>report</goal>
 								<goal>check</goal>
 							</goals>
+							<phase>post-integration-test</phase>
 							<configuration>
 								<rules>
 									<rule>
@@ -467,11 +450,6 @@
 							</configuration>
 						</execution>
 					</executions>
-					<configuration>
-						<includes>
-							<include>**/*</include>
-						</includes>
-					</configuration>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -533,13 +511,6 @@
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${maven-checkstyle-plugin.version}</version>
-					<dependencies>
-						<dependency>
-							<groupId>com.puppycrawl.tools</groupId>
-							<artifactId>checkstyle</artifactId>
-							<version>${checkstyle.version}</version>
-						</dependency>
-					</dependencies>
 					<configuration>
 						<configLocation>etc/checkstyle/config.xml</configLocation>
 						<suppressionsLocation>etc/checkstyle/suppressions.xml</suppressionsLocation>
@@ -548,6 +519,13 @@
 						<failsOnError>true</failsOnError>
 						<includeTestSourceDirectory>true</includeTestSourceDirectory>
 					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>com.puppycrawl.tools</groupId>
+							<artifactId>checkstyle</artifactId>
+							<version>${checkstyle.version}</version>
+						</dependency>
+					</dependencies>
 				</plugin>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -588,18 +566,6 @@
 					<groupId>com.github.siom79.japicmp</groupId>
 					<artifactId>japicmp-maven-plugin</artifactId>
 					<version>${japicmp-maven-plugin.version}</version>
-					<executions>
-						<!--
-						Release will always set a -Drevision=XXXX and use `deploy` phase, which in turn will depend
-						on verify, regardless if tests are skipped or not.
-						-->
-						<execution>
-							<phase>verify</phase>
-							<goals>
-								<goal>cmp</goal>
-							</goals>
-						</execution>
-					</executions>
 					<configuration>
 						<oldVersion>
 							<dependency>
@@ -664,6 +630,18 @@
 							</excludes>
 						</parameter>
 					</configuration>
+					<executions>
+						<!--
+						Release will always set a -Drevision=XXXX and use `deploy` phase, which in turn will depend
+						on verify, regardless if tests are skipped or not.
+						-->
+						<execution>
+							<goals>
+								<goal>cmp</goal>
+							</goals>
+							<phase>verify</phase>
+						</execution>
+					</executions>
 				</plugin>
 				<plugin>
 					<groupId>com.mycila</groupId>
@@ -677,15 +655,6 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>validate</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 
 					<strictCheck>true</strictCheck>
@@ -765,11 +734,21 @@
 						</dependencyPolicy>
 					</dependencyPolicies>
 				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>${exec-maven-plugin.version}</version>
+				<inherited>false</inherited>
 				<executions>
 					<execution>
 						<id>prepare-release</id>
@@ -785,7 +764,6 @@
 						</configuration>
 					</execution>
 				</executions>
-				<inherited>false</inherited>
 			</plugin>
 			<plugin>
 				<groupId>com.github.ekryd.sortpom</groupId>
@@ -793,10 +771,10 @@
 				<executions>
 					<execution>
 						<id>sort</id>
-						<phase>verify</phase>
 						<goals>
 							<goal>sort</goal>
 						</goals>
+						<phase>verify</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -811,10 +789,10 @@
 				<executions>
 					<execution>
 						<id>enforce</id>
-						<phase>validate</phase>
 						<goals>
 							<goal>enforce</goal>
 						</goals>
+						<phase>validate</phase>
 						<configuration>
 							<rules>
 								<requireJavaVersion>
@@ -823,7 +801,7 @@
 								<requireMavenVersion>
 									<version>${maven.version}</version>
 								</requireMavenVersion>
-								<DependencyConvergence />
+								<DependencyConvergence/>
 							</rules>
 						</configuration>
 					</execution>
@@ -835,10 +813,10 @@
 				<executions>
 					<execution>
 						<id>validate</id>
-						<phase>validate</phase>
 						<goals>
 							<goal>check</goal>
 						</goals>
+						<phase>validate</phase>
 					</execution>
 				</executions>
 			</plugin>
@@ -900,47 +878,31 @@
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>flatten-maven-plugin</artifactId>
 				<version>${flatten-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>flatten</id>
-						<phase>package</phase>
-						<goals>
-							<goal>flatten</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>flatten.clean</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<updatePomFile>true</updatePomFile>
 					<flattenMode>resolveCiFriendliesOnly</flattenMode>
 				</configuration>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+					<execution>
+						<id>flatten.clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<phase>clean</phase>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
 				<version>${asciidoctor-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>generate-docs</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>process-asciidoc</goal>
-						</goals>
-					</execution>
-				</executions>
-				<dependencies>
-					<dependency>
-						<groupId>org.asciidoctor</groupId>
-						<artifactId>asciidoctorj-diagram</artifactId>
-						<version>${asciidoctorj-diagram.version}</version>
-					</dependency>
-				</dependencies>
 				<inherited>false</inherited>
 				<configuration>
 					<backend>html</backend>
@@ -950,9 +912,9 @@
 					<attributes>
 						<icons>font</icons>
 						<toc>left</toc>
-						<setanchors />
-						<idprefix />
-						<idseparator />
+						<setanchors/>
+						<idprefix/>
+						<idseparator/>
 						<imagesdir>img</imagesdir>
 						<neo4j-version>${neo4j.version}</neo4j-version>
 						<neo4j-java-driver-version>${neo4j-java-driver.version}</neo4j-java-driver-version>
@@ -965,6 +927,22 @@
 					</requires>
 					<outputDirectory>${project.build.docs}</outputDirectory>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.asciidoctor</groupId>
+						<artifactId>asciidoctorj-diagram</artifactId>
+						<version>${asciidoctorj-diagram.version}</version>
+					</dependency>
+				</dependencies>
+				<executions>
+					<execution>
+						<id>generate-docs</id>
+						<goals>
+							<goal>process-asciidoc</goal>
+						</goals>
+						<phase>prepare-package</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
@@ -1028,6 +1006,12 @@
 			<activation>
 				<activeByDefault>false</activeByDefault>
 			</activation>
+			<properties>
+				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
+				<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
+				<sonar.organization>michael-simons-github</sonar.organization>
+				<sonar.projectKey>org.neo4j:neo4j-cypher-dsl-parent</sonar.projectKey>
+			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -1036,21 +1020,15 @@
 						<executions>
 							<execution>
 								<id>sonar</id>
-								<phase>verify</phase>
 								<goals>
 									<goal>sonar</goal>
 								</goals>
+								<phase>verify</phase>
 							</execution>
 						</executions>
 					</plugin>
 				</plugins>
 			</build>
-			<properties>
-				<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-				<sonar.moduleKey>${project.groupId}:${project.artifactId}</sonar.moduleKey>
-				<sonar.organization>michael-simons-github</sonar.organization>
-				<sonar.projectKey>org.neo4j:neo4j-cypher-dsl-parent</sonar.projectKey>
-			</properties>
 		</profile>
 	</profiles>
 </project>

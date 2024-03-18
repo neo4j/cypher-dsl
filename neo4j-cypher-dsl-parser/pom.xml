@@ -38,6 +38,18 @@
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 
 		<dependency>
@@ -48,7 +60,6 @@
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${revision}${sha1}${changelist}</version>
 		</dependency>
 
 		<dependency>
@@ -153,10 +164,10 @@
 				<artifactId>maven-shade-plugin</artifactId>
 				<executions>
 					<execution>
-						<phase>package</phase>
 						<goals>
 							<goal>shade</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<artifactSet>
 								<includes>
@@ -193,10 +204,10 @@
 				<executions>
 					<execution>
 						<id>add-module-infos</id>
-						<phase>package</phase>
 						<goals>
 							<goal>add-module-info</goal>
 						</goals>
+						<phase>package</phase>
 						<configuration>
 							<overwriteExistingFiles>true</overwriteExistingFiles>
 							<module>
@@ -224,10 +235,10 @@
 				<executions>
 					<execution>
 						<id>copy-resources</id>
-						<phase>generate-test-resources</phase>
 						<goals>
 							<goal>copy-resources</goal>
 						</goals>
+						<phase>generate-test-resources</phase>
 						<configuration>
 							<outputDirectory>${basedir}/target/test-classes</outputDirectory>
 							<resources>
