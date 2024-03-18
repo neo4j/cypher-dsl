@@ -1,5 +1,31 @@
 == 2023.9
 
+=== 2023.9.5
+
+==== 🚀 Features
+
+* Add a bom project
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.springframework.data:spring-data-neo4j
+** Bump neo4j.version from 5.17.0 to 5.18.0 (#944)
+** Bump com.google.guava:guava (#952)
+** Bump io.projectreactor:reactor-bom (#951)
+** Bump org.asciidoctor:asciidoctorj from 2.5.11 to 2.5.12 (#950)
+** Bump com.fasterxml.jackson:jackson-bom (#949)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#947)
+** Bump org.moditect:moditect-maven-plugin (#946)
+** Bump com.puppycrawl.tools:checkstyle (#945)
+** Bump testcontainers.version from 1.19.6 to 1.19.7 (#942)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#941)
+** Bump com.fasterxml.jackson:jackson-bom (#940)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#938)
+** Bump org.neo4j.driver:neo4j-java-driver (#937)
+** Bump com.puppycrawl.tools:checkstyle (#936)
+** Bump mockito.version from 5.10.0 to 5.11.0 (#935)
+
 === 2023.9.4
 
 Change parser license to The Apache Software License, Version 2.0 (same as the Neo4j JavaCC based parser, which we use under the hoods).
