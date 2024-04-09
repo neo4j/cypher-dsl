@@ -273,7 +273,9 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		indentationLevel--;
 		trimNewline();
 		indent(indentationLevel);
-		super.leave(subquery);
+
+	//	this.inSubquery = false;
+		builder.append("} ");
 	}
 
 	private void trimNewline() {

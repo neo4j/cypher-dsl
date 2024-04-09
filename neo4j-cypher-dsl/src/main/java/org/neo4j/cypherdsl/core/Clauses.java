@@ -215,7 +215,7 @@ public final class Clauses {
 	 */
 	public static Clause callClause(Statement statement) {
 
-		return Subquery.call(statement, true);
+		return Subquery.call(statement);
 	}
 
 	/**
