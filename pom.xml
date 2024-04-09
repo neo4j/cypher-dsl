@@ -627,6 +627,10 @@
 								<!-- 2023.5.0 and higher, move up an interface, not to be implemented, has not been removed -->
 								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.util.Collection)</exclude>
 								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$ExposesSetAndRemove#set(org.neo4j.cypherdsl.core.Node,java.lang.String[])</exclude>
+								<!-- 2023.10.0 and higher, changed to a broader return type, only we implement that interface -->
+								<exclude>org.neo4j.cypherdsl.core.ExposesSubqueryCall#call(org.neo4j.cypherdsl.core.Statement)</exclude>
+								<exclude>org.neo4j.cypherdsl.core.ExposesSubqueryCall#call(org.neo4j.cypherdsl.core.Statement,java.lang.String[])</exclude>
+								<exclude>org.neo4j.cypherdsl.core.ExposesSubqueryCall#call(org.neo4j.cypherdsl.core.Statement,org.neo4j.cypherdsl.core.IdentifiableElement[])</exclude>
 							</excludes>
 						</parameter>
 					</configuration>

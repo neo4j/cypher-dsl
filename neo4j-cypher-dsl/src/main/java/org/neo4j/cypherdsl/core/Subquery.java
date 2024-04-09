@@ -37,8 +37,13 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @Neo4jVersion(minimum = "4.0.0")
 public final class Subquery extends AbstractClause implements Clause {
 
-	private ImportingWith importingWith;
+	private final ImportingWith importingWith;
 	private final Statement statement;
+	private final RawLiteral rawStatement;
+
+	static Subquery raw(String format, Object... mixedArgs) {
+		return new Subquery(RawLiteral.create(format, mixedArgs));
+	}
 
 	/**
 	 * The {@code statement} can either be a unit sub-query, used to modify the graph. Those won't impact the amount of
@@ -56,14 +61,25 @@ public final class Subquery extends AbstractClause implements Clause {
 	private Subquery(ImportingWith importingWith, Statement statement) {
 		this.importingWith = importingWith;
 		this.statement = statement;
+		this.rawStatement = null;
+	}
+
+	private Subquery(RawLiteral rawStatement) {
+		this.rawStatement = rawStatement;
+		this.importingWith = null;
+		this.statement = null;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		this.importingWith.accept(visitor);
-		statement.accept(visitor);
+		if (this.rawStatement != null) {
+			this.rawStatement.accept(visitor);
+		} else {
+			this.importingWith.accept(visitor);
+			this.statement.accept(visitor);
+		}
 		visitor.leave(this);
 	}
 
@@ -77,6 +93,6 @@ public final class Subquery extends AbstractClause implements Clause {
 	 */
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
-		return statement.doesReturnOrYield();
+		return statement != null && statement.doesReturnOrYield();
 	}
 }
