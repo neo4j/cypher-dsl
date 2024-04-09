@@ -491,12 +491,24 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	@NotNull
 	@Override
-	public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
+	public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 
 		this.closeCurrentOngoingMatch();
 		this.closeCurrentOngoingUpdate();
 
 		this.currentSinglePartElements.add(Subquery.call(statement, imports));
+
+		return this;
+	}
+
+	@NotNull
+	@Override
+	public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingUpdate();
+
+		this.currentSinglePartElements.add(Subquery.raw(rawCypher, args));
 
 		return this;
 	}
@@ -969,11 +981,19 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
+		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.call(statement, imports);
+		}
+
+		@Override
+		public @NotNull BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+
+			return DefaultStatementBuilder.this
+				.addWith(buildWith())
+				.callRawCypher(rawCypher, args);
 		}
 
 		@NotNull
@@ -1724,8 +1744,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
+		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 			return new DefaultStatementBuilder(this.buildCall()).call(statement, imports);
+		}
+
+		@Override
+		public @NotNull BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+			return new DefaultStatementBuilder(this.buildCall()).callRawCypher(rawCypher, args);
 		}
 
 		@NotNull
@@ -1873,10 +1898,17 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports) {
+		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.call(statement, imports);
+		}
+
+		@Override
+		public @NotNull BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.callRawCypher(rawCypher, args);
 		}
 
 		@NotNull
