@@ -623,6 +623,11 @@
 
 								<!-- 2022.8.2, Not to be implemented by users, also a bug fix as it has been oversight -->
 								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$OngoingReading</exclude>
+
+								<!-- 2022.9.2 (and 2023.10.0 and higher on main), changed to a broader return type, only we implement that interface -->
+								<exclude>org.neo4j.cypherdsl.core.ExposesSubqueryCall#call(org.neo4j.cypherdsl.core.Statement)</exclude>
+								<exclude>org.neo4j.cypherdsl.core.ExposesSubqueryCall#call(org.neo4j.cypherdsl.core.Statement,java.lang.String[])</exclude>
+								<exclude>org.neo4j.cypherdsl.core.ExposesSubqueryCall#call(org.neo4j.cypherdsl.core.Statement,org.neo4j.cypherdsl.core.IdentifiableElement[])</exclude>
 							</excludes>
 						</parameter>
 					</configuration>

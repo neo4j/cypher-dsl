@@ -63,7 +63,7 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading
 	 */
 	@NotNull @CheckReturnValue
-	default StatementBuilder.OngoingReadingWithoutWhere call(Statement statement) {
+	default BuildableSubquery call(Statement statement) {
 		return call(statement, new IdentifiableElement[0]);
 	}
 
@@ -82,7 +82,7 @@ public interface ExposesSubqueryCall {
 	 * @since 2021.3.0
 	 */
 	@NotNull @CheckReturnValue
-	default StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, String... imports) {
+	default BuildableSubquery call(Statement statement, String... imports) {
 		return call(statement, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
 
@@ -102,12 +102,23 @@ public interface ExposesSubqueryCall {
 	 * @since 2021.3.0
 	 */
 	@NotNull @CheckReturnValue
-	StatementBuilder.OngoingReadingWithoutWhere call(Statement statement, IdentifiableElement... imports);
+	BuildableSubquery call(Statement statement, IdentifiableElement... imports);
 
 	@NotNull @CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement) {
 		return callInTransactions(statement, null, new IdentifiableElement[0]);
 	}
+
+	/**
+	 * Starts building a new sub-query from a raw Cypher string that might also have arguments as supported through {@link Cypher#raw(String, Object...)}.
+	 * Use this method as your own risk and be aware that no checks are done on the Cypher.
+	 * @param rawCypher the raw Cypher statement to call
+	 * @param args optional args that replace placeholders in the {@code rawCypher}
+	 * @return Ongoing sub-query definition
+	 * @since 2023.10.0
+	 */
+	@NotNull @CheckReturnValue
+	BuildableSubquery callRawCypher(String rawCypher, Object... args);
 
 	/**
 	 * Creates a subquery running in its own transactions. The statement won't be checked for a {@literal RETURN} or

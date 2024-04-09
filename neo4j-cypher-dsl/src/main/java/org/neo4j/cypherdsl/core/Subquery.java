@@ -45,6 +45,11 @@ public final class Subquery implements Clause {
 	private final With imports;
 	private final With renames;
 	private final Statement statement;
+	private final RawLiteral rawStatement;
+
+	static Subquery raw(String format, Object... mixedArgs) {
+		return new Subquery(RawLiteral.create(format, mixedArgs));
+	}
 
 	/**
 	 * The {@code statement} can either be a unit sub-query, used to modify the graph. Those won't impact the amount of
@@ -53,7 +58,7 @@ public final class Subquery implements Clause {
 	 * same names as variables in the enclosing query.
 	 *
 	 * @param statement      The statement to wrap into a sub-query.
-	 @param imports   additional imports
+	 * @param imports   additional imports
 	 * @return A sub-query.
 	 */
 	static Subquery call(Statement statement, IdentifiableElement... imports) {
@@ -88,15 +93,27 @@ public final class Subquery implements Clause {
 		this.imports = imports;
 		this.renames = renames;
 		this.statement = statement;
+		this.rawStatement = null;
+	}
+
+	private Subquery(RawLiteral rawStatement) {
+		this.rawStatement = rawStatement;
+		this.imports = null;
+		this.renames = null;
+		this.statement = null;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		Visitable.visitIfNotNull(this.imports, visitor);
-		Visitable.visitIfNotNull(this.renames, visitor);
-		statement.accept(visitor);
+		if (this.rawStatement != null) {
+			this.rawStatement.accept(visitor);
+		} else {
+			Visitable.visitIfNotNull(this.imports, visitor);
+			Visitable.visitIfNotNull(this.renames, visitor);
+			this.statement.accept(visitor);
+		}
 		visitor.leave(this);
 	}
 
@@ -107,6 +124,6 @@ public final class Subquery implements Clause {
 
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
-		return statement.doesReturnOrYield();
+		return statement != null && statement.doesReturnOrYield();
 	}
 }
