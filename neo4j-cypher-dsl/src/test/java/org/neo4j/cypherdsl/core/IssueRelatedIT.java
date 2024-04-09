@@ -704,6 +704,25 @@ class IssueRelatedIT {
 			}""");
 	}
 
+	@Test
+	void veryRawCallShouldWork() {
+
+		SymbolicName msg = Cypher.name("message");
+		String statement = Cypher.unwind(Cypher.parameter("events")).as(msg)
+			.with(
+				msg.property("value").as("event"),
+				msg.property("header").as("header"),
+				msg.property("key").as("key"),
+				msg.property("value").as("value")
+			)
+			.callRawCypher("WITH key, value CREATE (e:Event {key: key, value: value})")
+			.build()
+			.getCypher();
+
+		assertThat(statement)
+			.isEqualTo("UNWIND $events AS message WITH message.value AS event, message.header AS header, message.key AS key, message.value AS value CALL {WITH key, value CREATE (e:Event {key: key, value: value})}");
+	}
+
 	@Test // GH-190
 	void mixedWithShouldMakeSense() {
 
