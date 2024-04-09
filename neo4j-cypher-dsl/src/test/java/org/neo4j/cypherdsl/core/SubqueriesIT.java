@@ -429,4 +429,20 @@ class SubqueriesIT {
 				.isEqualTo("MATCH (n) WITH n CALL db.labels() YIELD label CALL {WITH label MATCH (n2) WHERE n2.name = label RETURN n2} IN TRANSACTIONS RETURN n2");
 		}
 	}
+
+	@Test // GH-533
+	void unitSubqueries() {
+
+		Node p = Cypher.node("Person").named("p");
+		StatementBuilder.OngoingReadingWithoutWhere outer = Cypher.match(p);
+		Statement inner = Cypher.with(p)
+				.unwind(Functions.range(1, 5)).as("i")
+				.create(Cypher.node("Person").withProperties("name", p.property("name"))).build();
+
+		ResultStatement statement = outer.call(inner)
+			.returning(Functions.count(Cypher.asterisk()))
+			.build();
+		assertThat(statement.getCypher())
+			.isEqualTo("MATCH (p:`Person`) CALL {WITH p UNWIND range(1, 5) AS i CREATE (:`Person` {name: p.name})} RETURN count(*)");
+	}
 }

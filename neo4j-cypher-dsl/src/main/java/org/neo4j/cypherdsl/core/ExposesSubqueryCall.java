@@ -53,7 +53,7 @@ public interface ExposesSubqueryCall {
 	/**
 	 * The {@link Statement subquery} parameter must be a valid subquery.
 	 * <ul>
-	 * <li>must end with a RETURN clause</li>
+	 * <li>can be a unit statement</li>
 	 * <li>cannot refer to variables from the enclosing query</li>
 	 * <li>cannot return variables with the same names as variables in the enclosing query</li>
 	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
