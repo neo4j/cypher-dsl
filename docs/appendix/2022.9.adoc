@@ -1,5 +1,38 @@
 == 2022.9
 
+=== 2022.9.2
+
+==== 🚀 Features
+
+* Allow calling of raw Cypher strings in sub queries. (Backport from 2023.x)
+
+==== 🐛 Bug Fixes
+
+* Driving symbolic names for list predicate function must not be scoped. (#905)
+
+==== 🔄️ Refactorings
+
+* Allow unit-subqueries (Backport from 2023.x)
+
+==== 🧰 Tasks
+
+* Extend license header to 2024.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump spring-boot-starter-parent from 2.7.5 to 2.7.18
+** Update Spring Data Neo4j from 6.3.14 to 6.3.18
+** Bump reactor-bom from 2022.0.2 to 2022.0.15
+** Update Neo4j from 4.4.23 to 4.4.29
+** Update Neo4j Java Driver from 4.4.12 to 4.4.13
+** Update Neo4j Java Driver from 4.4.13 to 4.4.15
+** Bump testcontainers.version from 1.17.6 to 1.19.7
+
+==== 🛠 Build
+
+* Update various build related plugins.
+
 === 2022.9.1
 
 ==== 🐛 Bug Fixes
