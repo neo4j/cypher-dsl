@@ -460,9 +460,7 @@
 							</goals>
 							<configuration combine.self="override">
 								<release>11</release>
-								<compileSourceRoots>
-									<compileSourceRoot>${project.basedir}/src/main/java11</compileSourceRoot>
-								</compileSourceRoots>
+								<basedir>${project.basedir}/src/main/java11</basedir>
 								<multiReleaseOutput>true</multiReleaseOutput>
 							</configuration>
 						</execution>
