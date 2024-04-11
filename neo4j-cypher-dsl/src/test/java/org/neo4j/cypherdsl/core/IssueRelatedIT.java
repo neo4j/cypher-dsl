@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.stream.Stream;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -1955,5 +1956,34 @@ class IssueRelatedIT {
 			.returning(movie.project("actorCount").as("this")).build();
 		assertThat(statement.getCypher())
 			.isEqualTo(expected.replace("\n", " "));
+	}
+
+	@Nested
+	class Chaining {
+
+		@Test
+		void afterYieldingCalls() {
+			var statementPart1 = Cypher.call(
+					"db.index.vector.queryNodes")
+				.withArgs(
+					Cypher.parameter("indexName"),
+					Cypher.parameter("numberOfNearestNeighbours"),
+					Cypher.parameter("embeddingValue")
+				)
+				.yield("node", "score");
+
+			// statement 2
+			var node = Cypher.anyNode().named("node");
+			var relatedNode = Cypher.anyNode().named("relatedNode");
+			var relationship = node.relationshipTo(relatedNode, "CONNECTED_TO");
+			var statementPart2 = Cypher.match(relationship).returning(relatedNode.property("value").as("value"));
+
+			var newStatement = statementPart1.andThen(statementPart2.build()).build();
+
+			assertThat(newStatement.getCypher()).isEqualToIgnoringWhitespace("""
+				CALL db.index.vector.queryNodes($indexName, $numberOfNearestNeighbours, $embeddingValue)
+				YIELD node, score
+				MATCH (node)-[:`CONNECTED_TO`]->(relatedNode) RETURN relatedNode.value AS value""");
+		}
 	}
 }

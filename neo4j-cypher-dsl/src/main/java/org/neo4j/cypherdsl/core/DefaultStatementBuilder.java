@@ -55,12 +55,13 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 class DefaultStatementBuilder implements StatementBuilder,
 	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
 	BuildableMatchAndUpdate,
+	ExposesAndThen<DefaultStatementBuilder, Statement>,
 	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall {
 
 	/**
 	 * Current list of reading or update clauses to be generated.
 	 */
-	private final List<Visitable> currentSinglePartElements = new ArrayList<>();
+	final List<Visitable> currentSinglePartElements = new ArrayList<>();
 
 	/**
 	 * The latest ongoing match.
@@ -486,6 +487,16 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.closeCurrentOngoingUpdate();
 
 		this.currentSinglePartElements.add(Subquery.call(statement, imports).inTransactionsOf(rows));
+
+		return this;
+	}
+
+	public DefaultStatementBuilder andThen(Statement statement) {
+
+		this.closeCurrentOngoingMatch();
+		this.closeCurrentOngoingUpdate();
+
+		this.currentSinglePartElements.add(statement);
 
 		return this;
 	}
@@ -1626,6 +1637,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		private final YieldItems yieldItems;
 
+		private DefaultStatementBuilder delegate;
+
 		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, SymbolicName... resultFields) {
 			super(procedureName, arguments);
 			this.yieldItems = YieldItems.yieldAllOf(resultFields);
@@ -1702,6 +1715,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public ResultStatement build() {
 
+			if (this.delegate != null) {
+				return (ResultStatement) this.delegate.build();
+			}
+
 			return (ResultStatement) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
@@ -1714,6 +1731,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public  StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 			return new DefaultStatementBuilder(this.buildCall()).match(optional, pattern);
+		}
+
+		@Override
+		public ExposesAndThen<OngoingStandaloneCallWithReturnFields, ResultStatement> andThen(Statement statement) {
+			if (this.delegate == null) {
+				this.delegate = new DefaultStatementBuilder(this.buildCall());
+			}
+			this.delegate.currentSinglePartElements.add(statement);
+			return this;
 		}
 	}
 
