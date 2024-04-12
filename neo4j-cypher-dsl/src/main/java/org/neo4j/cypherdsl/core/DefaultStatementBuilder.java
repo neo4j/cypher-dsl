@@ -490,16 +490,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	DefaultStatementBuilder andThen(Statement statement) {
-
-		this.closeCurrentOngoingMatch();
-		this.closeCurrentOngoingUpdate();
-
-		this.currentSinglePartElements.add(statement);
-
-		return this;
-	}
-
 	private void closeCurrentOngoingMatch() {
 		if (this.currentOngoingMatch == null) {
 			return;
