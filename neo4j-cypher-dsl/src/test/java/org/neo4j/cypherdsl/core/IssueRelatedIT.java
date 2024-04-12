@@ -1405,13 +1405,13 @@ class IssueRelatedIT {
 
 	@Test // GH-490
 	void shouldAllowAsteriskInYield() {
-		ResultStatement yield = Cypher.call("db.info").yield(Cypher.asterisk()).build();
+		Statement yield = Cypher.call("db.info").yield(Cypher.asterisk()).build();
 		assertThat(Renderer.getDefaultRenderer().render(yield)).isEqualTo("CALL db.info() YIELD *");
 	}
 
 	@Test // GH-544
 	void shouldAllowAsteriskInYieldAndArgs() {
-		ResultStatement yield = Cypher.call("dbms.listConfig").withArgs(Cypher.literalOf("port")).yield(Cypher.asterisk()).build();
+		Statement yield = Cypher.call("dbms.listConfig").withArgs(Cypher.literalOf("port")).yield(Cypher.asterisk()).build();
 		assertThat(Renderer.getDefaultRenderer().render(yield)).isEqualTo("CALL dbms.listConfig('port') YIELD *");
 	}
 
@@ -1963,7 +1963,7 @@ class IssueRelatedIT {
 
 		@Test
 		void afterYieldingCalls() {
-			var statementPart1 = Cypher.call(
+			StatementBuilder.OngoingStandaloneCallWithReturnFields statementPart1 = Cypher.call(
 					"db.index.vector.queryNodes")
 				.withArgs(
 					Cypher.parameter("indexName"),

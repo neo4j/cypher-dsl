@@ -55,7 +55,6 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 class DefaultStatementBuilder implements StatementBuilder,
 	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
 	BuildableMatchAndUpdate,
-	ExposesAndThen<DefaultStatementBuilder, Statement>,
 	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall {
 
 	/**
@@ -491,7 +490,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	public DefaultStatementBuilder andThen(Statement statement) {
+	DefaultStatementBuilder andThen(Statement statement) {
 
 		this.closeCurrentOngoingMatch();
 		this.closeCurrentOngoingUpdate();
@@ -1713,13 +1712,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public ResultStatement build() {
+		public Statement build() {
 
 			if (this.delegate != null) {
-				return (ResultStatement) this.delegate.build();
+				return this.delegate.build();
 			}
 
-			return (ResultStatement) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
+			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
 
@@ -1734,7 +1733,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public ExposesAndThen<OngoingStandaloneCallWithReturnFields, ResultStatement> andThen(Statement statement) {
+		public ExposesAndThen<OngoingStandaloneCallWithReturnFields, Statement> andThen(Statement statement) {
 			if (this.delegate == null) {
 				this.delegate = new DefaultStatementBuilder(this.buildCall());
 			}

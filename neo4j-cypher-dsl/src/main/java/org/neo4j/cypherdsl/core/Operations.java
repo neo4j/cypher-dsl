@@ -18,11 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.DEPRECATED;
-
 import java.util.Set;
 
-import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -30,13 +27,9 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  *
  * @author Michael J. Simons
  * @since 1.0
- * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
  * be accessible.
  */
-@API(status = DEPRECATED, since = "2023.9.0")
-@Deprecated(since = "2023.9.0")
-@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
-public final class Operations {
+final class Operations {
 
 	private static final java.util.Set<Class<? extends Expression>> VALID_MUTATORS =
 		Set.of(MapExpression.class, Parameter.class, MapProjection.class, SymbolicName.class, FunctionInvocation.class);
@@ -49,7 +42,7 @@ public final class Operations {
 	 * @return An unary minus operation.
 	 * @since 2021.2.3
 	 */
-	public static Operation minus(Expression e) {
+	static Operation minus(Expression e) {
 
 		return Operation.create(Operator.UNARY_MINUS, e);
 	}
@@ -62,7 +55,7 @@ public final class Operations {
 	 * @return An unary plus operation.
 	 * @since 2021.2.3
 	 */
-	public static Expression plus(Expression e) {
+	static Expression plus(Expression e) {
 
 		return Operation.create(Operator.UNARY_PLUS, e);
 	}
@@ -111,7 +104,7 @@ public final class Operations {
 	 * @return A new operation.
 	 * @since 2021.2.3
 	 */
-	public static Operation set(Expression target, Expression value) {
+	static Operation set(Expression target, Expression value) {
 
 		return Operation.create(target, Operator.SET, value);
 	}
@@ -125,7 +118,7 @@ public final class Operations {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	public static Operation mutate(Expression target, MapExpression value) {
+	static Operation mutate(Expression target, MapExpression value) {
 
 		return Operation.create(target, Operator.MUTATE, value);
 	}
@@ -139,7 +132,7 @@ public final class Operations {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	public static Operation mutate(Expression target, Expression value) {
+	static Operation mutate(Expression target, Expression value) {
 
 		Assertions.notNull(value, "New properties value must not be null");
 		Assertions.isTrue(Property.class.isAssignableFrom(value.getClass()) || VALID_MUTATORS.contains(value.getClass()),
@@ -155,10 +148,8 @@ public final class Operations {
 	 * @param label  The labels to be added
 	 * @return A set operation
 	 * @since 2021.2.3
-	 * @deprecated use {@link Cypher#setLabel(Node, String...)} instead.
 	 */
-	@Deprecated
-	public static Operation set(Node target, String... label) {
+	static Operation set(Node target, String... label) {
 
 		return Operation.create(target, Operator.SET_LABEL, label);
 	}
@@ -170,10 +161,8 @@ public final class Operations {
 	 * @param label  The labels to be removed
 	 * @return A remove operation
 	 * @since 2021.2.3
-	 * @deprecated use {@link Cypher#removeLabel(Node, String...)} instead.
 	 */
-	@Deprecated
-	public static Operation remove(Node target, String... label) {
+	static Operation remove(Node target, String... label) {
 
 		return Operation.create(target, Operator.REMOVE_LABEL, label);
 	}

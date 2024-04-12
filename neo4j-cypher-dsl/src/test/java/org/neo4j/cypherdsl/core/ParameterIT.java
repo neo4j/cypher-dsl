@@ -48,11 +48,11 @@ class ParameterIT {
 				.returning(userNode)
 				.limit(Cypher.parameter("param").withValue(5)).build();
 
-		assertThat(statement.getParameters())
+		assertThat(statement.getCatalog().getParameters())
 			.containsEntry("param", 5)
 			.containsEntry("name", "Neo");
 
-		assertThat(statement.getParameterNames())
+		assertThat(statement.getCatalog().getParameterNames())
 			.containsExactlyInAnyOrder("param", "name");
 	}
 
@@ -66,7 +66,7 @@ class ParameterIT {
 
 		assertThat(Renderer.getDefaultRenderer().render(statement))
 				.isEqualTo("MATCH (u:`User`) SET u.name = $param RETURN u");
-		assertThat(statement.getParameters()).containsEntry("param", null);
+		assertThat(statement.getCatalog().getParameters()).containsEntry("param", null);
 	}
 
 	private static Stream<Arguments> conflictingParameters() {
@@ -95,7 +95,7 @@ class ParameterIT {
 	void shouldFailWithNoValueVsNull(Statement statement) {
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-			.isThrownBy(statement::getParameters);
+			.isThrownBy(statement::getCatalog);
 	}
 
 	@Test
@@ -112,7 +112,7 @@ class ParameterIT {
 
 		assertThat(Renderer.getDefaultRenderer().render(statement))
 			.isEqualTo("MATCH (u:`User`) SET u.name = $param, u.firstName = $param RETURN u");
-		assertThat(statement.getParameters()).containsEntry("param", null);
+		assertThat(statement.getCatalog().getParameters()).containsEntry("param", null);
 	}
 
 	@Test
@@ -129,8 +129,8 @@ class ParameterIT {
 
 		assertThat(Renderer.getDefaultRenderer().render(statement))
 			.isEqualTo("MATCH (u:`User`) SET u.name = $param, u.firstName = $param RETURN u");
-		assertThat(statement.getParameters()).isEmpty();
-		assertThat(statement.getParameterNames()).containsExactlyInAnyOrder("param");
+		assertThat(statement.getCatalog().getParameters()).isEmpty();
+		assertThat(statement.getCatalog().getParameterNames()).containsExactlyInAnyOrder("param");
 	}
 
 	@Test
@@ -142,7 +142,7 @@ class ParameterIT {
 				.limit(Cypher.parameter("param").withValue(5)).build();
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(statement::getParameters)
+				.isThrownBy(statement::getCatalog)
 				.satisfies(e -> {
 					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
 					assertThat(erroneousParameters).containsKey("param");
@@ -162,7 +162,7 @@ class ParameterIT {
 				.limit(Cypher.parameter("param").withValue(1)).build();
 
 		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(statement::getParameters)
+				.isThrownBy(statement::getCatalog)
 				.satisfies(e -> {
 					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
 					assertThat(erroneousParameters).containsKey("param");
@@ -180,19 +180,19 @@ class ParameterIT {
 				.where(bikeNode.property("a").isEqualTo(Cypher.parameter("p1").withValue("A")))
 				.returning(bikeNode)
 				.build();
-		assertThat(statement1.getParameters()).containsEntry("p1", "A");
+		assertThat(statement1.getCatalog().getParameters()).containsEntry("p1", "A");
 
 		Statement statement2 = Cypher.match(bikeNode)
 				.where(bikeNode.property("b").isEqualTo(Cypher.parameter("p2").withValue("B")))
 				.returning(bikeNode)
 				.build();
-		assertThat(statement2.getParameters()).containsEntry("p2", "B");
+		assertThat(statement2.getCatalog().getParameters()).containsEntry("p2", "B");
 
 		Statement statement3 = Cypher.match(bikeNode)
 				.where(bikeNode.property("c").isEqualTo(Cypher.parameter("p3").withValue("C")))
 				.returning(bikeNode)
 				.build();
-		assertThat(statement3.getParameters()).containsEntry("p3", "C");
+		assertThat(statement3.getCatalog().getParameters()).containsEntry("p3", "C");
 
 		Statement statement = Cypher.union(statement1, statement2, statement3);
 
@@ -205,6 +205,6 @@ class ParameterIT {
 			"p2", "B",
 			"p3", "C"
 		);
-		assertThat(statement.getParameters()).containsAllEntriesOf(expectedParams);
+		assertThat(statement.getCatalog().getParameters()).containsAllEntriesOf(expectedParams);
 	}
 }

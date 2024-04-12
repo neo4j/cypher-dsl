@@ -38,14 +38,6 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public enum Dialect {
 
 	/**
-	 * Please use {@link Dialect#NEO4J_4}
-	 * @deprecated see {@link #NEO4J_4}
-	 */
-	@Deprecated(forRemoval = true, since = "2023.4.0")
-	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
-	DEFAULT,
-
-	/**
 	 * Neo4j 4.4 and earlier
 	 */
 	NEO4J_4,

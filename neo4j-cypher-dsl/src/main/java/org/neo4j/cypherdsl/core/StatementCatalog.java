@@ -420,9 +420,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 	 * @param operator       The operator used
 	 * @param right          The right hand side of the comparison
 	 * @param parameterNames The parameter names used in this comparison
-	 *                       (analoge to {@link Statement#getParameterNames()}
 	 * @param parameters     Parameters with defined values used in this comparison
-	 *                       (analoge to {@link Statement#getParameters()}
 	 */
 	record PropertyFilter(Clause clause, Expression left, Operator operator, Expression right, Set<String> parameterNames,
 		Map<String, Object> parameters
@@ -436,9 +434,7 @@ public sealed interface StatementCatalog permits StatementCatalogBuildingVisitor
 		 * @param operator       The operator used
 		 * @param right          The right hand side of the comparison
 		 * @param parameterNames The parameter names used in this comparison
-		 *                       (analoge to {@link Statement#getParameterNames()}
 		 * @param parameters     Parameters with defined values used in this comparison
-		 *                       (analoge to {@link Statement#getParameters()}
 		 */
 		public PropertyFilter {
 			parameterNames = Set.copyOf(parameterNames);

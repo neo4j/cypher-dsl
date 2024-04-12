@@ -20,9 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import java.util.Collection;
-import java.util.Map;
-
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
@@ -80,27 +77,6 @@ abstract class AbstractStatement implements Statement {
 			this.cypher = null;
 			this.statementCatalog = null;
 		}
-	}
-
-	@SuppressWarnings("removal")
-	@NotNull
-	@Override
-	public Map<String, Object> getParameters() {
-		return getCatalog().getParameters();
-	}
-
-	@SuppressWarnings("removal")
-	@NotNull
-	@Override
-	public Collection<String> getParameterNames() {
-		return getCatalog().getParameterNames();
-	}
-
-	@SuppressWarnings("removal")
-	@NotNull
-	@Override
-	public Collection<Expression> getIdentifiableExpressions() {
-		return getCatalog().getIdentifiableExpressions();
 	}
 
 	@NotNull

@@ -26,6 +26,7 @@ import java.time.Duration;
 import java.time.Period;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -496,9 +497,8 @@ public final class Cypher {
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static SubqueryExpressionBuilder subqueryWith(String... identifiableElements) {
-		return Expressions.with(identifiableElements);
+		return subqueryWith(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
 
 	/**
@@ -508,7 +508,6 @@ public final class Cypher {
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static SubqueryExpressionBuilder subqueryWith(IdentifiableElement... identifiableElements) {
 		return Expressions.with(identifiableElements);
 	}
@@ -1290,22 +1289,6 @@ public final class Cypher {
 	 */
 	public static UseStatement use(StringLiteral target, Statement statement) {
 		return DecoratedQuery.decorate(statement, UseClauseImpl.of(target));
-	}
-
-	/**
-	 * Decorates the given statement by prepending a dynamic {@literal USE} clause. A dynamic {@literal USE} clause will
-	 * utilize {@code graph.byName} to resolve the target database.
-	 *
-	 * @param target    The name of a variable pointing to the graph or constituent
-	 * @param statement The statement to decorate
-	 * @return The new buildable statement
-	 * @since 2023.0.0
-	 * @deprecated Use {@link #use(Expression, Statement)}
-	 */
-	@Deprecated(forRemoval = true, since = "2023.4.0")
-	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some point, but not yet.
-	public static UseStatement use(SymbolicName target, Statement statement) {
-		return use((Expression) target, statement);
 	}
 
 	/**
@@ -3795,7 +3778,6 @@ public final class Cypher {
 	 * @return A new operation.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Operation mutate(Expression target, Expression value) {
 		return Operations.mutate(target, value);
 	}
@@ -3808,7 +3790,6 @@ public final class Cypher {
 	 * @return A set operation
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Operation setLabel(Node target, String... label) {
 		return Operations.set(target, label);
 	}
@@ -3922,7 +3903,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction all(String variable) {
+	public static OngoingListBasedPredicateFunction all(String variable) {
 		return Predicates.all(variable);
 	}
 
@@ -3936,7 +3917,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction all(
+	public static OngoingListBasedPredicateFunction all(
 		SymbolicName variable) {
 		return Predicates.all(variable);
 	}
@@ -3949,7 +3930,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction any(String variable) {
+	public static OngoingListBasedPredicateFunction any(String variable) {
 		return Predicates.any(variable);
 	}
 
@@ -3963,7 +3944,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction any(
+	public static OngoingListBasedPredicateFunction any(
 		SymbolicName variable) {
 		return Predicates.any(variable);
 	}
@@ -3976,7 +3957,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction none(String variable) {
+	public static OngoingListBasedPredicateFunction none(String variable) {
 		return Predicates.none(variable);
 	}
 
@@ -3990,7 +3971,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction none(
+	public static OngoingListBasedPredicateFunction none(
 		SymbolicName variable) {
 		return Predicates.none(variable);
 	}
@@ -4003,7 +3984,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction single(String variable) {
+	public static OngoingListBasedPredicateFunction single(String variable) {
 		return Predicates.single(variable);
 	}
 
@@ -4017,7 +3998,7 @@ public final class Cypher {
 	 */
 	@Contract(pure = true) @NotNull
 	@SuppressWarnings("deprecation")
-	public static Predicates.OngoingListBasedPredicateFunction single(
+	public static OngoingListBasedPredicateFunction single(
 		SymbolicName variable) {
 		return Predicates.single(variable);
 	}

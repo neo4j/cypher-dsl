@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.DEPRECATED;
-
-import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
@@ -33,13 +30,8 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Gerrit Meier
  * @author Aakash Sorathiya
  * @since 1.0
- * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
- * be accessible.
  */
-@API(status = DEPRECATED, since = "2023.9.0")
-@Deprecated(since = "2023.9.0")
-@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
-public final class Conditions {
+final class Conditions {
 
 	/**
 	 * Creates a condition that checks whether the {@code lhs} includes all elements present in {@code rhs}.
@@ -69,7 +61,7 @@ public final class Conditions {
 	 * @param relationshipPattern The pattern being evaluated in a condition
 	 * @return A new condition matching the given pattern
 	 */
-	public static Condition matching(RelationshipPattern relationshipPattern) {
+	static Condition matching(RelationshipPattern relationshipPattern) {
 		return RelationshipPatternCondition.of(relationshipPattern);
 	}
 
@@ -158,7 +150,7 @@ public final class Conditions {
 	 * @return The negated condition.
 	 */
 	@NotNull @Contract(pure = true)
-	public static Condition not(@NotNull Condition condition) {
+	static Condition not(@NotNull Condition condition) {
 
 		Assertions.notNull(condition, "Condition to negate must not be null.");
 		return condition.not();
@@ -171,7 +163,7 @@ public final class Conditions {
 	 * @return A condition that evaluates to true when the pattern does not match.
 	 */
 	@NotNull @Contract(pure = true)
-	public static Condition not(@NotNull RelationshipPattern pattern) {
+	static Condition not(@NotNull RelationshipPattern pattern) {
 
 		return RelationshipPatternCondition.not(pattern);
 	}
@@ -216,7 +208,7 @@ public final class Conditions {
 	 * @return A placeholder condition.
 	 */
 	@NotNull @Contract(pure = true)
-	public static Condition noCondition() {
+	static Condition noCondition() {
 
 		return CompoundCondition.empty();
 	}
@@ -244,22 +236,9 @@ public final class Conditions {
 	}
 
 	/**
-	 * A condition that evaluates to true if a list or a string represented by {@code expression} is empty or has the length of 0.
-	 *
-	 * @param expression The expression to test for emptiness.
-	 * @return A new condition.
-	 * @deprecated since 2023.9.0, no replacement plan, use something like {@code Functions.size(exp).isEqualTo(Cypher.literalOf(0L))}
-	 */
-	@Deprecated(forRemoval = true)
-	static Condition isEmpty(Expression expression) {
-
-		return Functions.size(expression).isEqualTo(Cypher.literalOf(0L));
-	}
-
-	/**
 	 * @return a condition that is always true.
 	 */
-	public static Condition isTrue() {
+	static Condition isTrue() {
 
 		return ConstantCondition.TRUE;
 	}
@@ -267,7 +246,7 @@ public final class Conditions {
 	/**
 	 * @return a condition that is always false.
 	 */
-	public static Condition isFalse() {
+	static Condition isFalse() {
 
 		return ConstantCondition.FALSE;
 	}
@@ -278,7 +257,7 @@ public final class Conditions {
 	 * @return A condition that checks whether a node has a set of given labels or a relationship a set of given types.
 	 * @since 2021.3.0
 	 */
-	public static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
+	static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
 
 		return HasLabelCondition.create(symbolicName, labelsOrTypes);
 	}

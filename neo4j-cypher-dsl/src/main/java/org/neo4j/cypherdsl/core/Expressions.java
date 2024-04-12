@@ -18,12 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.DEPRECATED;
-
 import java.util.Arrays;
 import java.util.List;
 
-import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Statement.UnionQuery;
@@ -33,21 +30,8 @@ import org.neo4j.cypherdsl.core.Statement.UnionQuery;
  *
  * @author Michael J. Simons
  * @since 1.0
- * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
- * be accessible.
  */
-@API(status = DEPRECATED, since = "2023.9.0")
-@Deprecated(since = "2023.9.0")
-@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
-public final class Expressions {
-
-	/**
-	 * @deprecated use {@link org.neo4j.cypherdsl.core.SubqueryExpressionBuilder} instead.
-	 */
-	@API(status = DEPRECATED, since = "2023.9.0")
-	@Deprecated(since = "2023.9.0")
-	public interface SubqueryExpressionBuilder extends org.neo4j.cypherdsl.core.SubqueryExpressionBuilder {
-	}
+final class Expressions {
 
 	/**
 	 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
@@ -58,7 +42,7 @@ public final class Expressions {
 	 * @since 2023.0.0
 	 */
 	@NotNull
-	public static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
+	static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
 		return CountExpression.count(Pattern.of(requiredPattern, patternElement));
 	}
 
@@ -70,7 +54,7 @@ public final class Expressions {
 	 * @since 2023.0.0
 	 */
 	@NotNull
-	public static CountExpression count(UnionQuery union) {
+	static CountExpression count(UnionQuery union) {
 		return CountExpression.count(union);
 	}
 
@@ -85,7 +69,7 @@ public final class Expressions {
 	 * @since 2023.1.0
 	 */
 	@NotNull
-	public static CountExpression count(Statement statement, IdentifiableElement... imports) {
+	static CountExpression count(Statement statement, IdentifiableElement... imports) {
 		return CountExpression.count(statement, imports);
 	}
 
@@ -97,7 +81,7 @@ public final class Expressions {
 	 * @return a count expression.
 	 * @since 2023.9.0
 	 */
-	public static CountExpression count(List<PatternElement> pattern, @Nullable Where where) {
+	static CountExpression count(List<PatternElement> pattern, @Nullable Where where) {
 
 		return CountExpression.count(pattern, where);
 	}
@@ -108,24 +92,8 @@ public final class Expressions {
 	 * @param identifiableElements The identifiable elements to import
 	 * @return A builder for creating the concrete sub-query
 	 * @since 2023.0.0
-	 * @deprecated use {@link Cypher#subqueryWith(String...)} instead.
 	 */
-	@Deprecated
-	public static SubqueryExpressionBuilder with(String... identifiableElements) {
-
-		return with(Arrays.stream(identifiableElements).map(SymbolicName::of).toArray(SymbolicName[]::new));
-	}
-
-	/**
-	 * Start building a new sub-query expression by importing variables into the scope with a {@literal WITH} clause.
-	 *
-	 * @param identifiableElements The identifiable elements to import
-	 * @return A builder for creating the concrete sub-query
-	 * @since 2023.0.0
-	 * @deprecated use {@link Cypher#subqueryWith(IdentifiableElement...)} instead.
-	 */
-	@Deprecated
-	public static SubqueryExpressionBuilder with(IdentifiableElement... identifiableElements) {
+	static SubqueryExpressionBuilder with(IdentifiableElement... identifiableElements) {
 
 		var returnItems = new ExpressionList(
 			Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
@@ -158,7 +126,7 @@ public final class Expressions {
 	 * @since 2023.8.0
 	 */
 	@NotNull
-	public static Expression collect(Statement statement) {
+	static Expression collect(Statement statement) {
 
 		if (!statement.doesReturnOrYield()) {
 			throw new IllegalArgumentException(
