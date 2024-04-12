@@ -30,7 +30,7 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 public interface OngoingListBasedPredicateFunction {
 
 	/**
-	 * @param list A list
+	 * @param list A list expression
 	 * @return A builder to specify the where condition for the list based predicate
 	 */
 	@NotNull
