@@ -60,7 +60,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	/**
 	 * Current list of reading or update clauses to be generated.
 	 */
-	final List<Visitable> currentSinglePartElements = new ArrayList<>();
+	private final List<Visitable> currentSinglePartElements = new ArrayList<>();
 
 	/**
 	 * The latest ongoing match.
