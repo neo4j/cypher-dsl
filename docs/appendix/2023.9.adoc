@@ -1,5 +1,30 @@
 == 2023.9
 
+=== 2023.9.6
+
+**Heads up** this is the last _planned_ release in the 2023.x series.
+The next release will be 2024.0.0, in which all deprecations apart from `internalId` on nodes and relationships will be removed.
+With that change, the Cypher-DSL will have one single entry point for all operations: `org.neo4j.cypherdsl.core.Cypher`.
+
+Nothing will change in terms of JDK compatibility.
+Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and higher.
+
+==== 🚀 Features
+
+* Allow calling of raw Cypher strings in sub queries. (#961)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.jacoco:jacoco-maven-plugin from 0.8.11 to 0.8.12 (#960)
+** Bump org.neo4j.driver:neo4j-java-driver (#959)
+** Bump org.apache.maven.plugins:maven-source-plugin (#958)
+** Bump com.puppycrawl.tools:checkstyle (#957)
+** Bump org.moditect:moditect-maven-plugin (#956)
+** Bump neo4j.version from 5.18.0 to 5.18.1 (#955)
+** Bump org.ow2.asm:asm from 9.6 to 9.7 (#954)
+** Bump org.springframework.boot:spring-boot-starter-parent (#953)
+
 === 2023.9.5
 
 ==== 🚀 Features
