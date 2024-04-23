@@ -98,6 +98,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	Statement,
 	Statement,
 	Clause,
+	Clause,
 	Return,
 	Expression,
 	List<Expression>,
@@ -311,6 +312,11 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause functionUseClause(InputPosition p, Expression function) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Clause newFinishClause(InputPosition p) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -837,56 +843,39 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement createRole(InputPosition p, boolean replace, SimpleEither<String, Parameter<?>> roleName,
-		SimpleEither<String, Parameter<?>> fromRole, boolean ifNotExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Statement dropRole(InputPosition p, SimpleEither<String, Parameter<?>> roleName, boolean ifExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Statement renameRole(InputPosition p, SimpleEither<String, Parameter<?>> fromRoleName,
-		SimpleEither<String, Parameter<?>> toRoleName, boolean ifExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
 	public Statement showRoles(InputPosition p, boolean withUsers, boolean showAll, Clause yieldExpr,
 		Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement grantRoles(InputPosition p, List<SimpleEither<String, Parameter<?>>> roles,
-		List<SimpleEither<String, Parameter<?>>> users) {
+	public Statement grantRoles(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
+		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement revokeRoles(InputPosition p, List<SimpleEither<String, Parameter<?>>> roles,
-		List<SimpleEither<String, Parameter<?>>> users) {
+	public Statement revokeRoles(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
+		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createUser(InputPosition p, boolean replace, boolean ifNotExists,
-		SimpleEither<String, Parameter<?>> username,
-		Expression password, boolean encrypted, boolean changeRequired, Boolean suspended,
-		DatabaseName homeDatabase) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password, boolean encrypted,
+		boolean changeRequired, Boolean suspended, DatabaseName homeDatabase) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement dropUser(InputPosition p, boolean ifExists, SimpleEither<String, Parameter<?>> username) {
+	public Statement dropUser(InputPosition p, boolean ifExists,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement renameUser(InputPosition p, SimpleEither<String, Parameter<?>> fromUserName,
-		SimpleEither<String, Parameter<?>> toUserName, boolean ifExists) {
+	public Statement renameUser(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> fromUserName,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> toUserName, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -896,10 +885,9 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement alterUser(InputPosition p, boolean ifExists, SimpleEither<String, Parameter<?>> username,
-		Expression password,
-		boolean encrypted, Boolean changeRequired, Boolean suspended, DatabaseName homeDatabase,
-		boolean removeHome) {
+	public Statement alterUser(InputPosition p, boolean ifExists,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password, boolean encrypted,
+		Boolean changeRequired, Boolean suspended, DatabaseName homeDatabase, boolean removeHome) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -933,12 +921,34 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement showRolePrivileges(InputPosition p, List<SimpleEither<String, Parameter<?>>> roles, boolean asCommand, boolean asRevoke, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showRolePrivileges(InputPosition p,
+		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles, boolean asCommand, boolean asRevoke,
+		Clause yieldExpr, Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement showUserPrivileges(InputPosition p, List<SimpleEither<String, Parameter<?>>> users, boolean asCommand, boolean asRevoke, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showUserPrivileges(InputPosition p,
+		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users, boolean asCommand, boolean asRevoke,
+		Clause yieldExpr, Return returnWithoutGraph, Where where) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement grantPrivilege(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
+		NULL privilege) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement denyPrivilege(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
+		NULL privilege) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Statement revokePrivilege(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
+		NULL privilege, boolean revokeGrant, boolean revokeDeny) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1034,9 +1044,9 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Statement createRemoteDatabaseAlias(InputPosition p, boolean replace, DatabaseName aliasName,
 		DatabaseName targetName, boolean ifNotExists, SimpleEither<String, Parameter<?>> url,
-		SimpleEither<String, Parameter<?>> username, Expression password, SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
-		SimpleEither<Map<String, Expression>, Parameter<?>> properties
-	) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password,
+		SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
+		SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1049,10 +1059,10 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement alterRemoteDatabaseAlias(InputPosition p, DatabaseName aliasName, DatabaseName targetName,
-		boolean ifExists, SimpleEither<String, Parameter<?>> url, SimpleEither<String, Parameter<?>> username,
-		Expression password, SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
-		SimpleEither<Map<String, Expression>, Parameter<?>> properties
-	) {
+		boolean ifExists, SimpleEither<String, Parameter<?>> url,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password,
+		SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
+		SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1261,6 +1271,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Expression minus(InputPosition p, Expression lhs, Expression rhs) {
 		return lhs.subtract(rhs);
+	}
+
+	@Override
+	public Expression concatenate(InputPosition p, Expression lhs, Expression rhs) {
+		return lhs.concat(rhs);
 	}
 
 	@Override
@@ -1660,7 +1675,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace,
-		boolean ifNotExists, SimpleEither<String, Parameter<?>> constraintName, Expression expression,
+		boolean ifNotExists, SimpleEither<StringPos<InputPosition>, Parameter<?>> constraintName, Expression expression,
 		StringPos<InputPosition> label, List<Property> properties, ParserCypherTypeName propertyType,
 		SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions, boolean containsOn,
 		ConstraintVersion constraintVersion) {
@@ -1668,7 +1683,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement dropConstraint(InputPosition p, SimpleEither<String, Parameter<?>> name, boolean ifExists) {
+	public Statement dropConstraint(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> name,
+		boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1686,28 +1702,31 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement createLookupIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		SimpleEither<String, Parameter<?>> indexName, Expression expression, StringPos<InputPosition> functionName,
-		Expression functionParameter, SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
+		StringPos<InputPosition> functionName, Expression functionParameter,
+		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		SimpleEither<String, Parameter<?>> indexName, Expression expression, StringPos<InputPosition> label,
-		List<Property> properties, SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions,
-		CreateIndexTypes indexType) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
+		StringPos<InputPosition> label, List<Property> properties,
+		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions, CreateIndexTypes indexType) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createFulltextIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		SimpleEither<String, Parameter<?>> indexName, Expression expression, List<StringPos<InputPosition>> labels,
-		List<Property> properties, SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
+		List<StringPos<InputPosition>> labels, List<Property> properties,
+		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement dropIndex(InputPosition p, SimpleEither<String, Parameter<?>> name, boolean ifExists) {
+	public Statement dropIndex(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> name,
+		boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1718,18 +1737,21 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement grantPrivilege(InputPosition p, List<SimpleEither<String, Parameter<?>>> roles, NULL privilege) {
+	public Statement createRole(InputPosition p, boolean replace,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> roleName,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRole, boolean ifNotExists) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement denyPrivilege(InputPosition p, List<SimpleEither<String, Parameter<?>>> roles, NULL privilege) {
+	public Statement dropRole(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> roleName,
+		boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement revokePrivilege(InputPosition p, List<SimpleEither<String, Parameter<?>>> roles, NULL privilege,
-		boolean revokeGrant, boolean revokeDeny) {
+	public Statement renameRole(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRoleName,
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> toRoleName, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1835,7 +1857,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public List<NULL> userQualifier(List<SimpleEither<String, Parameter<?>>> users) {
+	public List<NULL> userQualifier(List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
 		throw new UnsupportedOperationException();
 	}
 
