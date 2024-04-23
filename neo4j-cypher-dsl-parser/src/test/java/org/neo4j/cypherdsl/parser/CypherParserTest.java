@@ -738,4 +738,16 @@ class CypherParserTest {
 			  .actorCount
 			} AS v4""");
 	}
+
+	@Test
+	void newConcatenate() {
+		var cypher = "RETURN 'a' || 'B'";
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+		var normalized = renderer.render(CypherParser.parse(cypher));
+		assertThat(normalized).isEqualTo("RETURN ('a' + 'B')");
+	}
 }
