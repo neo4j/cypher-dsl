@@ -107,18 +107,19 @@ class CypherDslASTFactoryTest {
 			"useGraph", "setOwnPassword", "addDeprecatedIdentifierUnicodeNotification",
 			"showAllPrivileges", "showRolePrivileges", "showUserPrivileges", "createDatabase",
 			"createCompositeDatabase", "dropDatabase",
-			"showDatabase", "startDatabase", "stopDatabase", "createUser", "newSensitiveStringParameter",
-			"newSensitiveStringParameter",
+			"showDatabase", "startDatabase", "stopDatabase", "createUser", "dropUser", "alterUser", "renameUser",
+			"newSensitiveStringParameter", "passwordExpression", "showUsers", "showRolePrivileges",
 			"labelWildcard", "subqueryInTransactionsBatchParameters", "subqueryInTransactionsErrorParameters",
 			"subqueryInTransactionsReportParameters",
 			"showTransactionsClause", "terminateTransactionsClause", "turnYieldToWith", "alterDatabase",
 			"settingQualifier", "showSettingsClause",
 			"anyPathSelector", "allPathSelector", "anyShortestPathSelector", "allShortestPathSelector",
 			"shortestGroupsSelector", "repeatableElements", "differentRelationships",
-			"createConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped", "functionUseClause", "isNormalized",
+			"createConstraint", "dropConstraint", "showSupportedPrivileges", "isTyped", "isNotTyped", "functionUseClause", "isNormalized",
 			"isNotNormalized", "normalizeExpression",
 			"insertClause", "insertPathPattern", "subqueryInTransactionsBatchParameters",
-			"subqueryInTransactionsConcurrencyParameters", "subqueryInTransactionsErrorParameters" })
+			"subqueryInTransactionsConcurrencyParameters", "subqueryInTransactionsErrorParameters",
+		"grantRoles", "showRoles", "renameRole", "revokeRoles"})
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);
 			var methods = factory.getClass().getMethods();
