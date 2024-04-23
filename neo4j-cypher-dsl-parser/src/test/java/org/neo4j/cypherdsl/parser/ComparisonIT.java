@@ -660,6 +660,39 @@ class ComparisonIT {
 					""");
 	}
 
+	@Test // GH-963
+	void scopingAndNormalizingShouldWork() {
+		var cypher = """
+			CALL {
+				CREATE (this0:Movie)
+				WITH *
+				CALL {
+					WITH this0
+					return true
+				}
+				RETURN this0
+			} RETURN this0
+			""";
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+		var parseOptions = Options.newOptions().createSortedMaps(true).build();
+		var normalized = renderer.render(CypherParser.parse(cypher, parseOptions));
+		assertThat(normalized).isEqualTo("""
+			CALL {
+			  CREATE (v0:Movie)
+			  WITH *
+			  CALL {
+			    WITH v0
+			    RETURN true
+			  }
+			  RETURN v0
+			}
+			RETURN v0""");
+	}
+
 	static boolean areSemanticallyEquivalent(Statement statement1, Statement statement2) {
 
 		var cfg = Configuration.newConfig().withGeneratedNames(true).build();
