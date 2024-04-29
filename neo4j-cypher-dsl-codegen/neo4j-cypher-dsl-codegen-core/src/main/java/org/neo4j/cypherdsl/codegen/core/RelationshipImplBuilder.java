@@ -158,8 +158,20 @@ import com.squareup.javapoet.WildcardTypeName;
 	@Override
 	public RelationshipModelBuilder addRelationship(NodeModelBuilder newStartNode, NodeModelBuilder newEndNode) {
 		return callOnlyWithoutJavaFilePresent(() -> {
-			var startNode = newStartNode == null ? S : extractClassName(newStartNode);
-			var endNode = newEndNode == null ? E : extractClassName(newEndNode);
+			TypeName startNode = S;
+			if (newStartNode != null) {
+				startNode = newStartNode.isExtensible() ? ParameterizedTypeName
+					.get(extractClassName(newStartNode), WildcardTypeName.subtypeOf(Object.class)) :
+					extractClassName(newStartNode);
+			}
+
+			TypeName endNode = E;
+			if (newEndNode != null) {
+				endNode = newEndNode.isExtensible() ? ParameterizedTypeName
+					.get(extractClassName(newEndNode), WildcardTypeName.subtypeOf(Object.class)) :
+					extractClassName(newEndNode);
+			}
+
 			this.edges.add(new Edge(startNode, endNode));
 			return this;
 		});

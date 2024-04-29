@@ -36,6 +36,7 @@ import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
 
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
@@ -46,6 +47,7 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
+import com.squareup.javapoet.WildcardTypeName;
 
 /**
  * This is a builder. It builds classes extending {@link NodeBase}. The workflow is as follows: Create an instance via
@@ -71,7 +73,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	private final Set<RelationshipFactoryDefinition> relationshipMethodDefinitions = new LinkedHashSet<>();
 
 	private NodeModelBuilder baseModel;
-	private final TypeVariableName self;
+	private TypeVariableName self;
 	private boolean extensible;
 
 	static NodeModelBuilder create(Configuration configuration, String packageName, String suggestedTypeName) {
@@ -89,7 +91,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	private NodeImplBuilder(Configuration configuration, ClassName className, String fieldName) {
 		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
 			configuration.getIndent());
-		self = TypeVariableName.get("SELF", className);
+		this.self = TypeVariableName.get("SELF", className);
 	}
 
 	@Override
@@ -141,9 +143,22 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	@Override
 	public NodeModelBuilder setExtensible(boolean isExtensible) {
 		return callOnlyWithoutJavaFilePresent(() -> {
-			this.extensible = isExtensible;
-			return this;
+			synchronized (NodeImplBuilder.this) {
+				this.extensible = isExtensible;
+				if (this.extensible) {
+					this.self = TypeVariableName.get("SELF",
+						ParameterizedTypeName.get(className, WildcardTypeName.subtypeOf(Object.class)));
+				} else {
+					this.self = TypeVariableName.get("SELF", className);
+				}
+				return this;
+			}
 		});
+	}
+
+	@Override
+	public boolean isExtensible() {
+		return this.extensible;
 	}
 
 	private MethodSpec buildDefaultConstructor(FieldSpec primaryLabelField) {
@@ -209,7 +224,9 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 			builder.addAnnotation(Override.class);
 		}
 		if (extensible) {
-			builder.addStatement("return ($T) new $T($N, $N, $N)", self, className, symbolicName, labelsParameter,
+			builder.addAnnotation(
+				AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
+			builder.addStatement("return ($T) new $T<>($N, $N, $N)", self, className, symbolicName, labelsParameter,
 					properties)
 				.returns(self);
 		} else {
@@ -286,8 +303,10 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 
 		FieldSpec defaultInstance;
 		if (extensible) {
+			var type = ParameterizedTypeName.get(className,
+				ParameterizedTypeName.get(className, WildcardTypeName.subtypeOf(Object.class)));
 			defaultInstance = FieldSpec
-				.builder(ParameterizedTypeName.get(className, className), getFieldName(), Modifier.PUBLIC,
+				.builder(type, getFieldName(), Modifier.PUBLIC,
 					Modifier.STATIC, Modifier.FINAL)
 				.initializer("new $T<>()", className)
 				.build();

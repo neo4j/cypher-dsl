@@ -96,4 +96,10 @@ public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 	 * @since 2023.9.2
 	 */
 	NodeModelBuilder setExtensible(boolean extensible);
+
+	/**
+	 * Returns {@literal true} when this builder produces extensible modules.
+	 * @return {@literal true} when this builder produces extensible modules
+	 */
+	boolean isExtensible();
 }
