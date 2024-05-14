@@ -3058,6 +3058,56 @@ class CypherIT {
 					"FOREACH (a IN [] | FOREACH (a IN [] | MERGE (n) ON CREATE SET n.prop = 1))");
 
 		}
+
+		@Test
+		void fakeIfAsDocumentedInKbShouldWork() {
+			Node node = Cypher.node("Node")
+				.named("node")
+				.withProperties("id", Cypher.literalOf(12345));
+
+			Property needsUpdate = node.property("needsUpdate");
+			Statement stmt = Cypher.match(node)
+				.foreach(
+					Cypher.name("i")).in(Cypher.caseExpression().when(needsUpdate).then(Cypher.listOf(Cypher.literalOf("1"))).elseDefault(Cypher.listOf()))
+				.apply(
+					(UpdatingClause) Clauses.set(Collections.singletonList(Operations.set(node.property("newProperty"), Cypher.literalOf(5678)))),
+					(UpdatingClause) Clauses.remove(Collections.singletonList(needsUpdate)),
+					(UpdatingClause) Clauses.set(Collections.singletonList(Operations.set(node, "Updated")))
+				).build();
+
+			assertThat(stmt.getCypher()).isEqualTo("MATCH (node:`Node` {id: 12345}) FOREACH (i IN CASE WHEN node.needsUpdate THEN ['1'] ELSE [] END | SET node.newProperty = 5678 REMOVE node.needsUpdate SET node:`Updated`)");
+		}
+
+		@Test
+		void foreachCanBeChained() {
+			SymbolicName event = Cypher.name("event");
+			SymbolicName create = Cypher.name("create");
+			SymbolicName delete = Cypher.name("delete");
+
+			ListExpression t = Cypher.listOf(Cypher.literalOf("1"));
+			ListExpression f = Cypher.listOf();
+
+			Node user = Cypher.node("User").withProperties("id", Cypher.property(Cypher.property("event", "keys"), "id")).named("n");
+			Clause merge = Clauses.merge(Collections.singletonList(user), Collections.emptyList());
+
+			Statement stmt = Cypher.unwind(Cypher.parameter("messages")).as(event)
+				.with(
+					Cypher.caseExpression().when(Cypher.valueAt(event, 0).eq(Cypher.literalOf("C"))).then(t).elseDefault(f).as(create),
+					Cypher.caseExpression().when(Cypher.valueAt(event, 0).eq(Cypher.literalOf("d"))).then(t).elseDefault(f).as(delete),
+					Cypher.valueAt(event, 1).as(event)
+				)
+				.foreach(Cypher.name("i")).in(create).apply(
+					(UpdatingClause) merge,
+					(UpdatingClause) Clauses.set(Collections.singletonList(Operations.set(user.asExpression(), Cypher.property("event", "properties")))),
+					(UpdatingClause) Clauses.set(Collections.singletonList(Operations.mutate(user.asExpression(), Cypher.property("event", "keys"))))
+				)
+				.foreach(Cypher.name("i")).in(delete).apply(
+					(UpdatingClause) merge,
+					(UpdatingClause) Clauses.delete(true, Collections.singletonList(user.asExpression()))
+				)
+				.build();
+			assertThat(stmt.getCypher()).isEqualTo("UNWIND $messages AS event WITH CASE WHEN event[0] = 'C' THEN ['1'] ELSE [] END AS create, CASE WHEN event[0] = 'd' THEN ['1'] ELSE [] END AS delete, event[1] AS event FOREACH (i IN create | MERGE (n:`User` {id: event.keys.id}) SET n = event.properties SET n += event.keys) FOREACH (i IN delete | MERGE (n:`User` {id: event.keys.id}) DETACH DELETE n)");
+		}
 	}
 
 	@Nested

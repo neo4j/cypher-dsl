@@ -114,7 +114,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingUpdate extends BuildableStatement<Statement>,
-		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet {
+		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet, ExposesForeach {
 	}
 
 	/**

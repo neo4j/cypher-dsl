@@ -631,6 +631,8 @@
 
 								<!-- 2022.9.2 (Backport of Unit-Subqueries) -->
 								<exclude>org.neo4j.cypherdsl.core.DefaultStatementBuilder$DefaultStatementWithWithBuilder#call(org.neo4j.cypherdsl.core.Statement,org.neo4j.cypherdsl.core.IdentifiableElement[])</exclude>
+								<!-- 2022.9.3 (Backport of chainable foreach) -->
+								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$OngoingUpdate</exclude>
 							</excludes>
 						</parameter>
 					</configuration>
