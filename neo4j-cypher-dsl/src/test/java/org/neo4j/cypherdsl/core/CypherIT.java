@@ -400,10 +400,10 @@ class CypherIT {
 			@Test
 			void sortOrderDefaultExpression() {
 				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(userNode.property("name").ascending()).build();
+					.orderBy(userNode.property("name")).build();
 
 				assertThat(cypherRenderer.render(statement))
-					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
+					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name");
 			}
 
 			@Test
