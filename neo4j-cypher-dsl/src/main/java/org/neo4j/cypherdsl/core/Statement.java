@@ -21,9 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
@@ -106,52 +104,8 @@ public interface Statement extends Visitable {
 	}
 
 	/**
-	 * After a statement has been build, all parameters that have been added to the statement can be retrieved through
-	 * this method. The result will only contain parameters with a defined value. If you are interested in all parameter
-	 * names, use {@link #getParameterNames()}.
-	 * <p>
-	 * The map can be used for example as an argument with various methods on the Neo4j Java Driver that allow the
-	 * execution of parameterized queries.
-	 * <p>
-	 * This method is threadsafe
-	 *
-	 * @return A map of all parameters with a bound value.
-	 * @since 2021.0.0
-	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getParameters()}
-	 */
-	@NotNull @Contract(pure = true)
-	@Deprecated(forRemoval = true, since = "2023.2.0")
-	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
-	Map<String, Object> getParameters();
-
-	/**
-	 * After the statement has been build, this method returns a list of all parameter names used, regardless whether
-	 * a value was bound to the parameter o not.
-	 * <p>
-	 * This method is threadsafe
-	 *
-	 * @return A set of parameter names being used.
-	 * @since 2021.0.0
-	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getParameterNames()}
-	 */
-	@NotNull @Contract(pure = true)
-	@Deprecated(forRemoval = true, since = "2023.2.0")
-	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
-	Collection<String> getParameterNames();
-
-	/**
-	 * @return The set of identifiable expressions that are available when this statement ends.
-	 * @since 2021.3.2
-	 * @deprecated Use {@link #getCatalog()} and {@link StatementCatalog#getIdentifiableExpressions()}
-	 */
-	@NotNull @Contract(pure = true)
-	@Deprecated(forRemoval = true, since = "2023.1.0")
-	@SuppressWarnings({"squid:S1133"}) // Yes, I promise, this will be removed in 2024.
-	Collection<Expression> getIdentifiableExpressions();
-
-	/**
 	 * Analyzes the statement and provides access to the resolved properties, their (potential) owners and the context
-	 * in which they have been resolved. Also, a view on {@link #getIdentifiableExpressions()} is provided.
+	 * in which they have been resolved. Identifiable expressions may be retrieved via {@link StatementCatalog#getIdentifiableExpressions()}.
 	 *
 	 * @return An immutable object representing properties resolved in a statement together with their context and owner
 	 * @since 2023.1.0
@@ -162,10 +116,10 @@ public interface Statement extends Visitable {
 	/**
 	 * This method uses the default renderer to create a String representation of this statement. The generated Cypher
 	 * will use escaped literals and correct placeholders like {@code $param} for parameters. The placeholders for
-	 * parameters can be retrieved via {@link #getParameterNames}. Bounded values for parameters can be retrieved via
-	 * {@link #getParameters()}.
+	 * parameters can be retrieved via {@link StatementCatalog#getParameterNames}. Bounded values for parameters can be
+	 * retrieved via {@link StatementCatalog#getParameters()}.
 	 * <p>
-	 * This method is threadsafe
+	 * This method is thread safe.
 	 *
 	 * @return A valid Cypher statement
 	 * @since 2021.0.0
@@ -190,7 +144,7 @@ public interface Statement extends Visitable {
 
 	/**
 	 * Use this method to configure whether some constant values should be rendered as parameters or as literals before
-	 * the first call to {@link Statement#getParameters()} or {@link Statement#getCypher()}.
+	 * the first call to {@link StatementCatalog#getParameters()} or {@link Statement#getCypher()}.
 	 * <p>
 	 * Renderers are free to chose to ignore this.
 	 *

@@ -45,6 +45,9 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		}
 
 		if (aReturn == null) {
+			if (precedingClauses.get(precedingClauses.size() - 1) instanceof ResultStatement) {
+				return new SinglePartQueryAsResultStatementWrapper(precedingClauses);
+			}
 			return new SinglePartQuery(precedingClauses);
 		} else {
 			return new SinglePartQueryWithResult(precedingClauses, aReturn);
@@ -64,6 +67,13 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		visitor.enter(this);
 		precedingClauses.forEach(c -> c.accept(visitor));
 		visitor.leave(this);
+	}
+
+	static final class SinglePartQueryAsResultStatementWrapper extends SinglePartQuery implements ResultStatement {
+
+		private SinglePartQueryAsResultStatementWrapper(List<Visitable> precedingClauses) {
+			super(precedingClauses);
+		}
 	}
 
 	static final class SinglePartQueryWithResult extends SinglePartQuery implements ResultStatement {

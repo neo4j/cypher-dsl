@@ -143,7 +143,8 @@ class FunctionsIT {
 			Class<?>[] argTypes = new Class<?>[2];
 			argTypes[0] = Expression.class;
 			argTypes[1] = Expression[].class;
-			@SuppressWarnings("deprecation") Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			Method m = Functions.class.getDeclaredMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			m.setAccessible(true);
 
 			Expression arg1 = Cypher.literalOf(1);
 			for (int n = 0; n <= function.getMaxArgs() - function.getMinArgs(); ++n) {
@@ -176,7 +177,8 @@ class FunctionsIT {
 			}
 			expected.append(");");
 
-			@SuppressWarnings("deprecation") Method m = Functions.class.getMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			Method m = Functions.class.getDeclaredMethod(function.name().toLowerCase(Locale.ROOT), argTypes);
+			m.setAccessible(true);
 			FunctionInvocation f = (FunctionInvocation) m.invoke(null, (Object[]) args);
 			assertThat(cypherRenderer.render(Cypher.returning(f).build()) + ";")
 				.isEqualTo(expected.toString());

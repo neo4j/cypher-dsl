@@ -1626,6 +1626,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		private final YieldItems yieldItems;
 
+		private DefaultStatementBuilder delegate;
+
 		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, SymbolicName... resultFields) {
 			super(procedureName, arguments);
 			this.yieldItems = YieldItems.yieldAllOf(resultFields);
@@ -1700,9 +1702,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@NotNull
 		@Override
-		public ResultStatement build() {
+		public Statement build() {
 
-			return (ResultStatement) ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
+			if (this.delegate != null) {
+				return this.delegate.build();
+			}
+
+			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
 
@@ -1714,6 +1720,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 		@Override
 		public  StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 			return new DefaultStatementBuilder(this.buildCall()).match(optional, pattern);
+		}
+
+		@Override
+		public ExposesAndThen<OngoingStandaloneCallWithReturnFields, Statement> andThen(Statement statement) {
+			if (this.delegate == null) {
+				this.delegate = new DefaultStatementBuilder(this.buildCall());
+			}
+			this.delegate.currentSinglePartElements.add(statement);
+			return this;
 		}
 	}
 

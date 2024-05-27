@@ -18,15 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.DEPRECATED;
-
 import java.util.List;
 
-import org.apiguardian.api.API;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -35,13 +31,9 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Michael J. Simons
  * @soundtrack Mine &amp; Fatoni - Alle Liebe nachträglich
  * @since 1.0
- * @deprecated use {@link Cypher} instead. This class will become package private in the next major release and no longer
  * be accessible.
  */
-@API(status = DEPRECATED, since = "2023.9.0")
-@Deprecated(since = "2023.9.0")
-@SuppressWarnings({ "squid:S1133" }) // Suppresses warnings about removing deprecations
-public final class Predicates {
+final class Predicates {
 
 	/**
 	 * Creates a new condition based on a function invocation for the {@code exists()} function.
@@ -51,7 +43,7 @@ public final class Predicates {
 	 * @return A function call for {@code exists()} for one property
 	 */
 	@NotNull @Contract(pure = true)
-	public static Condition exists(Property property) {
+	static Condition exists(Property property) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, property));
 	}
@@ -64,7 +56,7 @@ public final class Predicates {
 	 * @return A function call for {@code exists()} for one pattern
 	 */
 	@NotNull @Contract(pure = true)
-	public static Condition exists(RelationshipPattern pattern) {
+	static Condition exists(RelationshipPattern pattern) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, pattern));
 	}
@@ -81,7 +73,7 @@ public final class Predicates {
 	 * @return An existential sub-query.
 	 * @since 2023.1.0
 	 */
-	public static Condition exists(Statement statement, IdentifiableElement... imports) {
+	static Condition exists(Statement statement, IdentifiableElement... imports) {
 
 		return ExistentialSubquery.exists(statement, imports);
 	}
@@ -96,7 +88,7 @@ public final class Predicates {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	public static Condition exists(PatternElement pattern) {
+	static Condition exists(PatternElement pattern) {
 
 		return ExistentialSubquery.exists(List.of(pattern), null);
 	}
@@ -111,7 +103,7 @@ public final class Predicates {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	public static Condition exists(List<PatternElement> pattern) {
+	static Condition exists(List<PatternElement> pattern) {
 
 		return ExistentialSubquery.exists(pattern, null);
 	}
@@ -127,7 +119,7 @@ public final class Predicates {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	public static Condition exists(List<PatternElement> pattern, @Nullable Where where) {
+	static Condition exists(List<PatternElement> pattern, @Nullable Where where) {
 
 		return ExistentialSubquery.exists(pattern, where);
 	}
@@ -139,7 +131,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction all(String variable) {
+	static OngoingListBasedPredicateFunction all(String variable) {
 
 		return all(SymbolicName.of(variable));
 	}
@@ -153,7 +145,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction all(SymbolicName variable) {
+	static OngoingListBasedPredicateFunction all(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.ALL, variable);
 	}
@@ -165,7 +157,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction any(String variable) {
+	static OngoingListBasedPredicateFunction any(String variable) {
 
 		return any(SymbolicName.of(variable));
 	}
@@ -179,7 +171,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction any(SymbolicName variable) {
+	static OngoingListBasedPredicateFunction any(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.ANY, variable);
 	}
@@ -191,7 +183,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction none(String variable) {
+	static OngoingListBasedPredicateFunction none(String variable) {
 
 		return none(SymbolicName.of(variable));
 	}
@@ -205,7 +197,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction none(SymbolicName variable) {
+	static OngoingListBasedPredicateFunction none(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.NONE, variable);
 	}
@@ -217,7 +209,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction single(String variable) {
+	static OngoingListBasedPredicateFunction single(String variable) {
 
 		return single(SymbolicName.of(variable));
 	}
@@ -231,7 +223,7 @@ public final class Predicates {
 	 * @since 1.1
 	 */
 	@NotNull @Contract(pure = true)
-	public static OngoingListBasedPredicateFunction single(SymbolicName variable) {
+	static OngoingListBasedPredicateFunction single(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.SINGLE, variable);
 	}
@@ -246,35 +238,9 @@ public final class Predicates {
 	 * @return A function call for {@code isEmpty()} for a list
 	 * @since 2023.6.1
 	 */
-	public static Condition isEmpty(Expression e) {
+	static Condition isEmpty(Expression e) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.IS_EMPTY, e));
-	}
-
-	/**
-	 * Allows to define the source of the list predicate.
-	 */
-	public interface OngoingListBasedPredicateFunction {
-
-		/**
-		 * @param list A list
-		 * @return A builder to specify the where condition for the list based predicate
-		 */
-		@NotNull @CheckReturnValue
-		OngoingListBasedPredicateFunctionWithList in(Expression list);
-	}
-
-	/**
-	 * Allows to specify the where condition for the list based predicate.
-	 */
-	public interface OngoingListBasedPredicateFunctionWithList {
-
-		/**
-		 * @param condition The condition for the list based predicate.
-		 * @return The final list based predicate function
-		 */
-		@NotNull @Contract(pure = true)
-		Condition where(Condition condition);
 	}
 
 	private static class Builder implements OngoingListBasedPredicateFunction,
@@ -292,7 +258,7 @@ public final class Predicates {
 			this.name = name;
 		}
 
-		@Override
+		@Override @NotNull
 		public OngoingListBasedPredicateFunctionWithList in(Expression list) {
 
 			Assertions.notNull(list, "The list expression is required");
@@ -300,7 +266,7 @@ public final class Predicates {
 			return this;
 		}
 
-		@Override
+		@Override @NotNull
 		public Condition where(Condition condition) {
 
 			Assertions.notNull(condition, "The condition is required");

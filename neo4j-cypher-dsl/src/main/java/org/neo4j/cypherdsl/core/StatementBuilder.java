@@ -1010,8 +1010,12 @@ public interface StatementBuilder
 	 * A buildable statement exposing where and return clauses.
 	 */
 	sealed interface OngoingStandaloneCallWithReturnFields extends
-		StatementBuilder.BuildableStatement<ResultStatement>,
-		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesWith, ExposesSubqueryCall permits DefaultStatementBuilder.YieldingStandaloneCallBuilder {
+		StatementBuilder.BuildableStatement<Statement>,
+		ExposesMatch,
+		ExposesWhere<StatementBuilder.OngoingReadingWithWhere>,
+		ExposesReturning, ExposesWith, ExposesSubqueryCall,
+		ExposesAndThen<OngoingStandaloneCallWithReturnFields, Statement>
+		permits DefaultStatementBuilder.YieldingStandaloneCallBuilder {
 	}
 
 	/**
