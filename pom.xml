@@ -127,7 +127,7 @@
 		<asciidoctorj-diagram.version>2.3.0</asciidoctorj-diagram.version>
 		<asciidoctorj.version>2.5.12</asciidoctorj.version>
 		<asm.version>9.7</asm.version>
-		<assertj.version>3.25.3</assertj.version>
+		<assertj.version>3.26.0</assertj.version>
 		<auto-common.version>1.2.2</auto-common.version>
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
