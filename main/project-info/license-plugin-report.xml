@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1715696894823">
+<licensePluginReport goal="CHECK" timestamp="1716839187918">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -38,6 +38,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/DriverValueAdapter.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/DurationLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExistentialSubquery.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesAndThen.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesCall.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesCreate.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesHints.java" result="PRESENT"/>
@@ -100,13 +101,14 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/NodeLabels.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/NullLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/NumberLiteral.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/OngoingListBasedPredicateFunction.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/OngoingListBasedPredicateFunctionWithList.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Operation.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Operations.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Operator.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Order.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Parameter.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ParameterCollectingVisitor.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/ParenthesizedPathPattern.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Pattern.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/PatternComprehension.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/PatternElement.java" result="PRESENT"/>
