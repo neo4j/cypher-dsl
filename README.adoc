@@ -36,7 +36,7 @@ starting at _2020.0.0_.
 
 The year digit is treated in a semver fashion for the core module.
 That means that you won't experience any breaking changes when staying in a release line.
-However, the first or the latest release in a given year does not necessary reflect the current calendar year.
+However, the first or the latest release in a given year does not necessarily reflect the current calendar year.
 It's kind of a trade-off, but one that we think is valuable, otherwise we would need to postpone the first release in a year until we need todo some breaking changes.
 
 == Manual
