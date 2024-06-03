@@ -48,6 +48,7 @@ import org.neo4j.cypher.internal.ast.factory.HintIndexType;
 import org.neo4j.cypher.internal.ast.factory.ParameterType;
 import org.neo4j.cypher.internal.ast.factory.ParserCypherTypeName;
 import org.neo4j.cypher.internal.ast.factory.ParserNormalForm;
+import org.neo4j.cypher.internal.ast.factory.ParserTrimSpecification;
 import org.neo4j.cypher.internal.ast.factory.ScopeType;
 import org.neo4j.cypher.internal.ast.factory.ShowCommandFilterTypes;
 import org.neo4j.cypher.internal.ast.factory.SimpleEither;
@@ -1516,6 +1517,20 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Expression normalizeExpression(InputPosition p, Expression i, ParserNormalForm normalForm) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Expression trimFunction(InputPosition inputPosition, ParserTrimSpecification parserTrimSpecification,
+		Expression expression, Expression expression1) {
+
+		var call = switch (parserTrimSpecification) {
+			case BOTH -> Cypher.call("trim");
+			case LEADING -> Cypher.call("ltrim");
+			case TRAILING -> Cypher.call("rtrim");
+		};
+		return call.withArgs(
+				expression == null ? new Expression[] {expression1} : new Expression[] {expression1, expression})
+			.asFunction();
 	}
 
 	@Override

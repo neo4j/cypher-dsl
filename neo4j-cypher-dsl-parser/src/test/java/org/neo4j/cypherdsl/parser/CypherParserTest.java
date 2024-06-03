@@ -750,4 +750,25 @@ class CypherParserTest {
 		var normalized = renderer.render(CypherParser.parse(cypher));
 		assertThat(normalized).isEqualTo("RETURN ('a' + 'B')");
 	}
+
+
+	@ParameterizedTest
+	@CsvSource(delimiterString = "|", textBlock = """
+		RETURN trim(' asd ')               | RETURN trim(' asd ')
+		RETURN trim(BOTH ' ' FROM ' asd ') | RETURN trim(' asd ', ' ')
+		RETURN trim(LEADING ' ' FROM ' asd ') | RETURN ltrim(' asd ', ' ')
+		RETURN trim(TRAILING ' ' FROM ' asd ') | RETURN rtrim(' asd ', ' ')
+		RETURN btrim(' asd ') | RETURN btrim(' asd ')
+		RETURN btrim(' asd ', ' ') | RETURN btrim(' asd ', ' ')
+		RETURN ltrim(' asd ') | RETURN ltrim(' asd ')
+		RETURN ltrim(' asd ', ' ') | RETURN ltrim(' asd ', ' ')
+		RETURN rtrim(' asd ') | RETURN rtrim(' asd ')
+		RETURN rtrim(' asd ', ' ') | RETURN rtrim(' asd ', ' ')
+		""")
+	void trimShouldWork(String in, String out) {
+
+		var renderer = Renderer.getRenderer(Configuration.defaultConfig());
+		var normalized = renderer.render(CypherParser.parse(in));
+		assertThat(normalized).isEqualTo(out);
+	}
 }
