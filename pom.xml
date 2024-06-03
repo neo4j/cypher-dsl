@@ -185,7 +185,7 @@
 		<revision>9999</revision>
 		<sha1 />
 		<slf4j.version>1.7.36</slf4j.version>
-		<sonar-maven-plugin.version>3.11.0.3922</sonar-maven-plugin.version>
+		<sonar-maven-plugin.version>4.0.0.4121</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>4.0.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>7.3.0</spring-data-neo4j.version>
 		<testcontainers.version>1.19.8</testcontainers.version>
