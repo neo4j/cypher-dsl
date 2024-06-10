@@ -1,0 +1,45 @@
+== 2024.0
+
+=== 2024.0.0
+
+We're finally going 2024 with this release.
+The biggest new feature in this release is that we now allow chaining statements that end with a `YIELD` clause, which lets you compose complex queries in a nicer way.
+
+We also removed all deprecated constructs and methods we accumulated until now. If you ignored the warnings until now, you cannot do any longer. The latest SDN release is prepared for this Cypher-DSL release already, as we did the necessary changes over there already (See this https://github.com/spring-projects/spring-data-neo4j/commit/2861e771333d8b9443026669763ddccd5be7659d[commit] for the necessary changes for example).
+
+==== 🚀 Features
+
+* Allow chaining statements to yielding calls. (#964)
+* Allow chainable foreach. (#988)
+
+==== 🐛 Bug Fixes
+
+* Actually make `sortOrderDefaultExpression` test what it is supposed to test.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.apache.maven.plugins:maven-shade-plugin (#1006)
+** Bump org.neo4j.driver:neo4j-java-driver (#1005)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1004)
+** Bump com.google.guava:guava (#1003)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#1002)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1001)
+** Bump com.github.ekryd.sortpom:sortpom-maven-plugin (#992)
+** Bump org.assertj:assertj-core from 3.25.3 to 3.26.0 (#998)
+** Bump org.springframework.boot:spring-boot-starter-parent (#997)
+** Bump com.puppycrawl.tools:checkstyle (#996)
+** Bump org.codehaus.mojo:exec-maven-plugin (#995)
+** Bump org.asciidoctor:asciidoctorj from 2.5.12 to 2.5.13 (#993)
+** Bump org.springframework.data:spring-data-neo4j (#991)
+** Bump io.projectreactor:reactor-bom (#990)
+** Bump org.graalvm.buildtools:native-maven-plugin (#989)
+** Bump com.mycila:license-maven-plugin from 4.3 to 4.5 (#987)
+** Bump mockito.version from 5.11.0 to 5.12.0 (#986)
+** Bump testcontainers.version from 1.19.7 to 1.19.8 (#985)
+** Bump com.google.guava:guava (#982)
+** Bump org.checkerframework:checker-qual (#984)
+** Bump org.apache.maven.plugins:maven-install-plugin (#983)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#981)
+** Bump com.fasterxml.jackson:jackson-bom (#980)
+** Bump org.apache.maven.plugins:maven-deploy-plugin (#979)
