@@ -186,6 +186,7 @@ public final class ScopingStrategy {
 		}
 
 		if (notify) {
+			scopeSeed.addAll(afterStatement);
 			this.onScopeEntered.forEach(c -> c.accept(visitable, scopeSeed));
 		}
 	}

@@ -1958,6 +1958,33 @@ class IssueRelatedIT {
 			.isEqualTo(expected.replace("\n", " "));
 	}
 
+	@Test // GH-999
+	void subQueryFromParserScope() {
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+
+		var named = Cypher.node("Movie").named("m");
+		var stmt = Cypher.call(Cypher.create(named).returning("m").build())
+			.call(Cypher.returning(named.project(Cypher.property(named.getRequiredSymbolicName(), "title")).as("movies")).build(), named)
+			.returning("movies").build();
+		var normalized = renderer.render(stmt);
+		assertThat(normalized).isEqualTo("""
+			CALL {
+			  CREATE (v0:Movie)
+			  RETURN v0
+			}
+			CALL {
+			  WITH v0
+			  RETURN v0 {
+			    .title
+			  } AS v1
+			}
+			RETURN v1""");
+	}
+
 	@Nested
 	class Chaining {
 

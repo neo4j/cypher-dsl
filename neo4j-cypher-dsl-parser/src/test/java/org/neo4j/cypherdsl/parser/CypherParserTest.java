@@ -739,12 +739,46 @@ class CypherParserTest {
 			} AS v4""");
 	}
 
+	@Test // GH-999
+	void subQueryFromParserScope() {
+		var cypher = """
+			CALL {
+				CREATE (m:Movie)
+				RETURN m
+			}
+			CALL {
+				WITH m
+				RETURN m { .title } AS movies
+			}
+			RETURN movies""";
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+		var parseOptions = Options.newOptions().createSortedMaps(true).build();
+		var normalized = renderer.render(CypherParser.parse(cypher, parseOptions));
+
+		assertThat(normalized).isEqualTo("""
+			CALL {
+			  CREATE (v0:Movie)
+			  RETURN v0
+			}
+			CALL {
+			  WITH v0
+			  RETURN v0 {
+			    .title
+			  } AS v1
+			}
+			RETURN v1"""
+		);
+	}
+
 	@Test
 	void newConcatenate() {
 		var cypher = "RETURN 'a' || 'B'";
 		var cfg = Configuration.newConfig()
 			.withPrettyPrint(true)
-			.withGeneratedNames(true)
 			.build();
 		var renderer = Renderer.getRenderer(cfg);
 		var normalized = renderer.render(CypherParser.parse(cypher));
