@@ -1,5 +1,21 @@
 == 2024.0
 
+=== 2024.0.1
+
+This is a pure bug-fix release. Thanks to @Andy2003 for spotting yet another scoping issue.
+
+==== 🐛 Bug Fixes
+
+* Include implicit new variables in seed for name generator. (#999)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump io.projectreactor:reactor-bom (#1013)
+** Bump org.springframework.data:spring-data-neo4j (#1012)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1011)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1010)
+
 === 2024.0.0
 
 We're finally going 2024 with this release.
