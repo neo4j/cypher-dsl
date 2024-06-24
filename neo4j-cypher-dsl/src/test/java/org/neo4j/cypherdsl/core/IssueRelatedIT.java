@@ -1956,4 +1956,48 @@ class IssueRelatedIT {
 		assertThat(statement.getCypher())
 			.isEqualTo(expected.replace("\n", " "));
 	}
+
+	@Test // GH-1014
+	void patternExpressionMustNotIntroduceNames() {
+
+		var userIdParam = Cypher.parameter("userId");
+
+		var book = Cypher.node("Book").named("b");
+		var userActivity = Cypher.node("UserSuggestionActivity")
+			.named("ua")
+			.withProperties("userId", userIdParam);
+
+
+		// ua has not been used before
+		var rel = book.relationshipBetween(userActivity);
+		var cypher = Cypher.match(book)
+			.where(Cypher.not(Cypher.exists(rel)))
+			.returning(Cypher.asterisk())
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (b:`Book`) WHERE NOT (exists((b)--(:`UserSuggestionActivity` {userId: $userId}))) RETURN *");
+
+		// b has not been used before
+		cypher = Cypher.match(userActivity)
+			.where(Cypher.not(Cypher.exists(rel)))
+			.returning(Cypher.asterisk())
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (ua:`UserSuggestionActivity` {userId: $userId}) WHERE NOT (exists((:`Book`)--(ua))) RETURN *");
+
+		// Both have been used before, example does not make much sense, but still
+		cypher = Cypher.match(book.relationshipFrom(userActivity, "WROTE"))
+			.where(Cypher.not(Cypher.exists(rel)))
+			.returning(Cypher.asterisk())
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (b:`Book`)<-[:`WROTE`]-(ua:`UserSuggestionActivity` {userId: $userId}) WHERE NOT (exists((b)--(ua))) RETURN *");
+
+		// All expressions
+		cypher = Cypher.match(book)
+			.returning(Cypher.size(rel))
+			.build().getCypher();
+
+		assertThat(cypher).isEqualTo("MATCH (b:`Book`) RETURN size((b)--(:`UserSuggestionActivity` {userId: $userId}))");
+	}
 }

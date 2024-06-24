@@ -24,9 +24,11 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -138,8 +140,11 @@ public final class FunctionInvocation implements Expression {
 		String message = MESSAGE_FMT_PATTERN_REQUIRED.format(new Object[] { definition.getImplementationName() });
 		Assertions.notNull(pattern, message);
 
+		Predicate<FunctionDefinition> isShortestPath = d ->
+			BuiltInFunctions.Scalars.SHORTEST_PATH.getImplementationName().equals(d.getImplementationName()) || "allShortestPaths".equals(d.getImplementationName());
+
 		return new FunctionInvocation(definition.getImplementationName(),
-			Pattern.of(List.of(pattern)));
+			isShortestPath.test(definition) ? Pattern.of(List.of(pattern)) : new PatternExpressionImpl(pattern));
 	}
 
 	static FunctionInvocation create(FunctionDefinition definition, TypedSubtree<?> arguments) {
@@ -152,7 +157,7 @@ public final class FunctionInvocation implements Expression {
 
 	private final String functionName;
 
-	private final TypedSubtree<?> arguments;
+	private final Visitable arguments;
 
 	private FunctionInvocation(String functionName, Expression... arguments) {
 
@@ -160,10 +165,10 @@ public final class FunctionInvocation implements Expression {
 		this.arguments = new ExpressionList(arguments);
 	}
 
-	private <T extends TypedSubtree<?>> FunctionInvocation(String functionName, T pattern) {
+	private FunctionInvocation(String functionName, Visitable arguments) {
 
 		this.functionName = functionName;
-		this.arguments = pattern;
+		this.arguments = arguments;
 	}
 
 	/**
