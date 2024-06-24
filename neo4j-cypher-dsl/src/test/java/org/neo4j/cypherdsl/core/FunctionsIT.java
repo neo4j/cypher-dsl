@@ -260,7 +260,7 @@ class FunctionsIT {
 			Arguments.of(Cypher.trim(e1), "RETURN trim(e1)"),
 			Arguments.of(Cypher.split(e1, Cypher.literalOf(",")), "RETURN split(e1, ',')"),
 			Arguments.of(Cypher.size(e1), "RETURN size(e1)"),
-			Arguments.of(Cypher.size(r), "RETURN size((n:`Node`)-[r]->(m:`Node2`))"),
+			Arguments.of(Cypher.size(r), "RETURN size((:`Node`)-[]->(:`Node2`))"),
 			Arguments.of(Cypher.exists(e1), "RETURN exists(e1)"),
 			Arguments.of(Cypher.distance(p1, p2),
 				"RETURN distance(point({latitude: 1, longitude: 2}), point({latitude: 3, longitude: 4}))"),

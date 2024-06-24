@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
+import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
@@ -55,6 +56,7 @@ import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
+import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.NestedExpression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
@@ -62,6 +64,7 @@ import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.PatternExpression;
 import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.ProcedureCall;
@@ -184,12 +187,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private boolean inRelationshipCondition = false;
 
-	/**
-	 * Will be set to true when entering a {@link RelationshipPatternCondition}: In this case only existing symbolic names
-	 * may be used, new ones must not be introduced. The {@link #scopingStrategy scoping strategy}
-	 * will contain the list of named elements in the scope of the current subquery or with clause.
-	 */
-	private boolean skipSymbolicName = false;
+	private final Deque<Boolean> inPatternExpression = new ArrayDeque<>();
 
 	/**
 	 * Rendering parameters is not a config property due to some needs in Spring Data Neo4j: This needs to be configured
@@ -552,7 +550,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 				node.getSymbolicName().orElseGet(node::getRequiredSymbolicName), true, false));
 		}
 
-		skipSymbolicName = inRelationshipCondition;
 		inEntity = true;
 	}
 
@@ -561,7 +558,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		builder.append(")");
 
 		skipNodeContent = false;
-		skipSymbolicName = false;
 		inEntity = false;
 	}
 
@@ -615,10 +611,26 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(SymbolicName symbolicName) {
 		if (!inRelationshipCondition || nameResolvingStrategy.isResolved(symbolicName)) {
+			if (Boolean.TRUE.equals(inPatternExpression.peek()) && !scopingStrategy.hasVisitedBefore(new Named() {
+				@Override
+				public @NotNull Optional<SymbolicName> getSymbolicName() {
+					return Optional.of(symbolicName);
+				}
+			})) {
+				return;
+			}
+
 			builder.append(nameResolvingStrategy.resolve(symbolicName, inEntity, inPropertyLookup));
 		}
 	}
 
+	void enter(PatternExpression p) {
+		this.inPatternExpression.push(true);
+	}
+
+	void leave(PatternExpression p) {
+		this.inPatternExpression.pop();
+	}
 
 	void enter(Relationship relationship) {
 		skipRelationshipContent = scopingStrategy.hasVisitedBefore(relationship);
@@ -706,7 +718,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			builder.append("[");
 		}
 
-		skipSymbolicName = inRelationshipCondition && !skipRelationshipContent;
 		inEntity = true;
 	}
 
@@ -759,7 +770,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 		builder.append(direction.getSymbolRight());
 
-		skipSymbolicName = false;
 		inEntity = false;
 	}
 
