@@ -78,10 +78,9 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 *
 	 * @param symbolicName The symbolic name for this node object
 	 * @param labels The list of labels, no primary is given
-	 * @param properties A seto f properties
+	 * @param properties A set of properties
 	 */
 	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
-
 		this(symbolicName, new ArrayList<>(labels), null, properties, null);
 	}
 
