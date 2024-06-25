@@ -1,5 +1,11 @@
 == 2023.9
 
+=== 2023.9.8
+
+==== 🐛 Bug Fixes
+
+* Don’t introduce new names in pattern expressions. (#1017)
+
 === 2023.9.7
 
 Not everything goes as planned ;) Another 2023.9 release, enjoy.
