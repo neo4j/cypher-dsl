@@ -42,7 +42,7 @@ It's kind of a trade-off, but one that we think is valuable, otherwise we would 
 == Manual
 
 For a gentle introduction and some getting started guides, please use our
-https://neo4j-contrib.github.io/cypher-dsl[Manual].
+https://neo4j.github.io/cypher-dsl[Manual].
 
 == Getting Started
 
