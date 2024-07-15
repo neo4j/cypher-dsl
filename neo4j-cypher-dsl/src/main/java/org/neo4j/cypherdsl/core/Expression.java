@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public interface Expression extends Visitable, HasProperties {
+public interface Expression extends Visitable, PropertyAccessor {
 
 	/**
 	 * Creates a condition that checks whether this {@code expression} includes all elements of {@code rhs}.
@@ -488,11 +488,6 @@ public interface Expression extends Visitable, HasProperties {
 		return InternalPropertyImpl.create(this, names);
 	}
 
-	@Override @NotNull
-	default Property property(@NotNull String name) {
-		return InternalPropertyImpl.create(this, name);
-	}
-
 	/**
 	 * Creates a new {@link Property} associated with this property container. This property can be used as a lookup in
 	 * other expressions. It does not add a value to the property.
@@ -506,7 +501,7 @@ public interface Expression extends Visitable, HasProperties {
 	 *
 	 * @param lookup the expression that is evaluated to lookup this property.
 	 * @return a new {@link Property} associated with this named container
-	 * @since 2023.9.4
+	 * @since 2024.1.0
 	 */
 	@Override @NotNull
 	default Property property(@NotNull Expression lookup) {

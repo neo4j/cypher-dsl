@@ -35,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 1.1
  */
 @API(status = STABLE, since = "1.1")
-public interface PropertyContainer extends Named, HasProperties {
+public interface PropertyContainer extends Named, PropertyAccessor {
 
 	/**
 	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not

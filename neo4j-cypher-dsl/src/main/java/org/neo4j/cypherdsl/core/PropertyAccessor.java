@@ -28,10 +28,11 @@ import org.jetbrains.annotations.NotNull;
  * This interface represents an element that has properties.
  *
  * @author Andreas Berger
- * @since 2023.9.4
+ * @author Michael J. Simons
+ * @since 2024.1.0
  */
-@API(status = STABLE, since = "2023.9.4")
-public interface HasProperties {
+@API(status = STABLE, since = "2024.1.0")
+public interface PropertyAccessor {
 
 	/**
 	 * Creates a new {@link Property} associated with this element. This property can be used as a lookup in
@@ -42,16 +43,16 @@ public interface HasProperties {
 	 *
 	 * @param name property name, must not be {@literal null} or empty.
 	 * @return a new {@link Property} associated with this element
-	 * @since 2023.9.4
 	 */
 	@NotNull @Contract(pure = true)
-	Property property(@NotNull String name);
+	default Property property(@NotNull String name) {
+		return property(new String[] { name });
+	}
 
 	/**
 	 * @param names a list of nested property names
 	 * @return a new {@link Property} associated with this element
 	 * @see  #property(String)
-	 * @since 2023.9.4
 	 */
 	@NotNull @Contract(pure = true)
 	Property property(String... names);
@@ -69,7 +70,6 @@ public interface HasProperties {
 	 *
 	 * @param lookup the expression that is evaluated to lookup this property.
 	 * @return a new {@link Property} associated with this element
-	 * @since 2023.9.4
 	 */
 	@NotNull @Contract(pure = true)
 	Property property(@NotNull Expression lookup);
