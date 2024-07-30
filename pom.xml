@@ -634,6 +634,9 @@
 								<!-- 2023.9.8 and higher, internal API -->
 								<exclude>org.neo4j.cypherdsl.core.StatementBuilder$OngoingUpdate</exclude>
 							</excludes>
+							<ignoreMissingClassesByRegularExpressions>
+								<ignoreMissingClassesByRegularExpression>org.neo4j.cypherdsl.parser.internal.*</ignoreMissingClassesByRegularExpression>
+							</ignoreMissingClassesByRegularExpressions>
 						</parameter>
 					</configuration>
 					<executions>

@@ -28,6 +28,7 @@ module org.neo4j.cypherdsl.parser {
 	requires transitive org.apiguardian.api;
 	requires transitive org.neo4j.cypherdsl.core;
 
+	requires org.neo4j.cypher.internal.parser;
 	requires org.neo4j.cypher.internal.parser.javacc;
 	requires org.neo4j.cypher.internal.ast.factory;
 
