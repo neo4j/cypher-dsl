@@ -38,20 +38,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory.NULL;
-import org.neo4j.cypher.internal.ast.factory.AccessType;
-import org.neo4j.cypher.internal.ast.factory.ActionType;
-import org.neo4j.cypher.internal.ast.factory.CallInTxsOnErrorBehaviourType;
-import org.neo4j.cypher.internal.ast.factory.ConstraintType;
-import org.neo4j.cypher.internal.ast.factory.ConstraintVersion;
-import org.neo4j.cypher.internal.ast.factory.CreateIndexTypes;
-import org.neo4j.cypher.internal.ast.factory.HintIndexType;
-import org.neo4j.cypher.internal.ast.factory.ParameterType;
-import org.neo4j.cypher.internal.ast.factory.ParserCypherTypeName;
-import org.neo4j.cypher.internal.ast.factory.ParserNormalForm;
-import org.neo4j.cypher.internal.ast.factory.ParserTrimSpecification;
-import org.neo4j.cypher.internal.ast.factory.ScopeType;
-import org.neo4j.cypher.internal.ast.factory.ShowCommandFilterTypes;
-import org.neo4j.cypher.internal.ast.factory.SimpleEither;
+import org.neo4j.cypher.internal.parser.common.ast.factory.AccessType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ActionType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.CallInTxsOnErrorBehaviourType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ConstraintType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ConstraintVersion;
+import org.neo4j.cypher.internal.parser.common.ast.factory.CreateIndexTypes;
+import org.neo4j.cypher.internal.parser.common.ast.factory.HintIndexType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ParameterType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ParserCypherTypeName;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ParserNormalForm;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ParserTrimSpecification;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ScopeType;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ShowCommandFilterTypes;
+import org.neo4j.cypher.internal.parser.common.ast.factory.SimpleEither;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
@@ -126,6 +126,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	Statement,
 	Clause,
 	Where,
+	NULL,
+	NULL,
 	NULL,
 	NULL,
 	NULL,
@@ -456,6 +458,11 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public Expression setDynamicProperty(Expression dynamicProperty, Expression value) {
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_PROPERTY, Cypher.set(dynamicProperty, value));
+	}
+
+	@Override
 	public Operation setVariable(Expression v, Expression value) {
 
 		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_VARIABLE, Cypher.set(v, value));
@@ -467,7 +474,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression setLabels(Expression v, List<StringPos<InputPosition>> values, boolean containsIs) {
+	public Expression setLabels(Expression v, List<StringPos<InputPosition>> values, List<Expression> dynamicLabels, boolean containsIs) {
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
@@ -485,7 +492,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values, boolean containsIs) {
+	public Expression removeDynamicProperty(Expression dynamicProperty) {
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_PROPERTY, dynamicProperty);
+	}
+
+	@Override
+	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values,
+		List<Expression> dynamicLabels, boolean containsIs) {
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
@@ -863,8 +876,8 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement createUser(InputPosition p, boolean replace, boolean ifNotExists,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password, boolean encrypted,
-		boolean changeRequired, Boolean suspended, DatabaseName homeDatabase) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Boolean suspended, DatabaseName homeDatabase,
+		List<NULL> nulls, List<NULL> systemAuthAttributes) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -886,9 +899,30 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
+	public NULL auth(String provider, List<NULL> nulls, InputPosition p) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL authId(InputPosition s, Expression id) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL password(InputPosition p, Expression password, boolean encrypted) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public NULL passwordChangeRequired(InputPosition p, boolean changeRequired) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
 	public Statement alterUser(InputPosition p, boolean ifExists,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password, boolean encrypted,
-		Boolean changeRequired, Boolean suspended, DatabaseName homeDatabase, boolean removeHome) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Boolean suspended, DatabaseName homeDatabase,
+		boolean removeHome, List<NULL> nulls, List<NULL> systemAuthAttributes, boolean removeAllAuth,
+		List<Expression> removeAuths) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -902,7 +936,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement showUsers(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showUsers(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where,
+		boolean withAuth) {
 		throw new UnsupportedOperationException();
 	}
 

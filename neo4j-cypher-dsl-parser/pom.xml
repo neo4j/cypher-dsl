@@ -122,6 +122,13 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration combine.self="append">
+					<useModulePath>false</useModulePath>
+				</configuration>
+			</plugin>
+			<plugin>
 				<!-- This forces the failsafe plugin not to use the byte-code manipulated classes in the full bundle (yep, I know, it kinda
 				defeats the purpose of "IT", thank you very much), otherwise JaCoCo won't be able to actually recognize that classes have
 				been tested. Sure I might be as well just rename the tests and treat them as unit, ok, but at some time another developer
@@ -135,6 +142,7 @@
 					<classpathDependencyExcludes>
 						<classpathDependencyExclude>org.neo4j:neo4j-cypher-dsl-parser</classpathDependencyExclude>
 					</classpathDependencyExcludes>
+					<useModulePath>false</useModulePath>
 				</configuration>
 			</plugin>
 			<!--
@@ -173,6 +181,7 @@
 								<includes>
 									<include>org.neo4j:cypher-ast-factory</include>
 									<include>org.neo4j:neo4j-cypher-javacc-parser</include>
+									<include>org.neo4j:cypher-parser-common</include>
 								</includes>
 							</artifactSet>
 							<relocations>
@@ -186,11 +195,28 @@
 								<filter>
 									<artifact>*:*</artifact>
 									<excludes>
-										<exclude>META-INF/*</exclude>
 										<exclude>module-info.class</exclude>
 										<exclude>library.properties</exclude>
 										<exclude>LICENSE.txt</exclude>
 										<exclude>rootdoc.txt</exclude>
+									</excludes>
+								</filter>
+								<filter>
+									<artifact>org.neo4j:cypher-ast-factory</artifact>
+									<excludes>
+										<exclude>META-INF/**/*</exclude>
+									</excludes>
+								</filter>
+								<filter>
+									<artifact>org.neo4j:neo4j-cypher-javacc-parser</artifact>
+									<excludes>
+										<exclude>META-INF/**/*</exclude>
+									</excludes>
+								</filter>
+								<filter>
+									<artifact>org.neo4j:cypher-parser-common</artifact>
+									<excludes>
+										<exclude>META-INF/**/*</exclude>
 									</excludes>
 								</filter>
 							</filters>
@@ -219,6 +245,7 @@
 										requires transitive org.neo4j.cypherdsl.core;
 
 										// Those are shaded
+										// requires org.neo4j.cypher.internal.parser;
 										// requires org.neo4j.cypher.internal.parser.javacc;
 										// requires org.neo4j.cypher.internal.ast.factory;
 

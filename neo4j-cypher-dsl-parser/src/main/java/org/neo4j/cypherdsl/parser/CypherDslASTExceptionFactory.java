@@ -23,7 +23,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypher.internal.ast.factory.ASTExceptionFactory;
+import org.neo4j.cypher.internal.parser.common.ast.factory.ASTExceptionFactory;
 
 /**
  * @author Michael J. Simons
