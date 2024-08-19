@@ -1,5 +1,45 @@
 == 2024.0
 
+=== 2024.0.3
+
+This is mostly a release that upgrades dependency, with the noteworthy exception of having now a unified property accessor.
+
+Thanks to @fbiville for his contribution to the documentation, @loveleif for his support and making the latest Neo4j Cypher parser and its improvements work on the module path again and to @Andy2003 for his latest suggestion of the unified property accessor.
+
+==== 🚀 Features
+
+* Add a common interface `PropertyAccessor` (#908)
+
+==== 📖 Documentation
+
+* Update latest version supporting JDK 8 in README. (#1041)
+* Fix documentation link in README (#1026)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump com.google.guava:guava (#1049)
+** Bump org.junit:junit-bom from 5.10.3 to 5.11.0 (#1048)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1047)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1046)
+** Bump org.springframework.data:spring-data-neo4j (#1045)
+** Bump io.projectreactor:reactor-bom (#1044)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1043)
+** Bump org.apache.maven.plugins:maven-site-plugin (#1042)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1040)
+** Bump org.checkerframework:checker-qual (#1039)
+** Bump testcontainers.version from 1.20.0 to 1.20.1 (#1038)
+** Bump neo4j.version from 5.20.0 to 5.22.0 (#1036)
+** Bump org.neo4j.driver:neo4j-java-driver (#1037)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1035)
+** Bump testcontainers.version from 1.19.8 to 1.20.0 (#1034)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1033)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1032)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1030)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1029)
+** Bump org.springframework.data:spring-data-neo4j (#1028)
+** Bump org.assertj:assertj-core from 3.26.0 to 3.26.3 (#1027)
+
 === 2024.0.2
 
 🎉 The big party release! 🎉
