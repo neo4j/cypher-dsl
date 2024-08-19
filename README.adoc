@@ -100,7 +100,7 @@ class SimpleExample {
 
 === Required Java Version
 
-From version 2023.0.0 onwards, the minimal required Java version to use and build the Cypher-DSL is *Java 17*. If you need a version that is compatible with Java 8, please use 2022.8.x.
+From version 2023.0.0 onwards, the minimal required Java version to use and build the Cypher-DSL is *Java 17*. If you need a version that is compatible with Java 8, please use 2022.9.x.
 
 == Licensing
 
