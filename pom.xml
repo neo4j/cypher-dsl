@@ -144,7 +144,7 @@
 		<guava.version>33.3.0-jre</guava.version>
 		<jackson.version>2.17.2</jackson.version>
 		<jacoco-maven-plugin.version>0.8.12</jacoco-maven-plugin.version>
-		<japicmp-maven-plugin.version>0.22.0</japicmp-maven-plugin.version>
+		<japicmp-maven-plugin.version>0.23.0</japicmp-maven-plugin.version>
 		<java-module-name />
 		<java.version>17</java.version>
 		<javapoet.version>1.13.0</javapoet.version>
