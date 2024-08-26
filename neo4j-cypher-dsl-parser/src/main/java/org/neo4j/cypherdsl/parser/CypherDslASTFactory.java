@@ -42,7 +42,6 @@ import org.neo4j.cypher.internal.parser.common.ast.factory.AccessType;
 import org.neo4j.cypher.internal.parser.common.ast.factory.ActionType;
 import org.neo4j.cypher.internal.parser.common.ast.factory.CallInTxsOnErrorBehaviourType;
 import org.neo4j.cypher.internal.parser.common.ast.factory.ConstraintType;
-import org.neo4j.cypher.internal.parser.common.ast.factory.ConstraintVersion;
 import org.neo4j.cypher.internal.parser.common.ast.factory.CreateIndexTypes;
 import org.neo4j.cypher.internal.parser.common.ast.factory.HintIndexType;
 import org.neo4j.cypher.internal.parser.common.ast.factory.ParameterType;
@@ -810,7 +809,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause subqueryClause(InputPosition p, Statement subquery, NULL inTransactions) {
+	public Clause subqueryClause(InputPosition p, Statement subquery, NULL inTransactions, boolean scopeAll,
+		boolean hasScope, List<Expression> expressions) {
 		return Clauses.callClause(subquery);
 	}
 
@@ -828,14 +828,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause showIndexClause(InputPosition p, ShowCommandFilterTypes indexType, boolean brief, boolean verbose,
-		Where where, Clause yieldClause) {
+	public Clause showIndexClause(InputPosition p, ShowCommandFilterTypes indexType, Where where, Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showConstraintClause(InputPosition p, ShowCommandFilterTypes constraintType, boolean brief,
-		boolean verbose, Where where, Clause yieldClause) {
+	public Clause showConstraintClause(InputPosition p, ShowCommandFilterTypes constraintType, Where where,
+		Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1727,26 +1726,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace,
 		boolean ifNotExists, SimpleEither<StringPos<InputPosition>, Parameter<?>> constraintName, Expression expression,
 		StringPos<InputPosition> label, List<Property> properties, ParserCypherTypeName propertyType,
-		SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions, boolean containsOn,
-		ConstraintVersion constraintVersion) {
+		SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement dropConstraint(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> name,
 		boolean ifExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Statement dropConstraint(InputPosition p, ConstraintType constraintType, Expression expression,
-		StringPos<InputPosition> label, List<Property> properties) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Statement createIndexWithOldSyntax(InputPosition p, StringPos<InputPosition> label,
-		List<StringPos<InputPosition>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1777,12 +1763,6 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Statement dropIndex(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> name,
 		boolean ifExists) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public Statement dropIndex(InputPosition p, StringPos<InputPosition> label,
-		List<StringPos<InputPosition>> propertyNames) {
 		throw new UnsupportedOperationException();
 	}
 
