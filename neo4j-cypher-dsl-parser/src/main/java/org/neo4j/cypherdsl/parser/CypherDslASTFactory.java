@@ -678,6 +678,11 @@ final class CypherDslASTFactory implements ASTFactory<
 			}
 		}
 
+		if (relationshipPattern == null && patternList != null && patternList.size() == 1 && patternList.get(0) instanceof RelationshipPattern singleListItem) {
+			relationshipPattern = singleListItem;
+			patternList = null;
+		}
+
 		if (relationshipPattern != null) {
 			patternElements.add((PatternElement) relationshipPattern);
 		} else if (patternList != null) {

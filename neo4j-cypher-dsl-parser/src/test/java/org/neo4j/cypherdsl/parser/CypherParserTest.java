@@ -785,6 +785,24 @@ class CypherParserTest {
 		assertThat(normalized).isEqualTo("RETURN ('a' + 'B')");
 	}
 
+	@Test // GH-1059
+	void patternListAsLTRMustBeUnwrappedIntoRelPattern() {
+		var cypher = """
+			MATCH (movie:Movie)
+			RETURN size((movie)<-[:REVIEWED]-(:Person)) AS movieReviewedByEveryTotal
+		""";
+
+		var cfg = Configuration.newConfig()
+			.withGeneratedNames(true)
+			.build();
+		var renderer = Renderer.getRenderer(cfg);
+		var parseOptions = Options.newOptions()
+			.createSortedMaps(true)
+			.alwaysCreateRelationshipsLTR(true)
+			.build();
+		var normalized = renderer.render(CypherParser.parse(cypher, parseOptions));
+		assertThat(normalized).isEqualTo("MATCH (v0:`Movie`) RETURN size((:`Person`)-[:`REVIEWED`]->(v0)) AS v1");
+	}
 
 	@ParameterizedTest
 	@CsvSource(delimiterString = "|", textBlock = """
