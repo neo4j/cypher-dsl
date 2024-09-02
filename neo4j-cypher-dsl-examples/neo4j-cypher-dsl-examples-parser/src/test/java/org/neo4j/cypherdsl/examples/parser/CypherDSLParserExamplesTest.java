@@ -53,6 +53,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 // tag::main-entry-point[]
 import org.neo4j.cypherdsl.parser.CypherParser;
@@ -527,5 +528,16 @@ class CypherDSLParserExamplesTest {
 		var stmt = CypherParser.parse(query, options);
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (m:`Movie` {title: $pcdsl01})<-[r:`ACTED_IN`]-(p:`Person` {born: 1964}) WHERE (m.releaseYear IS NOT NULL AND p.name = $pcdsl02) RETURN m");
 		assertThat(stmt.getCatalog().getParameters()).containsValues("The Matrix", "Keanu Reeves");
+	}
+
+	@Test // GH-1060
+	void buildingWhereClauseShouldWork() {
+
+		var node = Cypher.node("Product").named("Product");
+		var where = Where.from(node.property("product_id").eq(Cypher.literalOf("BG2")));
+		assertThat(where).hasToString("Where{cypher=WHERE Product.product_id = 'BG2'}");
+
+		var cypher = Renderer.getRenderer(Configuration.defaultConfig(), GeneralizedRenderer.class).render(where);
+		assertThat(cypher).isEqualTo("WHERE Product.product_id = 'BG2'");
 	}
 }
