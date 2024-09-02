@@ -26,8 +26,10 @@ import java.net.URI;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
@@ -47,6 +49,99 @@ class SubqueriesIT {
 				.build();
 			String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
 			assertThat(cypher).isEqualTo("MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1980 RETURN n AS m} RETURN n.name");
+		}
+	}
+
+	@Nested
+	class DialectSupport {
+
+		@ParameterizedTest
+		@CsvSource(delimiterString = "|", textBlock = """
+			NEO4J_5|UNWIND [0, 1, 2] AS x CALL {RETURN 'hello' AS innerReturn} RETURN innerReturn
+			NEO4J_5_23|UNWIND [0, 1, 2] AS x CALL () {RETURN 'hello' AS innerReturn} RETURN innerReturn
+			""")
+		void starterExample(Dialect dialect, String expected) {
+			var stmt = Cypher.unwind(Cypher.listOf(Cypher.literalOf(0), Cypher.literalOf(1), Cypher.literalOf(2)))
+				.as("x")
+				.call(Cypher.returning(Cypher.literalOf("hello").as("innerReturn")).build())
+				.returning("innerReturn")
+				.build();
+
+			var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+			assertThat(renderer.render(stmt)).isEqualTo(expected);
+		}
+
+		@ParameterizedTest
+		@CsvSource(delimiterString = "|", textBlock = """
+			NEO4J_5|MATCH (p:Player), (t:Team) CALL {WITH p WITH p, rand() AS random SET p.rating = random RETURN p.name AS playerName, p.rating AS rating} RETURN playerName, rating, t AS team ORDER BY rating LIMIT 1
+			NEO4J_5_23|MATCH (p:Player), (t:Team) CALL (p) {WITH p, rand() AS random SET p.rating = random RETURN p.name AS playerName, p.rating AS rating} RETURN playerName, rating, t AS team ORDER BY rating LIMIT 1
+			""")
+		void someImports(Dialect dialect, String expected) {
+
+			var p = Cypher.node("Player").named("p");
+			var t = Cypher.node("Team").named("t");
+
+			var rating = Cypher.name("rating");
+			var playerName = Cypher.name("playerName");
+			var stmt = Cypher.match(p, t)
+				.call(
+					Cypher.with(p, Cypher.rand().as("random"))
+						.set(p.property("rating").to(Cypher.name("random")))
+						.returning(p.property("name").as(playerName), p.property("rating").as(rating))
+						.build(), p
+				).returning(playerName, rating, t.as("team"))
+				.orderBy(rating)
+				.limit(1).build();
+
+			var renderer = Renderer.getRenderer(Configuration.newConfig()
+				.alwaysEscapeNames(false)
+				.withDialect(dialect).build());
+			assertThat(renderer.render(stmt)).isEqualTo(expected);
+		}
+
+		@ParameterizedTest
+		@CsvSource(delimiterString = "|", textBlock = """
+			NEO4J_5|MATCH (p:Player), (t:Team) CALL {WITH * RETURN p AS player, t AS team} RETURN player, team
+			NEO4J_5_23|MATCH (p:Player), (t:Team) CALL (*) {RETURN p AS player, t AS team} RETURN player, team
+			""")
+		void allImports(Dialect dialect, String expected) {
+
+			var p = Cypher.node("Player").named("p");
+			var t = Cypher.node("Team").named("t");
+
+			var player = Cypher.name("player");
+			var stmt = Cypher.match(p, t)
+				.call(
+					Cypher.returning(p.as("player"), t.as("team")).build(), Cypher.asterisk()
+				).returning(player, Cypher.name("team"))
+				.build();
+
+			var renderer = Renderer.getRenderer(Configuration.newConfig()
+				.alwaysEscapeNames(false)
+				.withDialect(dialect).build());
+			assertThat(renderer.render(stmt)).isEqualTo(expected);
+		}
+
+		@ParameterizedTest
+		@CsvSource(delimiterString = "|", textBlock = """
+			NEO4J_5|MATCH (t:Team) CALL {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
+			NEO4J_5_23|MATCH (t:Team) CALL () {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
+			""")
+		void noImports(Dialect dialect, String expected) {
+
+			var p = Cypher.node("Player").named("p");
+			var t = Cypher.node("Team").named("t");
+
+			var stmt = Cypher.match(t)
+				.call(
+					Cypher.match(p).returning(Cypher.count(p).as("totalPlayers")).build()
+				).returning(Cypher.count(t).as("totalTeams"), Cypher.name("totalPlayers"))
+				.build();
+
+			var renderer = Renderer.getRenderer(Configuration.newConfig()
+				.alwaysEscapeNames(false)
+				.withDialect(dialect).build());
+			assertThat(renderer.render(stmt)).isEqualTo(expected);
 		}
 	}
 

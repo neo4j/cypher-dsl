@@ -20,10 +20,15 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
+import java.util.Optional;
+import java.util.function.Function;
+
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
+import org.neo4j.cypherdsl.core.Subquery;
+import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -46,18 +51,51 @@ public enum Dialect {
 	 * Neo4j 5
 	 */
 	NEO4J_5 {
+
+		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplier();
+
 		@Override
 		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
-			if (visitable instanceof FunctionInvocation) {
-				return Neo4j5FunctionInvocationVisitor.class;
-			} else if (visitable instanceof Comparison) {
-				return Neo4j5ComparisonVisitor.class;
-			}
-			return super.getHandler(visitable);
+			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+		}
+	},
+
+	/**
+	 * Enhanced Neo4j 5 dialect that renders importing with statements for call subqueries as variable scoped subqueries.
+	 * @since 2024.1.0
+	 */
+	NEO4J_5_23 {
+		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplier();
+
+		@Override
+		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
+			return handlerSupplier.apply(visitable)
+				.or(() -> {
+					if (visitable instanceof Subquery || visitable instanceof With) {
+						return Optional.of(Neo4j523SubqueryVisitor.class);
+					}
+					return Optional.empty();
+				})
+				.orElseGet(() -> super.getHandler(visitable));
 		}
 	};
 
 	@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
 		return null;
 	}
+
+	private static class DefaultNeo4j5HandlerSupplier
+		implements Function<Visitable, Optional<Class<? extends Visitor>>> {
+
+		@Override
+		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
+			if (visitable instanceof FunctionInvocation) {
+				return Optional.of(Neo4j5FunctionInvocationVisitor.class);
+			} else if (visitable instanceof Comparison) {
+				return Optional.of(Neo4j5ComparisonVisitor.class);
+			}
+			return Optional.empty();
+		}
+	}
+
 }
