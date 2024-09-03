@@ -75,7 +75,7 @@ jobs:
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: artifacts
           path: repository
@@ -98,7 +98,7 @@ jobs:
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v4
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4.1.7
         with:
           name: artifacts
           path: repository
