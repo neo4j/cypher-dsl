@@ -22,6 +22,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
+import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -94,5 +95,13 @@ public final class Subquery extends AbstractClause implements Clause {
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
 		return statement != null && statement.doesReturnOrYield();
+	}
+
+	/**
+	 * {@return the importing with clause if any}
+	 */
+	@API(status = INTERNAL)
+	public @Nullable With importingWith() {
+		return this.importingWith == null ? null : this.importingWith.imports();
 	}
 }

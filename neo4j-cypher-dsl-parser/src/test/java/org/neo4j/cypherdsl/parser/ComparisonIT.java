@@ -615,8 +615,9 @@ class ComparisonIT {
 					├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
 					│   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
 					│       ├── With{cypher=WITH n}
-					│       │   └── ExpressionList{cypher=n}
-					│       │       └── SymbolicName{cypher=n}
+					│       │   └── ReturnBody{cypher=n}
+					│       │       └── ExpressionList{cypher=n}
+					│       │           └── SymbolicName{cypher=n}
 					│       ├── Match{cypher=MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956)}
 					│       │   ├── Pattern{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
 					│       │   │   └── InternalRelationshipImpl{cypher=(m:Movie)<-[:ACTED_IN]-(n)}
@@ -645,18 +646,20 @@ class ComparisonIT {
 					│       │               ├── Operator{cypher==}
 					│       │               └── NumberLiteral{cypher=1956}
 					│       └── Return{cypher=RETURN m}
-					│           └── ExpressionList{cypher=m}
-					│               └── SymbolicName{cypher=m}
+					│           └── ReturnBody{cypher=m}
+					│               └── ExpressionList{cypher=m}
+					│                   └── SymbolicName{cypher=m}
 					└── Return{cypher=RETURN n.name, m.title}
-					    └── ExpressionList{cypher=n.name, m.title}
-					        ├── InternalPropertyImpl{cypher=n.name}
-					        │   ├── SymbolicName{cypher=n}
-					        │   └── PropertyLookup{cypher=.name}
-					        │       └── SymbolicName{cypher=name}
-					        └── InternalPropertyImpl{cypher=m.title}
-					            ├── SymbolicName{cypher=m}
-					            └── PropertyLookup{cypher=.title}
-					                └── SymbolicName{cypher=title}
+					    └── ReturnBody{cypher=n.name, m.title}
+					        └── ExpressionList{cypher=n.name, m.title}
+					            ├── InternalPropertyImpl{cypher=n.name}
+					            │   ├── SymbolicName{cypher=n}
+					            │   └── PropertyLookup{cypher=.name}
+					            │       └── SymbolicName{cypher=name}
+					            └── InternalPropertyImpl{cypher=m.title}
+					                ├── SymbolicName{cypher=m}
+					                └── PropertyLookup{cypher=.title}
+					                    └── SymbolicName{cypher=title}
 					""");
 	}
 

@@ -50,10 +50,12 @@ public final class ReturnBody implements Visitable {
 
 	@Override
 	public void accept(Visitor visitor) {
+		visitor.enter(this);
 		returnItems.accept(visitor);
 		Visitable.visitIfNotNull(order, visitor);
 		Visitable.visitIfNotNull(skip, visitor);
 		Visitable.visitIfNotNull(limit, visitor);
+		visitor.leave(this);
 	}
 
 	@Override

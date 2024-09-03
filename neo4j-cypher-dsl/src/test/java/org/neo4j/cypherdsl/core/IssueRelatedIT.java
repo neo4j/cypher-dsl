@@ -32,6 +32,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
@@ -1047,8 +1048,9 @@ class IssueRelatedIT {
 		assertThat(cypher).isEqualTo(expected);
 	}
 
-	@Test // GH-319
-	void subqueryWithRename() {
+	@ParameterizedTest // GH-319
+	@EnumSource(Dialect.class)
+	void subqueryWithRename(Dialect dialect) {
 
 		SymbolicName nodes = Cypher.name("nodes");
 		SymbolicName relations = Cypher.name("relations");
@@ -1066,7 +1068,7 @@ class IssueRelatedIT {
 				.returning(Cypher.asterisk())
 				.build();
 
-		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
+		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).withPrettyPrint(true).build());
 		String cypher = renderer.render(completeStatement);
 		String expected = """
 			MATCH p = (:Target)<-[:REL]-()
@@ -1077,6 +1079,11 @@ class IssueRelatedIT {
 			  RETURN x
 			}
 			RETURN *""";
+		if (dialect == Dialect.NEO4J_5_23) {
+			expected = expected
+				.replace("CALL {", "CALL (nodes) {")
+				.replace("  WITH nodes\n", "");
+		}
 		assertThat(cypher).isEqualTo(expected);
 	}
 

@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.Distinct;
@@ -56,10 +57,11 @@ public final class With implements Visitable, Clause {
 	@Override
 	public void accept(Visitor visitor) {
 
-		visitor.enter(this);
-		Visitable.visitIfNotNull(this.distinct, visitor);
-		this.body.accept(visitor);
-		Visitable.visitIfNotNull(where, visitor);
+		if (visitor.enterWithResult(this) == EnterResult.CONTINUE) {
+			Visitable.visitIfNotNull(this.distinct, visitor);
+			this.body.accept(visitor);
+			Visitable.visitIfNotNull(where, visitor);
+		}
 		visitor.leave(this);
 	}
 
