@@ -144,19 +144,22 @@ class RewriteTest {
 		var mapping = Map.of("param1", "foo", "x", "y");
 		var parserOptions = Options.newOptions()
 			.withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Expression.class, e -> {
-				if (e instanceof Parameter<?> p) {
+				if (e instanceof Parameter<?>) {
+					var p = (Parameter<?>) e;
 					return Cypher.parameter(mapping.getOrDefault(p.getName(), p.getName()), p.getValue());
 				}
 				return e;
 			})
 			.withCallback(ExpressionCreatedEventType.ON_NEW_VARIABLE, Expression.class, e -> {
-				if (e instanceof SymbolicName s) {
+				if (e instanceof SymbolicName) {
+					var s = (SymbolicName) e;
 					return Cypher.name(mapping.getOrDefault(s.getValue(), s.getValue()));
 				}
 				return e;
 			})
 			.build();
-		var statement = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x", parserOptions).getCypher();
+		var statement = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x", parserOptions)
+			.getCypher();
 		assertThat(statement).isEqualTo("MATCH (y:`Movie`) WHERE y.title = $foo RETURN y");
 	}
 }
