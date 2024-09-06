@@ -82,8 +82,10 @@ public final class Parameter<T> implements Expression {
 
 	/**
 	 * @return The name of this parameter.
+	 * @since 2023.1.0
 	 */
-	String getName() {
+	@API(status = STABLE, since = "2023.1.0")
+	public String getName() {
 		return name;
 	}
 
