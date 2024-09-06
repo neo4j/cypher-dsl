@@ -1,0 +1,18 @@
+== 2022.10
+
+=== 2022.10.0
+
+Welcome @ali-ince to the list of contributors to Cypher-DSL.
+We are glad that you and your team are users of this module.
+
+==== 🚀 Features
+
+* Allow retrieving parameter names (#1071)
+* Allow chainable foreach. (#988)
+* Add builder methods for `FOREACH`. (#740)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Update Neo4j from 4.4.29 to 4.4.37
+** Update Neo4j Java Driver from 4.4.15 to 4.4.18
