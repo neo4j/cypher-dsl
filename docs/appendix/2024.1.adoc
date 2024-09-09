@@ -1,0 +1,40 @@
+== 2024.1
+
+=== 2024.1.0
+
+This new minor release adds a third dialect: Neo4j 5.23, catering for Neo4j >= 5.23.
+The initial release will rewrite sub-query `CALL` statements with importing `WITH` into sub-queries with variable scoped `CALL` clause.
+While the former is still available in Neo4j 5.23, it will cause deprecation warnings, hence, if you want to get rid of those, change the dialect accordingly.
+No need to rewrite any query on your own.
+
+==== 🚀 Features
+
+* Add a Neo4j 5.23 dialect. (#1069)
+
+==== 🐛 Bug Fixes
+
+* Unwrap `PatternList` proper if unique.
+
+==== 📖 Documentation
+
+* Add an example of building a stand-alone `WHERE` clause.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.checkerframework:checker-qual (#1072)
+** Bump actions/download-artifact from 1 to 4.1.7 in /.github/workflows (#1070)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1068)
+** Bump mockito.version from 5.12.0 to 5.13.0 (#1067)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1066)
+** Bump org.neo4j.driver:neo4j-java-driver (#1065)
+** Bump com.puppycrawl.tools:checkstyle (#1064)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1063)
+** Bump neo4j.version from 5.22.0 to 5.23.0 (#1053)
+** Bump org.apache.maven.plugins:maven-install-plugin (#1057)
+** Bump org.asciidoctor:asciidoctorj from 2.5.13 to 3.0.0 (#1056)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1055)
+** Bump org.apache.maven.plugins:maven-deploy-plugin (#1054)
+** Bump com.puppycrawl.tools:checkstyle (#1052)
+** Bump org.apache.maven.plugins:maven-checkstyle-plugin (#1051)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1050)
