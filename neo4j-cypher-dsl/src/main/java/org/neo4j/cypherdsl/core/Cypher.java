@@ -1115,6 +1115,18 @@ public final class Cypher {
 	}
 
 	/**
+	 * Starts building a statement from a raw Cypher string that might also have arguments as supported through {@link Cypher#raw(String, Object...)}.
+	 * Use this method as your own risk and be aware that no checks are done on the Cypher.
+	 *
+	 * @param rawCypher the raw Cypher statement to call
+	 * @param args      optional args that replace placeholders in the {@code rawCypher}
+	 * @return Ongoing sub-query definition based on the raw Cypher statement.
+	 */
+	public static ExposesSubqueryCall.BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+		return Statement.builder().callRawCypher(rawCypher, args);
+	}
+
+	/**
 	 * Creates a {@code RETURN} clause from a raw Cypher expression created via {@link Cypher#raw(String, Object...)}.
 	 * The expression maybe aliased but it must resolve to a raw element
 	 *
