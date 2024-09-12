@@ -96,6 +96,17 @@
 			</roles>
 			<timezone>+1</timezone>
 		</developer>
+		<developer>
+			<id>aince</id>
+			<name>Ali Ince</name>
+			<email>ali.ince at neo4j.com</email>
+			<organization>Neo Technology</organization>
+			<organizationUrl>https://neo4j.com</organizationUrl>
+			<roles>
+				<role>developer</role>
+			</roles>
+			<timezone>0</timezone>
+		</developer>
 	</developers>
 
 	<modules>
