@@ -100,7 +100,7 @@ jobs:
     steps:
       - uses: graalvm/setup-graalvm@v1
         with:
-          distribution: 'graalvm-community'
+          distribution: 'liberica'
           java-version: '11'
           components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
