@@ -1086,7 +1086,7 @@ public final class Cypher {
 	 * @param rawCypher the raw Cypher statement to call
 	 * @param args      optional args that replace placeholders in the {@code rawCypher}
 	 * @return Ongoing sub-query definition based on the raw Cypher statement.
-	 * @since 2024.2.0
+	 * @since 2022.11.0
 	 */
 	public static ExposesSubqueryCall.BuildableSubquery callRawCypher(String rawCypher, Object... args) {
 		return Statement.builder().callRawCypher(rawCypher, args);
