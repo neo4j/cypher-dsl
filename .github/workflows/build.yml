@@ -102,7 +102,6 @@ jobs:
         with:
           distribution: 'liberica'
           java-version: '11'
-          components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
