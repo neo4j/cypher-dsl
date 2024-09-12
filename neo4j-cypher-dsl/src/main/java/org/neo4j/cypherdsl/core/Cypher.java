@@ -57,6 +57,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  * @author Michael J. Simons
  * @author Gerrit Meier
  * @author Andreas Berger
+ * @author Ali Ince
  * @since 1.0
  */
 @SuppressWarnings("unused") @API(status = STABLE, since = "1.0")
@@ -1121,6 +1122,7 @@ public final class Cypher {
 	 * @param rawCypher the raw Cypher statement to call
 	 * @param args      optional args that replace placeholders in the {@code rawCypher}
 	 * @return Ongoing sub-query definition based on the raw Cypher statement.
+	 * @since 2024.2.0
 	 */
 	public static ExposesSubqueryCall.BuildableSubquery callRawCypher(String rawCypher, Object... args) {
 		return Statement.builder().callRawCypher(rawCypher, args);
