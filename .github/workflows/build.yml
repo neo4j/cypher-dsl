@@ -60,7 +60,7 @@ jobs:
           -pl !org.neo4j:neo4j-cypher-dsl-examples-parser
           -pl !org.neo4j:neo4j-cypher-dsl-examples-sdn6
       - name: Archive artifacts
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: artifacts
           path: target/repository
@@ -80,7 +80,7 @@ jobs:
           java-version: 11
           distribution: zulu
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: artifacts
           path: binaries
@@ -100,15 +100,14 @@ jobs:
     steps:
       - uses: graalvm/setup-graalvm@v1
         with:
-          version: '21.3.0'
+          distribution: 'liberica'
           java-version: '11'
-          components: 'native-image'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: artifacts
           path: repository
@@ -131,7 +130,7 @@ jobs:
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
       - name: Download artifacts
-        uses: actions/download-artifact@v1
+        uses: actions/download-artifact@v4
         with:
           name: artifacts
           path: repository

@@ -4978,4 +4978,30 @@ class CypherIT {
 							+ "RETURN node");
 		}
 	}
+
+	@Nested
+	class Call {
+
+		@Test
+		void simpleCallRawCypher() {
+			String cypher = Cypher.callRawCypher("MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b").build()
+				.getCypher();
+			assertThat(cypher).isEqualTo("CALL {MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b}");
+		}
+
+		@Test
+		void rawCypherWithWhereAndReturn() {
+			String cypher = Cypher.callRawCypher("MATCH (n:Test) RETURN id(n) as a, n.id as b, n.timestamp as timestamp")
+				.with(Cypher.asterisk())
+				.where(org.neo4j.cypherdsl.core.Conditions.gt(Cypher.raw("timestamp"), Cypher.parameter("from"))
+					.and(org.neo4j.cypherdsl.core.Conditions.lte(Cypher.raw("timestamp"), Cypher.parameter("to"))))
+				.returning(Cypher.asterisk())
+				.build().getCypher();
+
+			assertThat(cypher).isEqualTo(
+				"CALL {MATCH (n:Test) RETURN id(n) as a, n.id as b, n.timestamp as timestamp} WITH * WHERE (timestamp > $from AND timestamp <= $to) RETURN *");
+		}
+
+	}
+
 }

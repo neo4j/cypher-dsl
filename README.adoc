@@ -6,7 +6,7 @@
 :artifactId: neo4j-cypher-dsl
 
 // This will be next version and also the one that will be put into the manual for the main branch
-:neo4j-cypher-dsl-version: 2022.10.1-SNAPSHOT
+:neo4j-cypher-dsl-version: 2022.11.0-SNAPSHOT
 // This is the latest released version, used only in the readme
 :neo4j-cypher-dsl-version-latest: 2022.10.0
 
@@ -20,7 +20,7 @@ image:https://maven-badges.herokuapp.com/maven-central/org.neo4j/neo4j-cypher-ds
 [abstract]
 --
 The Neo4j Cypher-DSL in its current form is a spin-off from Spring Data Neo4j 6+ (né Spring Data Neo4j⚡️RX), where it is used to generate all Cypher queries.
-We thank all contributors to all branches prior to 2020.0 for their effort in creating the previous verions.
+We thank all contributors to all branches prior to 2020.0 for their effort in creating the previous versions.
 --
 
 The primary goal of this project is to have a type safe way of creating Cypher queries targeted at https://neo4j.com[Neo4j 4.0+].
@@ -37,7 +37,7 @@ starting at _2020.0.0_.
 == Manual
 
 For a gentle introduction and some getting started guides, please use our
-https://neo4j-contrib.github.io/cypher-dsl[Manual].
+https://neo4j.github.io/cypher-dsl[Manual].
 
 == Getting Started
 
@@ -63,7 +63,7 @@ First, include the dependency to the Neo4j Cypher-DSL under the following coordi
 .Inclusion of the Neo4j Cypher-DSL in a Gradle project
 ----
 dependencies {
-    implementation '{groupId}:{artifactId}:{neo4j-cypher-dsl-version-latest}'
+    compile '{groupId}:{artifactId}:{neo4j-cypher-dsl-version-latest}'
 }
 ----
 
