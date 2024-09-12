@@ -4984,17 +4984,17 @@ class CypherIT {
 
 		@Test
 		void simpleCallRawCypher() {
-			var cypher = Cypher.callRawCypher("MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b").build()
+			String cypher = Cypher.callRawCypher("MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b").build()
 				.getCypher();
 			assertThat(cypher).isEqualTo("CALL {MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b}");
 		}
 
 		@Test
 		void rawCypherWithWhereAndReturn() {
-			var cypher = Cypher.callRawCypher("MATCH (n:Test) RETURN id(n) as a, n.id as b, n.timestamp as timestamp")
+			String cypher = Cypher.callRawCypher("MATCH (n:Test) RETURN id(n) as a, n.id as b, n.timestamp as timestamp")
 				.with(Cypher.asterisk())
-				.where(Cypher.gt(Cypher.raw("timestamp"), Cypher.parameter("from"))
-					.and(Cypher.lte(Cypher.raw("timestamp"), Cypher.parameter("to"))))
+				.where(org.neo4j.cypherdsl.core.Conditions.gt(Cypher.raw("timestamp"), Cypher.parameter("from"))
+					.and(org.neo4j.cypherdsl.core.Conditions.lte(Cypher.raw("timestamp"), Cypher.parameter("to"))))
 				.returning(Cypher.asterisk())
 				.build().getCypher();
 
