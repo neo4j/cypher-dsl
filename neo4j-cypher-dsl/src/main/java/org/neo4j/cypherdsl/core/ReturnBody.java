@@ -18,7 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
+
+import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -56,6 +59,11 @@ public final class ReturnBody implements Visitable {
 		Visitable.visitIfNotNull(skip, visitor);
 		Visitable.visitIfNotNull(limit, visitor);
 		visitor.leave(this);
+	}
+
+	@API(status = INTERNAL)
+	List<Expression> getReturnItems() {
+		return returnItems.getChildren();
 	}
 
 	@Override

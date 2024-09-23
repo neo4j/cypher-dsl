@@ -32,7 +32,6 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -115,7 +114,7 @@ public final class ScopingStrategy {
 
 	private boolean inListFunctionPredicate = false;
 
-	private final AtomicReference<Set<String>> currentImports = new AtomicReference<>();
+	private final Deque<Set<String>> currentImports = new ArrayDeque<>();
 	private final Deque<Set<String>> definedInSubquery = new ArrayDeque<>();
 
 	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
@@ -148,23 +147,26 @@ public final class ScopingStrategy {
 			this.inProperty = true;
 		}
 
-		if (visitable instanceof Subquery) {
+		if (visitable instanceof Subquery subquery) {
+			var with = subquery.importingWith();
+
 			this.inSubquery = true;
 			this.definedInSubquery.push(new LinkedHashSet<>());
+
+			Set<String> imports = new LinkedHashSet<>();
+			this.currentImports.push(imports);
+			if (with != null) {
+				with.getItems().stream()
+					.filter(IdentifiableElement.class::isInstance)
+					.map(IdentifiableElement.class::cast)
+					.map(ScopingStrategy::extractIdentifier)
+					.filter(Objects::nonNull)
+					.forEach(imports::add);
+			}
 		}
 
 		if (isListFunctionPredicate(visitable)) {
 			this.inListFunctionPredicate = true;
-		}
-
-		if (this.inSubquery && visitable instanceof With with) {
-			Set<String> imports = new HashSet<>();
-			with.accept(segment -> {
-				if (segment instanceof SymbolicName symbolicName) {
-					imports.add(symbolicName.getValue());
-				}
-			});
-			this.currentImports.compareAndSet(null, imports);
 		}
 
 		if (visitable instanceof MapProjection) {
@@ -187,7 +189,13 @@ public final class ScopingStrategy {
 
 		if (notify) {
 			scopeSeed.addAll(afterStatement);
-			this.onScopeEntered.forEach(c -> c.accept(visitable, scopeSeed));
+			var importsAndScope = new LinkedHashSet<IdentifiableElement>();
+			var current = this.currentImports.peek();
+			if (current != null) {
+				current.stream().map(Cypher::name).forEach(importsAndScope::add);
+			}
+			importsAndScope.addAll(scopeSeed);
+			this.onScopeEntered.forEach(c -> c.accept(visitable, importsAndScope));
 		}
 	}
 
@@ -264,7 +272,7 @@ public final class ScopingStrategy {
 		}
 		if (visitable instanceof Subquery) {
 			this.inSubquery = false;
-			this.currentImports.set(null);
+			this.currentImports.pop();
 			this.definedInSubquery.pop();
 		}
 
@@ -359,7 +367,7 @@ public final class ScopingStrategy {
 		return i -> {
 			boolean result = i.equals(needle.getRequiredSymbolicName().getValue());
 			if (result && inSubquery) {
-				var imported = Optional.ofNullable(currentImports.get()).orElseGet(Set::of).contains(i);
+				var imported = Optional.ofNullable(currentImports.peek()).orElseGet(Set::of).contains(i);
 				return imported || this.definedInSubquery.peek().contains(i);
 			}
 			return result;
@@ -506,6 +514,9 @@ public final class ScopingStrategy {
 	 * @return The set of current imports
 	 */
 	public Set<SymbolicName> getCurrentImports() {
-		return Optional.ofNullable(this.currentImports.get()).stream().flatMap(v -> v.stream().map(Cypher::name)).collect(Collectors.toSet());
+		return Optional.ofNullable(this.currentImports.peek()).stream()
+			.flatMap(v -> v.stream()
+				.map(Cypher::name))
+			.collect(Collectors.toSet());
 	}
 }

@@ -53,6 +53,11 @@ class ExpressionList extends TypedSubtree<Expression> {
 	}
 
 	@Override
+	protected List<Expression> getChildren() {
+		return super.getChildren();
+	}
+
+	@Override
 	public String toString() {
 		return RendererBridge.render(this);
 	}

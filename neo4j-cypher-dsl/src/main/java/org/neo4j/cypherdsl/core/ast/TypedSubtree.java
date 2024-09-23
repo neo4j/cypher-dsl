@@ -84,6 +84,11 @@ public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 	}
 
 	@API(status = INTERNAL)
+	protected List<T> getChildren() {
+		return children;
+	}
+
+	@API(status = INTERNAL)
 	public String separator() {
 		return ", ";
 	}
