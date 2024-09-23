@@ -132,7 +132,96 @@ class ParserIssuesIT {
 			} AS v5""");
 	}
 
+	@Test // GH-1075
+	void unionPartsMustBeExportedToScope() {
 
+		var cypher = """
+			MATCH (this:Actor)
+			CALL {
+				WITH this
+				CALL {
+					WITH this
+					MATCH (this)-[this0:ACTED_IN]->(this1:Movie)
+					WITH {
+						properties: {
+							screenTime: this0.screenTime
+						},
+						node: {
+							__resolveType: 'Movie',
+								title: this1.title
+						}
+					} AS edge
+					RETURN edge
+					UNION
+					WITH this
+					MATCH (this)-[this2:ACTED_IN]->(this3:Series)
+					WITH {
+						properties: {
+							screenTime: this2.screenTime
+						},
+						node: {
+							__resolveType: 'Series',
+								episodes: this3.episodes,
+								title: this3.title
+						}
+					} AS edge
+					RETURN edge
+				}
+				WITH collect(edge) AS edges
+				RETURN {
+					edges: edges
+				} AS var4
+			}
+			RETURN this {
+				.name,
+				actedInConnection: var4
+			} AS this
+			""";
+		var renderer = Renderer.getRenderer(Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build());
+		var normalized = renderer.render(CypherParser.parse(cypher));
 
-
+		assertThat(normalized).isEqualTo("""
+			MATCH (v0:Actor)
+			CALL {
+			  WITH v0
+			  CALL {
+			    WITH v0
+			    MATCH (v0)-[v1:ACTED_IN]->(v2:Movie)
+			    WITH {
+			      properties: {
+			        screenTime: v1.screenTime
+			      },
+			      node: {
+			        __resolveType: 'Movie',
+			        title: v2.title
+			      }
+			    } AS v3
+			    RETURN v3 UNION
+			    WITH v0
+			    MATCH (v0)-[v4:ACTED_IN]->(v5:Series)
+			    WITH {
+			      properties: {
+			        screenTime: v4.screenTime
+			      },
+			      node: {
+			        __resolveType: 'Series',
+			        episodes: v5.episodes,
+			        title: v5.title
+			      }
+			    } AS v6
+			    RETURN v6
+			  }
+			  WITH collect(v6) AS v1
+			  RETURN {
+			    edges: v1
+			  } AS v2
+			}
+			RETURN v0 {
+			  .name,
+			  actedInConnection: v2
+			} AS v3""");
+	}
 }
