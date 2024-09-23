@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.parser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -223,5 +224,36 @@ class ParserIssuesIT {
 			  .name,
 			  actedInConnection: v2
 			} AS v3""");
+	}
+
+	@Test
+	void projectionsShouldBeSortedToo() {
+		var cypher = """
+			MATCH (user:User)
+			return user {
+			   .title,
+			   b: 'B',
+			   .*,
+			   a: 'A'
+			 } AS user
+			""";
+
+		Statement statement = CypherParser.parse(cypher, Options.newOptions()
+			.createSortedMaps(true) // this has no effect on the projection
+			.build());
+
+		var renderer = Renderer.getRenderer(Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build());
+		var normalized = renderer.render(statement);
+		assertThat(normalized).isEqualTo("""
+			MATCH (v0:User)
+			RETURN v0 {
+			  a: 'A',
+			  b: 'B',
+			  .*,
+			  .title
+			} AS v1""");
 	}
 }

@@ -54,7 +54,20 @@ public final class MapProjection implements Expression {
 	@API(status = INTERNAL, since = "2023.9.0")
 	public static MapProjection create(SymbolicName name, Object... content) {
 
-		return new MapProjection(name, MapExpression.withEntries(createNewContent(content)));
+		return new MapProjection(name, MapExpression.withEntries(createNewContent(false, content)));
+	}
+
+	/**
+	 * Create a new map projection with the given, mixed content
+	 * @param name The symbolic name of this project
+	 * @param content The projected content
+	 * @return A new map projection
+	 * @since 2024.1.1
+	 */
+	@API(status = INTERNAL, since = "2024.1.1")
+	public static MapProjection sorted(SymbolicName name, Object... content) {
+
+		return new MapProjection(name, MapExpression.withEntries(createNewContent(true, content)));
 	}
 
 	MapProjection(SymbolicName name, MapExpression map) {
@@ -70,7 +83,7 @@ public final class MapProjection implements Expression {
 	 */
 	@NotNull @Contract(pure = true)
 	public MapProjection and(Object... content) {
-		return new MapProjection(this.name, this.map.addEntries(createNewContent(content)));
+		return new MapProjection(this.name, this.map.addEntries(createNewContent(false, content)));
 	}
 
 	@Override
@@ -93,7 +106,7 @@ public final class MapProjection implements Expression {
 		return currentObject;
 	}
 
-	private static List<Expression> createNewContent(Object... content) {
+	private static List<Expression> createNewContent(boolean sort, Object... content) {
 		final List<Expression> newContent = new ArrayList<>(content.length);
 		final Set<String> knownKeys = new HashSet<>();
 
@@ -153,6 +166,25 @@ public final class MapProjection implements Expression {
 			lastKey = null;
 			lastExpression = null;
 		}
+
+		if (sort) {
+			newContent.sort((o1, o2) -> {
+				if (o1 instanceof KeyValueMapEntry kvm1 && o2 instanceof KeyValueMapEntry kvm2) {
+					return kvm1.getKey().compareTo(kvm2.getKey());
+				} else if (o1 instanceof PropertyLookup pl1 && o2 instanceof PropertyLookup pl2) {
+					if (pl1 == PropertyLookup.wildcard()) {
+						return -1;
+					} else if (pl2 == PropertyLookup.wildcard()) {
+						return 1;
+					}
+					return pl1.getPropertyKeyName().getValue().compareTo(pl2.getPropertyKeyName().getValue());
+				} else if (o1 instanceof PropertyLookup) {
+					return 1;
+				}
+				return -1;
+			});
+		}
+
 		return newContent;
 	}
 

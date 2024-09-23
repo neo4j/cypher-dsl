@@ -1614,7 +1614,9 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression mapProjection(InputPosition p, Expression v, List<Expression> items) {
-		return MapProjection.create(assertSymbolicName(v), items.toArray(new Object[0]));
+		return options.isCreateSortedMaps() ?
+			MapProjection.sorted(assertSymbolicName(v), items.toArray(new Object[0])) :
+			MapProjection.create(assertSymbolicName(v), items.toArray(new Object[0]));
 	}
 
 	@Override
