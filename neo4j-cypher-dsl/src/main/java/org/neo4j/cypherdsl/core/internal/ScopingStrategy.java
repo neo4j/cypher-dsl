@@ -58,6 +58,7 @@ import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SubqueryExpression;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.UnionPart;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -307,7 +308,10 @@ public final class ScopingStrategy {
 
 		Set<IdentifiableElement> lastScope = this.dequeOfVisitedNamed.peek();
 		// We keep properties only around when they have been actually returned
-		if (!(previous instanceof Return || previous instanceof YieldItems)) {
+		if (previous instanceof UnionPart && afterStatement != null) {
+			lastScope.stream().filter(i -> !(i instanceof Property))
+				.forEach(afterStatement::add);
+		} else if (!(previous instanceof Return || previous instanceof YieldItems)) {
 			this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
 				.collect(Collectors.toCollection(LinkedHashSet::new));
 		} else {
