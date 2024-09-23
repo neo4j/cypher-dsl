@@ -66,4 +66,9 @@ class ClausesBasedStatement extends AbstractStatement {
 		Clause lastClause = this.clauses.get(this.clauses.size() - 1);
 		return lastClause instanceof Return;
 	}
+
+	@API(status = INTERNAL)
+	List<Clause> getClauses() {
+		return clauses;
+	}
 }

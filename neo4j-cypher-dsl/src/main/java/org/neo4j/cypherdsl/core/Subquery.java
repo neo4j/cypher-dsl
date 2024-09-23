@@ -102,6 +102,12 @@ public final class Subquery extends AbstractClause implements Clause {
 	 */
 	@API(status = INTERNAL)
 	public @Nullable With importingWith() {
-		return this.importingWith == null ? null : this.importingWith.imports();
+		var imports = this.importingWith == null ? null : this.importingWith.imports();
+		if (imports == null && statement instanceof ClausesBasedStatement cbs) {
+			return cbs.getClauses().stream().findFirst().filter(With.class::isInstance)
+				.map(With.class::cast)
+				.orElse(null);
+		}
+		return imports;
 	}
 }

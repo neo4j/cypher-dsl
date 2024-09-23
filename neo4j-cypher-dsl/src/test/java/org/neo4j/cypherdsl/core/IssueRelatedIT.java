@@ -2036,6 +2036,56 @@ class IssueRelatedIT {
 		assertThat(cypher).isEqualTo("MATCH (b:`Book`) RETURN size((b)--(:`UserSuggestionActivity` {userId: $userId}))");
 	}
 
+	@Test
+	void generatedNamesWithDeeplyNestedSubquerie() {
+		var m = Cypher.node("Movie").named("this");
+		var a = Cypher.node("Actor").named("this1");
+		var edge = Cypher.name("edge");
+		var this1 = Cypher.name("this1");
+		var edges = Cypher.name("edges");
+		var stmt = Cypher.match(m)
+			.call(
+				Cypher.match(m.relationshipFrom(a, "ACTED_IN").named("this0"))
+				.with(Cypher.collect(Cypher.mapOf("node", this1)).as(edges))
+				.with(edges, Cypher.size(edges).as("totalCount"))
+				.call(
+					Cypher
+						.unwind(edges).as(edge)
+						.with(edge.property("node").as(this1))
+						.call(Cypher.match(Cypher.anyNode(this1).relationshipTo(Cypher.node("Movie").named("this3"), "ACTED_IN").named("this2")).returning(Cypher.asterisk()).build(), this1).build(),
+					edges
+				).build(), m)
+			.returning(Cypher.asterisk()).build();
+
+		var renderer = Renderer.getRenderer(Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build());
+
+		var expected = """
+			MATCH (v0:Movie)
+			CALL {
+			  WITH v0
+			  MATCH (v0)<-[v1:ACTED_IN]-(v2:Actor)
+			  WITH collect( {
+			    node: v2
+			  }) AS v3
+			  WITH v3, size(v3) AS v4
+			  CALL {
+			    WITH v3
+			    UNWIND v3 AS v5
+			    WITH v5.node AS v6
+			    CALL {
+			      WITH v6
+			      MATCH (v6)-[v0:ACTED_IN]->(v1:Movie)
+			      RETURN *
+			    }
+			  }
+			}
+			RETURN *""";
+		assertThat(renderer.render(stmt)).isEqualTo(expected);
+	}
+
 	@Nested
 	class Chaining {
 

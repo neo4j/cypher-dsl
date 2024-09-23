@@ -18,7 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
+
+import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
@@ -68,5 +71,10 @@ public final class With implements Visitable, Clause {
 	@Override
 	public String toString() {
 		return RendererBridge.render(this);
+	}
+
+	@API(status = INTERNAL)
+	public List<Expression> getItems() {
+		return body.getReturnItems();
 	}
 }
