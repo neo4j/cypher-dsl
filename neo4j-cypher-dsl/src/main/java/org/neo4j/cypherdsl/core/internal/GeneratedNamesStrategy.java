@@ -175,9 +175,14 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			return aliasedExpression.getAlias();
 		}
 
-		var result = newName();
-		nameLookup().put(Key.of(aliasedExpression), result);
-		return result;
+		var nameLookup = nameLookup();
+		if (config.contains(GeneratedNames.REUSE_ALIASES)) {
+			return nameLookup.computeIfAbsent(Key.of(aliasedExpression), key -> newName());
+		} else {
+			var result = newName();
+			nameLookup().put(Key.of(aliasedExpression), result);
+			return result;
+		}
 	}
 
 	@Override

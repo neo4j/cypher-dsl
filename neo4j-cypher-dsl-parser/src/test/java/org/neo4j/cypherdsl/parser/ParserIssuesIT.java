@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.parser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
-import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -130,7 +129,7 @@ class ParserIssuesIT {
 			RETURN v0 {
 			  .title,
 			  actorsConnection: v10
-			} AS v5""");
+			} AS v0""");
 	}
 
 	@Test // GH-1075
@@ -212,10 +211,10 @@ class ParserIssuesIT {
 			        episodes: v5.episodes,
 			        title: v5.title
 			      }
-			    } AS v6
-			    RETURN v6
+			    } AS v3
+			    RETURN v3
 			  }
-			  WITH collect(v6) AS v1
+			  WITH collect(v3) AS v1
 			  RETURN {
 			    edges: v1
 			  } AS v2
@@ -223,7 +222,7 @@ class ParserIssuesIT {
 			RETURN v0 {
 			  .name,
 			  actedInConnection: v2
-			} AS v3""");
+			} AS v0""");
 	}
 
 	@Test
@@ -238,8 +237,8 @@ class ParserIssuesIT {
 			 } AS user
 			""";
 
-		Statement statement = CypherParser.parse(cypher, Options.newOptions()
-			.createSortedMaps(true) // this has no effect on the projection
+		var statement = CypherParser.parse(cypher, Options.newOptions()
+			.createSortedMaps(true)
 			.build());
 
 		var renderer = Renderer.getRenderer(Configuration.newConfig()
@@ -254,6 +253,86 @@ class ParserIssuesIT {
 			  b: 'B',
 			  .*,
 			  .title
-			} AS v1""");
+			} AS v0""");
+	}
+
+	@Test
+	void aliasesShouldBeReusedToo() {
+		var q1 = """
+			MATCH (this:Film:Multimedia)
+			CALL {
+				WITH this
+				MATCH (this_actors:Actor:Person)-[this0:ACTED_IN]->(this)
+				WITH this_actors {
+					.name
+				} AS this_actors
+				RETURN collect(this_actors) AS this_actors
+			}
+			RETURN this {
+				.title,
+				actors: this_actors
+			} AS this
+			""";
+
+		var q2 = """
+			MATCH (this:Film:Multimedia)
+			CALL {
+				WITH this
+				MATCH (actor0:Actor:Person)-[actedIn0:ACTED_IN]->(this)
+				WITH actor0 {
+					.name
+				} AS actors
+				RETURN collect(actors) AS actors
+			}
+			RETURN this {
+				.title,
+				actors: actors
+			} AS this
+			""";
+
+		var parserConfig = Options.newOptions()
+			.createSortedMaps(true)
+			.alwaysCreateRelationshipsLTR(true)
+			.build();
+		var renderer = Renderer.getRenderer(Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build());
+
+		var s1 = renderer.render(CypherParser.parse(q1, parserConfig));
+		var s2 = renderer.render(CypherParser.parse(q2, parserConfig));
+
+		var expected1 = """
+			MATCH (v0:Film:Multimedia)
+			CALL {
+			  WITH v0
+			  MATCH (v1:Actor:Person)-[v2:ACTED_IN]->(v0)
+			  WITH v1 {
+			    .name
+			  } AS v1
+			  RETURN collect(v1) AS v1
+			}
+			RETURN v0 {
+			  actors: v1,
+			  .title
+			} AS v0""";
+
+		var expected2 = """
+			MATCH (v0:Film:Multimedia)
+			CALL {
+			  WITH v0
+			  MATCH (v1:Actor:Person)-[v2:ACTED_IN]->(v0)
+			  WITH v1 {
+			    .name
+			  } AS v3
+			  RETURN collect(v3) AS v3
+			}
+			RETURN v0 {
+			  actors: v3,
+			  .title
+			} AS v0""";
+
+		assertThat(s1).isEqualTo(expected1);
+		assertThat(s2).isEqualTo(expected2);
 	}
 }

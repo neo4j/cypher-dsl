@@ -736,7 +736,7 @@ class CypherParserTest {
 			WHERE true)
 			RETURN v0 {
 			  .actorCount
-			} AS v4""");
+			} AS v0""");
 	}
 
 	@Test // GH-999

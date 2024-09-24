@@ -23,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -2084,6 +2085,25 @@ class IssueRelatedIT {
 			}
 			RETURN *""";
 		assertThat(renderer.render(stmt)).isEqualTo(expected);
+	}
+
+	static Stream<Arguments> reusingAliases() {
+		return Stream.of(
+			Arguments.of(EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.REUSE_ALIASES)), "MATCH (v0:`Movie`) RETURN v0{.a, .b} AS v1"),
+			Arguments.of(EnumSet.allOf(Configuration.GeneratedNames.class), "MATCH (v0:`Movie`) RETURN v0{.a, .b} AS v0")
+		);
+	}
+
+	@ParameterizedTest // GH-1084
+	@MethodSource
+	void reusingAliases(EnumSet<Configuration.GeneratedNames> config, String expected) {
+		var renderer = Renderer.getRenderer(Configuration.newConfig()
+			.withGeneratedNames(config)
+			.build());
+
+		var movie = Cypher.node("Movie").named("movie");
+		var cypher = renderer.render(Cypher.match(movie).returning(movie.project("a", "b").as("movie")).build());
+		assertThat(cypher).isEqualTo(expected);
 	}
 
 	@Nested
