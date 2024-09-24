@@ -37,6 +37,8 @@ import org.junit.jupiter.api.Test;
  */
 class CypherTest {
 
+
+
 	@Test
 	void sortDirectionShouldBeSpecified() {
 
