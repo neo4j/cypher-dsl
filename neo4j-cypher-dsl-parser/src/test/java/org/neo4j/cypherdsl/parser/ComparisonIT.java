@@ -171,7 +171,7 @@ class ComparisonIT {
 								screentime: v3
 							}
 						}
-					} AS v4
+					} AS v0
 					""",
 				false
 			),
@@ -225,7 +225,7 @@ class ComparisonIT {
 						directorsAggregate: {
 							count: v4
 						}
-					} AS v5
+					} AS v0
 					""",
 				false
 			),
@@ -279,7 +279,7 @@ class ComparisonIT {
 						directorsAggregate: {
 							count: v4
 						}
-					} AS v5
+					} AS v0
 					""",
 				false
 			),
@@ -308,7 +308,7 @@ class ComparisonIT {
 					WHERE v4 = true
 					RETURN v0 {
 						.content
-					} AS v5""",
+					} AS v0""",
 				false),
 			Arguments.of("MATCH (n:Movie)<-[:ACTED_IN]-(p:Person)", "MATCH (v0:`Person`)-[:`ACTED_IN`]->(v1:`Movie`)",
 				true),
@@ -363,7 +363,7 @@ class ComparisonIT {
 								screentime: v3
 							}
 						}
-					} AS v6
+					} AS v0
 					"""
 			),
 			Arguments.of(

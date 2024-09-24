@@ -78,7 +78,13 @@ public final class Configuration {
 		/**
 		 * All aliases except the ones used in the last {@literal RETURN} clause.
 		 */
-		INTERNAL_ALIASES_ONLY
+		INTERNAL_ALIASES_ONLY,
+		/**
+		 * This is an additional flag that is on by default for aliases, but can be removed from the
+		 * config, so that every alias name triggers a new generated name. Otherwise, any overwriting of an alias will
+		 * reuse the name that was previously generated for that alias.
+		 */
+		REUSE_ALIASES
 	}
 
 	/**
