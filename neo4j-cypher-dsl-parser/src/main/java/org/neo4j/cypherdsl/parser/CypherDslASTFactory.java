@@ -543,9 +543,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Clause callClause(InputPosition p, InputPosition namespacePosition, InputPosition procedureNamePosition,
 		InputPosition procedureResultPosition, List<String> namespace, String name, List<Expression> arguments,
-		boolean yieldAll, List<Expression> resultItems, Where where) {
+		boolean yieldAll, List<Expression> resultItems, Where where, boolean optional) {
 		var intermediateResult = Clauses.callClause(namespace, name, arguments,
 			yieldAll && resultItems == null ? List.of(Cypher.asterisk()) : resultItems, where);
+		if (optional) {
+			throw new IllegalArgumentException("Cannot render optional call clause");
+		}
 		return applyCallbacksFor(InvocationCreatedEventType.ON_CALL, intermediateResult);
 	}
 
@@ -815,7 +818,10 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause subqueryClause(InputPosition p, Statement subquery, NULL inTransactions, boolean scopeAll,
-		boolean hasScope, List<Expression> expressions) {
+		boolean hasScope, List<Expression> expressions, boolean optional) {
+		if (optional) {
+			throw new IllegalArgumentException("Cannot render optional subquery clause");
+		}
 		return Clauses.callClause(subquery);
 	}
 
@@ -1008,7 +1014,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement dropDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, boolean composite,
-		boolean dumpData, NULL wait) {
+		boolean aliasAction, boolean dumpData, NULL wait) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1706,6 +1712,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public NULL subqueryInTransactionsReportParameters(InputPosition p, Expression v) {
 		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public Clause orderBySkipLimitClause(InputPosition inputPosition, List<SortItem> list, InputPosition pos1,
+		Expression expression, InputPosition pos2, Expression expression1, InputPosition pos3) {
+		return null;
 	}
 
 	@Override

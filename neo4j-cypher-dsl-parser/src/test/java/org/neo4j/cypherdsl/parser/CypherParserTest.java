@@ -823,4 +823,19 @@ class CypherParserTest {
 		var normalized = renderer.render(CypherParser.parse(in));
 		assertThat(normalized).isEqualTo(out);
 	}
+
+	@Test
+	void optionalCall() {
+
+		assertThatIllegalArgumentException().isThrownBy(() ->
+			CypherParser.parse("OPTIONAL call db.awaitIndexes()"))
+			.withMessage("Cannot render optional call clause");
+	}
+
+	@Test
+	void optionalSubquery() {
+		assertThatIllegalArgumentException().isThrownBy(() ->
+				CypherParser.parse("MATCH (n) OPTIONAL CALL() {MATCH (m)}"))
+			.withMessage("Cannot render optional subquery clause");
+	}
 }
