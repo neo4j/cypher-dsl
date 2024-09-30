@@ -1,0 +1,60 @@
+== 2024.2
+
+=== 2024.2.0
+
+A new minor release so shortly after the last?
+We changed the behaviour of the renderer when using generated names.
+Before and upto including 2024.1.0 we didn't allow aliases to be reused.
+If in the original query alias `x` would have been legally reused, we would not have reused them with generated names, i.e. we would have usd `v0` and then `v1`.
+I think this is wrong, and we changed this behaviour, hence a new minor is due.
+
+If you are using generated names, you can opt out of this behaviour like this:
+
+[source,java]
+----
+var generatedNamesConfig = EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.REUSE_ALIASES));
+var renderer = Renderer.getRenderer(Configuration.newConfig()
+	.withGeneratedNames(generatedNamesConfig)
+	.build());
+----
+
+Apart from that, this is a drop-in replacement for 2024.1 and 2024.0.
+
+Congratulations to @ali-ince for contributing his first feature.
+
+And last but not least, @Andy2003 gave our AST factory and the scoping mechanism a real good test run, and we have been able to fix several bugs again.
+Thank you!
+
+==== 🚀 Features
+
+* Apply sorting of maps when parsing to projections, too. (#1085)
+* Add call raw cypher to top level entry point (#1073)
+
+==== 🐛 Bug Fixes
+
+* Don’t introduce new aliases on for each alias used. (#1084)
+* Export return variables from unions into scope proper. (#1075)
+* Correctly compute imports. (#1076)
+
+==== 📖 Documentation
+
+* Add example test for `LabelExpression`.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j.version from 5.23.0 to 5.24.0 (#1092)
+** Bump com.google.guava:guava (#1095)
+** Bump com.mycila:license-maven-plugin from 4.5 to 4.6 (#1090)
+** Bump mockito.version from 5.13.0 to 5.14.0 (#1094)
+** Bump org.neo4j.driver:neo4j-java-driver (#1093)
+** Bump com.fasterxml.jackson:jackson-bom (#1091)
+** Bump com.puppycrawl.tools:checkstyle (#1089)
+** Bump org.jetbrains:annotations from 24.1.0 to 25.0.0 (#1088)
+** Bump org.junit:junit-bom from 5.11.0 to 5.11.1 (#1087)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1083)
+** Bump net.java.dev.jna:jna from 5.14.0 to 5.15.0 (#1082)
+** Bump joda-time:joda-time from 2.12.7 to 2.13.0 (#1081)
+** Bump io.projectreactor:reactor-bom (#1080)
+** Bump org.springframework.data:spring-data-neo4j (#1079)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1078)
