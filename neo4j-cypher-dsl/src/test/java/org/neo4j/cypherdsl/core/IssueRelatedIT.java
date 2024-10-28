@@ -2106,6 +2106,18 @@ class IssueRelatedIT {
 		assertThat(cypher).isEqualTo(expected);
 	}
 
+	@Test // GH-1113
+	void listComprehensionsBasedOnRelationshipsMustWork() {
+		Node anotherNode = Cypher.node("AnotherNode").named("n");
+		Node movie = Cypher.node("Movie").named("m");
+
+		var refersTo = movie.relationshipFrom(anotherNode, "HAS_RELATION");
+		var stmt = Cypher.match(movie).where(movie.property("name").isEqualTo(Cypher.literalOf("star")))
+				.returningDistinct(Cypher.listBasedOn(refersTo).returning(Cypher.name("n")))
+			.build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (m:`Movie`) WHERE m.name = 'star' RETURN DISTINCT [(m)<-[:`HAS_RELATION`]-(n:`AnotherNode`) | n]");
+	}
+
 	@Nested
 	class Chaining {
 
