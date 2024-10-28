@@ -143,7 +143,7 @@
 		<cglib.version>3.3.0</cglib.version>
 		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>3.48.1</checker-qual.version>
-		<checkstyle.version>10.18.2</checkstyle.version>
+		<checkstyle.version>10.19.0</checkstyle.version>
 		<compile-testing.version>0.21.0</compile-testing.version>
 		<covered-ratio-complexity>0.75</covered-ratio-complexity>
 		<covered-ratio-instructions>0.75</covered-ratio-instructions>
