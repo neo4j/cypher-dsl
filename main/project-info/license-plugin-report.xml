@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1727682972326">
+<licensePluginReport goal="CHECK" timestamp="1730112957041">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -263,7 +263,6 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/internal/ReflectiveVisitorTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/Person.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/Place.java" result="PRESENT"/>
-        <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/QueryDSLAdapterTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/Stuff.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/querydsl/UnsupportedOperatorExceptionTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/renderer/ConfigurableRendererTest.java" result="PRESENT"/>
