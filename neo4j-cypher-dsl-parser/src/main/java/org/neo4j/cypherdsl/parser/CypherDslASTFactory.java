@@ -1936,7 +1936,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL databaseScope(InputPosition inputPosition, List<DatabaseName> databaseNames, ScopeType scopeType) {
+	public NULL databasePrivilegeScope(InputPosition inputPosition, List<DatabaseName> list, ScopeType scopeType) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public LabelExpression dynamicLabelLeaf(InputPosition p, Expression e, EntityType entityType, boolean all,
+		boolean containsIs) {
 		throw new UnsupportedOperationException();
 	}
 
