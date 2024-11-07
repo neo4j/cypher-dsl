@@ -26,7 +26,7 @@ import org.jetbrains.annotations.NotNull;
  * It has been introduced to circumvent the absence of union types in Java
  * and to avoid an overload of {@link StatementBuilder#with(String...)} or other expressions with an {@code Object...}
  * parameter. This type here allows passing {@link Named named things}. {@link AliasedExpression aliased expression},
- * {@link SymbolicName symobolic names} into a pipeline.
+ * {@link SymbolicName symbolic names} into a pipeline.
  * <p>
  * There should be no need to implement this on your own.
  *
