@@ -999,10 +999,10 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@SuppressWarnings("HiddenField") // The database options are quite different options than ours ;)
-	@Override
-	public Statement createDatabase(InputPosition p, boolean replace, DatabaseName databaseName,
-		boolean ifNotExists, NULL aNull, SimpleEither<Map<String, Expression>, Parameter<?>> options,
-		Integer topologyPrimaries, Integer topologySecondaries) {
+	public Statement createDatabase(InputPosition p, boolean replace, DatabaseName databaseName, boolean ifNotExists,
+		NULL aNull, SimpleEither<Map<String, Expression>, Parameter<?>> options,
+		SimpleEither<Integer, Parameter<?>> topologyPrimaries,
+		SimpleEither<Integer, Parameter<?>> topologySecondaries) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1018,8 +1018,11 @@ final class CypherDslASTFactory implements ASTFactory<
 		throw new UnsupportedOperationException();
 	}
 
+	@SuppressWarnings("HiddenField") // The database options are quite different options than ours ;)
 	@Override
-	public Statement alterDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, AccessType accessType, Integer topologyPrimaries, Integer topologySecondaries, Map<String, Expression> newOptions, java.util.Set<String> optionsToRemove, NULL aNull) {
+	public Statement alterDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, AccessType accessType,
+		SimpleEither<Integer, Parameter<?>> topologyPrimaries, SimpleEither<Integer, Parameter<?>> topologySecondaries,
+		Map<String, Expression> options, java.util.Set<String> optionsToRemove, NULL aNull) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1788,7 +1791,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Statement createRole(InputPosition p, boolean replace,
 		SimpleEither<StringPos<InputPosition>, Parameter<?>> roleName,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRole, boolean ifNotExists) {
+		SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRole, boolean ifNotExists, boolean immutable) {
 		throw new UnsupportedOperationException();
 	}
 

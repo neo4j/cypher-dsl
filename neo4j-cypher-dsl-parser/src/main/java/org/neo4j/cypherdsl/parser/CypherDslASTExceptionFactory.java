@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypher.internal.parser.common.ast.factory.ASTExceptionFactory;
+import org.neo4j.gqlstatus.ErrorGqlStatusObject;
 
 /**
  * @author Michael J. Simons
@@ -34,6 +35,12 @@ enum CypherDslASTExceptionFactory implements ASTExceptionFactory {
 	INSTANCE;
 
 	@Override
+	public Exception syntaxException(ErrorGqlStatusObject errorGqlStatusObject, String s, List<String> list,
+		Exception e, int i, int i1, int i2) {
+		return new RuntimeException(errorGqlStatusObject.getMessage());
+	}
+
+	@Override
 	public Exception syntaxException(String got, List<String> expected, Exception source, int offset, int line, int column) {
 		return new RuntimeException(source.getMessage());
 	}
@@ -41,5 +48,10 @@ enum CypherDslASTExceptionFactory implements ASTExceptionFactory {
 	@Override
 	public Exception syntaxException(Exception source, int offset, int line, int column) {
 		return new RuntimeException(source.getMessage());
+	}
+
+	@Override
+	public Exception syntaxException(ErrorGqlStatusObject errorGqlStatusObject, Exception e, int i, int i1, int i2) {
+		return new RuntimeException(errorGqlStatusObject.getMessage());
 	}
 }

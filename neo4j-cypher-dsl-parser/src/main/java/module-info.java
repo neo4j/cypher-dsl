@@ -31,6 +31,7 @@ module org.neo4j.cypherdsl.parser {
 	requires org.neo4j.cypher.internal.parser;
 	requires org.neo4j.cypher.internal.parser.javacc;
 	requires org.neo4j.cypher.internal.ast.factory;
+	requires org.neo4j.gql.status;
 
 	exports org.neo4j.cypherdsl.parser;
 }
