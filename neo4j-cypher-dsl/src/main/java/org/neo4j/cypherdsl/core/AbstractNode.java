@@ -43,6 +43,14 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
 	@NotNull
 	@Override
+	public final Condition hasLabels(LabelExpression labels) {
+		return new HasLabelExpressionCondition(this.getSymbolicName()
+			.orElseThrow(() -> new IllegalStateException("Cannot query a node without a symbolic name.")),
+			labels);
+	}
+
+	@NotNull
+	@Override
 	public final Condition isEqualTo(Node otherNode) {
 
 		return this.getRequiredSymbolicName().isEqualTo(otherNode.getRequiredSymbolicName());
