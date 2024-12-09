@@ -20,14 +20,18 @@ package org.neo4j.cypherdsl.core;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 class LabelExpressionTest {
 
+	static final LabelExpression SIMPLE_OR = new LabelExpression("Person").or(new LabelExpression("Organization"));
+	static final LabelExpression OR_AND_NOT = SIMPLE_OR.and(new LabelExpression("Sanctioned").negate());
+
 	@Test // GH-1077
 	void labelExpressionsShouldWork1() {
 
-		var node = Cypher.node(new LabelExpression("Person").or(new LabelExpression("Organization"))).named("n");
+		var node = Cypher.node(SIMPLE_OR).named("n");
 		var cypher = Cypher.match(node).returning(node).build().getCypher();
 
 		assertThat(cypher).isEqualTo("MATCH (n:`Person`|`Organization`) RETURN n");
@@ -36,10 +40,93 @@ class LabelExpressionTest {
 	@Test // GH-1077
 	void labelExpressionsShouldWork2() {
 
-		var node = Cypher.node(new LabelExpression("Person").or(new LabelExpression("Organization"))
-			.and(new LabelExpression("Sanctioned").negate())).named("n");
+		var node = Cypher.node(OR_AND_NOT).named("n");
 		var cypher = Cypher.match(node).returning(node).build().getCypher();
 
 		assertThat(cypher).isEqualTo("MATCH (n:(`Person`|`Organization`)&!`Sanctioned`) RETURN n");
+	}
+
+	@Nested
+	class AsConditions {
+
+		@Test // GH-1077
+		void labelExpressionsShouldWork1() {
+
+			var node = Cypher.anyNode("n");
+			var cypher = Cypher.match(node).where(node.hasLabels(SIMPLE_OR)).returning(node).build().getCypher();
+
+			assertThat(cypher).isEqualTo("MATCH (n) WHERE n:`Person`|`Organization` RETURN n");
+		}
+
+		@Test // GH-1077
+		void labelExpressionsShouldWork2() {
+
+			var node = Cypher.anyNode("n");
+			var cypher = Cypher.match(node).where(node.hasLabels(OR_AND_NOT)).returning(node).build().getCypher();
+
+			assertThat(cypher).isEqualTo("MATCH (n) WHERE n:(`Person`|`Organization`)&!`Sanctioned` RETURN n");
+		}
+
+		@Test // GH-1141
+		void labelExpressionsInPredicates() {
+
+			var movieOrFilm = new LabelExpression("Movie").or(new LabelExpression("Film"));
+
+			String statement;
+			Node a = Cypher.node("Person").withProperties("name", Cypher.literalOf("Keanu Reeves")).named("a");
+			Node b = Cypher.anyNode("b");
+
+			statement = Cypher.match(a)
+				.returning(
+					Cypher.listBasedOn(a.relationshipBetween(b))
+						.where(b.hasLabels(movieOrFilm).and(b.property("released").isNotNull()))
+						.returning(b.property("released"))
+						.as("years"))
+				.build().getCypher();
+			assertThat(statement)
+				.isEqualTo(
+					"MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) WHERE (b:`Movie`|`Film` AND b.released IS NOT NULL) | b.released] AS years");
+
+			statement = Cypher.match(a)
+				.returning(
+					Cypher.listBasedOn(a.relationshipBetween(b))
+						.where(
+							b.hasLabels(movieOrFilm)
+								.and(b.property("released").isNotNull())
+								.or(b.property("title").isEqualTo(Cypher.literalOf("The Matrix")))
+								.or(b.property("title").isEqualTo(Cypher.literalOf("The Matrix 2"))))
+						.returning(b.property("released"))
+						.as("years"))
+				.build().getCypher();
+			assertThat(statement)
+				.isEqualTo(
+					"MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) WHERE ((b:`Movie`|`Film` AND b.released IS NOT NULL) OR b.title = 'The Matrix' OR b.title = 'The Matrix 2') | b.released] AS years");
+
+			statement = Cypher.match(a)
+				.returning(
+					Cypher.listBasedOn(a.relationshipBetween(b))
+						.where(b.hasLabels(movieOrFilm))
+						.and(b.property("released").isNotNull())
+						.or(b.property("title").isEqualTo(Cypher.literalOf("The Matrix")))
+						.or(b.property("title").isEqualTo(Cypher.literalOf("The Matrix 2")))
+						.returning(b.property("released"))
+						.as("years"))
+				.build().getCypher();
+
+			assertThat(statement)
+				.isEqualTo(
+					"MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) WHERE ((b:`Movie`|`Film` AND b.released IS NOT NULL) OR b.title = 'The Matrix' OR b.title = 'The Matrix 2') | b.released] AS years");
+
+			statement = Cypher.match(a)
+				.returning(
+					Cypher.listBasedOn(a.relationshipBetween(b))
+						.where(b.hasLabels(movieOrFilm))
+						.returning(b.property("released"))
+						.as("years"))
+				.build().getCypher();
+			assertThat(statement)
+				.isEqualTo(
+					"MATCH (a:`Person` {name: 'Keanu Reeves'}) RETURN [(a)--(b) WHERE b:`Movie`|`Film` | b.released] AS years");
+		}
 	}
 }

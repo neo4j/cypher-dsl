@@ -63,10 +63,17 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * A condition that checks for the presence of labels on a node.
 	 *
 	 * @param labelsToQuery A list of labels to query
-	 * @return A condition that checks whether this node has all of the labels to query
+	 * @return A condition that checks whether this node has all the labels to query
 	 */
 	@NotNull @Contract(pure = true)
 	Condition hasLabels(String... labelsToQuery);
+
+	/**
+	 * A condition that checks for the presence of a label expression on a node
+	 * @since 2024.3.0
+	 */
+	@NotNull @Contract(pure = true)
+	Condition hasLabels(LabelExpression labels);
 
 	/**
 	 * Creates a new condition whether this node is equal to {@literal otherNode}.
