@@ -1,0 +1,64 @@
+== 2024.3
+
+=== 2024.3.0
+
+Thanks to @nk-coding for the idea of supporting label expressions as conditions.
+
+==== 🚀 Features
+
+* Add `hasLabels(LabelExpression labels)` for nodes. (#1146)
+
+==== 📖 Documentation
+
+* Fix typo (#1127)
+* Add another example for list comprehensions.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j.version from 5.25.1 to 5.26.0 (#1142)
+** Bump org.checkerframework:checker-qual (#1144)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1145)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1143)
+** Bump com.puppycrawl.tools:checkstyle (#1140)
+** Bump com.fasterxml.jackson:jackson-bom (#1139)
+** Bump org.neo4j.driver:neo4j-java-driver (#1138)
+** Bump testcontainers.version from 1.20.3 to 1.20.4 (#1137)
+** Bump org.springframework.data:spring-data-neo4j from 7.3.5 to 7.4.0 (#1133)
+** Bump io.projectreactor:reactor-bom (#1136)
+** Bump org.neo4j.driver:neo4j-java-driver (#1135)
+** Bump org.asciidoctor:asciidoctor-maven-plugin (#1134)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1132)
+** Bump org.neo4j.driver:neo4j-java-driver (#1131)
+** Bump org.apache.maven.plugins:maven-site-plugin (#1130)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1129)
+** Bump com.puppycrawl.tools:checkstyle (#1128)
+** Bump neo4j.version from 5.24.2 to 5.25.1 (#1117)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1121)
+** Bump com.puppycrawl.tools:checkstyle (#1120)
+** Bump org.apache.maven.plugins:maven-checkstyle-plugin (#1119)
+** Bump org.asciidoctor:asciidoctor-maven-plugin (#1122)
+** Bump testcontainers.version from 1.20.2 to 1.20.3 (#1123)
+** Bump com.fasterxml.jackson:jackson-bom (#1124)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1125)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1126)
+** Bump org.checkerframework:checker-qual (#1118)
+** Bump com.puppycrawl.tools:checkstyle (#1114)
+** Bump org.neo4j.driver:neo4j-java-driver (#1112)
+** Bump org.junit:junit-bom from 5.11.2 to 5.11.3 (#1116)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1115)
+** Bump io.projectreactor:reactor-bom (#1111)
+** Bump org.jetbrains:annotations from 25.0.0 to 26.0.1 (#1110)
+** Bump org.springframework.data:spring-data-neo4j (#1109)
+** Bump neo4j.version from 5.24.1 to 5.24.2 (#1108)
+** Bump mockito.version from 5.14.1 to 5.14.2 (#1107)
+** Bump org.checkerframework:checker-qual (#1105)
+** Bump org.junit:junit-bom from 5.11.1 to 5.11.2 (#1104)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1103)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1102)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1101)
+** Bump mockito.version from 5.14.0 to 5.14.1 (#1100)
+** Bump neo4j.version from 5.24.0 to 5.24.1 (#1099)
+** Bump org.checkerframework:checker-qual (#1098)
+** Bump testcontainers.version from 1.20.1 to 1.20.2 (#1097)
+** Bump org.ow2.asm:asm from 9.7 to 9.7.1 (#1096)
