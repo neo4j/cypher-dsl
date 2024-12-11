@@ -54,6 +54,22 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		}
 	}
 
+	static SinglePartQuery create(List<Visitable> precedingClauses, Finish aFinish) {
+
+		if (precedingClauses.isEmpty() || precedingClauses.get(precedingClauses.size() - 1) instanceof Match) {
+			Assertions.notNull(aFinish, "A finish clause is required.");
+		}
+
+		if (aFinish == null) {
+			if (precedingClauses.get(precedingClauses.size() - 1) instanceof ResultStatement) {
+				return new SinglePartQueryAsResultStatementWrapper(precedingClauses);
+			}
+			return new SinglePartQuery(precedingClauses);
+		} else {
+			return new SinglePartQueryWithFinish(precedingClauses, aFinish);
+		}
+	}
+
 	private final List<Visitable> precedingClauses;
 
 	private SinglePartQuery(List<Visitable> precedingClauses) {
@@ -91,6 +107,30 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 			visitor.enter(this);
 			super.precedingClauses.forEach(c -> c.accept(visitor));
 			aReturn.accept(visitor);
+			visitor.leave(this);
+		}
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
+	}
+
+	static final class SinglePartQueryWithFinish extends SinglePartQuery implements ResultStatement {
+
+		private final Finish aFinish;
+
+		private SinglePartQueryWithFinish(List<Visitable> precedingClauses, Finish aFinish) {
+			super(precedingClauses);
+
+			this.aFinish = aFinish;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+			visitor.enter(this);
+			super.precedingClauses.forEach(c -> c.accept(visitor));
+			aFinish.accept(visitor);
 			visitor.leave(this);
 		}
 

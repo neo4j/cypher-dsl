@@ -34,6 +34,7 @@ import java.util.function.UnaryOperator;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Finish;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Return;
@@ -89,6 +90,8 @@ public final class Options {
 			= new EnumMap<>(InvocationCreatedEventType.class);
 
 		private Function<ReturnDefinition, Return> returnClauseFactory;
+
+		private Function<FinishDefinition, Finish> finishClauseFactory;
 
 		private Function<MatchDefinition, Match> matchClauseFactory;
 
@@ -224,6 +227,19 @@ public final class Options {
 		}
 
 		/**
+		 * Configures the factory for return clauses. The idea here is that you might intercept what is being returned
+		 * or how it is sorted, limited and the like. The {@link ReturnDefinition definition} passed to the factory contains
+		 * all necessary information for delegating to the {@link org.neo4j.cypherdsl.core.Clauses#returning(boolean, List, List, Expression, Expression)}
+		 * factory.
+		 *
+		 * @param finishClauseFactory The factory producing finish class that should be used.
+		 * @return This builder
+		 */
+		public Builder withFinishClauseFactory(Function<FinishDefinition, Finish> finishClauseFactory) {
+			this.finishClauseFactory = finishClauseFactory;
+			return this;
+		}
+		/**
 		 * Configures the factory for return clauses. The idea here is that you might intercept what is being matched
 		 * and or how it is restricted. The {@link MatchDefinition definition} passed to the factory contains
 		 * all necessary information for delegating to the {@link org.neo4j.cypherdsl.core.Clauses#match(boolean, List, Where, List)}
@@ -298,6 +314,8 @@ public final class Options {
 
 	private final Function<ReturnDefinition, Return> returnClauseFactory;
 
+	private final Function<FinishDefinition, Finish> finishClauseFactory;
+
 	private final Function<MatchDefinition, Match> matchClauseFactory;
 
 	private final boolean createSortedMaps;
@@ -330,6 +348,8 @@ public final class Options {
 					returnDefinition.getOptionalSortItems(),
 					returnDefinition.getOptionalSkip(), returnDefinition.getOptionalLimit());
 
+		this.finishClauseFactory = builder.finishClauseFactory;
+
 		this.matchClauseFactory = builder.matchClauseFactory != null ?
 			builder.matchClauseFactory :
 			returnDefinition -> (Match) Clauses
@@ -361,6 +381,9 @@ public final class Options {
 		return returnClauseFactory;
 	}
 
+	Function<FinishDefinition, Finish> getFinishClauseFactory() {
+		return finishClauseFactory;
+	}
 	Function<MatchDefinition, Match> getMatchClauseFactory() {
 		return matchClauseFactory;
 	}
