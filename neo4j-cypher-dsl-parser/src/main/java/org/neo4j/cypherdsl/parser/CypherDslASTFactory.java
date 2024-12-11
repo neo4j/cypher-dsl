@@ -320,7 +320,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Finish newFinishClause(InputPosition p) {
-		return options.getFinishClauseFactory().apply(new FinishDefinition());
+		return Finish.create();
 	}
 
 	public List<Expression> newReturnItems(InputPosition p, boolean returnAll, List<Expression> returnItems) {
