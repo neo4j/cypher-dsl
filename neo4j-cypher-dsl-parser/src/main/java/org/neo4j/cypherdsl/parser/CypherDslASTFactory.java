@@ -1059,7 +1059,6 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public void addDeprecatedIdentifierUnicodeNotification(InputPosition p, Character character, String identifier) {
-		throw new UnsupportedOperationException();
 	}
 
 	@Override

@@ -838,4 +838,9 @@ class CypherParserTest {
 				CypherParser.parse("MATCH (n) OPTIONAL CALL() {MATCH (m)}"))
 			.withMessage("Cannot render optional subquery clause");
 	}
+
+	@Test
+	void unescapedThings() {
+		assertThat(CypherParser.parse("RETURN 1 AS v$_id").getCypher()).isEqualTo("RETURN 1 AS `v$_id`");
+	}
 }

@@ -239,15 +239,16 @@ public final class SchemaNames {
 
 		String id = name.toString();
 		int cp = id.codePointAt(0);
-		if (!Character.isJavaIdentifierStart(cp)) {
+		if (!Character.isJavaIdentifierStart(cp) || '$' == cp) {
 			return false;
 		}
 		for (int i = Character.charCount(cp); i < id.length(); i += Character.charCount(cp)) {
 			cp = id.codePointAt(i);
-			if (!Character.isJavaIdentifierPart(cp)) {
+			if (!Character.isJavaIdentifierPart(cp) || '$' == cp) {
 				return false;
 			}
 		}
+
 		return true;
 	}
 
