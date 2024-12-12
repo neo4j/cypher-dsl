@@ -1,5 +1,11 @@
 == 2024.3
 
+=== 2024.3.1
+
+==== 🐛 Bug Fixes
+
+* `$` must be escaped in future Cypher versions.
+
 === 2024.3.0
 
 Thanks to @nk-coding for the idea of supporting label expressions as conditions.
