@@ -42,6 +42,7 @@ import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Asterisk;
 import org.neo4j.cypherdsl.core.Cypher;
+import org.neo4j.cypherdsl.core.ExistentialSubquery;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Foreach;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
@@ -259,7 +260,10 @@ public final class ScopingStrategy {
 			leaveStatement(visitable);
 		} else if (hasLocalScope(visitable)) {
 			notify = true;
-			this.dequeOfVisitedNamed.pop();
+			Set<IdentifiableElement> lastVisitedNames = this.dequeOfVisitedNamed.pop();
+			if (visitable instanceof ExistentialSubquery) {
+				this.afterStatement.retainAll(lastVisitedNames);
+			}
 		} else {
 			clearPreviouslyVisitedNamed(visitable);
 		}
