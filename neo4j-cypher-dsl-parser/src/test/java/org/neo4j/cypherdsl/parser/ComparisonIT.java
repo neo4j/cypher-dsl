@@ -728,4 +728,46 @@ class ComparisonIT {
 
 		return true;
 	}
+
+	@Test // GH-1147
+	void shouldNotRecognizeLocallyScopedElementsFromExistentialSubqueries() {
+		var cypher = """
+		MATCH (this:Series)
+		WHERE ((EXISTS {
+		MATCH (this)-[edge:MANUFACTURER]->(this0:Manufacturer)
+			WHERE (this0.name = $param0 AND edge.current = $param1)
+		}
+		OR EXISTS {
+			MATCH (this)-[edge:MANUFACTURER]->(this1:Manufacturer)
+			WHERE (this1.name = $param2 AND edge.current = $param3)
+		})
+		AND EXISTS {
+			MATCH (this)-[edge:BRAND]->(this2:Brand)
+			WHERE (this2.name = $param4 AND edge.current = $param5)
+		})
+		RETURN this""";
+		var renderer = Renderer.getRenderer(Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.build());
+		var normalized = renderer.render(CypherParser.parse(cypher));
+		assertThat(normalized).isEqualTo("""
+		MATCH (v0:Series)
+		WHERE ((EXISTS {
+		      MATCH (v0)-[v1:MANUFACTURER]->(v2:Manufacturer)
+		      WHERE (v2.name = $p0
+		        AND v1.current = $p1)
+		    }
+		    OR EXISTS {
+		      MATCH (v0)-[v1:MANUFACTURER]->(v2:Manufacturer)
+		      WHERE (v2.name = $p2
+		        AND v1.current = $p3)
+		    })
+		  AND EXISTS {
+		    MATCH (v0)-[v1:BRAND]->(v2:Brand)
+		    WHERE (v2.name = $p4
+		      AND v1.current = $p5)
+		  })
+		RETURN v0""");
+	}
 }
