@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1734514761766">
+<licensePluginReport goal="CHECK" timestamp="1734689440542">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -41,6 +41,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesAndThen.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesCall.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesCreate.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesFinish.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesHints.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesLoadCSV.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesLogicalOperators.java" result="PRESENT"/>
@@ -58,6 +59,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExpressionCondition.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExpressionList.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Expressions.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/Finish.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Foreach.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ForeignAdapter.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ForeignAdapterFactory.java" result="PRESENT"/>
