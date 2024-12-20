@@ -404,25 +404,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public Statement build() {
 
-		return buildImpl((Return) null);
+		return buildImpl(null);
 	}
 
-	protected final Statement buildImpl(Return returning) {
+	protected final Statement buildImpl(Clause returnOrFinish) {
 
 		SinglePartQuery singlePartQuery = SinglePartQuery.create(
-			buildListOfVisitables(false), returning);
-
-		if (multiPartElements.isEmpty()) {
-			return singlePartQuery;
-		} else {
-			return MultiPartQuery.create(multiPartElements, singlePartQuery);
-		}
-	}
-
-	protected final Statement buildImpl(Finish finish) {
-
-		SinglePartQuery singlePartQuery = SinglePartQuery.create(
-			buildListOfVisitables(false), finish);
+			buildListOfVisitables(false), returnOrFinish);
 
 		if (multiPartElements.isEmpty()) {
 			return singlePartQuery;
@@ -1501,7 +1489,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public Statement build() {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.buildImpl((Return) null);
+			return DefaultStatementBuilder.this.buildImpl(null);
 		}
 
 		@Override

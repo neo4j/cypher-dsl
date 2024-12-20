@@ -18,14 +18,19 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
+import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
  * @author Gerrit Meier
+ * @author Michael J. Simons
  */
-public class Finish implements Clause {
+@API(status = STABLE, since = "2024.4.0")
+public final class Finish implements Clause {
 
-	private static final Expression finishExpression = new RawLiteral.RawElement("FINISH");
+	private static final Expression FINISH_EXPRESSION = new RawLiteral.RawElement("FINISH");
 
 	private Finish() {
 
@@ -38,7 +43,7 @@ public class Finish implements Clause {
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		finishExpression.accept(visitor);
+		FINISH_EXPRESSION.accept(visitor);
 		visitor.leave(this);
 	}
 }
