@@ -271,4 +271,21 @@ class LoadCSVIT {
 		assertThat(statement.getCypher())
 			.isEqualTo("MATCH (u:`User` {name: 'Michael'}) WITH u ORDER BY u.name ASC LOAD CSV FROM 'file:///bikes.csv' AS row MERGE (u)-[:`OWNS`]->(:`Bike` {name: row[0]})");
 	}
+
+	@Test
+	void finish() {
+		SymbolicName row = SymbolicName.of("row");
+		Node userNode = Cypher.node("User").named("u").withProperties("name", Cypher.literalOf("Michael"));
+
+		Statement statement = Cypher.match(userNode)
+			.with(userNode)
+			.orderBy(userNode.property("name")).ascending()
+			.loadCSV(URI.create("file:///bikes.csv"))
+			.as(row)
+			.finish()
+			.build();
+
+		assertThat(statement.getCypher())
+			.isEqualTo("MATCH (u:`User` {name: 'Michael'}) WITH u ORDER BY u.name ASC LOAD CSV FROM 'file:///bikes.csv' AS row FINISH");
+	}
 }

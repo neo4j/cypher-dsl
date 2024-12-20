@@ -38,19 +38,19 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = INTERNAL, since = "1.0")
 class SinglePartQuery extends AbstractStatement implements SingleQuery {
 
-	static SinglePartQuery create(List<Visitable> precedingClauses, Return aReturn) {
+	static SinglePartQuery create(List<Visitable> precedingClauses, Clause returnOrFinish) {
 
 		if (precedingClauses.isEmpty() || precedingClauses.get(precedingClauses.size() - 1) instanceof Match) {
-			Assertions.notNull(aReturn, "A return clause is required.");
+			Assertions.notNull(returnOrFinish, "A returning or finishing clause is required.");
 		}
 
-		if (aReturn == null) {
+		if (returnOrFinish == null) {
 			if (precedingClauses.get(precedingClauses.size() - 1) instanceof ResultStatement) {
 				return new SinglePartQueryAsResultStatementWrapper(precedingClauses);
 			}
 			return new SinglePartQuery(precedingClauses);
 		} else {
-			return new SinglePartQueryWithResult(precedingClauses, aReturn);
+			return new SinglePartQueryWithFinishingClause(precedingClauses, returnOrFinish);
 		}
 	}
 
@@ -76,21 +76,21 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		}
 	}
 
-	static final class SinglePartQueryWithResult extends SinglePartQuery implements ResultStatement {
+	static final class SinglePartQueryWithFinishingClause extends SinglePartQuery implements ResultStatement {
 
-		private final Return aReturn;
+		private final Clause finishingClause;
 
-		private SinglePartQueryWithResult(List<Visitable> precedingClauses, Return aReturn) {
+		private SinglePartQueryWithFinishingClause(List<Visitable> precedingClauses, Clause finishingClause) {
 			super(precedingClauses);
 
-			this.aReturn = aReturn;
+			this.finishingClause = finishingClause;
 		}
 
 		@Override
 		public void accept(Visitor visitor) {
 			visitor.enter(this);
 			super.precedingClauses.forEach(c -> c.accept(visitor));
-			aReturn.accept(visitor);
+			finishingClause.accept(visitor);
 			visitor.leave(this);
 		}
 

@@ -524,7 +524,72 @@ class CypherIT {
 					.isEqualTo(
 						expected);
 			}
+
 		}
+	}
+
+	@Nested
+	class Finish {
+		@Test
+		void finishAfterMatch() {
+			String expected = "MATCH (u:`User`) FINISH";
+
+			Statement statement = Cypher.match(userNode).finish().build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					expected);
+		}
+
+		@Test
+		void finishAfterMatchWithWhere() {
+			String expected = "MATCH (u:`User`) WHERE u:`User` FINISH";
+
+			Statement statement = Cypher.match(userNode).where(userNode.hasLabels("User")).finish().build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					expected);
+		}
+
+		@Test
+		void finishAfterSet() {
+			String expected = "MATCH (u:`User`) SET u.name = 'hans' FINISH";
+
+			Statement statement = Cypher.match(userNode).set(userNode.property("name").to(Cypher.literalOf("hans"))).finish().build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					expected);
+		}
+
+		@Test
+		void finishAfterDelete() {
+			String expected = "MATCH (u:`User`) DELETE u FINISH";
+
+			Statement statement = Cypher.match(userNode).delete(userNode).finish().build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					expected);
+		}
+
+		@Test
+		void finishAfterCreate() {
+			String expected = "CREATE (u:`User`) FINISH";
+
+			Statement statement = Cypher.create(userNode).finish().build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					expected);
+		}
+
+		@Test
+		void finishAfterMerge() {
+			String expected = "MERGE (u:`User`)-[:`KNOWS`]->(u) FINISH";
+
+			Statement statement = Cypher.merge(userNode.relationshipTo(userNode, "KNOWS")).finish().build();
+			assertThat(cypherRenderer.render(statement))
+				.isEqualTo(
+					expected);
+		}
+
 	}
 
 	@Nested

@@ -119,7 +119,7 @@ class CypherDslASTFactoryTest {
 			"isNotNormalized", "normalizeExpression",
 			"insertClause", "insertPathPattern", "subqueryInTransactionsBatchParameters",
 			"subqueryInTransactionsConcurrencyParameters", "subqueryInTransactionsErrorParameters",
-			"grantRoles", "showRoles", "renameRole", "revokeRoles", "newFinishClause",
+			"grantRoles", "showRoles", "renameRole", "revokeRoles",
 			"auth", "authId", "password", "passwordChangeRequired", "dynamicLabelLeaf", "databasePrivilegeScope" })
 		void newMethodsShouldNotBeSupportedOOTB(String methodName) {
 			var factory = CypherDslASTFactory.getInstance(null);

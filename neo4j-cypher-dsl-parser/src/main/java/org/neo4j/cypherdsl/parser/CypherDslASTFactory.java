@@ -57,6 +57,7 @@ import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
+import org.neo4j.cypherdsl.core.Finish;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
@@ -98,7 +99,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	Statement,
 	Statement,
 	Clause,
-	Clause,
+	Finish,
 	Return,
 	Expression,
 	List<Expression>,
@@ -318,8 +319,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause newFinishClause(InputPosition p) {
-		throw new UnsupportedOperationException();
+	public Finish newFinishClause(InputPosition p) {
+		return Finish.create();
 	}
 
 	public List<Expression> newReturnItems(InputPosition p, boolean returnAll, List<Expression> returnItems) {

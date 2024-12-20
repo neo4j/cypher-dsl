@@ -55,7 +55,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 class DefaultStatementBuilder implements StatementBuilder,
 	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
 	BuildableMatchAndUpdate,
-	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall {
+	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall, StatementBuilder.Terminal {
 
 	/**
 	 * Current list of reading or update clauses to be generated.
@@ -407,10 +407,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return buildImpl(null);
 	}
 
-	protected final Statement buildImpl(Return returning) {
+	protected final Statement buildImpl(Clause returnOrFinish) {
 
 		SinglePartQuery singlePartQuery = SinglePartQuery.create(
-			buildListOfVisitables(false), returning);
+			buildListOfVisitables(false), returnOrFinish);
 
 		if (multiPartElements.isEmpty()) {
 			return singlePartQuery;
@@ -560,6 +560,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new ForeachBuilder(variable);
 	}
 
+	@Override
+	public @NotNull Terminal finish() {
+		return new DefaultStatementWithFinishBuilder();
+	}
+
 	final class ForeachBuilder implements ForeachSourceStep, ForeachUpdateStep {
 
 		private final SymbolicName variable;
@@ -705,6 +710,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			Return returning = Return.create(rawReturn, distinct, returnList, orderBuilder);
 			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(returning);
+		}
+	}
+
+	protected final class DefaultStatementWithFinishBuilder implements Terminal {
+
+		@Override
+		public @NotNull Statement build() {
+			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(Finish.create());
 		}
 	}
 
@@ -1076,6 +1089,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.foreach(variable);
+		}
+
+		@Override
+		public @NotNull StatementBuilder.Terminal finish() {
+			return DefaultStatementBuilder.this;
 		}
 	}
 
@@ -1480,6 +1498,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.foreach(variable);
 		}
+
+		@Override
+		public @NotNull StatementBuilder.Terminal finish() {
+
+			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
+			return new DefaultStatementWithFinishBuilder();
+		}
 	}
 
 	// Static builder and support classes
@@ -1622,7 +1647,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
-		implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, OngoingStandaloneCallWithReturnFields {
+		implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesFinish, OngoingStandaloneCallWithReturnFields {
 
 		private final YieldItems yieldItems;
 
@@ -1729,6 +1754,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 			}
 			this.delegate.currentSinglePartElements.add(statement);
 			return this;
+		}
+
+		@Override
+		public @NotNull StatementBuilder.Terminal finish() {
+			return new DefaultStatementBuilder(this.buildCall());
 		}
 	}
 
@@ -1864,6 +1894,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.foreach(variable);
+		}
+
+		@Override
+		public @NotNull StatementBuilder.Terminal finish() {
+			return DefaultStatementBuilder.this;
 		}
 	}
 

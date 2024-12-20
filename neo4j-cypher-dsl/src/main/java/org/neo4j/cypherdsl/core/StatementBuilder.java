@@ -37,7 +37,7 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = STABLE, since = "1.0")
 public interface StatementBuilder
-	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning, ExposesSubqueryCall, ExposesWith {
+	extends ExposesMatch, ExposesCreate, ExposesMerge, ExposesUnwind, ExposesReturning, ExposesFinish, ExposesSubqueryCall, ExposesWith {
 
 	/**
 	 * An ongoing update statement that can be used to chain more update statements or add a with or return clause.
@@ -45,7 +45,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingUpdate extends BuildableStatement<Statement>,
-		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesWith, ExposesSet, ExposesForeach {
+		ExposesCreate, ExposesMerge, ExposesDelete, ExposesReturning, ExposesFinish, ExposesWith, ExposesSet, ExposesForeach {
 	}
 
 	/**
@@ -103,7 +103,7 @@ public interface StatementBuilder
 	 * @since 1.0
 	 */
 	interface OngoingReading
-		extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate, ExposesMatch,
+		extends ExposesReturning, ExposesFinish, ExposesWith, ExposesUpdatingClause, ExposesUnwind, ExposesCreate, ExposesMatch,
 		ExposesCall<OngoingInQueryCallWithoutArguments>, ExposesSubqueryCall {
 	}
 
@@ -428,6 +428,16 @@ public interface StatementBuilder
 		 */
 		@NotNull @CheckReturnValue
 		BuildableStatement<ResultStatement> limit(Expression expression);
+	}
+
+	/**
+	 * Terminal operation that only allows access to {@link BuildableStatement}.
+	 * A marker interface to clarify the intention instead of just exposing the {@code BuildableStatement}.
+	 *
+	 * @since 2024.3.0
+	 */
+	interface Terminal extends BuildableStatement<Statement> {
+
 	}
 
 	/**
@@ -837,7 +847,7 @@ public interface StatementBuilder
 	 *
 	 * @since 1.0
 	 */
-	interface OngoingMatchAndUpdate extends ExposesReturning, ExposesWith, ExposesUpdatingClause, ExposesCreate {
+	interface OngoingMatchAndUpdate extends ExposesReturning, ExposesFinish, ExposesWith, ExposesUpdatingClause, ExposesCreate {
 	}
 
 	/**
@@ -1013,7 +1023,7 @@ public interface StatementBuilder
 		StatementBuilder.BuildableStatement<Statement>,
 		ExposesMatch,
 		ExposesWhere<StatementBuilder.OngoingReadingWithWhere>,
-		ExposesReturning, ExposesWith, ExposesSubqueryCall,
+		ExposesReturning, ExposesFinish, ExposesWith, ExposesSubqueryCall,
 		ExposesAndThen<OngoingStandaloneCallWithReturnFields, Statement>
 		permits DefaultStatementBuilder.YieldingStandaloneCallBuilder {
 	}
@@ -1062,6 +1072,6 @@ public interface StatementBuilder
 	 * An in-query call exposing where and return clauses.
 	 */
 	interface OngoingInQueryCallWithReturnFields extends
-		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesWith, ExposesSubqueryCall, ExposesForeach {
+		ExposesMatch, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesFinish, ExposesWith, ExposesSubqueryCall, ExposesForeach {
 	}
 }
