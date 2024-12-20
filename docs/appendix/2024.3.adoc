@@ -1,5 +1,24 @@
 == 2024.3
 
+=== 2024.3.2
+
+==== 🐛 Bug Fixes
+
+* Restore wrongly deleted `module-info.java`
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.springframework.data:spring-data-neo4j (#1150)
+** Bump io.projectreactor:reactor-bom (#1149)
+** Bump com.puppycrawl.tools:checkstyle (#1148)
+
+=== 2024.3.1
+
+==== 🐛 Bug Fixes
+
+* `$` must be escaped in future Cypher versions.
+
 === 2024.3.0
 
 Thanks to @nk-coding for the idea of supporting label expressions as conditions.
