@@ -1,0 +1,14 @@
+== 2024.4
+
+=== 2024.4.0
+
+Thanks to @meistermeier for both the bugfix in scoping of existential subqueries and kicking off the support for the `FINISH` clause, to finish of 2024 in style.
+Happy holidays and all the best for 2025, we are looking forward helping more projects with Cypher-DSL 2025 next year.
+
+==== 🚀 Features
+
+* Add support for creating and parsing the `FINISH` clause.
+
+==== 🐛 Bug Fixes
+
+* Fix scoping issue with existential subquery (#1151)
