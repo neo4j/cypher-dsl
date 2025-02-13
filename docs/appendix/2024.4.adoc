@@ -12,3 +12,38 @@ Happy holidays and all the best for 2025, we are looking forward helping more pr
 ==== 🐛 Bug Fixes
 
 * Fix scoping issue with existential subquery (#1151)
+
+=== 2024.4.1
+
+==== 🧰 Tasks
+
+* Extend license header to 2025.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump neo4j.version from 5.26.1 to 5.26.2 (#1176)
+** Bump org.checkerframework:checker-qual (#1177)
+** Bump org.neo4j.driver:neo4j-java-driver (#1175)
+** Bump joda-time:joda-time from 2.13.0 to 2.13.1 (#1174)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1173)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1172)
+** Bump com.puppycrawl.tools:checkstyle (#1171)
+** Bump org.jetbrains:annotations from 26.0.1 to 26.0.2 (#1170)
+** Bump org.assertj:assertj-core from 3.27.2 to 3.27.3 (#1168)
+** Bump io.projectreactor:reactor-bom (#1167)
+** Bump org.springframework.data:spring-data-neo4j (#1166)
+** Bump neo4j.version from 5.26.0 to 5.26.1 (#1165)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1164)
+** Bump com.opencsv:opencsv from 5.9 to 5.10 (#1163)
+** Bump com.puppycrawl.tools:checkstyle (#1159)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1154)
+** Bump net.java.dev.jna:jna from 5.15.0 to 5.16.0 (#1155)
+** Bump org.junit:junit-bom from 5.11.3 to 5.11.4 (#1157)
+** Bump com.google.guava:guava (#1158)
+** Bump org.checkerframework:checker-qual (#1160)
+** Bump mockito.version from 5.14.2 to 5.15.2 (#1161)
+** Bump org.assertj:assertj-core from 3.26.3 to 3.27.2 (#1162)
+
+==== 🛠 Build
+* Add announcement notifier.
