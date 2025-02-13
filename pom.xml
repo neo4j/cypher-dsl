@@ -1085,6 +1085,7 @@
 									<webhooks>
 										<slack>
 											<active>ALWAYS</active>
+											<structuredMessage>true</structuredMessage>
 										</slack>
 									</webhooks>
 								</announce>
