@@ -29,7 +29,7 @@
 
 	<name>Neo4j Cypher DSL</name>
 	<description>A DSL for generating Cypher statements for Neo4j</description>
-	<url>https://neo4j-contrib.github.io/cypher-dsl</url>
+	<url>https://neo4j.github.io/cypher-dsl</url>
 
 	<inceptionYear>2011</inceptionYear>
 	<organization>
@@ -124,10 +124,10 @@
 	</modules>
 
 	<scm>
-		<connection>scm:git:git@github.com:neo4j-contrib/cypher-dsl.git</connection>
-		<developerConnection>scm:git:git@github.com:neo4j-contrib/cypher-dsl.git</developerConnection>
+		<connection>scm:git:git@github.com:neo4j/cypher-dsl.git</connection>
+		<developerConnection>scm:git:git@github.com:neo4j/cypher-dsl.git</developerConnection>
 		<tag>HEAD</tag>
-		<url>https://github.com/neo4j-contrib/cypher-dsl</url>
+		<url>https://github.com/neo4j/cypher-dsl</url>
 	</scm>
 
 	<properties>
@@ -163,6 +163,7 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
 		<joda-time.version>2.13.1</joda-time.version>
+		<jreleaser-maven-plugin.version>1.16.0</jreleaser-maven-plugin.version>
 		<jsr305.version>3.0.2</jsr305.version>
 		<junit-jupiter.version>5.11.4</junit-jupiter.version>
 		<license-maven-plugin.version>4.6</license-maven-plugin.version>
@@ -668,6 +669,11 @@
 					<artifactId>license-maven-plugin</artifactId>
 					<version>${license-maven-plugin.version}</version>
 				</plugin>
+				<plugin>
+					<groupId>org.jreleaser</groupId>
+					<artifactId>jreleaser-maven-plugin</artifactId>
+					<version>${jreleaser-maven-plugin.version}</version>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 
@@ -1046,6 +1052,44 @@
 								<phase>verify</phase>
 							</execution>
 						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<profile>
+			<id>jreleaser</id>
+			<activation>
+				<property>
+					<name>jreleaser</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jreleaser</groupId>
+						<artifactId>jreleaser-maven-plugin</artifactId>
+						<configuration>
+							<jreleaser>
+								<project>
+									<name>neo4j-cypher-dsl</name>
+								</project>
+								<release>
+									<github>
+										<owner>neo4j</owner>
+										<tagName>{{projectVersion}}</tagName>
+										<releaseName>{{projectVersion}}</releaseName>
+									</github>
+								</release>
+								<announce>
+									<webhooks>
+										<slack>
+											<active>ALWAYS</active>
+										</slack>
+									</webhooks>
+								</announce>
+							</jreleaser>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
