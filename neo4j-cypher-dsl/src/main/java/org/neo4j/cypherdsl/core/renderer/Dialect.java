@@ -62,26 +62,43 @@ public enum Dialect {
 
 	/**
 	 * Enhanced Neo4j 5 dialect that renders importing with statements for call subqueries as variable scoped subqueries.
+	 *
 	 * @since 2024.1.0
 	 */
 	NEO4J_5_23 {
-		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplier();
+		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport();
 
 		@Override
 		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
-			return handlerSupplier.apply(visitable)
-				.or(() -> {
-					if (visitable instanceof Subquery || visitable instanceof With) {
-						return Optional.of(Neo4j523SubqueryVisitor.class);
-					}
-					return Optional.empty();
-				})
-				.orElseGet(() -> super.getHandler(visitable));
+			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+		}
+	},
+
+	/**
+	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 5} preamble on generated statements.
+	 *
+	 * @since 2024.5.0
+	 */
+	NEO4J_5_26 {
+		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport();
+
+		@Override
+		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
+			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+		}
+
+		@Override
+		Optional<String> getPrefix() {
+			return Optional.of("CYPHER 5 ");
 		}
 	};
 
 	@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
 		return null;
+	}
+
+	Optional<String> getPrefix() {
+		return Optional.empty();
 	}
 
 	private static class DefaultNeo4j5HandlerSupplier
@@ -98,4 +115,17 @@ public enum Dialect {
 		}
 	}
 
+	private static class DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport
+		extends DefaultNeo4j5HandlerSupplier {
+
+		@Override
+		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
+			return super.apply(visitable).or(() -> {
+				if (visitable instanceof Subquery || visitable instanceof With) {
+					return Optional.of(Neo4j523SubqueryVisitor.class);
+				}
+				return Optional.empty();
+			});
+		}
+	}
 }

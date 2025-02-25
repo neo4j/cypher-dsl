@@ -1080,10 +1080,13 @@ class IssueRelatedIT {
 			  RETURN x
 			}
 			RETURN *""";
-		if (dialect == Dialect.NEO4J_5_23) {
+		if (dialect == Dialect.NEO4J_5_23 || dialect == Dialect.NEO4J_5_26) {
 			expected = expected
 				.replace("CALL {", "CALL (nodes) {")
 				.replace("  WITH nodes\n", "");
+		}
+		if (dialect == Dialect.NEO4J_5_26) {
+			expected = "CYPHER 5 " + expected;
 		}
 		assertThat(cypher).isEqualTo(expected);
 	}
