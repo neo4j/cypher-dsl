@@ -81,13 +81,14 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 		BiFunction<RenderingConfig, Visitable, String> renderOp = (cfg, v) -> {
 			var renderingVisitor = createVisitor(cfg.ctx, cfg.renderConstantsAsParameters);
 			v.accept(renderingVisitor);
-			return renderingVisitor.getRenderedContent().trim();
+			var result = renderingVisitor.getRenderedContent().trim();
+			return configuration.getDialect().getPrefix().map(pv -> pv + result).orElse(result);
 		};
 
 		if (visitable instanceof Statement statement) {
 			String renderedContent;
 
-			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters());
+			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters(), configuration.getDialect());
 			try {
 				read.lock();
 				renderedContent = renderedStatementCache.get(key);

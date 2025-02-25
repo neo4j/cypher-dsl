@@ -93,8 +93,10 @@ sealed class DecoratedQuery extends AbstractStatement implements UseStatement {
 	@Override
 	public void accept(Visitor visitor) {
 
+		visitor.enter(this);
 		this.decoration.accept(visitor);
 		this.target.accept(visitor);
+		visitor.leave(this);
 	}
 
 	@Override

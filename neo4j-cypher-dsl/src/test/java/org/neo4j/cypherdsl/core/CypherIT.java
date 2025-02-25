@@ -50,8 +50,8 @@ class CypherIT {
 
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
 	public static final Configuration NEO5J_CONFIG = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
-	private final Node bikeNode = Cypher.node("Bike").named("b");
-	private final Node userNode = Cypher.node("User").named("u");
+	static final Node BIKE_NODE = Cypher.node("Bike").named("b");
+	static final Node USER_NODE = Cypher.node("User").named("u");
 
 	@Test
 	void statementShouldBeRenderable() {
@@ -70,17 +70,17 @@ class CypherIT {
 			.isInstanceOf(ResultStatement.class)
 			.isInstanceOf(Statement.SingleQuery.class);
 
-		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
-			.set(bikeNode.property("x").to(Cypher.literalTrue()))
+		statement = Cypher.match(BIKE_NODE, USER_NODE, Cypher.node("U").named("o"))
+			.set(BIKE_NODE.property("x").to(Cypher.literalTrue()))
 			.build();
 		assertThat(statement)
 			.isNotInstanceOf(ResultStatement.class)
 			.isInstanceOf(Statement.SingleQuery.class);
 
-		statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
-			.set(bikeNode.property("x").to(Cypher.literalTrue()))
-			.with(bikeNode)
-			.returning(bikeNode)
+		statement = Cypher.match(BIKE_NODE, USER_NODE, Cypher.node("U").named("o"))
+			.set(BIKE_NODE.property("x").to(Cypher.literalTrue()))
+			.with(BIKE_NODE)
+			.returning(BIKE_NODE)
 			.build();
 		assertThat(statement)
 			.isInstanceOf(ResultStatement.class)
@@ -95,8 +95,8 @@ class CypherIT {
 
 			@Test
 			void unrelatedNodes() {
-				Statement statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
-					.returning(bikeNode, userNode)
+				Statement statement = Cypher.match(BIKE_NODE, USER_NODE, Cypher.node("U").named("o"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -105,7 +105,7 @@ class CypherIT {
 
 			@Test
 			void asteriskShouldWork() {
-				Statement statement = Cypher.match(bikeNode, userNode, Cypher.node("U").named("o"))
+				Statement statement = Cypher.match(BIKE_NODE, USER_NODE, Cypher.node("U").named("o"))
 					.returning(Cypher.asterisk())
 					.build();
 
@@ -128,8 +128,8 @@ class CypherIT {
 			@Test
 			void simpleRelationship() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS"))
-					.returning(bikeNode, userNode)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -140,14 +140,14 @@ class CypherIT {
 			void simpleRelationshipChainNamed() {
 
 				for (RelationshipChain chain : new RelationshipChain[] {
-					userNode.relationshipTo(bikeNode, "OWNS")
+					USER_NODE.relationshipTo(BIKE_NODE, "OWNS")
 						.relationshipTo(Cypher.node("Brand"), "MADE_BY").named(SymbolicName.of("m")),
-					userNode.relationshipTo(bikeNode, "OWNS")
+					USER_NODE.relationshipTo(BIKE_NODE, "OWNS")
 						.relationshipTo(Cypher.node("Brand"), "MADE_BY").named("m")
 				}) {
 					Statement statement = Cypher
 						.match(chain)
-						.returning(bikeNode, userNode)
+						.returning(BIKE_NODE, USER_NODE)
 						.build();
 
 					assertThat(cypherRenderer.render(statement))
@@ -158,8 +158,8 @@ class CypherIT {
 			@Test // GH-169
 			void multipleRelationshipTypes() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS", "RIDES"))
-					.returning(bikeNode, userNode)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS", "RIDES"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -169,9 +169,9 @@ class CypherIT {
 			@Test // GH-170
 			void relationshipWithProperties() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS")
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS")
 						.withProperties(Cypher.mapOf("boughtOn", Cypher.literalOf("2019-04-16"))))
-					.returning(bikeNode, userNode)
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -181,8 +181,8 @@ class CypherIT {
 			@Test // GH-168
 			void relationshipWithMinimumLength() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS").min(3))
-					.returning(bikeNode, userNode)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").min(3))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -192,8 +192,8 @@ class CypherIT {
 			@Test // GH-168
 			void relationshipWithMaximumLength() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS").max(5))
-					.returning(bikeNode, userNode)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").max(5))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -203,8 +203,8 @@ class CypherIT {
 			@Test // GH-168
 			void unboundedRelationship() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS").unbounded())
-					.returning(bikeNode, userNode)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").unbounded())
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -214,8 +214,8 @@ class CypherIT {
 			@Test // GH-168
 			void relationshipWithLength() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS").length(3, 5))
-					.returning(bikeNode, userNode)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").length(3, 5))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -225,9 +225,9 @@ class CypherIT {
 			@Test // GH-168
 			void relationshipWithLengthAndProperties() {
 				Statement statement = Cypher
-					.match(userNode.relationshipTo(bikeNode, "OWNS").length(3, 5)
+					.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").length(3, 5)
 						.withProperties(Cypher.mapOf("boughtOn", Cypher.literalOf("2019-04-16"))))
-					.returning(bikeNode, userNode)
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -236,12 +236,12 @@ class CypherIT {
 
 			@Test
 			void simpleRelationshipWithReturn() {
-				Relationship owns = userNode
-					.relationshipTo(bikeNode, "OWNS").named("o");
+				Relationship owns = USER_NODE
+					.relationshipTo(BIKE_NODE, "OWNS").named("o");
 
 				Statement statement = Cypher
 					.match(owns)
-					.returning(bikeNode, userNode, owns)
+					.returning(BIKE_NODE, USER_NODE, owns)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -252,12 +252,12 @@ class CypherIT {
 			void chainedRelations() {
 				Node tripNode = Cypher.node("Trip").named("t");
 				Statement statement = Cypher
-					.match(userNode
-						.relationshipTo(bikeNode, "OWNS").named("r1")
+					.match(USER_NODE
+						.relationshipTo(BIKE_NODE, "OWNS").named("r1")
 						.relationshipTo(tripNode, "USED_ON").named("r2")
 					)
-					.where(userNode.property("name").matches(".*aName"))
-					.returning(bikeNode, userNode)
+					.where(USER_NODE.property("name").matches(".*aName"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -265,12 +265,12 @@ class CypherIT {
 						"MATCH (u:`User`)-[r1:`OWNS`]->(b:`Bike`)-[r2:`USED_ON`]->(t:`Trip`) WHERE u.name =~ '.*aName' RETURN b, u");
 
 				statement = Cypher
-					.match(userNode
-						.relationshipTo(bikeNode, "OWNS")
+					.match(USER_NODE
+						.relationshipTo(BIKE_NODE, "OWNS")
 						.relationshipTo(tripNode, "USED_ON").named("r2")
 					)
-					.where(userNode.property("name").matches(".*aName"))
-					.returning(bikeNode, userNode)
+					.where(USER_NODE.property("name").matches(".*aName"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -278,14 +278,14 @@ class CypherIT {
 						"MATCH (u:`User`)-[:`OWNS`]->(b:`Bike`)-[r2:`USED_ON`]->(t:`Trip`) WHERE u.name =~ '.*aName' RETURN b, u");
 
 				statement = Cypher
-					.match(userNode
-						.relationshipTo(bikeNode, "OWNS")
+					.match(USER_NODE
+						.relationshipTo(BIKE_NODE, "OWNS")
 						.relationshipTo(tripNode, "USED_ON").named("r2")
-						.relationshipFrom(userNode, "WAS_ON").named("x")
+						.relationshipFrom(USER_NODE, "WAS_ON").named("x")
 						.relationshipBetween(Cypher.node("SOMETHING")).named("y")
 					)
-					.where(userNode.property("name").matches(".*aName"))
-					.returning(bikeNode, userNode)
+					.where(USER_NODE.property("name").matches(".*aName"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -297,17 +297,17 @@ class CypherIT {
 			void chainedRelationshipsWithPropertiesAndLength() {
 				Node tripNode = Cypher.node("Trip").named("t");
 				Statement statement = Cypher
-					.match(userNode
-						.relationshipTo(bikeNode, "OWNS")
+					.match(USER_NODE
+						.relationshipTo(BIKE_NODE, "OWNS")
 						.relationshipTo(tripNode, "USED_ON").named("r2").min(1)
 						.properties(Cypher.mapOf("when", Cypher.literalOf("2019-04-16")))
-						.relationshipFrom(userNode, "WAS_ON").named("x").max(2)
+						.relationshipFrom(USER_NODE, "WAS_ON").named("x").max(2)
 						.properties("whatever", Cypher.literalOf("2020-04-16"))
 						.relationshipBetween(Cypher.node("SOMETHING")).named("y").length(2, 3)
 						.properties(Cypher.mapOf("idk", Cypher.literalOf("2021-04-16")))
 					)
-					.where(userNode.property("name").matches(".*aName"))
-					.returning(bikeNode, userNode)
+					.where(USER_NODE.property("name").matches(".*aName"))
+					.returning(BIKE_NODE, USER_NODE)
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -346,8 +346,8 @@ class CypherIT {
 
 			@Test
 			void sortOrderDefault() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(Cypher.sort(userNode.property("name"))).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(Cypher.sort(USER_NODE.property("name"))).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
@@ -356,8 +356,8 @@ class CypherIT {
 
 			@Test // GH-189
 			void sortOrderDefaultBasedOnSortItemCollection() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(Collections.singleton(Cypher.sort(userNode.property("name")))).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(Collections.singleton(Cypher.sort(USER_NODE.property("name")))).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
@@ -366,8 +366,8 @@ class CypherIT {
 
 			@Test
 			void sortOrderAscending() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(Cypher.sort(userNode.property("name")).ascending()).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(Cypher.sort(USER_NODE.property("name")).ascending()).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
@@ -376,8 +376,8 @@ class CypherIT {
 
 			@Test
 			void sortOrderDescending() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(Cypher.sort(userNode.property("name")).descending()).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(Cypher.sort(USER_NODE.property("name")).descending()).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
@@ -386,10 +386,10 @@ class CypherIT {
 
 			@Test
 			void sortOrderConcatenation() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
 					.orderBy(
-						Cypher.sort(userNode.property("name")).descending(),
-						Cypher.sort(userNode.property("age")).ascending()
+						Cypher.sort(USER_NODE.property("name")).descending(),
+						Cypher.sort(USER_NODE.property("age")).ascending()
 					)
 					.build();
 
@@ -399,8 +399,8 @@ class CypherIT {
 
 			@Test
 			void sortOrderDefaultExpression() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(userNode.property("name")).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(USER_NODE.property("name")).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name");
@@ -408,8 +408,8 @@ class CypherIT {
 
 			@Test
 			void sortOrderAscendingExpression() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(userNode.property("name").ascending()).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(USER_NODE.property("name").ascending()).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name ASC");
@@ -417,8 +417,8 @@ class CypherIT {
 
 			@Test
 			void sortOrderDescendingExpression() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(userNode.property("name").descending()).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(USER_NODE.property("name").descending()).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo("MATCH (u:`User`) RETURN u ORDER BY u.name DESC");
@@ -426,9 +426,9 @@ class CypherIT {
 
 			@Test
 			void sortOrderConcatenationExpression() {
-				Statement statement = Cypher.match(userNode).returning(userNode)
-					.orderBy(userNode.property("name")).descending()
-					.and(userNode.property("age")).ascending()
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE)
+					.orderBy(USER_NODE.property("name")).descending()
+					.and(USER_NODE.property("age")).ascending()
 					.build();
 
 				assertThat(cypherRenderer.render(statement))
@@ -437,7 +437,7 @@ class CypherIT {
 
 			@Test
 			void skip() {
-				Statement statement = Cypher.match(userNode).returning(userNode).skip(1).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).skip(1).build();
 
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
@@ -446,7 +446,7 @@ class CypherIT {
 
 			@Test
 			void nullSkip() {
-				Statement statement = Cypher.match(userNode).returning(userNode).skip((Number) null).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).skip((Number) null).build();
 
 				assertThat(cypherRenderer.render(statement))
 						.isEqualTo(
@@ -455,7 +455,7 @@ class CypherIT {
 
 			@Test
 			void limit() {
-				Statement statement = Cypher.match(userNode).returning(userNode).limit(1).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).limit(1).build();
 
 				assertThat(cypherRenderer.render(statement))
 						.isEqualTo(
@@ -464,7 +464,7 @@ class CypherIT {
 
 			@Test // GH-129
 			void limitWithParams() {
-				Statement statement = Cypher.match(userNode).returning(userNode).limit(Cypher.parameter("param")).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).limit(Cypher.parameter("param")).build();
 
 				assertThat(cypherRenderer.render(statement))
 						.isEqualTo("MATCH (u:`User`) RETURN u LIMIT $param");
@@ -472,7 +472,7 @@ class CypherIT {
 
 			@Test
 			void nullLimit() {
-				Statement statement = Cypher.match(userNode).returning(userNode).limit((Number) null).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).limit((Number) null).build();
 
 				assertThat(cypherRenderer.render(statement))
 						.isEqualTo(
@@ -481,7 +481,7 @@ class CypherIT {
 
 			@Test
 			void skipAndLimit() {
-				Statement statement = Cypher.match(userNode).returning(userNode).skip(1).limit(1).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).skip(1).limit(1).build();
 
 				assertThat(cypherRenderer.render(statement))
 						.isEqualTo(
@@ -490,8 +490,8 @@ class CypherIT {
 
 			@Test // GH-129
 			void skipAndLimitWithParams() {
-				Statement statement = Cypher.match(userNode)
-						.returning(userNode)
+				Statement statement = Cypher.match(USER_NODE)
+						.returning(USER_NODE)
 						.skip(Cypher.parameter("skip"))
 						.limit(Cypher.parameter("limit"))
 						.build();
@@ -503,7 +503,7 @@ class CypherIT {
 
 			@Test
 			void nullSkipAndLimit() {
-				Statement statement = Cypher.match(userNode).returning(userNode).skip((Number) null).limit((Number) null).build();
+				Statement statement = Cypher.match(USER_NODE).returning(USER_NODE).skip((Number) null).limit((Number) null).build();
 
 				assertThat(cypherRenderer.render(statement))
 						.isEqualTo(
@@ -514,12 +514,12 @@ class CypherIT {
 			void distinct() {
 				String expected = "MATCH (u:`User`) RETURN DISTINCT u SKIP 1 LIMIT 1";
 
-				Statement statement = Cypher.match(userNode).returningDistinct(userNode).skip(1).limit(1).build();
+				Statement statement = Cypher.match(USER_NODE).returningDistinct(USER_NODE).skip(1).limit(1).build();
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
 						expected);
 
-				statement = Cypher.match(userNode).returningDistinct("u").skip(1).limit(1).build();
+				statement = Cypher.match(USER_NODE).returningDistinct("u").skip(1).limit(1).build();
 				assertThat(cypherRenderer.render(statement))
 					.isEqualTo(
 						expected);
@@ -534,7 +534,7 @@ class CypherIT {
 		void finishAfterMatch() {
 			String expected = "MATCH (u:`User`) FINISH";
 
-			Statement statement = Cypher.match(userNode).finish().build();
+			Statement statement = Cypher.match(USER_NODE).finish().build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					expected);
@@ -544,7 +544,7 @@ class CypherIT {
 		void finishAfterMatchWithWhere() {
 			String expected = "MATCH (u:`User`) WHERE u:`User` FINISH";
 
-			Statement statement = Cypher.match(userNode).where(userNode.hasLabels("User")).finish().build();
+			Statement statement = Cypher.match(USER_NODE).where(USER_NODE.hasLabels("User")).finish().build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					expected);
@@ -554,7 +554,7 @@ class CypherIT {
 		void finishAfterSet() {
 			String expected = "MATCH (u:`User`) SET u.name = 'hans' FINISH";
 
-			Statement statement = Cypher.match(userNode).set(userNode.property("name").to(Cypher.literalOf("hans"))).finish().build();
+			Statement statement = Cypher.match(USER_NODE).set(USER_NODE.property("name").to(Cypher.literalOf("hans"))).finish().build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					expected);
@@ -564,7 +564,7 @@ class CypherIT {
 		void finishAfterDelete() {
 			String expected = "MATCH (u:`User`) DELETE u FINISH";
 
-			Statement statement = Cypher.match(userNode).delete(userNode).finish().build();
+			Statement statement = Cypher.match(USER_NODE).delete(USER_NODE).finish().build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					expected);
@@ -574,7 +574,7 @@ class CypherIT {
 		void finishAfterCreate() {
 			String expected = "CREATE (u:`User`) FINISH";
 
-			Statement statement = Cypher.create(userNode).finish().build();
+			Statement statement = Cypher.create(USER_NODE).finish().build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					expected);
@@ -584,7 +584,7 @@ class CypherIT {
 		void finishAfterMerge() {
 			String expected = "MERGE (u:`User`)-[:`KNOWS`]->(u) FINISH";
 
-			Statement statement = Cypher.merge(userNode.relationshipTo(userNode, "KNOWS")).finish().build();
+			Statement statement = Cypher.merge(USER_NODE.relationshipTo(USER_NODE, "KNOWS")).finish().build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					expected);
@@ -599,10 +599,10 @@ class CypherIT {
 		void shouldRenderExplain() {
 
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
-				.where(userNode.property("a").isNull())
-				.with(bikeNode, userNode)
-				.returning(bikeNode)
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+				.where(USER_NODE.property("a").isNull())
+				.with(BIKE_NODE, USER_NODE)
+				.returning(BIKE_NODE)
 				.explain();
 
 			assertThat(cypherRenderer.render(statement))
@@ -614,13 +614,13 @@ class CypherIT {
 
 			Node tripNode = Cypher.node("Trip").named("tt");
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
-				.where(userNode.property("a").isNull())
-				.with(bikeNode, userNode)
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+				.where(USER_NODE.property("a").isNull())
+				.with(BIKE_NODE, USER_NODE)
 				.match(tripNode)
 				.where(tripNode.property("name").isEqualTo(Cypher.literalOf("Festive500")))
-				.with(bikeNode, userNode, tripNode)
-				.returning(bikeNode, userNode, tripNode)
+				.with(BIKE_NODE, USER_NODE, tripNode)
+				.returning(BIKE_NODE, USER_NODE, tripNode)
 				.profile();
 
 			assertThat(cypherRenderer.render(statement))
@@ -634,10 +634,10 @@ class CypherIT {
 		@Test
 		void simpleWith() {
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
-				.where(userNode.property("a").isNull())
-				.with(bikeNode, userNode)
-				.returning(bikeNode)
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+				.where(USER_NODE.property("a").isNull())
+				.with(BIKE_NODE, USER_NODE)
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -754,13 +754,13 @@ class CypherIT {
 
 			Node tripNode = Cypher.node("Trip").named("t");
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
-				.where(userNode.property("a").isNull())
-				.with(bikeNode, userNode)
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+				.where(USER_NODE.property("a").isNull())
+				.with(BIKE_NODE, USER_NODE)
 				.match(tripNode)
 				.where(tripNode.property("name").isEqualTo(Cypher.literalOf("Festive500")))
-				.with(bikeNode, userNode, tripNode)
-				.returning(bikeNode, userNode, tripNode)
+				.with(BIKE_NODE, USER_NODE, tripNode)
+				.returning(BIKE_NODE, USER_NODE, tripNode)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -771,11 +771,11 @@ class CypherIT {
 		@Test
 		void deletingSimpleWith() {
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
-				.where(userNode.property("a").isNull())
-				.delete(userNode)
-				.with(bikeNode, userNode)
-				.returning(bikeNode, userNode)
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+				.where(USER_NODE.property("a").isNull())
+				.delete(USER_NODE)
+				.with(BIKE_NODE, USER_NODE)
+				.returning(BIKE_NODE, USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -785,11 +785,11 @@ class CypherIT {
 		@Test
 		void deletingSimpleWithReverse() {
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
-				.where(userNode.property("a").isNull())
-				.with(bikeNode, userNode)
-				.delete(userNode)
-				.returning(bikeNode, userNode)
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
+				.where(USER_NODE.property("a").isNull())
+				.with(BIKE_NODE, USER_NODE)
+				.delete(USER_NODE)
+				.returning(BIKE_NODE, USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -801,13 +801,13 @@ class CypherIT {
 
 			Node tripNode = Cypher.node("Trip").named("t");
 			Statement statement = Cypher
-				.match(userNode.relationshipTo(bikeNode, "OWNS"))
+				.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
 				.match(tripNode)
 				.delete(tripNode)
-				.with(bikeNode, tripNode)
-				.match(userNode)
-				.with(bikeNode, userNode)
-				.returning(bikeNode, userNode)
+				.with(BIKE_NODE, tripNode)
+				.match(USER_NODE)
+				.with(BIKE_NODE, USER_NODE)
+				.returning(BIKE_NODE, USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -822,9 +822,9 @@ class CypherIT {
 		@Test
 		void simple() {
 			Statement statement = Cypher
-				.match(bikeNode)
-				.match(userNode, Cypher.node("U").named("o"))
-				.returning(bikeNode)
+				.match(BIKE_NODE)
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -834,9 +834,9 @@ class CypherIT {
 		@Test // GH-189
 		void simpleWithPatternCollection() {
 			Statement statement = Cypher
-				.match(Collections.singleton(bikeNode))
-				.match(userNode, Cypher.node("U").named("o"))
-				.returning(bikeNode)
+				.match(Collections.singleton(BIKE_NODE))
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -845,11 +845,11 @@ class CypherIT {
 
 		@Test // GH-189
 		void simpleWithPatternCollectionInExposesMatch() {
-			PatternElement[] patternElements = {userNode, Cypher.node("U").named("o")};
+			PatternElement[] patternElements = { USER_NODE, Cypher.node("U").named("o")};
 			Statement statement = Cypher
-					.match(Collections.singleton(bikeNode))
+					.match(Collections.singleton(BIKE_NODE))
 					.match(Arrays.asList(patternElements))
-				.returning(bikeNode)
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -859,10 +859,10 @@ class CypherIT {
 		@Test
 		void simpleWhere() {
 			Statement statement = Cypher
-				.match(bikeNode)
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.match(BIKE_NODE)
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -872,11 +872,11 @@ class CypherIT {
 		@Test
 		void multiWhere() {
 			Statement statement = Cypher
-				.match(bikeNode)
-				.where(bikeNode.property("a").isNotNull())
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isNotNull())
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -888,12 +888,12 @@ class CypherIT {
 		@SuppressWarnings("deprecation")
 		void multiWhereMultiConditions() {
 			Statement statement = Cypher
-				.match(bikeNode)
-				.where(bikeNode.property("a").isNotNull())
-				.and(bikeNode.property("b").isNull())
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull().or(userNode.internalId().isEqualTo(Cypher.literalOf(4711))))
-				.returning(bikeNode)
+				.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isNotNull())
+				.and(BIKE_NODE.property("b").isNull())
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull().or(USER_NODE.internalId().isEqualTo(Cypher.literalOf(4711))))
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -904,10 +904,10 @@ class CypherIT {
 		@Test
 		void optional() {
 			Statement statement = Cypher
-				.optionalMatch(bikeNode)
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.optionalMatch(BIKE_NODE)
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -917,10 +917,10 @@ class CypherIT {
 		@Test
 		void optionalWithFlag() {
 			Statement statement = Cypher
-				.match(true, bikeNode)
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.match(true, BIKE_NODE)
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -930,10 +930,10 @@ class CypherIT {
 		@Test // GH-189
 		void optionalWithFlagAndPatternCollection() {
 			Statement statement = Cypher
-				.match(true, Collections.singleton(bikeNode))
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.match(true, Collections.singleton(BIKE_NODE))
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -943,10 +943,10 @@ class CypherIT {
 		@Test // GH-189
 		void optionalWithPatternCollection() {
 			Statement statement = Cypher
-				.optionalMatch(Collections.singleton(bikeNode))
-				.match(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.optionalMatch(Collections.singleton(BIKE_NODE))
+				.match(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -956,9 +956,9 @@ class CypherIT {
 		@Test
 		@SuppressWarnings({ "ResultOfMethodCallIgnored" }) // That is the purpose of this test
 		void usingSameWithStepWithoutReassign() {
-			StatementBuilder.OrderableOngoingReadingAndWith firstStep = Cypher.match(bikeNode).with(bikeNode);
+			StatementBuilder.OrderableOngoingReadingAndWith firstStep = Cypher.match(BIKE_NODE).with(BIKE_NODE);
 
-			firstStep.optionalMatch(userNode);
+			firstStep.optionalMatch(USER_NODE);
 			firstStep.optionalMatch(Cypher.node("Trip"));
 
 			Statement statement = firstStep.returning(Cypher.asterisk()).build();
@@ -970,9 +970,9 @@ class CypherIT {
 		@Test
 		@SuppressWarnings({ "ResultOfMethodCallIgnored" }) // That is the purpose of this test
 		void usingSameWithStepWithoutReassignThenUpdate() {
-			StatementBuilder.OrderableOngoingReadingAndWith firstStep = Cypher.match(bikeNode).with(bikeNode);
+			StatementBuilder.OrderableOngoingReadingAndWith firstStep = Cypher.match(BIKE_NODE).with(BIKE_NODE);
 
-			firstStep.optionalMatch(userNode);
+			firstStep.optionalMatch(USER_NODE);
 			firstStep.optionalMatch(Cypher.node("Trip"));
 			firstStep.delete("u");
 
@@ -985,9 +985,9 @@ class CypherIT {
 
 		@Test
 		void usingSameWithStepWithReassign() {
-			ExposesMatch firstStep = Cypher.match(bikeNode).with(bikeNode);
+			ExposesMatch firstStep = Cypher.match(BIKE_NODE).with(BIKE_NODE);
 
-			firstStep = firstStep.optionalMatch(userNode);
+			firstStep = firstStep.optionalMatch(USER_NODE);
 			firstStep = firstStep.optionalMatch(Cypher.node("Trip"));
 
 			Statement statement = ((ExposesReturning) firstStep).returning(Cypher.asterisk()).build();
@@ -1019,10 +1019,10 @@ class CypherIT {
 		@Test
 		void optionalNext() {
 			Statement statement = Cypher
-				.match(bikeNode)
-				.optionalMatch(userNode, Cypher.node("U").named("o"))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.match(BIKE_NODE)
+				.optionalMatch(USER_NODE, Cypher.node("U").named("o"))
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1031,12 +1031,12 @@ class CypherIT {
 
 		@Test
 		void optionalNextBasedOnPatternElementCollection() {
-			PatternElement[] patternElements = {userNode, Cypher.node("U").named("o")};
+			PatternElement[] patternElements = { USER_NODE, Cypher.node("U").named("o")};
 			Statement statement = Cypher
-					.match(bikeNode)
+					.match(BIKE_NODE)
 					.optionalMatch(Arrays.asList(patternElements))
-				.where(userNode.property("a").isNull())
-				.returning(bikeNode)
+				.where(USER_NODE.property("a").isNull())
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1046,9 +1046,9 @@ class CypherIT {
 		@Test
 		void optionalMatchThenDelete() {
 			Statement statement = Cypher
-				.match(bikeNode)
-				.optionalMatch(userNode, Cypher.node("U").named("o"))
-				.delete(userNode, bikeNode)
+				.match(BIKE_NODE)
+				.optionalMatch(USER_NODE, Cypher.node("U").named("o"))
+				.delete(USER_NODE, BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1062,8 +1062,8 @@ class CypherIT {
 
 		@Test
 		void inWhereClause() {
-			Statement statement = Cypher.match(userNode).where(userNode.internalId().isEqualTo(Cypher.literalOf(1L)))
-				.returning(userNode).build();
+			Statement statement = Cypher.match(USER_NODE).where(USER_NODE.internalId().isEqualTo(Cypher.literalOf(1L)))
+				.returning(USER_NODE).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1072,7 +1072,7 @@ class CypherIT {
 
 		@Test
 		void inReturnClause() {
-			Statement statement = Cypher.match(userNode).returning(Cypher.count(userNode)).build();
+			Statement statement = Cypher.match(USER_NODE).returning(Cypher.count(USER_NODE)).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1081,7 +1081,7 @@ class CypherIT {
 
 		@Test // GH-195
 		void inReturnClauseBasedOnExpressionCollection() {
-			Statement statement = Cypher.match(userNode).returning(Collections.singleton(Cypher.count(userNode))).build();
+			Statement statement = Cypher.match(USER_NODE).returning(Collections.singleton(Cypher.count(USER_NODE))).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1090,7 +1090,8 @@ class CypherIT {
 
 		@Test // GH-195
 		void inDistinctReturnClauseBasedOnExpressionCollection() {
-			Statement statement = Cypher.match(userNode).returningDistinct(Collections.singleton(Cypher.count(userNode))).build();
+			Statement statement = Cypher.match(USER_NODE).returningDistinct(Collections.singleton(Cypher.count(
+				USER_NODE))).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1099,7 +1100,7 @@ class CypherIT {
 
 		@Test
 		void inReturnClauseWithDistinct() {
-			Statement statement = Cypher.match(userNode).returning(Cypher.countDistinct(userNode)).build();
+			Statement statement = Cypher.match(USER_NODE).returning(Cypher.countDistinct(USER_NODE)).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1108,7 +1109,7 @@ class CypherIT {
 
 		@Test
 		void aliasedInReturnClause() {
-			Statement statement = Cypher.match(userNode).returning(Cypher.count(userNode).as("cnt")).build();
+			Statement statement = Cypher.match(USER_NODE).returning(Cypher.count(USER_NODE).as("cnt")).build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1117,9 +1118,9 @@ class CypherIT {
 
 		@Test
 		void shouldSupportMoreThanOneArgument() {
-			Statement statement = Cypher.match(userNode)
+			Statement statement = Cypher.match(USER_NODE)
 				.returning(
-					Cypher.coalesce(userNode.property("a"), userNode.property("b"), Cypher.literalOf("¯\\_(ツ)_/¯")))
+					Cypher.coalesce(USER_NODE.property("a"), USER_NODE.property("b"), Cypher.literalOf("¯\\_(ツ)_/¯")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1129,8 +1130,8 @@ class CypherIT {
 
 		@Test
 		void literalsShouldDealWithNull() {
-			Statement statement = Cypher.match(userNode)
-				.returning(Cypher.coalesce(Cypher.literalOf(null), userNode.property("field")).as("p"))
+			Statement statement = Cypher.match(USER_NODE)
+				.returning(Cypher.coalesce(Cypher.literalOf(null), USER_NODE.property("field")).as("p"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1163,9 +1164,9 @@ class CypherIT {
 
 		@Test
 		void equalsWithStringLiteral() {
-			Statement statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(Cypher.literalOf("Test")))
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(Cypher.literalOf("Test")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1175,9 +1176,9 @@ class CypherIT {
 
 		@Test
 		void equalsWithNumberLiteral() {
-			Statement statement = Cypher.match(userNode)
-				.where(userNode.property("age").isEqualTo(Cypher.literalOf(21)))
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("age").isEqualTo(Cypher.literalOf(21)))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1190,11 +1191,11 @@ class CypherIT {
 	class Conditions {
 		@Test
 		void conditionsChainingAnd() {
-			Statement statement = Cypher.match(userNode)
+			Statement statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(Cypher.literalOf("Test"))
-						.and(userNode.property("age").isEqualTo(Cypher.literalOf(21))))
-				.returning(userNode)
+					USER_NODE.property("name").isEqualTo(Cypher.literalOf("Test"))
+						.and(USER_NODE.property("age").isEqualTo(Cypher.literalOf(21))))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1204,11 +1205,11 @@ class CypherIT {
 
 		@Test
 		void conditionsChainingOr() {
-			Statement statement = Cypher.match(userNode)
+			Statement statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(Cypher.literalOf("Test"))
-						.or(userNode.property("age").isEqualTo(Cypher.literalOf(21))))
-				.returning(userNode)
+					USER_NODE.property("name").isEqualTo(Cypher.literalOf("Test"))
+						.or(USER_NODE.property("age").isEqualTo(Cypher.literalOf(21))))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1264,90 +1265,90 @@ class CypherIT {
 
 			Condition isTrue = Cypher.isTrue();
 			Condition isFalse = Cypher.isFalse();
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue)
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE ((true OR false) AND true) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue)
 				)
 				.or(isFalse)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (((true OR false) AND true) OR false) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue)
 				)
 				.or(isFalse)
 				.and(isFalse)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE ((((true OR false) AND true) OR false) AND false) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue))
 				.or(isFalse.and(isTrue))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (((true OR false) AND true) OR (false AND true)) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue))
 				.or(isFalse.and(isTrue))
 				.and(isTrue)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE ((((true OR false) AND true) OR (false AND true)) AND true) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue)
 				)
 				.or(isFalse.or(isTrue))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (((true OR false) AND true) OR false OR true) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isFalse).and(isTrue)
 						.or(
 							isFalse.or(isTrue))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (((true OR false) AND true) OR false OR true) RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
 					isTrue.or(isTrue).or(isTrue)
 				).or(isFalse.or(isFalse).or(isFalse))
 				.or(isTrue).or(isTrue).or(isTrue)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1356,11 +1357,11 @@ class CypherIT {
 
 		@Test
 		void conditionsChainingXor() {
-			Statement statement = Cypher.match(userNode)
+			Statement statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(Cypher.literalOf("Test"))
-						.xor(userNode.property("age").isEqualTo(Cypher.literalOf(21))))
-				.returning(userNode)
+					USER_NODE.property("name").isEqualTo(Cypher.literalOf("Test"))
+						.xor(USER_NODE.property("age").isEqualTo(Cypher.literalOf(21))))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1375,24 +1376,24 @@ class CypherIT {
 			String expected = "MATCH (u:`User`) RETURN u";
 
 			Statement statement;
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.or(no))
 				.and(no.and(no).or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.and(no).or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
@@ -1402,36 +1403,36 @@ class CypherIT {
 		void multipleEmptyConditionsMustCollapse2() {
 
 			var no = Cypher.noCondition();
-			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
+			Supplier<Condition> t = () -> USER_NODE.property("a").isEqualTo(Cypher.literalTrue());
 			String expected = "MATCH (u:`User`) WHERE u.a = true RETURN u";
 
 			Statement statement;
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.and(t.get()).or(no))
 				.and(no.and(no).or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.or(no).or(t.get()))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.and(t.get()).or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.or(no))
 				.and(t.get())
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
@@ -1441,29 +1442,29 @@ class CypherIT {
 		void multipleEmptyConditionsMustCollapse3() {
 
 			var no = Cypher.noCondition();
-			Supplier<Condition> t = () -> userNode.property("a").isEqualTo(Cypher.literalTrue());
-			Supplier<Condition> f = () -> userNode.property("b").isEqualTo(Cypher.literalFalse());
+			Supplier<Condition> t = () -> USER_NODE.property("a").isEqualTo(Cypher.literalTrue());
+			Supplier<Condition> f = () -> USER_NODE.property("b").isEqualTo(Cypher.literalFalse());
 			String expected = "MATCH (u:`User`) WHERE (u.a = true AND u.b = false) RETURN u";
 
 			Statement statement;
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.and(t.get()).or(no))
 				.and(no.and(f.get()).or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.or(no).or(t.get()).and(f.get()))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(no.and(t.get()).or(no)).and(f.get().or(no))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(expected);
@@ -1476,94 +1477,94 @@ class CypherIT {
 			Literal<?> test = Cypher.literalOf("Test");
 			Literal<?> foobar = Cypher.literalOf("foobar");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE u.name = 'Test' RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.and(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (u.name = 'Test' AND u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.and(userNode.property("name").isEqualTo(test))
-				.and(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (u.name = 'Test' AND u.name = 'Test' AND u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (u.name = 'Test' OR u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MATCH (u:`User`) WHERE (u.name = 'Test' OR u.name = 'Test' OR u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.and(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(foobar))
-				.and(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(foobar))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (((u.name = 'Test' AND u.name = 'Test') OR u.name = 'foobar') AND u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(foobar))
-				.and(userNode.property("name").isEqualTo(test))
-				.and(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(foobar))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE ((u.name = 'Test' OR u.name = 'foobar') AND u.name = 'Test' AND u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(foobar))
-				.and(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("name").isEqualTo(foobar))
-				.and(userNode.property("name").isEqualTo(test))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(foobar))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("name").isEqualTo(foobar))
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE ((((u.name = 'Test' OR u.name = 'foobar') AND u.name = 'Test') OR u.name = 'foobar') AND u.name = 'Test') RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isNotNull())
-				.and(userNode.property("name").isEqualTo(test))
-				.or(userNode.property("age").isEqualTo(Cypher.literalOf(21)))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isNotNull())
+				.and(USER_NODE.property("name").isEqualTo(test))
+				.or(USER_NODE.property("age").isEqualTo(Cypher.literalOf(21)))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1579,70 +1580,70 @@ class CypherIT {
 			Literal<?> foobar = Cypher.literalOf("foobar");
 			Literal<?> bazbar = Cypher.literalOf("bazbar");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(test)
-						.or(userNode.property("name").isEqualTo(foobar))
-						.or(userNode.property("name").isEqualTo(foobar))
+					USER_NODE.property("name").isEqualTo(test)
+						.or(USER_NODE.property("name").isEqualTo(foobar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (u.name = 'Test' OR u.name = 'foobar' OR u.name = 'foobar') RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(test)
-						.and(userNode.property("name").isEqualTo(bazbar))
-						.or(userNode.property("name").isEqualTo(foobar))
-						.or(userNode.property("name").isEqualTo(foobar))
+					USER_NODE.property("name").isEqualTo(test)
+						.and(USER_NODE.property("name").isEqualTo(bazbar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE ((u.name = 'Test' AND u.name = 'bazbar') OR u.name = 'foobar' OR u.name = 'foobar') RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(test))
+					USER_NODE.property("name").isEqualTo(test))
 				.and(
-					userNode.property("name").isEqualTo(bazbar)
-						.and(userNode.property("name").isEqualTo(foobar))
+					USER_NODE.property("name").isEqualTo(bazbar)
+						.and(USER_NODE.property("name").isEqualTo(foobar))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (u.name = 'Test' AND u.name = 'bazbar' AND u.name = 'foobar') RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(test)
-						.and(userNode.property("name").isEqualTo(bazbar))
-						.or(userNode.property("name").isEqualTo(foobar))
-						.or(userNode.property("name").isEqualTo(foobar))
+					USER_NODE.property("name").isEqualTo(test)
+						.and(USER_NODE.property("name").isEqualTo(bazbar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE ((u.name = 'Test' AND u.name = 'bazbar') OR u.name = 'foobar' OR u.name = 'foobar') RETURN u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(test)
-						.and(userNode.property("name").isEqualTo(bazbar))
-						.or(userNode.property("name").isEqualTo(foobar))
-						.or(userNode.property("name").isEqualTo(foobar))
-						.and(userNode.property("name").isEqualTo(bazbar))
+					USER_NODE.property("name").isEqualTo(test)
+						.and(USER_NODE.property("name").isEqualTo(bazbar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
+						.and(USER_NODE.property("name").isEqualTo(bazbar))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -1657,20 +1658,20 @@ class CypherIT {
 			Literal<?> foobar = Cypher.literalOf("foobar");
 			Literal<?> bazbar = Cypher.literalOf("bazbar");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(
-					userNode.property("name").isEqualTo(test)
-						.and(userNode.property("name").isEqualTo(bazbar))
-						.or(userNode.property("name").isEqualTo(foobar))
-						.or(userNode.property("name").isEqualTo(foobar))
+					USER_NODE.property("name").isEqualTo(test)
+						.and(USER_NODE.property("name").isEqualTo(bazbar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
+						.or(USER_NODE.property("name").isEqualTo(foobar))
 				)
 				.and(
-					userNode.property("name").isEqualTo(bazbar)
-						.and(userNode.property("name").isEqualTo(foobar))
-						.or(userNode.property("name").isEqualTo(test))
+					USER_NODE.property("name").isEqualTo(bazbar)
+						.and(USER_NODE.property("name").isEqualTo(foobar))
+						.or(USER_NODE.property("name").isEqualTo(test))
 						.not()
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1681,9 +1682,9 @@ class CypherIT {
 
 		@Test
 		void negatedConditions() {
-			Statement statement = Cypher.match(userNode)
-				.where(userNode.property("name").isNotNull().not())
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isNotNull().not())
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1694,20 +1695,20 @@ class CypherIT {
 		@Test
 		void noConditionShouldNotBeRendered() {
 			Statement statement;
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.where(Cypher.noCondition())
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(Cypher.literalOf("test")))
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(Cypher.literalOf("test")))
 				.and(Cypher.noCondition()).or(
 					Cypher.noCondition())
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -1987,20 +1988,20 @@ class CypherIT {
 		void shouldRenderRemoveOnNodes() {
 			Statement statement;
 
-			statement = Cypher.match(userNode)
-				.remove(userNode, "A", "B")
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.remove(USER_NODE, "A", "B")
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) REMOVE u:`A`:`B` RETURN u");
 
-			statement = Cypher.match(userNode)
-				.with(userNode)
-				.set(userNode, "A", "B")
-				.remove(userNode, "C", "D")
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.with(USER_NODE)
+				.set(USER_NODE, "A", "B")
+				.remove(USER_NODE, "C", "D")
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2012,20 +2013,20 @@ class CypherIT {
 		void shouldRenderRemoveOfProperties() {
 			Statement statement;
 
-			statement = Cypher.match(userNode)
-				.remove(userNode.property("a"), userNode.property("b"))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.remove(USER_NODE.property("a"), USER_NODE.property("b"))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) REMOVE u.a, u.b RETURN u");
 
-			statement = Cypher.match(userNode)
-				.with(userNode)
-				.remove(userNode.property("a"))
-				.remove(userNode.property("b"))
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.with(USER_NODE)
+				.remove(USER_NODE.property("a"))
+				.remove(USER_NODE.property("b"))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2039,9 +2040,9 @@ class CypherIT {
 
 		@Test
 		void simpleWithParam() {
-			Statement statement = Cypher.match(userNode)
-				.mutate(userNode, Cypher.parameter("newMapsOfHell"))
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE)
+				.mutate(USER_NODE, Cypher.parameter("newMapsOfHell"))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2051,12 +2052,12 @@ class CypherIT {
 
 		@Test
 		void afterMerge() {
-			Statement statement = Cypher.merge(userNode)
+			Statement statement = Cypher.merge(USER_NODE)
 				.onMatch()
-					.mutate(userNode, Cypher.parameter("newMapsOfHell"))
+					.mutate(USER_NODE, Cypher.parameter("newMapsOfHell"))
 				.onCreate()
-					.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
-				.returning(userNode)
+					.mutate(USER_NODE, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2065,9 +2066,9 @@ class CypherIT {
 
 		@Test
 		void simpleWithMap() {
-			Statement statement = Cypher.match(userNode)
-				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE)
+				.mutate(USER_NODE, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2076,10 +2077,10 @@ class CypherIT {
 
 		@Test
 		void chainedWithParam() {
-			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
-				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
-				.mutate(bikeNode, Cypher.parameter("newMapsOfHell"))
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("r"))
+				.mutate(USER_NODE, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.mutate(BIKE_NODE, Cypher.parameter("newMapsOfHell"))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2088,10 +2089,10 @@ class CypherIT {
 
 		@Test
 		void chainedWithMap() {
-			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
-				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
-				.mutate(bikeNode, Cypher.mapOf("c", Cypher.literalOf("D")))
-				.returning(userNode)
+			Statement statement = Cypher.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("r"))
+				.mutate(USER_NODE, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.mutate(BIKE_NODE, Cypher.mapOf("c", Cypher.literalOf("D")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2100,11 +2101,11 @@ class CypherIT {
 
 		@Test
 		void multipleLevelsOfChaining() {
-			Statement statement = Cypher.match(userNode.relationshipTo(bikeNode, "OWNS").named("r"))
-				.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
-				.mutate(bikeNode, Cypher.mapOf("c", Cypher.literalOf("D")))
+			Statement statement = Cypher.match(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("r"))
+				.mutate(USER_NODE, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.mutate(BIKE_NODE, Cypher.mapOf("c", Cypher.literalOf("D")))
 				.mutate(Cypher.name("r"), Cypher.mapOf("e", Cypher.literalOf("F")))
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2113,14 +2114,14 @@ class CypherIT {
 
 		@Test
 		void foldingMultipleMutatesIntoOne() {
-			Relationship ownsRelationship = userNode.relationshipTo(bikeNode, "OWNS").named("r");
+			Relationship ownsRelationship = USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("r");
 			Statement statement = Cypher.match(ownsRelationship)
 				.set(
-					userNode.mutate(Cypher.mapOf("a", Cypher.literalOf("B"))),
-					bikeNode.mutate(Cypher.mapOf("c", Cypher.literalOf("D"))),
+					USER_NODE.mutate(Cypher.mapOf("a", Cypher.literalOf("B"))),
+					BIKE_NODE.mutate(Cypher.mapOf("c", Cypher.literalOf("D"))),
 					ownsRelationship.mutate(Cypher.mapOf("e", Cypher.literalOf("F")))
 				)
-				.returning(userNode)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2129,17 +2130,17 @@ class CypherIT {
 
 		@Test
 		void afterMergeFolding() {
-			Relationship ownsRelationship = userNode.relationshipTo(bikeNode, "OWNS").named("r");
+			Relationship ownsRelationship = USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("r");
 			Statement statement = Cypher.merge(ownsRelationship)
 				.onMatch()
 					.set(
-						userNode.mutate(Cypher.mapOf("a", Cypher.literalOf("B"))),
-						bikeNode.mutate(Cypher.mapOf("c", Cypher.literalOf("D"))),
+						USER_NODE.mutate(Cypher.mapOf("a", Cypher.literalOf("B"))),
+						BIKE_NODE.mutate(Cypher.mapOf("c", Cypher.literalOf("D"))),
 						ownsRelationship.mutate(Cypher.mapOf("e", Cypher.literalOf("F")))
 					)
 				.onCreate()
-					.mutate(userNode, Cypher.mapOf("a", Cypher.literalOf("B")))
-				.returning(userNode)
+					.mutate(USER_NODE, Cypher.mapOf("a", Cypher.literalOf("B")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2148,9 +2149,9 @@ class CypherIT {
 
 		@Test
 		void mergeMutate() {
-			Statement statement = Cypher.merge(userNode)
-				.mutate(userNode, Cypher.mapOf("e", Cypher.literalOf("F")))
-				.returning(userNode)
+			Statement statement = Cypher.merge(USER_NODE)
+				.mutate(USER_NODE, Cypher.mapOf("e", Cypher.literalOf("F")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2159,9 +2160,9 @@ class CypherIT {
 
 		@Test
 		void createMutate() {
-			Statement statement = Cypher.create(userNode)
-				.mutate(userNode, Cypher.mapOf("e", Cypher.literalOf("F")))
-				.returning(userNode)
+			Statement statement = Cypher.create(USER_NODE)
+				.mutate(USER_NODE, Cypher.mapOf("e", Cypher.literalOf("F")))
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2176,8 +2177,8 @@ class CypherIT {
 
 			statement =
 				Cypher.with(Cypher.mapOf("p", Cypher.literalOf("Hello, Welt"), "i", Cypher.literalOf(1)).as(map))
-					.merge(userNode)
-					.mutate(userNode, map.project(Cypher.asterisk()))
+					.merge(USER_NODE)
+					.mutate(USER_NODE, map.project(Cypher.asterisk()))
 					.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2192,8 +2193,8 @@ class CypherIT {
 
 			statement =
 				Cypher.with(Cypher.mapOf("p", Cypher.literalOf("Hello, Welt"), "i", Cypher.literalOf(1)).as(map))
-					.merge(userNode)
-					.mutate(userNode, map)
+					.merge(USER_NODE)
+					.mutate(USER_NODE, map)
 					.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2204,8 +2205,8 @@ class CypherIT {
 		@Test
 		void mergeMutateWithFunctionCall() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.mutate(userNode, Cypher.call("returns.map").asFunction())
+			statement = Cypher.merge(USER_NODE)
+				.mutate(USER_NODE, Cypher.call("returns.map").asFunction())
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2220,8 +2221,8 @@ class CypherIT {
 		@Test
 		void shouldRenderSetAfterCreate() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.set(userNode.property("p").to(Cypher.literalOf("Hallo, Welt")))
+			statement = Cypher.create(USER_NODE)
+				.set(USER_NODE.property("p").to(Cypher.literalOf("Hallo, Welt")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2232,8 +2233,8 @@ class CypherIT {
 		@Test
 		void shouldRenderSetAfterMerge() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.set(userNode.property("p").to(Cypher.literalOf("Hallo, Welt")))
+			statement = Cypher.merge(USER_NODE)
+				.set(USER_NODE.property("p").to(Cypher.literalOf("Hallo, Welt")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2244,9 +2245,9 @@ class CypherIT {
 		@Test
 		void shouldRenderSetAfterCreateAndWith() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.with(userNode)
-				.set(userNode.property("p").to(Cypher.literalOf("Hallo, Welt")))
+			statement = Cypher.create(USER_NODE)
+				.with(USER_NODE)
+				.set(USER_NODE.property("p").to(Cypher.literalOf("Hallo, Welt")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2257,9 +2258,9 @@ class CypherIT {
 		@Test
 		void shouldRenderSetAfterMergeAndWith() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.with(userNode)
-				.set(userNode.property("p").to(Cypher.literalOf("Hallo, Welt")))
+			statement = Cypher.merge(USER_NODE)
+				.with(USER_NODE)
+				.set(USER_NODE.property("p").to(Cypher.literalOf("Hallo, Welt")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2272,27 +2273,27 @@ class CypherIT {
 
 			Statement statement;
 
-			statement = Cypher.match(userNode)
-				.set(userNode.property("p").to(Cypher.literalOf("Hallo, Welt")))
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE.property("p").to(Cypher.literalOf("Hallo, Welt")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) SET u.p = 'Hallo, Welt'");
 
-			statement = Cypher.match(userNode)
-				.set(userNode.property("p").to(Cypher.literalOf("Hallo, Welt")))
-				.set(userNode.property("a").to(Cypher.literalOf("Selber hallo.")))
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE.property("p").to(Cypher.literalOf("Hallo, Welt")))
+				.set(USER_NODE.property("a").to(Cypher.literalOf("Selber hallo.")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) SET u.p = 'Hallo, Welt' SET u.a = 'Selber hallo.'");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.set(
-					userNode.property("p").to(Cypher.literalOf("Hallo")),
-					userNode.property("g").to(Cypher.literalOf("Welt"))
+					USER_NODE.property("p").to(Cypher.literalOf("Hallo")),
+					USER_NODE.property("g").to(Cypher.literalOf("Welt"))
 				)
 				.build();
 
@@ -2306,20 +2307,20 @@ class CypherIT {
 		void shouldRenderSetOnNodes() {
 			Statement statement;
 
-			statement = Cypher.match(userNode)
-				.set(userNode, "A", "B")
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE, "A", "B")
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) SET u:`A`:`B` RETURN u");
 
-			statement = Cypher.match(userNode)
-				.with(userNode)
-				.set(userNode, "A", "B")
-				.set(userNode, "C", "D")
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.with(USER_NODE)
+				.set(USER_NODE, "A", "B")
+				.set(USER_NODE, "C", "D")
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2331,27 +2332,27 @@ class CypherIT {
 		void shouldRenderSetFromAListOfExpression() {
 			Statement statement;
 
-			statement = Cypher.match(userNode)
-				.set(userNode.property("p"), Cypher.literalOf("Hallo, Welt"))
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE.property("p"), Cypher.literalOf("Hallo, Welt"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) SET u.p = 'Hallo, Welt'");
 
-			statement = Cypher.match(userNode)
-				.set(userNode.property("p"), Cypher.literalOf("Hallo"),
-					userNode.property("g"), Cypher.literalOf("Welt"))
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE.property("p"), Cypher.literalOf("Hallo"),
+					USER_NODE.property("g"), Cypher.literalOf("Welt"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) SET u.p = 'Hallo', u.g = 'Welt'");
 
-			statement = Cypher.match(userNode)
-				.set(userNode.property("p"), Cypher.literalOf("Hallo, Welt"))
-				.set(userNode.property("p"), Cypher.literalOf("Hallo"),
-					userNode.property("g"), Cypher.literalOf("Welt"))
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE.property("p"), Cypher.literalOf("Hallo, Welt"))
+				.set(USER_NODE.property("p"), Cypher.literalOf("Hallo"),
+					USER_NODE.property("g"), Cypher.literalOf("Welt"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2359,7 +2360,7 @@ class CypherIT {
 					"MATCH (u:`User`) SET u.p = 'Hallo, Welt' SET u.p = 'Hallo', u.g = 'Welt'");
 
 			//noinspection ResultOfMethodCallIgnored
-			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(userNode).set(userNode.property("g")))
+			assertThatIllegalArgumentException().isThrownBy(() -> Cypher.match(USER_NODE).set(USER_NODE.property("g")))
 				.withMessage("The list of expression to set must be even.");
 		}
 
@@ -2367,16 +2368,16 @@ class CypherIT {
 		void shouldRenderMixedSet() {
 			Statement statement;
 
-			statement = Cypher.match(userNode)
-				.set(userNode.property("p1"), Cypher.literalOf("Two expressions"))
-				.set(userNode.property("p2").to(Cypher.literalOf("A set expression")))
+			statement = Cypher.match(USER_NODE)
+				.set(USER_NODE.property("p1"), Cypher.literalOf("Two expressions"))
+				.set(USER_NODE.property("p2").to(Cypher.literalOf("A set expression")))
 				.set(
-					userNode.property("p3").to(Cypher.literalOf("One of two set expression")),
-					userNode.property("p4").to(Cypher.literalOf("Two of two set expression"))
+					USER_NODE.property("p3").to(Cypher.literalOf("One of two set expression")),
+					USER_NODE.property("p4").to(Cypher.literalOf("Two of two set expression"))
 				)
 				.set(
-					userNode.property("p5"), Cypher.literalOf("Pair one of 2 expressions"),
-					userNode.property("p6"), Cypher.literalOf("Pair two of 4 expressions")
+					USER_NODE.property("p5"), Cypher.literalOf("Pair one of 2 expressions"),
+					USER_NODE.property("p6"), Cypher.literalOf("Pair two of 4 expressions")
 				)
 				.returning(Cypher.asterisk())
 				.build();
@@ -2393,14 +2394,14 @@ class CypherIT {
 		@Test
 		void shouldRenderMergeWithoutReturn() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
+			statement = Cypher.merge(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MERGE (u:`User`)");
 
-			statement = Cypher.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2411,14 +2412,14 @@ class CypherIT {
 		@Test // GH-189
 		void shouldRenderMergeBasedOnPatternExpressionCollectionWithoutReturn() {
 			Statement statement;
-			statement = Cypher.merge(Collections.singleton(userNode))
+			statement = Cypher.merge(Collections.singleton(USER_NODE))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MERGE (u:`User`)");
 
-			statement = Cypher.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2429,8 +2430,8 @@ class CypherIT {
 		@Test
 		void shouldRenderMultipleMergesWithoutReturn() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.merge(bikeNode)
+			statement = Cypher.merge(USER_NODE)
+				.merge(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2438,7 +2439,7 @@ class CypherIT {
 					"MERGE (u:`User`) MERGE (b:`Bike`)");
 
 			statement = Cypher
-				.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.merge(Cypher.node("Other"))
 				.build();
 
@@ -2450,26 +2451,26 @@ class CypherIT {
 		@Test
 		void shouldRenderMergeReturn() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.returning(userNode)
+			statement = Cypher.merge(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MERGE (u:`User`) RETURN u");
 
-			Relationship r = userNode.relationshipTo(bikeNode, "OWNS").named("o");
+			Relationship r = USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o");
 			statement = Cypher.merge(r)
-				.returning(userNode, r)
+				.returning(USER_NODE, r)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MERGE (u:`User`)-[o:`OWNS`]->(b:`Bike`) RETURN u, o");
 
-			statement = Cypher.merge(userNode)
-				.returning(userNode)
-				.orderBy(userNode.property("name"))
+			statement = Cypher.merge(USER_NODE)
+				.returning(USER_NODE)
+				.orderBy(USER_NODE.property("name"))
 				.skip(23)
 				.limit(42)
 				.build();
@@ -2482,20 +2483,20 @@ class CypherIT {
 		@Test
 		void shouldRenderMultipleMergesReturn() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.merge(bikeNode)
-				.returning(userNode)
+			statement = Cypher.merge(USER_NODE)
+				.merge(BIKE_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MERGE (u:`User`) MERGE (b:`Bike`) RETURN u");
 
-			Relationship r = userNode.relationshipTo(bikeNode, "OWNS").named("o");
+			Relationship r = USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o");
 			statement = Cypher
-				.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.merge(Cypher.node("Other"))
-				.returning(userNode, r)
+				.returning(USER_NODE, r)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2506,18 +2507,18 @@ class CypherIT {
 		@Test
 		void shouldRenderMergeWithWith() {
 			Statement statement;
-			statement = Cypher.merge(userNode)
-				.with(userNode)
-				.returning(userNode)
+			statement = Cypher.merge(USER_NODE)
+				.with(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MERGE (u:`User`) WITH u RETURN u");
 
-			statement = Cypher.merge(userNode)
-				.with(userNode)
-				.set(userNode.property("x").to(Cypher.literalOf("y")))
+			statement = Cypher.merge(USER_NODE)
+				.with(USER_NODE)
+				.set(USER_NODE.property("x").to(Cypher.literalOf("y")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2528,8 +2529,8 @@ class CypherIT {
 		@Test
 		void matchShouldExposeMerge() {
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.match(USER_NODE)
+				.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2540,9 +2541,9 @@ class CypherIT {
 		@Test
 		void withShouldExposeMerge() {
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.withDistinct(userNode)
-				.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.match(USER_NODE)
+				.withDistinct(USER_NODE)
+				.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2556,10 +2557,10 @@ class CypherIT {
 
 			Node tripNode = Cypher.node("Trip").named("t");
 
-			statement = Cypher.create(userNode)
-				.merge(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
-				.withDistinct(bikeNode)
-				.merge(tripNode.relationshipFrom(bikeNode, "USED_ON"))
+			statement = Cypher.create(USER_NODE)
+				.merge(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
+				.withDistinct(BIKE_NODE)
+				.merge(tripNode.relationshipFrom(BIKE_NODE, "USED_ON"))
 				.returning(Cypher.asterisk())
 				.build();
 
@@ -2573,11 +2574,11 @@ class CypherIT {
 
 			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
 			for (Statement statement : new Statement[] {
-				Cypher.merge(userNode)
-					.onCreate().set(userNode.property("p").to(halloWeltString))
+				Cypher.merge(USER_NODE)
+					.onCreate().set(USER_NODE.property("p").to(halloWeltString))
 					.build(),
-				Cypher.merge(userNode)
-					.onCreate().set(userNode.property("p"), halloWeltString)
+				Cypher.merge(USER_NODE)
+					.onCreate().set(USER_NODE.property("p"), halloWeltString)
 					.build()
 			}) {
 				assertThat(cypherRenderer.render(statement))
@@ -2590,11 +2591,11 @@ class CypherIT {
 
 			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
 			for (Statement statement : new Statement[] {
-				Cypher.merge(userNode)
-					.onMatch().set(userNode.property("p").to(halloWeltString))
+				Cypher.merge(USER_NODE)
+					.onMatch().set(USER_NODE.property("p").to(halloWeltString))
 					.build(),
-				Cypher.merge(userNode)
-					.onMatch().set(userNode.property("p"), halloWeltString)
+				Cypher.merge(USER_NODE)
+					.onMatch().set(USER_NODE.property("p"), halloWeltString)
 					.build(),
 			}) {
 				assertThat(cypherRenderer.render(statement))
@@ -2607,9 +2608,9 @@ class CypherIT {
 
 			for (Statement statement : new Statement[] {
 				Cypher
-					.create(bikeNode).set(bikeNode.property("nice").to(Cypher.literalTrue()))
-					.merge(userNode).onMatch().set(userNode.property("happy").to(Cypher.literalTrue()))
-					.create(userNode.relationshipTo(bikeNode, "OWNS"))
+					.create(BIKE_NODE).set(BIKE_NODE.property("nice").to(Cypher.literalTrue()))
+					.merge(USER_NODE).onMatch().set(USER_NODE.property("happy").to(Cypher.literalTrue()))
+					.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS"))
 					.build(),
 			}) {
 				assertThat(cypherRenderer.render(statement))
@@ -2621,13 +2622,13 @@ class CypherIT {
 		void singleActionMultipleProperties() {
 
 			for (Statement statement : new Statement[] {
-				Cypher.merge(userNode).onMatch().set(
-					userNode.property("p1").to(Cypher.literalOf("v1")),
-					userNode.property("p2").to(Cypher.literalOf("v2"))
+				Cypher.merge(USER_NODE).onMatch().set(
+					USER_NODE.property("p1").to(Cypher.literalOf("v1")),
+					USER_NODE.property("p2").to(Cypher.literalOf("v2"))
 				).build(),
-				Cypher.merge(userNode).onCreate().set(
-					userNode.property("p1").to(Cypher.literalOf("v1")),
-					userNode.property("p2").to(Cypher.literalOf("v2"))
+				Cypher.merge(USER_NODE).onCreate().set(
+					USER_NODE.property("p1").to(Cypher.literalOf("v1")),
+					USER_NODE.property("p2").to(Cypher.literalOf("v2"))
 				).build(),
 			}) {
 				assertThat(cypherRenderer.render(statement))
@@ -2638,12 +2639,12 @@ class CypherIT {
 		@Test
 		void multipleActionMultipleProperties() {
 
-			Statement statement = Cypher.merge(userNode).onMatch().set(
-				userNode.property("p1").to(Cypher.literalOf("v1")),
-				userNode.property("p2").to(Cypher.literalOf("v2"))
+			Statement statement = Cypher.merge(USER_NODE).onMatch().set(
+				USER_NODE.property("p1").to(Cypher.literalOf("v1")),
+				USER_NODE.property("p2").to(Cypher.literalOf("v2"))
 			).onCreate().set(
-				userNode.property("p3").to(Cypher.literalOf("v3")),
-				userNode.property("p4").to(Cypher.literalOf("v4"))
+				USER_NODE.property("p3").to(Cypher.literalOf("v3")),
+				USER_NODE.property("p4").to(Cypher.literalOf("v4"))
 			).build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -2655,9 +2656,9 @@ class CypherIT {
 
 			Literal<String> helloWorldString = Cypher.literalOf("Hello, World");
 			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
-			Statement statement = Cypher.merge(userNode)
-				.onCreate().set(userNode.property("p").to(helloWorldString))
-				.onMatch().set(userNode.property("p").to(halloWeltString))
+			Statement statement = Cypher.merge(USER_NODE)
+				.onCreate().set(USER_NODE.property("p").to(helloWorldString))
+				.onMatch().set(USER_NODE.property("p").to(halloWeltString))
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MERGE (u:`User`) ON CREATE SET u.p = 'Hello, World' ON MATCH SET u.p = 'Hallo, Welt'");
@@ -2668,9 +2669,9 @@ class CypherIT {
 
 			Literal<String> helloWorldString = Cypher.literalOf("Hello, World");
 			Literal<String> halloWeltString = Cypher.literalOf("Hallo, Welt");
-			Statement statement = Cypher.merge(userNode)
-				.onMatch().set(userNode.property("p").to(halloWeltString))
-				.onCreate().set(userNode.property("p").to(helloWorldString))
+			Statement statement = Cypher.merge(USER_NODE)
+				.onMatch().set(USER_NODE.property("p").to(halloWeltString))
+				.onCreate().set(USER_NODE.property("p").to(helloWorldString))
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p = 'Hallo, Welt' ON CREATE SET u.p = 'Hello, World'");
@@ -2679,11 +2680,11 @@ class CypherIT {
 		@Test // GH-104
 		void multipleMatchesAndCreates() {
 
-			Statement statement = Cypher.merge(userNode)
-				.onMatch().set(userNode.property("p1").to(Cypher.literalOf("v1")))
-				.onCreate().set(userNode.property("p2").to(Cypher.literalOf("v2")))
-				.onCreate().set(userNode.property("p3").to(Cypher.literalOf("v3")))
-				.onMatch().set(userNode.property("p4").to(Cypher.literalOf("v4")))
+			Statement statement = Cypher.merge(USER_NODE)
+				.onMatch().set(USER_NODE.property("p1").to(Cypher.literalOf("v1")))
+				.onCreate().set(USER_NODE.property("p2").to(Cypher.literalOf("v2")))
+				.onCreate().set(USER_NODE.property("p3").to(Cypher.literalOf("v3")))
+				.onMatch().set(USER_NODE.property("p4").to(Cypher.literalOf("v4")))
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
@@ -2693,10 +2694,10 @@ class CypherIT {
 		@Test // GH-104
 		void actionThanSet() {
 
-			Statement statement = Cypher.merge(userNode)
-				.onMatch().set(userNode.property("p1").to(Cypher.literalOf("v1")))
-				.set(userNode.property("p2").to(Cypher.literalOf("v2")))
-				.returning(userNode)
+			Statement statement = Cypher.merge(USER_NODE)
+				.onMatch().set(USER_NODE.property("p1").to(Cypher.literalOf("v1")))
+				.set(USER_NODE.property("p2").to(Cypher.literalOf("v2")))
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p1 = 'v1' SET u.p2 = 'v2' RETURN u");
@@ -2705,10 +2706,10 @@ class CypherIT {
 		@Test // GH-104
 		void actionThanContinue() {
 
-			Statement statement = Cypher.merge(userNode)
-				.onMatch().set(userNode.property("p1").to(Cypher.literalOf("v1")))
-				.with(userNode)
-				.returning(userNode)
+			Statement statement = Cypher.merge(USER_NODE)
+				.onMatch().set(USER_NODE.property("p1").to(Cypher.literalOf("v1")))
+				.with(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo("MERGE (u:`User`) ON MATCH SET u.p1 = 'v1' WITH u RETURN u");
@@ -2802,14 +2803,14 @@ class CypherIT {
 		@Test
 		void shouldRenderCreateWithoutReturn() {
 			Statement statement;
-			statement = Cypher.create(userNode)
+			statement = Cypher.create(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"CREATE (u:`User`)");
 
-			statement = Cypher.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2820,14 +2821,14 @@ class CypherIT {
 		@Test // GH-189
 		void shouldRenderCreateBasedOnPatternElementCollectionWithoutReturn() {
 			Statement statement;
-			statement = Cypher.create(Collections.singleton(userNode))
+			statement = Cypher.create(Collections.singleton(USER_NODE))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"CREATE (u:`User`)");
 
-			statement = Cypher.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2838,8 +2839,8 @@ class CypherIT {
 		@Test
 		void shouldRenderMultipleCreatesWithoutReturn() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.create(bikeNode)
+			statement = Cypher.create(USER_NODE)
+				.create(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2847,7 +2848,7 @@ class CypherIT {
 					"CREATE (u:`User`) CREATE (b:`Bike`)");
 
 			statement = Cypher
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.create(Cypher.node("Other"))
 				.build();
 
@@ -2859,8 +2860,8 @@ class CypherIT {
 		@Test
 		void shouldRenderMultipleCreatesBasedOnPatternElementCollectionWithoutReturn() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.create(Collections.singleton(bikeNode))
+			statement = Cypher.create(USER_NODE)
+				.create(Collections.singleton(BIKE_NODE))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2868,7 +2869,7 @@ class CypherIT {
 					"CREATE (u:`User`) CREATE (b:`Bike`)");
 
 			statement = Cypher
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.create(Collections.singleton(Cypher.node("Other")))
 				.build();
 
@@ -2880,26 +2881,26 @@ class CypherIT {
 		@Test
 		void shouldRenderCreateReturn() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.returning(userNode)
+			statement = Cypher.create(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"CREATE (u:`User`) RETURN u");
 
-			Relationship r = userNode.relationshipTo(bikeNode, "OWNS").named("o");
+			Relationship r = USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o");
 			statement = Cypher.create(r)
-				.returning(userNode, r)
+				.returning(USER_NODE, r)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"CREATE (u:`User`)-[o:`OWNS`]->(b:`Bike`) RETURN u, o");
 
-			statement = Cypher.create(userNode)
-				.returning(userNode)
-				.orderBy(userNode.property("name"))
+			statement = Cypher.create(USER_NODE)
+				.returning(USER_NODE)
+				.orderBy(USER_NODE.property("name"))
 				.skip(23)
 				.limit(42)
 				.build();
@@ -2912,20 +2913,20 @@ class CypherIT {
 		@Test
 		void shouldRenderMultipleCreatesReturn() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.create(bikeNode)
-				.returning(userNode)
+			statement = Cypher.create(USER_NODE)
+				.create(BIKE_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"CREATE (u:`User`) CREATE (b:`Bike`) RETURN u");
 
-			Relationship r = userNode.relationshipTo(bikeNode, "OWNS").named("o");
+			Relationship r = USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o");
 			statement = Cypher
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.create(Cypher.node("Other"))
-				.returning(userNode, r)
+				.returning(USER_NODE, r)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2936,18 +2937,18 @@ class CypherIT {
 		@Test
 		void shouldRenderCreateWithWith() {
 			Statement statement;
-			statement = Cypher.create(userNode)
-				.with(userNode)
-				.returning(userNode)
+			statement = Cypher.create(USER_NODE)
+				.with(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"CREATE (u:`User`) WITH u RETURN u");
 
-			statement = Cypher.create(userNode)
-				.with(userNode)
-				.set(userNode.property("x").to(Cypher.literalOf("y")))
+			statement = Cypher.create(USER_NODE)
+				.with(USER_NODE)
+				.set(USER_NODE.property("x").to(Cypher.literalOf("y")))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2958,8 +2959,8 @@ class CypherIT {
 		@Test
 		void matchShouldExposeCreate() {
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.match(USER_NODE)
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2970,18 +2971,18 @@ class CypherIT {
 		@Test
 		void withShouldExposeCreate() {
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.withDistinct(userNode)
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.match(USER_NODE)
+				.withDistinct(USER_NODE)
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WITH DISTINCT u CREATE (u)-[o:`OWNS`]->(b:`Bike`)");
 
-			statement = Cypher.match(userNode)
-				.withDistinct(userNode.getRequiredSymbolicName())
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+			statement = Cypher.match(USER_NODE)
+				.withDistinct(USER_NODE.getRequiredSymbolicName())
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -2992,9 +2993,9 @@ class CypherIT {
 		@Test
 		void withWithStringVarsShouldWork() {
 			Statement statement;
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.withDistinct("u")
-				.create(userNode.relationshipTo(bikeNode, "OWNS").named("o"))
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "OWNS").named("o"))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3010,15 +3011,15 @@ class CypherIT {
 		void shouldRenderDeleteWithoutReturn() {
 
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.detachDelete(userNode)
+			statement = Cypher.match(USER_NODE)
+				.detachDelete(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) DETACH DELETE u");
 
-			statement = Cypher.match(userNode)
+			statement = Cypher.match(USER_NODE)
 				.detachDelete("u")
 				.build();
 
@@ -3026,26 +3027,26 @@ class CypherIT {
 				.isEqualTo(
 					"MATCH (u:`User`) DETACH DELETE u");
 
-			statement = Cypher.match(userNode)
-				.with(userNode)
-				.detachDelete(userNode)
+			statement = Cypher.match(USER_NODE)
+				.with(USER_NODE)
+				.detachDelete(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WITH u DETACH DELETE u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("a").isNotNull()).and(userNode.property("b").isNull())
-				.delete(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("a").isNotNull()).and(USER_NODE.property("b").isNull())
+				.delete(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (u.a IS NOT NULL AND u.b IS NULL) DELETE u");
 
-			statement = Cypher.match(userNode, bikeNode)
-				.delete(userNode, bikeNode)
+			statement = Cypher.match(USER_NODE, BIKE_NODE)
+				.delete(USER_NODE, BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3057,34 +3058,34 @@ class CypherIT {
 		void shouldRenderDeleteBasedOnExpressionCollectionWithoutReturn() {
 
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.detachDelete(Collections.singleton(userNode.getRequiredSymbolicName()))
+			statement = Cypher.match(USER_NODE)
+				.detachDelete(Collections.singleton(USER_NODE.getRequiredSymbolicName()))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) DETACH DELETE u");
 
-			statement = Cypher.match(userNode)
-				.with(userNode)
-				.detachDelete(Collections.singleton(userNode.getRequiredSymbolicName()))
+			statement = Cypher.match(USER_NODE)
+				.with(USER_NODE)
+				.detachDelete(Collections.singleton(USER_NODE.getRequiredSymbolicName()))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WITH u DETACH DELETE u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("a").isNotNull()).and(userNode.property("b").isNull())
-				.delete(Collections.singleton(userNode.getRequiredSymbolicName()))
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("a").isNotNull()).and(USER_NODE.property("b").isNull())
+				.delete(Collections.singleton(USER_NODE.getRequiredSymbolicName()))
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (u.a IS NOT NULL AND u.b IS NULL) DELETE u");
 
-			Expression[] namedOnes = {userNode.getRequiredSymbolicName(), bikeNode.getRequiredSymbolicName()};
-			statement = Cypher.match(userNode, bikeNode)
+			Expression[] namedOnes = { USER_NODE.getRequiredSymbolicName(), BIKE_NODE.getRequiredSymbolicName()};
+			statement = Cypher.match(USER_NODE, BIKE_NODE)
 					.delete(Arrays.asList(namedOnes))
 					.build();
 
@@ -3097,29 +3098,29 @@ class CypherIT {
 		void shouldRenderDeleteWithReturn() {
 
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.detachDelete(userNode)
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.detachDelete(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) DETACH DELETE u RETURN u");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("a").isNotNull()).and(userNode.property("b").isNull())
-				.detachDelete(userNode)
-				.returning(userNode).orderBy(userNode.property("a").ascending()).skip(2).limit(1)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("a").isNotNull()).and(USER_NODE.property("b").isNull())
+				.detachDelete(USER_NODE)
+				.returning(USER_NODE).orderBy(USER_NODE.property("a").ascending()).skip(2).limit(1)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
 				.isEqualTo(
 					"MATCH (u:`User`) WHERE (u.a IS NOT NULL AND u.b IS NULL) DETACH DELETE u RETURN u ORDER BY u.a ASC SKIP 2 LIMIT 1");
 
-			statement = Cypher.match(userNode)
-				.where(userNode.property("a").isNotNull()).and(userNode.property("b").isNull())
-				.detachDelete(userNode)
-				.returningDistinct(userNode).orderBy(userNode.property("a").ascending()).skip(2).limit(1)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("a").isNotNull()).and(USER_NODE.property("b").isNull())
+				.detachDelete(USER_NODE)
+				.returningDistinct(USER_NODE).orderBy(USER_NODE.property("a").ascending()).skip(2).limit(1)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3152,8 +3153,8 @@ class CypherIT {
 				.match(n).where(n.internalId().isEqualTo(Cypher.literalOf(4711)))
 				.optionalMatch(r)
 				.delete(r, n)
-				.delete(bikeNode)
-				.detachDelete(userNode)
+				.delete(BIKE_NODE)
+				.detachDelete(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3260,10 +3261,10 @@ class CypherIT {
 		@Test
 		void shouldRenderParameters() {
 			Statement statement;
-			statement = Cypher.match(userNode)
-				.where(userNode.property("a").isEqualTo(Cypher.parameter("aParameter")))
-				.detachDelete(userNode)
-				.returning(userNode)
+			statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("a").isEqualTo(Cypher.parameter("aParameter")))
+				.detachDelete(USER_NODE)
+				.returning(USER_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3520,10 +3521,10 @@ class CypherIT {
 		@Test
 		void shouldNotRenderPropertiesInReturn() {
 
-			Node nodeWithProperties = bikeNode.withProperties("a", Cypher.literalOf("b"));
+			Node nodeWithProperties = BIKE_NODE.withProperties("a", Cypher.literalOf("b"));
 
 			Statement statement;
-			statement = Cypher.match(nodeWithProperties, nodeWithProperties.relationshipFrom(userNode, "OWNS"))
+			statement = Cypher.match(nodeWithProperties, nodeWithProperties.relationshipFrom(USER_NODE, "OWNS"))
 				.returning(nodeWithProperties)
 				.build();
 
@@ -3662,8 +3663,8 @@ class CypherIT {
 
 			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
 				.as("n")
-				.merge(bikeNode.withProperties("b", Cypher.name("n")))
-				.returning(bikeNode)
+				.merge(BIKE_NODE.withProperties("b", Cypher.name("n")))
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3676,8 +3677,8 @@ class CypherIT {
 
 			Statement statement = Cypher.unwind(Cypher.literalOf(1), Cypher.literalTrue(), Cypher.literalFalse())
 				.as("n")
-				.create(bikeNode.withProperties("b", Cypher.name("n")))
-				.returning(bikeNode)
+				.create(BIKE_NODE.withProperties("b", Cypher.name("n")))
+				.returning(BIKE_NODE)
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
@@ -3688,8 +3689,8 @@ class CypherIT {
 		@Test
 		void shouldRenderUnwind() {
 
-			AliasedExpression collected = Cypher.collect(bikeNode).as("collected");
-			Statement statement = Cypher.match(bikeNode)
+			AliasedExpression collected = Cypher.collect(BIKE_NODE).as("collected");
+			Statement statement = Cypher.match(BIKE_NODE)
 				.with(collected)
 				.unwind(collected).as("x")
 				.with("x")
@@ -3709,19 +3710,19 @@ class CypherIT {
 		@Test
 		void shouldRenderUnions() {
 
-			Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
-				.returning(bikeNode)
+			Statement statement1 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
-				.returning(bikeNode)
+			Statement statement2 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement3 = Cypher.match(bikeNode)
-				.where(bikeNode.property("c").isEqualTo(Cypher.literalOf("C")))
-				.returning(bikeNode)
+			Statement statement3 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("c").isEqualTo(Cypher.literalOf("C")))
+				.returning(BIKE_NODE)
 				.build();
 			Statement statement;
 			statement = Cypher.union(statement1, statement2, statement3);
@@ -3734,19 +3735,19 @@ class CypherIT {
 		@Test // GH-189
 		void shouldRenderUnionsBasedOnStatementCollections() {
 
-			Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
-				.returning(bikeNode)
+			Statement statement1 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
-				.returning(bikeNode)
+			Statement statement2 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement3 = Cypher.match(bikeNode)
-				.where(bikeNode.property("c").isEqualTo(Cypher.literalOf("C")))
-				.returning(bikeNode)
+			Statement statement3 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("c").isEqualTo(Cypher.literalOf("C")))
+				.returning(BIKE_NODE)
 				.build();
 			Statement statement;
 			Statement[] statements = {statement1, statement2, statement3};
@@ -3760,14 +3761,14 @@ class CypherIT {
 		@Test
 		void shouldRenderAllUnions() {
 
-			Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
-				.returning(bikeNode)
+			Statement statement1 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
-				.returning(bikeNode)
+			Statement statement2 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(BIKE_NODE)
 				.build();
 
 			Statement statement;
@@ -3781,14 +3782,14 @@ class CypherIT {
 		@Test // GH-189
 		void shouldRenderAllUnionsBasedOnStatementCollections() {
 
-			Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
-				.returning(bikeNode)
+			Statement statement1 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
-				.returning(bikeNode)
+			Statement statement2 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(BIKE_NODE)
 				.build();
 
 			Statement statement;
@@ -3803,27 +3804,27 @@ class CypherIT {
 		@Test
 		void shouldAppendToExistingUnions() {
 
-			Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
-				.returning(bikeNode)
+			Statement statement1 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
-				.returning(bikeNode)
+			Statement statement2 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(BIKE_NODE)
 				.build();
 
 			Statement statement;
 			statement = Cypher.unionAll(statement1, statement2);
 
-			Statement statement3 = Cypher.match(bikeNode)
-				.where(bikeNode.property("c").isEqualTo(Cypher.literalOf("C")))
-				.returning(bikeNode)
+			Statement statement3 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("c").isEqualTo(Cypher.literalOf("C")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement4 = Cypher.match(bikeNode)
-				.where(bikeNode.property("d").isEqualTo(Cypher.literalOf("D")))
-				.returning(bikeNode)
+			Statement statement4 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("d").isEqualTo(Cypher.literalOf("D")))
+				.returning(BIKE_NODE)
 				.build();
 
 			statement = Cypher.unionAll(statement, statement3, statement4);
@@ -3836,22 +3837,22 @@ class CypherIT {
 		@Test
 		void shouldNotMix() {
 
-			Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.literalOf("A")))
-				.returning(bikeNode)
+			Statement statement1 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("a").isEqualTo(Cypher.literalOf("A")))
+				.returning(BIKE_NODE)
 				.build();
 
-			Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.literalOf("B")))
-				.returning(bikeNode)
+			Statement statement2 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("b").isEqualTo(Cypher.literalOf("B")))
+				.returning(BIKE_NODE)
 				.build();
 
 			Statement statement;
 			statement = Cypher.unionAll(statement1, statement2);
 
-			Statement statement3 = Cypher.match(bikeNode)
-				.where(bikeNode.property("c").isEqualTo(Cypher.literalOf("C")))
-				.returning(bikeNode)
+			Statement statement3 = Cypher.match(BIKE_NODE)
+				.where(BIKE_NODE.property("c").isEqualTo(Cypher.literalOf("C")))
+				.returning(BIKE_NODE)
 				.build();
 
 			//noinspection ResultOfMethodCallIgnored
@@ -4862,22 +4863,22 @@ class CypherIT {
 
 		PrettyPrinting() {
 			Node otherNode = Cypher.anyNode("other");
-			this.statement = Cypher.match(userNode)
-				.where(userNode.property("name").isEqualTo(Cypher.literalOf("Max")))
-				.and(userNode.property("lastName").isEqualTo(Cypher.literalOf("Mustermann")))
+			this.statement = Cypher.match(USER_NODE)
+				.where(USER_NODE.property("name").isEqualTo(Cypher.literalOf("Max")))
+				.and(USER_NODE.property("lastName").isEqualTo(Cypher.literalOf("Mustermann")))
 					.and(Cypher
-							.match(userNode.relationshipTo(bikeNode, "LIKES"))
-							.where(bikeNode.relationshipTo(Cypher.anyNode(), "LINK"))
-							.or(Cypher.match(bikeNode.relationshipTo(Cypher.anyNode(), "LINK")).asCondition())
+							.match(USER_NODE.relationshipTo(BIKE_NODE, "LIKES"))
+							.where(BIKE_NODE.relationshipTo(Cypher.anyNode(), "LINK"))
+							.or(Cypher.match(BIKE_NODE.relationshipTo(Cypher.anyNode(), "LINK")).asCondition())
 							.asCondition())
-				.set(userNode.property("lastName").to(Cypher.parameter("newName")))
-				.with(userNode)
-				.match(bikeNode)
-				.create(userNode.relationshipTo(bikeNode, "LIKES"))
-					.with(userNode)
+				.set(USER_NODE.property("lastName").to(Cypher.parameter("newName")))
+				.with(USER_NODE)
+				.match(BIKE_NODE)
+				.create(USER_NODE.relationshipTo(BIKE_NODE, "LIKES"))
+					.with(USER_NODE)
 					.call(Cypher
-							.with(userNode)
-							.match(userNode.relationshipTo(Cypher.anyNode("x"), "SOMETHING"))
+							.with(USER_NODE)
+							.match(USER_NODE.relationshipTo(Cypher.anyNode("x"), "SOMETHING"))
 							.call(Cypher
 									.with(Cypher.anyNode("x"))
 									.match(Cypher.anyNode("x").relationshipTo(Cypher.anyNode("y"), "DEEPER"))
@@ -4890,24 +4891,24 @@ class CypherIT {
 									.project("foo", "bar", Cypher.name("bar"))
 									.as("anyThing"))
 							.build())
-					.with(userNode)
+					.with(USER_NODE)
 					.call(
 							Cypher.use("movies.actors", Cypher.match(Cypher.node("Person").named("person")).returning("person").build())
 					)
-					.with(userNode)
-					.returning(userNode.project(
+					.with(USER_NODE)
+					.returning(USER_NODE.project(
 					"name",
-					userNode.property("name"),
+					USER_NODE.property("name"),
 					"anyThing", Cypher.name("anyThing"),
 					"nesting1",
 					Cypher.mapOf(
 						"name",
-						userNode.property("name"),
+						USER_NODE.property("name"),
 						"nesting2",
 						Cypher.mapOf(
-							"name", bikeNode.property("name"),
+							"name", BIKE_NODE.property("name"),
 							"pattern", Cypher
-								.listBasedOn(userNode.relationshipTo(otherNode, "LIKES"))
+								.listBasedOn(USER_NODE.relationshipTo(otherNode, "LIKES"))
 								.where(otherNode.property("foo").isEqualTo(Cypher.parameter("foo")))
 								.returning(otherNode.project("x", "y"))
 						)
