@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1739459593604">
+<licensePluginReport goal="CHECK" timestamp="1740479294777">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -225,6 +225,7 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/BuiltInFunctionsTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ClausesTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ComparisonTest.java" result="PRESENT"/>
+        <file path="src/test/java/org/neo4j/cypherdsl/core/Cypher5IT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/CypherIT.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/CypherTest.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DefaultStatementBuilderTest.java" result="PRESENT"/>
