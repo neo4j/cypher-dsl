@@ -1170,6 +1170,14 @@ class IssueRelatedIT {
 				+ " RETURN [this0{.title}] AS data");
 	}
 
+	@Test // GH-1193
+	void addLabels() {
+
+		Node user = Cypher.node("User").named("n");
+		Statement statement = Cypher.match(user).set(Cypher.setLabel(user, "Cool", "Person")).returning(user).build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n:`User`) SET n:`Cool`:`Person` RETURN n");
+	}
+
 	public static Statement createSomewhatComplexStatement() {
 		Node this0 = Cypher.node("Movie").named("this0");
 
