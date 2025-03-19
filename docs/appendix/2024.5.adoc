@@ -1,5 +1,30 @@
 == 2024.5
 
+=== 2024.5.1
+
+==== 🐛 Bug Fixes
+
+* Use a `Pattern` typed subtree for a list of patterns in an existential subquery. (#1200)
+
+==== 📖 Documentation
+
+* Add an example for setting multiple labels. (#1199)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j.driver:neo4j-java-driver (#1198)
+** Bump com.puppycrawl.tools:checkstyle (#1197)
+** Bump org.checkerframework:checker-qual (#1195)
+** Bump mockito.version from 5.15.2 to 5.16.0 (#1194)
+** Bump org.codehaus.mojo:flatten-maven-plugin (#1192)
+** Bump org.apache.maven.plugins:maven-deploy-plugin (#1191)
+** Bump com.fasterxml.jackson:jackson-bom (#1190)
+** Bump neo4j.version from 5.26.2 to 5.26.3 (#1189)
+** Bump org.apache.maven.plugins:maven-install-plugin (#1188)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1187)
+
+
 === 2024.5.0
 
 This new minor release does not have any breaking changes.
