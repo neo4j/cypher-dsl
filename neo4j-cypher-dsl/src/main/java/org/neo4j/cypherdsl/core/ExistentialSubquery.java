@@ -59,7 +59,7 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 	private  final Where innerWhere;
 
 	ExistentialSubquery(List<PatternElement> fragments, @Nullable Where innerWhere) {
-		this.fragments = List.copyOf(fragments);
+		this.fragments = List.of(Pattern.of(fragments));
 		this.importingWith = new ImportingWith();
 		this.innerWhere = innerWhere;
 	}
