@@ -1178,6 +1178,17 @@ class IssueRelatedIT {
 		assertThat(statement.getCypher()).isEqualTo("MATCH (n:`User`) SET n:`Cool`:`Person` RETURN n");
 	}
 
+	@Test // GH-1186
+	public void testMultiPatternElementExist() {
+		final Node user = Cypher.node("user").named("T1");
+		final Node dept = Cypher.node("dept").named("T2");
+		final Node parentDept = Cypher.node("dept").named("T3");
+		final Statement statement = Cypher.match(user)
+			.where(Cypher.exists(List.of(user.relationshipTo(dept, "dept_id"), dept.relationshipTo(parentDept, "parent_id"))))
+			.returning(user).build();
+		assertThat(statement.getCypher()).isEqualTo("MATCH (T1:`user`) WHERE EXISTS { (T1)-[:`dept_id`]->(T2:`dept`), (T2)-[:`parent_id`]->(T3:`dept`) } RETURN T1");
+	}
+
 	public static Statement createSomewhatComplexStatement() {
 		Node this0 = Cypher.node("Movie").named("this0");
 
