@@ -38,7 +38,10 @@ import org.neo4j.driver.summary.ResultSummary;
  * @author Michael J. Simons
  * @soundtrack Swiss + Die Andern - Randalieren für die Liebe
  * @since 2021.2.1
+ * @deprecated Without replacement, as there are other ideas bouncing around for plain object mapping from the common Neo4j Java Driver
  */
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public interface ExecutableResultStatement extends ExecutableStatement {
 
 	/**

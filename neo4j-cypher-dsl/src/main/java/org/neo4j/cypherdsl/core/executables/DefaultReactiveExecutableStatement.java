@@ -33,6 +33,7 @@ import org.reactivestreams.Publisher;
  * @soundtrack Swiss + Die Andern - Randalieren für die Liebe
  * @since 2021.2.1
  */
+@SuppressWarnings({ "removal" })
 @API(status = INTERNAL, since = "2021.2.1")
 class DefaultReactiveExecutableStatement extends DefaultExecutableStatement implements ReactiveExecutableStatement {
 
