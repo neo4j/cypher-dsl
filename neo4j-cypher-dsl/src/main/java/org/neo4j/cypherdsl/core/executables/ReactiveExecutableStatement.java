@@ -18,7 +18,7 @@
  */
 package org.neo4j.cypherdsl.core.executables;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import static org.apiguardian.api.API.Status.DEPRECATED;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ResultStatement;
@@ -37,8 +37,11 @@ import org.reactivestreams.Publisher;
  * @author Michael J. Simons
  * @soundtrack Swiss + Die Andern - Randalieren für die Liebe
  * @since 2021.2.1
+ * @deprecated Without replacement, as there are other ideas bouncing around for plain object mapping from the common Neo4j Java Driver
  */
-@API(status = STABLE, since = "2021.2.1")
+@API(status = DEPRECATED, since = "2021.2.1")
+@Deprecated(forRemoval = true)
+@SuppressWarnings("removal")
 public interface ReactiveExecutableStatement extends ExecutableStatement {
 
 	/**

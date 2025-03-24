@@ -39,6 +39,7 @@ import org.neo4j.driver.summary.ResultSummary;
  * @soundtrack Swiss + Die Andern - Randalieren für die Liebe
  * @since 2021.2.1
  */
+@SuppressWarnings("removal")
 @API(status = INTERNAL, since = "2021.2.1")
 class DefaultExecutableResultStatement extends DefaultExecutableStatement implements ExecutableResultStatement {
 

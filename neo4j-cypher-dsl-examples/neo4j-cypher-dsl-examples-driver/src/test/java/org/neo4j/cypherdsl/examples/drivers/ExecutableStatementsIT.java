@@ -55,7 +55,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
  * @author Michael J. Simons
  * @soundtrack Motörhead - Live At Brixton Academy
  */
-@Testcontainers(disabledWithoutDocker = true)
+@SuppressWarnings({ "removal", "deprecation" }) @Testcontainers(disabledWithoutDocker = true)
 class ExecutableStatementsIT {
 
 	@Container
