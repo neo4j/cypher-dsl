@@ -193,7 +193,7 @@
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<querydsl.version>5.1.0</querydsl.version>
-		<reactor.version>2024.0.4</reactor.version>
+		<reactor.version>2024.0.5</reactor.version>
 		<revision>9999</revision>
 		<sha1 />
 		<slf4j.version>1.7.36</slf4j.version>
