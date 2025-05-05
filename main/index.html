@@ -602,7 +602,7 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 <div class="quoteblock abstract">
 <blockquote>
 <div class="paragraph">
-<p>This is the Neo4j Cypher-DSL manual version 2024.6.0-SNAPSHOT.</p>
+<p>This is the Neo4j Cypher-DSL manual version 2024.6.1-SNAPSHOT.</p>
 </div>
 </blockquote>
 </div>
@@ -690,7 +690,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
         <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
         <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl<span class="tag">&lt;/artifactId&gt;</span>
-        <span class="tag">&lt;version&gt;</span>2024.6.0-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+        <span class="tag">&lt;version&gt;</span>2024.6.1-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -701,7 +701,7 @@ for example through <code>Neo4jTemplate#findAll(Statement, Class&lt;T&gt;)</code
 <div class="title">Listing 2. Inclusion of the Neo4j Cypher-DSL in a Gradle project</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2024.6.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl:2024.6.1-SNAPSHOT</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -1800,7 +1800,7 @@ into elements of the Cypher-DSL. In such cases an <code>UnsupportedOperationExce
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
     <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
     <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-parser<span class="tag">&lt;/artifactId&gt;</span>
-    <span class="tag">&lt;version&gt;</span>2024.6.0-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;version&gt;</span>2024.6.1-SNAPSHOT<span class="tag">&lt;/version&gt;</span>
 <span class="tag">&lt;/dependency&gt;</span></code></pre>
 </div>
 </div>
@@ -1811,7 +1811,7 @@ into elements of the Cypher-DSL. In such cases an <code>UnsupportedOperationExce
 <div class="title">Listing 17. Gradle variant for additional dependencies</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:2024.6.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+    implementation <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-parser:2024.6.1-SNAPSHOT</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -3412,7 +3412,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="title">Listing 42. Coordinates of the SDN 6 annotation processor</div>
 <div class="content">
-<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2024.6.0-SNAPSHOT</code></pre>
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2024.6.1-SNAPSHOT</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3478,7 +3478,7 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
-    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2024.6.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-sdn6:2024.6.1-SNAPSHOT</span><span class="delimiter">'</span></span>
 }</code></pre>
 </div>
 </div>
@@ -4312,7 +4312,244 @@ The <code>ast</code> and <code>utils</code> packages however should not have dep
 <div class="sect2">
 <h3 id="changelog"><a class="anchor" href="#changelog"></a>Change log</h3>
 <div class="sect3">
+<h4 id="2024.6"><a class="anchor" href="#2024.6"></a>2024.6</h4>
+<div class="sect4">
+<h5 id="2024.6.0"><a class="anchor" href="#2024.6.0"></a>2024.6.0</h5>
+<div class="paragraph">
+<p>Take note that this release deprecates direct integrations with the Neo4j Java Driver. They have never been used widely and can be easily added when needed in calling code.
+Removing them from Cypher-DSL avoid unnessary complexity in dependency management.</p>
+</div>
+<div class="sect5">
+<h6 id="️refactorings"><a class="anchor" href="#️refactorings"></a>🔄️ Refactorings</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>refactor: Deprecate all driver integrations from Cypher-DSL side. (#1211)</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect5">
+<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Dependency upgrades:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Bump org.checkerframework:checker-qual (#1233)</p>
+</li>
+<li>
+<p>Bump com.puppycrawl.tools:checkstyle (#1232)</p>
+</li>
+<li>
+<p>Bump org.springframework.boot:spring-boot-starter-parent (#1231)</p>
+</li>
+<li>
+<p>Bump com.google.guava:guava (#1230)</p>
+</li>
+<li>
+<p>Bump io.projectreactor:reactor-bom (#1229)</p>
+</li>
+<li>
+<p>Bump org.junit:junit-bom from 5.12.1 to 5.12.2 (#1228)</p>
+</li>
+<li>
+<p>Bump org.jacoco:jacoco-maven-plugin from 0.8.12 to 0.8.13 (#1226)</p>
+</li>
+<li>
+<p>Bump org.asciidoctor:asciidoctorj-diagram (#1223)</p>
+</li>
+<li>
+<p>Bump mockito.version from 5.16.1 to 5.17.0 (#1222)</p>
+</li>
+<li>
+<p>Bump neo4j.version from 5.26.4 to 5.26.5 (#1221)</p>
+</li>
+<li>
+<p>Bump org.apache.maven.plugins:maven-failsafe-plugin (#1220)</p>
+</li>
+<li>
+<p>Bump org.asciidoctor:asciidoctor-maven-plugin (#1219)</p>
+</li>
+<li>
+<p>Bump org.apache.maven.plugins:maven-surefire-plugin (#1218)</p>
+</li>
+<li>
+<p>Bump org.springframework.boot:spring-boot-starter-parent (#1217)</p>
+</li>
+<li>
+<p>Bump com.google.guava:guava (#1216)</p>
+</li>
+<li>
+<p>Bump com.puppycrawl.tools:checkstyle (#1215)</p>
+</li>
+<li>
+<p>Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1214)</p>
+</li>
+<li>
+<p>Bump joda-time:joda-time from 2.13.1 to 2.14.0 (#1213)</p>
+</li>
+<li>
+<p>Bump org.ow2.asm:asm from 9.7.1 to 9.8 (#1212)</p>
+</li>
+<li>
+<p>Bump testcontainers.version from 1.20.5 to 1.20.6 (#1207)</p>
+</li>
+<li>
+<p>Bump org.junit:junit-bom from 5.12.0 to 5.12.1 (#1209)</p>
+</li>
+<li>
+<p>Bump io.projectreactor:reactor-bom (#1210)</p>
+</li>
+<li>
+<p>Bump org.graalvm.buildtools:native-maven-plugin (#1208)</p>
+</li>
+<li>
+<p>Bump net.java.dev.jna:jna from 5.16.0 to 5.17.0 (#1206)</p>
+</li>
+<li>
+<p>Bump org.springframework.data:spring-data-neo4j (#1205)</p>
+</li>
+<li>
+<p>Bump com.mycila:license-maven-plugin from 4.6 to 5.0.0 (#1204)</p>
+</li>
+<li>
+<p>Bump com.google.guava:guava (#1203)</p>
+</li>
+<li>
+<p>Bump neo4j.version from 5.26.3 to 5.26.4 (#1202)</p>
+</li>
+<li>
+<p>Bump mockito.version from 5.16.0 to 5.16.1 (#1201)</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
 <h4 id="2024.5"><a class="anchor" href="#2024.5"></a>2024.5</h4>
+<div class="sect4">
+<h5 id="2024.5.2"><a class="anchor" href="#2024.5.2"></a>2024.5.2</h5>
+<div class="paragraph">
+<p>Take note that this release deprecates direct integrations with the Neo4j Java Driver. They have never been used widely and can be easily added when needed in calling code.
+Removing them from Cypher-DSL avoid unnessary complexity in dependency management.</p>
+</div>
+<div class="sect5">
+<h6 id="️refactorings2"><a class="anchor" href="#️refactorings2"></a>🔄️ Refactorings</h6>
+<div class="literalblock">
+<div class="content">
+<pre>refactor: Deprecate all driver integrations from Cypher-DSL side. (#1211)</pre>
+</div>
+</div>
+</div>
+<div class="sect5">
+<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
+<div class="ulist">
+<ul>
+<li>
+<p>Dependency upgrades:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Bump org.checkerframework:checker-qual (#1233)</p>
+</li>
+<li>
+<p>Bump com.puppycrawl.tools:checkstyle (#1232)</p>
+</li>
+<li>
+<p>Bump org.springframework.boot:spring-boot-starter-parent (#1231)</p>
+</li>
+<li>
+<p>Bump com.google.guava:guava (#1230)</p>
+</li>
+<li>
+<p>Bump io.projectreactor:reactor-bom (#1229)</p>
+</li>
+<li>
+<p>Bump org.junit:junit-bom from 5.12.1 to 5.12.2 (#1228)</p>
+</li>
+<li>
+<p>Bump org.jacoco:jacoco-maven-plugin from 0.8.12 to 0.8.13 (#1226)</p>
+</li>
+<li>
+<p>Bump org.asciidoctor:asciidoctorj-diagram (#1223)</p>
+</li>
+<li>
+<p>Bump mockito.version from 5.16.1 to 5.17.0 (#1222)</p>
+</li>
+<li>
+<p>Bump neo4j.version from 5.26.4 to 5.26.5 (#1221)</p>
+</li>
+<li>
+<p>Bump org.apache.maven.plugins:maven-failsafe-plugin (#1220)</p>
+</li>
+<li>
+<p>Bump org.asciidoctor:asciidoctor-maven-plugin (#1219)</p>
+</li>
+<li>
+<p>Bump org.apache.maven.plugins:maven-surefire-plugin (#1218)</p>
+</li>
+<li>
+<p>Bump org.springframework.boot:spring-boot-starter-parent (#1217)</p>
+</li>
+<li>
+<p>Bump com.google.guava:guava (#1216)</p>
+</li>
+<li>
+<p>Bump com.puppycrawl.tools:checkstyle (#1215)</p>
+</li>
+<li>
+<p>Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1214)</p>
+</li>
+<li>
+<p>Bump joda-time:joda-time from 2.13.1 to 2.14.0 (#1213)</p>
+</li>
+<li>
+<p>Bump org.ow2.asm:asm from 9.7.1 to 9.8 (#1212)</p>
+</li>
+<li>
+<p>Bump testcontainers.version from 1.20.5 to 1.20.6 (#1207)</p>
+</li>
+<li>
+<p>Bump org.junit:junit-bom from 5.12.0 to 5.12.1 (#1209)</p>
+</li>
+<li>
+<p>Bump io.projectreactor:reactor-bom (#1210)</p>
+</li>
+<li>
+<p>Bump org.graalvm.buildtools:native-maven-plugin (#1208)</p>
+</li>
+<li>
+<p>Bump net.java.dev.jna:jna from 5.16.0 to 5.17.0 (#1206)</p>
+</li>
+<li>
+<p>Bump org.springframework.data:spring-data-neo4j (#1205)</p>
+</li>
+<li>
+<p>Bump com.mycila:license-maven-plugin from 4.6 to 5.0.0 (#1204)</p>
+</li>
+<li>
+<p>Bump com.google.guava:guava (#1203)</p>
+</li>
+<li>
+<p>Bump neo4j.version from 5.26.3 to 5.26.4 (#1202)</p>
+</li>
+<li>
+<p>Bump mockito.version from 5.16.0 to 5.16.1 (#1201)</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
 <div class="sect4">
 <h5 id="2024.5.1"><a class="anchor" href="#2024.5.1"></a>2024.5.1</h5>
 <div class="sect5">
@@ -4336,7 +4573,7 @@ The <code>ast</code> and <code>utils</code> packages however should not have dep
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping"><a class="anchor" href="#housekeeping"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4399,7 +4636,7 @@ It ensures that a future version of Neo4j will treat all queries generated with 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping2"><a class="anchor" href="#housekeeping2"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4487,7 +4724,7 @@ Happy holidays and all the best for 2025, we are looking forward helping more pr
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping3"><a class="anchor" href="#housekeeping3"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4593,7 +4830,7 @@ Happy holidays and all the best for 2025, we are looking forward helping more pr
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping4"><a class="anchor" href="#housekeeping4"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4658,7 +4895,7 @@ Happy holidays and all the best for 2025, we are looking forward helping more pr
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping5"><a class="anchor" href="#housekeeping5"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping7"><a class="anchor" href="#housekeeping7"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4883,7 +5120,7 @@ Thank you!</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping6"><a class="anchor" href="#housekeeping6"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping8"><a class="anchor" href="#housekeeping8"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -4984,7 +5221,7 @@ No need to rewrite any query on your own.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping7"><a class="anchor" href="#housekeeping7"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping9"><a class="anchor" href="#housekeeping9"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5081,7 +5318,7 @@ No need to rewrite any query on your own.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping8"><a class="anchor" href="#housekeeping8"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping10"><a class="anchor" href="#housekeeping10"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5181,7 +5418,7 @@ What we have now on our todo list is to incorporate our <a href="http://neo4j.gi
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping9"><a class="anchor" href="#housekeeping9"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping11"><a class="anchor" href="#housekeeping11"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5248,7 +5485,7 @@ What we have now on our todo list is to incorporate our <a href="http://neo4j.gi
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping10"><a class="anchor" href="#housekeeping10"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping12"><a class="anchor" href="#housekeeping12"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5307,7 +5544,7 @@ The biggest new feature in this release is that we now allow chaining statements
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping11"><a class="anchor" href="#housekeeping11"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping13"><a class="anchor" href="#housekeeping13"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5428,7 +5665,7 @@ The biggest new feature in this release is that we now allow chaining statements
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping12"><a class="anchor" href="#housekeeping12"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping14"><a class="anchor" href="#housekeeping14"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5504,7 +5741,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping13"><a class="anchor" href="#housekeeping13"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping15"><a class="anchor" href="#housekeeping15"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5555,7 +5792,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping14"><a class="anchor" href="#housekeeping14"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping16"><a class="anchor" href="#housekeeping16"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5636,7 +5873,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping15"><a class="anchor" href="#housekeeping15"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping17"><a class="anchor" href="#housekeeping17"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5730,7 +5967,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping16"><a class="anchor" href="#housekeeping16"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping18"><a class="anchor" href="#housekeeping18"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5781,7 +6018,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings"><a class="anchor" href="#️refactorings"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings3"><a class="anchor" href="#️refactorings3"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5811,7 +6048,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping17"><a class="anchor" href="#housekeeping17"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping19"><a class="anchor" href="#housekeeping19"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5889,7 +6126,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings2"><a class="anchor" href="#️refactorings2"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings4"><a class="anchor" href="#️refactorings4"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -5899,7 +6136,7 @@ Cypher-DSL 2024 will still require JDK 17, and will run just fine on JDK 21 and 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping18"><a class="anchor" href="#housekeeping18"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping20"><a class="anchor" href="#housekeeping20"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6012,7 +6249,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping19"><a class="anchor" href="#housekeeping19"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping21"><a class="anchor" href="#housekeeping21"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6100,7 +6337,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping20"><a class="anchor" href="#housekeeping20"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping22"><a class="anchor" href="#housekeeping22"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6167,7 +6404,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping21"><a class="anchor" href="#housekeeping21"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping23"><a class="anchor" href="#housekeeping23"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6237,7 +6474,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping22"><a class="anchor" href="#housekeeping22"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping24"><a class="anchor" href="#housekeeping24"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6387,7 +6624,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings3"><a class="anchor" href="#️refactorings3"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings5"><a class="anchor" href="#️refactorings5"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6397,7 +6634,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping23"><a class="anchor" href="#housekeeping23"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping25"><a class="anchor" href="#housekeeping25"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6472,7 +6709,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings4"><a class="anchor" href="#️refactorings4"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings6"><a class="anchor" href="#️refactorings6"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6482,7 +6719,7 @@ Until then, they are deprecated.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping24"><a class="anchor" href="#housekeeping24"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping26"><a class="anchor" href="#housekeeping26"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6556,7 +6793,7 @@ While these are not interfaces for you to implemented and the methods are defaul
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping25"><a class="anchor" href="#housekeeping25"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping27"><a class="anchor" href="#housekeeping27"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6627,7 +6864,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings5"><a class="anchor" href="#️refactorings5"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings7"><a class="anchor" href="#️refactorings7"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6640,7 +6877,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping26"><a class="anchor" href="#housekeeping26"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping28"><a class="anchor" href="#housekeeping28"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6712,7 +6949,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping27"><a class="anchor" href="#housekeeping27"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping29"><a class="anchor" href="#housekeeping29"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6787,7 +7024,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping28"><a class="anchor" href="#housekeeping28"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping30"><a class="anchor" href="#housekeeping30"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6863,7 +7100,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings6"><a class="anchor" href="#️refactorings6"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings8"><a class="anchor" href="#️refactorings8"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6873,7 +7110,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping29"><a class="anchor" href="#housekeeping29"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping31"><a class="anchor" href="#housekeeping31"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6955,7 +7192,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings7"><a class="anchor" href="#️refactorings7"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings9"><a class="anchor" href="#️refactorings9"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -6965,7 +7202,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping30"><a class="anchor" href="#housekeeping30"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping32"><a class="anchor" href="#housekeeping32"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7093,7 +7330,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings8"><a class="anchor" href="#️refactorings8"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings10"><a class="anchor" href="#️refactorings10"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7122,7 +7359,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping31"><a class="anchor" href="#housekeeping31"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping33"><a class="anchor" href="#housekeeping33"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7286,7 +7523,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings9"><a class="anchor" href="#️refactorings9"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings11"><a class="anchor" href="#️refactorings11"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7312,7 +7549,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping32"><a class="anchor" href="#housekeeping32"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping34"><a class="anchor" href="#housekeeping34"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7476,7 +7713,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping33"><a class="anchor" href="#housekeeping33"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping35"><a class="anchor" href="#housekeeping35"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7545,7 +7782,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping34"><a class="anchor" href="#housekeeping34"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping36"><a class="anchor" href="#housekeeping36"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7621,7 +7858,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping35"><a class="anchor" href="#housekeeping35"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping37"><a class="anchor" href="#housekeeping37"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7667,7 +7904,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings10"><a class="anchor" href="#️refactorings10"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings12"><a class="anchor" href="#️refactorings12"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7721,7 +7958,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings11"><a class="anchor" href="#️refactorings11"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings13"><a class="anchor" href="#️refactorings13"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7772,7 +8009,7 @@ As we deprecated two things (the <code>DEFAULT</code> dialect and <code>org.neo4
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping36"><a class="anchor" href="#housekeeping36"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping38"><a class="anchor" href="#housekeeping38"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7903,7 +8140,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping37"><a class="anchor" href="#housekeeping37"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping39"><a class="anchor" href="#housekeeping39"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7949,7 +8186,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings12"><a class="anchor" href="#️refactorings12"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings14"><a class="anchor" href="#️refactorings14"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -7969,7 +8206,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping38"><a class="anchor" href="#housekeeping38"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping40"><a class="anchor" href="#housekeeping40"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8040,7 +8277,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping39"><a class="anchor" href="#housekeeping39"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping41"><a class="anchor" href="#housekeeping41"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8079,7 +8316,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings13"><a class="anchor" href="#️refactorings13"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings15"><a class="anchor" href="#️refactorings15"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8112,7 +8349,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping40"><a class="anchor" href="#housekeeping40"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping42"><a class="anchor" href="#housekeeping42"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8165,7 +8402,7 @@ We are glad that you and your team are users of this module.</p>
 <div class="sect4">
 <h5 id="2022.8.3"><a class="anchor" href="#2022.8.3"></a>2022.8.3</h5>
 <div class="sect5">
-<h6 id="️refactorings14"><a class="anchor" href="#️refactorings14"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings16"><a class="anchor" href="#️refactorings16"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8175,7 +8412,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping41"><a class="anchor" href="#housekeeping41"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping43"><a class="anchor" href="#housekeeping43"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8240,7 +8477,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping42"><a class="anchor" href="#housekeeping42"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping44"><a class="anchor" href="#housekeeping44"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8269,7 +8506,7 @@ We are glad that you and your team are users of this module.</p>
 <div class="sect4">
 <h5 id="2022.8.1"><a class="anchor" href="#2022.8.1"></a>2022.8.1</h5>
 <div class="sect5">
-<h6 id="️refactorings15"><a class="anchor" href="#️refactorings15"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings17"><a class="anchor" href="#️refactorings17"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8282,7 +8519,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping43"><a class="anchor" href="#housekeeping43"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping45"><a class="anchor" href="#housekeeping45"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8343,7 +8580,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping44"><a class="anchor" href="#housekeeping44"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping46"><a class="anchor" href="#housekeeping46"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8418,7 +8655,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings16"><a class="anchor" href="#️refactorings16"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings18"><a class="anchor" href="#️refactorings18"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8438,7 +8675,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping45"><a class="anchor" href="#housekeeping45"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping47"><a class="anchor" href="#housekeeping47"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8553,7 +8790,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping46"><a class="anchor" href="#housekeeping46"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping48"><a class="anchor" href="#housekeeping48"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8604,7 +8841,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings17"><a class="anchor" href="#️refactorings17"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings19"><a class="anchor" href="#️refactorings19"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8614,7 +8851,7 @@ We are glad that you and your team are users of this module.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping47"><a class="anchor" href="#housekeeping47"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping49"><a class="anchor" href="#housekeeping49"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8672,7 +8909,7 @@ This release is - again - a safe drop-in replacement for the prior (2022.6.1) on
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings18"><a class="anchor" href="#️refactorings18"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings20"><a class="anchor" href="#️refactorings20"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8692,7 +8929,7 @@ This release is - again - a safe drop-in replacement for the prior (2022.6.1) on
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping48"><a class="anchor" href="#housekeeping48"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping50"><a class="anchor" href="#housekeeping50"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8740,7 +8977,7 @@ This release is - again - a safe drop-in replacement for the prior (2022.6.1) on
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping49"><a class="anchor" href="#housekeeping49"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping51"><a class="anchor" href="#housekeeping51"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8802,7 +9039,7 @@ be replaced by <code>elementId()</code>).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings19"><a class="anchor" href="#️refactorings19"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings21"><a class="anchor" href="#️refactorings21"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8812,7 +9049,7 @@ be replaced by <code>elementId()</code>).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping50"><a class="anchor" href="#housekeeping50"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping52"><a class="anchor" href="#housekeeping52"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8861,7 +9098,7 @@ This release is - again - a safe drop-in replacement for the prior (2022.4.0) on
 </div>
 </div>
 <div class="sect5">
-<h6 id="️refactorings20"><a class="anchor" href="#️refactorings20"></a>🔄️ Refactorings</h6>
+<h6 id="️refactorings22"><a class="anchor" href="#️refactorings22"></a>🔄️ Refactorings</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -8900,7 +9137,7 @@ This release is - again - a safe drop-in replacement for the prior (2022.4.0) on
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping51"><a class="anchor" href="#housekeeping51"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping53"><a class="anchor" href="#housekeeping53"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9038,7 +9275,7 @@ This might break things if you have them changed inflight.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping52"><a class="anchor" href="#housekeeping52"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping54"><a class="anchor" href="#housekeeping54"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9164,7 +9401,7 @@ for the rationale behind it).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping53"><a class="anchor" href="#housekeeping53"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping55"><a class="anchor" href="#housekeeping55"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9247,7 +9484,7 @@ for the rationale behind it).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping54"><a class="anchor" href="#housekeeping54"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping56"><a class="anchor" href="#housekeeping56"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9363,7 +9600,7 @@ for the rationale behind it).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping55"><a class="anchor" href="#housekeeping55"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping57"><a class="anchor" href="#housekeeping57"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9431,7 +9668,7 @@ Thanks, <a href="https://github.com/meistermeier">Gerrit</a>, for integrating it
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping56"><a class="anchor" href="#housekeeping56"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping58"><a class="anchor" href="#housekeeping58"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9554,7 +9791,7 @@ And last but not least, we added the <em>Contributor Covenant Code of Conduct</e
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping57"><a class="anchor" href="#housekeeping57"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping59"><a class="anchor" href="#housekeeping59"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9620,7 +9857,7 @@ And last but not least, we added the <em>Contributor Covenant Code of Conduct</e
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping58"><a class="anchor" href="#housekeeping58"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping60"><a class="anchor" href="#housekeeping60"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9645,7 +9882,7 @@ And last but not least, we added the <em>Contributor Covenant Code of Conduct</e
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping59"><a class="anchor" href="#housekeeping59"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping61"><a class="anchor" href="#housekeeping61"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9671,7 +9908,7 @@ module name is however different from the generated one, it will be a breaking c
 we bump our version, too.</p>
 </div>
 <div class="sect5">
-<h6 id="housekeeping60"><a class="anchor" href="#housekeeping60"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping62"><a class="anchor" href="#housekeeping62"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9715,7 +9952,7 @@ vie <a href="https://sonarcloud.io">Sonarcloud</a> and are happy to announce tha
 <p>In addition, we finally invited <a href="https://dependabot.com">Dependabot</a> taking care of at least creating the PRs.</p>
 </div>
 <div class="sect5">
-<h6 id="housekeeping61"><a class="anchor" href="#housekeeping61"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping63"><a class="anchor" href="#housekeeping63"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9747,7 +9984,7 @@ vie <a href="https://sonarcloud.io">Sonarcloud</a> and are happy to announce tha
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping62"><a class="anchor" href="#housekeeping62"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping64"><a class="anchor" href="#housekeeping64"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -9928,7 +10165,7 @@ release. Those are brought in now so that they can be benefial to others without
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping63"><a class="anchor" href="#housekeeping63"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping65"><a class="anchor" href="#housekeeping65"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10007,7 +10244,7 @@ release. Those are brought in now so that they can be benefial to others without
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping64"><a class="anchor" href="#housekeeping64"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping66"><a class="anchor" href="#housekeeping66"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10073,7 +10310,7 @@ Cypher literals giving you much more flexibility in regards what to pass to the 
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping65"><a class="anchor" href="#housekeeping65"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping67"><a class="anchor" href="#housekeeping67"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10212,7 +10449,7 @@ up truly immutable statements. One pattern that is mutable like the above invali
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping66"><a class="anchor" href="#housekeeping66"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping68"><a class="anchor" href="#housekeeping68"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10325,7 +10562,7 @@ after rendering).</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping67"><a class="anchor" href="#housekeeping67"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping69"><a class="anchor" href="#housekeeping69"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10410,7 +10647,7 @@ This will already be the last release of the 2021.0 line.
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping68"><a class="anchor" href="#housekeeping68"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping70"><a class="anchor" href="#housekeeping70"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10610,7 +10847,7 @@ assertThat(parameters).containsEntry(<span class="string"><span class="delimiter
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping69"><a class="anchor" href="#housekeeping69"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping71"><a class="anchor" href="#housekeeping71"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10729,7 +10966,7 @@ Re-released 2020.1.5 due downtime and staging issues of oss.sonatype.org.</p>
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping70"><a class="anchor" href="#housekeeping70"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping72"><a class="anchor" href="#housekeeping72"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10841,7 +11078,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping71"><a class="anchor" href="#housekeeping71"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping73"><a class="anchor" href="#housekeeping73"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10897,7 +11134,7 @@ including the <a href="http://neo4j-contrib.github.io/cypher-dsl/current/project
 </div>
 </div>
 <div class="sect5">
-<h6 id="housekeeping72"><a class="anchor" href="#housekeeping72"></a>🧹 Housekeeping</h6>
+<h6 id="housekeeping74"><a class="anchor" href="#housekeeping74"></a>🧹 Housekeeping</h6>
 <div class="ulist">
 <ul>
 <li>
@@ -10933,7 +11170,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-05-05 12:23:40 UTC
+Last updated 2025-05-05 12:28:11 UTC
 </div>
 </div>
 </body>
