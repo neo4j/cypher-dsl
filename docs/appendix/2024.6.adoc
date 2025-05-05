@@ -1,13 +1,13 @@
-== 2024.5
+== 2024.6
 
-=== 2024.5.2
+=== 2024.6.0
 
 Take note that this release deprecates direct integrations with the Neo4j Java Driver. They have never been used widely and can be easily added when needed in calling code.
 Removing them from Cypher-DSL avoid unnessary complexity in dependency management.
 
 ==== 🔄️ Refactorings
 
- refactor: Deprecate all driver integrations from Cypher-DSL side. (#1211)
+* refactor: Deprecate all driver integrations from Cypher-DSL side. (#1211)
 
 ==== 🧹 Housekeeping
 
@@ -41,55 +41,3 @@ Removing them from Cypher-DSL avoid unnessary complexity in dependency managemen
 ** Bump com.google.guava:guava (#1203)
 ** Bump neo4j.version from 5.26.3 to 5.26.4 (#1202)
 ** Bump mockito.version from 5.16.0 to 5.16.1 (#1201)
-
-
-=== 2024.5.1
-
-==== 🐛 Bug Fixes
-
-* Use a `Pattern` typed subtree for a list of patterns in an existential subquery. (#1200)
-
-==== 📖 Documentation
-
-* Add an example for setting multiple labels. (#1199)
-
-==== 🧹 Housekeeping
-
-* Dependency upgrades:
-** Bump org.neo4j.driver:neo4j-java-driver (#1198)
-** Bump com.puppycrawl.tools:checkstyle (#1197)
-** Bump org.checkerframework:checker-qual (#1195)
-** Bump mockito.version from 5.15.2 to 5.16.0 (#1194)
-** Bump org.codehaus.mojo:flatten-maven-plugin (#1192)
-** Bump org.apache.maven.plugins:maven-deploy-plugin (#1191)
-** Bump com.fasterxml.jackson:jackson-bom (#1190)
-** Bump neo4j.version from 5.26.2 to 5.26.3 (#1189)
-** Bump org.apache.maven.plugins:maven-install-plugin (#1188)
-** Bump org.jreleaser:jreleaser-maven-plugin (#1187)
-
-
-=== 2024.5.0
-
-This new minor release does not have any breaking changes.
-A new dialect dubbed 5.26 has been introduced.
-When configured, the renderer will prefix all queries with `CYPHER 5`, which is compatible with Neo4j 5.26 as well as the main line 2025.x.
-It ensures that a future version of Neo4j will treat all queries generated with Cypher-DSL as Cypher 5, even when newer Cypher versions become available.
-
-==== 🚀 Features
-
-* Introduce Dialect 5.26 (#1185)
-
-==== 🧹 Housekeeping
-
-* Dependency upgrades:
-** Bump testcontainers.version from 1.20.4 to 1.20.5 (#1184)
-** Bump org.springframework.boot:spring-boot-starter-parent (#1183)
-** Bump org.junit:junit-bom from 5.11.4 to 5.12.0 (#1182)
-** Bump com.puppycrawl.tools:checkstyle (#1181)
-** Bump io.projectreactor:reactor-bom (#1180)
-** Bump org.springframework.data:spring-data-neo4j (#1179)
-** Bump com.tngtech.archunit:archunit from 1.3.0 to 1.4.0 (#1178)
-
-==== 🛠 Build
-
-* fix: The default of `structuredMessage` is `false`. (Internal release announcer)
