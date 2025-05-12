@@ -78,7 +78,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	private final List<MultiPartElement> multiPartElements = new ArrayList<>();
 
 	/**
-	 * Default constructor. Builder can be pre-loaded with visitables.
+	 * Default constructor. Builder can be preloaded with visitables.
 	 *
 	 * @param visitables A set of visitables. {@literal NULL} values will be skipped.
 	 */
@@ -380,6 +380,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final OngoingReadingWithWhere where(Condition newCondition) {
 
+		if (this.currentOngoingMatch == null) {
+			if (!this.currentSinglePartElements.isEmpty() && this.currentSinglePartElements.get(
+				this.currentSinglePartElements.size() - 1) instanceof Subquery) {
+				throw new IllegalArgumentException(
+					"A CALL{} clause requires to WITH before you can add further conditions");
+			}
+			throw new IllegalArgumentException("Cannot adda WHERE clause at this point");
+		}
 		this.currentOngoingMatch.conditionBuilder.where(newCondition);
 		return this;
 	}
