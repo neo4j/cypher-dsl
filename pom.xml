@@ -133,7 +133,7 @@
 	<properties>
 		<aggregate.report.dir>neo4j-cypher-dsl-test-results/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
 		<apiguardian.version>1.1.2</apiguardian.version>
-		<archunit.version>1.4.0</archunit.version>
+		<archunit.version>1.4.1</archunit.version>
 		<asciidoctor-maven-plugin.version>3.2.0</asciidoctor-maven-plugin.version>
 		<asciidoctorj-diagram.version>2.3.2</asciidoctorj-diagram.version>
 		<asciidoctorj.version>3.0.0</asciidoctorj.version>
