@@ -7,7 +7,7 @@ Removing them from Cypher-DSL avoid unnessary complexity in dependency managemen
 
 ==== 🔄️ Refactorings
 
- refactor: Deprecate all driver integrations from Cypher-DSL side. (#1211)
+refactor: Deprecate all driver integrations from Cypher-DSL side. (#1211)
 
 ==== 🧹 Housekeeping
 

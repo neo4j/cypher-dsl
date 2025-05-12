@@ -1,5 +1,28 @@
 == 2024.6
 
+=== 2024.6.1
+
+==== 🐛 Bug Fixes
+
+* Don't change simple case to generic case.
+
+==== 🔄️ Refactorings
+
+* Add better error messages when attempting to continue subquery without `with`.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j.driver:neo4j-java-driver (#1242)
+** Bump org.springframework.data:spring-data-neo4j (#1239)
+** Bump com.opencsv:opencsv from 5.10 to 5.11 (#1237)
+** Bump com.tngtech.archunit:archunit from 1.4.0 to 1.4.1 (#1243)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1241)
+** Bump com.fasterxml.jackson:jackson-bom (#1240)
+** Bump testcontainers.version from 1.20.6 to 1.21.0 (#1238)
+** Bump neo4j.version from 5.26.5 to 5.26.6 (#1236)
+
+
 === 2024.6.0
 
 Take note that this release deprecates direct integrations with the Neo4j Java Driver. They have never been used widely and can be easily added when needed in calling code.
