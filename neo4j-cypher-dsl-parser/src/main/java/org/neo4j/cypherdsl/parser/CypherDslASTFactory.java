@@ -54,6 +54,7 @@ import org.neo4j.cypher.internal.parser.common.ast.factory.SimpleEither;
 import org.neo4j.cypherdsl.core.Case;
 import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
+import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.ExposesRelationships;
 import org.neo4j.cypherdsl.core.Expression;
@@ -68,6 +69,7 @@ import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.NamedPath;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.Operation;
+import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
@@ -1661,7 +1663,13 @@ final class CypherDslASTFactory implements ASTFactory<
 			var iteratorWhens = whens.iterator();
 			var iteratorThens = thens.iterator();
 			while (iteratorWhens.hasNext() && iteratorThens.hasNext()) {
-				aCase = aCase.when(iteratorWhens.next()).then(iteratorThens.next());
+				var when = iteratorWhens.next();
+				if (e != null && when instanceof Comparison comparison && comparison.getComparator()
+					.equals(Operator.EQUALITY) && e.equals(comparison.getLeft())) {
+					aCase = aCase.when(comparison.getRight()).then(iteratorThens.next());
+				} else {
+					aCase = aCase.when(when).then(iteratorThens.next());
+				}
 			}
 			if (elze != null) {
 				return ((Case.CaseEnding) aCase).elseDefault(elze);

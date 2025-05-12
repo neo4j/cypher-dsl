@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
@@ -73,7 +74,6 @@ public final class Comparison implements Condition {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		EnterResult result = visitor.enterWithResult(this);
@@ -88,6 +88,22 @@ public final class Comparison implements Condition {
 		}
 		visitor.leave(this);
 	}
+
+	@API(status = INTERNAL, since = "2024.6.1")
+	public Expression getLeft() {
+		return this.left;
+	}
+
+	@API(status = INTERNAL, since = "2024.6.1")
+	public Operator getComparator() {
+		return this.comparator;
+	}
+
+	@API(status = INTERNAL, since = "2024.6.1")
+	public Expression getRight() {
+		return this.right;
+	}
+
 
 	@NotNull
 	@Override

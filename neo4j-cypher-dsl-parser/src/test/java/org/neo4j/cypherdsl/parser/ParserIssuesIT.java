@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.parser;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -334,5 +335,36 @@ class ParserIssuesIT {
 
 		assertThat(s1).isEqualTo(expected1);
 		assertThat(s2).isEqualTo(expected2);
+	}
+
+	@Test // GH-1235
+	void caseParsingAndRenderingShouldWork() {
+		final var node = Cypher.node("Node").named("n");
+		final var query = Cypher.match(node)
+			.returning(Cypher.caseExpression(node.property("prop"))
+				.when(Cypher.literalOf("A"))
+				.then(Cypher.literalOf(1))
+				.elseDefault(Cypher.literalOf(2)))
+			.build();
+
+		assertThat(query.getCypher()).isEqualTo("MATCH (n:`Node`) RETURN CASE n.prop WHEN 'A' THEN 1 ELSE 2 END");
+		var renderedParsedAndRendered = CypherParser.parse(query.getCypher()).getCypher();
+		assertThat(renderedParsedAndRendered).isEqualTo("MATCH (n:`Node`) RETURN CASE n.prop WHEN 'A' THEN 1 ELSE 2 END");
+		renderedParsedAndRendered = CypherParser.parse(renderedParsedAndRendered).getCypher();
+		assertThat(renderedParsedAndRendered).isEqualTo("MATCH (n:`Node`) RETURN CASE n.prop WHEN 'A' THEN 1 ELSE 2 END");
+	}
+
+	@Test // GH-1235
+	void genericCase() {
+		var cypher = """
+			MATCH (n:Person)
+			RETURN
+			CASE
+			  WHEN n.eyes = 'blue' THEN 1
+			  WHEN n.age < 40      THEN 2
+			  ELSE 3
+			END AS result, n.eyes, n.age
+			""";
+		assertThat(CypherParser.parse(cypher).getCypher()).isEqualTo("MATCH (n:`Person`) RETURN CASE WHEN n.eyes = 'blue' THEN 1 WHEN n.age < 40 THEN 2 ELSE 3 END AS result, n.eyes, n.age");
 	}
 }
