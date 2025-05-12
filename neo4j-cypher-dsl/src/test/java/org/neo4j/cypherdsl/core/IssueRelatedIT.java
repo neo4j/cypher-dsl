@@ -2140,6 +2140,35 @@ class IssueRelatedIT {
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (m:`Movie`) WHERE m.name = 'star' RETURN DISTINCT [(m)<-[:`HAS_RELATION`]-(n:`AnotherNode`) | n]");
 	}
 
+	@Test
+	void callRawCypherFollowedByWhereMustWork() {
+		var cypher = Cypher.callRawCypher("MATCH (n:Movie) RETURN n")
+			.with(Cypher.asterisk())
+			.where(Cypher.property("n", "title").eq(Cypher.literalOf("The Matrix")))
+			.returning(Cypher.asterisk())
+			.build().getCypher();
+		assertThat(cypher).isEqualTo("CALL {MATCH (n:Movie) RETURN n} WITH * WHERE n.title = 'The Matrix' RETURN *");
+	}
+
+	@Test
+	void callCypherFollowedByWhereMustWork() {
+
+		var cypher = Cypher.call(Cypher.match(Cypher.node("Movie").named("n")).returning(Cypher.name("n")).build())
+			.with(Cypher.asterisk())
+			.where(Cypher.property("n", "title").eq(Cypher.literalOf("The Matrix")))
+			.returning(Cypher.asterisk())
+			.build().getCypher();
+		assertThat(cypher).isEqualTo("CALL {MATCH (n:`Movie`) RETURN n} WITH * WHERE n.title = 'The Matrix' RETURN *");
+	}
+
+	@Test
+	void callRawCypherFollowedByWhereWithoutWithMustThrowGoodException() {
+		var buildableSubquery = Cypher.callRawCypher("MATCH (n:Movie) RETURN n");
+		var trueCondition = Cypher.isTrue();
+		assertThatIllegalArgumentException().isThrownBy(() -> buildableSubquery.where(trueCondition))
+			.withMessage("A CALL{} clause requires to WITH before you can add further conditions");
+	}
+
 	@Nested
 	class Chaining {
 
