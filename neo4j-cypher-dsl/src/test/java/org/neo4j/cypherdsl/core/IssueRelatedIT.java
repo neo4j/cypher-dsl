@@ -2169,6 +2169,19 @@ class IssueRelatedIT {
 			.withMessage("A CALL{} clause requires to WITH before you can add further conditions");
 	}
 
+	@Test // GH-1235
+	void caseParsingAndRenderingShouldWork() {
+		var node = Cypher.node("Node").named("n");
+		var query = Cypher.match(node)
+			.returning(Cypher.caseExpression(node.property("prop"))
+				.when(Cypher.literalOf("A"))
+				.then(Cypher.literalOf(1))
+				.elseDefault(Cypher.literalOf(2)))
+			.build();
+
+		assertThat(query.getCypher()).isEqualTo("MATCH (n:`Node`) RETURN CASE n.prop WHEN 'A' THEN 1 ELSE 2 END");
+	}
+
 	@Nested
 	class Chaining {
 
