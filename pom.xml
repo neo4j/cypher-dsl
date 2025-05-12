@@ -163,7 +163,7 @@
 		<jaxb.version>2.3.1</jaxb.version>
 		<jetbrains-annotations.version>26.0.2</jetbrains-annotations.version>
 		<joda-time.version>2.14.0</joda-time.version>
-		<jreleaser-maven-plugin.version>1.17.0</jreleaser-maven-plugin.version>
+		<jreleaser-maven-plugin.version>1.18.0</jreleaser-maven-plugin.version>
 		<jsr305.version>3.0.2</jsr305.version>
 		<junit-jupiter.version>5.12.2</junit-jupiter.version>
 		<license-maven-plugin.version>5.0.0</license-maven-plugin.version>
