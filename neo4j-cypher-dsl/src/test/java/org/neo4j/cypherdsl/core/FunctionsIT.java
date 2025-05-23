@@ -230,6 +230,7 @@ class FunctionsIT {
 
 		// NOTE: Not all of those return valid Cypher statements. They are used only for integration testing the function calls so far.
 		@SuppressWarnings("deprecation") var idOfRel = Functions.id(r);
+		@SuppressWarnings("deprecation") var shortestPath = Cypher.shortestPath(r);
 		return Stream.of(
 			Arguments.of(Cypher.left(null, null), "RETURN left(NULL, NULL)"),
 			Arguments.of(Cypher.left(Cypher.literalOf("hello"), Cypher.literalOf(3)), "RETURN left('hello', 3)"),
@@ -291,7 +292,7 @@ class FunctionsIT {
 			Arguments.of(Cypher.last(e1), "RETURN last(e1)"),
 			Arguments.of(Cypher.nodes(Cypher.path("p").definedBy(r)), "RETURN nodes(p)"),
 			Arguments.of(Cypher.length(Cypher.path("p").definedBy(r)), "RETURN length(p)"),
-			Arguments.of(Cypher.shortestPath(r), "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
+			Arguments.of(shortestPath, "RETURN shortestPath((n:`Node`)-[r]->(m:`Node2`))"),
 			Arguments.of(Cypher.properties(n), "RETURN properties(n)"),
 			Arguments.of(Cypher.properties(r), "RETURN properties(r)"),
 			Arguments.of(Cypher.properties(Cypher.mapOf("a", Cypher.literalOf("b"))), "RETURN properties({a: 'b'})"),

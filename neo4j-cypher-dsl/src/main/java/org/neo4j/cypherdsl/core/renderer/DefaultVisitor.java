@@ -74,6 +74,7 @@ import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Remove;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
+import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Subquery;
@@ -1027,6 +1028,23 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (use.dynamic()) {
 			builder.append(")");
 		}
+		builder.append(" ");
+	}
+
+	void enter(PatternSelector shortest) {
+
+		if (shortest instanceof PatternSelector.ShortestK shortestK) {
+			builder.append("SHORTEST ").append(shortestK.getK());
+		} else if (shortest instanceof PatternSelector.ShortestKGroups shortestK) {
+			builder.append("SHORTEST ").append(shortestK.getK()).append(" GROUPS");
+		} else if (shortest instanceof PatternSelector.AllShortest) {
+			builder.append("ALL SHORTEST");
+		} else if (shortest instanceof PatternSelector.Any) {
+			builder.append("ANY");
+		}
+	}
+
+	void leave(PatternSelector shortest) {
 		builder.append(" ");
 	}
 

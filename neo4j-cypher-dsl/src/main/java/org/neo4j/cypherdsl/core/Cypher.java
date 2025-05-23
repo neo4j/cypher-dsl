@@ -282,8 +282,10 @@ public final class Cypher {
 	 * @param name The name of the new shortestPath path
 	 * @return An ongoing definition of a named path
 	 * @since 1.1.1
+	 * @deprecated use {@link #shortestK(int)} with {@literal 1} or {@link #anyShortest()}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated
 	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(String name) {
 		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
 	}
@@ -294,10 +296,44 @@ public final class Cypher {
 	 * @param name The name of the new shortestPath path
 	 * @return An ongoing definition of a named path
 	 * @since 1.1.1
+	 * @deprecated use {@link #shortestK(int)} with {@literal 1} or {@link #anyShortest()}
 	 */
 	@NotNull @Contract(pure = true)
+	@Deprecated
 	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(SymbolicName name) {
 		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
+	}
+
+	/**
+	 * @return An ongoing definition of a named path, returning the k shortest paths.
+	 * @since 2024.7.0
+	 */
+	public static NamedPath.OngoingShortestDefinition shortestK(int k) {
+		return NamedPath.shortest(k);
+	}
+
+	/**
+	 * @return An ongoing definition of a named path, returning the k shortest groups of paths.
+	 * @since 2024.7.0
+	 */
+	public static NamedPath.OngoingShortestDefinition shortestKGroups(int k) {
+		return NamedPath.shortestKGroups(k);
+	}
+
+	/**
+	 * @return An ongoing definition of a named path, returning any shortest path.
+	 * @since 2024.7.0
+	 */
+	public static NamedPath.OngoingShortestDefinition anyShortest() {
+		return NamedPath.any();
+	}
+
+	/**
+	 * @return An ongoing definition of a named path, returning all shortest paths.
+	 * @since 2024.7.0
+	 */
+	public static NamedPath.OngoingShortestDefinition allShortest() {
+		return NamedPath.allShortest();
 	}
 
 	/**
@@ -1260,7 +1296,6 @@ public final class Cypher {
 	 * @throws IllegalArgumentException When the expression cannot be formatted
 	 * @since 2021.3.2
 	 */
-	@SuppressWarnings("deprecation")
 	public static String format(Expression expression) {
 		return Expressions.format(expression);
 	}
@@ -3177,12 +3212,15 @@ public final class Cypher {
 	 * @param relationship The relationship to be passed to {@code shortestPath}.
 	 * @return A function call for {@code shortestPath({})}.
 	 * @since 2023.9.0
+	 * @deprecated the Cypher funktion of the same name is not GQL compliant, use SHORTEST 1 or ANY as replacement
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
+	@Deprecated
 	public static FunctionInvocation shortestPath(Relationship relationship) {
 		return Functions.shortestPath(relationship);
 	}
+
+
 
 	/**
 	 * Starts building a function invocation for {@code reduce({})}.

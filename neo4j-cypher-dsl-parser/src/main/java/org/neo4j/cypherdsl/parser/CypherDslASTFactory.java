@@ -80,6 +80,7 @@ import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
+import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.StringLiteral;
@@ -147,7 +148,7 @@ final class CypherDslASTFactory implements ASTFactory<
 	QuantifiedPathPattern.Quantifier,
 	PatternAtom,
 	DatabaseName,
-	NULL,
+	PatternSelector,
 	NULL,
 	PatternElement> {
 
@@ -565,8 +566,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternElement patternWithSelector(NULL aNull, PatternElement patternPart) {
-		return null;
+	public PatternElement patternWithSelector(PatternSelector patternSelector, PatternElement patternPart) {
+		return NamedPath.select(patternSelector, patternPart);
 	}
 
 	@Override
@@ -701,28 +702,39 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NULL anyPathSelector(String count, InputPosition countPosition, InputPosition position) {
-		throw new UnsupportedOperationException();
+	public PatternSelector anyPathSelector(String count, InputPosition countPosition, InputPosition position) {
+		if (count != null) {
+			throw new UnsupportedOperationException("ANY with k is not supported");
+		}
+		return PatternSelector.any();
 	}
 
 	@Override
-	public NULL allPathSelector(InputPosition position) {
-		throw new UnsupportedOperationException();
+	public PatternSelector allPathSelector(InputPosition position) {
+		return PatternSelector.allShortest();
 	}
 
 	@Override
-	public NULL anyShortestPathSelector(String count, InputPosition countPosition, InputPosition position) {
-		throw new UnsupportedOperationException();
+	public PatternSelector anyShortestPathSelector(String count, InputPosition countPosition, InputPosition position) {
+		var k = 1;
+		if (count != null) {
+			k = Integer.parseInt(count);
+		}
+		return PatternSelector.shortestK(k);
 	}
 
 	@Override
-	public NULL allShortestPathSelector(InputPosition position) {
-		throw new UnsupportedOperationException();
+	public PatternSelector allShortestPathSelector(InputPosition position) {
+		return PatternSelector.allShortest();
 	}
 
 	@Override
-	public NULL shortestGroupsSelector(String count, InputPosition countPosition, InputPosition position) {
-		throw new UnsupportedOperationException();
+	public PatternSelector shortestGroupsSelector(String count, InputPosition countPosition, InputPosition position) {
+		var k = 1;
+		if (count != null) {
+			k = Integer.parseInt(count);
+		}
+		return PatternSelector.shortestKGroups(k);
 	}
 
 	@Override
