@@ -63,11 +63,61 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
  */
 class CypherParserTest {
 
+	static Stream<Arguments> pathMatchingAndAssignment() {
+		return Stream.of(
+			Arguments.of(
+				"""
+					MATCH p = SHORTEST 1 (wos:Station)-[:LINK]-+(bmv:Station)
+					WHERE wos.name = "Worcester Shrub Hill" AND bmv.name = "Bromsgrove"
+					RETURN length(p) AS result
+					""",
+				"MATCH p = SHORTEST 1 (wos:`Station`)-[:`LINK`]-+(bmv:`Station`) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN length(p) AS result"
+			),
+			Arguments.of(
+				"""
+					MATCH p = SHORTEST 2 (wos:Station)-[:LINK]-+(bmv:Station)
+					WHERE wos.name = "Worcester Shrub Hill" AND bmv.name = "Bromsgrove"
+					RETURN [n in nodes(p) | n.name] AS stops
+					""",
+				"MATCH p = SHORTEST 2 (wos:`Station`)-[:`LINK`]-+(bmv:`Station`) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN [n IN nodes(p) | n.name] AS stops"
+			),
+			Arguments.of(
+				"""
+					MATCH p = ALL SHORTEST (wos:Station)-[:LINK]-+(bmv:Station)
+					WHERE wos.name = "Worcester Shrub Hill" AND bmv.name = "Bromsgrove"
+					RETURN [n in nodes(p) | n.name] AS stops
+					""",
+				"MATCH p = ALL SHORTEST (wos:`Station`)-[:`LINK`]-+(bmv:`Station`) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN [n IN nodes(p) | n.name] AS stops"
+			),
+			Arguments.of(
+				"""
+					MATCH p = SHORTEST 2 GROUPS (wos:Station)-[:LINK]-+(bmv:Station)
+					WHERE wos.name = "Worcester Shrub Hill" AND bmv.name = "Bromsgrove"
+					RETURN [n in nodes(p) | n.name] AS stops, length(p) AS pathLength
+					""",
+				"MATCH p = SHORTEST 2 GROUPS (wos:`Station`)-[:`LINK`]-+(bmv:`Station`) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN [n IN nodes(p) | n.name] AS stops, length(p) AS pathLength"
+			),
+			Arguments.of(
+				"""
+					MATCH path = ANY (:Station {name: 'Pershore'})-[l:LINK WHERE l.distance < 10]-+(b:Station {name: 'Bromsgrove'})
+					RETURN [r IN relationships(path) | r.distance] AS distances
+					""",
+				"MATCH path = ANY (:`Station` {name: 'Pershore'})-[l:`LINK` WHERE l.distance < 10]-+(b:`Station` {name: 'Bromsgrove'}) RETURN [r IN relationships(path) | r.distance] AS distances"
+			)
+		);
+	}
+
+	@ParameterizedTest
+	@MethodSource
+	void pathMatchingAndAssignment(String in, String expected) {
+		assertThat(CypherParser.parse(in).getCypher()).isEqualTo(expected);
+	}
+
 	@Nested
 	class RelationshipPatterns {
 
 		@ParameterizedTest
-		@CsvSource(nullValues = "N/A", value = {"N/A, N/A", "N/A, 5", "5, N/A", "5, 10", "-,-"})
+		@CsvSource(nullValues = "N/A", value = { "N/A, N/A", "N/A, 5", "5, N/A", "5, 10", "-,-" })
 		void simplePatternWithVariousLengths(String minimum, String maximum) {
 			StringBuilder simplePattern = new StringBuilder("(n)-");
 			if (minimum != null || maximum != null) {
@@ -90,7 +140,7 @@ class CypherParserTest {
 		}
 
 		@ParameterizedTest
-		@ValueSource(strings = {"T", "T1|T2", "T1|T2|T3"})
+		@ValueSource(strings = { "T", "T1|T2", "T1|T2|T3" })
 		void types(String types) {
 			var rel = CypherParser.parseRelationship(String.format("(n)-[:%s]->(m)", types));
 			assertThat(Cypher.match(rel).returning(Cypher.asterisk()).build().getCypher())
@@ -100,7 +150,7 @@ class CypherParserTest {
 		}
 
 		@ParameterizedTest
-		@CsvSource({"-,-", "<-,-", "-,->"})
+		@CsvSource({ "-,-", "<-,-", "-,->" })
 		void direction(String left, String right) {
 			StringBuilder simplePattern = new StringBuilder("(n)")
 				.append(left)
@@ -312,7 +362,7 @@ class CypherParserTest {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"CREATE", "MERGE", "MATCH"})
+	@ValueSource(strings = { "CREATE", "MERGE", "MATCH" })
 	void patternElementCallBacksShouldBeApplied(String clause) {
 
 		var builder = Options.newOptions();
@@ -357,9 +407,9 @@ class CypherParserTest {
 					CALL {
 						MATCH (p:Person)-[:LIKES]->(:Technology {type: "Java"})
 						RETURN p
-
+					
 						UNION
-
+					
 						MATCH (p:Person)
 						WHERE size((p)-[:IS_FRIENDS_WITH]->()) > 1
 						RETURN p
@@ -396,20 +446,25 @@ class CypherParserTest {
 	void transformingWhereShouldWork() {
 
 		var query = "MATCH (m:Movie {title: 'The Matrix'}) WHERE m.releaseYear IS NOT NULL OR false RETURN m";
-		var options = Options.newOptions().withMatchClauseFactory(matchDefinition -> (Match) Clauses.match(matchDefinition.optional(), matchDefinition.patternElements(), Where.from(Cypher.isFalse()), matchDefinition.optionalHints())).build();
+		var options = Options.newOptions().withMatchClauseFactory(
+			matchDefinition -> (Match) Clauses.match(matchDefinition.optional(), matchDefinition.patternElements(),
+				Where.from(Cypher.isFalse()), matchDefinition.optionalHints())).build();
 		var cypher = CypherParser.parse(query, options).getCypher();
 		assertThat(cypher).isEqualTo("MATCH (m:`Movie` {title: 'The Matrix'}) WHERE false RETURN m");
 	}
 
 	@Test
 	void labelColonConjunction() {
-		assertThat(CypherParser.parse("MATCH (a:A:B:C) RETURN a").getCypher()).isEqualTo("MATCH (a:`A`:`B`:`C`) RETURN a");
+		assertThat(CypherParser.parse("MATCH (a:A:B:C) RETURN a").getCypher()).isEqualTo(
+			"MATCH (a:`A`:`B`:`C`) RETURN a");
 	}
 
 	@Test
 	void labelColonDisjunction() {
-		assertThat(CypherParser.parse("MATCH (wallstreet {title: 'Wall Street'})<-[:ACTED_IN|:DIRECTED]-(person) RETURN person.name").getCypher())
-			.isEqualTo("MATCH (wallstreet {title: 'Wall Street'})<-[:`ACTED_IN`|`DIRECTED`]-(person) RETURN person.name");
+		assertThat(CypherParser.parse(
+			"MATCH (wallstreet {title: 'Wall Street'})<-[:ACTED_IN|:DIRECTED]-(person) RETURN person.name").getCypher())
+			.isEqualTo(
+				"MATCH (wallstreet {title: 'Wall Street'})<-[:`ACTED_IN`|`DIRECTED`]-(person) RETURN person.name");
 	}
 
 	@Test
@@ -484,7 +539,8 @@ class CypherParserTest {
 			""";
 		Statement parsed = CypherParser.parseStatement(statement);
 		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
-		assertThat(cypher).isEqualTo("MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
+		assertThat(cypher).isEqualTo(
+			"MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
 	}
 
 	@Test
@@ -513,7 +569,9 @@ class CypherParserTest {
 			""";
 
 		var parsed = CypherParser.parse(in, Options.newOptions().createSortedMaps(true).build());
-		var cypher = Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withIndentStyle(Configuration.IndentStyle.TAB).build()).render(parsed);
+		var cypher = Renderer.getRenderer(
+				Configuration.newConfig().withPrettyPrint(true).withIndentStyle(Configuration.IndentStyle.TAB).build())
+			.render(parsed);
 		assertThat(cypher)
 			.isEqualTo("""
 				MATCH (this:Movie)
@@ -543,18 +601,20 @@ class CypherParserTest {
 		var oidValue = "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --";
 		String userProvidedCypher =
 			"MATCH (p:`confignode` {oid: $oid}) " +
-			"CALL apoc.path.subgraphAll(p, {relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY', minLevel: 1, maxLevel: 3}) " +
+			"CALL apoc.path.subgraphAll(p, {relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY', minLevel: 1, maxLevel: 3}) "
+			+
 			"YIELD nodes, relationships " +
 			"FOREACH(node in nodes |detach delete node)" +
 			"RETURN nodes";
 
-		var options = Options.newOptions().withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Parameter.class, newExpression -> {
-			var p = (Parameter<?>) newExpression;
-			if ("oid".equals(p.getName())) {
-				return Cypher.parameter(p.getName(), oidValue);
-			}
-			return p;
-		}).build();
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_NEW_PARAMETER, Parameter.class, newExpression -> {
+				var p = (Parameter<?>) newExpression;
+				if ("oid".equals(p.getName())) {
+					return Cypher.parameter(p.getName(), oidValue);
+				}
+				return p;
+			}).build();
 
 		var userStatement = CypherParser.parse(userProvidedCypher, options);
 
@@ -570,7 +630,8 @@ class CypherParserTest {
 				}) YIELD nodes, relationships FOREACH (node IN nodes | DETACH DELETE node)
 				RETURN nodes""");
 
-		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid", "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
+		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid",
+			"look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
 	}
 
 	@Test // GH-729
@@ -579,14 +640,16 @@ class CypherParserTest {
 		var oidValue = "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --";
 		String userProvidedCypher =
 			"MATCH (p:`confignode` {oid: $oid}) " +
-			"CALL apoc.path.subgraphAll(p, {relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY', minLevel: 1, maxLevel: 3}) " +
+			"CALL apoc.path.subgraphAll(p, {relationshipFilter: 'BELONGS_TO_ARRAY|IN|IN_ARRAY', minLevel: 1, maxLevel: 3}) "
+			+
 			"YIELD nodes, relationships " +
 			"FOREACH(node in nodes |detach delete node)" +
 			"RETURN nodes";
 
 		var options = Options.newOptions().withParameterValues(Map.of("oid", oidValue)).build();
 		var userStatement = CypherParser.parse(userProvidedCypher, options);
-		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid", "look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
+		assertThat(userStatement.getCatalog().getParameters()).containsEntry("oid",
+			"look ma, no Cypher injection'}) MATCH (n) DETACH DELETE n --");
 	}
 
 	@Test // GH-739
@@ -600,7 +663,8 @@ class CypherParserTest {
 			})
 			.build();
 
-		CypherParser.parse("RETURN NULL, 1.0 as d, 100 as l, 0x13af as h, 0o1372 as o, 'Hallo' as s, true, false, Inf, NaN", options);
+		CypherParser.parse(
+			"RETURN NULL, 1.0 as d, 100 as l, 0x13af as h, 0o1372 as o, 'Hallo' as s, true, false, Inf, NaN", options);
 
 		assertThat(literals.stream().map(Literal::getClass).distinct()).hasSize(6);
 		assertThat(literals)
@@ -655,9 +719,11 @@ class CypherParserTest {
 					return e;
 				}).build();
 
-			var statement = CypherParser.parseStatement("call { call dbms.showCurrentUser() yield username return username} return username", options);
+			var statement = CypherParser.parseStatement(
+				"call { call dbms.showCurrentUser() yield username return username} return username", options);
 			assertThat(procedures.get()).isEqualTo(2);
-			assertThat(statement.getCypher()).isEqualTo("CALL {CALL dbms.showCurrentUser() YIELD username RETURN username} RETURN username");
+			assertThat(statement.getCypher()).isEqualTo(
+				"CALL {CALL dbms.showCurrentUser() YIELD username RETURN username} RETURN username");
 		}
 
 		@Test
@@ -668,25 +734,30 @@ class CypherParserTest {
 				}).build();
 
 			assertThatRuntimeException()
-				.isThrownBy(() -> CypherParser.parseStatement("call { call dbms.showCurrentUser() yield username return username} return username", options))
+				.isThrownBy(() -> CypherParser.parseStatement(
+					"call { call dbms.showCurrentUser() yield username return username} return username", options))
 				.withRootCauseInstanceOf(RuntimeException.class)
 				.withStackTraceContaining("Procedure calls are not allowed!");
 
 			assertThatNoException()
-				.isThrownBy(() -> CypherParser.parseStatement("call {match (n:Movie) return n.title as title} return title", options));
+				.isThrownBy(
+					() -> CypherParser.parseStatement("call {match (n:Movie) return n.title as title} return title",
+						options));
 		}
 
 		@Test
 		void preventingFunctionCalls() {
 			var options = Options.newOptions()
-				.withCallback(InvocationCreatedEventType.ON_INVOCATION, FunctionInvocation.class, functionInvocation -> {
-					if("id".equals(functionInvocation.getFunctionName())) {
-						throw new RuntimeException("id must not be used anymore");
-					}
-					return functionInvocation;
-				}).build();
+				.withCallback(InvocationCreatedEventType.ON_INVOCATION, FunctionInvocation.class,
+					functionInvocation -> {
+						if ("id".equals(functionInvocation.getFunctionName())) {
+							throw new RuntimeException("id must not be used anymore");
+						}
+						return functionInvocation;
+					}).build();
 
-			for(String invalidQuery : List.of("MATCH (n) RETURN id(n)", "MATCH (n) WHERE id(n) = $id RETURN n, {__id: id(n), __labels: labels(n)} AS __node__")) {
+			for (String invalidQuery : List.of("MATCH (n) RETURN id(n)",
+				"MATCH (n) WHERE id(n) = $id RETURN n, {__id: id(n), __labels: labels(n)} AS __node__")) {
 				CypherParser.parseExpression(invalidQuery, options);
 				assertThatRuntimeException()
 					.isThrownBy(() -> CypherParser.parseStatement(invalidQuery, options))
@@ -788,9 +859,9 @@ class CypherParserTest {
 	@Test // GH-1059
 	void patternListAsLTRMustBeUnwrappedIntoRelPattern() {
 		var cypher = """
-			MATCH (movie:Movie)
-			RETURN size((movie)<-[:REVIEWED]-(:Person)) AS movieReviewedByEveryTotal
-		""";
+				MATCH (movie:Movie)
+				RETURN size((movie)<-[:REVIEWED]-(:Person)) AS movieReviewedByEveryTotal
+			""";
 
 		var cfg = Configuration.newConfig()
 			.withGeneratedNames(true)
@@ -828,7 +899,7 @@ class CypherParserTest {
 	void optionalCall() {
 
 		assertThatIllegalArgumentException().isThrownBy(() ->
-			CypherParser.parse("OPTIONAL call db.awaitIndexes()"))
+				CypherParser.parse("OPTIONAL call db.awaitIndexes()"))
 			.withMessage("Cannot render optional call clause");
 	}
 

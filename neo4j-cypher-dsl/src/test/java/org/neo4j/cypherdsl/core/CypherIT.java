@@ -37,6 +37,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
@@ -60,6 +61,107 @@ class CypherIT {
 		String cypher = statement.getCypher();
 		assertThat(cypher).isEqualTo("RETURN true AS t");
 		assertThat(statement.getCypher()).isSameAs(cypher);
+	}
+
+	@Nested
+	class PathMatchingAndAssignment {
+
+		private final Renderer renderer = Renderer.getRenderer(
+			Configuration.newConfig().alwaysEscapeNames(false).build());
+		private final PatternElement stationsPattern = Cypher.node("Station").named("wos")
+			.relationshipBetween(Cypher.node("Station").named("bmv"), "LINK")
+			.quantifyRelationship(QuantifiedPathPattern.plus());
+		private final AliasedExpression stops = Cypher.listWith(Cypher.name("n"))
+			.in(Cypher.nodes(Cypher.path("p").get()))
+			.returning(Cypher.property("n", "name")).as("stops");
+
+		@Test
+		void plain() {
+			var pattern = Cypher.node("Station").relationshipTo(Cypher.node("Station").named("b"), "LINK").named("l");
+			var statement = Cypher.match(Cypher.path("p").definedBy(pattern))
+				.returning(Cypher.name("p")).build();
+			assertThat(statement.getCypher()).isEqualTo("MATCH p = (:`Station`)-[l:`LINK`]->(b:`Station`) RETURN p");
+		}
+
+		@SuppressWarnings("deprecation")
+		@Test
+		void deprecatedShortest() {
+			var pattern = Cypher.node("Station").relationshipTo(Cypher.node("Station").named("b"), "LINK").named("l");
+			var statement = Cypher.match(Cypher.shortestPath("p").definedBy(pattern))
+				.returning(Cypher.name("p")).build();
+			assertThat(statement.getCypher()).isEqualTo(
+				"MATCH p = shortestPath((:`Station`)-[l:`LINK`]->(b:`Station`)) RETURN p");
+		}
+
+		@ParameterizedTest
+		@ValueSource(ints = { -1, 0, 1, 5 })
+		void shortestK(int k) {
+
+			if (k <= 0) {
+				assertThatIllegalArgumentException().isThrownBy(() -> Cypher.shortestK(k))
+					.withMessage("The path count needs to be greater than 0.");
+			} else {
+				var statement = Cypher.match(Cypher.shortestK(k).named("p").definedBy(stationsPattern))
+					.where(Cypher.property("wos", "name").isEqualTo(Cypher.literalOf("Worcester Shrub Hill")))
+					.and(Cypher.property("bmv", "name").isEqualTo(Cypher.literalOf("Bromsgrove")))
+					.returning(Cypher.length(Cypher.path("p").get()).as("result")).build();
+				assertThat(renderer.render(statement))
+					.isEqualTo(
+						"MATCH p = SHORTEST %d (wos:Station)-[:LINK]-+(bmv:Station) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN length(p) AS result",
+						k);
+			}
+		}
+
+		@ParameterizedTest
+		@ValueSource(ints = { -1, 0, 1, 2 })
+		void shortestKGroups(int k) {
+
+			if (k <= 0) {
+				assertThatIllegalArgumentException().isThrownBy(() -> Cypher.shortestK(k))
+					.withMessage("The path count needs to be greater than 0.");
+			} else {
+				var statement = Cypher.match(Cypher.shortestKGroups(k).named("p").definedBy(stationsPattern))
+					.where(Cypher.property("wos", "name").isEqualTo(Cypher.literalOf("Worcester Shrub Hill")))
+					.and(Cypher.property("bmv", "name").isEqualTo(Cypher.literalOf("Bromsgrove")))
+					.returning(stops, Cypher.length(Cypher.path("p").get()).as("pathLength")).build();
+				assertThat(renderer.render(statement))
+					.isEqualTo(
+						"MATCH p = SHORTEST %d GROUPS (wos:Station)-[:LINK]-+(bmv:Station) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN [n IN nodes(p) | n.name] AS stops, length(p) AS pathLength",
+						k);
+			}
+		}
+
+		@Test
+		void allShortest() {
+			var statement = Cypher.match(Cypher.allShortest().named("p").definedBy(stationsPattern))
+				.where(Cypher.property("wos", "name").isEqualTo(Cypher.literalOf("Worcester Shrub Hill")))
+				.and(Cypher.property("bmv", "name").isEqualTo(Cypher.literalOf("Bromsgrove")))
+				.returning(stops).build();
+			assertThat(renderer.render(statement))
+				.isEqualTo(
+					"MATCH p = ALL SHORTEST (wos:Station)-[:LINK]-+(bmv:Station) WHERE (wos.name = 'Worcester Shrub Hill' AND bmv.name = 'Bromsgrove') RETURN [n IN nodes(p) | n.name] AS stops");
+		}
+
+		@Test
+		void anyShortest() {
+			var pattern = Cypher.node("Station").withProperties("name", Cypher.literalOf("Pershore"))
+				.relationshipBetween(
+					Cypher.node("Station").named("b").withProperties("name", Cypher.literalOf("Bromsgrove")), "LINK")
+				.named("l")
+				.quantifyRelationship(QuantifiedPathPattern.plus())
+				.where(Cypher.property("l", "distance").lt(Cypher.literalOf(10)));
+
+			var distances = Cypher.listWith(Cypher.name("r"))
+				.in(Cypher.relationships(Cypher.path("path").get()))
+				.returning(Cypher.property("r", "distance")).as("distances");
+
+			var statement = Cypher.match(Cypher.anyShortest().named("path").definedBy(pattern))
+				.returning(distances).build();
+
+			assertThat(renderer.render(statement))
+				.isEqualTo(
+					"MATCH path = ANY (:Station {name: 'Pershore'})-[l:LINK WHERE l.distance < 10]-+(b:Station {name: 'Bromsgrove'}) RETURN [r IN relationships(path) | r.distance] AS distances");
+		}
 	}
 
 	@Test
@@ -4467,6 +4569,15 @@ class CypherIT {
 
 	@Nested
 	class NamedPaths {
+
+		@Test
+		void selectorShouldBeSensible() {
+			var patternElement = Cypher.node("M").relationshipFrom(Cypher.node("N")).named("r");
+			var namedPath = NamedPath.select(PatternSelector.any(), patternElement);
+			assertThat(RendererBridge.render(namedPath)).matches(
+				"NamedPath\\{cypher=.+ = ANY \\(:M\\)<-\\[r]-\\(:N\\)}"
+			);
+		}
 
 		@Test
 		void doc3148() {

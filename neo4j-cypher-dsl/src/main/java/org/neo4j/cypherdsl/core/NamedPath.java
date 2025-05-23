@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import java.util.Optional;
@@ -51,6 +52,11 @@ public final class NamedPath implements PatternElement, Named {
 	private final SymbolicName name;
 
 	/**
+	 * An optional {@code SHORTEST} keyword element.
+	 */
+	private final PatternSelector optionalPatternSelector;
+
+	/**
 	 * The pattern defining this path.
 	 */
 	private final Visitable optionalPattern;
@@ -77,20 +83,51 @@ public final class NamedPath implements PatternElement, Named {
 		return new ShortestPathBuilder(name, algorithm);
 	}
 
+	static OngoingShortestDefinition shortest(int k) {
+		return new ShortestBuilder(PatternSelector.shortestK(k));
+	}
+
+	static OngoingShortestDefinition allShortest() {
+		return new ShortestBuilder(PatternSelector.allShortest());
+	}
+
+	static OngoingShortestDefinition shortestKGroups(int k) {
+		return new ShortestBuilder(PatternSelector.shortestKGroups(k));
+	}
+
+	static OngoingShortestDefinition any() {
+		return new ShortestBuilder(PatternSelector.any());
+	}
+
+	@API(status = INTERNAL, since = "2024.7.0")
+	public static NamedPath select(PatternSelector patternSelector, PatternElement patternElement) {
+		if (patternElement instanceof NamedPath namedPath
+			&& namedPath.optionalPattern instanceof PatternElement target) {
+			return new NamedPath(namedPath.name, patternSelector, target);
+		}
+		return new NamedPath(SymbolicName.unresolved(), patternSelector, patternElement);
+	}
+
 	/**
-	 * Partial path that has a name ({@code p = }).
+	 * Partial path that has a name, introduced as a superinterface for {@link OngoingDefinitionWithName} to avoid
+	 * dragging {@link OngoingDefinitionWithName#get()}.
 	 */
-	public interface OngoingDefinitionWithName {
+	public interface OngoingNamedDefinition {
 
 		/**
-		 * Create a new named path based on a {@link PatternElement} single node.
-		 * If a {@link NamedPath} will be provided, it will get used directly.
+		 * Create a new named path based on a {@link PatternElement}.
 		 *
-		 * @param patternElement The PatternElement to be used in named path.
+		 * @param pattern The pattern to be matched for the named path.
 		 * @return A named path.
 		 */
 		@NotNull @Contract(pure = true)
-		NamedPath definedBy(PatternElement patternElement);
+		NamedPath definedBy(PatternElement pattern);
+	}
+
+	/**
+	 * Partial path that has a name ({@code p = }).
+	 */
+	public interface OngoingDefinitionWithName extends OngoingNamedDefinition {
 
 		/**
 		 * Create a new named path that references a given, symbolic name. No checks are done if the referenced name
@@ -117,6 +154,18 @@ public final class NamedPath implements PatternElement, Named {
 		NamedPath definedBy(Relationship relationship);
 	}
 
+	/**
+	 * Partial path with the number of paths to match.
+	 */
+	public interface OngoingShortestDefinition {
+
+		default OngoingNamedDefinition named(String name) {
+			return named(Cypher.name(name));
+		}
+
+		OngoingNamedDefinition named(SymbolicName name);
+	}
+
 	private record Builder(SymbolicName name) implements OngoingDefinitionWithName {
 
 		@NotNull
@@ -125,7 +174,7 @@ public final class NamedPath implements PatternElement, Named {
 			if (pattern instanceof NamedPath namedPath) {
 				return namedPath;
 			}
-			return new NamedPath(name, pattern);
+			return new NamedPath(name, null, pattern);
 		}
 
 		@NotNull
@@ -144,18 +193,45 @@ public final class NamedPath implements PatternElement, Named {
 		}
 	}
 
+	private static class ShortestBuilder implements OngoingShortestDefinition, OngoingNamedDefinition {
+
+		private final PatternSelector shortest;
+
+		private SymbolicName name;
+
+		private ShortestBuilder(PatternSelector shortest) {
+			this.shortest = shortest;
+		}
+
+		@Override
+		public OngoingNamedDefinition named(SymbolicName newName) {
+			this.name = newName;
+			return this;
+		}
+
+		@Override
+		@NotNull
+		public  NamedPath definedBy(PatternElement pattern) {
+			return new NamedPath(name, shortest, pattern);
+		}
+
+	}
+
 	private NamedPath(SymbolicName name) {
 		this.name = name;
+		this.optionalPatternSelector = null;
 		this.optionalPattern = null;
 	}
 
-	private NamedPath(SymbolicName name, PatternElement optionalPattern) {
+	private NamedPath(SymbolicName name, PatternSelector optionalPatternSelector, PatternElement optionalPattern) {
 		this.name = name;
+		this.optionalPatternSelector = optionalPatternSelector;
 		this.optionalPattern = optionalPattern;
 	}
 
 	private NamedPath(SymbolicName name, FunctionInvocation algorithm) {
 		this.name = name;
+		this.optionalPatternSelector = null;
 		this.optionalPattern = algorithm;
 	}
 
@@ -172,6 +248,7 @@ public final class NamedPath implements PatternElement, Named {
 		this.name.accept(visitor);
 		if (optionalPattern != null) {
 			Operator.ASSIGMENT.accept(visitor);
+			Visitable.visitIfNotNull(optionalPatternSelector, visitor);
 			this.optionalPattern.accept(visitor);
 		}
 		visitor.leave(this);
