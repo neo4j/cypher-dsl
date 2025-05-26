@@ -1,0 +1,17 @@
+== 2024.7
+
+=== 2024.7.0
+
+This is a feature release that is fully compatible with the previous 2024.6 and earlier series.
+
+==== 🚀 Features
+
+* Add support for `SHORTEST k`, `SHORTEST k GROUPS`, `ALL SHORTEST` and `ANY` path selectors. (#1247)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump mockito.version from 5.17.0 to 5.18.0 (#1249)
+** Bump com.puppycrawl.tools:checkstyle (#1248)
+** Bump org.springframework.data:spring-data-neo4j from 7.4.5 to 7.5.0 (#1245)
+** Bump io.projectreactor:reactor-bom (#1246)
