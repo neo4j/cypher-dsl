@@ -26,7 +26,7 @@ ifeval::[{use-latest-version-for-docs} == 0]
 :the-version: {neo4j-cypher-dsl-version}
 endif::[]
 
-:copyright: 2020 Neo4j, Inc.,
+:copyright: 2020-2025 Neo4j, Inc.,
 :gh-base: https://github.com/neo4j/sdn-rx
 :java-driver-starter-href: https://github.com/neo4j/neo4j-java-driver-spring-boot-starter
 :springVersion: 5.2.0.RELEASE
