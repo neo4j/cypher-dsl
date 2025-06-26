@@ -1,5 +1,33 @@
 == 2024.7
 
+=== 2024.7.1
+
+==== 📖 Documentation
+
+* Fix copyright date.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump testcontainers.version from 1.21.1 to 1.21.2 (#1263)
+** Bump com.opencsv:opencsv from 5.11.1 to 5.11.2 (#1266)
+** Bump org.asciidoctor:asciidoctorj-diagram (#1265)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1264)
+** Bump com.puppycrawl.tools:checkstyle (#1262)
+** Bump io.projectreactor:reactor-bom (#1261)
+** Bump org.springframework.data:spring-data-neo4j (#1260)
+** Bump com.fasterxml.jackson:jackson-bom (#1259)
+** Bump org.codehaus.mojo:flatten-maven-plugin (#1267)
+** Bump neo4j.version from 5.26.7 to 5.26.8 (#1258)
+** Bump org.checkerframework:checker-qual (#1257)
+** Bump org.junit:junit-bom from 5.13.0 to 5.13.1 (#1256)
+** Bump com.opencsv:opencsv from 5.11 to 5.11.1 (#1254)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1255)
+** Bump neo4j.version from 5.26.6 to 5.26.7 (#1253)
+** Bump org.junit:junit-bom from 5.12.2 to 5.13.0 (#1252)
+** Bump com.puppycrawl.tools:checkstyle (#1251)
+** Bump testcontainers.version from 1.21.0 to 1.21.1 (#1250)
+
 === 2024.7.0
 
 This is a feature release that is fully compatible with the previous 2024.6 and earlier series.
