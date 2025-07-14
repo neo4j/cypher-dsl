@@ -69,7 +69,7 @@ jobs:
       - uses: graalvm/setup-graalvm@v1
         with:
           distribution: 'graalvm-community'
-          java-version: '21'
+          java-version: '24'
           github-token: ${{ secrets.GITHUB_TOKEN }}
       - name: Determine revision
         run: echo "REVISION=${{ needs.build.outputs.revision }}" >> $GITHUB_ENV
