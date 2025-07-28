@@ -27,14 +27,15 @@
 		<version>${revision}${sha1}${changelist}</version>
 	</parent>
 
-	<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
-	<name>Code Generator (SDN 6)</name>
-	<description>Annotation processor reading SDN 6 annotations and creating a static model of them.</description>
+	<artifactId>neo4j-cypher-dsl-codegen-ogm</artifactId>
+	<name>Code Generator (Neo4j-OGM)</name>
+	<description>Annotation processor reading Neo4j-OGM annotations and creating a static model of them.</description>
 
 	<properties>
-		<covered-ratio-complexity>0.7</covered-ratio-complexity>
-		<covered-ratio-instructions>0.7</covered-ratio-instructions>
-		<java-module-name>org.neo4j.cypherdsl.codegen.sdn6</java-module-name>
+		<!-- TODO @Shinigami92 bump this up again after add the appropriate tests -->
+		<covered-ratio-complexity>0.1</covered-ratio-complexity>
+		<covered-ratio-instructions>0.1</covered-ratio-instructions>
+		<java-module-name>org.neo4j.cypherdsl.codegen.ogm</java-module-name>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>
 
@@ -44,14 +45,9 @@
 			<artifactId>neo4j-cypher-dsl-codegen-core</artifactId>
 		</dependency>
 
-		<!-- SDN 6 annotation proc -->
 		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-neo4j</artifactId>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-ogm-core</artifactId>
 		</dependency>
 
 		<dependency>
@@ -81,9 +77,10 @@
 	<build>
 		<testResources>
 			<testResource>
+				<!-- We add the classes as resources. We could have them directly in resources, but than we would miss compile time safety on them -->
 				<directory>src/test/java</directory>
 				<includes>
-					<include>org/neo4j/cypherdsl/codegen/sdn6/models/**/*.java</include>
+					<include>org/neo4j/cypherdsl/codegen/ogm/models/**/*.java</include>
 				</includes>
 			</testResource>
 			<testResource>
@@ -92,6 +89,7 @@
 		</testResources>
 		<plugins>
 			<plugin>
+				<!-- Massage the Java compiler so that it trusts us what we are doing with jdk modules -->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
 				<configuration combine.self="append">

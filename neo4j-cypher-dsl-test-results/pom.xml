@@ -59,11 +59,22 @@
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-dsl-codegen-ogm</artifactId>
+			<exclusions>
+				<exclusion>
+					<!-- See below -->
+					<groupId>com.querydsl</groupId>
+					<artifactId>querydsl-apt</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
 			<exclusions>
 				<exclusion>
-					<groupId>com.querydsl</groupId>
 					<!-- Depends on com.google.code.findbugs:annotations and so does the neo4j-cypher-javacc-parser, which is actually used in contrast to the Spring QueryDSL integration. -->
+					<groupId>com.querydsl</groupId>
 					<artifactId>querydsl-apt</artifactId>
 				</exclusion>
 			</exclusions>

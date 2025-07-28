@@ -16,14 +16,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.codegen.sdn6;
-
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+package org.neo4j.cypherdsl.codegen.ogm;
 
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -34,7 +31,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,14 +45,12 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor8;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.tools.Diagnostic;
 
-import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.codegen.core.AbstractMappingAnnotationProcessor;
 import org.neo4j.cypherdsl.codegen.core.Configuration;
 import org.neo4j.cypherdsl.codegen.core.ModelBuilder;
@@ -64,25 +58,17 @@ import org.neo4j.cypherdsl.codegen.core.NodeModelBuilder;
 import org.neo4j.cypherdsl.codegen.core.PropertyDefinition;
 import org.neo4j.cypherdsl.codegen.core.RelationshipModelBuilder;
 import org.neo4j.cypherdsl.codegen.core.RelationshipPropertyDefinition;
-import org.springframework.data.neo4j.core.convert.Neo4jConversions;
-import org.springframework.data.neo4j.core.convert.Neo4jPersistentPropertyConverter;
-import org.springframework.data.neo4j.core.convert.Neo4jSimpleTypes;
-import org.springframework.data.neo4j.core.schema.Node;
-import org.springframework.data.neo4j.core.schema.Property;
-import org.springframework.data.neo4j.core.schema.Relationship;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Property;
+import org.neo4j.ogm.annotation.Relationship;
 
 /**
- * Annotation processor supporting the annotations provided by
- * <a href="https://github.com/spring-projects/spring-data-neo4j">Spring Data Neo4j 6+</a>.
- *
- * @author Michael J. Simons
- * @soundtrack Bear McCreary - Battlestar Galactica Season 2
- * @since 2021.1.0
+ * @author Shinigami
+ * @since TODO
  */
-@API(status = EXPERIMENTAL, since = "2021.1.0")
 @SupportedAnnotationTypes({
-	SDN6AnnotationProcessor.NODE_ANNOTATION,
-	SDN6AnnotationProcessor.RELATIONSHIP_PROPERTIES_ANNOTATION
+	OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
+	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION
 })
 @SupportedOptions({
 	Configuration.PROPERTY_PREFIX,
@@ -90,105 +76,52 @@ import org.springframework.data.neo4j.core.schema.Relationship;
 	Configuration.PROPERTY_INDENT_STYLE,
 	Configuration.PROPERTY_INDENT_SIZE,
 	Configuration.PROPERTY_TIMESTAMP,
-	Configuration.PROPERTY_ADD_AT_GENERATED,
-	SDN6AnnotationProcessor.PROPERTY_CUSTOM_CONVERTER_CLASSES
+	Configuration.PROPERTY_ADD_AT_GENERATED
 })
-public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProcessor {
+public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProcessor {
 
-	static final String NODE_ANNOTATION = "org.springframework.data.neo4j.core.schema.Node";
-	static final String RELATIONSHIP_PROPERTIES_ANNOTATION = "org.springframework.data.neo4j.core.schema.RelationshipProperties";
-	static final String PROPERTY_CUSTOM_CONVERTER_CLASSES = "org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes";
+	static final String NODE_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.NodeEntity";
+	static final String RELATIONSHIP_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.RelationshipEntity";
 	static final Set<String> VALID_GENERATED_ID_TYPES = Set.of(Long.class.getName(), long.class.getName());
 
-	// Resources
-	// * http://hannesdorfmann.com/annotation-processing/annotationprocessing101/
-	// * https://speakerdeck.com/gunnarmorling/das-annotation-processing-api-use-cases-und-best-practices
-
-	static {
-		disableSpringConverterDebugLog();
-	}
-
-	private TypeElement nodeAnnotationType;
+	private TypeElement nodeEntityAnnotationType;
+	private TypeElement relationshipEntityAnnotationType;
 	private TypeElement relationshipAnnotationType;
-	private TypeElement compositePropertyAnnotationType;
-	private TypeElement convertWithAnnotationType;
 	private TypeElement targetNodeAnnotationType;
-	private TypeElement relationshipPropertiesAnnotationType;
-	private TypeElement sdnIdAnnotationType;
-	private TypeElement sdcIdAnnotationType;
+	private TypeElement ogmIdAnnotationType;
 	private TypeElement generatedValueAnnotationType;
-	private Neo4jConversions conversions;
 
-	@SuppressWarnings("PMD") private static void disableSpringConverterDebugLog() {
-		try {
-			Class<?> logback = Class.forName("ch.qos.logback.classic.Logger");
-			// Don't replace the qualified names, Checkstyle will yell at you.
-			logback.getMethod("setLevel")
-				.invoke(org.slf4j.LoggerFactory.getLogger("org.springframework.data.convert.CustomConversions"),
-					org.slf4j.event.Level.DEBUG);
-		} catch (Exception e) {
-			// There's nothing we can do or should do in case there is no logback.
-		}
+	@Override
+	public void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
+
+		Elements elementUtils = processingEnv.getElementUtils();
+		this.nodeEntityAnnotationType = elementUtils.getTypeElement(NODE_ENTITY_ANNOTATION);
+		this.relationshipEntityAnnotationType = elementUtils.getTypeElement(RELATIONSHIP_ENTITY_ANNOTATION);
+
+		this.relationshipAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Relationship");
+		this.targetNodeAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.StartNode");
+
+		this.ogmIdAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Id");
+		this.generatedValueAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.GeneratedValue");
 	}
 
 	@Override
-	protected void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
-		this.conversions = createConversions(processingEnv);
-
-		Elements elementUtils = processingEnv.getElementUtils();
-		this.nodeAnnotationType = elementUtils.getTypeElement(NODE_ANNOTATION);
-		this.relationshipPropertiesAnnotationType = elementUtils.getTypeElement(RELATIONSHIP_PROPERTIES_ANNOTATION);
-
-		this.relationshipAnnotationType = elementUtils.getTypeElement(
-			"org.springframework.data.neo4j.core.schema.Relationship");
-		this.compositePropertyAnnotationType = elementUtils.getTypeElement(
-			"org.springframework.data.neo4j.core.schema.CompositeProperty");
-		this.convertWithAnnotationType = elementUtils.getTypeElement(
-			"org.springframework.data.neo4j.core.convert.ConvertWith");
-		this.targetNodeAnnotationType = elementUtils.getTypeElement(
-			"org.springframework.data.neo4j.core.schema.TargetNode");
-
-		this.sdnIdAnnotationType = elementUtils.getTypeElement("org.springframework.data.neo4j.core.schema.Id");
-		this.sdcIdAnnotationType = elementUtils.getTypeElement("org.springframework.data.annotation.Id");
-		this.generatedValueAnnotationType = elementUtils.getTypeElement(
-			"org.springframework.data.neo4j.core.schema.GeneratedValue");
-	}
-
-	/**
-	 * Create an instance of {@link Neo4jConversions} and registers optional additional converters with it.
-	 * The converters must have a default-non-args constructor.
-	 *
-	 * @param processingEnv The processing environment
-	 * @return a conversions instance
-	 */
-	private Neo4jConversions createConversions(ProcessingEnvironment processingEnv) {
-
-		Map<String, String> options = processingEnv.getOptions();
-		if (!options.containsKey(PROPERTY_CUSTOM_CONVERTER_CLASSES)) {
-			return new Neo4jConversions();
-		}
-		String classNames = options.get(PROPERTY_CUSTOM_CONVERTER_CLASSES);
-		List<Object> converters = new ArrayList<>();
-		Arrays.stream(classNames.split(",")).map(String::trim).filter(cn -> !cn.isEmpty()).forEach(cn -> {
-			try {
-				Class<?> clazz = Class.forName(cn);
-				if (Neo4jPersistentPropertyConverter.class.isAssignableFrom(clazz)) {
-					messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING,
-						"Cannot use dedicated Neo4j persistent property converter of type `" + cn
-						+ "` as Spring converter, it will be ignored.");
-					return;
-				}
-				converters.add(clazz.getDeclaredConstructor().newInstance());
-			} catch (Exception e) {
-				String message = e.getMessage();
-				if (e instanceof ClassNotFoundException) {
-					message = "Class `" + cn + "` not found";
-				}
-				messager.printMessage(Diagnostic.Kind.MANDATORY_WARNING,
-					"Cannot load converter of type `" + cn + "`, it will be ignored: " + message + ".");
+	protected Collection<String> getLabel(TypeElement annotatedClass) {
+		NodeEntity nodeAnnotation = annotatedClass.getAnnotation(NodeEntity.class);
+		Set<String> labels = new LinkedHashSet<>();
+		Consumer<String> addLabel = label -> {
+			if (!label.isEmpty()) {
+				labels.add(label);
 			}
-		});
-		return new Neo4jConversions(converters);
+		};
+		addLabel.accept(nodeAnnotation.label());
+		// TODO Just so that you know @Shinigami92, you always have to look at both the original and the aliases
+		addLabel.accept(nodeAnnotation.value());
+
+		if (labels.isEmpty()) {
+			addLabel.accept(annotatedClass.getSimpleName().toString());
+		}
+		return Collections.unmodifiableCollection(labels);
 	}
 
 	@Override
@@ -198,7 +131,7 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 		}
 
 		Map<TypeElement, NodeModelBuilder> nodeBuilders = populateListOfNodes(
-			getTypesAnnotatedWith(nodeAnnotationType, roundEnv));
+			getTypesAnnotatedWith(nodeEntityAnnotationType, roundEnv));
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties = collectRelationshipProperties(
 			roundEnv);
 		Map<NodeModelBuilder, List<VariableElement>> relationshipFields = populateNodePropertiesAndCollectRelationshipFields(
@@ -217,38 +150,18 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 		return true;
 	}
 
-	@Override
-	protected Collection<String> getLabel(TypeElement annotatedClass) {
-
-		Node nodeAnnotation = annotatedClass.getAnnotation(Node.class);
-		Set<String> labels = new LinkedHashSet<>();
-		Consumer<String> addLabel = label -> {
-			if (!label.isEmpty()) {
-				labels.add(label);
-			}
-		};
-
-		addLabel.accept(nodeAnnotation.primaryLabel());
-		Arrays.stream(nodeAnnotation.value()).forEach(addLabel);
-		Arrays.stream(nodeAnnotation.labels()).forEach(addLabel);
-
-		if (labels.isEmpty()) {
-			addLabel.accept(annotatedClass.getSimpleName().toString());
-		}
-		return Collections.unmodifiableCollection(labels);
-	}
-
 	/**
-	 * Collects classes annotated with {@code @RelationshipProperties}
+	 * Collects classes annotated with {@code @RelationshipEntity}
 	 *
 	 * @param roundEnvironment The current environment
-	 * @return A map from the other end of the relationship (target node) to the properties of the relationship
+	 * @return A map from the other end of the relationship (target node) to the
+	 * properties of the relationship
 	 */
 	private Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> collectRelationshipProperties(
 		RoundEnvironment roundEnvironment) {
 
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> result = new HashMap<>();
-		Set<TypeElement> relationshipProperties = getTypesAnnotatedWith(relationshipPropertiesAnnotationType,
+		Set<TypeElement> relationshipProperties = getTypesAnnotatedWith(relationshipEntityAnnotationType,
 			roundEnvironment);
 		relationshipProperties.forEach(e -> {
 			List<PropertyDefinition> properties = new ArrayList<>();
@@ -283,11 +196,13 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 	}
 
 	/**
-	 * Creates and populates the list of relationships from their definitions. It also registered the freshly generated
+	 * Creates and populates the list of relationships from their definitions. It
+	 * also registered the freshly generated
 	 * relationship builders with the previously created node builders.
 	 *
 	 * @param relationshipDefinitions Definitions by type and owner
-	 * @return Map of builder per type. Can be multiple builders in case of different relationship property classes with different properties.
+	 * @return Map of builder per type. Can be multiple builders in case of
+	 * different relationship property classes with different properties.
 	 */
 	private Map<String, List<RelationshipModelBuilder>> populateListOfRelationships(
 		Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
@@ -380,7 +295,6 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 
 	@Override
 	protected PropertyDefinition asPropertyDefinition(Element e) {
-
 		Optional<Property> optionalPropertyAnnotation = Optional.ofNullable(e.getAnnotation(Property.class));
 
 		PropertyDefinition propertyDefinition;
@@ -395,8 +309,7 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 			if (!nameValue.isEmpty() && !valueValue.isEmpty()) {
 				if (!nameValue.equals(valueValue)) {
 					messager.printMessage(Diagnostic.Kind.ERROR,
-						"Different @AliasFor mirror values for annotation [org.springframework.data.neo4j.core.schema.Property]!",
-						e);
+						"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.Property]!", e);
 				}
 				propertyDefinition = PropertyDefinition.create(nameValue, fieldName);
 			} else if (!nameValue.isEmpty()) {
@@ -417,13 +330,12 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 	protected RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
 		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
-
 		Optional<Relationship> optionalRelationshipAnnotation = Optional.ofNullable(
 			e.getAnnotation(Relationship.class));
 
 		String fieldName = e.getSimpleName().toString();
 
-		// Default SDN 6 is outgoing. SDN 6 does not support undirected.
+		// Default Relationship#direction is outgoing.
 		boolean isIncoming = false;
 
 		String relationshipType;
@@ -438,8 +350,7 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 			if (!typeValue.isEmpty() && !valueValue.isEmpty()) {
 				if (!typeValue.equals(valueValue)) {
 					messager.printMessage(Diagnostic.Kind.ERROR,
-						"Different @AliasFor mirror values for annotation [org.springframework.data.neo4j.core.schema.Relationship]!",
-						e);
+						"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.Relationship]!", e);
 				}
 				relationshipType = typeValue;
 			} else if (!typeValue.isEmpty()) {
@@ -505,7 +416,9 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 	/**
 	 * Pre-groups fields into properties and relationships to avoid running the association check multiple times.
 	 */
-	@SuppressWarnings("squid:S110") // Not something we need or can do anything about.
+	// Silence Sonar complaining about the class hierarchy, which is given through
+	// the ElementKindVisitor8, which we need but cannot change
+	@SuppressWarnings("squid:S110")
 	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<VariableElement>>, Void> implements PropertiesAndRelationshipGrouping {
 
 		private final Map<FieldType, List<VariableElement>> result;
@@ -542,8 +455,7 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 
 		private boolean isInternalId(VariableElement e, Set<Element> declaredAnnotations) {
 
-			boolean idAnnotationPresent =
-				declaredAnnotations.contains(sdcIdAnnotationType) || declaredAnnotations.contains(sdnIdAnnotationType);
+			boolean idAnnotationPresent = declaredAnnotations.contains(ogmIdAnnotationType);
 			if (!idAnnotationPresent) {
 				return false;
 			}
@@ -568,8 +480,7 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 			String name = null;
 			if (generatorClassValue != null && valueValue != null && !generatorClassValue.equals(valueValue)) {
 				messager.printMessage(Diagnostic.Kind.ERROR,
-					"Different @AliasFor mirror values for annotation [org.springframework.data.neo4j.core.schema.GeneratedValue]!",
-					e);
+					"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.GeneratedValue]!", e);
 			} else if (generatorClassValue != null) {
 				name = generatorClassValue.toString();
 			} else if (valueValue != null) {
@@ -577,46 +488,19 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 			}
 
 			// The defaults will not be materialized
-			return
-				(name == null || "org.springframework.data.neo4j.core.schema.GeneratedValue.InternalIdGenerator".equals(
-					name)) && VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
+			return (name == null || "org.neo4j.ogm.id.InternalIdStrategy".equals(name)) && VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
 		}
 
 		/**
-		 * Reassembles org.springframework.data.neo4j.core.mapping.DefaultNeo4jPersistentProperty#isAssociation
-		 *
-		 * @param field A variable element describing a field. No further checks done if this is true or not
+		 * @param field A variable element describing a field. No further checks done if
+		 *              this is true or not
 		 * @return True if this field is an association
 		 */
 		private boolean isAssociation(Set<Element> declaredAnnotations, VariableElement field) {
-
 			TypeMirror typeMirrorOfField = field.asType();
 			boolean explicitRelationship = declaredAnnotations.contains(relationshipAnnotationType);
-			boolean isTargetNodeOrComposite =
-				declaredAnnotations.contains(targetNodeAnnotationType) || declaredAnnotations.contains(
-					compositePropertyAnnotationType);
-
-			BooleanSupplier simpleTypeOrCustomWriteTarget = () -> {
-				try {
-					String className = typeMirrorOfField.accept(new SimpleTypeVisitor8<String, Void>() {
-						@Override public String visitPrimitive(PrimitiveType t, Void unused) {
-							// While I could use the fact that this is a primitive directly, I'd rather stick with the
-							// wrapper class so that in turn this can be passed on to the Spring infrastructure.
-							return typeUtils.boxedClass(t).getQualifiedName().toString();
-						}
-
-						@Override public String visitDeclared(DeclaredType t, Void unused) {
-							return t.asElement().accept(new TypeElementVisitor<>(newTypeElementNameFunction()), null);
-						}
-					}, null);
-					// This is likely to fail for everything but primitives as the associated thing is currently compiled
-					Class<?> fieldType = Class.forName(className);
-					return Neo4jSimpleTypes.HOLDER.isSimpleType(fieldType) || conversions.hasCustomWriteTarget(
-						fieldType);
-				} catch (ClassNotFoundException e) {
-					return false;
-				}
-			};
+			// TODO @Shinigami92 2025-07-26: check if we need to add @StartNode and @EndNode here.
+			boolean isTargetNode = declaredAnnotations.contains(targetNodeAnnotationType);
 
 			if (explicitRelationship) {
 				return true;
@@ -627,7 +511,7 @@ public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProc
 				return false;
 			}
 
-			return !(isTargetNodeOrComposite || declaredAnnotations.contains(convertWithAnnotationType) || simpleTypeOrCustomWriteTarget.getAsBoolean());
+			return !isTargetNode;
 		}
 	}
 }
