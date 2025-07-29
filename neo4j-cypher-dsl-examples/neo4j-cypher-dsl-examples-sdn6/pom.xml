@@ -246,7 +246,7 @@
 	</build>
 	<!-- end::sdn-processor[] -->
 
-	<!-- This not relevant to the example, only for our project structure and build chain. -->
+	<!-- This is not relevant to the example, only for our project structure and build chain. -->
 	<profiles>
 		<profile>
 			<id>revisionMissing</id>

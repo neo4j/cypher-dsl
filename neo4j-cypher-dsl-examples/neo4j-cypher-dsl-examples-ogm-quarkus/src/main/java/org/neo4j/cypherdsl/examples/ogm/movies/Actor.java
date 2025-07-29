@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2024 "Neo4j,"
+ * Copyright (c) 2019-2025 "Neo4j,"
  * Neo4j Sweden AB [https://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -16,45 +16,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.examples.quarkus.movies;
+package org.neo4j.cypherdsl.examples.ogm.movies;
 
+import java.util.List;
+
+import jakarta.json.bind.annotation.JsonbProperty;
+import jakarta.json.bind.annotation.JsonbTransient;
+
+import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
-import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.RelationshipEntity;
+import org.neo4j.ogm.annotation.StartNode;
 
 /**
  * @author Michael J. Simons
  */
-@NodeEntity
-public final class Person {
+@RelationshipEntity("ACTED_IN")
+public final class Actor {
 
-	@Id
-	@GeneratedValue
+	@Id @GeneratedValue
+	@JsonbTransient
 	private Long id;
 
-	private String name;
+	private List<String> roles;
 
-	private Integer born;
+	@StartNode
+	@JsonbTransient
+	private Person person;
+
+	@EndNode private Movie movie;
 
 	/**
-	 * Make OGM happy.
+	 * @return Name of this actor
 	 */
-	Person() {
-	}
-
-	public Long getId() {
-		return id;
-	}
-
+	@JsonbProperty
 	public String getName() {
-		return name;
+		return person.getName();
 	}
 
-	public Integer getBorn() {
-		return born;
-	}
-
-	public void setBorn(Integer born) {
-		this.born = born;
+	/**
+	 * @return Read only view of all the roles this actor played
+	 */
+	public List<String> getRoles() {
+		return List.copyOf(roles);
 	}
 }

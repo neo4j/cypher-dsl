@@ -188,11 +188,13 @@
 		<mockito.version>5.18.0</mockito.version>
 		<moditect-maven-plugin.version>1.3.0.Final</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>5.28.9</neo4j-java-driver.version>
+		<neo4j-ogm-quarkus.version>3.15.0</neo4j-ogm-quarkus.version>
 		<neo4j-ogm.version>4.0.19</neo4j-ogm.version>
 		<neo4j.version>5.26.9</neo4j.version>
 		<opencsv.version>5.11.2</opencsv.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<quarkus.platform.version>3.24.5</quarkus.platform.version>
 		<querydsl.version>5.1.0</querydsl.version>
 		<reactor.version>2024.0.8</reactor.version>
 		<revision>9999</revision>
@@ -254,6 +256,11 @@
 				<groupId>com.tngtech.archunit</groupId>
 				<artifactId>archunit</artifactId>
 				<version>${archunit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-ogm-quarkus</artifactId>
+				<version>${neo4j-ogm-quarkus.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.xml.bind</groupId>
@@ -489,6 +496,7 @@
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>${maven-compiler-plugin.version}</version>
 					<configuration>
+						<parameters>true</parameters>
 						<forceJavacCompilerUse>true</forceJavacCompilerUse>
 						<showWarnings>true</showWarnings>
 						<compilerArgs>
