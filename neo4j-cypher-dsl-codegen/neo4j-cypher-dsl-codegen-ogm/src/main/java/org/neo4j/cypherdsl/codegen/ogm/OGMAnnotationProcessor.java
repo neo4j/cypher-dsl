@@ -49,6 +49,7 @@ import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementKindVisitor8;
 import javax.lang.model.util.Elements;
 import javax.lang.model.util.SimpleTypeVisitor8;
+import javax.lang.model.util.TypeKindVisitor8;
 import javax.tools.Diagnostic;
 
 import org.neo4j.cypherdsl.codegen.core.AbstractMappingAnnotationProcessor;
@@ -83,11 +84,12 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	static final String NODE_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.NodeEntity";
 	static final String RELATIONSHIP_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.RelationshipEntity";
 	static final Set<String> VALID_GENERATED_ID_TYPES = Set.of(Long.class.getName(), long.class.getName());
-
+	private final List<TypeElement> convertAnnotationTypes = new ArrayList<>();
 	private TypeElement nodeEntityAnnotationType;
 	private TypeElement relationshipEntityAnnotationType;
 	private TypeElement relationshipAnnotationType;
-	private TypeElement targetNodeAnnotationType;
+	private TypeElement startNodeAnnotationType;
+	private TypeElement endNodeAnnotationType;
 	private TypeElement ogmIdAnnotationType;
 	private TypeElement generatedValueAnnotationType;
 
@@ -99,7 +101,12 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		this.relationshipEntityAnnotationType = elementUtils.getTypeElement(RELATIONSHIP_ENTITY_ANNOTATION);
 
 		this.relationshipAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Relationship");
-		this.targetNodeAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.StartNode");
+		this.startNodeAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.StartNode");
+		this.endNodeAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.EndNode");
+		for (var name : List.of("Convert", "DateLong", "DateString", "EnumString", "NumberString")) {
+			this.convertAnnotationTypes.add(
+				elementUtils.getTypeElement("org.neo4j.ogm.annotation.typeconversion.%s".formatted(name)));
+		}
 
 		this.ogmIdAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Id");
 		this.generatedValueAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.GeneratedValue");
@@ -173,7 +180,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 				Set<Element> declaredAnnotations = enclosedElement.getAnnotationMirrors().stream()
 					.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
-				if (declaredAnnotations.contains(targetNodeAnnotationType)) {
+				if (declaredAnnotations.contains(startNodeAnnotationType)) {
 
 					Element element = typeUtils.asElement(enclosedElement.asType());
 					actualTargetType = element.accept(new TypeElementVisitor<>(Function.identity()), null);
@@ -419,7 +426,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	// Silence Sonar complaining about the class hierarchy, which is given through
 	// the ElementKindVisitor8, which we need but cannot change
 	@SuppressWarnings("squid:S110")
-	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<VariableElement>>, Void> implements PropertiesAndRelationshipGrouping {
+	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<VariableElement>>, Void>
+		implements PropertiesAndRelationshipGrouping {
 
 		private final Map<FieldType, List<VariableElement>> result;
 
@@ -470,25 +478,18 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			Map<String, ? extends AnnotationValue> values = generatedValue.getElementValues().entrySet().stream()
 				.collect(Collectors.toMap(entry -> entry.getKey().getSimpleName().toString(), Map.Entry::getValue));
 
-			DeclaredType generatorClassValue = values.containsKey("generatorClass") ?
-				(DeclaredType) values.get("generatorClass").getValue() :
-				null;
-			DeclaredType valueValue = values.containsKey("value") ?
-				(DeclaredType) values.get("value").getValue() :
+			DeclaredType generatorClassValue = values.containsKey("strategy") ?
+				(DeclaredType) values.get("strategy").getValue() :
 				null;
 
 			String name = null;
-			if (generatorClassValue != null && valueValue != null && !generatorClassValue.equals(valueValue)) {
-				messager.printMessage(Diagnostic.Kind.ERROR,
-					"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.GeneratedValue]!", e);
-			} else if (generatorClassValue != null) {
+			if (generatorClassValue != null) {
 				name = generatorClassValue.toString();
-			} else if (valueValue != null) {
-				name = valueValue.toString();
 			}
 
 			// The defaults will not be materialized
-			return (name == null || "org.neo4j.ogm.id.InternalIdStrategy".equals(name)) && VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
+			return (name == null || "org.neo4j.ogm.id.InternalIdStrategy".equals(name))
+				&& VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
 		}
 
 		/**
@@ -499,8 +500,6 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		private boolean isAssociation(Set<Element> declaredAnnotations, VariableElement field) {
 			TypeMirror typeMirrorOfField = field.asType();
 			boolean explicitRelationship = declaredAnnotations.contains(relationshipAnnotationType);
-			// TODO @Shinigami92 2025-07-26: check if we need to add @StartNode and @EndNode here.
-			boolean isTargetNode = declaredAnnotations.contains(targetNodeAnnotationType);
 
 			if (explicitRelationship) {
 				return true;
@@ -511,7 +510,38 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 				return false;
 			}
 
-			return !isTargetNode;
+			// Strings, primitives and their boxed variants are never associations
+			if (typeMirrorOfField.getKind().isPrimitive()) {
+				return false;
+			} else {
+				var type = typeMirrorOfField.accept(new TypeKindVisitor8<>() {
+					@Override
+					public String visitDeclared(DeclaredType t, Object o) {
+						return t.asElement().accept(new TypeElementVisitor<>(newTypeElementNameFunction()), null);
+					}
+				}, null);
+				if ("java.lang.String".equals(type)) {
+					return false;
+				}
+				try {
+					typeUtils.unboxedType(typeMirrorOfField);
+					return false;
+				} catch (IllegalArgumentException ex) {
+					// Exception driven development for the win, yeah
+				}
+			}
+
+			// Stuff that is explicitly converted can't be an association either
+			for (var converterAnnotation : convertAnnotationTypes) {
+				if (declaredAnnotations.contains(converterAnnotation)) {
+					return false;
+				}
+			}
+
+			// Unless it is a start / end node, it is by a big chance an implicit relationship and hence, an association
+			boolean isStartNode = declaredAnnotations.contains(startNodeAnnotationType);
+			boolean isEndNode = declaredAnnotations.contains(endNodeAnnotationType);
+			return !(isStartNode || isEndNode);
 		}
 	}
 }

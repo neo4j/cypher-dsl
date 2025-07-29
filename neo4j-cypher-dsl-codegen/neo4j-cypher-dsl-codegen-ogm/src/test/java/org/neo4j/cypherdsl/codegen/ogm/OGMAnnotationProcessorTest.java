@@ -72,7 +72,9 @@ class OGMAnnotationProcessorTest {
 	}
 
 	@CsvSource({
+		"ids, 'InternalGeneratedId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
 		"labels, 'LabelOnNode1, LabelOnNode2', nodeswithdifferentlabelannotations",
+		"primitives, 'Connector', ",
 	})
 	@ParameterizedTest
 	void validSourceFiles(String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
