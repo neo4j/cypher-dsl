@@ -77,6 +77,7 @@ class OGMAnnotationProcessorTest {
 		"8, ids, 'InternalGeneratedId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
 		"8, simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
 		"8, labels, 'LabelOnNode1, LabelOnNode2', nodeswithdifferentlabelannotations",
+		"8, abstract_rels, 'Person, Movie, Directed',",
 		"8, primitives, 'Connector', ",
 		"17, records, 'NodeWithRecordProperties, RecordAsRelationship, RecordTarget', "
 	})
@@ -89,7 +90,12 @@ class OGMAnnotationProcessorTest {
 			.compile(getJavaResources("/org/neo4j/cypherdsl/codegen/ogm/models/" + scenario));
 
 		CompilationSubject.assertThat(compilation).succeeded();
-		CompilationSubject.assertThat(compilation).hadWarningCount(0);
+		if ("abstract_rels".equals(scenario)) {
+			CompilationSubject.assertThat(compilation).hadWarningContaining(
+				"Cannot resolve generic type, not generating a property for relationships referring to org.neo4j.cypherdsl.codegen.ogm.models.abstract_rels.Actor");
+		} else {
+			CompilationSubject.assertThat(compilation).hadWarningCount(0);
+		}
 
 		for (String expectedSourceFile : expected) {
 			String finalName = scenario + "." + (subpackage == null ? "" : subpackage + ".") + expectedSourceFile + "_";
