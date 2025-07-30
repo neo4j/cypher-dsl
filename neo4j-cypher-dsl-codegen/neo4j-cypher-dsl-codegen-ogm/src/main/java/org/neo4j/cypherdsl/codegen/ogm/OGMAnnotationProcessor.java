@@ -42,6 +42,7 @@ import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.RecordComponentElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -85,6 +86,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	static final String RELATIONSHIP_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.RelationshipEntity";
 	static final Set<String> VALID_GENERATED_ID_TYPES = Set.of(Long.class.getName(), long.class.getName());
 	private final List<TypeElement> convertAnnotationTypes = new ArrayList<>();
+	private TypeElement propertyAnnotationType;
 	private TypeElement nodeEntityAnnotationType;
 	private TypeElement relationshipEntityAnnotationType;
 	private TypeElement relationshipAnnotationType;
@@ -107,6 +109,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			this.convertAnnotationTypes.add(
 				elementUtils.getTypeElement("org.neo4j.ogm.annotation.typeconversion.%s".formatted(name)));
 		}
+		this.propertyAnnotationType = elementUtils.getTypeElement(
+			"org.neo4j.ogm.annotation.Property");
 
 		this.ogmIdAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Id");
 		this.generatedValueAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.GeneratedValue");
@@ -141,7 +145,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			getTypesAnnotatedWith(nodeEntityAnnotationType, roundEnv));
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties = collectRelationshipProperties(
 			roundEnv);
-		Map<NodeModelBuilder, List<VariableElement>> relationshipFields = populateNodePropertiesAndCollectRelationshipFields(
+		Map<NodeModelBuilder, List<Element>> relationshipFields = populateNodePropertiesAndCollectRelationshipFields(
 			nodeBuilders);
 		Map<String, List<RelationshipModelBuilder>> relationshipBuilders = populateListOfRelationships(
 			computeRelationshipDefinitions(relationshipFields, relationshipProperties, nodeBuilders));
@@ -426,14 +430,14 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	// Silence Sonar complaining about the class hierarchy, which is given through
 	// the ElementKindVisitor8, which we need but cannot change
 	@SuppressWarnings("squid:S110")
-	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<VariableElement>>, Void>
+	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<Element>>, Void>
 		implements PropertiesAndRelationshipGrouping {
 
-		private final Map<FieldType, List<VariableElement>> result;
+		private final Map<FieldType, List<Element>> result;
 
 		GroupPropertiesAndRelationships() {
 
-			final Map<FieldType, List<VariableElement>> hlp = new EnumMap<>(FieldType.class);
+			final Map<FieldType, List<Element>> hlp = new EnumMap<>(FieldType.class);
 			hlp.put(FieldType.R, new ArrayList<>());
 			hlp.put(FieldType.P, new ArrayList<>());
 			this.result = Collections.unmodifiableMap(hlp);
@@ -443,12 +447,27 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			element.accept(this, null);
 		}
 
-		public Map<FieldType, List<VariableElement>> getResult() {
+		public Map<FieldType, List<Element>> getResult() {
 			return result;
 		}
 
-		@Override public Map<FieldType, List<VariableElement>> visitVariableAsField(VariableElement e, Void unused) {
+		@Override
+		public Map<FieldType, List<Element>> visitTypeAsRecord(TypeElement e, Void unused) {
+			// We must overwrite this or visitUnknown() in case we encounter a record
+			return result;
+		}
 
+		@Override
+		public Map<FieldType, List<Element>> visitRecordComponent(RecordComponentElement e, Void unused) {
+			return visitFieldOrRecordComponent(e);
+		}
+
+		@Override
+		public Map<FieldType, List<Element>> visitVariableAsField(VariableElement e, Void unused) {
+			return visitFieldOrRecordComponent(e);
+		}
+
+		private Map<FieldType, List<Element>> visitFieldOrRecordComponent(Element e) {
 			Set<Element> declaredAnnotations = e.getAnnotationMirrors().stream()
 				.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
 
@@ -461,7 +480,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			return result;
 		}
 
-		private boolean isInternalId(VariableElement e, Set<Element> declaredAnnotations) {
+		private boolean isInternalId(Element e, Set<Element> declaredAnnotations) {
 
 			boolean idAnnotationPresent = declaredAnnotations.contains(ogmIdAnnotationType);
 			if (!idAnnotationPresent) {
@@ -473,7 +492,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 				.map(generatedValue -> isUsingInternalIdGenerator(e, generatedValue)).orElse(false);
 		}
 
-		private boolean isUsingInternalIdGenerator(VariableElement e, AnnotationMirror generatedValue) {
+		private boolean isUsingInternalIdGenerator(Element e, AnnotationMirror generatedValue) {
 
 			Map<String, ? extends AnnotationValue> values = generatedValue.getElementValues().entrySet().stream()
 				.collect(Collectors.toMap(entry -> entry.getKey().getSimpleName().toString(), Map.Entry::getValue));
@@ -497,12 +516,15 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		 *              this is true or not
 		 * @return True if this field is an association
 		 */
-		private boolean isAssociation(Set<Element> declaredAnnotations, VariableElement field) {
+		private boolean isAssociation(Set<Element> declaredAnnotations, Element field) {
 			TypeMirror typeMirrorOfField = field.asType();
-			boolean explicitRelationship = declaredAnnotations.contains(relationshipAnnotationType);
 
-			if (explicitRelationship) {
+			if (declaredAnnotations.contains(relationshipAnnotationType)) {
 				return true;
+			}
+
+			if (declaredAnnotations.contains(propertyAnnotationType)) {
+				return false;
 			}
 
 			// They will be converted anyway

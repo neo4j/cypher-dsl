@@ -54,16 +54,18 @@ class SDN6AnnotationProcessorTest {
 	private final static PathMatchingResourcePatternResolver resourceResolver
 		= new PathMatchingResourcePatternResolver();
 
-	static Compiler getCompiler(Object... options) {
+	static Compiler getCompiler(String release, Object... options) {
 
 		String ts = "-Aorg.neo4j.cypherdsl.codegen.timestamp=2019-09-21T21:21:00+01:00";
 		Object[] defaultOptions;
 
 		if (ToolProvider.getSystemJavaCompiler().isSupportedOption("--release") >= 0) {
 			// release 8 deprecated since Java 21, surprised with -options
-			defaultOptions = new Object[] { "-Xlint:-options", ts, "--release", "8" };
-		} else {
+			defaultOptions = new Object[] { "-Xlint:-options", ts, "--release", release };
+		} else if ("8".equals(release)) {
 			defaultOptions = new Object[] { ts, "-source", "8", "-target", "8" };
+		} else {
+			throw new IllegalArgumentException("Release %s not supported for testing".formatted(release));
 		}
 
 		Object[] finalOptions = new Object[options.length + defaultOptions.length];
@@ -106,7 +108,7 @@ class SDN6AnnotationProcessorTest {
 		"org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes.InnerInnerClassConverter" })
 	@ParameterizedTest
 	void shouldNotFailWithInvalidConverters(String converter) {
-		Compilation compilation = getCompiler("-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=" + converter)
+		Compilation compilation = getCompiler("8", "-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=" + converter)
 			.withProcessors(new SDN6AnnotationProcessor())
 			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/simple"));
 
@@ -122,7 +124,7 @@ class SDN6AnnotationProcessorTest {
 
 	@Test
 	void shouldRecognizeGlobalConvertersOnInnerClasses() {
-		Compilation compilation = getCompiler(
+		Compilation compilation = getCompiler("8",
 			"-Aorg.neo4j.cypherdsl.codegen.sdn.custom_converter_classes=org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes.SpringBasedConverter")
 			.withProcessors(new SDN6AnnotationProcessor())
 			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/enums_and_inner_classes"));
@@ -136,26 +138,27 @@ class SDN6AnnotationProcessorTest {
 	}
 
 	@CsvSource({
-		"ids, 'InternalGeneratedId, InternalGeneratedIdWithSpringId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
-		"simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
-		"labels, 'LabelOnNode1, LabelOnNode2, LabelOnNode3, MultipleLabels1, MultipleLabels2, MultipleLabels3', nodeswithdifferentlabelannotations",
-		"same_properties_for_rel_type, 'Person, Movie, Play, ActedIn', ",
-		"different_properties_for_rel_type, 'Person, Movie, Play, ActedInPlay, ActedInMovie', ",
-		"same_rel_different_target, 'Person, Movie, Book, Wrote', ",
-		"same_rel_different_source, 'Person, Movie, Book, Wrote', ",
-		"same_rel_mixed, 'Person, Movie, Book, Wrote', ",
-		"same_rel_mixed_different_directions, 'Person, Movie, Book, Wrote', ",
-		"abstract_rels, 'Person, Movie, Directed',",
-		"primitives, 'Connector', ",
-		"enums_and_inner_classes, 'ConnectorTransport', ",
-		"related_classes_not_on_cp_like_in_reallife, 'Movie, Person', ",
-		"self_referential, 'Example', "
+		"8, ids, 'InternalGeneratedId, InternalGeneratedIdWithSpringId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
+		"8, simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
+		"8, labels, 'LabelOnNode1, LabelOnNode2, LabelOnNode3, MultipleLabels1, MultipleLabels2, MultipleLabels3', nodeswithdifferentlabelannotations",
+		"8, same_properties_for_rel_type, 'Person, Movie, Play, ActedIn', ",
+		"8, different_properties_for_rel_type, 'Person, Movie, Play, ActedInPlay, ActedInMovie', ",
+		"8, same_rel_different_target, 'Person, Movie, Book, Wrote', ",
+		"8, same_rel_different_source, 'Person, Movie, Book, Wrote', ",
+		"8, same_rel_mixed, 'Person, Movie, Book, Wrote', ",
+		"8, same_rel_mixed_different_directions, 'Person, Movie, Book, Wrote', ",
+		"8, abstract_rels, 'Person, Movie, Directed',",
+		"8, primitives, 'Connector', ",
+		"8, enums_and_inner_classes, 'ConnectorTransport', ",
+		"8, related_classes_not_on_cp_like_in_reallife, 'Movie, Person', ",
+		"8, self_referential, 'Example', ",
+		"17, records, 'NodeWithRecordProperties, RecordAsRelationship, RecordTarget', "
 	})
 	@ParameterizedTest
-	void validSourceFiles(String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
+	void validSourceFiles(String release, String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
 		String subpackage) {
 
-		Compilation compilation = getCompiler()
+		Compilation compilation = getCompiler(release)
 			.withProcessors(new SDN6AnnotationProcessor())
 			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/" + scenario));
 

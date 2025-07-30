@@ -43,16 +43,18 @@ import com.google.testing.compile.JavaFileObjects;
  */
 class OGMAnnotationProcessorTest {
 
-	static Compiler getCompiler(Object... options) {
+	static Compiler getCompiler(String release, Object... options) {
 
 		String ts = "-Aorg.neo4j.cypherdsl.codegen.timestamp=2025-09-21T21:21:00+01:00";
 		Object[] defaultOptions;
 
 		if (ToolProvider.getSystemJavaCompiler().isSupportedOption("--release") >= 0) {
-			// release 8 deprecated since Java 21, suppressed with -options
-			defaultOptions = new Object[] { "-Xlint:-options", ts, "--release", "8" };
-		} else {
+			// release 8 deprecated since Java 21, surprised with -options
+			defaultOptions = new Object[] { "-Xlint:-options", ts, "--release", release };
+		} else if ("8".equals(release)) {
 			defaultOptions = new Object[] { ts, "-source", "8", "-target", "8" };
+		} else {
+			throw new IllegalArgumentException("Release %s not supported for testing".formatted(release));
 		}
 
 		Object[] finalOptions = new Object[options.length + defaultOptions.length];
@@ -72,15 +74,16 @@ class OGMAnnotationProcessorTest {
 	}
 
 	@CsvSource({
-		"ids, 'InternalGeneratedId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
-		"labels, 'LabelOnNode1, LabelOnNode2', nodeswithdifferentlabelannotations",
-		"primitives, 'Connector', ",
+		"8, ids, 'InternalGeneratedId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
+		"8, labels, 'LabelOnNode1, LabelOnNode2', nodeswithdifferentlabelannotations",
+		"8, primitives, 'Connector', ",
+		"17, records, 'NodeWithRecordProperties, RecordAsRelationship, RecordTarget', "
 	})
 	@ParameterizedTest
-	void validSourceFiles(String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
+	void validSourceFiles(String release, String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
 		String subpackage) {
 
-		Compilation compilation = getCompiler()
+		Compilation compilation = getCompiler(release)
 			.withProcessors(new OGMAnnotationProcessor())
 			.compile(getJavaResources("/org/neo4j/cypherdsl/codegen/ogm/models/" + scenario));
 

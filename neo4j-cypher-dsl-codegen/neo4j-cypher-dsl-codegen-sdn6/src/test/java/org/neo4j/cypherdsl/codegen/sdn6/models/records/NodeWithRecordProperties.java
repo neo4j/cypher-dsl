@@ -16,44 +16,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.neo4j.cypherdsl.codegen.sdn6.models.simple;
+package org.neo4j.cypherdsl.codegen.sdn6.models.records;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.springframework.data.neo4j.core.convert.ConvertWith;
+import org.springframework.data.neo4j.core.convert.Neo4jPersistentPropertyConverter;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 /**
- * @author Michael J. Simons
+ * Random test class.
  */
 @Node
-public class Movie {
+public class NodeWithRecordProperties {
 
 	@Id
-	private final String title;
+	private String id;
 
-	@Property("tagline")
-	private final String description;
+	@ConvertWith(converter = RecordConverter.class)
+	private RecordAsProperty recordAsPropertyWithConversion;
 
-	@Relationship(type = "ACTED_IN", direction = Relationship.Direction.INCOMING)
-	private List<Actor> actors = new ArrayList<>();
+	@Property
+	private RecordAsProperty yoloingNoConversion;
 
-	@Relationship(type = "DIRECTED", direction = Relationship.Direction.INCOMING)
-	private List<Person> directors = new ArrayList<>();
+	// Inner types for relationships are not supported
+	@Relationship
+	private RecordTarget recordAsRelationship;
 
-	// This will be ignored, not annotated and the other type is not a node
-	private SomeType someProp;
-
-	private Integer released;
-
-	public Movie(String title, String description) {
-		this.title = title;
-		this.description = description;
+	record RecordAsProperty(String value) {
 	}
 
-	static class SomeType {
+	static abstract class RecordConverter implements Neo4jPersistentPropertyConverter<RecordAsProperty> {
 	}
 }

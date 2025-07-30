@@ -44,7 +44,6 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.NestingKind;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -230,7 +229,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	protected interface PropertiesAndRelationshipGrouping {
 		void apply(Element element);
 
-		Map<FieldType, List<VariableElement>> getResult();
+		Map<FieldType, List<Element>> getResult();
 	}
 
 	protected abstract PropertiesAndRelationshipGrouping newPropertiesAndRelationshipGrouping();
@@ -250,15 +249,15 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	 * @param nodeBuilders The map of all node builders for all annotated classes
 	 * @return A map from a node builder to a list of fields describing relationships
 	 */
-	protected final Map<NodeModelBuilder, List<VariableElement>> populateNodePropertiesAndCollectRelationshipFields(
+	protected final Map<NodeModelBuilder, List<Element>> populateNodePropertiesAndCollectRelationshipFields(
 		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 
-		Map<NodeModelBuilder, List<VariableElement>> relationshipFields = new HashMap<>();
+		Map<NodeModelBuilder, List<Element>> relationshipFields = new HashMap<>();
 		nodeBuilders.forEach((type, nodeImplBuilder) -> {
 
 			var groupPropertiesAndRelationships = newPropertiesAndRelationshipGrouping();
 			type.getEnclosedElements().forEach(groupPropertiesAndRelationships::apply);
-			Map<FieldType, List<VariableElement>> fields = groupPropertiesAndRelationships.getResult();
+			Map<FieldType, List<Element>> fields = groupPropertiesAndRelationships.getResult();
 
 			nodeImplBuilder.addProperties(fields.get(FieldType.P).stream().map(this::asPropertyDefinition).toList());
 
@@ -282,7 +281,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	 * The entry in the list is (start, definition)
 	 */
 	protected final Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> computeRelationshipDefinitions(
-		Map<NodeModelBuilder, List<VariableElement>> allRelationshipFields,
+		Map<NodeModelBuilder, List<Element>> allRelationshipFields,
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
 		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 
