@@ -75,6 +75,7 @@ class OGMAnnotationProcessorTest {
 
 	@CsvSource({
 		"8, ids, 'InternalGeneratedId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
+		"8, simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
 		"8, labels, 'LabelOnNode1, LabelOnNode2', nodeswithdifferentlabelannotations",
 		"8, primitives, 'Connector', ",
 		"17, records, 'NodeWithRecordProperties, RecordAsRelationship, RecordTarget', "

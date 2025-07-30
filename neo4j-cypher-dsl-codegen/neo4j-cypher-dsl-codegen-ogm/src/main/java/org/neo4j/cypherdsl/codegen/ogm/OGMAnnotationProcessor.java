@@ -27,7 +27,6 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -176,8 +175,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			roundEnvironment);
 		relationshipProperties.forEach(e -> {
 			List<PropertyDefinition> properties = new ArrayList<>();
-			TypeElement actualTargetType = null;
 			for (Element enclosedElement : e.getEnclosedElements()) {
+				TypeElement actualTargetType = null;
 				if (!enclosedElement.getKind().isField()) {
 					continue;
 				}
@@ -185,7 +184,6 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 				Set<Element> declaredAnnotations = enclosedElement.getAnnotationMirrors().stream()
 					.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
 				if (declaredAnnotations.contains(startNodeAnnotationType)) {
-
 					Element element = typeUtils.asElement(enclosedElement.asType());
 					actualTargetType = element.accept(new TypeElementVisitor<>(Function.identity()), null);
 					if (actualTargetType == null) {
@@ -193,112 +191,14 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 							"Cannot resolve generic type, not generating a property for relationships referring to "
 							+ e.getQualifiedName(), element);
 					}
-				} else {
+				} else if (!declaredAnnotations.contains(endNodeAnnotationType)) {
 					properties.add(asPropertyDefinition(enclosedElement));
 				}
-			}
 
-			if (actualTargetType != null) {
-				result.put(e,
-					new AbstractMap.SimpleEntry<>(actualTargetType, Collections.unmodifiableList(properties)));
-			}
-		});
-		return Collections.unmodifiableMap(result);
-	}
-
-	/**
-	 * Creates and populates the list of relationships from their definitions. It
-	 * also registered the freshly generated
-	 * relationship builders with the previously created node builders.
-	 *
-	 * @param relationshipDefinitions Definitions by type and owner
-	 * @return Map of builder per type. Can be multiple builders in case of
-	 * different relationship property classes with different properties.
-	 */
-	private Map<String, List<RelationshipModelBuilder>> populateListOfRelationships(
-		Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
-		Map<String, List<RelationshipModelBuilder>> result = new HashMap<>();
-
-		relationshipDefinitions.forEach((type, definitions) -> {
-			RelationshipModelBuilder relationshipBuilder = null;
-
-			// Simple case: All unique types
-			if (definitions.size() == 1) {
-
-				NodeModelBuilder owner = definitions.get(0).getKey();
-				RelationshipPropertyDefinition definition = definitions.get(0).getValue();
-
-				relationshipBuilder = RelationshipModelBuilder.create(configuration, owner.getPackageName(), type);
-				relationshipBuilder.setStartNode(definition.getStart());
-				relationshipBuilder.setEndNode(definition.getEnd());
-				relationshipBuilder.addProperties(definition.getProperties());
-			} else {
-				Set<NodeModelBuilder> owners = definitions.stream().map(Map.Entry::getKey).collect(Collectors.toSet());
-
-				// Exactly one owner, but variable targets
-				if (owners.size() == 1) {
-
-					NodeModelBuilder owner = owners.stream().findFirst().get();
-
-					Map<Boolean, List<RelationshipPropertyDefinition>> ownerAtStartOrEnd = definitions.stream()
-						.map(Map.Entry::getValue).collect(Collectors.partitioningBy(p -> p.getStart() == owner));
-
-					if (sameOrNoProperties(definitions)) {
-						relationshipBuilder = RelationshipModelBuilder.create(configuration, owner.getPackageName(),
-							type);
-						relationshipBuilder.addProperties(definitions.get(0).getValue().getProperties());
-						if (ownerAtStartOrEnd.get(true).isEmpty()) {
-							relationshipBuilder.setEndNode(owner);
-						} else if (ownerAtStartOrEnd.get(false).isEmpty()) {
-							relationshipBuilder.setStartNode(owner);
-						}
-					} else {
-						List<RelationshipModelBuilder> newBuilders = new ArrayList<>();
-						for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
-
-							RelationshipPropertyDefinition propertyDefinition = definition.getValue();
-							RelationshipModelBuilder newBuilder = RelationshipModelBuilder.create(configuration,
-								owner.getPackageName(), type,
-								type + "_" + propertyDefinition.getEnd().getPlainClassName().toUpperCase(Locale.ROOT));
-							newBuilder.addProperties(propertyDefinition.getProperties());
-							if (ownerAtStartOrEnd.get(true).isEmpty()) {
-								newBuilder.setStartNode(propertyDefinition.getStart());
-								newBuilder.setEndNode(owner);
-							} else if (ownerAtStartOrEnd.get(false).isEmpty()) {
-								newBuilder.setStartNode(owner);
-								newBuilder.setEndNode(propertyDefinition.getEnd());
-							}
-
-							definition.getKey().addRelationshipDefinition(propertyDefinition.withBuilder(newBuilder));
-							newBuilders.add(newBuilder);
-						}
-						result.put(type, Collections.unmodifiableList(newBuilders));
-					}
-				} else if (owners.size() > 1) {
-					List<NodeModelBuilder> startNodes = definitions.stream().map(d -> d.getValue().getStart())
-						.distinct().toList();
-					List<NodeModelBuilder> endNodes = definitions.stream().map(d -> d.getValue().getStart()).distinct()
-						.toList();
-
-					relationshipBuilder = RelationshipModelBuilder.create(configuration,
-						owners.stream().findFirst().get().getPackageName(), type);
-					if (startNodes.size() == 1) {
-						relationshipBuilder.setStartNode(startNodes.get(0));
-					} else if (endNodes.size() == 1) {
-						relationshipBuilder.setStartNode(endNodes.get(0));
-					}
+				if (actualTargetType != null) {
+					result.put(e,
+						new AbstractMap.SimpleEntry<>(actualTargetType, Collections.unmodifiableList(properties)));
 				}
-			}
-
-			// A single builder created for all definitions
-			// Multiple builders have been taken care of independent.
-			if (relationshipBuilder != null) {
-				for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
-					RelationshipPropertyDefinition finishedDefinition = definition.getValue()
-						.withBuilder(relationshipBuilder);
-					definition.getKey().addRelationshipDefinition(finishedDefinition);
-				}
-				result.put(type, Collections.singletonList(relationshipBuilder));
 			}
 		});
 		return Collections.unmodifiableMap(result);

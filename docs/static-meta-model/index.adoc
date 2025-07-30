@@ -1,5 +1,5 @@
 [[static-meta-model]]
-= Building a static meta model
+= Building a static metamodel
 
 include::concepts.adoc[]
 

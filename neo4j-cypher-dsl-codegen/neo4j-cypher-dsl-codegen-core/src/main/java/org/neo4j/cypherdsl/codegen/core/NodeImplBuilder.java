@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,7 +29,6 @@ import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
 
-import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
@@ -61,7 +58,6 @@ import com.squareup.javapoet.WildcardTypeName;
  * @author Andreas Berger
  * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "2021.1.0")
 final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	implements NodeModelBuilder {
 
