@@ -6,3 +6,5 @@ include::concepts.adoc[]
 include::possible-usage.adoc[]
 
 include::sdn6-annotation-processor.adoc[]
+
+include::ogm-annotation-processor.adoc[]

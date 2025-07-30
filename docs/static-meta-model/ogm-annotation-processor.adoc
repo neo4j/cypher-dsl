@@ -1,0 +1,91 @@
+[[ogm-annotation-processor]]
+== The Neo4j-OGM annotation processor
+
+We provide a Java annotation processor for https://github.com/neo4j/neo4j-ogm[Neo4j-OGM] under the following coordinates:
+
+[source,subs="verbatim,attributes",indent=0,tabsize=4]
+.Coordinates of the Neo4j-OGM annotation processor
+----
+{groupId}:neo4j-cypher-dsl-codegen-ogm:{the-version}
+----
+
+The annotation processor understands classes annotated with `@NodeEntity` and `@RelationshipEntity`.
+Inside those classes `@Relationship`, `@Property`, `@StartNode` and `@EndNode` are read.
+
+The processor generates a static metamodel for each annotated class found in the same package with an underscore (`_`) added to the name.
+
+The processor needs Neo4j-OGM 4 and the Cypher-DSL in version `2025.7.0` or later on it's classpath.
+We recommend using it explicitly on the separate annotation processor classpath (via `--processor-path` to `javac`).
+
+The processor does *not* support nested classes used as `@NodeEntity` or `@RelationshipEntity`.
+
+This processor is a great choice for applications built on https://quarkus.io[Quarkus] using https://github.com/neo4j/neo4j-ogm-quarkus[Neo4j-OGM-Quarkus] but also for https://github.com/neo4j/neo4j-ogm-spring[Neo4j-OGM-Spring], our Spring Data Neo4j 5 work that supports Spring Boot >= 3 and the latest Spring Data generation with the behaviour of SDN5 and OGM.
+
+=== Configure your build
+
+==== Maven
+
+As a Maven user, please configure the build as follows:
+
+[source,xml,subs="verbatim,attributes",indent=0,tabsize=4]
+----
+<build>
+    <plugins>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <configuration>
+                <annotationProcessorPaths>
+                    <annotationProcessorPath>
+                        <groupId>{groupId}</groupId>
+                        <artifactId>neo4j-cypher-dsl-codegen-ogm</artifactId>
+                        <version>{neo4j-cypher-dsl.version}</version>
+                    </annotationProcessorPath>
+                </annotationProcessorPaths>
+            </configuration>
+        </plugin>
+    </plugins>
+</build>
+----
+
+==== Gradle
+
+In a Gradle project, please add the following:
+
+[source,groovy,subs="verbatim,attributes"]
+----
+dependencies {
+    annotationProcessor '{groupId}:neo4j-cypher-dsl-codegen-ogm:{the-version}'
+}
+----
+
+==== As dependency on the classpath
+
+NOTE: We recommend the annotation processor path for two reasons: The processor needs Neo4j-OGM as dependency. While Neo4j-OGM is already on the classpath,
+it might not fit the one we build the annotation processor against exactly.
+While the processor is lenient in that regard, your dependency setup might not.
+Furthermore: Why should you have the annotation processor as a dependency in your final artifact? This would be unnecessary.
+
+If you insist on having the Neo4j-OGM annotation processor on the standard class path, please include with your Neo4j-OGM
+application like as follows to avoid dependency conflicts:
+
+[source,xml,subs="verbatim,attributes",indent=0,tabsize=4]
+----
+<dependency>
+    <groupId>{groupId}</groupId>
+    <artifactId>neo4j-cypher-dsl-codegen-ogm</artifactId>
+    <version>{neo4j-cypher-dsl.version}</version>
+    <optional>true</optional>
+    <exclusions>
+        <exclusion>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-core</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
+----
+
+=== Usage
+
+The processor supports the same arguments as the <<sdn6-annotation-processor>> except for `org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes`.
+The usage of the generated classes is identical.
