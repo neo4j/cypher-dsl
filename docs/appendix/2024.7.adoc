@@ -1,5 +1,32 @@
 == 2024.7
 
+=== 2024.7.2
+
+This is a dependency upgrade release only.
+The next release will most likely be the first 2025.x release with some new features, removal of deprecations and some of the meta-annotations that we use.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump com.opencsv:opencsv from 5.11.2 to 5.12.0 (#1290)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1289)
+** Bump org.junit:junit-bom from 5.13.3 to 5.13.4 (#1288)
+** Bump org.neo4j.driver:neo4j-java-driver (#1280)
+** Bump com.fasterxml.jackson:jackson-bom (#1285)
+** Bump org.springframework.data:spring-data-neo4j (#1284)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1283)
+** Bump io.projectreactor:reactor-bom (#1282)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#1281)
+** Bump org.moditect:moditect-maven-plugin (#1279)
+** Bump org.neo4j.driver:neo4j-java-driver from 5.28.5 to 5.28.8 (#1277)
+** Bump org.junit:junit-bom from 5.13.1 to 5.13.3 (#1274)
+** Bump org.checkerframework:checker-qual (#1272)
+** Bump neo4j.version from 5.26.8 to 5.26.9 (#1278)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#1276)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1275)
+** Bump testcontainers.version from 1.21.2 to 1.21.3 (#1269)
+** Bump com.puppycrawl.tools:checkstyle (#1268)
+
 === 2024.7.1
 
 ==== 📖 Documentation
