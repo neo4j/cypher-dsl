@@ -77,12 +77,17 @@ class OGMAnnotationProcessorTest {
 		"8, ids, 'InternalGeneratedId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
 		"8, simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
 		"8, labels, 'LabelOnNode1, LabelOnNode2', nodeswithdifferentlabelannotations",
+		"8, same_properties_for_rel_type, 'Person, Movie, Play, ActedIn', ",
+		"8, different_properties_for_rel_type, 'Person, Movie, Play, ActedInPlay, ActedInMovie', ",
 		"8, same_rel_different_target, 'Person, Movie, Book, Wrote', ",
 		"8, same_rel_different_source, 'Person, Movie, Book, Wrote', ",
 		"8, same_rel_mixed, 'Person, Movie, Book, Wrote', ",
 		"8, same_rel_mixed_different_directions, 'Person, Movie, Book, Wrote', ",
 		"8, abstract_rels, 'Person, Movie, Directed',",
 		"8, primitives, 'Connector', ",
+		"8, enums_and_inner_classes, 'ConnectorTransport', ",
+		"8, related_classes_not_on_cp_like_in_reallife, 'Movie, Person', ",
+		"8, self_referential, 'Example', ",
 		"17, records, 'NodeWithRecordProperties, RecordAsRelationship, RecordTarget', "
 	})
 	@ParameterizedTest

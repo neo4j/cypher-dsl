@@ -62,23 +62,16 @@ import org.neo4j.cypherdsl.codegen.core.RelationshipPropertyDefinition;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.RelationshipEntity;
 
 /**
  * @author Shinigami
  * @since TODO
  */
-@SupportedAnnotationTypes({
-	OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
-	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION
-})
-@SupportedOptions({
-	Configuration.PROPERTY_PREFIX,
-	Configuration.PROPERTY_SUFFIX,
-	Configuration.PROPERTY_INDENT_STYLE,
-	Configuration.PROPERTY_INDENT_SIZE,
-	Configuration.PROPERTY_TIMESTAMP,
-	Configuration.PROPERTY_ADD_AT_GENERATED
-})
+@SupportedAnnotationTypes({ OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
+	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION })
+@SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,
+	Configuration.PROPERTY_INDENT_SIZE, Configuration.PROPERTY_TIMESTAMP, Configuration.PROPERTY_ADD_AT_GENERATED })
 public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProcessor {
 
 	static final String NODE_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.NodeEntity";
@@ -94,8 +87,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	private TypeElement ogmIdAnnotationType;
 	private TypeElement generatedValueAnnotationType;
 
-	@Override
-	public void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
+	@Override public void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
 
 		Elements elementUtils = processingEnv.getElementUtils();
 		this.nodeEntityAnnotationType = elementUtils.getTypeElement(NODE_ENTITY_ANNOTATION);
@@ -108,15 +100,13 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			this.convertAnnotationTypes.add(
 				elementUtils.getTypeElement("org.neo4j.ogm.annotation.typeconversion.%s".formatted(name)));
 		}
-		this.propertyAnnotationType = elementUtils.getTypeElement(
-			"org.neo4j.ogm.annotation.Property");
+		this.propertyAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Property");
 
 		this.ogmIdAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Id");
 		this.generatedValueAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.GeneratedValue");
 	}
 
-	@Override
-	protected Collection<String> getLabel(TypeElement annotatedClass) {
+	@Override protected Collection<String> getLabel(TypeElement annotatedClass) {
 		NodeEntity nodeAnnotation = annotatedClass.getAnnotation(NodeEntity.class);
 		Set<String> labels = new LinkedHashSet<>();
 		Consumer<String> addLabel = label -> {
@@ -134,18 +124,17 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		return Collections.unmodifiableCollection(labels);
 	}
 
-	@Override
-	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+	@Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		if (annotations.isEmpty()) {
 			return false;
 		}
 
 		Map<TypeElement, NodeModelBuilder> nodeBuilders = populateListOfNodes(
 			getTypesAnnotatedWith(nodeEntityAnnotationType, roundEnv));
-		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties = collectRelationshipProperties(
-			roundEnv);
 		Map<NodeModelBuilder, List<Element>> relationshipFields = populateNodePropertiesAndCollectRelationshipFields(
 			nodeBuilders);
+		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties = collectRelationshipProperties(
+			relationshipFields, roundEnv);
 		Map<String, List<RelationshipModelBuilder>> relationshipBuilders = populateListOfRelationships(
 			computeRelationshipDefinitions(relationshipFields, relationshipProperties, nodeBuilders));
 
@@ -160,52 +149,133 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		return true;
 	}
 
-	/**
-	 * Collects classes annotated with {@code @RelationshipEntity}
-	 *
-	 * @param roundEnvironment The current environment
-	 * @return A map from the other end of the relationship (target node) to the
-	 * properties of the relationship
-	 */
+	private String getRelationshipEntityType(Element annotatedEntity) {
+
+		var relationshipEntity = annotatedEntity.getAnnotation(RelationshipEntity.class);
+		if (relationshipEntity == null) {
+			return null;
+		}
+
+		String typeValue = relationshipEntity.type();
+		String valueValue = relationshipEntity.value();
+		String relationshipType = null;
+
+		if (!typeValue.isEmpty() && !valueValue.isEmpty()) {
+			if (!typeValue.equals(valueValue)) {
+				messager.printMessage(Diagnostic.Kind.ERROR,
+					"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.RelationshipEntity]!",
+					annotatedEntity);
+			}
+			relationshipType = typeValue;
+		} else if (!typeValue.isEmpty()) {
+			relationshipType = typeValue;
+		} else if (!valueValue.isEmpty()) {
+			relationshipType = valueValue;
+		}
+		return relationshipType;
+	}
+
+	// Tries to figure out the direction of this relationship, so that we can decide on how to treat start/end nodes
+	private Optional<Relationship.Direction> findDirection(String type, Element annotatedEntity, Element startElement,
+		Set<Element> allRelationshipFields) {
+
+		return allRelationshipFields.stream().filter(element -> {
+
+			// The enclosing field must be of the same type as the startElement
+			if (!element.getEnclosingElement().asType().equals(startElement.asType())) {
+				return false;
+			}
+
+			// Get the type
+			if (element.asType() instanceof DeclaredType dt) {
+				// Single field
+				if (dt.equals(annotatedEntity.asType())) {
+					return true;
+				} else {
+					// Treating anything that has a generic type argument for a collection shaped thing
+					// Most other mappings with OGM won't work anyhow, so this is good enough for now
+					for (var typeArgument : dt.getTypeArguments()) {
+						if (typeArgument.equals(annotatedEntity.asType())) {
+							return true;
+						}
+					}
+				}
+			}
+			return false;
+		}).map(element -> {
+			var relationship = element.getAnnotation(Relationship.class);
+			return relationship == null ? Relationship.Direction.OUTGOING : relationship.direction();
+		}).findFirst();
+
+	}
+
 	private Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> collectRelationshipProperties(
-		RoundEnvironment roundEnvironment) {
+		Map<NodeModelBuilder, List<Element>> relationshipFields, RoundEnvironment roundEnvironment) {
+
+		var allRelationshipFields = relationshipFields.values().stream().flatMap(List::stream)
+			.collect(Collectors.toSet());
 
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> result = new HashMap<>();
-		Set<TypeElement> relationshipProperties = getTypesAnnotatedWith(relationshipEntityAnnotationType,
-			roundEnvironment);
-		relationshipProperties.forEach(e -> {
+		Set<TypeElement> annotatedEntities = getTypesAnnotatedWith(relationshipEntityAnnotationType, roundEnvironment);
+		annotatedEntities.forEach(annotatedEntity -> {
+
+			var relationshipType = getRelationshipEntityType(annotatedEntity);
+
 			List<PropertyDefinition> properties = new ArrayList<>();
-			for (Element enclosedElement : e.getEnclosedElements()) {
-				TypeElement actualTargetType = null;
+			Element startElement = null;
+			Element endElement = null;
+			for (Element enclosedElement : annotatedEntity.getEnclosedElements()) {
+
 				if (!enclosedElement.getKind().isField()) {
 					continue;
 				}
-
 				Set<Element> declaredAnnotations = enclosedElement.getAnnotationMirrors().stream()
 					.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
+
 				if (declaredAnnotations.contains(startNodeAnnotationType)) {
-					Element element = typeUtils.asElement(enclosedElement.asType());
-					actualTargetType = element.accept(new TypeElementVisitor<>(Function.identity()), null);
-					if (actualTargetType == null) {
-						messager.printMessage(Diagnostic.Kind.WARNING,
-							"Cannot resolve generic type, not generating a property for relationships referring to "
-							+ e.getQualifiedName(), element);
-					}
-				} else if (!declaredAnnotations.contains(endNodeAnnotationType)) {
+					startElement = enclosedElement;
+				} else if (declaredAnnotations.contains(endNodeAnnotationType)) {
+					endElement = enclosedElement;
+				} else {
 					properties.add(asPropertyDefinition(enclosedElement));
 				}
+			}
 
-				if (actualTargetType != null) {
-					result.put(e,
-						new AbstractMap.SimpleEntry<>(actualTargetType, Collections.unmodifiableList(properties)));
+			TypeElement actualTargetType = null;
+			Element relationshipDefiningElement = null;
+			if (startElement != null && endElement != null) {
+				var finalEndElement = endElement;
+				var direction = findDirection(relationshipType, annotatedEntity, startElement,
+					allRelationshipFields).or(
+						() -> findDirection(relationshipType, annotatedEntity, finalEndElement, allRelationshipFields))
+					.orElse(Relationship.Direction.OUTGOING);
+
+				relationshipDefiningElement = direction == Relationship.Direction.OUTGOING ? endElement : startElement;
+			} else if (startElement != null) {
+				relationshipDefiningElement = startElement;
+			} else if (endElement != null) {
+				relationshipDefiningElement = endElement;
+			}
+
+			if (relationshipDefiningElement != null) {
+				actualTargetType = typeUtils.asElement(relationshipDefiningElement.asType())
+					.accept(new TypeElementVisitor<>(Function.identity()), null);
+				if (actualTargetType == null) {
+					messager.printMessage(Diagnostic.Kind.WARNING,
+						"Cannot resolve generic type, not generating a property for relationships referring to "
+						+ annotatedEntity.getQualifiedName(), relationshipDefiningElement);
 				}
+			}
+
+			if (actualTargetType != null) {
+				result.put(annotatedEntity,
+					new AbstractMap.SimpleEntry<>(actualTargetType, Collections.unmodifiableList(properties)));
 			}
 		});
 		return Collections.unmodifiableMap(result);
 	}
 
-	@Override
-	protected PropertyDefinition asPropertyDefinition(Element e) {
+	@Override protected PropertyDefinition asPropertyDefinition(Element e) {
 		Optional<Property> optionalPropertyAnnotation = Optional.ofNullable(e.getAnnotation(Property.class));
 
 		PropertyDefinition propertyDefinition;
@@ -237,8 +307,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		return propertyDefinition;
 	}
 
-	@Override
-	protected RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
+	@Override protected RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
 		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 		Optional<Relationship> optionalRelationshipAnnotation = Optional.ofNullable(
@@ -319,8 +388,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		}
 	}
 
-	@Override
-	protected PropertiesAndRelationshipGrouping newPropertiesAndRelationshipGrouping() {
+	@Override protected PropertiesAndRelationshipGrouping newPropertiesAndRelationshipGrouping() {
 		return new GroupPropertiesAndRelationships();
 	}
 
@@ -329,9 +397,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	 */
 	// Silence Sonar complaining about the class hierarchy, which is given through
 	// the ElementKindVisitor8, which we need but cannot change
-	@SuppressWarnings("squid:S110")
-	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<Element>>, Void>
-		implements PropertiesAndRelationshipGrouping {
+	@SuppressWarnings("squid:S110") class GroupPropertiesAndRelationships
+		extends ElementKindVisitor8<Map<FieldType, List<Element>>, Void> implements PropertiesAndRelationshipGrouping {
 
 		private final Map<FieldType, List<Element>> result;
 
@@ -351,19 +418,16 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			return result;
 		}
 
-		@Override
-		public Map<FieldType, List<Element>> visitTypeAsRecord(TypeElement e, Void unused) {
+		@Override public Map<FieldType, List<Element>> visitTypeAsRecord(TypeElement e, Void unused) {
 			// We must overwrite this or visitUnknown() in case we encounter a record
 			return result;
 		}
 
-		@Override
-		public Map<FieldType, List<Element>> visitRecordComponent(RecordComponentElement e, Void unused) {
+		@Override public Map<FieldType, List<Element>> visitRecordComponent(RecordComponentElement e, Void unused) {
 			return visitFieldOrRecordComponent(e);
 		}
 
-		@Override
-		public Map<FieldType, List<Element>> visitVariableAsField(VariableElement e, Void unused) {
+		@Override public Map<FieldType, List<Element>> visitVariableAsField(VariableElement e, Void unused) {
 			return visitFieldOrRecordComponent(e);
 		}
 
@@ -437,8 +501,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 				return false;
 			} else {
 				var type = typeMirrorOfField.accept(new TypeKindVisitor8<>() {
-					@Override
-					public String visitDeclared(DeclaredType t, Object o) {
+					@Override public String visitDeclared(DeclaredType t, Object o) {
 						return t.asElement().accept(new TypeElementVisitor<>(newTypeElementNameFunction()), null);
 					}
 				}, null);
