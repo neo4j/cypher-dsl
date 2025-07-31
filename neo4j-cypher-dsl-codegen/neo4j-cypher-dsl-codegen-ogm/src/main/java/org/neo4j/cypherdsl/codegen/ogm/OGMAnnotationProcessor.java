@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.codegen.ogm;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -52,6 +54,7 @@ import javax.lang.model.util.SimpleTypeVisitor8;
 import javax.lang.model.util.TypeKindVisitor8;
 import javax.tools.Diagnostic;
 
+import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.codegen.core.AbstractMappingAnnotationProcessor;
 import org.neo4j.cypherdsl.codegen.core.Configuration;
 import org.neo4j.cypherdsl.codegen.core.ModelBuilder;
@@ -65,9 +68,11 @@ import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 
 /**
- * @author Shinigami
- * @since TODO
+ * @author Shinigami92 (Christopher Quadflieg)
+ * @author Michael J. Simons
+ * @since 2025.8.0
  */
+@API(status = EXPERIMENTAL, since = "2025.8.0")
 @SupportedAnnotationTypes({ OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
 	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION })
 @SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,
@@ -115,7 +120,6 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			}
 		};
 		addLabel.accept(nodeAnnotation.label());
-		// TODO Just so that you know @Shinigami92, you always have to look at both the original and the aliases
 		addLabel.accept(nodeAnnotation.value());
 
 		if (labels.isEmpty()) {

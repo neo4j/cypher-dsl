@@ -14,7 +14,7 @@ Inside those classes `@Relationship`, `@Property`, `@StartNode` and `@EndNode` a
 
 The processor generates a static metamodel for each annotated class found in the same package with an underscore (`_`) added to the name.
 
-The processor needs Neo4j-OGM 4 and the Cypher-DSL in version `2025.7.0` or later on it's classpath.
+The processor needs Neo4j-OGM 4 and the Cypher-DSL in version `2025.8.0` or later on it's classpath.
 We recommend using it explicitly on the separate annotation processor classpath (via `--processor-path` to `javac`).
 
 The processor does *not* support nested classes used as `@NodeEntity` or `@RelationshipEntity`.

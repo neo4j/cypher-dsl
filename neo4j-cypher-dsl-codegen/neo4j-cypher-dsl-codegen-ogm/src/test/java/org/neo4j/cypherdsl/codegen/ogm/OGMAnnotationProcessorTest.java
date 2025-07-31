@@ -39,7 +39,7 @@ import com.google.testing.compile.JavaFileObjects;
 
 /**
  * @author Michael J. Simons
- * @author Shinigami
+ * @author Shinigami92 (Christopher Quadflieg)
  */
 class OGMAnnotationProcessorTest {
 

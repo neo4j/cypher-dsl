@@ -55,7 +55,7 @@ import javax.tools.JavaFileObject;
  * Base class to build generators based on Neo4j supported object mapping frameworks (we ship with support for SDN6+ and Neo4j-OGM).
  *
  * @author Michael J. Simons
- * @since TODO
+ * @since 2025.8.0
  */
 public abstract class AbstractMappingAnnotationProcessor extends AbstractProcessor {
 
@@ -433,11 +433,11 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	 *
 	 * @param <E> The type of the returned value
 	 */
-	private static class TypeElementVisitor<E> extends SimpleElementVisitor8<E, Void> {
+	protected static class TypeElementVisitor<E> extends SimpleElementVisitor8<E, Void> {
 
 		private final Function<TypeElement, E> delegate;
 
-		TypeElementVisitor(Function<TypeElement, E> delegate) {
+		public TypeElementVisitor(Function<TypeElement, E> delegate) {
 			this.delegate = delegate;
 		}
 

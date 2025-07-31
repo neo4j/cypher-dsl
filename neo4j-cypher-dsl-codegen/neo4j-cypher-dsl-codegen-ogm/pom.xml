@@ -32,9 +32,6 @@
 	<description>Annotation processor reading Neo4j-OGM annotations and creating a static model of them.</description>
 
 	<properties>
-		<!-- TODO @Shinigami92 bump this up again after add the appropriate tests -->
-		<covered-ratio-complexity>0.1</covered-ratio-complexity>
-		<covered-ratio-instructions>0.1</covered-ratio-instructions>
 		<java-module-name>org.neo4j.cypherdsl.codegen.ogm</java-module-name>
 		<sonar.coverage.jacoco.xmlReportPaths>${basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
 	</properties>

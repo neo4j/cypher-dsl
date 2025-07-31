@@ -35,5 +35,4 @@ public class NodesWithDifferentLabelAnnotations {
 	static class LabelOnNode2 {
 	}
 
-	// TODO inherited labels, different than what we have in SDN6
 }
