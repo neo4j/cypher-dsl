@@ -30,8 +30,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Exception thrown when extracting parameters from a statement leads to one parameter with a given name appearing
@@ -58,7 +56,6 @@ public final class ConflictingParametersException extends RuntimeException {
 	/**
 	 * @return the conflicting parameters
 	 */
-	@NotNull @Contract(pure = true)
 	public Map<String, Set<Object>> getErroneousParameters() {
 		return Collections.unmodifiableMap(erroneousParameters);
 	}

@@ -25,7 +25,6 @@ module org.neo4j.cypherdsl.core {
 
 	requires static com.querydsl.core;
 	requires static java.sql;
-	requires static org.jetbrains.annotations;
 	requires static org.neo4j.cypherdsl.build.annotations;
 	requires static org.neo4j.driver;
 	requires static org.reactivestreams;

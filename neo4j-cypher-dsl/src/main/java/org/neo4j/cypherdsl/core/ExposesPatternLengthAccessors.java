@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This interface is used to derive new relationship patterns from existing {@link Relationship relationships} or {@link RelationshipChain chains of relationships}
@@ -41,7 +39,6 @@ public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 	 * @return the new relationship
 	 * @since 1.1.1
 	 */
-	@NotNull @Contract(pure = true)
 	T unbounded();
 
 	/**
@@ -50,7 +47,6 @@ public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 	 * @param minimum the new minimum
 	 * @return the new relationship
 	 */
-	@NotNull @Contract(pure = true)
 	T min(Integer minimum);
 
 	/**
@@ -59,7 +55,6 @@ public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
-	@NotNull @Contract(pure = true)
 	T max(Integer maximum);
 
 	/**
@@ -69,6 +64,5 @@ public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
-	@NotNull @Contract(pure = true)
 	T length(Integer minimum, Integer maximum);
 }

@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -47,7 +45,6 @@ public final class Reduction extends TypedSubtree<Visitable> {
 	 * @param variable The closure will have a variable introduced in its context. We decide here which variable to use.
 	 * @return An ongoing definition
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingDefinitionWithVariable of(SymbolicName variable) {
 
 		Assertions.notNull(variable, "A variable is required");
@@ -67,7 +64,7 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		 * @param list The list that is the subject of the reduction
 		 * @return An ongoing definition
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingDefinitionWithList in(Expression list);
 	}
 
@@ -80,7 +77,7 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		 * @param mapper This expression will run once per value in the list, and produce the result value.
 		 * @return An ongoing definition
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingDefinitionWithReducer map(Expression mapper);
 	}
 
@@ -93,7 +90,7 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		 * @param accumulator A variable that will hold the result and the partial results as the list is iterated.
 		 * @return An ongoing definition
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingDefinitionWithInitial accumulateOn(Expression accumulator);
 	}
 
@@ -106,7 +103,6 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		 * @param initialValue An expression that runs once to give a starting value to the accumulator.
 		 * @return An ongoing definition
 		 */
-		@NotNull @Contract(pure = true)
 		FunctionInvocation withInitialValueOf(Expression initialValue);
 	}
 

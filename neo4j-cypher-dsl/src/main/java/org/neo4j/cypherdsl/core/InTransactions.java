@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -38,11 +37,10 @@ public final class InTransactions implements Visitable {
 
 	private final Subquery subquery;
 
-	@Nullable
 	private final Integer rows;
 
 	@API(status = INTERNAL)
-	InTransactions(Subquery subquery, @Nullable Integer rows) {
+	InTransactions(Subquery subquery, Integer rows) {
 		this.subquery = subquery;
 		this.rows = rows;
 	}
@@ -51,7 +49,6 @@ public final class InTransactions implements Visitable {
 	 * @return number of rows in this transaction
 	 */
 	@API(status = INTERNAL)
-	@Nullable
 	public Integer getRows() {
 		return rows;
 	}

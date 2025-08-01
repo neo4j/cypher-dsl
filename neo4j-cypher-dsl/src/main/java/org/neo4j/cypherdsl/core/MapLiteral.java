@@ -24,7 +24,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A map of literals.
@@ -39,7 +38,6 @@ public final class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 		super(content);
 	}
 
-	@NotNull
 	@Override
 	public String asString() {
 		return content.entrySet().stream()

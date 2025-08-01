@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * An element with an alias. An alias has a subtle difference to a symbolic name in cypher. Nodes and relationships can
@@ -39,7 +37,6 @@ public interface Aliased {
 	/**
 	 * @return the alias.
 	 */
-	@NotNull @Contract(pure = true)
 	String getAlias();
 
 	/**
@@ -47,7 +44,6 @@ public interface Aliased {
 	 *
 	 * @return A new symbolic name
 	 */
-	@NotNull @Contract(pure = true)
 	default SymbolicName asName() {
 		return SymbolicName.of(this.getAlias());
 	}

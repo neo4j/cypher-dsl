@@ -37,7 +37,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.Aliased;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Asterisk;
@@ -343,7 +342,6 @@ public final class ScopingStrategy {
 			.anyMatch(identifiedBy(needle));
 	}
 
-	@NotNull
 	private static Predicate<IdentifiableElement> byHasAName() {
 		Predicate<IdentifiableElement> hasAName = Named.class::isInstance;
 		hasAName = hasAName.or(AliasedExpression.class::isInstance);
@@ -370,7 +368,6 @@ public final class ScopingStrategy {
 		return value;
 	}
 
-	@NotNull
 	private Predicate<String> identifiedBy(Named needle) {
 		return i -> {
 			boolean result = i.equals(needle.getRequiredSymbolicName().getValue());

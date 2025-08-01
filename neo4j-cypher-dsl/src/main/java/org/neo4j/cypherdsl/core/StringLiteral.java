@@ -26,7 +26,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The string representation of a string literal will be a quoted Cypher string in single tickmarks with
@@ -45,7 +44,6 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 		super(content);
 	}
 
-	@NotNull
 	@Override
 	public String asString() {
 

@@ -23,9 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.net.URI;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl;
 
 /**
@@ -42,8 +39,7 @@ public interface LoadCSVStatementBuilder extends StatementBuilder {
 	 * @param rate The rate to be used. No checks are done on the rate, the database will verify valid values.
 	 * @return An ongoing definition of a {@code LOAD CSV} clause
 	 */
-	@NotNull @Contract(pure = true)
-	static ExposesLoadCSV usingPeriodicCommit(@Nullable Integer rate) {
+	static ExposesLoadCSV usingPeriodicCommit(Integer rate) {
 		return new PrepareLoadCSVStatementImpl(rate);
 	}
 
@@ -54,7 +50,6 @@ public interface LoadCSVStatementBuilder extends StatementBuilder {
 	 * @param withHeaders Set to {@literal true} if the csv file contains header
 	 * @return An ongoing definition of a {@code LOAD CSV} clause
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
 		return new PrepareLoadCSVStatementImpl(from, withHeaders);
 	}
@@ -70,7 +65,6 @@ public interface LoadCSVStatementBuilder extends StatementBuilder {
 		 * @param alias The alias for each line
 		 * @return A statement builder supporting all available clauses plus an option to configure the field terminator
 		 */
-		@NotNull @Contract(pure = true)
 		default LoadCSVStatementBuilder as(SymbolicName alias) {
 			return as(alias.getValue());
 		}
@@ -81,7 +75,6 @@ public interface LoadCSVStatementBuilder extends StatementBuilder {
 		 * @param alias The alias for each line
 		 * @return A statement builder supporting all available clauses plus an option to configure the field terminator
 		 */
-		@NotNull @Contract(pure = true)
 		LoadCSVStatementBuilder as(String alias);
 	}
 
@@ -91,6 +84,5 @@ public interface LoadCSVStatementBuilder extends StatementBuilder {
 	 * @param fieldTerminator A new field terminator
 	 * @return A statement builder supporting all available clauses
 	 */
-	@NotNull @Contract(pure = true)
 	StatementBuilder withFieldTerminator(String fieldTerminator);
 }

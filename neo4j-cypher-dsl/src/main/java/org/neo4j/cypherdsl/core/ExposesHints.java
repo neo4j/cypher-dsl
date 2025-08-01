@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.Arrays;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
@@ -51,7 +50,7 @@ public interface ExposesHints {
 	 * @param properties One or properties that makes up the index. The properties must belong to the same node.
 	 * @return A statement using an INDEX hint.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere usingIndex(Property... properties);
 
 	/**
@@ -66,7 +65,7 @@ public interface ExposesHints {
 	 * @param properties One or properties that makes up the index. The properties must belong to the same node.
 	 * @return A statement using an INDEX SEEK hint.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere usingIndexSeek(Property... properties);
 
 	/**
@@ -80,7 +79,7 @@ public interface ExposesHints {
 	 * @param node The node that should be scanned
 	 * @return A statement using a SCAN hint.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere usingScan(Node node);
 
 	/**
@@ -96,7 +95,7 @@ public interface ExposesHints {
 	 * @param nodes The nodes on which a join should be started.
 	 * @return A statement using a JOIN hint.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere usingJoinOn(Node... nodes) {
 
 		Assertions.notEmpty(nodes, "At least one node is required to define a JOIN hint.");
@@ -116,6 +115,6 @@ public interface ExposesHints {
 	 * @param names The symbolic names identifying the nodes.
 	 * @return A statement using a JOIN hint.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere usingJoinOn(SymbolicName... names);
 }

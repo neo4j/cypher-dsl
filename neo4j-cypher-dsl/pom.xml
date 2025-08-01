@@ -55,10 +55,6 @@
 			<artifactId>apiguardian-api</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.jetbrains</groupId>
-			<artifactId>annotations</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-schema-name-support</artifactId>
 		</dependency>
@@ -185,8 +181,10 @@
 						<configuration combine.self="append">
 							<compilerArgs>
 								<arg>-Aquerydsl.generatedAnnotationClass=com.querydsl.core.annotations.Generated</arg>
-								<arg>-Xlint:all,-options,-path,-processing,-exports,-missing-explicit-ctor</arg>
+								<arg>-Xlint:all,-options,-path,-processing,-exports,-missing-explicit-ctor,-classfile</arg>
 								<arg>-Werror</arg>
+								<!-- Added because QueryDSL drags in Jetbrains annotation which we won't add explicitly. Goes together with -classfile. -->
+								<arg>-implicit:class</arg>
 							</compilerArgs>
 							<annotationProcessorPaths>
 								<annotationProcessorPath>

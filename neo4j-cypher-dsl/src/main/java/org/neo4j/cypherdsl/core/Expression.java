@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -43,7 +41,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 * @since 2022.7.0
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition includesAll(Expression rhs) {
 		return Conditions.includesAll(this, rhs);
 	}
@@ -55,7 +52,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 * @since 2022.7.0
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition includesAny(Expression rhs) {
 		return Conditions.includesAny(this, rhs);
 	}
@@ -66,7 +62,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param alias The alias to use
 	 * @return An aliased expression.
 	 */
-	@NotNull @Contract(pure = true)
 	default AliasedExpression as(String alias) {
 
 		Assertions.hasText(alias, "The alias may not be null or empty.");
@@ -85,7 +80,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return The size of this expression (Either the number of items in a list or the number of characters in a string expression).
 	 * @since 2022.1.0
 	 */
-	@NotNull @Contract(pure = true)
 	default Expression size() {
 
 		return Functions.size(this);
@@ -99,7 +93,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @see #size()
 	 * @since 2022.1.0
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition hasSize(Expression expectedSize) {
 
 		return Functions.size(this).isEqualTo(expectedSize);
@@ -112,7 +105,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return An aliased expression.
 	 * @since 2021.0.2
 	 */
-	@NotNull @Contract(pure = true)
 	default AliasedExpression as(SymbolicName alias) {
 
 		Assertions.notNull(alias, "The alias may not be null.");
@@ -125,7 +117,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return this expression as a condition. Will return the same instance if it is already a condition.
 	 * @since 2021.2.2
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition asCondition() {
 		return this instanceof Condition condition ? condition : new ExpressionCondition(this);
 	}
@@ -136,7 +127,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isEqualTo(Expression rhs) {
 		return Conditions.isEqualTo(this, rhs);
 	}
@@ -147,7 +137,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition eq(Expression rhs) {
 		return isEqualTo(rhs);
 	}
@@ -158,7 +147,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isNotEqualTo(Expression rhs) {
 		return Conditions.isNotEqualTo(this, rhs);
 	}
@@ -169,7 +157,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition ne(Expression rhs) {
 		return isNotEqualTo(rhs);
 	}
@@ -180,7 +167,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition lt(Expression rhs) {
 		return Conditions.lt(this, rhs);
 	}
@@ -191,7 +177,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition lte(Expression rhs) {
 		return Conditions.lte(this, rhs);
 	}
@@ -202,7 +187,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition gt(Expression rhs) {
 		return Conditions.gt(this, rhs);
 	}
@@ -213,7 +197,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param rhs The right hand side of the condition
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition gte(Expression rhs) {
 		return Conditions.gte(this, rhs);
 	}
@@ -223,7 +206,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isTrue() {
 		return Conditions.isEqualTo(this, Cypher.literalTrue());
 	}
@@ -233,7 +215,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A new condition
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isFalse() {
 		return Conditions.isEqualTo(this, Cypher.literalFalse());
 	}
@@ -244,7 +225,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param expression The expression to match against. Must evaluate into a string during runtime.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition matches(Expression expression) {
 		return Conditions.matches(this, expression);
 	}
@@ -255,7 +235,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param pattern The pattern to match
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition matches(String pattern) {
 		return Conditions.matches(this, Cypher.literalOf(pattern));
 	}
@@ -266,7 +245,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param expression The expression to match against. Must evaluate into a string during runtime.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition startsWith(Expression expression) {
 		return Conditions.startsWith(this, expression);
 	}
@@ -277,7 +255,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param expression The expression to match against. Must evaluate into a string during runtime.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition contains(Expression expression) {
 		return Conditions.contains(this, expression);
 	}
@@ -288,7 +265,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param expression The expression to match against. Must evaluate into a string during runtime.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition endsWith(Expression expression) {
 		return Conditions.endsWith(this, expression);
 	}
@@ -299,7 +275,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param expression The expression to concat to this expression.
 	 * @return A new expression.
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation concat(Expression expression) {
 		return Operations.concat(this, expression);
 	}
@@ -311,7 +286,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation add(Expression addend) {
 		return Operations.add(this, addend);
 	}
@@ -323,7 +297,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation subtract(Expression subtrahend) {
 		return Operations.subtract(this, subtrahend);
 	}
@@ -335,7 +308,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation multiply(Expression multiplicand) {
 		return Operations.multiply(this, multiplicand);
 	}
@@ -347,7 +319,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation divide(Expression dividend) {
 		return Operations.divide(this, dividend);
 	}
@@ -358,7 +329,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param dividend The dividend
 	 * @return A new operation.
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation remainder(Expression dividend) {
 		return Operations.remainder(this, dividend);
 	}
@@ -369,7 +339,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param n power to raise this {@code Expression} to.
 	 * @return A new operation.
 	 */
-	@NotNull @Contract(pure = true)
 	default Operation pow(Expression n) {
 
 		return Operations.pow(this, n);
@@ -381,7 +350,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A condition based on this expression that evaluates to true when this expression is null.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isNull() {
 		return Conditions.isNull(this);
 	}
@@ -392,7 +360,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A condition based on this expression that evaluates to true when this expression is not null.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isNotNull() {
 		return Conditions.isNotNull(this);
 	}
@@ -404,7 +371,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @param haystack The expression to search for this expression
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition in(Expression haystack) {
 		return Comparison.create(this, Operator.IN, haystack);
 	}
@@ -414,7 +380,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition isEmpty() {
 
 		return Functions.size(this).isEqualTo(Cypher.literalOf(0L));
@@ -425,7 +390,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A sort item for this property in descending order
 	 */
-	@NotNull @Contract(pure = true)
 	default SortItem descending() {
 
 		return SortItem.create(this, SortItem.Direction.DESC);
@@ -436,7 +400,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 *
 	 * @return A sort item for this property in ascending order
 	 */
-	@NotNull @Contract(pure = true)
 	default SortItem ascending() {
 
 		return SortItem.create(this, SortItem.Direction.ASC);
@@ -449,14 +412,12 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new sort item.
 	 * @since 2021.4.1
 	 */
-	@NotNull @Contract(pure = true)
 	default SortItem sorted(SortItem.Direction direction) {
 
 		return SortItem.create(this, direction);
 	}
 
-	@Override @NotNull
-	default Property property(String... names) {
+	@Override default Property property(String... names) {
 
 		return InternalPropertyImpl.create(this, names);
 	}
@@ -476,8 +437,7 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return a new {@link Property} associated with this named container
 	 * @since 2024.1.0
 	 */
-	@Override @NotNull
-	default Property property(@NotNull Expression lookup) {
+	@Override default Property property(Expression lookup) {
 		return InternalPropertyImpl.create(this, lookup);
 	}
 }

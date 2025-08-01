@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
@@ -32,7 +31,7 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 @API(status = STABLE, since = "2024.4.0")
 public interface ExposesFinish {
 
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.Terminal finish();
 
 }

@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.querydsl.CypherContext;
 import org.neo4j.cypherdsl.core.querydsl.ToCypherFormatStringVisitor;
@@ -52,7 +51,6 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
-	@NotNull
 	public Condition asCondition() {
 
 		if (!(expression instanceof Predicate)) {
@@ -70,7 +68,6 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
-	@NotNull
 	public Expression asExpression() {
 
 		CypherContext context = new CypherContext();
@@ -80,7 +77,6 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
-	@NotNull
 	public Node asNode() {
 
 		if (!(expression instanceof Path<?> entityPath)) {
@@ -90,7 +86,6 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 		return Cypher.node(entityPath.getRoot().getType().getSimpleName()).named(entityPath.getMetadata().getName());
 	}
 
-	@NotNull
 	@Override
 	public Relationship asRelationship() {
 
@@ -98,7 +93,6 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	}
 
 	@Override
-	@NotNull
 	public SymbolicName asName() {
 
 		if (!(expression instanceof Path<?> entityPath)) {

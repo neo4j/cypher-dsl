@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -71,7 +69,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 
 	private final Quantifier quantifier;
 
-	static QuantifiedPathPattern of(PatternElement patternElement, @Nullable Quantifier quantifier) {
+	static QuantifiedPathPattern of(PatternElement patternElement, Quantifier quantifier) {
 
 		var delegate = patternElement instanceof TargetPattern ppp ? ppp : new TargetPattern(patternElement, null);
 
@@ -92,7 +90,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 	}
 
 	@Override
-	public @NotNull PatternElement where(@Nullable Expression predicate) {
+	public PatternElement where(Expression predicate) {
 		if (predicate == null) {
 			return this;
 		}
@@ -107,10 +105,9 @@ public final class QuantifiedPathPattern implements PatternElement {
 
 		private final PatternElement delegate;
 
-		@Nullable
-		private final Where innerPredicate;
+			private final Where innerPredicate;
 
-		private TargetPattern(PatternElement delegate, @Nullable Where innerPredicate) {
+		private TargetPattern(PatternElement delegate, Where innerPredicate) {
 			this.delegate = delegate;
 			this.innerPredicate = innerPredicate;
 		}
@@ -125,7 +122,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 		}
 
 		@Override
-		public @NotNull PatternElement where(@Nullable Expression predicate) {
+		public PatternElement where(Expression predicate) {
 			if (predicate == null) {
 				return this;
 			}

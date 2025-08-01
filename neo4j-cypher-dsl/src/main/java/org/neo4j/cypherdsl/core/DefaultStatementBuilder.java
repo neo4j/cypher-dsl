@@ -32,7 +32,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableMatchAndUpdate;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableOngoingMergeAction;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMatchAndUpdate;
@@ -110,7 +109,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
@@ -124,34 +122,29 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingUpdate create(PatternElement... pattern) {
 
 		return update(UpdateType.CREATE, pattern);
 	}
 
-	@NotNull
 	@Override
 	public final OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 
 		return create(pattern.toArray(new PatternElement[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final OngoingMerge merge(PatternElement... pattern) {
 
 		return update(UpdateType.MERGE, pattern);
 	}
 
-	@NotNull
 	@Override
 	public final OngoingMergeAction onCreate() {
 		return ongoingOnAfterMerge(MergeAction.Type.ON_CREATE);
 	}
 
-	@NotNull
 	@Override
 	public final OngoingMergeAction onMatch() {
 		return ongoingOnAfterMerge(MergeAction.Type.ON_MATCH);
@@ -165,27 +158,25 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new OngoingMergeAction() {
 
 			@Override
-			public @NotNull BuildableOngoingMergeAction set(Node node, String... labels) {
+			public BuildableOngoingMergeAction set(Node node, String... labels) {
 
 				return this.set(Operations.set(node, labels));
 			}
 
 			@Override
-			public @NotNull BuildableOngoingMergeAction set(Node node, Collection<String> labels) {
+			public BuildableOngoingMergeAction set(Node node, Collection<String> labels) {
 
 				return this.set(Operations.set(node, labels.toArray(new String[0])));
 			}
 
-			@NotNull
-			@Override
+					@Override
 			public BuildableOngoingMergeAction mutate(Expression target, Expression properties) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.MUTATE, target, properties);
 				return DefaultStatementBuilder.this;
 			}
 
-			@NotNull
-			@Override
+					@Override
 			public BuildableOngoingMergeAction set(Expression... expressions) {
 
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
@@ -193,8 +184,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				return DefaultStatementBuilder.this;
 			}
 
-			@NotNull
-			@Override
+					@Override
 			public BuildableOngoingMergeAction set(Collection<? extends Expression> expressions) {
 				return set(expressions.toArray(new Expression[] {}));
 			}
@@ -226,21 +216,18 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingAndReturn returning(Collection<? extends Expression> elements) {
 
 		return returning(false, false, elements);
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> elements) {
 
 		return returning(false, true, elements);
 	}
 
-	@NotNull
 	@Override
 	public StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 
@@ -254,13 +241,11 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ongoingMatchAndReturn;
 	}
 
-	@NotNull
 	@Override
 	public final OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 		return with(false, elements);
 	}
 
-	@NotNull
 	@Override
 	public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 		return with(true, elements);
@@ -273,35 +258,30 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ongoingMatchAndWith;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingUpdate delete(Expression... expressions) {
 
 		return update(UpdateType.DELETE, expressions);
 	}
 
-	@NotNull
 	@Override
 	public final OngoingUpdate delete(Collection<? extends Expression> expressions) {
 
 		return delete(expressions.toArray(new Expression[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final OngoingUpdate detachDelete(Expression... expressions) {
 
 		return update(UpdateType.DETACH_DELETE, expressions);
 	}
 
-	@NotNull
 	@Override
 	public final OngoingUpdate detachDelete(Collection<? extends Expression> expressions) {
 
 		return detachDelete(expressions.toArray(new Expression[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Expression... expressions) {
 
@@ -310,14 +290,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return result;
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Collection<? extends Expression> expressions) {
 
 		return set(expressions.toArray(new Expression[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Node named, String... labels) {
 
@@ -325,14 +303,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(named, labels));
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate set(Node named, Collection<String> labels) {
 
 		return set(named, labels.toArray(new String[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
@@ -341,7 +317,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return result;
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Property... properties) {
 
@@ -349,14 +324,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Collection<Property> properties) {
 
 		return remove(properties.toArray(new Property[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Node named, String... labels) {
 
@@ -364,14 +337,12 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(named, labels));
 	}
 
-	@NotNull
 	@Override
 	public final BuildableMatchAndUpdate remove(Node named, Collection<String> labels) {
 
 		return remove(named, labels.toArray(new String[] {}));
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithWhere where(Condition newCondition) {
 
@@ -387,7 +358,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithWhere and(Condition additionalCondition) {
 
@@ -395,7 +365,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithWhere or(Condition additionalCondition) {
 
@@ -403,7 +372,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public Statement build() {
 
@@ -457,7 +425,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.currentSinglePartElements.add(updatingClause);
 	}
 
-	@NotNull
 	@Override
 	public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 
@@ -469,7 +436,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
 
@@ -481,7 +447,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
 
@@ -511,7 +476,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.currentOngoingUpdate = null;
 	}
 
-	@NotNull
 	@Override
 	public final Condition asCondition() {
 
@@ -522,7 +486,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return ExistentialSubquery.exists(this.currentOngoingMatch.buildMatch());
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere usingIndex(Property... properties) {
 
@@ -530,7 +493,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere usingIndexSeek(Property... properties) {
 
@@ -538,7 +500,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere usingScan(Node node) {
 
@@ -546,7 +507,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return this;
 	}
 
-	@NotNull
 	@Override
 	public final OngoingReadingWithoutWhere usingJoinOn(SymbolicName... names) {
 
@@ -555,7 +515,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+	public ForeachSourceStep foreach(SymbolicName variable) {
 
 		this.closeCurrentOngoingMatch();
 		this.closeCurrentOngoingUpdate();
@@ -564,7 +524,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	@Override
-	public @NotNull Terminal finish() {
+	public Terminal finish() {
 		return new DefaultStatementWithFinishBuilder();
 	}
 
@@ -579,7 +539,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public ForeachUpdateStep in(@NotNull Expression newVariableList) {
+		public ForeachUpdateStep in(Expression newVariableList) {
 
 			this.list = Objects.requireNonNull(newVariableList);
 			return this;
@@ -640,75 +600,64 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return extractIdentifiablesFromReturnList(returnList);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem) {
 			orderBuilder.orderBy(sortItem);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem) {
 			return orderBy(sortItem.toArray(new SortItem[] {}));
 		}
 
-		@NotNull
-		@Override
-		public final TerminalOngoingOrderDefinition orderBy(@NotNull Expression expression) {
+			@Override
+		public final TerminalOngoingOrderDefinition orderBy(Expression expression) {
 			orderBuilder.orderBy(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
-		public final TerminalOngoingOrderDefinition and(@NotNull Expression expression) {
+			@Override
+		public final TerminalOngoingOrderDefinition and(Expression expression) {
 			orderBuilder.and(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final DefaultStatementWithReturnBuilder descending() {
 			orderBuilder.descending();
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final DefaultStatementWithReturnBuilder ascending() {
 			orderBuilder.ascending();
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final OngoingReadingAndReturn skip(Number number) {
 			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final OngoingReadingAndReturn skip(Expression expression) {
 			orderBuilder.skip(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final OngoingReadingAndReturn limit(Number number) {
 			return limit(number == null ? null : new NumberLiteral(number));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public final OngoingReadingAndReturn limit(Expression expression) {
 			orderBuilder.limit(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public ResultStatement build() {
 
 			Return returning = Return.create(rawReturn, distinct, returnList, orderBuilder);
@@ -719,7 +668,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 	protected final class DefaultStatementWithFinishBuilder implements Terminal {
 
 		@Override
-		public @NotNull Statement build() {
+		public Statement build() {
 			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(Finish.create());
 		}
 	}
@@ -762,8 +711,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return extractIdentifiablesFromReturnList(returnList);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			return DefaultStatementBuilder.this
@@ -771,8 +719,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.returning(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
 
 			return DefaultStatementBuilder.this
@@ -780,16 +727,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.returningDistinct(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.returningRaw(rawExpression);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate delete(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
@@ -797,15 +742,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.delete(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate delete(Collection<? extends Expression> expressions) {
 
 			return delete(expressions.toArray(new Expression[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate detachDelete(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
@@ -813,15 +756,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.detachDelete(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate detachDelete(Collection<? extends Expression> expressions) {
 
 			return detachDelete(expressions.toArray(new Expression[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Expression... expressions) {
 
 			return DefaultStatementBuilder.this
@@ -829,15 +770,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.set(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Collection<? extends Expression> expressions) {
 
 			return set(expressions.toArray(new Expression[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
@@ -845,15 +784,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.set(node, labels);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
 
 			return set(node, labels.toArray(new String[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			return DefaultStatementBuilder.this
@@ -861,8 +798,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.mutate(target, properties);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
 			return DefaultStatementBuilder.this
@@ -870,15 +806,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.remove(node, labels);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
 
 			return remove(node, labels.toArray(new String[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			return DefaultStatementBuilder.this
@@ -886,15 +820,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.remove(properties);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
 
 			return remove(properties.toArray(new Property[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 
 			return DefaultStatementBuilder.this
@@ -902,8 +834,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.with(elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 
 			return DefaultStatementBuilder.this
@@ -911,32 +842,28 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.withDistinct(elements);
 		}
 
-		@NotNull
-		@Override
-		public OrderableOngoingReadingAndWithWithWhere where(@NotNull Condition newCondition) {
+			@Override
+		public OrderableOngoingReadingAndWithWithWhere where(Condition newCondition) {
 
 			conditionBuilder.where(newCondition);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithWhere and(Condition additionalCondition) {
 
 			conditionBuilder.and(additionalCondition);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithWhere or(Condition additionalCondition) {
 
 			conditionBuilder.or(additionalCondition);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
@@ -944,8 +871,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.match(optional, pattern);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate create(PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
@@ -953,15 +879,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.create(pattern);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 
 			return create(pattern.toArray(new PatternElement[]{}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingMerge merge(PatternElement... pattern) {
 
 			return DefaultStatementBuilder.this
@@ -977,8 +901,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.unwind(expression);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 
 			return DefaultStatementBuilder.this
@@ -987,23 +910,21 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public @NotNull BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.callRawCypher(rawCypher, args);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
 				.callInTransactions(statement, rows, imports);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public InQueryCallBuilder call(String... namespaceAndProcedure) {
 
 			return DefaultStatementBuilder.this
@@ -1011,83 +932,72 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.call(namespaceAndProcedure);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem) {
 			orderBuilder.orderBy(sortItem);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem) {
 			return orderBy(sortItem.toArray(new SortItem[] {}));
 		}
 
-		@NotNull
-		@Override
-		public OngoingOrderDefinition orderBy(@NotNull Expression expression) {
+			@Override
+		public OngoingOrderDefinition orderBy(Expression expression) {
 			orderBuilder.orderBy(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
-		public OngoingOrderDefinition and(@NotNull Expression expression) {
+			@Override
+		public OngoingOrderDefinition and(Expression expression) {
 			orderBuilder.and(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndWithWithWhereAndOrder descending() {
 			orderBuilder.descending();
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndWithWithWhereAndOrder ascending() {
 			orderBuilder.ascending();
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndWithWithSkip skip(Number number) {
 			return skip(number == null ? null : new NumberLiteral(number));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndWithWithSkip skip(Expression expression) {
 			orderBuilder.skip(expression);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndWith limit(Number number) {
 			return limit(number == null ? null : new NumberLiteral(number));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndWith limit(Expression expression) {
 			orderBuilder.limit(expression);
 			return this;
 		}
 
 		@Override
-		@NotNull
-		public LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
+			public LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
 
 			DefaultStatementBuilder this0 = DefaultStatementBuilder.this.addWith(buildWith());
 			return new DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl(from, withHeaders, this0);
 		}
 
 		@Override
-		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+		public ForeachSourceStep foreach(SymbolicName variable) {
 
 			return DefaultStatementBuilder.this
 				.addWith(buildWith())
@@ -1095,7 +1005,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public @NotNull StatementBuilder.Terminal finish() {
+		public StatementBuilder.Terminal finish() {
 			return DefaultStatementBuilder.this;
 		}
 	}
@@ -1231,7 +1141,6 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return propertyOperations;
 	}
 
-	@NotNull
 	private static Collection<Expression> extractIdentifiablesFromReturnList(List<Expression> returnList) {
 		return returnList.stream()
 			.filter(IdentifiableElement.class::isInstance)
@@ -1312,8 +1221,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.builder = getUpdatingClauseBuilder(updateType, expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
@@ -1323,8 +1231,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return delegate;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> elements) {
 
 			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(elements);
@@ -1332,40 +1239,34 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return delegate;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return new DefaultStatementWithReturnBuilder(rawExpression);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate delete(Expression... deletedExpressions) {
 			return delete(false, deletedExpressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate delete(Collection<? extends Expression> deletedExpressions) {
 			return delete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate detachDelete(Expression... deletedExpressions) {
 			return delete(true, deletedExpressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate detachDelete(Collection<? extends Expression> deletedExpressions) {
 			return detachDelete(deletedExpressions.toArray(new Expression[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingMerge merge(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.merge(pattern);
@@ -1377,8 +1278,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Expression... keyValuePairs) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
@@ -1386,15 +1286,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return result;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Collection<? extends Expression> keyValuePairs) {
 
 			return set(keyValuePairs.toArray(new Expression[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Node node, String... labels) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
@@ -1403,15 +1301,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return result;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
 
 			return set(node, labels.toArray(new String[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
@@ -1420,8 +1316,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return result;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Node node, String... labels) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
@@ -1430,15 +1325,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return result;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
 
 			return remove(node, labels.toArray(new String[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
@@ -1446,34 +1339,29 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return result;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
 
 			return remove(properties.toArray(new Property[] {}));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> returnedExpressions) {
 			return this.with(false, returnedExpressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 			return this.with(true, elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate create(PatternElement... pattern) {
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.create(pattern);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
 			return create(pattern.toArray(new PatternElement[] {}));
 		}
@@ -1483,8 +1371,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this.with(distinct, elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public Statement build() {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
@@ -1492,14 +1379,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+		public ForeachSourceStep foreach(SymbolicName variable) {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return DefaultStatementBuilder.this.foreach(variable);
 		}
 
 		@Override
-		public @NotNull StatementBuilder.Terminal finish() {
+		public StatementBuilder.Terminal finish() {
 
 			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
 			return new DefaultStatementWithFinishBuilder();
@@ -1535,15 +1422,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.expressionToUnwind = expressionToUnwind;
 		}
 
-		@NotNull
-		@Override
-		public OngoingReading as(@NotNull String variable) {
+			@Override
+		public OngoingReading as(String variable) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(new Unwind(expressionToUnwind, variable));
 			return DefaultStatementBuilder.this;
 		}
 	}
 
-	@NotNull
 	@Override
 	public InQueryCallBuilder call(String... namespaceAndProcedure) {
 
@@ -1589,36 +1474,31 @@ class DefaultStatementBuilder implements StatementBuilder,
 			super(procedureName);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StandaloneCallBuilder withArgs(Expression... arguments) {
 
 			super.arguments = arguments;
 			return this;
 		}
 
-		@NotNull
-		public OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk) {
+			public OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk) {
 
 			return new YieldingStandaloneCallBuilder(procedureName, arguments, asterisk);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(SymbolicName... resultFields) {
 
 			return new YieldingStandaloneCallBuilder(procedureName, arguments, resultFields);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(AliasedExpression... aliasedResultFields) {
 
 			return new YieldingStandaloneCallBuilder(procedureName,  arguments, aliasedResultFields);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public Expression asFunction(boolean distinct) {
 
 			if (super.arguments == null || super.arguments.length == 0) {
@@ -1636,8 +1516,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return new DefaultStatementBuilder(this.build());
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public ProcedureCall build() {
 
 			return ProcedureCallImpl.create(procedureName, createArgumentList(), null,
@@ -1667,65 +1546,56 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returning(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 			return new DefaultStatementBuilder(this.buildCall()).returningRaw(rawExpression);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StatementBuilder.OngoingReadingWithWhere where(Condition newCondition) {
 
 			conditionBuilder.where(newCondition);
 			return new DefaultStatementBuilder(this.buildCall());
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 			return new DefaultStatementBuilder(this.buildCall()).with(elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 			return new DefaultStatementBuilder(this.buildCall()).withDistinct(elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 			return new DefaultStatementBuilder(this.buildCall()).call(statement, imports);
 		}
 
 		@Override
-		public @NotNull BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
 			return new DefaultStatementBuilder(this.buildCall()).callRawCypher(rawCypher, args);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
 			return new DefaultStatementBuilder(this.buildCall()).callInTransactions(statement, rows, imports);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public Statement build() {
 
 			if (this.delegate != null) {
@@ -1740,8 +1610,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return build();
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public  StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 			return new DefaultStatementBuilder(this.buildCall()).match(optional, pattern);
 		}
@@ -1756,7 +1625,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public @NotNull StatementBuilder.Terminal finish() {
+		public StatementBuilder.Terminal finish() {
 			return new DefaultStatementBuilder(this.buildCall());
 		}
 	}
@@ -1779,32 +1648,28 @@ class DefaultStatementBuilder implements StatementBuilder,
 				conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public InQueryCallBuilder withArgs(Expression... arguments) {
 
 			super.arguments = arguments;
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public InQueryCallBuilder yield(SymbolicName... resultFields) {
 
 			this.yieldItems = YieldItems.yieldAllOf(resultFields);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public InQueryCallBuilder yield(AliasedExpression... aliasedResultFields) {
 
 			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingWithWhere where(Condition newCondition) {
 
 			conditionBuilder.where(newCondition);
@@ -1812,47 +1677,41 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return DefaultStatementBuilder.this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returning(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returningDistinct(expressions);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.returningRaw(rawExpression);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.with(elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.withDistinct(elements);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
@@ -1860,22 +1719,20 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public @NotNull BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.callRawCypher(rawCypher, args);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
 
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.callInTransactions(statement, rows, imports);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public
 		StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 
@@ -1890,13 +1747,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		@Override
-		public @NotNull ForeachSourceStep foreach(SymbolicName variable) {
+		public ForeachSourceStep foreach(SymbolicName variable) {
 			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
 			return DefaultStatementBuilder.this.foreach(variable);
 		}
 
 		@Override
-		public @NotNull StatementBuilder.Terminal finish() {
+		public StatementBuilder.Terminal finish() {
 			return DefaultStatementBuilder.this;
 		}
 	}

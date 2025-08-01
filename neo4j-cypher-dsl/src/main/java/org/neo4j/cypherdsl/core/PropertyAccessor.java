@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This interface represents an element that has properties.
@@ -44,8 +42,7 @@ public interface PropertyAccessor {
 	 * @param name property name, must not be {@literal null} or empty.
 	 * @return a new {@link Property} associated with this element
 	 */
-	@NotNull @Contract(pure = true)
-	default Property property(@NotNull String name) {
+	default Property property(String name) {
 		return property(new String[] { name });
 	}
 
@@ -54,7 +51,6 @@ public interface PropertyAccessor {
 	 * @return a new {@link Property} associated with this element
 	 * @see  #property(String)
 	 */
-	@NotNull @Contract(pure = true)
 	Property property(String... names);
 
 	/**
@@ -71,6 +67,5 @@ public interface PropertyAccessor {
 	 * @param lookup the expression that is evaluated to lookup this property.
 	 * @return a new {@link Property} associated with this element
 	 */
-	@NotNull @Contract(pure = true)
-	Property property(@NotNull Expression lookup);
+	Property property(Expression lookup);
 }
