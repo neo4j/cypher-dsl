@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Something that can build counting sub-queries. Might be used in the future for existential sub-queries, too.
@@ -39,7 +38,6 @@ public interface SubqueryExpressionBuilder {
 	 * @return The immutable {@link CountExpression}
 	 * @since 2023.9.0
 	 */
-	@NotNull
 	CountExpression count(PatternElement requiredPattern, PatternElement... patternElement);
 
 	/**
@@ -49,7 +47,6 @@ public interface SubqueryExpressionBuilder {
 	 * @return The immutable {@link CountExpression}
 	 * @since 2023.9.0
 	 */
-	@NotNull
 	CountExpression count(Statement.UnionQuery union);
 
 	/**

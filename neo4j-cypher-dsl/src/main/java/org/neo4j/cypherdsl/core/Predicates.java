@@ -20,9 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -42,7 +39,6 @@ final class Predicates {
 	 * @param property The property to be passed to {@code exists()}
 	 * @return A function call for {@code exists()} for one property
 	 */
-	@NotNull @Contract(pure = true)
 	static Condition exists(Property property) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, property));
@@ -55,7 +51,6 @@ final class Predicates {
 	 * @param pattern The pattern to be passed to {@code exists()}
 	 * @return A function call for {@code exists()} for one pattern
 	 */
-	@NotNull @Contract(pure = true)
 	static Condition exists(RelationshipPattern pattern) {
 
 		return new BooleanFunctionCondition(FunctionInvocation.create(BuiltInFunctions.Predicates.EXISTS, pattern));
@@ -119,7 +114,7 @@ final class Predicates {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	static Condition exists(List<PatternElement> pattern, @Nullable Where where) {
+	static Condition exists(List<PatternElement> pattern, Where where) {
 
 		return ExistentialSubquery.exists(pattern, where);
 	}
@@ -130,7 +125,6 @@ final class Predicates {
 	 * @see #all(SymbolicName)
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction all(String variable) {
 
 		return all(SymbolicName.of(variable));
@@ -144,7 +138,6 @@ final class Predicates {
 	 * @return A builder for the {@code all()} predicate function
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction all(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.ALL, variable);
@@ -156,7 +149,6 @@ final class Predicates {
 	 * @see #any(SymbolicName)
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction any(String variable) {
 
 		return any(SymbolicName.of(variable));
@@ -170,7 +162,6 @@ final class Predicates {
 	 * @return A builder for the {@code any()} predicate function
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction any(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.ANY, variable);
@@ -182,7 +173,6 @@ final class Predicates {
 	 * @see #none(SymbolicName)
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction none(String variable) {
 
 		return none(SymbolicName.of(variable));
@@ -196,7 +186,6 @@ final class Predicates {
 	 * @return A builder for the {@code none()} predicate function
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction none(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.NONE, variable);
@@ -208,7 +197,6 @@ final class Predicates {
 	 * @see #single(SymbolicName)
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction single(String variable) {
 
 		return single(SymbolicName.of(variable));
@@ -222,7 +210,6 @@ final class Predicates {
 	 * @return A builder for the {@code single()} predicate function
 	 * @since 1.1
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingListBasedPredicateFunction single(SymbolicName variable) {
 
 		return new Builder(BuiltInFunctions.Predicates.SINGLE, variable);
@@ -258,16 +245,14 @@ final class Predicates {
 			this.name = name;
 		}
 
-		@Override @NotNull
-		public OngoingListBasedPredicateFunctionWithList in(Expression list) {
+		@Override 	public OngoingListBasedPredicateFunctionWithList in(Expression list) {
 
 			Assertions.notNull(list, "The list expression is required");
 			this.listExpression = list;
 			return this;
 		}
 
-		@Override @NotNull
-		public Condition where(Condition condition) {
+		@Override 	public Condition where(Condition condition) {
 
 			Assertions.notNull(condition, "The condition is required");
 			return new BooleanFunctionCondition(

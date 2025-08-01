@@ -24,8 +24,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingStandaloneCallWithoutArguments;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
@@ -49,7 +47,6 @@ public interface Statement extends Visitable {
 	/**
 	 * @return A new statement builder.
 	 */
-	@NotNull @Contract(pure = true)
 	static StatementBuilder builder() {
 
 		return new DefaultStatementBuilder();
@@ -63,8 +60,7 @@ public interface Statement extends Visitable {
 	 * @return A statement
 	 * @since 2021.3.0
 	 */
-	@NotNull
-	static Statement of(@NotNull List<Clause> clauses) {
+	static Statement of(List<Clause> clauses) {
 
 		Assertions.notNull(clauses, "Clauses must not be null.");
 		return new ClausesBasedStatement(clauses, null);
@@ -83,8 +79,7 @@ public interface Statement extends Visitable {
 	 * @since 2021.3.0
 	 */
 	@API(status = STABLE, since = "2021.3.0")
-	@NotNull
-	static Statement usingPeriodic(Integer batchSize, @NotNull List<Clause> clauses) {
+	static Statement usingPeriodic(Integer batchSize, List<Clause> clauses) {
 
 		Assertions.notNull(clauses, "Clauses must not be null.");
 		Assertions.isTrue(!clauses.isEmpty(), "Clauses must not be empty.");
@@ -97,7 +92,6 @@ public interface Statement extends Visitable {
 	 *                              String, but a fully qualified String is ok as well.
 	 * @return An entry point into a statement that starts with a call to stored procedure.
 	 */
-	@NotNull @Contract(pure = true)
 	static OngoingStandaloneCallWithoutArguments call(String... namespaceAndProcedure) {
 
 		return new DefaultStatementBuilder.StandaloneCallBuilder(ProcedureName.from(namespaceAndProcedure));
@@ -110,7 +104,6 @@ public interface Statement extends Visitable {
 	 * @return An immutable object representing properties resolved in a statement together with their context and owner
 	 * @since 2023.1.0
 	 */
-	@NotNull @Contract(pure = true)
 	StatementCatalog getCatalog();
 
 	/**
@@ -124,14 +117,12 @@ public interface Statement extends Visitable {
 	 * @return A valid Cypher statement
 	 * @since 2021.0.0
 	 */
-	@NotNull @Contract(pure = true)
 	String getCypher();
 
 	/**
 	 * @return The context of this statement, allowing access to parameter names etc.
 	 */
 	@API(status = INTERNAL, since = "2021.0.0")
-	@NotNull @Contract(pure = true)
 	StatementContext getContext();
 
 	/**
@@ -139,7 +130,6 @@ public interface Statement extends Visitable {
 	 *
 	 * @return True if literal parameters hav
 	 */
-	@Contract(pure = true)
 	boolean isRenderConstantsAsParameters();
 
 	/**
@@ -187,7 +177,6 @@ public interface Statement extends Visitable {
 		/**
 		 * @return Creates a statement that returns an explain plan for the original statement.
 		 */
-		@NotNull @Contract(pure = true)
 		default Statement explain() {
 			return DecoratedQuery.explain(this);
 		}

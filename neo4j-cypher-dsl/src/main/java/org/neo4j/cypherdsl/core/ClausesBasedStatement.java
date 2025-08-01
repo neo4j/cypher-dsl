@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
@@ -44,7 +42,7 @@ class ClausesBasedStatement extends AbstractStatement {
 
 	private final List<Clause> clauses;
 
-	ClausesBasedStatement(@NotNull List<Clause> clauses, @Nullable UsingPeriodicCommit optionalPeriodicCommit) {
+	ClausesBasedStatement(List<Clause> clauses, UsingPeriodicCommit optionalPeriodicCommit) {
 		this.optionalPeriodicCommit = optionalPeriodicCommit;
 		this.clauses = List.copyOf(clauses);
 	}

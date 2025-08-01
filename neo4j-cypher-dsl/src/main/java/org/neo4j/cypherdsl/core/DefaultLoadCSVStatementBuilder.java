@@ -23,9 +23,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.net.URI;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 
@@ -57,7 +54,7 @@ final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder imple
 			this(uri, withHeaders, null);
 		}
 
-		PrepareLoadCSVStatementImpl(URI uri, boolean withHeaders, @Nullable DefaultStatementBuilder source) {
+		PrepareLoadCSVStatementImpl(URI uri, boolean withHeaders, DefaultStatementBuilder source) {
 
 			this.usingPeriodicCommit = null;
 
@@ -66,15 +63,13 @@ final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder imple
 			this.source = source;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public LoadCSVStatementBuilder as(String alias) {
 
 			return DefaultLoadCSVStatementBuilder.create(this, alias, source);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public OngoingLoadCSV loadCSV(URI newUri, boolean newWithHeaders) {
 
 			this.uri = newUri;
@@ -84,7 +79,7 @@ final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder imple
 	}
 
 	static DefaultLoadCSVStatementBuilder create(PrepareLoadCSVStatementImpl config, String alias,
-		@Nullable DefaultStatementBuilder source) {
+		DefaultStatementBuilder source) {
 
 		// It should be reasonable safe to keep that immutable object around
 		final LoadCSV loadCSV = new LoadCSV(config.uri, config.withHeaders, alias);
@@ -111,7 +106,6 @@ final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder imple
 	}
 
 	@Override
-	@NotNull @Contract(pure = true)
 	public StatementBuilder withFieldTerminator(String fieldTerminator) {
 		return new DefaultStatementBuilder(this.usingPeriodicCommit, this.loadCSV.withFieldTerminator(fieldTerminator));
 	}

@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * The boolean literal.
@@ -37,7 +35,7 @@ public final class BooleanLiteral extends LiteralBase<Boolean> {
 	static final BooleanLiteral TRUE = new BooleanLiteral(true);
 	static final BooleanLiteral FALSE = new BooleanLiteral(false);
 
-	static Literal<Boolean> of(@Nullable Boolean value) {
+	static Literal<Boolean> of(Boolean value) {
 
 		if (value != null && value) {
 			return TRUE;
@@ -50,7 +48,6 @@ public final class BooleanLiteral extends LiteralBase<Boolean> {
 		super(content);
 	}
 
-	@NotNull
 	@Override
 	public String asString() {
 		return getContent().toString();

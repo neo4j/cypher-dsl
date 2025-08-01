@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
@@ -58,7 +57,6 @@ abstract class AbstractStatement implements Statement {
 	@SuppressWarnings("squid:S3077")
 	private volatile StatementCatalog statementCatalog;
 
-	@NotNull
 	@Override
 	public StatementContext getContext() {
 		return context;
@@ -79,7 +77,6 @@ abstract class AbstractStatement implements Statement {
 		}
 	}
 
-	@NotNull
 	@Override
 	public String getCypher() {
 
@@ -97,7 +94,6 @@ abstract class AbstractStatement implements Statement {
 	}
 
 	@Override
-	@NotNull
 	public StatementCatalog getCatalog() {
 
 		StatementCatalog result = this.statementCatalog;

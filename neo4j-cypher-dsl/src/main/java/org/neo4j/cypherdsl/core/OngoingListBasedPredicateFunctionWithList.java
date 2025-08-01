@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Allows to specify the where condition for the list based predicate.
@@ -33,7 +31,5 @@ public interface OngoingListBasedPredicateFunctionWithList {
 	 * @param condition The condition for the list based predicate.
 	 * @return The final list based predicate function
 	 */
-	@NotNull
-	@Contract(pure = true)
 	Condition where(Condition condition);
 }

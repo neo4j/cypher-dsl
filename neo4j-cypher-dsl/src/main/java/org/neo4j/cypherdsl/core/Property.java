@@ -24,8 +24,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A property. A property might belong to a container such as a {@link Node} or {@link Relationship}, but it's not uncommon
@@ -46,27 +44,22 @@ public non-sealed interface Property extends Expression, IdentifiableElement {
 	 * @return A name to reference the property under in an external application
 	 */
 	@API(status = STABLE, since = "2021.1.0")
-	@NotNull @Contract(pure = true)
 	String getName();
 
 	/**
 	 * @return The actual property being looked up. The order matters, so this will return a list, not a collection.
 	 */
-	@NotNull @Contract(pure = true)
 	List<PropertyLookup> getNames();
 
 	/**
 	 * @return The container "owning" this property.
 	 */
-	@Contract(pure = true)
 	Named getContainer();
 
 	/**
 	 * @return A reference to the container owning this property
 	 */
 	@API(status = INTERNAL, since = "2023.1.0")
-	@NotNull
-	@Contract(pure = true)
 	default Expression getContainerReference() {
 		if (getContainer() == null) {
 			throw new UnsupportedOperationException();
@@ -81,7 +74,6 @@ public non-sealed interface Property extends Expression, IdentifiableElement {
 	 * @return A new property
 	 */
 	@API(status = STABLE, since = "2021.1.0")
-	@NotNull @Contract(pure = true)
 	Property referencedAs(String newReference);
 
 	/**
@@ -91,6 +83,5 @@ public non-sealed interface Property extends Expression, IdentifiableElement {
 	 * @param expression expression describing the new value
 	 * @return A new operation.
 	 */
-	@NotNull @Contract(pure = true)
 	Operation to(Expression expression);
 }

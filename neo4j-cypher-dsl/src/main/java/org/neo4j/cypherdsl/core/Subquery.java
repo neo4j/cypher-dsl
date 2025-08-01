@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -101,7 +100,7 @@ public final class Subquery extends AbstractClause implements Clause {
 	 * {@return the importing with clause if any}
 	 */
 	@API(status = INTERNAL)
-	public @Nullable With importingWith() {
+	public With importingWith() {
 		var imports = this.importingWith == null ? null : this.importingWith.imports();
 		if (imports == null && statement instanceof ClausesBasedStatement cbs) {
 			return cbs.getClauses().stream().findFirst().filter(With.class::isInstance)

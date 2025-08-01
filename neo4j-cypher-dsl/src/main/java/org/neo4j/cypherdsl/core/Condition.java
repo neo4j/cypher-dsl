@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 
 /**
@@ -40,7 +38,6 @@ public interface Condition extends Expression {
 	 * @param condition The new condition to add, must not be {@literal null}.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition and(Condition condition) {
 		return CompoundCondition.create(this, Operator.AND, condition);
 	}
@@ -51,7 +48,6 @@ public interface Condition extends Expression {
 	 * @param condition The new condition to add, must not be {@literal null}.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition or(Condition condition) {
 		return CompoundCondition.create(this, Operator.OR, condition);
 	}
@@ -62,7 +58,6 @@ public interface Condition extends Expression {
 	 * @param condition The new condition to add, must not be {@literal null}.
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition xor(Condition condition) {
 		return CompoundCondition.create(this, Operator.XOR, condition);
 	}
@@ -77,7 +72,6 @@ public interface Condition extends Expression {
 	 * @return A new condition.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition and(RelationshipPattern pathPattern) {
 		return CompoundCondition.create(this, Operator.AND, RelationshipPatternCondition.of(pathPattern));
 	}
@@ -92,7 +86,6 @@ public interface Condition extends Expression {
 	 * @return A new condition.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition or(RelationshipPattern pathPattern) {
 		return CompoundCondition.create(this, Operator.OR, RelationshipPatternCondition.of(pathPattern));
 	}
@@ -107,7 +100,6 @@ public interface Condition extends Expression {
 	 * @return A new condition.
 	 * @since 1.0.1
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition xor(RelationshipPattern pathPattern) {
 		return CompoundCondition.create(this, Operator.XOR, RelationshipPatternCondition.of(pathPattern));
 	}
@@ -117,7 +109,6 @@ public interface Condition extends Expression {
 	 *
 	 * @return A new condition.
 	 */
-	@NotNull @Contract(pure = true)
 	default Condition not() {
 		return Comparison.create(Operator.NOT, this);
 	}

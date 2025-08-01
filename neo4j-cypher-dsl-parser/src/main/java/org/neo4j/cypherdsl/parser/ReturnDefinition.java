@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.SortItem;
 
@@ -40,14 +39,14 @@ public final class ReturnDefinition {
 
 	private final boolean distinct;
 	private final List<Expression> expressions;
-	private final @Nullable List<SortItem> optionalSortItems;
-	private final @Nullable Expression optionalSkip;
-	private final @Nullable Expression optionalLimit;
+	private final List<SortItem> optionalSortItems;
+	private final Expression optionalSkip;
+	private final Expression optionalLimit;
 
 	ReturnDefinition(boolean distinct, List<Expression> expressions,
-		@Nullable List<SortItem> optionalSortItems,
-		@Nullable Expression optionalSkip,
-		@Nullable Expression optionalLimit) {
+		List<SortItem> optionalSortItems,
+		Expression optionalSkip,
+		Expression optionalLimit) {
 		this.distinct = distinct;
 		this.expressions = expressions;
 		this.optionalSortItems = optionalSortItems;

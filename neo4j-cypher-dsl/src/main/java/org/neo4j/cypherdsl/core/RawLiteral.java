@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -53,8 +52,7 @@ final class RawLiteral implements Expression {
 		}
 
 		@Override
-		@NotNull
-		public String asString() {
+			public String asString() {
 
 			return content;
 		}

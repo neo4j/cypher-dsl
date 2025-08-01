@@ -23,14 +23,11 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * Added for supporting the Neo5j parser.
+ * Added for supporting the Neo4j v5 parser.
  *
  * @author Michael J. Simons
  * @soundtrack The Prodigy - Invaders Must Die
@@ -42,7 +39,6 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 
 	private final ImportingWith importingWith;
 	private final List<Visitable> fragments;
-	@Nullable
 	private final Where innerWhere;
 
 	static CountExpression count(Statement statement, IdentifiableElement... imports) {
@@ -54,15 +50,15 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 		return new CountExpression(new ImportingWith(), List.of(patternOrUnion), null);
 	}
 
-	static CountExpression count(@Nullable With optionalWith, Visitable patternOrUnion) {
+	static CountExpression count(With optionalWith, Visitable patternOrUnion) {
 		return new CountExpression(new ImportingWith(optionalWith, null), List.of(patternOrUnion), null);
 	}
 
-	static CountExpression count(List<PatternElement> patternElements, @Nullable Where innerWhere) {
+	static CountExpression count(List<PatternElement> patternElements, Where innerWhere) {
 		return new CountExpression(new ImportingWith(), patternElements, innerWhere);
 	}
 
-	private CountExpression(ImportingWith optionalWith, List<? extends Visitable> fragments, @Nullable Where innerWhere) {
+	private CountExpression(ImportingWith optionalWith, List<? extends Visitable> fragments, Where innerWhere) {
 
 		var patternOrUnion = fragments.size() == 1 ? fragments.get(0) : null;
 
@@ -90,7 +86,6 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 	 * @param condition the condition to apply in the count expression
 	 * @return A new {@link CountExpression}
 	 */
-	@NotNull @Contract(pure = true)
 	public CountExpression where(Condition condition) {
 
 		if (fragments.size() == 1 && fragments.get(0) instanceof Statement) {

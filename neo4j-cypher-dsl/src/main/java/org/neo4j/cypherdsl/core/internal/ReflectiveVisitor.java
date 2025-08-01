@@ -34,8 +34,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -109,10 +107,9 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 			return new PreEnterResult(handler);
 		}
 
-		@Nullable
-		private final Visitor delegate;
+			private final Visitor delegate;
 
-		private PreEnterResult(@Nullable Visitor delegate) {
+		private PreEnterResult(Visitor delegate) {
 			this.delegate = delegate;
 		}
 	}
@@ -229,7 +226,6 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 	}
 
 	@SuppressWarnings("squid:S3011") // Very much the point of the whole thing
-	@NotNull
 	private static Method getMethodInPhaseWithActualVisitor(TargetAndPhase targetAndPhase, Class<?> visitorClass, Class<?> clazz) throws NoSuchMethodException {
 		Method method = visitorClass.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
 		method.setAccessible(true);

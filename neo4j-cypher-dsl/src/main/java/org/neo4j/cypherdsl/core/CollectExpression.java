@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
@@ -49,7 +48,7 @@ public final class CollectExpression implements SubqueryExpression {
 		return new CollectExpression(new ImportingWith(), resultStatement);
 	}
 
-	static CollectExpression collect(@Nullable With optionalWith, Statement resultStatement) {
+	static CollectExpression collect(With optionalWith, Statement resultStatement) {
 		return new CollectExpression(new ImportingWith(optionalWith, null), resultStatement);
 	}
 

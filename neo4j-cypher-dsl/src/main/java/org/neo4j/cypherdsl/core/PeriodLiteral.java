@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import java.time.Period;
 
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A literal representing a period value to be formatted in a way that Neo4j's Cypher understands it.
@@ -44,7 +43,6 @@ final class PeriodLiteral extends LiteralBase<Period> {
 	}
 
 	@Override
-	@NotNull
 	public String asString() {
 		var result = new StringBuilder();
 		result.append("duration('P");

@@ -25,15 +25,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
 
 /**
  * Simple version of the JSR 305 annotation that allows detecting accidentally omitted calls to
  * {@link org.neo4j.cypherdsl.core.Cypher#match(org.neo4j.cypherdsl.core.PatternElement...)} ()} and the likes in IntelliJ.
  * <p>
  * This annotation is {@link org.apiguardian.api.API.Status#INTERNAL}. Clients should not rely on its presence.
- * The annotation may be replaced with a more suitable one by JetBrains, e.g.
- * the {@link Contract} annotation, when a favourable use-case can be found.
  *
  * @author Lukas Eder
  * @author Michael J. Simons

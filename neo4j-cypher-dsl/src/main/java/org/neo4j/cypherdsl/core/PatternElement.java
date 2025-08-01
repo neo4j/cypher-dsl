@@ -21,9 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
@@ -49,8 +46,7 @@ public interface PatternElement extends Visitable {
 	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0")
-	@NotNull @Contract(pure = true)
-	default PatternElement where(@Nullable Expression predicate) {
+	default PatternElement where(Expression predicate) {
 		throw new UnsupportedOperationException();
 	}
 }

@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * An internal implementation of the {@link RelationshipBase}. It's primary purpose is to have {@link RelationshipBase#named(SymbolicName)}
@@ -48,14 +47,12 @@ final class InternalRelationshipImpl extends RelationshipBase<NodeBase<?>, NodeB
 		super(left, details, quantifier, right);
 	}
 
-	@NotNull
 	@Override
 	public InternalRelationshipImpl named(SymbolicName newSymbolicName) {
 
 		return new InternalRelationshipImpl(this.left, this.details.named(newSymbolicName), quantifier, this.right);
 	}
 
-	@NotNull
 	@Override
 	public InternalRelationshipImpl withProperties(MapExpression newProperties) {
 

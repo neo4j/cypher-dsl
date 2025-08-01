@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Subquery;
@@ -55,7 +54,7 @@ public enum Dialect {
 		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplier();
 
 		@Override
-		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
+		Class<? extends Visitor> getHandler(Visitable visitable) {
 			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 	},
@@ -69,7 +68,7 @@ public enum Dialect {
 		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport();
 
 		@Override
-		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
+		Class<? extends Visitor> getHandler(Visitable visitable) {
 			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 	},
@@ -83,7 +82,7 @@ public enum Dialect {
 		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport();
 
 		@Override
-		@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
+		Class<? extends Visitor> getHandler(Visitable visitable) {
 			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 
@@ -93,7 +92,7 @@ public enum Dialect {
 		}
 	};
 
-	@Nullable Class<? extends Visitor> getHandler(Visitable visitable) {
+	Class<? extends Visitor> getHandler(Visitable visitable) {
 		return null;
 	}
 

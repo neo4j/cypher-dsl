@@ -25,9 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Clause;
 
 /**
@@ -60,7 +57,7 @@ public final class LoadCSV implements Clause {
 		this(uri, withHeaders, alias, null);
 	}
 
-	private LoadCSV(URI uri, boolean withHeaders, String alias, @Nullable String fieldTerminator) {
+	private LoadCSV(URI uri, boolean withHeaders, String alias, String fieldTerminator) {
 		this.uri = uri;
 		this.withHeaders = withHeaders;
 		this.alias = alias;
@@ -84,7 +81,6 @@ public final class LoadCSV implements Clause {
 	/**
 	 * @return The field terminator to use
 	 */
-	@Nullable
 	public String getFieldTerminator() {
 		return fieldTerminator;
 	}
@@ -101,8 +97,7 @@ public final class LoadCSV implements Clause {
 	 * @param newFieldTerminator the new field terminator
 	 * @return A new instance or this instance if the terminator hasn't changed
 	 */
-	@NotNull @Contract(pure = true)
-	public LoadCSV withFieldTerminator(@Nullable final String newFieldTerminator) {
+	public LoadCSV withFieldTerminator(final String newFieldTerminator) {
 
 		String value = Optional.ofNullable(newFieldTerminator).map(String::trim)
 			.filter(v -> !v.isEmpty()).orElse(null);

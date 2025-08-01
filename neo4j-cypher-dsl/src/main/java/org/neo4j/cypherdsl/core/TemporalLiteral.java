@@ -29,7 +29,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A literal representing a temporal value to be formatted in a way that Neo4j's Cypher understands it.
@@ -69,7 +68,6 @@ public final class TemporalLiteral extends LiteralBase<TemporalAccessor> {
 		this.value = String.format("%s('%s')", method, formatter.format(content));
 	}
 
-	@NotNull
 	@Override
 	public String asString() {
 		return value;

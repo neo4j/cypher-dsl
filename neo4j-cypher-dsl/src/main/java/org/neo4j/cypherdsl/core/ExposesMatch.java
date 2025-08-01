@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 import java.util.Collection;
@@ -41,7 +40,7 @@ public interface ExposesMatch {
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern) {
 		return this.match(false, pattern);
 	}
@@ -52,7 +51,7 @@ public interface ExposesMatch {
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 * @since 2021.2.2
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere match(Collection<? extends PatternElement> pattern) {
 		return this.match(pattern.toArray(new PatternElement[] {}));
 	}
@@ -63,7 +62,7 @@ public interface ExposesMatch {
 	 * @param pattern The patterns to match
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
 		return this.match(true, pattern);
 	}
@@ -75,7 +74,7 @@ public interface ExposesMatch {
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 * @since 2021.2.2
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(Collection<? extends PatternElement> pattern) {
 		return this.optionalMatch(pattern.toArray(pattern.toArray(new PatternElement[] {})));
 	}
@@ -88,6 +87,6 @@ public interface ExposesMatch {
 	 * @return An ongoing match that is used to specify an optional where and a required return clause
 	 * @since 2020.1.3
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern);
 }

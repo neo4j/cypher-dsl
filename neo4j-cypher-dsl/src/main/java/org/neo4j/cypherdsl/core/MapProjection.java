@@ -27,8 +27,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -81,7 +79,6 @@ public final class MapProjection implements Expression {
 	 * @param content The additional content for a new projection.
 	 * @return A new map projection with additional content.
 	 */
-	@NotNull @Contract(pure = true)
 	public MapProjection and(Object... content) {
 		return new MapProjection(this.name, this.map.addEntries(createNewContent(false, content)));
 	}
