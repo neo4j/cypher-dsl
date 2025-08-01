@@ -57,8 +57,6 @@ include::functions/index.adoc[leveloffset=+1]
 
 include::cypher-parser/index.adoc[leveloffset=+1]
 
-include::driver-integration/index.adoc[leveloffset=+1]
-
 include::static-meta-model/index.adoc[leveloffset=+1]
 
 include::appendix/index.adoc[leveloffset=+1]
