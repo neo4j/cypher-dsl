@@ -44,10 +44,16 @@ public class Movie {
 	@Relationship(type = "DIRECTED", direction = Relationship.Direction.INCOMING)
 	private List<Person> directors = new ArrayList<>();
 
+	// This will be ignored, not annotated and the other type is not a node
+	private SomeType someProp;
+
 	private Integer released;
 
 	public Movie(String title, String description) {
 		this.title = title;
 		this.description = description;
+	}
+
+	static class SomeType {
 	}
 }

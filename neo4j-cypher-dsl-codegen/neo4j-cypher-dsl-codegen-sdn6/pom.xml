@@ -99,11 +99,11 @@
 				</configuration>
 			</plugin>
 
-			<!--
-			| Disable processors, otherwise Javac would already find our processors while compiling them and end up with
-			| "Bad service configuration file, or exception thrown while constructing Processor object: javax.annotation.processing.Processor: Provider org.neo4j.cypherdsl.codegen.neo4j.SDN6AnnotationProcessor not found"
-			-->
 			<plugin>
+				<!--
+				| Disable processors, otherwise Javac would already find our processors while compiling them and end up with
+				| "Bad service configuration file, or exception thrown while constructing Processor object: javax.annotation.processing.Processor: Provider org.neo4j.cypherdsl.codegen.neo4j.SDN6AnnotationProcessor not found"
+				-->
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<configuration combine.self="append">

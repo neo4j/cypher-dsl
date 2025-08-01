@@ -31,7 +31,7 @@
 	<artifactId>neo4j-cypher-dsl-examples-driver</artifactId>
 
 	<name>Examples (Driver)</name>
-	<description>Examples for the core Cypher-DSL using a driver instance to execute statements..</description>
+	<description>Examples for the core Cypher-DSL using a driver instance to execute statements.</description>
 
 	<properties>
 		<java-module-name>org.neo4j.cypherdsl.examples.driver</java-module-name>

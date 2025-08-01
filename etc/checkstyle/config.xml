@@ -85,6 +85,7 @@
                     org.apiguardian.api.API.Status.*,
                     org.assertj.core.api.Assertions.*,
                     org.assertj.core.api.Assumptions.*,
+                    org.junit.jupiter.api.Assertions.*,
                     org.junit.internal.matchers.ThrowableMessageMatcher.*,
                     org.mockito.Mockito.*,
                     org.mockito.ArgumentMatchers.*,
