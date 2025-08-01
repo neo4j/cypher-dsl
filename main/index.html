@@ -2438,7 +2438,7 @@ This instance should be a long living instance in your application:</p>
 <div class="listingblock">
 <div class="title">Listing 29. Create a driver instance</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic(<span class="string"><span class="delimiter">&quot;</span><span class="content">neo4j</span><span class="delimiter">&quot;</span></span>, neo4j.getAdminPassword()));</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=create-driver]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2477,10 +2477,7 @@ We will use <a href="#statement-without-result">the following listing</a> as exa
 <div id="statement-without-result" class="listingblock">
 <div class="title">Listing 30. Example statement that does not return any data.</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = ExecutableStatement.of(Cypher.create(m)
-    .set(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.anonParameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">statementWithoutResult</span><span class="delimiter">&quot;</span></span>)))
-    .build());</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result]</code></pre>
 </div>
 </div>
 <div class="sect4">
@@ -2498,10 +2495,7 @@ It will always return a result summary:</p>
 <div id="statement-without-result-tx-function" class="listingblock">
 <div class="title">Listing 31. Executing statements in a managed transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="type">var</span> summary = session.executeWrite(statement::executeWith); <i class="conum" data-value="2"></i><b>(2)</b>
-    assertThat(summary.counters().nodesCreated()).isEqualTo(<span class="integer">1</span>); <i class="conum" data-value="3"></i><b>(3)</b>
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result-tx-function]</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2542,14 +2536,7 @@ It is your responsibility to commit or rollback and close it.</p>
 <div id="statement-without-result-unmanaged-tx" class="listingblock">
 <div class="title">Listing 32. Executing statements in an unmanaged transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session();
-    <span class="type">var</span> tx = session.beginTransaction() <i class="conum" data-value="1"></i><b>(1)</b>
-) {
-    <span class="type">var</span> summary = statement.executeWith(tx); <i class="conum" data-value="2"></i><b>(2)</b>
-    tx.commit(); <i class="conum" data-value="3"></i><b>(3)</b>
-
-    assertThat(summary.counters().nodesCreated()).isEqualTo(<span class="integer">1</span>);
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result-unmanaged-tx]</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2587,9 +2574,7 @@ to <code>executeWith</code>.</p>
 <div id="statement-with-result" class="listingblock">
 <div class="title">Listing 33. Example statement that does return data.</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = ExecutableStatement.of(Cypher.match(m)
-    .returning(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>)).build());</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2601,15 +2586,7 @@ The <a href="#reactive-api">reactive API</a> is fully non-blocking and uses a pu
 <div id="statement-with-result-tx-function" class="listingblock">
 <div class="title">Listing 34. Fetching statements in a managed transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
-
-    <span class="type">var</span> moviesTitles = session.executeRead(statement::fetchWith) <i class="conum" data-value="2"></i><b>(2)</b>
-        .stream() <i class="conum" data-value="3"></i><b>(3)</b>
-        .map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
-        .collect(Collectors.toList());
-
-    assertMovieTitleList(moviesTitles);
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function]</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2643,17 +2620,7 @@ outside the transaction. With managed transactions, it looks like this:</p>
 <div id="statement-with-result-tx-function-stream" class="listingblock">
 <div class="title">Listing 35. Streaming statements in a managed transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) { <i class="conum" data-value="1"></i><b>(1)</b>
-
-    <span class="type">var</span> summary = session.executeRead(tx -&gt; <i class="conum" data-value="2"></i><b>(2)</b>
-        statement.streamWith(tx, s -&gt; { <i class="conum" data-value="3"></i><b>(3)</b>
-            <span class="type">var</span> moviesTitles = s.map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
-                .collect(Collectors.toList()); <i class="conum" data-value="4"></i><b>(4)</b>
-            assertMovieTitleList(moviesTitles);
-        })
-    );
-    assertThat(summary.query().text()).isEqualTo(statement.getCypher());
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function-stream]</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2687,17 +2654,7 @@ The pattern of opening a session and transaction is the same as before.</p>
 <div id="statement-with-result-unmanaged-tx" class="listingblock">
 <div class="title">Listing 36. Listening results with an unmanaged transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session();
-    <span class="type">var</span> tx = session.beginTransaction()) {
-
-    <span class="type">var</span> moviesTitles = statement.fetchWith(
-        tx, <i class="conum" data-value="1"></i><b>(1)</b>
-        r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString() <i class="conum" data-value="2"></i><b>(2)</b>
-    );
-    tx.commit();
-
-    assertMovieTitleList(moviesTitles);
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-unmanaged-tx]</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2719,16 +2676,7 @@ As we pass the <code>Session</code> object itself, we are using an auto-commit t
 <div id="statement-with-result-auto-commit-stream" class="listingblock">
 <div class="title">Listing 37. Streaming results with an auto-commit-transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">try</span> (<span class="type">var</span> session = driver.session()) {
-
-    <span class="type">var</span> summary = statement.streamWith(session, stream -&gt; {
-        <span class="type">var</span> moviesTitles = stream
-            .map(r -&gt; r.get(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>).asString())
-            .collect(Collectors.toList());
-        assertMovieTitleList(moviesTitles);
-    });
-    assertThat(summary.query().text()).isEqualTo(statement.getCypher());
-}</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-auto-commit-stream]</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2750,10 +2698,7 @@ function.</p>
 <div id="create-statement-without-result" class="listingblock">
 <div class="title">Listing 38. Reactive Example statement that does not return any data.</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Test</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = ReactiveExecutableStatement.of(Cypher.create(m)
-    .set(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.anonParameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">statementsWithoutResultReactive</span><span class="delimiter">&quot;</span></span>)))
-    .build());</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=create-statement-without-result-reactive]</code></pre>
 </div>
 </div>
 <div class="sect3">
@@ -2766,13 +2711,7 @@ and doesn&#8217;t cancel after the first item being emitted and thus rolling bac
 <div id="statement-without-result-tx-function-reactive-stream" class="listingblock">
 <div class="title">Listing 39. Reactive streaming results with an managed transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Mono.usingWhen(
-    Mono.fromSupplier(() -&gt; driver.session(ReactiveSession.class)), <i class="conum" data-value="1"></i><b>(1)</b>
-    s -&gt; Mono.fromDirect(s.executeWrite(statement::executeWith)), <i class="conum" data-value="2"></i><b>(2)</b>
-    ReactiveSession::close <i class="conum" data-value="3"></i><b>(3)</b>
-).as(StepVerifier::create)
-    .expectNextMatches(r -&gt; r.counters().nodesCreated() == <span class="integer">1</span>) <i class="conum" data-value="4"></i><b>(4)</b>
-    .verifyComplete();</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-without-result-tx-function-reactive-stream]</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2807,16 +2746,7 @@ As the transaction is managed by the driver, canceling the publisher via <code>t
 <div id="statement-with-result-tx-function-reactive-stream" class="listingblock">
 <div class="title">Listing 40. Reactive streaming results with an managed transaction</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Flux.usingWhen(
-    Mono.fromSupplier(() -&gt; driver.session(ReactiveSession.class)),
-    s -&gt; s.executeRead(statement::fetchWith),
-    ReactiveSession::close
-)
-    .skip(<span class="integer">2</span>)
-    .take(<span class="integer">30</span>)
-    .as(StepVerifier::create)
-    .expectNextCount(<span class="integer">30</span>)
-    .verifyComplete();</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=statement-with-result-tx-function-reactive-stream]</code></pre>
 </div>
 </div>
 </div>
@@ -2832,24 +2762,7 @@ The server might or might not start streaming results after the configured perio
 <div id="periodic-commit-statement" class="listingblock">
 <div class="title">Listing 41. Using <code>PERIODIC COMMIT LOAD CSV</code> from a reactive auto-commit transaction:</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> row = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">row</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> a = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Author</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Cypher.trim(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>))).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Book</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, row.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">Title</span><span class="delimiter">&quot;</span></span>)).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>);
-
-<span class="type">var</span> statement = ReactiveExecutableStatement.of(Cypher.usingPeriodicCommit(<span class="integer">10</span>)
-    .loadCSV(<span class="predefined-type">URI</span>.create(<span class="string"><span class="delimiter">&quot;</span><span class="content">file:///books.csv</span><span class="delimiter">&quot;</span></span>), <span class="predefined-constant">true</span>).as(row).withFieldTerminator(<span class="string"><span class="delimiter">&quot;</span><span class="content">;</span><span class="delimiter">&quot;</span></span>)
-    .create(m)
-    .with(m.getRequiredSymbolicName(), row)
-    .unwind(Cypher.split(row.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">Authors</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">&amp;</span><span class="delimiter">&quot;</span></span>)).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">author</span><span class="delimiter">&quot;</span></span>)
-    .merge(a)
-    .create(a.relationshipTo(m, <span class="string"><span class="delimiter">&quot;</span><span class="content">WROTE</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>))
-    .returningDistinct(m.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
-    .build());
-
-Flux.using(() -&gt; driver.session(ReactiveSession.class), statement::fetchWith, ReactiveSession::close)
-    .as(StepVerifier::create)
-    .expectNextCount(<span class="integer">50</span>)
-    .verifyComplete();</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in driver-integration/driver-integration.adoc - include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-driver/src/test/java/org/neo4j/cypherdsl/examples/drivers/ExecutableStatementsIT.java[tag=periodic-commit-statement]</code></pre>
 </div>
 </div>
 </div>
@@ -11430,7 +11343,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-07-31 13:04:45 UTC
+Last updated 2025-08-01 10:32:15 UTC
 </div>
 </div>
 </body>

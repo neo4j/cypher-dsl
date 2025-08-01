@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1753967173881">
+<licensePluginReport goal="CHECK" timestamp="1754044422635">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -172,14 +172,6 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/ast/Visitable.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ast/Visitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ast/VisitorWithResult.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/DefaultExecutableResultStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/DefaultExecutableStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/DefaultReactiveExecutableResultStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/DefaultReactiveExecutableStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/ExecutableResultStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/ExecutableStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/ReactiveExecutableResultStatement.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/executables/ReactiveExecutableStatement.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/CaseElse.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/CaseWhenThen.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/internal/ConstantParameterHolder.java" result="PRESENT"/>
