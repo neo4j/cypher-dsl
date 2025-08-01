@@ -46,7 +46,6 @@ public interface ExposesWith {
 	 */
 	@NotNull
 	@CheckReturnValue
-	@SuppressWarnings("deprecation")
 	default OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
 		return with(Expressions.createSymbolicNames(variables));
 	}
@@ -82,7 +81,6 @@ public interface ExposesWith {
 	 */
 	@NotNull
 	@CheckReturnValue
-	@SuppressWarnings("deprecation")
 	default OrderableOngoingReadingAndWithWithoutWhere withDistinct(String... variables) {
 		return withDistinct(Expressions.createSymbolicNames(variables));
 	}

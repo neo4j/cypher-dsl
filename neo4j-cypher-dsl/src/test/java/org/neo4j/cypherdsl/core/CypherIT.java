@@ -83,14 +83,13 @@ class CypherIT {
 			assertThat(statement.getCypher()).isEqualTo("MATCH p = (:`Station`)-[l:`LINK`]->(b:`Station`) RETURN p");
 		}
 
-		@SuppressWarnings("deprecation")
 		@Test
 		void deprecatedShortest() {
 			var pattern = Cypher.node("Station").relationshipTo(Cypher.node("Station").named("b"), "LINK").named("l");
-			var statement = Cypher.match(Cypher.shortestPath("p").definedBy(pattern))
+			var statement = Cypher.match(Cypher.anyShortest().named("p").definedBy(pattern))
 				.returning(Cypher.name("p")).build();
 			assertThat(statement.getCypher()).isEqualTo(
-				"MATCH p = shortestPath((:`Station`)-[l:`LINK`]->(b:`Station`)) RETURN p");
+				"MATCH p = ANY (:`Station`)-[l:`LINK`]->(b:`Station`) RETURN p");
 		}
 
 		@ParameterizedTest
@@ -1243,19 +1242,19 @@ class CypherIT {
 
 		@Test // GH-257
 		void functionsBasedOnRelationships() {
-			String expected = "MATCH p = shortestPath((bacon:`Person` {name: 'Kevin Bacon'})-[*]-(meg:`Person` {name: 'Meg Ryan'})) RETURN p";
+			String expected = "MATCH p = ANY (bacon:`Person` {name: 'Kevin Bacon'})-[*]-(meg:`Person` {name: 'Meg Ryan'}) RETURN p";
 
 			Relationship relationship = Cypher.node("Person").named("bacon")
 				.withProperties("name", Cypher.literalOf("Kevin Bacon"))
 				.relationshipBetween(
 					Cypher.node("Person").named("meg").withProperties("name", Cypher.literalOf("Meg Ryan")))
 				.unbounded();
-			Statement statement = Cypher.match(Cypher.shortestPath("p").definedBy(relationship)).returning("p").build();
+			Statement statement = Cypher.match(Cypher.anyShortest().named("p").definedBy(relationship)).returning("p").build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 
 			SymbolicName p = Cypher.name("p");
-			statement = Cypher.match(Cypher.shortestPath(p).definedBy(relationship)).returning(p).build();
+			statement = Cypher.match(Cypher.anyShortest().named(p).definedBy(relationship)).returning(p).build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(expected);
 		}

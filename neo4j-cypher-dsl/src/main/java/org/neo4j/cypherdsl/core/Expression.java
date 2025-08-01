@@ -44,7 +44,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 2022.7.0
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition includesAll(Expression rhs) {
 		return Conditions.includesAll(this, rhs);
 	}
@@ -57,7 +56,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 2022.7.0
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition includesAny(Expression rhs) {
 		return Conditions.includesAny(this, rhs);
 	}
@@ -88,7 +86,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 2022.1.0
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Expression size() {
 
 		return Functions.size(this);
@@ -103,7 +100,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 2022.1.0
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition hasSize(Expression expectedSize) {
 
 		return Functions.size(this).isEqualTo(expectedSize);
@@ -141,7 +137,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isEqualTo(Expression rhs) {
 		return Conditions.isEqualTo(this, rhs);
 	}
@@ -164,7 +159,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isNotEqualTo(Expression rhs) {
 		return Conditions.isNotEqualTo(this, rhs);
 	}
@@ -187,7 +181,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition lt(Expression rhs) {
 		return Conditions.lt(this, rhs);
 	}
@@ -199,7 +192,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition lte(Expression rhs) {
 		return Conditions.lte(this, rhs);
 	}
@@ -211,7 +203,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition gt(Expression rhs) {
 		return Conditions.gt(this, rhs);
 	}
@@ -223,7 +214,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition gte(Expression rhs) {
 		return Conditions.gte(this, rhs);
 	}
@@ -234,7 +224,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isTrue() {
 		return Conditions.isEqualTo(this, Cypher.literalTrue());
 	}
@@ -245,7 +234,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isFalse() {
 		return Conditions.isEqualTo(this, Cypher.literalFalse());
 	}
@@ -257,7 +245,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition matches(Expression expression) {
 		return Conditions.matches(this, expression);
 	}
@@ -269,7 +256,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition matches(String pattern) {
 		return Conditions.matches(this, Cypher.literalOf(pattern));
 	}
@@ -281,7 +267,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition startsWith(Expression expression) {
 		return Conditions.startsWith(this, expression);
 	}
@@ -293,7 +278,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition contains(Expression expression) {
 		return Conditions.contains(this, expression);
 	}
@@ -305,7 +289,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition endsWith(Expression expression) {
 		return Conditions.endsWith(this, expression);
 	}
@@ -317,7 +300,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new expression.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation concat(Expression expression) {
 		return Operations.concat(this, expression);
 	}
@@ -330,7 +312,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 1.0.1
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation add(Expression addend) {
 		return Operations.add(this, addend);
 	}
@@ -343,7 +324,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 1.0.1
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation subtract(Expression subtrahend) {
 		return Operations.subtract(this, subtrahend);
 	}
@@ -356,7 +336,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 1.0.1
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation multiply(Expression multiplicand) {
 		return Operations.multiply(this, multiplicand);
 	}
@@ -369,7 +348,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @since 1.0.1
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation divide(Expression dividend) {
 		return Operations.divide(this, dividend);
 	}
@@ -381,7 +359,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new operation.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation remainder(Expression dividend) {
 		return Operations.remainder(this, dividend);
 	}
@@ -393,7 +370,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new operation.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Operation pow(Expression n) {
 
 		return Operations.pow(this, n);
@@ -406,7 +382,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A condition based on this expression that evaluates to true when this expression is null.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isNull() {
 		return Conditions.isNull(this);
 	}
@@ -418,7 +393,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A condition based on this expression that evaluates to true when this expression is not null.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isNotNull() {
 		return Conditions.isNotNull(this);
 	}
@@ -441,7 +415,6 @@ public interface Expression extends Visitable, PropertyAccessor {
 	 * @return A new condition.
 	 */
 	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default Condition isEmpty() {
 
 		return Functions.size(this).isEqualTo(Cypher.literalOf(0L));

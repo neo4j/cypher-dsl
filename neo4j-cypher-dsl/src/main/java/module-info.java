@@ -36,7 +36,6 @@ module org.neo4j.cypherdsl.core {
 
 	exports org.neo4j.cypherdsl.core;
 	exports org.neo4j.cypherdsl.core.ast;
-	exports org.neo4j.cypherdsl.core.executables;
 	exports org.neo4j.cypherdsl.core.renderer;
 	exports org.neo4j.cypherdsl.core.annotations;
 }

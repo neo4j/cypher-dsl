@@ -53,7 +53,6 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 
 	@Override
 	@NotNull
-	@SuppressWarnings("deprecation")
 	public Condition asCondition() {
 
 		if (!(expression instanceof Predicate)) {

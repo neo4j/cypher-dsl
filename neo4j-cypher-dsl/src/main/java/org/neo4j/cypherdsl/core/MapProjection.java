@@ -94,7 +94,6 @@ public final class MapProjection implements Expression {
 		visitor.leave(this);
 	}
 
-	@SuppressWarnings("deprecation")
 	private static Object contentAt(Object[] content, int i) {
 
 		Object currentObject = content[i];
