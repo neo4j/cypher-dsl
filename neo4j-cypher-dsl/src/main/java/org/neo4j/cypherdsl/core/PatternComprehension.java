@@ -62,7 +62,6 @@ public final class PatternComprehension implements Expression {
 		 * @see #returning(Expression...)
 		 */
 		@NotNull @Contract(pure = true)
-		@SuppressWarnings("deprecation")
 		default PatternComprehension returning(Named... variables) {
 			return returning(Expressions.createSymbolicNames(variables));
 		}

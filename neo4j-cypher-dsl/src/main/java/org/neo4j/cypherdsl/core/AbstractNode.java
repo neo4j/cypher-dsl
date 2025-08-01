@@ -107,7 +107,6 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
 	@NotNull
 	@Override
-	@SuppressWarnings("deprecation")
 	public final FunctionInvocation labels() {
 		return Functions.labels(this);
 	}

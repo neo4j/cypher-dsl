@@ -108,7 +108,6 @@ public final class ListComprehension implements Expression {
 		 * @see #returning(Expression...)
 		 */
 		@NotNull @Contract(pure = true)
-		@SuppressWarnings("deprecation")
 		default ListComprehension returning(Named... variables) {
 			return returning(Expressions.createSymbolicNames(variables));
 		}

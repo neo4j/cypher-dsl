@@ -277,34 +277,6 @@ public final class Cypher {
 	}
 
 	/**
-	 * Starts defining a named path defined by the {@code shortestPath} between a relationship by indicating a name.
-	 *
-	 * @param name The name of the new shortestPath path
-	 * @return An ongoing definition of a named path
-	 * @since 1.1.1
-	 * @deprecated use {@link #shortestK(int)} with {@literal 1} or {@link #anyShortest()}
-	 */
-	@NotNull @Contract(pure = true)
-	@Deprecated
-	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(String name) {
-		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
-	}
-
-	/**
-	 * Starts defining a named path defined by the {@code shortestPath} between a relationship by indicating a name.
-	 *
-	 * @param name The name of the new shortestPath path
-	 * @return An ongoing definition of a named path
-	 * @since 1.1.1
-	 * @deprecated use {@link #shortestK(int)} with {@literal 1} or {@link #anyShortest()}
-	 */
-	@NotNull @Contract(pure = true)
-	@Deprecated
-	public static NamedPath.OngoingShortestPathDefinitionWithName shortestPath(SymbolicName name) {
-		return NamedPath.named(name, BuiltInFunctions.Scalars.SHORTEST_PATH);
-	}
-
-	/**
 	 * @return An ongoing definition of a named path, returning the k shortest paths.
 	 * @since 2024.7.0
 	 */
@@ -1362,7 +1334,6 @@ public final class Cypher {
 	 * @return An "includesAll" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition includesAll(Expression lhs, Expression rhs) {
 		return Conditions.includesAll(lhs, rhs);
 	}
@@ -1375,7 +1346,6 @@ public final class Cypher {
 	 * @return A "not_includes" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition includesAny(Expression lhs, Expression rhs) {
 		return Conditions.includesAny(lhs, rhs);
 	}
@@ -1385,7 +1355,6 @@ public final class Cypher {
 	 * @return A new condition matching the given pattern
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition matching(RelationshipPattern relationshipPattern) {
 		return Conditions.matching(relationshipPattern);
 	}
@@ -1399,7 +1368,6 @@ public final class Cypher {
 	 * @return A "matches" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition matches(Expression lhs, Expression rhs) {
 		return Conditions.matches(lhs, rhs);
 	}
@@ -1412,7 +1380,6 @@ public final class Cypher {
 	 * @return An "equals" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isEqualTo(Expression lhs, Expression rhs) {
 		return Conditions.isEqualTo(lhs, rhs);
 	}
@@ -1422,10 +1389,9 @@ public final class Cypher {
 	 *
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
-	 * @return An "not equals" comparison
+	 * @return a "not equals" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isNotEqualTo(Expression lhs, Expression rhs) {
 		return Conditions.isNotEqualTo(lhs, rhs);
 	}
@@ -1435,10 +1401,9 @@ public final class Cypher {
 	 *
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
-	 * @return An "less than" comparison
+	 * @return a "less than" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition lt(Expression lhs, Expression rhs) {
 		return Conditions.lt(lhs, rhs);
 	}
@@ -1448,10 +1413,9 @@ public final class Cypher {
 	 *
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
-	 * @return An "less than or equal" comparison
+	 * @return a "less than or equal" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition lte(Expression lhs, Expression rhs) {
 		return Conditions.lte(lhs, rhs);
 	}
@@ -1461,10 +1425,9 @@ public final class Cypher {
 	 *
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
-	 * @return An "greater than or equal" comparison
+	 * @return a "greater than or equal" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition gte(Expression lhs, Expression rhs) {
 		return Conditions.gte(lhs, rhs);
 	}
@@ -1474,10 +1437,9 @@ public final class Cypher {
 	 *
 	 * @param lhs The left hand side of the comparison
 	 * @param rhs The right hand side of the comparison
-	 * @return An "greater than" comparison
+	 * @return a "greater than" comparison
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition gt(Expression lhs, Expression rhs) {
 		return Conditions.gt(lhs, rhs);
 	}
@@ -1490,20 +1452,18 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static Condition not(@NotNull Condition condition) {
 		return Conditions.not(condition);
 	}
 
 	/**
-	 * Negates the given pattern element: The pattern must not matched to be included in the result.
+	 * Negates the given pattern element: The pattern must not matche to be included in the result.
 	 *
 	 * @param pattern The pattern to negate. Must not be null.
 	 * @return A condition that evaluates to true when the pattern does not match.
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static Condition not(@NotNull RelationshipPattern pattern) {
 		return Conditions.not(pattern);
 	}
@@ -1516,7 +1476,6 @@ public final class Cypher {
 	 * @return A new condition.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition startsWith(Expression lhs, Expression rhs) {
 		return Conditions.startsWith(lhs, rhs);
 	}
@@ -1529,7 +1488,6 @@ public final class Cypher {
 	 * @return A new condition.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition contains(Expression lhs, Expression rhs) {
 		return Conditions.contains(lhs, rhs);
 	}
@@ -1542,7 +1500,6 @@ public final class Cypher {
 	 * @return A new condition.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition endsWith(Expression lhs, Expression rhs) {
 		return Conditions.endsWith(lhs, rhs);
 	}
@@ -1555,7 +1512,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static Condition noCondition() {
 		return Conditions.noCondition();
 	}
@@ -1567,7 +1523,6 @@ public final class Cypher {
 	 * @return A new condition.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isNull(Expression expression) {
 		return Conditions.isNull(expression);
 	}
@@ -1576,10 +1531,9 @@ public final class Cypher {
 	 * Creates a condition that checks whether the {@code expression} is not {@literal null}.
 	 *
 	 * @param expression The expression to check for {@literal null}
-	 * @return A new condition.
+	 * @return a new condition.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isNotNull(Expression expression) {
 		return Conditions.isNotNull(expression);
 	}
@@ -1591,10 +1545,9 @@ public final class Cypher {
 	 * The argument {@code e} must refer to an expression that evaluates to a list for {@code isEmpty()} to work
 	 *
 	 * @param expression An expression referring to a list
-	 * @return A function call for {@code isEmpty()} for a list
+	 * @return a function call for {@code isEmpty()} for a list
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isEmpty(Expression expression) {
 		return Predicates.isEmpty(expression);
 	}
@@ -1603,7 +1556,6 @@ public final class Cypher {
 	 * @return a condition that is always true.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isTrue() {
 		return Conditions.isTrue();
 	}
@@ -1612,7 +1564,6 @@ public final class Cypher {
 	 * @return a condition that is always false.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition isFalse() {
 		return Conditions.isFalse();
 	}
@@ -1620,10 +1571,9 @@ public final class Cypher {
 	/**
 	 * @param symbolicName  Reference to the entity that should be checked for labels or types
 	 * @param labelsOrTypes the list of labels or types to check for
-	 * @return A condition that checks whether a node has a set of given labels or a relationship a set of given types.
+	 * @return a condition that checks whether a node has a set of given labels or a relationship a set of given types.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
 		return Conditions.hasLabelsOrType(symbolicName, labelsOrTypes);
 	}
@@ -1633,11 +1583,10 @@ public final class Cypher {
 	 *
 	 * @param requiredPattern One pattern is required
 	 * @param patternElement  Optional pattern
-	 * @return The immutable {@link CountExpression}
+	 * @return the immutable {@link CountExpression}
 	 * @since 2023.9.0
 	 */
 	@NotNull
-	@SuppressWarnings("deprecation")
 	public static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
 		return Expressions.count(requiredPattern, patternElement);
 	}
@@ -1646,11 +1595,10 @@ public final class Cypher {
 	 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
 	 *
 	 * @param union The union that will be the source of the {@literal COUNT} sub-query
-	 * @return The immutable {@link CountExpression}
+	 * @return the immutable {@link CountExpression}
 	 * @since 2023.9.0
 	 */
 	@NotNull
-	@SuppressWarnings("deprecation")
 	public static CountExpression count(UnionQuery union) {
 		return Expressions.count(union);
 	}
@@ -1662,11 +1610,10 @@ public final class Cypher {
 	 *
 	 * @param statement The statement to be passed to {@code count{}}
 	 * @param imports   Optional imports to be used in the statement (will be imported with {@literal WITH})
-	 * @return A counting sub-query.
+	 * @return a counting sub-query.
 	 * @since 2023.9.0
 	 */
 	@NotNull
-	@SuppressWarnings("deprecation")
 	public static CountExpression count(Statement statement, IdentifiableElement... imports) {
 		return Expressions.count(statement, imports);
 	}
@@ -1679,7 +1626,6 @@ public final class Cypher {
 	 * @return a count expression.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static CountExpression count(List<PatternElement> pattern, @Nullable Where where) {
 		return Expressions.count(pattern, where);
 	}
@@ -1693,7 +1639,6 @@ public final class Cypher {
 	 * @return a collecting sub-query.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	@NotNull public static Expression collect(Statement statement) {
 		return Expressions.collect(statement);
 	}
@@ -1703,17 +1648,14 @@ public final class Cypher {
 	 * @return The name of the expression if the expression is named or the expression itself.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static <T extends Expression> Expression nameOrExpression(T expression) {
 		return Expressions.nameOrExpression(expression);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static SymbolicName[] createSymbolicNames(String[] variables) {
 		return Expressions.createSymbolicNames(variables);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static SymbolicName[] createSymbolicNames(Named[] variables) {
 		return Expressions.createSymbolicNames(variables);
 	}
@@ -1722,13 +1664,11 @@ public final class Cypher {
 	 * Creates a function invocation for {@code elementId{}}.
 	 *
 	 * @param node The node for which the element id should be retrieved
-	 * @return A function call for {@code elementId()} on a node.
+	 * @return a function call for {@code elementId()} on a node.
 	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
-	public static FunctionInvocation elementId(
-		@NotNull Node node) {
+	public static FunctionInvocation elementId(Node node) {
 		return Functions.elementId(node);
 	}
 
@@ -1740,9 +1680,7 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
-	public static FunctionInvocation elementId(
-		@NotNull Relationship relationship) {
+	public static FunctionInvocation elementId(Relationship relationship) {
 		return Functions.elementId(relationship);
 	}
 
@@ -1755,7 +1693,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation keys(@NotNull Node node) {
 		return Functions.keys(node);
 	}
@@ -1769,7 +1706,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation keys(@NotNull Relationship relationship) {
 		return Functions.keys(relationship);
 	}
@@ -1783,7 +1719,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation keys(@NotNull Expression expression) {
 		return Functions.keys(expression);
 	}
@@ -1797,7 +1732,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation labels(@NotNull Node node) {
 		return Functions.labels(node);
 	}
@@ -1813,7 +1747,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation labels(@NotNull SymbolicName node) {
 		return Functions.labels(node);
 	}
@@ -1827,7 +1760,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation type(@NotNull Relationship relationship) {
 		return Functions.type(relationship);
 	}
@@ -1843,7 +1775,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation type(@NotNull SymbolicName relationship) {
 		return Functions.type(relationship);
 	}
@@ -1855,7 +1786,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation count(@NotNull Node node) {
 		return Functions.count(node);
 	}
@@ -1869,7 +1799,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation count(Expression expression) {
 		return Functions.count(expression);
 	}
@@ -1883,7 +1812,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation countDistinct(@NotNull Node node) {
 		return Functions.countDistinct(node);
 	}
@@ -1897,7 +1825,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation countDistinct(Expression expression) {
 		return Functions.countDistinct(expression);
 	}
@@ -1910,7 +1837,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation properties(Node node) {
 		return Functions.properties(node);
 	}
@@ -1923,7 +1849,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation properties(Relationship relationship) {
 		return Functions.properties(relationship);
 	}
@@ -1931,12 +1856,11 @@ public final class Cypher {
 	/**
 	 * Creates a function invocation for {@code properties())} on maps.
 	 *
-	 * @param map The map who's properties should be returned.
+	 * @param map The map whose properties should be returned.
 	 * @return A function call for {@code properties())}
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation properties(MapExpression map) {
 		return Functions.properties(map);
 	}
@@ -1950,7 +1874,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation coalesce(Expression... expressions) {
 		return Functions.coalesce(expressions);
 	}
@@ -1965,7 +1888,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation left(Expression expression, Expression length) {
 		return Functions.left(expression, length);
 	}
@@ -1979,7 +1901,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation ltrim(@NotNull Expression expression) {
 		return Functions.ltrim(expression);
 	}
@@ -1995,9 +1916,7 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
-	public static FunctionInvocation replace(Expression original, Expression search,
-		Expression replace) {
+	public static FunctionInvocation replace(Expression original, Expression search, Expression replace) {
 		return Functions.replace(original, search, replace);
 	}
 
@@ -2010,7 +1929,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation reverse(@NotNull Expression original) {
 		return Functions.reverse(original);
 	}
@@ -2025,7 +1943,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation right(Expression expression, Expression length) {
 		return Functions.right(expression, length);
 	}
@@ -2039,7 +1956,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation rtrim(@NotNull Expression expression) {
 		return Functions.rtrim(expression);
 	}
@@ -2055,7 +1971,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation substring(Expression original, Expression start,
 		Expression length) {
 		return Functions.substring(original, start, length);
@@ -2070,7 +1985,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toLower(@NotNull Expression expression) {
 		return Functions.toLower(expression);
 	}
@@ -2084,7 +1998,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toUpper(@NotNull Expression expression) {
 		return Functions.toUpper(expression);
 	}
@@ -2098,7 +2011,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation trim(@NotNull Expression expression) {
 		return Functions.trim(expression);
 	}
@@ -2113,7 +2025,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation split(@NotNull Expression expression,
 		@NotNull Expression delimiter) {
 		return Functions.split(expression, delimiter);
@@ -2129,7 +2040,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation split(@NotNull Expression expression,
 		@NotNull String delimiter) {
 		return Functions.split(expression, delimiter);
@@ -2147,7 +2057,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation size(Expression expression) {
 		return Functions.size(expression);
 	}
@@ -2163,7 +2072,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation size(RelationshipPattern pattern) {
 		return Functions.size(pattern);
 	}
@@ -2172,12 +2080,11 @@ public final class Cypher {
 	 * Creates a function invocation for the {@code exists()} function.
 	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-exists">exists</a>.
 	 *
-	 * @param expression The expression who's existence is to be evaluated
+	 * @param expression The expression whose existence is to be evaluated
 	 * @return A function call for {@code exists()} for one expression
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation exists(Expression expression) {
 		return Functions.exists(expression);
 	}
@@ -2193,7 +2100,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation distance(@NotNull Expression point1,
 		@NotNull Expression point2) {
 		return Functions.distance(point1, point2);
@@ -2208,7 +2114,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation point(MapExpression parameterMap) {
 		return Functions.point(parameterMap);
 	}
@@ -2224,7 +2129,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation point(Expression expression) {
 		return Functions.point(expression);
 	}
@@ -2238,7 +2142,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation point(Parameter<?> parameter) {
 		return Functions.point(parameter);
 	}
@@ -2252,7 +2155,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation cartesian(double x, double y) {
 		return Functions.cartesian(x, y);
 	}
@@ -2266,7 +2168,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation coordinate(double longitude, double latitude) {
 		return Functions.coordinate(longitude, latitude);
 	}
@@ -2281,7 +2182,6 @@ public final class Cypher {
 	 * @return A function call for {@code point.withinBBox}
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation withinBBox(Expression point, Expression lowerLeft, Expression upperRight) {
 		return Functions.withinBBox(point, lowerLeft, upperRight);
 	}
@@ -2295,7 +2195,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation avg(Expression expression) {
 		return Functions.avg(expression);
 	}
@@ -2309,7 +2208,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation avgDistinct(Expression expression) {
 		return Functions.avgDistinct(expression);
 	}
@@ -2323,7 +2221,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation collect(@NotNull Named variable) {
 		return Functions.collect(variable);
 	}
@@ -2337,7 +2234,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation collectDistinct(@NotNull Named variable) {
 		return Functions.collectDistinct(variable);
 	}
@@ -2351,7 +2247,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation collect(Expression expression) {
 		return Functions.collect(expression);
 	}
@@ -2365,7 +2260,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation collectDistinct(Expression expression) {
 		return Functions.collectDistinct(expression);
 	}
@@ -2379,7 +2273,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation max(Expression expression) {
 		return Functions.max(expression);
 	}
@@ -2393,7 +2286,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation maxDistinct(Expression expression) {
 		return Functions.maxDistinct(expression);
 	}
@@ -2407,7 +2299,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation min(Expression expression) {
 		return Functions.min(expression);
 	}
@@ -2421,7 +2312,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation minDistinct(Expression expression) {
 		return Functions.minDistinct(expression);
 	}
@@ -2436,7 +2326,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation percentileCont(Expression expression,
 		Number percentile) {
 		return Functions.percentileCont(expression, percentile);
@@ -2452,7 +2341,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation percentileContDistinct(Expression expression,
 		Number percentile) {
 		return Functions.percentileContDistinct(expression, percentile);
@@ -2468,7 +2356,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation percentileDisc(Expression expression,
 		Number percentile) {
 		return Functions.percentileDisc(expression, percentile);
@@ -2484,7 +2371,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation percentileDiscDistinct(Expression expression,
 		Number percentile) {
 		return Functions.percentileDiscDistinct(expression, percentile);
@@ -2499,7 +2385,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation stDev(Expression expression) {
 		return Functions.stDev(expression);
 	}
@@ -2513,7 +2398,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation stDevDistinct(Expression expression) {
 		return Functions.stDevDistinct(expression);
 	}
@@ -2527,7 +2411,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation stDevP(Expression expression) {
 		return Functions.stDevP(expression);
 	}
@@ -2541,7 +2424,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation stDevPDistinct(Expression expression) {
 		return Functions.stDevPDistinct(expression);
 	}
@@ -2555,7 +2437,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation sum(Expression expression) {
 		return Functions.sum(expression);
 	}
@@ -2569,7 +2450,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation sumDistinct(Expression expression) {
 		return Functions.sumDistinct(expression);
 	}
@@ -2582,7 +2462,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation range(Integer start, Integer end) {
 		return Functions.range(start, end);
 	}
@@ -2595,7 +2474,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation range(@NotNull Expression start,
 		@NotNull Expression end) {
 		return Functions.range(start, end);
@@ -2613,7 +2491,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation range(@NotNull Integer start, @NotNull Integer end,
 		Integer step) {
 		return Functions.range(start, end, step);
@@ -2630,7 +2507,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation range(@NotNull Expression start,
 		@NotNull Expression end, Expression step) {
 		return Functions.range(start, end, step);
@@ -2645,7 +2521,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation head(Expression expression) {
 		return Functions.head(expression);
 	}
@@ -2659,7 +2534,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation last(Expression expression) {
 		return Functions.last(expression);
 	}
@@ -2673,7 +2547,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation nodes(@NotNull NamedPath path) {
 		return Functions.nodes(path);
 	}
@@ -2687,7 +2560,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation nodes(@NotNull SymbolicName symbolicName) {
 		return Functions.nodes(symbolicName);
 	}
@@ -2701,7 +2573,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation relationships(@NotNull NamedPath path) {
 		return Functions.relationships(path);
 	}
@@ -2715,7 +2586,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation relationships(@NotNull SymbolicName symbolicName) {
 		return Functions.relationships(symbolicName);
 	}
@@ -2729,7 +2599,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation startNode(@NotNull Relationship relationship) {
 		return Functions.startNode(relationship);
 	}
@@ -2743,7 +2612,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation endNode(@NotNull Relationship relationship) {
 		return Functions.endNode(relationship);
 	}
@@ -2757,7 +2625,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation date() {
 		return Functions.date();
 	}
@@ -2773,7 +2640,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation calendarDate(Integer year, Integer month,
 		Integer day) {
 		return Functions.calendarDate(year, month, day);
@@ -2790,7 +2656,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation weekDate(Integer year, Integer week,
 		Integer dayOfWeek) {
 		return Functions.weekDate(year, week, dayOfWeek);
@@ -2807,7 +2672,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation quarterDate(Integer year, Integer quarter,
 		Integer dayOfQuarter) {
 		return Functions.quarterDate(year, quarter, dayOfQuarter);
@@ -2823,7 +2687,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation ordinalDate(Integer year, Integer ordinalDay) {
 		return Functions.ordinalDate(year, ordinalDay);
 	}
@@ -2838,7 +2701,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation date(@NotNull MapExpression components) {
 		return Functions.date(components);
 	}
@@ -2853,7 +2715,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation date(@NotNull String temporalValue) {
 		return Functions.date(temporalValue);
 	}
@@ -2868,7 +2729,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation date(@NotNull Expression temporalValue) {
 		return Functions.date(temporalValue);
 	}
@@ -2881,7 +2741,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation datetime() {
 		return Functions.datetime();
 	}
@@ -2895,7 +2754,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation datetime(@NotNull TimeZone timeZone) {
 		return Functions.datetime(timeZone);
 	}
@@ -2910,7 +2768,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation datetime(@NotNull MapExpression components) {
 		return Functions.datetime(components);
 	}
@@ -2925,7 +2782,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation datetime(@NotNull String temporalValue) {
 		return Functions.datetime(temporalValue);
 	}
@@ -2940,7 +2796,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation datetime(@NotNull Expression temporalValue) {
 		return Functions.datetime(temporalValue);
 	}
@@ -2953,7 +2808,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localdatetime() {
 		return Functions.localdatetime();
 	}
@@ -2967,7 +2821,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localdatetime(@NotNull TimeZone timeZone) {
 		return Functions.localdatetime(timeZone);
 	}
@@ -2982,7 +2835,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localdatetime(@NotNull MapExpression components) {
 		return Functions.localdatetime(components);
 	}
@@ -2997,7 +2849,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localdatetime(@NotNull String temporalValue) {
 		return Functions.localdatetime(temporalValue);
 	}
@@ -3012,7 +2863,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localdatetime(@NotNull Expression temporalValue) {
 		return Functions.localdatetime(temporalValue);
 	}
@@ -3025,7 +2875,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localtime() {
 		return Functions.localtime();
 	}
@@ -3039,7 +2888,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localtime(@NotNull TimeZone timeZone) {
 		return Functions.localtime(timeZone);
 	}
@@ -3054,7 +2902,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localtime(@NotNull MapExpression components) {
 		return Functions.localtime(components);
 	}
@@ -3069,7 +2916,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localtime(@NotNull String temporalValue) {
 		return Functions.localtime(temporalValue);
 	}
@@ -3084,7 +2930,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation localtime(@NotNull Expression temporalValue) {
 		return Functions.localtime(temporalValue);
 	}
@@ -3097,7 +2942,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation time() {
 		return Functions.time();
 	}
@@ -3111,7 +2955,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation time(@NotNull TimeZone timeZone) {
 		return Functions.time(timeZone);
 	}
@@ -3126,7 +2969,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation time(@NotNull MapExpression components) {
 		return Functions.time(components);
 	}
@@ -3141,7 +2983,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation time(@NotNull String temporalValue) {
 		return Functions.time(temporalValue);
 	}
@@ -3156,7 +2997,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation time(@NotNull Expression temporalValue) {
 		return Functions.time(temporalValue);
 	}
@@ -3171,7 +3011,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation duration(@NotNull MapExpression components) {
 		return Functions.duration(components);
 	}
@@ -3186,7 +3025,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation duration(@NotNull String temporalAmount) {
 		return Functions.duration(temporalAmount);
 	}
@@ -3201,26 +3039,9 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation duration(@NotNull Expression temporalAmount) {
 		return Functions.duration(temporalAmount);
 	}
-
-	/**
-	 * Creates a function invocation for {@code shortestPath({})}.
-	 *
-	 * @param relationship The relationship to be passed to {@code shortestPath}.
-	 * @return A function call for {@code shortestPath({})}.
-	 * @since 2023.9.0
-	 * @deprecated the Cypher funktion of the same name is not GQL compliant, use SHORTEST 1 or ANY as replacement
-	 */
-	@Contract(pure = true) @NotNull
-	@Deprecated
-	public static FunctionInvocation shortestPath(Relationship relationship) {
-		return Functions.shortestPath(relationship);
-	}
-
-
 
 	/**
 	 * Starts building a function invocation for {@code reduce({})}.
@@ -3230,7 +3051,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static Reduction.OngoingDefinitionWithVariable reduce(
 		@NotNull SymbolicName variable) {
 		return Functions.reduce(variable);
@@ -3245,7 +3065,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation abs(@NotNull Expression expression) {
 		return Functions.abs(expression);
 	}
@@ -3259,7 +3078,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation ceil(@NotNull Expression expression) {
 		return Functions.ceil(expression);
 	}
@@ -3273,7 +3091,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation floor(@NotNull Expression expression) {
 		return Functions.floor(expression);
 	}
@@ -3286,7 +3103,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation rand() {
 		return Functions.rand();
 	}
@@ -3302,7 +3118,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation round(Expression value, Expression... expression) {
 		return Functions.round(value, expression);
 	}
@@ -3316,7 +3131,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation sign(@NotNull Expression expression) {
 		return Functions.sign(expression);
 	}
@@ -3329,7 +3143,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation e() {
 		return Functions.e();
 	}
@@ -3343,7 +3156,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation exp(@NotNull Expression expression) {
 		return Functions.exp(expression);
 	}
@@ -3357,7 +3169,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation log(@NotNull Expression expression) {
 		return Functions.log(expression);
 	}
@@ -3371,7 +3182,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation log10(@NotNull Expression expression) {
 		return Functions.log10(expression);
 	}
@@ -3385,7 +3195,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation sqrt(@NotNull Expression expression) {
 		return Functions.sqrt(expression);
 	}
@@ -3399,7 +3208,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation acos(@NotNull Expression expression) {
 		return Functions.acos(expression);
 	}
@@ -3413,7 +3221,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation asin(@NotNull Expression expression) {
 		return Functions.asin(expression);
 	}
@@ -3427,7 +3234,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation atan(@NotNull Expression expression) {
 		return Functions.atan(expression);
 	}
@@ -3442,7 +3248,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation atan2(@NotNull Expression y,
 		@NotNull Expression x) {
 		return Functions.atan2(y, x);
@@ -3457,7 +3262,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation cos(@NotNull Expression expression) {
 		return Functions.cos(expression);
 	}
@@ -3471,7 +3275,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation cot(@NotNull Expression expression) {
 		return Functions.cot(expression);
 	}
@@ -3485,7 +3288,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation degrees(@NotNull Expression expression) {
 		return Functions.degrees(expression);
 	}
@@ -3499,7 +3301,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation haversin(@NotNull Expression expression) {
 		return Functions.haversin(expression);
 	}
@@ -3512,7 +3313,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation pi() {
 		return Functions.pi();
 	}
@@ -3526,7 +3326,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation radians(@NotNull Expression expression) {
 		return Functions.radians(expression);
 	}
@@ -3540,7 +3339,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation sin(@NotNull Expression expression) {
 		return Functions.sin(expression);
 	}
@@ -3554,7 +3352,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation tan(@NotNull Expression expression) {
 		return Functions.tan(expression);
 	}
@@ -3568,7 +3365,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toInteger(@NotNull Expression expression) {
 		return Functions.toInteger(expression);
 	}
@@ -3582,7 +3378,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toString(@NotNull Expression expression) {
 		return Functions.toString(expression);
 	}
@@ -3596,7 +3391,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toStringOrNull(@NotNull Expression expression) {
 		return Functions.toStringOrNull(expression);
 	}
@@ -3610,7 +3404,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toFloat(@NotNull Expression expression) {
 		return Functions.toFloat(expression);
 	}
@@ -3624,7 +3417,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation toBoolean(@NotNull Expression expression) {
 		return Functions.toBoolean(expression);
 	}
@@ -3636,7 +3428,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation linenumber() {
 		return Functions.linenumber();
 	}
@@ -3648,7 +3439,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation file() {
 		return Functions.file();
 	}
@@ -3659,7 +3449,6 @@ public final class Cypher {
 	 * @return A function call for {@code randomUUID({})}.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation randomUUID() {
 		return Functions.randomUUID();
 	}
@@ -3673,7 +3462,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation length(@NotNull NamedPath path) {
 		return Functions.length(path);
 	}
@@ -3686,7 +3474,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation graphNames() {
 		return Functions.graphNames();
 	}
@@ -3700,7 +3487,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation graphPropertiesByName(Expression name) {
 		return Functions.graphPropertiesByName(name);
 	}
@@ -3714,7 +3500,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0") @Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static FunctionInvocation graphByName(
 		Expression name) {
 		return Functions.graphByName(name);
@@ -3740,7 +3525,6 @@ public final class Cypher {
 	 * @return An unary minus operation.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Operation minus(Expression e) {
 		return Operations.minus(e);
 	}
@@ -3753,42 +3537,34 @@ public final class Cypher {
 	 * @return An unary plus operation.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Expression plus(Expression e) {
 		return Operations.plus(e);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation concat(Expression op1, Expression op2) {
 		return Operations.concat(op1, op2);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation add(Expression op1, Expression op2) {
 		return Operations.add(op1, op2);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation subtract(Expression op1, Expression op2) {
 		return Operations.subtract(op1, op2);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation multiply(Expression op1, Expression op2) {
 		return Operations.multiply(op1, op2);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation divide(Expression op1, Expression op2) {
 		return Operations.divide(op1, op2);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation remainder(Expression op1, Expression op2) {
 		return Operations.remainder(op1, op2);
 	}
 
-	@SuppressWarnings("deprecation")
 	public static Operation pow(Expression op1, Expression op2) {
 		return Operations.pow(op1, op2);
 	}
@@ -3802,7 +3578,6 @@ public final class Cypher {
 	 * @return A new operation.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Operation set(Expression target, Expression value) {
 		return Operations.set(target, value);
 	}
@@ -3816,7 +3591,6 @@ public final class Cypher {
 	 * @return A new operation.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Operation mutate(Expression target, MapExpression value) {
 		return Operations.mutate(target, value);
 	}
@@ -3854,7 +3628,6 @@ public final class Cypher {
 	 * @return A remove operation
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Operation removeLabel(Node target, String... label) {
 		return Operations.remove(target, label);
 	}
@@ -3868,7 +3641,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static Condition exists(Property property) {
 		return Predicates.exists(property);
 	}
@@ -3882,7 +3654,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static Condition exists(RelationshipPattern pattern) {
 		return Predicates.exists(pattern);
 	}
@@ -3899,7 +3670,6 @@ public final class Cypher {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition exists(Statement statement, IdentifiableElement... imports) {
 		return Predicates.exists(statement, imports);
 	}
@@ -3913,7 +3683,6 @@ public final class Cypher {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition exists(PatternElement pattern) {
 		return Predicates.exists(pattern);
 	}
@@ -3927,7 +3696,6 @@ public final class Cypher {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition exists(List<PatternElement> pattern) {
 		return Predicates.exists(pattern);
 	}
@@ -3942,7 +3710,6 @@ public final class Cypher {
 	 * @return An existential sub-query.
 	 * @since 2023.9.0
 	 */
-	@SuppressWarnings("deprecation")
 	public static Condition exists(List<PatternElement> pattern, @Nullable Where where) {
 		return Predicates.exists(pattern, where);
 	}
@@ -3954,7 +3721,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction all(String variable) {
 		return Predicates.all(variable);
 	}
@@ -3968,7 +3734,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction all(
 		SymbolicName variable) {
 		return Predicates.all(variable);
@@ -3981,7 +3746,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction any(String variable) {
 		return Predicates.any(variable);
 	}
@@ -3995,7 +3759,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction any(
 		SymbolicName variable) {
 		return Predicates.any(variable);
@@ -4008,7 +3771,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction none(String variable) {
 		return Predicates.none(variable);
 	}
@@ -4022,7 +3784,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction none(
 		SymbolicName variable) {
 		return Predicates.none(variable);
@@ -4035,7 +3796,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction single(String variable) {
 		return Predicates.single(variable);
 	}
@@ -4049,7 +3809,6 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	@Contract(pure = true) @NotNull
-	@SuppressWarnings("deprecation")
 	public static OngoingListBasedPredicateFunction single(
 		SymbolicName variable) {
 		return Predicates.single(variable);

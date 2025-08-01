@@ -72,7 +72,6 @@ public final class SortItem implements Visitable {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
