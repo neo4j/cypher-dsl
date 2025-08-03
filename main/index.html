@@ -567,11 +567,12 @@ table.CodeRay td.code{padding:0 0 0 .75em}
 <li><a href="#cypher-parser-examples">5.3. Examples</a></li>
 </ul>
 </li>
-<li><a href="#static-meta-model">6. Building a static meta model</a>
+<li><a href="#static-meta-model">6. Building a static metamodel</a>
 <ul class="sectlevel2">
 <li><a href="#concepts">6.1. Concepts</a></li>
 <li><a href="#possibleusage">6.2. Possible Usage</a></li>
-<li><a href="#thespringdataneo4j6annotationprocessor">6.3. The Spring Data Neo4j 6 annotation processor</a></li>
+<li><a href="#sdn6-annotation-processor">6.3. The Spring Data Neo4j 6 annotation processor</a></li>
+<li><a href="#ogm-annotation-processor">6.4. The Neo4j-OGM annotation processor</a></li>
 </ul>
 </li>
 <li><a href="#appendix">7. Appendix</a>
@@ -2313,7 +2314,7 @@ Further validation and sanitiy checks are of course up to you.</p>
 </div>
 </div>
 <div class="sect1">
-<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>6. Building a static meta model</h2>
+<h2 id="static-meta-model"><a class="anchor" href="#static-meta-model"></a>6. Building a static metamodel</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="concepts"><a class="anchor" href="#concepts"></a>6.1. Concepts</h3>
@@ -2860,7 +2861,7 @@ Assertions.assertThat(cypher)
 </div>
 </div>
 <div class="sect2">
-<h3 id="thespringdataneo4j6annotationprocessor"><a class="anchor" href="#thespringdataneo4j6annotationprocessor"></a>6.3. The Spring Data Neo4j 6 annotation processor</h3>
+<h3 id="sdn6-annotation-processor"><a class="anchor" href="#sdn6-annotation-processor"></a>6.3. The Spring Data Neo4j 6 annotation processor</h3>
 <div class="paragraph">
 <p>We provide a Java annotation processor for <a href="https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference">Spring Data Neo4j</a> under the following coordinates:</p>
 </div>
@@ -2875,7 +2876,7 @@ Assertions.assertThat(cypher)
 Inside those classes <code>@Relationship</code> and <code>@Property</code> are read.</p>
 </div>
 <div class="paragraph">
-<p>The processor generates a static meta model for each annotated class found in the same package with an underscore (<code>_</code>) added to the name.</p>
+<p>The processor generates a static metamodel for each annotated class found in the same package with an underscore (<code>_</code>) added to the name.</p>
 </div>
 <div class="paragraph">
 <p>The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version <code>2021.1.0</code> or later on it&#8217;s classpath.
@@ -2895,6 +2896,9 @@ Please make sure to use <code>@Relationship</code> when you use the annotation p
 </td>
 </tr>
 </table>
+</div>
+<div class="paragraph">
+<p>The processor does <strong>not</strong> support nested classes used as <code>@Node</code> or <code>@RelationshipProperties</code> entities.</p>
 </div>
 <div class="sect3">
 <h4 id="configureyourbuild"><a class="anchor" href="#configureyourbuild"></a>6.3.1. Configure your build</h4>
@@ -3270,6 +3274,123 @@ MERGE (p:`Person` {name: $pcdsl01}) ON CREATE SET p.born = $arbitraryName, p.dob
 </div>
 </div>
 </div>
+<div class="sect2">
+<h3 id="ogm-annotation-processor"><a class="anchor" href="#ogm-annotation-processor"></a>6.4. The Neo4j-OGM annotation processor</h3>
+<div class="paragraph">
+<p>We provide a Java annotation processor for <a href="https://github.com/neo4j/neo4j-ogm">Neo4j-OGM</a> under the following coordinates:</p>
+</div>
+<div class="listingblock">
+<div class="title">Listing 28. Coordinates of the Neo4j-OGM annotation processor</div>
+<div class="content">
+<pre class="CodeRay highlight"><code>org.neo4j:neo4j-cypher-dsl-codegen-ogm:2025.8.0-SNAPSHOT</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The annotation processor understands classes annotated with <code>@NodeEntity</code> and <code>@RelationshipEntity</code>.
+Inside those classes <code>@Relationship</code>, <code>@Property</code>, <code>@StartNode</code> and <code>@EndNode</code> are read.</p>
+</div>
+<div class="paragraph">
+<p>The processor generates a static metamodel for each annotated class found in the same package with an underscore (<code>_</code>) added to the name.</p>
+</div>
+<div class="paragraph">
+<p>The processor needs Neo4j-OGM 4 and the Cypher-DSL in version <code>2025.8.0</code> or later on it&#8217;s classpath.
+We recommend using it explicitly on the separate annotation processor classpath (via <code>--processor-path</code> to <code>javac</code>).</p>
+</div>
+<div class="paragraph">
+<p>The processor does <strong>not</strong> support nested classes used as <code>@NodeEntity</code> or <code>@RelationshipEntity</code>.</p>
+</div>
+<div class="paragraph">
+<p>This processor is a great choice for applications built on <a href="https://quarkus.io">Quarkus</a> using <a href="https://github.com/neo4j/neo4j-ogm-quarkus">Neo4j-OGM-Quarkus</a> but also for <a href="https://github.com/neo4j/neo4j-ogm-spring">Neo4j-OGM-Spring</a>, our Spring Data Neo4j 5 work that supports Spring Boot &gt;= 3 and the latest Spring Data generation with the behaviour of SDN5 and OGM.</p>
+</div>
+<div class="sect3">
+<h4 id="configureyourbuild2"><a class="anchor" href="#configureyourbuild2"></a>6.4.1. Configure your build</h4>
+<div class="sect4">
+<h5 id="maven3"><a class="anchor" href="#maven3"></a>Maven</h5>
+<div class="paragraph">
+<p>As a Maven user, please configure the build as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;build&gt;</span>
+    <span class="tag">&lt;plugins&gt;</span>
+        <span class="tag">&lt;plugin&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.apache.maven.plugins<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>maven-compiler-plugin<span class="tag">&lt;/artifactId&gt;</span>
+            <span class="tag">&lt;configuration&gt;</span>
+                <span class="tag">&lt;annotationProcessorPaths&gt;</span>
+                    <span class="tag">&lt;annotationProcessorPath&gt;</span>
+                        <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
+                        <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-codegen-ogm<span class="tag">&lt;/artifactId&gt;</span>
+                        <span class="tag">&lt;version&gt;</span>{neo4j-cypher-dsl.version}<span class="tag">&lt;/version&gt;</span>
+                    <span class="tag">&lt;/annotationProcessorPath&gt;</span>
+                <span class="tag">&lt;/annotationProcessorPaths&gt;</span>
+            <span class="tag">&lt;/configuration&gt;</span>
+        <span class="tag">&lt;/plugin&gt;</span>
+    <span class="tag">&lt;/plugins&gt;</span>
+<span class="tag">&lt;/build&gt;</span></code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="gradle3"><a class="anchor" href="#gradle3"></a>Gradle</h5>
+<div class="paragraph">
+<p>In a Gradle project, please add the following:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
+    annotationProcessor <span class="string"><span class="delimiter">'</span><span class="content">org.neo4j:neo4j-cypher-dsl-codegen-ogm:2025.8.0-SNAPSHOT</span><span class="delimiter">'</span></span>
+}</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="asdependencyontheclasspath2"><a class="anchor" href="#asdependencyontheclasspath2"></a>As dependency on the classpath</h5>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+We recommend the annotation processor path for two reasons: The processor needs Neo4j-OGM as dependency. While Neo4j-OGM is already on the classpath,
+it might not fit the one we build the annotation processor against exactly.
+While the processor is lenient in that regard, your dependency setup might not.
+Furthermore: Why should you have the annotation processor as a dependency in your final artifact? This would be unnecessary.
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>If you insist on having the Neo4j-OGM annotation processor on the standard class path, please include with your Neo4j-OGM
+application like as follows to avoid dependency conflicts:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
+    <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
+    <span class="tag">&lt;artifactId&gt;</span>neo4j-cypher-dsl-codegen-ogm<span class="tag">&lt;/artifactId&gt;</span>
+    <span class="tag">&lt;version&gt;</span>{neo4j-cypher-dsl.version}<span class="tag">&lt;/version&gt;</span>
+    <span class="tag">&lt;optional&gt;</span>true<span class="tag">&lt;/optional&gt;</span>
+    <span class="tag">&lt;exclusions&gt;</span>
+        <span class="tag">&lt;exclusion&gt;</span>
+            <span class="tag">&lt;groupId&gt;</span>org.neo4j<span class="tag">&lt;/groupId&gt;</span>
+            <span class="tag">&lt;artifactId&gt;</span>neo4j-ogm-core<span class="tag">&lt;/artifactId&gt;</span>
+        <span class="tag">&lt;/exclusion&gt;</span>
+    <span class="tag">&lt;/exclusions&gt;</span>
+<span class="tag">&lt;/dependency&gt;</span></code></pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="usage2"><a class="anchor" href="#usage2"></a>6.4.2. Usage</h4>
+<div class="paragraph">
+<p>The processor supports the same arguments as the <a href="#sdn6-annotation-processor">Section 6.3</a> except for <code>org.neo4j.cypherdsl.codegen.sdn.custom_converter_classes</code>.
+The usage of the generated classes is identical.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -3415,7 +3536,7 @@ assertThat(statement.getCypher())
 To make use of <code>Cypher.adapt()</code>, you must add the following dependency in addition to the Cypher-DSL:</p>
 </div>
 <div class="sect4">
-<h5 id="maven3"><a class="anchor" href="#maven3"></a>Maven</h5>
+<h5 id="maven4"><a class="anchor" href="#maven4"></a>Maven</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="xml"><span class="tag">&lt;dependency&gt;</span>
@@ -3428,7 +3549,7 @@ To make use of <code>Cypher.adapt()</code>, you must add the following dependenc
 </div>
 </div>
 <div class="sect4">
-<h5 id="gradle3"><a class="anchor" href="#gradle3"></a>Gradle</h5>
+<h5 id="gradle4"><a class="anchor" href="#gradle4"></a>Gradle</h5>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="groovy">dependencies {
@@ -3506,7 +3627,7 @@ the wrapper downloads the appropriate Maven version automatically.</p>
 <p>The build requires a local copy of the project:</p>
 </div>
 <div id="clone-cypher-dsl" class="listingblock">
-<div class="title">Listing 28. Clone the Neo4j Cypher-DSL</div>
+<div class="title">Listing 29. Clone the Neo4j Cypher-DSL</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ git clone git@github.com:neo4j-contrib/cypher-dsl.git</code></pre>
 </div>
@@ -3527,7 +3648,7 @@ This is useful if you want to just have an installation of a snapshot version. N
 </table>
 </div>
 <div id="build-fast-bash" class="listingblock">
-<div class="title">Listing 29. Fast build (only compiling and producing packages)</div>
+<div class="title">Listing 30. Fast build (only compiling and producing packages)</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw -Dfast package</code></pre>
 </div>
@@ -3536,7 +3657,7 @@ This is useful if you want to just have an installation of a snapshot version. N
 <p>For a local install - maybe to try out a future release - you can also specify the version number:</p>
 </div>
 <div id="build-fast-and-install-bash" class="listingblock">
-<div class="title">Listing 30. Fast build (locally installed, with an artificial version number)</div>
+<div class="title">Listing 31. Fast build (locally installed, with an artificial version number)</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw -Dfast -Drevision=1337 -Dchangelist= install</code></pre>
 </div>
@@ -3549,7 +3670,7 @@ This is useful if you want to just have an installation of a snapshot version. N
 The output should be similar:</p>
 </div>
 <div id="verify-jdk" class="listingblock">
-<div class="title">Listing 31. Verify your JDK</div>
+<div class="title">Listing 32. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
 openjdk version &quot;17.0.5&quot; 2022-10-18
@@ -3561,7 +3682,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed
 <p>Check whether GraalVM <code>native-image</code> is present with:</p>
 </div>
 <div id="verify-native-image" class="listingblock">
-<div class="title">Listing 32. Check for the present of <code>native-image</code></div>
+<div class="title">Listing 33. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ gu list
 ComponentId              Version             Component name                Stability                     Origin
@@ -3578,7 +3699,7 @@ native-image             22.3.0              Native Image                  Exper
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
 </div>
 <div id="build-default-bash" class="listingblock">
-<div class="title">Listing 33. Build with default settings on Linux / macOS</div>
+<div class="title">Listing 34. Build with default settings on Linux / macOS</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
@@ -3587,7 +3708,7 @@ native-image             22.3.0              Native Image                  Exper
 <p>On a Windows machine, use</p>
 </div>
 <div id="build-default-windows" class="listingblock">
-<div class="title">Listing 34. Build with default settings on Windows</div>
+<div class="title">Listing 35. Build with default settings on Windows</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ mvnw.cmd clean verify</code></pre>
 </div>
@@ -3599,7 +3720,7 @@ native-image             22.3.0              Native Image                  Exper
 <p>On a plain JDK 17 or higher, run the following to skip the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
-<div class="title">Listing 35. Skipping native tests</div>
+<div class="title">Listing 36. Skipping native tests</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
 </div>
@@ -3611,7 +3732,7 @@ native-image             22.3.0              Native Image                  Exper
 <p>The core module can be build on plain JDK 17 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
-<div class="title">Listing 36. Build only the core module</div>
+<div class="title">Listing 37. Build only the core module</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -am -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
@@ -3624,7 +3745,7 @@ native-image             22.3.0              Native Image                  Exper
 If you need to create a specific version you can specify the revision, the changelist and an optional hash like this:</p>
 </div>
 <div class="listingblock">
-<div class="title">Listing 37. Specifying revision and changelist</div>
+<div class="title">Listing 38. Specifying revision and changelist</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT</code></pre>
 </div>
@@ -3667,7 +3788,7 @@ Therefore, there is little to know API to do so with the AST visitor being the e
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock">
-<div class="title">Listing 38. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 39. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@BeforeAll</span>
 <span class="type">void</span> importCorePackage() {
@@ -3688,7 +3809,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock">
-<div class="title">Listing 39. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 40. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
 <span class="type">void</span> coreMostNotDependOnRendering() {
@@ -3714,7 +3835,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock">
-<div class="title">Listing 40. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 41. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
 <span class="type">void</span> internalPublicClassesMustBeFinal() {
@@ -3759,7 +3880,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock">
-<div class="title">Listing 41. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 42. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
 <span class="type">void</span> coreMostNotDependOnRendering() {
@@ -3776,7 +3897,7 @@ explicitly specifying a renderer:</p>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock">
-<div class="title">Listing 42. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 43. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ParameterizedTest</span>
 <span class="annotation">@ValueSource</span>(strings = { <span class="string"><span class="delimiter">&quot;</span><span class="content">..core.ast</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">..core.utils</span><span class="delimiter">&quot;</span></span> })
@@ -10914,7 +11035,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-08-01 12:16:34 UTC
+Last updated 2025-08-03 18:13:02 UTC
 </div>
 </div>
 </body>
