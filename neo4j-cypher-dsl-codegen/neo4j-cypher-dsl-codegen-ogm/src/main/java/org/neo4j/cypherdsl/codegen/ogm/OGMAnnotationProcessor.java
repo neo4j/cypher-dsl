@@ -193,7 +193,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	}
 
 	// Tries to figure out the direction of this relationship, so that we can decide on how to treat start/end nodes
-	private Optional<Relationship.Direction> findDirection(String type, Element annotatedEntity, Element startElement,
+	private Optional<Relationship.Direction> findDirection(Element annotatedEntity, Element startElement,
 		Set<Element> allRelationshipFields) {
 
 		return allRelationshipFields.stream().filter(element -> {
@@ -205,18 +205,7 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 			// Get the type
 			if (element.asType() instanceof DeclaredType dt) {
-				// Single field
-				if (dt.equals(annotatedEntity.asType())) {
-					return true;
-				} else {
-					// Treating anything that has a generic type argument for a collection shaped thing
-					// Most other mappings with OGM won't work anyhow, so this is good enough for now
-					for (var typeArgument : dt.getTypeArguments()) {
-						if (typeArgument.equals(annotatedEntity.asType())) {
-							return true;
-						}
-					}
-				}
+				return declaredTypeContains(dt, annotatedEntity);
 			}
 			return false;
 		}).map(element -> {
@@ -224,6 +213,22 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			return relationship == null ? Relationship.Direction.OUTGOING : relationship.direction();
 		}).findFirst();
 
+	}
+
+	private static boolean declaredTypeContains(DeclaredType dt, Element annotatedEntity) {
+		// Single field
+		if (dt.equals(annotatedEntity.asType())) {
+			return true;
+		} else {
+			// Treating anything that has a generic type argument for a collection shaped thing
+			// Most other mappings with OGM won't work anyhow, so this is good enough for now
+			for (var typeArgument : dt.getTypeArguments()) {
+				if (typeArgument.equals(annotatedEntity.asType())) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	private Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> collectRelationshipProperties(
@@ -262,9 +267,9 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			Element relationshipDefiningElement = null;
 			if (startElement != null && endElement != null) {
 				var finalEndElement = endElement;
-				var direction = findDirection(relationshipType, annotatedEntity, startElement,
+				var direction = findDirection(annotatedEntity, startElement,
 					allRelationshipFields).or(
-						() -> findDirection(relationshipType, annotatedEntity, finalEndElement, allRelationshipFields))
+						() -> findDirection(annotatedEntity, finalEndElement, allRelationshipFields))
 					.orElse(Relationship.Direction.OUTGOING);
 
 				relationshipDefiningElement = direction == Relationship.Direction.OUTGOING ? endElement : startElement;
