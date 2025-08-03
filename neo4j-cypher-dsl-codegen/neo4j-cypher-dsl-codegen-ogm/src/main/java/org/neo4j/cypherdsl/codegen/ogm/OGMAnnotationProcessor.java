@@ -73,16 +73,26 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
  * @since 2025.8.0
  */
 @API(status = EXPERIMENTAL, since = "2025.8.0")
-@SupportedAnnotationTypes({ OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
-	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION })
-@SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,
-	Configuration.PROPERTY_INDENT_SIZE, Configuration.PROPERTY_TIMESTAMP, Configuration.PROPERTY_ADD_AT_GENERATED })
+@SupportedAnnotationTypes({
+	OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
+	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION
+})
+@SupportedOptions({
+	Configuration.PROPERTY_PREFIX,
+	Configuration.PROPERTY_SUFFIX,
+	Configuration.PROPERTY_INDENT_STYLE,
+	Configuration.PROPERTY_INDENT_SIZE,
+	Configuration.PROPERTY_TIMESTAMP,
+	Configuration.PROPERTY_ADD_AT_GENERATED
+})
 public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProcessor {
 
 	static final String NODE_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.NodeEntity";
 	static final String RELATIONSHIP_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.RelationshipEntity";
 	static final Set<String> VALID_GENERATED_ID_TYPES = Set.of(Long.class.getName(), long.class.getName());
+
 	private final List<TypeElement> convertAnnotationTypes = new ArrayList<>();
+
 	private TypeElement propertyAnnotationType;
 	private TypeElement nodeEntityAnnotationType;
 	private TypeElement relationshipEntityAnnotationType;
@@ -92,7 +102,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	private TypeElement ogmIdAnnotationType;
 	private TypeElement generatedValueAnnotationType;
 
-	@Override public void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
+	@Override
+	public void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
 
 		Elements elementUtils = processingEnv.getElementUtils();
 		this.nodeEntityAnnotationType = elementUtils.getTypeElement(NODE_ENTITY_ANNOTATION);
@@ -111,7 +122,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		this.generatedValueAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.GeneratedValue");
 	}
 
-	@Override protected Collection<String> getLabel(TypeElement annotatedClass) {
+	@Override
+	protected Collection<String> getLabel(TypeElement annotatedClass) {
 		NodeEntity nodeAnnotation = annotatedClass.getAnnotation(NodeEntity.class);
 		Set<String> labels = new LinkedHashSet<>();
 		Consumer<String> addLabel = label -> {
@@ -128,7 +140,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		return Collections.unmodifiableCollection(labels);
 	}
 
-	@Override public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
+	@Override
+	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 		if (annotations.isEmpty()) {
 			return false;
 		}
@@ -279,7 +292,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		return Collections.unmodifiableMap(result);
 	}
 
-	@Override protected PropertyDefinition asPropertyDefinition(Element e) {
+	@Override
+	protected PropertyDefinition asPropertyDefinition(Element e) {
 		Optional<Property> optionalPropertyAnnotation = Optional.ofNullable(e.getAnnotation(Property.class));
 
 		PropertyDefinition propertyDefinition;
@@ -311,7 +325,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		return propertyDefinition;
 	}
 
-	@Override protected RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
+	@Override
+	protected RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
 		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 		Optional<Relationship> optionalRelationshipAnnotation = Optional.ofNullable(
@@ -349,7 +364,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		}
 
 		DeclaredType declaredType = e.asType().accept(new SimpleTypeVisitor8<DeclaredType, Void>() {
-			@Override public DeclaredType visitDeclared(DeclaredType t, Void unused) {
+			@Override
+			public DeclaredType visitDeclared(DeclaredType t, Void unused) {
 				return t;
 			}
 		}, null);
@@ -392,7 +408,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		}
 	}
 
-	@Override protected PropertiesAndRelationshipGrouping newPropertiesAndRelationshipGrouping() {
+	@Override
+	protected PropertiesAndRelationshipGrouping newPropertiesAndRelationshipGrouping() {
 		return new GroupPropertiesAndRelationships();
 	}
 
@@ -401,7 +418,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	 */
 	// Silence Sonar complaining about the class hierarchy, which is given through
 	// the ElementKindVisitor8, which we need but cannot change
-	@SuppressWarnings("squid:S110") class GroupPropertiesAndRelationships
+	@SuppressWarnings("squid:S110")
+	class GroupPropertiesAndRelationships
 		extends ElementKindVisitor8<Map<FieldType, List<Element>>, Void> implements PropertiesAndRelationshipGrouping {
 
 		private final Map<FieldType, List<Element>> result;
@@ -422,16 +440,19 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			return result;
 		}
 
-		@Override public Map<FieldType, List<Element>> visitTypeAsRecord(TypeElement e, Void unused) {
+		@Override
+		public Map<FieldType, List<Element>> visitTypeAsRecord(TypeElement e, Void unused) {
 			// We must overwrite this or visitUnknown() in case we encounter a record
 			return result;
 		}
 
-		@Override public Map<FieldType, List<Element>> visitRecordComponent(RecordComponentElement e, Void unused) {
+		@Override
+		public Map<FieldType, List<Element>> visitRecordComponent(RecordComponentElement e, Void unused) {
 			return visitFieldOrRecordComponent(e);
 		}
 
-		@Override public Map<FieldType, List<Element>> visitVariableAsField(VariableElement e, Void unused) {
+		@Override
+		public Map<FieldType, List<Element>> visitVariableAsField(VariableElement e, Void unused) {
 			return visitFieldOrRecordComponent(e);
 		}
 
@@ -505,7 +526,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 				return false;
 			} else {
 				var type = typeMirrorOfField.accept(new TypeKindVisitor8<>() {
-					@Override public String visitDeclared(DeclaredType t, Object o) {
+					@Override
+					public String visitDeclared(DeclaredType t, Object o) {
 						return t.asElement().accept(new TypeElementVisitor<>(newTypeElementNameFunction()), null);
 					}
 				}, null);
