@@ -24,8 +24,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
@@ -51,7 +49,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	final Details details;
 
-	@Nullable
 	final QuantifiedPathPattern.Quantifier quantifier;
 
 	// ------------------------------------------------------------------------
@@ -114,7 +111,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		this(symbolicName, start, Direction.LTR, properties, null, end, type);
 	}
 
-	@NotNull
 	@Override
 	public final SELF named(String newSymbolicName) {
 
@@ -127,11 +123,9 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 * @param newSymbolicName the new symbolic name.
 	 * @return A new relationship
 	 */
-	@NotNull
 	@Override
 	public abstract SELF named(SymbolicName newSymbolicName);
 
-	@NotNull
 	@Override
 	public final SELF withProperties(Object... keysAndValues) {
 
@@ -142,7 +136,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		return withProperties(newProperties);
 	}
 
-	@NotNull
 	@Override
 	public final SELF withProperties(Map<String, Object> newProperties) {
 
@@ -154,82 +147,69 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return A new relationship
 	 */
-	@NotNull
 	@Override
 	public abstract SELF withProperties(MapExpression newProperties);
 
-	@NotNull
 	@Override
 	public final Node getLeft() {
 		return left;
 	}
 
-	@NotNull
 	@Override
 	public final Node getRight() {
 		return right;
 	}
 
-	@Nullable
 	@Override
 	public final QuantifiedPathPattern.Quantifier getQuantifier() {
 		return quantifier;
 	}
 
-	@NotNull
 	@Override
 	public final Details getDetails() {
 		return details;
 	}
 
-	@NotNull
 	@Override
 	public final Relationship unbounded() {
 
 		return new InternalRelationshipImpl(this.left, this.details.unbounded(), this.quantifier, this.right);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship min(Integer minimum) {
 
 		return new InternalRelationshipImpl(this.left, this.details.min(minimum), this.quantifier, this.right);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship max(Integer maximum) {
 
 		return new InternalRelationshipImpl(this.left, this.details.max(maximum), this.quantifier, this.right);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship length(Integer minimum, Integer maximum) {
 
 		return new InternalRelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.quantifier, this.right);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship inverse() {
 
 		return new InternalRelationshipImpl(this.right, this.details.inverse(), this.quantifier, this.left);
 	}
 
-	@NotNull
 	@Override
 	public final Optional<SymbolicName> getSymbolicName() {
 		return details.getSymbolicName();
 	}
 
-	@NotNull
 	@Override
 	public final SymbolicName getRequiredSymbolicName() {
 		return details.getRequiredSymbolicName();
 	}
 
-	@NotNull
 	@Override
 	public final RelationshipChain relationshipTo(Node other, String... types) {
 		return RelationshipChain
@@ -237,7 +217,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 				.add(this.right.relationshipTo(other, types));
 	}
 
-	@NotNull
 	@Override
 	public final RelationshipChain relationshipFrom(Node other, String... types) {
 		return RelationshipChain
@@ -245,7 +224,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 				.add(this.right.relationshipFrom(other, types));
 	}
 
-	@NotNull
 	@Override
 	public final RelationshipChain relationshipBetween(Node other, String... types) {
 		return RelationshipChain
@@ -253,7 +231,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 				.add(this.right.relationshipBetween(other, types));
 	}
 
-	@NotNull
 	@Override
 	public final Condition asCondition() {
 		return RelationshipPatternCondition.of(this);
@@ -304,16 +281,15 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	}
 
 	@Override
-	public @NotNull Relationship where(@Nullable Expression predicate) {
+	public Relationship where(Expression predicate) {
 		if (predicate == null) {
 			return this;
 		}
 		return new InternalRelationshipImpl(this.left, this.details.where(predicate), this.quantifier, this.right);
 	}
 
-	@NotNull
 	@Override
-	public RelationshipPattern quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier newQuantifier) {
+	public RelationshipPattern quantifyRelationship(QuantifiedPathPattern.Quantifier newQuantifier) {
 		if (newQuantifier == null) {
 			return this;
 		}
@@ -321,9 +297,8 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		return new InternalRelationshipImpl(this.left, this.details, newQuantifier, this.right);
 	}
 
-	@NotNull
 	@Override
-	public QuantifiedPathPattern quantify(@Nullable QuantifiedPathPattern.Quantifier newQuantifier) {
+	public QuantifiedPathPattern quantify(QuantifiedPathPattern.Quantifier newQuantifier) {
 
 		return QuantifiedPathPattern.of(this, newQuantifier);
 	}

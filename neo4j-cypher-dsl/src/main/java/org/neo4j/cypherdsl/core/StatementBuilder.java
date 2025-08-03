@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.Collection;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -72,8 +70,7 @@ public interface StatementBuilder
 		 * @neo4j.version 4.0.0
 		 */
 		@Neo4jVersion(minimum = "4.0.0")
-		@NotNull @Contract(pure = true)
-		Condition asCondition();
+			Condition asCondition();
 	}
 
 	/**
@@ -120,8 +117,8 @@ public interface StatementBuilder
 		 * @param variable The alias name
 		 * @return A normal, ongoing read.
 		 */
-		@NotNull @CheckReturnValue
-		OngoingReading as(@NotNull String variable);
+		@CheckReturnValue
+		OngoingReading as(String variable);
 
 		/**
 		 * Reuse an existing symbolic name.
@@ -130,7 +127,7 @@ public interface StatementBuilder
 		 * @return A normal, ongoing read.
 		 * @since 2021.0.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		default OngoingReading as(SymbolicName variable) {
 			return as(variable.getValue());
 		}
@@ -164,8 +161,8 @@ public interface StatementBuilder
 		 * @param condition The new condition, must not be {@literal null}
 		 * @return A match restricted by a where clause with no return items yet.
 		 */
-		@NotNull @CheckReturnValue
-		OrderableOngoingReadingAndWithWithWhere where(@NotNull Condition condition);
+		@CheckReturnValue
+		OrderableOngoingReadingAndWithWithWhere where(Condition condition);
 
 		/**
 		 * Adds a where clause based on a path pattern to this match.
@@ -177,8 +174,8 @@ public interface StatementBuilder
 		 * @return A match restricted by a where clause with no return items yet.
 		 * @since 1.0.1
 		 */
-		@NotNull @CheckReturnValue
-		default OrderableOngoingReadingAndWithWithWhere where(@NotNull RelationshipPattern pathPattern) {
+		@CheckReturnValue
+		default OrderableOngoingReadingAndWithWithWhere where(RelationshipPattern pathPattern) {
 
 			Assertions.notNull(pathPattern, "The path pattern must not be null.");
 			return this.where(RelationshipPatternCondition.of(pathPattern));
@@ -230,8 +227,8 @@ public interface StatementBuilder
 		 * @param expression The expression that is added with an {@literal AND}
 		 * @return A new order specifying step.
 		 */
-		@NotNull @CheckReturnValue
-		TerminalOngoingOrderDefinition and(@NotNull Expression expression);
+		@CheckReturnValue
+		TerminalOngoingOrderDefinition and(Expression expression);
 	}
 
 	/**
@@ -247,7 +244,7 @@ public interface StatementBuilder
 		 *
 		 * @return The ongoing definition of a match
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingMatchAndReturnWithOrder descending();
 
 		/**
@@ -255,7 +252,7 @@ public interface StatementBuilder
 		 *
 		 * @return The ongoing definition of a match
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingMatchAndReturnWithOrder ascending();
 	}
 
@@ -273,8 +270,8 @@ public interface StatementBuilder
 		 * @param expression The expression that is added with an {@literal AND}
 		 * @return A new order specifying step.
 		 */
-		@NotNull @CheckReturnValue
-		OngoingOrderDefinition and(@NotNull Expression expression);
+		@CheckReturnValue
+		OngoingOrderDefinition and(Expression expression);
 	}
 
 	/**
@@ -289,7 +286,7 @@ public interface StatementBuilder
 		 *
 		 * @return The ongoing definition of a match
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingReadingAndWithWithWhereAndOrder descending();
 
 		/**
@@ -297,7 +294,7 @@ public interface StatementBuilder
 		 *
 		 * @return The ongoing definition of a match
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingReadingAndWithWithWhereAndOrder ascending();
 	}
 
@@ -312,14 +309,12 @@ public interface StatementBuilder
 		/**
 		 * @return The statement ready to be used, i.e. in a renderer.
 		 */
-		@NotNull @Contract(pure = true)
 		T build();
 
 		/**
 		 * @return Creates a statement that returns an explain plan for the original statement.
 		 * @since 2020.1.2
 		 */
-		@NotNull @Contract(pure = true)
 		default Statement explain() {
 
 			return DecoratedQuery.explain(build());
@@ -329,7 +324,6 @@ public interface StatementBuilder
 		 * @return Creates a profiled statement that includes both the result and the actually executed and profiled plan.
 		 * @since 2020.1.2
 		 */
-		@NotNull @Contract(pure = true)
 		default Statement profile() {
 
 			return DecoratedQuery.profile(build());
@@ -351,7 +345,7 @@ public interface StatementBuilder
 		 * @param sortItem One or more sort items
 		 * @return A build step that still offers methods for defining skip and limit
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem);
 
 
@@ -363,7 +357,7 @@ public interface StatementBuilder
 		 * @return A build step that still offers methods for defining skip and limit
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem);
 
 		/**
@@ -372,8 +366,8 @@ public interface StatementBuilder
 		 * @param expression The expression to order by
 		 * @return A step that allows for adding more expression or fine-tuning the sort direction of the last expression
 		 */
-		@NotNull @CheckReturnValue
-		TerminalOngoingOrderDefinition orderBy(@NotNull Expression expression);
+		@CheckReturnValue
+		TerminalOngoingOrderDefinition orderBy(Expression expression);
 	}
 
 	/**
@@ -389,7 +383,7 @@ public interface StatementBuilder
 		 * @param number How many records to skip. If this is null, then no records are skipped.
 		 * @return A step that only allows the limit of records to be specified.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		TerminalExposesLimit skip(Number number);
 
 		/**
@@ -399,7 +393,7 @@ public interface StatementBuilder
 		 * @return A step that only allows the limit of records to be specified.
 		 * @since 2021.0.0
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		TerminalExposesLimit skip(Expression expression);
 	}
 
@@ -416,7 +410,7 @@ public interface StatementBuilder
 		 * @param number How many records to return. If this is null, all the records are returned.
 		 * @return A buildable match statement.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableStatement<ResultStatement> limit(Number number);
 
 		/**
@@ -426,7 +420,7 @@ public interface StatementBuilder
 		 * @return A buildable match statement.
 		 * @since 2021.0.0
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableStatement<ResultStatement> limit(Expression expression);
 	}
 
@@ -454,7 +448,7 @@ public interface StatementBuilder
 		 * @param sortItem One or more sort items
 		 * @return A build step that still offers methods for defining skip and limit
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem);
 
 		/**
@@ -465,7 +459,7 @@ public interface StatementBuilder
 		 * @return A build step that still offers methods for defining skip and limit
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem);
 
 		/**
@@ -474,8 +468,8 @@ public interface StatementBuilder
 		 * @param expression The expression to order by
 		 * @return A step that allows for adding more expression or fine-tuning the sort direction of the last expression
 		 */
-		@NotNull @CheckReturnValue
-		OngoingOrderDefinition orderBy(@NotNull Expression expression);
+		@CheckReturnValue
+		OngoingOrderDefinition orderBy(Expression expression);
 	}
 
 	/**
@@ -498,7 +492,7 @@ public interface StatementBuilder
 		 * @param number How many records to skip. If this is null, then no records are skipped.
 		 * @return A step that only allows the limit of records to be specified.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingReadingAndWithWithSkip skip(Number number);
 
 		/**
@@ -508,7 +502,7 @@ public interface StatementBuilder
 		 * @return A step that only allows the limit of records to be specified.
 		 * @since 2021.0.0
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingReadingAndWithWithSkip skip(Expression expression);
 	}
 
@@ -525,7 +519,7 @@ public interface StatementBuilder
 		 * @param number How many records to return. If this is null, all the records are returned.
 		 * @return A buildable match statement.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingReadingAndWith limit(Number number);
 
 		/**
@@ -535,7 +529,7 @@ public interface StatementBuilder
 		 * @return A buildable match statement.
 		 * @since 2021.0.0
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingReadingAndWith limit(Expression expression);
 	}
 
@@ -552,8 +546,6 @@ public interface StatementBuilder
 		 * @return A step for selecting the source of iteration
 		 * @since 2023.4.0
 		 */
-		@NotNull
-		@Contract(pure = true)
 		ForeachSourceStep foreach(SymbolicName variable);
 	}
 
@@ -612,8 +604,7 @@ public interface StatementBuilder
 		 * @param variables Variables indicating the things to delete.
 		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
-		@SuppressWarnings("deprecation")
+		@CheckReturnValue
 		default OngoingUpdate delete(String... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
@@ -625,8 +616,7 @@ public interface StatementBuilder
 		 * @param variables Variables indicating the things to delete.
 		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
-		@SuppressWarnings("deprecation")
+		@CheckReturnValue
 		default OngoingUpdate delete(Named... variables) {
 			return delete(Expressions.createSymbolicNames(variables));
 		}
@@ -637,7 +627,7 @@ public interface StatementBuilder
 		 * @param expressions The expressions to be deleted.
 		 * @return A match with a {@literal DELETE} clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingUpdate delete(Expression... expressions);
 
 		/**
@@ -647,7 +637,7 @@ public interface StatementBuilder
 		 * @return A match with a {@literal DELETE} clause that can be build now
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingUpdate delete(Collection<? extends Expression> expressions);
 
 		/**
@@ -657,8 +647,7 @@ public interface StatementBuilder
 		 * @param variables Variables indicating the things to delete.
 		 * @return A match with a {@literal DETACH DELETE} clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
-		@SuppressWarnings("deprecation")
+		@CheckReturnValue
 		default OngoingUpdate detachDelete(String... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
@@ -670,8 +659,7 @@ public interface StatementBuilder
 		 * @param variables Variables indicating the things to delete.
 		 * @return A match with a {@literal DETACH DELETE} clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
-		@SuppressWarnings("deprecation")
+		@CheckReturnValue
 		default OngoingUpdate detachDelete(Named... variables) {
 			return detachDelete(Expressions.createSymbolicNames(variables));
 		}
@@ -682,7 +670,7 @@ public interface StatementBuilder
 		 * @param expressions The expressions to be deleted.
 		 * @return A match with {@literal DETACH DELETE} clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingUpdate detachDelete(Expression... expressions);
 
 		/**
@@ -692,7 +680,7 @@ public interface StatementBuilder
 		 * @return A match with {@literal DETACH DELETE} clause that can be build now
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingUpdate detachDelete(Collection<? extends Expression> expressions);
 	}
 
@@ -710,7 +698,7 @@ public interface StatementBuilder
 		 * @param expressions The list of expressions to use in a set clause.
 		 * @return An ongoing match and update
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate set(Expression... expressions);
 
 		/**
@@ -721,7 +709,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate set(Collection<? extends Expression> expressions);
 
 		/**
@@ -731,7 +719,7 @@ public interface StatementBuilder
 		 * @param expression The modifying expression
 		 * @return An ongoing match and update
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		default BuildableMatchAndUpdate set(Named variable, Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
 		}
@@ -745,7 +733,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate mutate(Expression target, Expression properties);
 
 		/**
@@ -757,7 +745,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		default BuildableMatchAndUpdate mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
 		}
@@ -778,7 +766,7 @@ public interface StatementBuilder
 		 * @param labels The labels to be set
 		 * @return A match with a SET clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		R set(Node node, String... labels);
 
 		/**
@@ -789,7 +777,7 @@ public interface StatementBuilder
 		 * @return A match with a SET clause that can be build now
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		R set(Node node, Collection<String> labels);
 	}
 
@@ -807,7 +795,7 @@ public interface StatementBuilder
 		 * @param labels The labels to be removed
 		 * @return A match with a REMOVE clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate remove(Node node, String... labels);
 
 		/**
@@ -818,7 +806,7 @@ public interface StatementBuilder
 		 * @return A match with a REMOVE clause that can be build now
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate remove(Node node, Collection<String> labels);
 
 		/**
@@ -827,7 +815,7 @@ public interface StatementBuilder
 		 * @param properties The properties to be removed
 		 * @return A match with a REMOVE clause that can be build now
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate remove(Property... properties);
 
 		/**
@@ -837,7 +825,7 @@ public interface StatementBuilder
 		 * @return A match with a REMOVE clause that can be build now
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableMatchAndUpdate remove(Collection<Property> properties);
 	}
 
@@ -870,7 +858,7 @@ public interface StatementBuilder
 		 *
 		 * @return an ongoing definition of a merge action.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingMergeAction onCreate();
 
 		/**
@@ -878,7 +866,7 @@ public interface StatementBuilder
 		 *
 		 * @return an ongoing definition of a merge action.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingMergeAction onMatch();
 	}
 
@@ -903,7 +891,7 @@ public interface StatementBuilder
 		 * @param expressions The list of expressions to use in a set clause.
 		 * @return An ongoing match and update
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableOngoingMergeAction set(Expression... expressions);
 
 		/**
@@ -914,7 +902,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2021.2.2
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableOngoingMergeAction set(Collection<? extends Expression> expressions);
 
 		/**
@@ -924,7 +912,7 @@ public interface StatementBuilder
 		 * @param expression The modifying expression
 		 * @return An ongoing match and update
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		default BuildableOngoingMergeAction set(Named variable, Expression expression) {
 			return set(variable.getRequiredSymbolicName(), expression);
 		}
@@ -938,7 +926,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		BuildableOngoingMergeAction mutate(Expression target, Expression properties);
 
 		/**
@@ -950,7 +938,7 @@ public interface StatementBuilder
 		 * @return An ongoing match and update
 		 * @since 2020.1.5
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		default BuildableOngoingMergeAction mutate(Named variable, Expression properties) {
 			return mutate(variable.getRequiredSymbolicName(), properties);
 		}

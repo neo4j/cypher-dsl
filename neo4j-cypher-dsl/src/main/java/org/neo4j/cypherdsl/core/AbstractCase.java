@@ -23,8 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.CaseElse;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
@@ -44,7 +42,7 @@ abstract class AbstractCase implements Case {
 	private Optional<String> prefix = Optional.empty();
 	private Optional<String> suffix = Optional.empty();
 
-	public static Case create(@Nullable Expression expression) {
+	public static Case create(Expression expression) {
 		return expression == null ? new GenericCaseImpl() : new SimpleCaseImpl(expression);
 	}
 
@@ -70,7 +68,7 @@ abstract class AbstractCase implements Case {
 	 * @return An ongoing when builder.
 	 */
 	@Override
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	public OngoingWhenThen when(Expression nextExpression) {
 
 		return new DefaultOngoingWhenThen(nextExpression);
@@ -86,7 +84,6 @@ abstract class AbstractCase implements Case {
 		return suffix;
 	}
 
-	@NotNull
 	@Override
 	public Property property(String... names) {
 
@@ -122,8 +119,7 @@ abstract class AbstractCase implements Case {
 				super(caseExpression, caseWhenThens);
 			}
 
-			@NotNull
-			@Override
+					@Override
 			public Case elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
@@ -157,7 +153,7 @@ abstract class AbstractCase implements Case {
 
 			@Override
 			public
-			@NotNull Case elseDefault(Expression defaultExpression) {
+			Case elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
 			}
@@ -195,7 +191,7 @@ abstract class AbstractCase implements Case {
 		 * @return An ongoing when builder.
 		 */
 		@Override
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		public CaseEnding then(Expression expression) {
 
 			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, expression);

@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * This interface represents an element that can be for example an identifiable part of the {@code WITH} clause.
@@ -42,6 +40,5 @@ public sealed interface IdentifiableElement permits AliasedExpression, Asterisk,
 	 * @return this element as an expression. Will return the same instance if it is already an expression.
 	 * @since 2021.2.2
 	 */
-	@NotNull @Contract(pure = true)
 	Expression asExpression();
 }

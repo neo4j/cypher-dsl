@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Case;
@@ -614,7 +613,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (!inRelationshipCondition || nameResolvingStrategy.isResolved(symbolicName)) {
 			if (Boolean.TRUE.equals(inPatternExpression.peek()) && !scopingStrategy.hasVisitedBefore(new Named() {
 				@Override
-				public @NotNull Optional<SymbolicName> getSymbolicName() {
+				public Optional<SymbolicName> getSymbolicName() {
 					return Optional.of(symbolicName);
 				}
 			})) {

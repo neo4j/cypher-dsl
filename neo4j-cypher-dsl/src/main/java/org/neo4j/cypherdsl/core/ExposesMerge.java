@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
@@ -38,6 +37,6 @@ public interface ExposesMerge {
 	 * @return An ongoing merge
 	 * @see Cypher#merge(PatternElement...)
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingMerge merge(PatternElement... pattern);
 }

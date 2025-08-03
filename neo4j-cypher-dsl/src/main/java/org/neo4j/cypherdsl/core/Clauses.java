@@ -25,8 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
@@ -52,10 +50,9 @@ public final class Clauses {
 	 * @return an immutable match clause
 	 * @since 2022.0.0
 	 */
-	@NotNull
 	public static Clause match(boolean optional, List<PatternElement> patternElements,
-		@Nullable Where optionalWhere,
-		@Nullable List<Hint> optionalHints) {
+		Where optionalWhere,
+		List<Hint> optionalHints) {
 
 		return new Match(optional, Pattern.of(patternElements), optionalWhere, optionalHints);
 	}
@@ -67,7 +64,6 @@ public final class Clauses {
 	 * @param expressions The expressions pointing to the things to be deleted
 	 * @return an immutable delete clause
 	 */
-	@NotNull
 	public static Clause delete(boolean detach, List<Expression> expressions) {
 
 		return new Delete(new ExpressionList(expressions), detach);
@@ -83,10 +79,9 @@ public final class Clauses {
 	 * @param optionalLimit     an optional {@link NumberLiteral} of how many items to be returned
 	 * @return an immutable return clause
 	 */
-	@NotNull
 	public static Return returning(boolean distinct, List<Expression> expressions,
-		@Nullable List<SortItem> optionalSortItems,
-		@Nullable Expression optionalSkip, @Nullable Expression optionalLimit) {
+		List<SortItem> optionalSortItems,
+		Expression optionalSkip, Expression optionalLimit) {
 
 		DefaultStatementBuilder.OrderBuilder orderBuilder = new DefaultStatementBuilder.OrderBuilder();
 		orderBuilder.orderBy(optionalSortItems);
@@ -101,7 +96,6 @@ public final class Clauses {
 	 * @param patternElements The pattern elements to create
 	 * @return an immutable create clause
 	 */
-	@NotNull
 	public static Clause create(List<PatternElement> patternElements) {
 
 		return new Create(Pattern.of(patternElements));
@@ -114,8 +108,7 @@ public final class Clauses {
 	 * @param mergeActions    An optional list of {@link MergeAction merge actions}
 	 * @return an immutable merge clause
 	 */
-	@NotNull
-	public static Clause merge(List<PatternElement> patternElements, @Nullable List<MergeAction> mergeActions) {
+	public static Clause merge(List<PatternElement> patternElements, List<MergeAction> mergeActions) {
 
 		return new Merge(Pattern.of(patternElements), mergeActions == null ? Collections.emptyList() : mergeActions);
 	}
@@ -129,7 +122,7 @@ public final class Clauses {
 	 * @return an immutable with clause
 	 * @since 2022.0.0
 	 */
-	public static Clause with(Return returnClause, @Nullable Where optionalWhere) {
+	public static Clause with(Return returnClause, Where optionalWhere) {
 
 		return new With(returnClause, optionalWhere);
 	}
@@ -178,7 +171,7 @@ public final class Clauses {
 	 * @return an immutable clause
 	 */
 	public static Clause loadCSV(boolean withHeaders, StringLiteral uri, SymbolicName alias,
-		@Nullable String fieldTerminator) {
+		String fieldTerminator) {
 
 		return new LoadCSV(URI.create(uri.getContent().toString()), withHeaders, alias.getValue())
 			.withFieldTerminator(fieldTerminator);
@@ -195,8 +188,8 @@ public final class Clauses {
 	 * @return An immutable clause
 	 * @since 2022.0.0
 	 */
-	public static Clause callClause(List<String> namespace, String name, @Nullable List<Expression> arguments,
-		@Nullable List<Expression> resultItems, @Nullable Where optionalWhere) {
+	public static Clause callClause(List<String> namespace, String name, List<Expression> arguments,
+		List<Expression> resultItems, Where optionalWhere) {
 
 		return ProcedureCallImpl.create(ProcedureName.from(namespace, name),
 			new Arguments(arguments == null ? new Expression[0] : arguments.toArray(new Expression[0])),

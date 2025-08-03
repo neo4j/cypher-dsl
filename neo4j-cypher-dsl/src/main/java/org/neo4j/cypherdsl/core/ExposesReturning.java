@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 import java.util.Arrays;
@@ -43,8 +42,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
-	@NotNull @CheckReturnValue
-	@SuppressWarnings("deprecation")
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(String... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -55,8 +53,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
-	@NotNull @CheckReturnValue
-	@SuppressWarnings("deprecation")
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(Named... variables) {
 		return returning(Expressions.createSymbolicNames(variables));
 	}
@@ -67,7 +64,7 @@ public interface ExposesReturning {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
 		return returning(expressions == null ? null : Arrays.asList(expressions));
 	}
@@ -78,7 +75,7 @@ public interface ExposesReturning {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions);
 
 	/**
@@ -89,8 +86,7 @@ public interface ExposesReturning {
 	 * @param variables The variables to return
 	 * @return A build step with a defined list of things to return.
 	 */
-	@NotNull @CheckReturnValue
-	@SuppressWarnings("deprecation")
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(String... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
@@ -101,8 +97,7 @@ public interface ExposesReturning {
 	 * @param variables The named things to return
 	 * @return A build step with a defined list of things to return.
 	 */
-	@NotNull @CheckReturnValue
-	@SuppressWarnings("deprecation")
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Named... variables) {
 		return returningDistinct(Expressions.createSymbolicNames(variables));
 	}
@@ -113,7 +108,7 @@ public interface ExposesReturning {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
 		return returningDistinct(expressions == null ? null : Arrays.asList(expressions));
 	}
@@ -124,7 +119,7 @@ public interface ExposesReturning {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions);
 
 	/**
@@ -136,6 +131,6 @@ public interface ExposesReturning {
 	 * @return A match that can be build now
 	 * @since 2021.2.1
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression);
 }

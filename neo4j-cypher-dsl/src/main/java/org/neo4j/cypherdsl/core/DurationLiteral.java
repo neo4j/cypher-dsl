@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.core;
 
 import java.time.Duration;
 
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A literal representing a duration value to be formatted in a way that Neo4j's Cypher understands it.
@@ -44,7 +43,6 @@ final class DurationLiteral extends LiteralBase<Duration> {
 	}
 
 	@Override
-	@NotNull
 	public String asString() {
 		var result = new StringBuilder();
 		result.append("duration('P");

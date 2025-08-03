@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -149,8 +147,7 @@ final class Conditions {
 	 * @param condition The condition to negate. Must not be null.
 	 * @return The negated condition.
 	 */
-	@NotNull @Contract(pure = true)
-	static Condition not(@NotNull Condition condition) {
+	static Condition not(Condition condition) {
 
 		Assertions.notNull(condition, "Condition to negate must not be null.");
 		return condition.not();
@@ -162,8 +159,7 @@ final class Conditions {
 	 * @param pattern The pattern to negate. Must not be null.
 	 * @return A condition that evaluates to true when the pattern does not match.
 	 */
-	@NotNull @Contract(pure = true)
-	static Condition not(@NotNull RelationshipPattern pattern) {
+	static Condition not(RelationshipPattern pattern) {
 
 		return RelationshipPatternCondition.not(pattern);
 	}
@@ -207,7 +203,6 @@ final class Conditions {
 	 *
 	 * @return A placeholder condition.
 	 */
-	@NotNull @Contract(pure = true)
 	static Condition noCondition() {
 
 		return CompoundCondition.empty();

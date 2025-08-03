@@ -23,7 +23,7 @@
 @SuppressWarnings( {"requires-automatic"}) // Neo4j Cypher Parser
 module org.neo4j.cypherdsl.parser {
 
-	requires static org.jetbrains.annotations;
+
 
 	requires transitive org.apiguardian.api;
 	requires transitive org.neo4j.cypherdsl.core;

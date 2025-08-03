@@ -27,8 +27,6 @@ import java.util.Objects;
 
 import org.apiguardian.api.API;
 import org.apiguardian.api.API.Status;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.LRUCache;
 
@@ -88,7 +86,6 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 	 * @param otherValue The value to concat.
 	 * @return A new symbolic name
 	 */
-	@NotNull @Contract(pure = true)
 	public SymbolicName concat(String otherValue) {
 
 		Assertions.notNull(otherValue, "Value to concat must not be null.");
@@ -106,7 +103,6 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 	 * @return A map projection.
 	 * @since 2021.0.0
 	 */
-	@NotNull @Contract(pure = true)
 	public MapProjection project(List<Object> entries) {
 		return project(entries.toArray());
 	}
@@ -121,7 +117,6 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 	 * @return A map projection.
 	 * @since 2021.0.0
 	 */
-	@NotNull @Contract(pure = true)
 	public MapProjection project(Object... entries) {
 		return MapProjection.create(this, entries);
 	}
@@ -152,7 +147,6 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 		return value == null ? super.hashCode() : Objects.hash(value);
 	}
 
-	@NotNull
 	@Override
 	public Expression asExpression() {
 		return this;

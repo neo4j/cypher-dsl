@@ -24,9 +24,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
@@ -78,19 +75,16 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		return newChain;
 	}
 
-	@NotNull
 	@Override
 	public RelationshipChain relationshipTo(Node other, String... types) {
 		return this.add(this.relationships.getLast().getRight().relationshipTo(other, types));
 	}
 
-	@NotNull
 	@Override
 	public RelationshipChain relationshipFrom(Node other, String... types) {
 		return this.add(this.relationships.getLast().getRight().relationshipFrom(other, types));
 	}
 
-	@NotNull
 	@Override
 	public RelationshipChain relationshipBetween(Node other, String... types) {
 		return this.add(this.relationships.getLast().getRight().relationshipBetween(other, types));
@@ -102,7 +96,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @param newSymbolicName The new symbolic name to use
 	 * @return A new chain
 	 */
-	@NotNull
 	@Override
 	public RelationshipChain named(String newSymbolicName) {
 
@@ -117,7 +110,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @return A new chain
 	 * @since 2021.1.1
 	 */
-	@NotNull
 	@Override
 	public RelationshipChain named(SymbolicName newSymbolicName) {
 
@@ -125,9 +117,8 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		return this.replaceLast(lastElement.named(newSymbolicName));
 	}
 
-	@NotNull
 	@Override
-	public RelationshipChain where(@Nullable Expression predicate) {
+	public RelationshipChain where(Expression predicate) {
 
 		if (predicate == null) {
 			return this;
@@ -137,9 +128,8 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		return this.replaceLast((Relationship) lastElement.where(predicate));
 	}
 
-	@NotNull
 	@Override
-	public RelationshipPattern quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
+	public RelationshipPattern quantifyRelationship(QuantifiedPathPattern.Quantifier quantifier) {
 
 		if (quantifier == null) {
 			return this;
@@ -149,9 +139,8 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		return this.replaceLast((Relationship) lastElement.quantifyRelationship(quantifier));
 	}
 
-	@NotNull
 	@Override
-	public QuantifiedPathPattern quantify(@Nullable QuantifiedPathPattern.Quantifier newQuantifier) {
+	public QuantifiedPathPattern quantify(QuantifiedPathPattern.Quantifier newQuantifier) {
 
 		return QuantifiedPathPattern.of(this, newQuantifier);
 	}
@@ -162,7 +151,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @return A new chain
 	 * @since 1.1.1
 	 */
-	@NotNull @Contract(pure = true)
 	@Override
 	public RelationshipChain unbounded() {
 
@@ -176,7 +164,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @param minimum the new minimum
 	 * @return A new chain
 	 */
-	@NotNull @Contract(pure = true)
 	@Override
 	public RelationshipChain min(Integer minimum) {
 
@@ -190,7 +177,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @param maximum the new maximum
 	 * @return A new chain
 	 */
-	@NotNull @Contract(pure = true)
 	@Override
 	public RelationshipChain max(Integer maximum) {
 
@@ -205,7 +191,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @param maximum the new maximum
 	 * @return A new chain
 	 */
-	@NotNull @Contract(pure = true)
 	@Override
 	public RelationshipChain length(Integer minimum, Integer maximum) {
 
@@ -219,7 +204,6 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
 	 * @return A new chain
 	 */
-	@NotNull @Contract(pure = true)
 	public RelationshipChain properties(MapExpression newProperties) {
 
 		Relationship lastElement = this.relationships.getLast();
@@ -232,14 +216,12 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
 	 * @return A new chain
 	 */
-	@NotNull @Contract(pure = true)
 	public RelationshipChain properties(Object... keysAndValues) {
 
 		Relationship lastElement = this.relationships.getLast();
 		return this.replaceLast(lastElement.withProperties(keysAndValues));
 	}
 
-	@NotNull
 	@Override
 	public Condition asCondition() {
 		return RelationshipPatternCondition.of(this);

@@ -21,9 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
@@ -45,7 +42,7 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @param name The name to be used.
 	 * @return A named relationship that can be chained with more relationship definitions.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	ExposesRelationships<RelationshipChain> named(String name);
 
 	/**
@@ -54,7 +51,7 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @param name The name to be used.
 	 * @return A named relationship that can be chained with more relationship definitions.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	ExposesRelationships<RelationshipChain> named(SymbolicName name);
 
 	/**
@@ -64,7 +61,6 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @return A condition based on this pattern.
 	 * @since 2021.0.0
 	 */
-	@NotNull @Contract(pure = true)
 	Condition asCondition();
 
 	/**
@@ -74,8 +70,7 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @return a quantified relationship
 	 * @since 2023.9.0
 	 */
-	@NotNull @Contract(pure = true)
-	default PatternElement quantifyRelationship(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
+	default PatternElement quantifyRelationship(QuantifiedPathPattern.Quantifier quantifier) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -86,8 +81,7 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	 * @return a quantified path pattern
 	 * @since 2023.9.0
 	 */
-	@NotNull @Contract(pure = true)
-	default PatternElement quantify(@Nullable QuantifiedPathPattern.Quantifier quantifier) {
+	default PatternElement quantify(QuantifiedPathPattern.Quantifier quantifier) {
 		throw new UnsupportedOperationException();
 	}
 }

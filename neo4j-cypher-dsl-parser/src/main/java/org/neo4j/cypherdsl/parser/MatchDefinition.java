@@ -20,7 +20,6 @@ package org.neo4j.cypherdsl.parser;
 
 import java.util.List;
 
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.Where;
@@ -37,6 +36,6 @@ import org.neo4j.cypherdsl.core.Where;
  */
 public record MatchDefinition(
 	boolean optional, List<PatternElement> patternElements,
-	@Nullable Where optionalWhere,
-	@Nullable List<Hint> optionalHints) {
+	Where optionalWhere,
+	List<Hint> optionalHints) {
 }

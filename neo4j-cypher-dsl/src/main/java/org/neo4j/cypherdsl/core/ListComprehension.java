@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -78,7 +76,7 @@ public final class ListComprehension implements Expression {
 		 * @param list The source list.
 		 * @return An ongoing definition
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingDefinitionWithList in(Expression list);
 	}
 
@@ -93,7 +91,7 @@ public final class ListComprehension implements Expression {
 		 * @param condition the condition to start the {@code WHERE} clause with.
 		 * @return An ongoing definition
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingDefinitionWithoutReturn where(Condition condition);
 	}
 
@@ -107,8 +105,6 @@ public final class ListComprehension implements Expression {
 		 * @return The final definition of the list comprehension
 		 * @see #returning(Expression...)
 		 */
-		@NotNull @Contract(pure = true)
-		@SuppressWarnings("deprecation")
 		default ListComprehension returning(Named... variables) {
 			return returning(Expressions.createSymbolicNames(variables));
 		}
@@ -117,14 +113,12 @@ public final class ListComprehension implements Expression {
 		 * @param listDefinition Defines the elements to be returned from the pattern
 		 * @return The final definition of the list comprehension
 		 */
-		@NotNull @Contract(pure = true)
 		ListComprehension returning(Expression... listDefinition);
 
 		/**
 		 * @return Returns the list comprehension as is, without a {@literal WHERE} and returning each element of the
 		 * original list
 		 */
-		@NotNull @Contract(pure = true)
 		ListComprehension returning();
 	}
 
@@ -139,29 +133,25 @@ public final class ListComprehension implements Expression {
 			this.variable = variable;
 		}
 
-		@NotNull
 		@Override
 		public OngoingDefinitionWithList in(Expression list) {
 			this.listExpression = list;
 			return this;
 		}
 
-		@NotNull
 		@Override
 		public OngoingDefinitionWithoutReturn where(Condition condition) {
 			this.where = new Where(condition);
 			return this;
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public ListComprehension returning() {
 
 			return new ListComprehension(variable, listExpression, where, null);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public ListComprehension returning(Expression... expressions) {
 
 			return new ListComprehension(variable, listExpression, where,

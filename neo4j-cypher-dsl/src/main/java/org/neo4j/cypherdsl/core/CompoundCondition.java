@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -82,19 +81,16 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 		this.conditions = new ArrayList<>();
 	}
 
-	@NotNull
 	@Override
 	public Condition and(Condition condition) {
 		return this.add(Operator.AND, condition);
 	}
 
-	@NotNull
 	@Override
 	public Condition or(Condition condition) {
 		return this.add(Operator.OR, condition);
 	}
 
-	@NotNull
 	@Override
 	public Condition xor(Condition condition) {
 		return this.add(Operator.XOR, condition);

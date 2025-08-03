@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -43,7 +42,6 @@ public final class Properties implements Visitable {
 	 * @param expression Nullable expression
 	 * @return A properties expression
 	 */
-	@Contract(pure = true)
 	public static Properties create(MapExpression expression) {
 
 		return expression == null ? null : new Properties(expression);

@@ -1,4 +1,0 @@
-[[driver-integration]]
-= Integration with the Neo4j-Java-Driver
-
-include::driver-integration.adoc[]

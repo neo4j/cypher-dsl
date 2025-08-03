@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.Literal;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -46,7 +45,6 @@ public final class Namespace implements Literal<String[]> {
 		visitor.leave(this);
 	}
 
-	@NotNull
 	@Override
 	public String asString() {
 

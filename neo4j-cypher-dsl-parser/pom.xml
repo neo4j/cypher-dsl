@@ -53,11 +53,6 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>org.jetbrains</groupId>
-			<artifactId>annotations</artifactId>
-		</dependency>
-
-		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
 		</dependency>
@@ -238,8 +233,6 @@
 							<overwriteExistingFiles>true</overwriteExistingFiles>
 							<module>
 								<moduleInfoSource><![CDATA[module org.neo4j.cypherdsl.parser {
-
-										requires static org.jetbrains.annotations;
 
 										requires transitive org.apiguardian.api;
 										requires transitive org.neo4j.cypherdsl.core;

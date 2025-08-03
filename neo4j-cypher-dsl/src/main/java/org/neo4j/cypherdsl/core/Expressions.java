@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import java.util.Arrays;
 import java.util.List;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Statement.UnionQuery;
 
 /**
@@ -41,7 +39,6 @@ final class Expressions {
 	 * @return The immutable {@link CountExpression}
 	 * @since 2023.0.0
 	 */
-	@NotNull
 	static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
 		return CountExpression.count(Pattern.of(requiredPattern, patternElement));
 	}
@@ -53,7 +50,6 @@ final class Expressions {
 	 * @return The immutable {@link CountExpression}
 	 * @since 2023.0.0
 	 */
-	@NotNull
 	static CountExpression count(UnionQuery union) {
 		return CountExpression.count(union);
 	}
@@ -68,7 +64,6 @@ final class Expressions {
 	 * @return A counting sub-query.
 	 * @since 2023.1.0
 	 */
-	@NotNull
 	static CountExpression count(Statement statement, IdentifiableElement... imports) {
 		return CountExpression.count(statement, imports);
 	}
@@ -81,7 +76,7 @@ final class Expressions {
 	 * @return a count expression.
 	 * @since 2023.9.0
 	 */
-	static CountExpression count(List<PatternElement> pattern, @Nullable Where where) {
+	static CountExpression count(List<PatternElement> pattern, Where where) {
 
 		return CountExpression.count(pattern, where);
 	}
@@ -99,13 +94,11 @@ final class Expressions {
 			Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
 		var with = new With(false, returnItems, null, null, null, null);
 		return new SubqueryExpressionBuilder() {
-			@Override @NotNull
-			public CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
+			@Override 		public CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
 				return CountExpression.count(with, Pattern.of(requiredPattern, patternElement));
 			}
 
-			@Override @NotNull
-			public CountExpression count(UnionQuery union) {
+			@Override 		public CountExpression count(UnionQuery union) {
 				return CountExpression.count(with, union);
 			}
 
@@ -125,7 +118,6 @@ final class Expressions {
 	 * @return a collecting sub-query.
 	 * @since 2023.8.0
 	 */
-	@NotNull
 	static Expression collect(Statement statement) {
 
 		if (!statement.doesReturnOrYield()) {

@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/NodePattern.html">NodePattern</a>.
@@ -38,7 +36,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	/**
 	 * @return The labels associated with this {@link Node}
 	 */
-	@NotNull @Contract(pure = true)
 	List<NodeLabel> getLabels();
 
 	/**
@@ -47,7 +44,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new node.
 	 */
-	@NotNull @Contract(pure = true)
 	Node named(String newSymbolicName);
 
 	/**
@@ -56,7 +52,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new node.
 	 */
-	@NotNull @Contract(pure = true)
 	Node named(SymbolicName newSymbolicName);
 
 	/**
@@ -65,14 +60,12 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param labelsToQuery A list of labels to query
 	 * @return A condition that checks whether this node has all the labels to query
 	 */
-	@NotNull @Contract(pure = true)
 	Condition hasLabels(String... labelsToQuery);
 
 	/**
 	 * A condition that checks for the presence of a label expression on a node
 	 * @since 2024.3.0
 	 */
-	@NotNull @Contract(pure = true)
 	Condition hasLabels(LabelExpression labels);
 
 	/**
@@ -81,7 +74,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param otherNode The node to compare this node to.
 	 * @return A condition.
 	 */
-	@NotNull @Contract(pure = true)
 	Condition isEqualTo(Node otherNode);
 
 	/**
@@ -90,7 +82,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param otherNode The node to compare this node to.
 	 * @return A condition.
 	 */
-	@NotNull @Contract(pure = true)
 	Condition isNotEqualTo(Node otherNode);
 
 	/**
@@ -98,7 +89,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A condition.
 	 */
-	@NotNull @Contract(pure = true)
 	Condition isNull();
 
 	/**
@@ -106,7 +96,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A condition.
 	 */
-	@NotNull @Contract(pure = true)
 	Condition isNotNull();
 
 	/**
@@ -114,7 +103,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A sort item.
 	 */
-	@NotNull @Contract(pure = true)
 	SortItem descending();
 
 	/**
@@ -122,7 +110,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 *
 	 * @return A sort item.
 	 */
-	@NotNull @Contract(pure = true)
 	SortItem ascending();
 
 	/**
@@ -131,14 +118,12 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @param alias The alias to use.
 	 * @return The aliased expression.
 	 */
-	@NotNull @Contract(pure = true)
 	AliasedExpression as(String alias);
 
 	/**
 	 * @return A new function invocation returning the internal id of this node.
 	 * @deprecated Use {@link #elementId}
 	 */
-	@NotNull @Contract(pure = true)
 	@Deprecated(since = "2022.6.0")
 	@SuppressWarnings({ "DeprecatedIsStillUsed", "squid:S1133" }) // The deprecation warning on any client code calling this is actually the point.
 	FunctionInvocation internalId();
@@ -147,8 +132,6 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	 * @return A new function invocation returning the element id of this node.
 	 * @since 2022.6.0
 	 */
-	@NotNull @Contract(pure = true)
-	@SuppressWarnings("deprecation")
 	default FunctionInvocation elementId() {
 		return Functions.elementId(this);
 	}
@@ -156,6 +139,5 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	/**
 	 * @return A new function invocation returning the labels of this node.
 	 */
-	@NotNull @Contract(pure = true)
 	FunctionInvocation labels();
 }

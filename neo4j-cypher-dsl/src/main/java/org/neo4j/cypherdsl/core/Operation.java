@@ -26,7 +26,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -48,7 +47,7 @@ public final class Operation implements Expression {
 		.complementOf(EnumSet.of(Operator.Type.PROPERTY, Operator.Type.LABEL));
 	private static final EnumSet<Operator> DONT_GROUP = EnumSet.of(Operator.EXPONENTIATION, Operator.PIPE, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
 
-	static Operation create(@NotNull Operator operator, @NotNull Expression expression) {
+	static Operation create(Operator operator, Expression expression) {
 
 		Assertions.notNull(operator, "Operator must not be null.");
 		Assertions.isTrue(operator.isUnary(), "Operator must be unary.");
@@ -101,7 +100,6 @@ public final class Operation implements Expression {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);

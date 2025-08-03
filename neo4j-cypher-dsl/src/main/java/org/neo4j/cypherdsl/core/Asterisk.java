@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * The {@code *}.
@@ -41,14 +40,12 @@ public final class Asterisk extends LiteralBase<String> implements IdentifiableE
 		super("*");
 	}
 
-	@NotNull
 	@Override
 	public String asString() {
 		return content;
 	}
 
 	@Override
-	@NotNull
 	public  Expression asExpression() {
 		return this;
 	}

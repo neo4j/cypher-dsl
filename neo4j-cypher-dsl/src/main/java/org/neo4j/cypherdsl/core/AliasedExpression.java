@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -44,7 +43,6 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 		this.alias = alias;
 	}
 
-	@NotNull
 	@Override
 	public String getAlias() {
 		return alias;
@@ -56,7 +54,6 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 	 * @param newAlias The new alias to use
 	 * @return A new aliased, expression.
 	 */
-	@NotNull
 	@Override
 	public AliasedExpression as(String newAlias) {
 
@@ -65,7 +62,6 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
@@ -77,7 +73,6 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 		return delegate;
 	}
 
-	@NotNull
 	@Override
 	public Expression asExpression() {
 		return this;

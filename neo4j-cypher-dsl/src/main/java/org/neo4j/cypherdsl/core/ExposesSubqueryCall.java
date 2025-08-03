@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.Arrays;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.BuildableStatement;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
@@ -62,7 +61,7 @@ public interface ExposesSubqueryCall {
 	 * @param statement The statement representing the subquery.
 	 * @return An ongoing reading
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default BuildableSubquery call(Statement statement) {
 		return call(statement, new IdentifiableElement[0]);
 	}
@@ -81,7 +80,7 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading
 	 * @since 2021.3.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default BuildableSubquery call(Statement statement, String... imports) {
 		return call(statement, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
@@ -102,7 +101,7 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading
 	 * @since 2021.3.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	BuildableSubquery call(Statement statement, IdentifiableElement... imports);
 
 	/**
@@ -110,7 +109,7 @@ public interface ExposesSubqueryCall {
 	 * @param statement The sub-query to be called in transactions
 	 * @return Ongoing sub-query definition
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement) {
 		return callInTransactions(statement, null, new IdentifiableElement[0]);
 	}
@@ -123,7 +122,7 @@ public interface ExposesSubqueryCall {
 	 * @return Ongoing sub-query definition
 	 * @since 2023.10.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	BuildableSubquery callRawCypher(String rawCypher, Object... args);
 
 	/**
@@ -136,7 +135,7 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement, Integer rows) {
 		return callInTransactions(statement, rows, new IdentifiableElement[0]);
 	}
@@ -151,7 +150,7 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement, String... imports) {
 		return callInTransactions(statement, null, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
@@ -167,7 +166,7 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement, Integer rows, String... imports) {
 		return callInTransactions(statement, rows, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
@@ -199,6 +198,6 @@ public interface ExposesSubqueryCall {
 	 * @return An ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports);
 }

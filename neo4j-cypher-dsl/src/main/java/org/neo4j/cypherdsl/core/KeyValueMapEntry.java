@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -49,9 +48,8 @@ public final class KeyValueMapEntry implements Expression {
 	 * @return A new, immutable map entry.
 	 * @since 2021.2.3
 	 */
-	@NotNull
 	@API(status = STABLE, since = "2021.2.3")
-	public static KeyValueMapEntry create(@NotNull String key, @NotNull Expression value) {
+	public static KeyValueMapEntry create(String key, Expression value) {
 
 		Assertions.notNull(key, "Key is required.");
 		Assertions.notNull(value, "Value is required.");

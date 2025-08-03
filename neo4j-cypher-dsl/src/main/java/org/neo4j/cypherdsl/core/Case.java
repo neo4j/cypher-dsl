@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
@@ -43,7 +41,7 @@ public interface Case extends Expression, ProvidesAffixes {
 	 * @param nextExpression The next expression to use.
 	 * @return An ongoing when builder.
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	OngoingWhenThen when(Expression nextExpression);
 
 	/**
@@ -65,7 +63,7 @@ public interface Case extends Expression, ProvidesAffixes {
 	 * @param expression starting expression for the simple case
 	 * @return The new expression
 	 */
-	static Case create(@Nullable Expression expression) {
+	static Case create(Expression expression) {
 		return expression == null ? new AbstractCase.GenericCaseImpl() : new AbstractCase.SimpleCaseImpl(expression);
 	}
 
@@ -81,7 +79,7 @@ public interface Case extends Expression, ProvidesAffixes {
 		 * @param expression A new when expression.
 		 * @return An ongoing when builder.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		OngoingWhenThen when(Expression expression);
 
 		/**
@@ -90,7 +88,7 @@ public interface Case extends Expression, ProvidesAffixes {
 		 * @param defaultExpression The new default expression
 		 * @return An ongoing when builder.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		Case elseDefault(Expression defaultExpression);
 	}
 
@@ -106,7 +104,7 @@ public interface Case extends Expression, ProvidesAffixes {
 		 * @param expression The expression for the ongoing {@code WHEN} block.
 		 * @return An ongoing when builder.
 		 */
-		@NotNull @CheckReturnValue
+		@CheckReturnValue
 		CaseEnding then(Expression expression);
 	}
 }

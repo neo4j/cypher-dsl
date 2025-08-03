@@ -23,7 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -49,16 +48,15 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 		return new ExistentialSubquery(statement, imports);
 	}
 
-	static Condition exists(List<PatternElement> patternElements, @Nullable Where innerWhere) {
+	static Condition exists(List<PatternElement> patternElements, Where innerWhere) {
 		return new ExistentialSubquery(patternElements, innerWhere);
 	}
 
 	private final ImportingWith importingWith;
 	private final List<Visitable> fragments;
-	@Nullable
 	private  final Where innerWhere;
 
-	ExistentialSubquery(List<PatternElement> fragments, @Nullable Where innerWhere) {
+	ExistentialSubquery(List<PatternElement> fragments, Where innerWhere) {
 		this.fragments = List.of(Pattern.of(fragments));
 		this.importingWith = new ImportingWith();
 		this.innerWhere = innerWhere;

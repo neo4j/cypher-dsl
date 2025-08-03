@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core.internal;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.Neo4jVersion;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
@@ -35,5 +34,5 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  */
 @API(status = INTERNAL, since = "2021.2.1")
 @Neo4jVersion(minimum = "3.5", last = "4.4")
-public record UsingPeriodicCommit(@Nullable Integer rate) implements Visitable {
+public record UsingPeriodicCommit(Integer rate) implements Visitable {
 }

@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
@@ -44,9 +43,7 @@ public interface ExposesWith {
 	 * @param variables The variables to pass on to the next part
 	 * @return A match that can be build now
 	 */
-	@NotNull
 	@CheckReturnValue
-	@SuppressWarnings("deprecation")
 	default OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
 		return with(Expressions.createSymbolicNames(variables));
 	}
@@ -57,7 +54,6 @@ public interface ExposesWith {
 	 * @param elements The variables to pass on to the next part
 	 * @return A match that can be build now
 	 */
-	@NotNull
 	@CheckReturnValue
 	default OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
 		return with(Arrays.asList(elements));
@@ -69,7 +65,6 @@ public interface ExposesWith {
 	 * @param elements The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
-	@NotNull
 	@CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements);
 
@@ -80,9 +75,7 @@ public interface ExposesWith {
 	 * @return A match that can be build now
 	 * @see #withDistinct(IdentifiableElement...)
 	 */
-	@NotNull
 	@CheckReturnValue
-	@SuppressWarnings("deprecation")
 	default OrderableOngoingReadingAndWithWithoutWhere withDistinct(String... variables) {
 		return withDistinct(Expressions.createSymbolicNames(variables));
 	}
@@ -94,7 +87,6 @@ public interface ExposesWith {
 	 * @return A match that can be build now
 	 * @see #withDistinct(IdentifiableElement...)
 	 */
-	@NotNull
 	@CheckReturnValue
 	default OrderableOngoingReadingAndWithWithoutWhere withDistinct(IdentifiableElement... elements) {
 		return withDistinct(Arrays.asList(elements));
@@ -106,7 +98,6 @@ public interface ExposesWith {
 	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
 	 * @return A match that can be build now
 	 */
-	@NotNull
 	@CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> expressions);
 }

@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.net.URI;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * Exposes methods to configure a {@code LOAD CSV} clause.
@@ -41,7 +39,6 @@ public interface ExposesLoadCSV {
 	 * @param from The {@link URI} to load data from. Any uri that is resolvable by the database itself is valid.
 	 * @return An ongoing definition of a {@code LOAD CSV} clause
 	 */
-	@NotNull @Contract(pure = true)
 	default LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from) {
 		return loadCSV(from, false);
 	}
@@ -53,6 +50,5 @@ public interface ExposesLoadCSV {
 	 * @param withHeaders Set to {@literal true} if the csv file contains header
 	 * @return An ongoing definition of a {@code LOAD CSV} clause
 	 */
-	@NotNull @Contract(pure = true)
 	LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders);
 }

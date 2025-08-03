@@ -33,7 +33,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.TypeSystem;
@@ -55,7 +54,6 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	@Override
-	@NotNull
 	public Condition asCondition() {
 
 		if (value.hasType(TypeSystem.getDefault().BOOLEAN())) {
@@ -66,7 +64,6 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	@Override
-	@NotNull
 	public Expression asExpression() {
 
 		return asExpression0(value);
@@ -123,7 +120,6 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	@Override
-	@NotNull
 	public Node asNode() {
 
 		if (!value.hasType(TypeSystem.getDefault().NODE())) {
@@ -149,7 +145,6 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	@Override
-	@NotNull
 	public Relationship asRelationship() {
 
 		if (!value.hasType(TypeSystem.getDefault().RELATIONSHIP())) {
@@ -163,7 +158,6 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	@Override
-	@NotNull
 	public SymbolicName asName() {
 		throw new UnsupportedOperationException();
 	}
@@ -242,8 +236,7 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 		}
 
 		@Override
-		@NotNull
-		public String asString() {
+			public String asString() {
 			return content.entrySet().stream()
 				.map(e -> e.getKey() + ": " + e.getValue())
 				.collect(Collectors.joining(", ", "point({", "})"));

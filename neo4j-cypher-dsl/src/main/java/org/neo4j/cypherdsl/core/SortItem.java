@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -57,7 +55,6 @@ public final class SortItem implements Visitable {
 	 * Creates a new sort item from {@literal this} instance, setting the sort direction to ascending.
 	 * @return A new sort item.
 	 */
-	@NotNull @Contract(pure = true)
 	public SortItem ascending() {
 		return new SortItem(this.expression, Direction.ASC);
 	}
@@ -66,13 +63,11 @@ public final class SortItem implements Visitable {
 	 * Creates a new sort item from {@literal this} instance, setting the sort direction to descending.
 	 * @return A new sort item.
 	 */
-	@NotNull @Contract(pure = true)
 	public SortItem descending() {
 		return new SortItem(this.expression, Direction.DESC);
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);

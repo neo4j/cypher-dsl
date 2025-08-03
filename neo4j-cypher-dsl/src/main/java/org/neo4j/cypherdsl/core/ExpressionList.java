@@ -43,7 +43,6 @@ class ExpressionList extends TypedSubtree<Expression> {
 	}
 
 	@Override
-	@SuppressWarnings("deprecation")
 	protected Visitable prepareVisit(Expression child) {
 		return Expressions.nameOrExpression(child);
 	}

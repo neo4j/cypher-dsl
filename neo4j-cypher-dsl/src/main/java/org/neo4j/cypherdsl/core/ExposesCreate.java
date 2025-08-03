@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 import java.util.Collection;
@@ -40,7 +39,7 @@ public interface ExposesCreate {
 	 * @return An ongoing merge
 	 * @see Cypher#create(PatternElement...)
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingUpdate create(PatternElement... pattern);
 
 	/**
@@ -49,6 +48,6 @@ public interface ExposesCreate {
 	 * @see Cypher#create(Collection)
 	 * @since 2021.2.2
 	 */
-	@NotNull @CheckReturnValue
+	@CheckReturnValue
 	StatementBuilder.OngoingUpdate create(Collection<? extends PatternElement> pattern);
 }

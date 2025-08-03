@@ -21,8 +21,6 @@ package org.neo4j.cypherdsl.core;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A marker interface for things that expose methods to create new relationships to other elements.
@@ -41,7 +39,6 @@ public interface ExposesRelationships<T extends RelationshipPattern & ExposesPat
 	 * @param types The types to match
 	 * @return An ongoing relationship definition, that can be used to specify the type
 	 */
-	@NotNull @Contract(pure = true)
 	T relationshipTo(Node other, String... types);
 
 	/**
@@ -51,7 +48,6 @@ public interface ExposesRelationships<T extends RelationshipPattern & ExposesPat
 	 * @param types The types to match
 	 * @return An ongoing relationship definition, that can be used to specify the type
 	 */
-	@NotNull @Contract(pure = true)
 	T relationshipFrom(Node other, String... types);
 
 	/**
@@ -61,7 +57,6 @@ public interface ExposesRelationships<T extends RelationshipPattern & ExposesPat
 	 * @param types The types to match
 	 * @return An ongoing relationship definition, that can be used to specify the type
 	 */
-	@NotNull @Contract(pure = true)
 	T relationshipBetween(Node other, String... types);
 
 	/**

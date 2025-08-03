@@ -25,7 +25,6 @@ module org.neo4j.cypherdsl.core {
 
 	requires static com.querydsl.core;
 	requires static java.sql;
-	requires static org.jetbrains.annotations;
 	requires static org.neo4j.cypherdsl.build.annotations;
 	requires static org.neo4j.driver;
 	requires static org.reactivestreams;
@@ -36,7 +35,6 @@ module org.neo4j.cypherdsl.core {
 
 	exports org.neo4j.cypherdsl.core;
 	exports org.neo4j.cypherdsl.core.ast;
-	exports org.neo4j.cypherdsl.core.executables;
 	exports org.neo4j.cypherdsl.core.renderer;
 	exports org.neo4j.cypherdsl.core.annotations;
 }

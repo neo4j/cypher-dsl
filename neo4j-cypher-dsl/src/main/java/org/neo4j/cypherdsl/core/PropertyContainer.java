@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 
 /**
  * A container having properties. A property container must be {@link Named} with a non empty name to be able to refer
@@ -45,7 +43,6 @@ public interface PropertyContainer extends Named, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	@NotNull @Contract(pure = true)
 	Operation mutate(Parameter<?> parameter);
 
 	/**
@@ -56,7 +53,6 @@ public interface PropertyContainer extends Named, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 2020.1.5
 	 */
-	@NotNull @Contract(pure = true)
 	Operation mutate(MapExpression properties);
 
 	/**
@@ -67,7 +63,6 @@ public interface PropertyContainer extends Named, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 2022.5.0
 	 */
-	@NotNull @Contract(pure = true)
 	Operation set(Parameter<?> parameter);
 
 	/**
@@ -78,7 +73,6 @@ public interface PropertyContainer extends Named, PropertyAccessor {
 	 * @return A new operation.
 	 * @since 2022.5.0
 	 */
-	@NotNull @Contract(pure = true)
 	Operation set(MapExpression properties);
 
 	/**
@@ -88,7 +82,6 @@ public interface PropertyContainer extends Named, PropertyAccessor {
 	 * @return A map projection.
 	 * @see SymbolicName#project(List)
 	 */
-	@NotNull @Contract(pure = true)
 	MapProjection project(List<Object> entries);
 
 	/**
@@ -98,6 +91,5 @@ public interface PropertyContainer extends Named, PropertyAccessor {
 	 * @return A map projection.
 	 * @see SymbolicName#project(Object...)
 	 */
-	@NotNull @Contract(pure = true)
 	MapProjection project(Object... entries);
 }

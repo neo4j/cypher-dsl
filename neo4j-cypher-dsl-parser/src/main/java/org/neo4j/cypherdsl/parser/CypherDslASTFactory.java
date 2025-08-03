@@ -34,8 +34,6 @@ import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory;
 import org.neo4j.cypher.internal.ast.factory.ASTFactory.NULL;
 import org.neo4j.cypher.internal.parser.common.ast.factory.AccessType;
@@ -277,7 +275,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		return (T) result;
 	}
 
-	private static SymbolicName assertSymbolicName(@Nullable Expression v) {
+	private static SymbolicName assertSymbolicName(Expression v) {
 
 		if (v == null) {
 			return null;
@@ -1154,7 +1152,6 @@ final class CypherDslASTFactory implements ASTFactory<
 		throw new UnsupportedOperationException("The Cypher-DSL does not support sensitive parameters.");
 	}
 
-	@NotNull
 	Parameter<?> parameterFromSymbolicName(Expression v) {
 		var symbolicName = assertSymbolicName(v);
 		if (symbolicName == null) {
@@ -1292,7 +1289,6 @@ final class CypherDslASTFactory implements ASTFactory<
 
 
 
-	@NotNull
 	private static LabelExpression colonJunjction(LabelExpression lhs, LabelExpression rhs, LabelExpression.Type colonDisjunction) {
 		List<String> value = new ArrayList<>();
 		value.addAll(lhs.value());

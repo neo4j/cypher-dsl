@@ -23,8 +23,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import java.util.List;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
@@ -58,7 +56,6 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 		super(symbolicName, primaryLabel, properties, additionalLabels);
 	}
 
-	@NotNull
 	@Override
 	public InternalNodeImpl named(SymbolicName newSymbolicName) {
 
@@ -67,16 +64,14 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 
 	}
 
-	@NotNull
 	@Override
 	public InternalNodeImpl withProperties(MapExpression newProperties) {
 
 		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, Properties.create(newProperties), innerPredicate);
 	}
 
-	@NotNull
 	@Override
-	public Node where(@Nullable Expression predicate) {
+	public Node where(Expression predicate) {
 		if (predicate == null) {
 			return this;
 		}

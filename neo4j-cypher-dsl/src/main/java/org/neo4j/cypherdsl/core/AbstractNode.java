@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
@@ -33,7 +32,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 @API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
-	@NotNull
 	@Override
 	public final Condition hasLabels(String... labelsToQuery) {
 		return HasLabelCondition.create(this.getSymbolicName()
@@ -41,7 +39,6 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 				labelsToQuery);
 	}
 
-	@NotNull
 	@Override
 	public final Condition hasLabels(LabelExpression labels) {
 		return new HasLabelExpressionCondition(this.getSymbolicName()
@@ -49,82 +46,69 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 			labels);
 	}
 
-	@NotNull
 	@Override
 	public final Condition isEqualTo(Node otherNode) {
 
 		return this.getRequiredSymbolicName().isEqualTo(otherNode.getRequiredSymbolicName());
 	}
 
-	@NotNull
 	@Override
 	public final Condition isNotEqualTo(Node otherNode) {
 
 		return this.getRequiredSymbolicName().isNotEqualTo(otherNode.getRequiredSymbolicName());
 	}
 
-	@NotNull
 	@Override
 	public final Condition isNull() {
 
 		return this.getRequiredSymbolicName().isNull();
 	}
 
-	@NotNull
 	@Override
 	public final Condition isNotNull() {
 
 		return this.getRequiredSymbolicName().isNotNull();
 	}
 
-	@NotNull
 	@Override
 	public final SortItem descending() {
 
 		return this.getRequiredSymbolicName().descending();
 	}
 
-	@NotNull
 	@Override
 	public final SortItem ascending() {
 
 		return this.getRequiredSymbolicName().ascending();
 	}
 
-	@NotNull
 	@Override
 	public final AliasedExpression as(String alias) {
 
 		return this.getRequiredSymbolicName().as(alias);
 	}
 
-	@NotNull
 	@Override
 	@SuppressWarnings("deprecation") // IDEA is stupid.
 	public final FunctionInvocation internalId() {
 		return Functions.id(this);
 	}
 
-	@NotNull
 	@Override
-	@SuppressWarnings("deprecation")
 	public final FunctionInvocation labels() {
 		return Functions.labels(this);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship relationshipTo(Node other, String... types) {
 		return new InternalRelationshipImpl(null, this, Relationship.Direction.LTR, null, other, types);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship relationshipFrom(Node other, String... types) {
 		return new InternalRelationshipImpl(null, this, Relationship.Direction.RTL, null, other, types);
 	}
 
-	@NotNull
 	@Override
 	public final Relationship relationshipBetween(Node other, String... types) {
 		return new InternalRelationshipImpl(null, this, Relationship.Direction.UNI, null, other, types);

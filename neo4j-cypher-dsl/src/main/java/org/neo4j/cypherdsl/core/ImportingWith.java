@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
@@ -39,13 +38,12 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @since 2023.1.0
  */
 @API(status = INTERNAL, since = "2023.1.0")
-record ImportingWith(@Nullable With imports, @Nullable With renames) implements Visitable {
+record ImportingWith(With imports, With renames) implements Visitable {
 
 	ImportingWith() {
 		this(null, null);
 	}
 
-	@Nullable
 	static ImportingWith of(IdentifiableElement... imports) {
 
 		With optionalImports;

@@ -24,8 +24,6 @@ import static org.apiguardian.api.API.Status.STABLE;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.FunctionInvocation.FunctionDefinition;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
@@ -120,7 +118,6 @@ public final class NamedPath implements PatternElement, Named {
 		 * @param pattern The pattern to be matched for the named path.
 		 * @return A named path.
 		 */
-		@NotNull @Contract(pure = true)
 		NamedPath definedBy(PatternElement pattern);
 	}
 
@@ -136,7 +133,6 @@ public final class NamedPath implements PatternElement, Named {
 		 * @return A named path.
 		 * @since 2020.1.4
 		 */
-		@NotNull @Contract(pure = true)
 		NamedPath get();
 	}
 
@@ -168,8 +164,7 @@ public final class NamedPath implements PatternElement, Named {
 
 	private record Builder(SymbolicName name) implements OngoingDefinitionWithName {
 
-		@NotNull
-		@Override
+			@Override
 		public NamedPath definedBy(PatternElement pattern) {
 			if (pattern instanceof NamedPath namedPath) {
 				return namedPath;
@@ -177,8 +172,7 @@ public final class NamedPath implements PatternElement, Named {
 			return new NamedPath(name, null, pattern);
 		}
 
-		@NotNull
-		@Override
+			@Override
 		public NamedPath get() {
 			return new NamedPath(name);
 		}
@@ -210,8 +204,7 @@ public final class NamedPath implements PatternElement, Named {
 		}
 
 		@Override
-		@NotNull
-		public  NamedPath definedBy(PatternElement pattern) {
+			public  NamedPath definedBy(PatternElement pattern) {
 			return new NamedPath(name, shortest, pattern);
 		}
 
@@ -236,7 +229,6 @@ public final class NamedPath implements PatternElement, Named {
 	}
 
 	@Override
-	@NotNull
 	public Optional<SymbolicName> getSymbolicName() {
 		return Optional.of(name);
 	}

@@ -22,7 +22,6 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.NotNull;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -105,7 +104,6 @@ public final class Comparison implements Condition {
 	}
 
 
-	@NotNull
 	@Override
 	public Condition not() {
 

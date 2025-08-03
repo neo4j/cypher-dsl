@@ -26,9 +26,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -277,19 +274,16 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 *
 	 * @return A wrapper around the details of this relationship.
 	 */
-	@NotNull @Contract(pure = true)
 	Details getDetails();
 
 	/**
 	 * @return the right-hand side of this relationship
 	 */
-	@NotNull @Contract(pure = true)
 	Node getRight();
 
 	/**
 	 * {@return the quantifier of this relationship if any}
 	 */
-	@Nullable @Contract(pure = true)
 	QuantifiedPathPattern.Quantifier getQuantifier();
 
 	/**
@@ -298,7 +292,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new relationship.
 	 */
-	@NotNull @Contract(pure = true)
 	Relationship named(String newSymbolicName);
 
 	/**
@@ -307,7 +300,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * @param newSymbolicName the new symbolic name.
 	 * @return The new relationship.
 	 */
-	@NotNull @Contract(pure = true)
 	Relationship named(SymbolicName newSymbolicName);
 
 	/**
@@ -318,6 +310,5 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 *
 	 * @return the new relationship
 	 */
-	@NotNull @Contract(pure = true)
 	Relationship inverse();
 }
