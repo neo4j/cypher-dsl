@@ -1,3 +1,4 @@
+[[sdn6-annotation-processor]]
 == The Spring Data Neo4j 6 annotation processor
 
 We provide a Java annotation processor for https://docs.spring.io/spring-data/neo4j/docs/current/reference/html/#reference[Spring Data Neo4j] under the following coordinates:
@@ -11,7 +12,7 @@ We provide a Java annotation processor for https://docs.spring.io/spring-data/ne
 The annotation processor understands classes annotated with `@Node` and `@RelationshipProperties`.
 Inside those classes `@Relationship` and `@Property` are read.
 
-The processor generates a static meta model for each annotated class found in the same package with an underscore (`_`) added to the name.
+The processor generates a static metamodel for each annotated class found in the same package with an underscore (`_`) added to the name.
 
 The processor needs Spring Data Neo4j 6 and the Cypher-DSL in version `2021.1.0` or later on it's classpath.
 We recommend using it explicitly on the separate annotation processor classpath (via `--processor-path` to `javac`).
@@ -20,6 +21,8 @@ TIP: Please make sure to use `@Relationship` when you use the annotation process
      implicit associations during annotation processing, we can't load classes that are being processed that very moment
      to check if the Spring infrastructure would provide a custom converter for them and make them a simple property.
      We won't generate fields when in doubt but relationships if we find the corresponding class.
+
+The processor does *not* support nested classes used as `@Node` or `@RelationshipProperties` entities.
 
 === Configure your build
 

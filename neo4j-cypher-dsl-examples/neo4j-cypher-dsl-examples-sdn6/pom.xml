@@ -131,15 +131,6 @@
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
 				<version>${license-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>validate</id>
-						<phase>validate</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
 				<configuration>
 					<strictCheck>true</strictCheck>
 					<mapping>
@@ -182,18 +173,20 @@
 						</dependencyPolicy>
 					</dependencyPolicies>
 				</configuration>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>${maven-checkstyle-plugin.version}</version>
-				<dependencies>
-					<dependency>
-						<groupId>com.puppycrawl.tools</groupId>
-						<artifactId>checkstyle</artifactId>
-						<version>${checkstyle.version}</version>
-					</dependency>
-				</dependencies>
 				<configuration>
 					<configLocation>../../etc/checkstyle/config.xml</configLocation>
 					<suppressionsLocation>../../etc/checkstyle/suppressions.xml</suppressionsLocation>
@@ -202,6 +195,13 @@
 					<failsOnError>true</failsOnError>
 					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>${checkstyle.version}</version>
+					</dependency>
+				</dependencies>
 			</plugin>
 			<plugin>
 				<groupId>com.github.ekryd.sortpom</groupId>
@@ -246,7 +246,7 @@
 	</build>
 	<!-- end::sdn-processor[] -->
 
-	<!-- This not relevant to the example, only for our project structure and build chain. -->
+	<!-- This is not relevant to the example, only for our project structure and build chain. -->
 	<profiles>
 		<profile>
 			<id>revisionMissing</id>

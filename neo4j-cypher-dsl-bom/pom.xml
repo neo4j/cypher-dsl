@@ -48,6 +48,11 @@
 			</dependency>
 			<dependency>
 				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-codegen-ogm</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
 				<artifactId>neo4j-cypher-dsl-codegen-sdn6</artifactId>
 				<version>${project.version}</version>
 			</dependency>
