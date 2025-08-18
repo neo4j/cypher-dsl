@@ -195,7 +195,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<quarkus.platform.version>3.24.5</quarkus.platform.version>
 		<querydsl.version>5.1.0</querydsl.version>
-		<reactor.version>2024.0.8</reactor.version>
+		<reactor.version>2024.0.9</reactor.version>
 		<revision>9999</revision>
 		<sha1/>
 		<slf4j.version>1.7.36</slf4j.version>
