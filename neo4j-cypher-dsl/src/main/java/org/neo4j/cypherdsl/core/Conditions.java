@@ -32,10 +32,18 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 final class Conditions {
 
 	/**
-	 * Creates a condition that checks whether the {@code lhs} includes all elements present in {@code rhs}.
-	 * @param lhs Argument that is tested whether it contains all values in {@code rhs} or not
-	 * @param rhs The reference collection
-	 * @return An "includesAll" comparison
+	 * Not to be instantiated.
+	 */
+	private Conditions() {
+	}
+
+	/**
+	 * Creates a condition that checks whether the {@code lhs} includes all elements
+	 * present in {@code rhs}.
+	 * @param lhs argument that is tested whether it contains all values in {@code rhs} or
+	 * not
+	 * @param rhs the reference collection
+	 * @return an "includesAll" comparison
 	 * @since 2022.7.0
 	 */
 	static Condition includesAll(Expression lhs, Expression rhs) {
@@ -44,10 +52,12 @@ final class Conditions {
 	}
 
 	/**
-	 * Creates a condition that checks whether the {@code lhs} includes any element present in {@code rhs}.
-	 * @param lhs Argument that is tested whether it contains any values in {@code rhs} or not
- 	 * @param rhs The reference collection
-	 * @return A "not_includes" comparison
+	 * Creates a condition that checks whether the {@code lhs} includes any element
+	 * present in {@code rhs}.
+	 * @param lhs argument that is tested whether it contains any values in {@code rhs} or
+	 * not
+	 * @param rhs the reference collection
+	 * @return a "not_includes" comparison
 	 * @since 2022.7.0
 	 */
 	static Condition includesAny(Expression lhs, Expression rhs) {
@@ -56,86 +66,86 @@ final class Conditions {
 	}
 
 	/**
-	 * @param relationshipPattern The pattern being evaluated in a condition
-	 * @return A new condition matching the given pattern
+	 * Creates a condition that checks whether this matches a given relationship pattern.
+	 * @param relationshipPattern the pattern being evaluated in a condition
+	 * @return a new condition matching the given pattern
 	 */
 	static Condition matching(RelationshipPattern relationshipPattern) {
 		return RelationshipPatternCondition.of(relationshipPattern);
 	}
 
 	/**
-	 * Creates a condition that matches if the right hand side is a regular expression that matches the the left hand side via
-	 * {@code =~}.
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return A "matches" comparison
+	 * Creates a condition that matches if the right hand side is a regular expression
+	 * that matches the left hand side via {@code =~}.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a "matches" comparison
 	 */
 	static Condition matches(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.MATCHES, rhs);
 	}
 
 	/**
-	 * Creates a condition that matches if both expressions are equals according to {@code =}.
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return An "equals" comparison
+	 * Creates a condition that matches if both expressions are equals according to
+	 * {@code =}.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return an "equals" comparison
 	 */
 	static Condition isEqualTo(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.EQUALITY, rhs);
 	}
 
 	/**
-	 * Creates a condition that matches if both expressions are equals according to {@code <>}.
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return An "not equals" comparison
+	 * Creates a condition that matches if both expressions are equals according to
+	 * {@code <>}.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a "not equals" comparison
 	 */
 	static Condition isNotEqualTo(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.INEQUALITY, rhs);
 	}
 
 	/**
-	 * Creates a condition that matches if the left hand side is less than the right hand side..
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return An "less than" comparison
+	 * Creates a condition that matches if the left hand side is less than the right hand
+	 * side.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return an "less than" comparison
 	 */
 	static Condition lt(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.LESS_THAN, rhs);
 	}
 
 	/**
-	 * Creates a condition that matches if the left hand side is less than or equal the right hand side..
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return An "less than or equal" comparison
+	 * Creates a condition that matches if the left hand side is less than or equal the
+	 * right hand side.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a "less than or equal" comparison
 	 */
 	static Condition lte(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.LESS_THAN_OR_EQUAL_TO, rhs);
 	}
 
 	/**
-	 * Creates a condition that matches if the left hand side is greater than or equal the right hand side..
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return An "greater than or equal" comparison
+	 * Creates a condition that matches if the left hand side is greater than or equal the
+	 * right hand side.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a "greater than or equal" comparison
 	 */
 	static Condition gte(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.GREATER_THAN_OR_EQUAL_TO, rhs);
 	}
 
 	/**
-	 * Creates a condition that matches if the left hand side is greater than the right hand side..
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return An "greater than" comparison
+	 * Creates a condition that matches if the left hand side is greater than the right
+	 * hand side.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return an "greater than" comparison
 	 */
 	static Condition gt(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.GREATER_THAN, rhs);
@@ -143,9 +153,8 @@ final class Conditions {
 
 	/**
 	 * Negates the given condition.
-	 *
-	 * @param condition The condition to negate. Must not be null.
-	 * @return The negated condition.
+	 * @param condition the condition to negate. Must not be null.
+	 * @return the negated condition.
 	 */
 	static Condition not(Condition condition) {
 
@@ -154,10 +163,10 @@ final class Conditions {
 	}
 
 	/**
-	 * Negates the given pattern element: The pattern must not matched to be included in the result.
-	 *
-	 * @param pattern The pattern to negate. Must not be null.
-	 * @return A condition that evaluates to true when the pattern does not match.
+	 * Negates the given pattern element: The pattern must not matched to be included in
+	 * the result.
+	 * @param pattern the pattern to negate. Must not be null.
+	 * @return a condition that evaluates to true when the pattern does not match.
 	 */
 	static Condition not(RelationshipPattern pattern) {
 
@@ -165,22 +174,22 @@ final class Conditions {
 	}
 
 	/**
-	 * Creates a condition that checks whether the {@code lhs} starts with the {@code rhs}.
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return A new condition.
+	 * Creates a condition that checks whether the {@code lhs} starts with the
+	 * {@code rhs}.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a new condition.
 	 */
 	static Condition startsWith(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.STARTS_WITH, rhs);
 	}
 
 	/**
-	 * Creates a condition that checks whether the {@code lhs} contains with the {@code rhs}.
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return A new condition.
+	 * Creates a condition that checks whether the {@code lhs} contains with the
+	 * {@code rhs}.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a new condition.
 	 */
 	static Condition contains(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.CONTAINS, rhs);
@@ -188,20 +197,18 @@ final class Conditions {
 
 	/**
 	 * Creates a condition that checks whether the {@code lhs} ends with the {@code rhs}.
-	 *
-	 * @param lhs The left hand side of the comparison
-	 * @param rhs The right hand side of the comparison
-	 * @return A new condition.
+	 * @param lhs the left hand side of the comparison
+	 * @param rhs the right hand side of the comparison
+	 * @return a new condition.
 	 */
 	static Condition endsWith(Expression lhs, Expression rhs) {
 		return Comparison.create(lhs, Operator.ENDS_WITH, rhs);
 	}
 
 	/**
-	 * Creates a placeholder condition which is not rendered in the final statement but is useful while chaining
-	 * conditions together.
-	 *
-	 * @return A placeholder condition.
+	 * Creates a placeholder condition which is not rendered in the final statement but is
+	 * useful while chaining conditions together.
+	 * @return a placeholder condition.
 	 */
 	static Condition noCondition() {
 
@@ -210,9 +217,8 @@ final class Conditions {
 
 	/**
 	 * Creates a condition that checks whether the {@code expression} is {@literal null}.
-	 *
-	 * @param expression The expression to check for {@literal null}
-	 * @return A new condition.
+	 * @param expression the expression to check for {@literal null}
+	 * @return a new condition.
 	 */
 	static Condition isNull(Expression expression) {
 
@@ -220,10 +226,10 @@ final class Conditions {
 	}
 
 	/**
-	 * Creates a condition that checks whether the {@code expression} is not {@literal null}.
-	 *
-	 * @param expression The expression to check for {@literal null}
-	 * @return A new condition.
+	 * Creates a condition that checks whether the {@code expression} is not
+	 * {@literal null}.
+	 * @param expression the expression to check for {@literal null}
+	 * @return a new condition.
 	 */
 	static Condition isNotNull(Expression expression) {
 
@@ -231,7 +237,7 @@ final class Conditions {
 	}
 
 	/**
-	 * @return a condition that is always true.
+	 * {@return a condition that is always true}
 	 */
 	static Condition isTrue() {
 
@@ -239,7 +245,7 @@ final class Conditions {
 	}
 
 	/**
-	 * @return a condition that is always false.
+	 * {@return a condition that is always false}
 	 */
 	static Condition isFalse() {
 
@@ -247,9 +253,12 @@ final class Conditions {
 	}
 
 	/**
-	 * @param symbolicName  Reference to the entity that should be checked for labels or types
+	 * Creates condition testing the existing of labels or types.
+	 * @param symbolicName reference to the entity that should be checked for labels or
+	 * types
 	 * @param labelsOrTypes the list of labels or types to check for
-	 * @return A condition that checks whether a node has a set of given labels or a relationship a set of given types.
+	 * @return a condition that checks whether a node has a set of given labels or a
+	 * relationship a set of given types.
 	 * @since 2021.3.0
 	 */
 	static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
@@ -257,9 +266,4 @@ final class Conditions {
 		return HasLabelCondition.create(symbolicName, labelsOrTypes);
 	}
 
-	/**
-	 * Not to be instantiated.
-	 */
-	private Conditions() {
-	}
 }

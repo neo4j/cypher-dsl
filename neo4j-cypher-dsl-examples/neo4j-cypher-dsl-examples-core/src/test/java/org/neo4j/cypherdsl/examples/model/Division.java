@@ -51,4 +51,5 @@ public final class Division extends AbstractNodeDefinition<Division> {
 	public Division withProperties(MapExpression newProperties) {
 		return new Division(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
 	}
+
 }

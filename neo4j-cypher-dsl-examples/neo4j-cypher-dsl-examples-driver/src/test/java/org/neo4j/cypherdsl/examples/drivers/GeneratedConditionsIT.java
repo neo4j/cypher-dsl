@@ -40,8 +40,7 @@ class GeneratedConditionsIT {
 
 	@SuppressWarnings("resource")
 	@Container
-	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.4")
-		.withReuse(true);
+	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:4.4").withReuse(true);
 
 	private static Driver driver;
 
@@ -64,19 +63,23 @@ class GeneratedConditionsIT {
 		var query = Cypher.match(node)
 			.where(node.property("listProp").includesAll(Cypher.literalOf(List.of("string 1", "string 2"))))
 			.returning(node)
-			.build().getCypher();
+			.build()
+			.getCypher();
 
 		try {
 			driver.executableQuery("""
-				CREATE (n1:IncludeAllNode {listProp: ["string 1", "string 2", "string 3"], name: "n1"})
-				CREATE (n2:IncludeAllNode {listProp: ["string 1", "string 3"], name: "n2"})
-				RETURN [n1, n2] AS nodes
-				"""
-			).execute();
+					CREATE (n1:IncludeAllNode {listProp: ["string 1", "string 2", "string 3"], name: "n1"})
+					CREATE (n2:IncludeAllNode {listProp: ["string 1", "string 3"], name: "n2"})
+					RETURN [n1, n2] AS nodes
+					""").execute();
 			var nodes = driver.executableQuery(query)
-					.execute().records().stream().map(r -> r.get("testNode").asNode().get("name").asString());
+				.execute()
+				.records()
+				.stream()
+				.map(r -> r.get("testNode").asNode().get("name").asString());
 			Assertions.assertThat(nodes).containsExactly("n1");
-		} finally {
+		}
+		finally {
 			driver.executableQuery("MATCH (n:IncludeAllNode) DELETE n").execute();
 		}
 	}
@@ -89,21 +92,26 @@ class GeneratedConditionsIT {
 			.where(node.property("listProp").includesAny(Cypher.literalOf(List.of("string 1"))))
 			.returning(node)
 			.orderBy(node.property("name"))
-			.build().getCypher();
+			.build()
+			.getCypher();
 
 		try {
 			driver.executableQuery("""
-				CREATE (n1:IncludeAnyNode {listProp: ["string 1", "string 2", "string 3"], name: "n1"})
-				CREATE (n2:IncludeAnyNode {listProp: ["string 1", "string 3"], name: "n2"})
-				CREATE (n3:IncludeAnyNode {listProp: ["string 4"], name: "n3"})
-				RETURN [n1, n2, n3] AS nodes
-				"""
-			).execute();
+					CREATE (n1:IncludeAnyNode {listProp: ["string 1", "string 2", "string 3"], name: "n1"})
+					CREATE (n2:IncludeAnyNode {listProp: ["string 1", "string 3"], name: "n2"})
+					CREATE (n3:IncludeAnyNode {listProp: ["string 4"], name: "n3"})
+					RETURN [n1, n2, n3] AS nodes
+					""").execute();
 			var nodes = driver.executableQuery(query)
-				.execute().records().stream().map(r -> r.get("testNode").asNode().get("name").asString());
+				.execute()
+				.records()
+				.stream()
+				.map(r -> r.get("testNode").asNode().get("name").asString());
 			Assertions.assertThat(nodes).containsExactly("n1", "n2");
-		} finally {
+		}
+		finally {
 			driver.executableQuery("MATCH (n:IncludeAnyNode) DELETE n").execute();
 		}
 	}
+
 }

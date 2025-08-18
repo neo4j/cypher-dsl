@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.time.Duration;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
@@ -37,9 +35,12 @@ import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.driver.Value;
 import org.neo4j.driver.types.TypeSystem;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * Adapters for using Neo4j driver values as parameters.
+ *
  * @author Michael J. Simons
- * @soundtrack Prezident - Gesunder Eskapismus
  * @since 2023.2.1
  */
 @API(status = INTERNAL, since = "2023.2.1")
@@ -51,22 +52,6 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 
 	DriverValueAdapter(Value value) {
 		this.value = value;
-	}
-
-	@Override
-	public Condition asCondition() {
-
-		if (value.hasType(TypeSystem.getDefault().BOOLEAN())) {
-			return asExpression().asCondition();
-		}
-
-		throw new UnsupportedOperationException("Only Boolean values can be adapted as condition");
-	}
-
-	@Override
-	public Expression asExpression() {
-
-		return asExpression0(value);
 	}
 
 	private static Expression asExpression0(Value value) {
@@ -81,7 +66,8 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 			var p = value.asPoint();
 			if (Double.isNaN(p.z())) {
 				return new PointLiteral(new TreeMap<>(Map.of("srid", p.srid(), "x", p.x(), "y", p.y())));
-			} else {
+			}
+			else {
 				return new PointLiteral(new TreeMap<>(Map.of("srid", p.srid(), "x", p.x(), "y", p.y(), "z", p.z())));
 			}
 		}
@@ -105,14 +91,17 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 		return Cypher.literalOf(value.asObject());
 	}
 
-	@SuppressWarnings("squid:S1872") // See below error checking, it's a bug in the Neo4j Java driver not exporting that exception in the module path
+	// See below error checking, it's a bug in the Neo4j Java driver
+	// not exporting that exception in the module path
+	@SuppressWarnings("squid:S1872")
 	private static Literal<Object> asFloatOrDouble(Value value) {
 		Number number;
 		try {
 			number = value.asFloat();
-		} catch (Exception e) {
-			if (!"org.neo4j.driver.exceptions.value.LossyCoercion".equals(e.getClass().getName())) {
-				throw e;
+		}
+		catch (Exception ex) {
+			if (!"org.neo4j.driver.exceptions.value.LossyCoercion".equals(ex.getClass().getName())) {
+				throw ex;
 			}
 			number = value.asDouble();
 		}
@@ -120,24 +109,42 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	@Override
-	public Node asNode() {
+	public Condition asCondition() {
 
-		if (!value.hasType(TypeSystem.getDefault().NODE())) {
-			throw new IllegalArgumentException("Cannot adopt value with type " + value.type().name() + " as node");
+		if (this.value.hasType(TypeSystem.getDefault().BOOLEAN())) {
+			return asExpression().asCondition();
 		}
 
-		var node = value.asNode();
+		throw new UnsupportedOperationException("Only Boolean values can be adapted as condition");
+	}
+
+	@Override
+	public Expression asExpression() {
+
+		return asExpression0(this.value);
+	}
+
+	@Override
+	public Node asNode() {
+
+		if (!this.value.hasType(TypeSystem.getDefault().NODE())) {
+			throw new IllegalArgumentException("Cannot adopt value with type " + this.value.type().name() + " as node");
+		}
+
+		var node = this.value.asNode();
 		var labels = node.labels();
 		String primaryLabel = null;
 		var additionalLabels = new ArrayList<String>();
 		for (String label : labels) {
 			if (primaryLabel == null) {
 				primaryLabel = label;
-			} else {
+			}
+			else {
 				additionalLabels.add(label);
 			}
 		}
-		var properties = node.size() == 0 ? null : MapExpression.create(node.asMap(DriverValueAdapter::asExpression0));
+		var properties = (node.size() == 0) ? null
+				: MapExpression.create(node.asMap(DriverValueAdapter::asExpression0));
 		if (primaryLabel != null) {
 			return Cypher.node(primaryLabel, properties, additionalLabels);
 		}
@@ -147,14 +154,15 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	@Override
 	public Relationship asRelationship() {
 
-		if (!value.hasType(TypeSystem.getDefault().RELATIONSHIP())) {
-			throw new IllegalArgumentException("Cannot adopt value with type " + value.type().name() + " as relationship");
+		if (!this.value.hasType(TypeSystem.getDefault().RELATIONSHIP())) {
+			throw new IllegalArgumentException(
+					"Cannot adopt value with type " + this.value.type().name() + " as relationship");
 		}
 
-		var relationship = value.asRelationship();
-		var properties = relationship.size() == 0 ? null : MapExpression.create(relationship.asMap(DriverValueAdapter::asExpression0));
-		return Cypher.anyNode()
-			.relationshipTo(Cypher.anyNode(), relationship.type()).withProperties(properties);
+		var relationship = this.value.asRelationship();
+		var properties = (relationship.size() == 0) ? null
+				: MapExpression.create(relationship.asMap(DriverValueAdapter::asExpression0));
+		return Cypher.anyNode().relationshipTo(Cypher.anyNode(), relationship.type()).withProperties(properties);
 	}
 
 	@Override
@@ -163,17 +171,21 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	}
 
 	/**
-	 * This adapter maps a Driver or embedded based {@link TemporalAmount} to a valid Java temporal amount. It tries to be
-	 * as specific as possible: If the amount can be reliable mapped to a {@link Period}, it returns a period. If only
-	 * fields are present that are no estimated time unites, then it returns a {@link Duration}. <br>
+	 * This adapter maps a Driver or embedded based {@link TemporalAmount} to a valid Java
+	 * temporal amount. It tries to be as specific as possible: If the amount can be
+	 * reliable mapped to a {@link Period}, it returns a period. If only fields are
+	 * present that are no estimated time unites, then it returns a {@link Duration}. <br>
 	 * <br>
-	 * In cases a user has used Cypher and its <code>duration()</code> function, i.e. like so
-	 * <code>CREATE (s:SomeTime {isoPeriod: duration('P13Y370M45DT25H120M')}) RETURN s</code> a duration object has been
-	 * created that cannot be represented by either a {@link Period} or {@link Duration}. The user has to map it to a plain
+	 * In cases a user has used Cypher and its <code>duration()</code> function, i.e. like
+	 * so
+	 * <code>CREATE (s:SomeTime {isoPeriod: duration('P13Y370M45DT25H120M')}) RETURN s</code>
+	 * a duration object has been created that cannot be represented by either a
+	 * {@link Period} or {@link Duration}. The user has to map it to a plain
 	 * {@link TemporalAmount} in these cases. <br>
-	 * The Java Driver uses a <code>org.neo4j.driver.types.IsoDuration</code>, embedded uses
-	 * <code>org.neo4j.values.storable.DurationValue</code> for representing a temporal amount, but in the end, they can be
-	 * treated the same. However, be aware that the temporal amount returned in that case may not be equal to the other one,
+	 * The Java Driver uses a <code>org.neo4j.driver.types.IsoDuration</code>, embedded
+	 * uses <code>org.neo4j.values.storable.DurationValue</code> for representing a
+	 * temporal amount, but in the end, they can be treated the same. However, be aware
+	 * that the temporal amount returned in that case may not be equal to the other one,
 	 * only represents the same amount after normalization.
 	 * <p>
 	 * From Neo4j-OGM, to SDN6, to Cypher-DSL… The joy.
@@ -181,14 +193,20 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 	static final class TemporalAmountAdapter implements UnaryOperator<TemporalAmount> {
 
 		private static final int PERIOD_MASK = 0b11100;
+
 		private static final int DURATION_MASK = 0b00011;
-		private static final TemporalUnit[] SUPPORTED_UNITS = {ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.DAYS,
-			ChronoUnit.SECONDS, ChronoUnit.NANOS};
+
+		private static final TemporalUnit[] SUPPORTED_UNITS = { ChronoUnit.YEARS, ChronoUnit.MONTHS, ChronoUnit.DAYS,
+				ChronoUnit.SECONDS, ChronoUnit.NANOS };
 
 		private static final short FIELD_YEAR = 0;
+
 		private static final short FIELD_MONTH = 1;
+
 		private static final short FIELD_DAY = 2;
+
 		private static final short FIELD_SECONDS = 3;
+
 		private static final short FIELD_NANOS = 4;
 
 		private static final BiFunction<TemporalAmount, TemporalUnit, Integer> TEMPORAL_UNIT_EXTRACTOR = (d, u) -> {
@@ -197,6 +215,14 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 			}
 			return Math.toIntExact(d.get(u));
 		};
+
+		private static boolean couldBePeriod(int type) {
+			return (PERIOD_MASK & type) > 0;
+		}
+
+		private static boolean couldBeDuration(int type) {
+			return (DURATION_MASK & type) > 0;
+		}
 
 		@Override
 		public TemporalAmount apply(TemporalAmount internalTemporalAmountRepresentation) {
@@ -213,20 +239,15 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 
 			if (couldBePeriod && !couldBeDuration) {
 				return Period.of(values[FIELD_YEAR], values[FIELD_MONTH], values[FIELD_DAY]).normalized();
-			} else if (couldBeDuration && !couldBePeriod) {
+			}
+			else if (couldBeDuration && !couldBePeriod) {
 				return Duration.ofSeconds(values[FIELD_SECONDS]).plusNanos(values[FIELD_NANOS]);
-			} else {
+			}
+			else {
 				return internalTemporalAmountRepresentation;
 			}
 		}
 
-		private static boolean couldBePeriod(int type) {
-			return (PERIOD_MASK & type) > 0;
-		}
-
-		private static boolean couldBeDuration(int type) {
-			return (DURATION_MASK & type) > 0;
-		}
 	}
 
 	private static final class PointLiteral extends LiteralBase<Map<String, Object>> {
@@ -236,10 +257,13 @@ class DriverValueAdapter implements ForeignAdapter<Value> {
 		}
 
 		@Override
-			public String asString() {
-			return content.entrySet().stream()
+		public String asString() {
+			return this.content.entrySet()
+				.stream()
 				.map(e -> e.getKey() + ": " + e.getValue())
 				.collect(Collectors.joining(", ", "point({", "})"));
 		}
+
 	}
+
 }

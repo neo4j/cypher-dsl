@@ -37,10 +37,11 @@ public final class NewPersonCmd {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public ZonedDateTime getDob() {
-		return dob;
+		return this.dob;
 	}
+
 }

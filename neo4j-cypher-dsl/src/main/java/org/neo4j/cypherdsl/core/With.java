@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -29,11 +26,14 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.Distinct;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/With.html">With</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/With.html">With</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Ferris MC - Ferris MC's Audiobiographie
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -63,7 +63,7 @@ public final class With implements Visitable, Clause {
 		if (visitor.enterWithResult(this) == EnterResult.CONTINUE) {
 			Visitable.visitIfNotNull(this.distinct, visitor);
 			this.body.accept(visitor);
-			Visitable.visitIfNotNull(where, visitor);
+			Visitable.visitIfNotNull(this.where, visitor);
 		}
 		visitor.leave(this);
 	}
@@ -75,6 +75,7 @@ public final class With implements Visitable, Clause {
 
 	@API(status = INTERNAL)
 	public List<Expression> getItems() {
-		return body.getReturnItems();
+		return this.body.getReturnItems();
 	}
+
 }

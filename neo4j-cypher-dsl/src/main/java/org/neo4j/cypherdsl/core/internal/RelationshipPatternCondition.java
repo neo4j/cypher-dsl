@@ -18,43 +18,22 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * Internal wrapper for marking a path pattern as a condition.
  *
  * @author Michael J. Simons
- * @soundtrack Red Hot Chili Peppers - Red Hot Chili Peppers: Greatest Hits
  * @since 1.0.1
  */
 @API(status = INTERNAL, since = "1.0")
 public final class RelationshipPatternCondition implements Condition {
-
-	/**
-	 * Creates a new {@link Condition} matching the given pattern.
-	 *
-	 * @param pathPattern The pattern to be matched
-	 * @return A new condition
-	 */
-	public static RelationshipPatternCondition of(RelationshipPattern pathPattern) {
-		return new RelationshipPatternCondition(false, pathPattern);
-	}
-
-	/**
-	 * Creates a new {@link Condition} that evaluates to {@literal true} when the pattern does not match.
-	 *
-	 * @param pathPattern The pattern to be matched
-	 * @return A new condition
-	 */
-	public static RelationshipPatternCondition not(RelationshipPattern pathPattern) {
-		return new RelationshipPatternCondition(true, pathPattern);
-	}
 
 	private final boolean not;
 
@@ -63,6 +42,25 @@ public final class RelationshipPatternCondition implements Condition {
 	private RelationshipPatternCondition(boolean not, RelationshipPattern pathPattern) {
 		this.not = not;
 		this.pathPattern = pathPattern;
+	}
+
+	/**
+	 * Creates a new {@link Condition} matching the given pattern.
+	 * @param pathPattern the pattern to be matched
+	 * @return a new condition
+	 */
+	public static RelationshipPatternCondition of(RelationshipPattern pathPattern) {
+		return new RelationshipPatternCondition(false, pathPattern);
+	}
+
+	/**
+	 * Creates a new {@link Condition} that evaluates to {@literal true} when the pattern
+	 * does not match.
+	 * @param pathPattern the pattern to be matched
+	 * @return a new condition
+	 */
+	public static RelationshipPatternCondition not(RelationshipPattern pathPattern) {
+		return new RelationshipPatternCondition(true, pathPattern);
 	}
 
 	@Override
@@ -74,10 +72,11 @@ public final class RelationshipPatternCondition implements Condition {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		if (not) {
+		if (this.not) {
 			Operator.NOT.accept(visitor);
 		}
-		pathPattern.accept(visitor);
+		this.pathPattern.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

@@ -30,6 +30,8 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Node
 public class ExternalGeneratedIdImplicit {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private UUID id;
+
 }

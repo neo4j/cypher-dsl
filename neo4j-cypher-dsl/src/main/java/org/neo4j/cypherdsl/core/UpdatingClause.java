@@ -19,8 +19,11 @@
 package org.neo4j.cypherdsl.core;
 
 /**
+ * Representation of any writing aka updating clause.
+ *
  * @author Michael J. Simons
  * @since 1.0
  */
 public interface UpdatingClause extends Clause {
+
 }

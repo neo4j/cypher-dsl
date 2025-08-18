@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * The {@code *}.
@@ -42,11 +42,12 @@ public final class Asterisk extends LiteralBase<String> implements IdentifiableE
 
 	@Override
 	public String asString() {
-		return content;
+		return this.content;
 	}
 
 	@Override
-	public  Expression asExpression() {
+	public Expression asExpression() {
 		return this;
 	}
+
 }

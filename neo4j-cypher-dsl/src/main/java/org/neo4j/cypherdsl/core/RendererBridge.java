@@ -25,28 +25,33 @@ import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 /**
- * A bridge to the renderer as a single entry point from core to the renderer infrastructure.
+ * A bridge to the renderer as a single entry point from core to the renderer
+ * infrastructure.
  *
  * @author Michael J. Simons
  * @since 2023.1.0
  */
-class RendererBridge {
+final class RendererBridge {
 
 	private static final Configuration CONFIGURATION = Configuration.newConfig()
 		.withDialect(Dialect.NEO4J_5)
-		.alwaysEscapeNames(false).build();
+		.alwaysEscapeNames(false)
+		.build();
+
+	private RendererBridge() {
+	}
 
 	static String render(Visitable visitable) {
 		String name;
 		Class<? extends Visitable> clazz = visitable.getClass();
 		if (clazz.isAnonymousClass()) {
 			name = clazz.getName();
-		} else {
+		}
+		else {
 			name = clazz.getSimpleName();
 		}
-		return "%s{cypher=%s}".formatted(name, Renderer.getRenderer(CONFIGURATION, GeneralizedRenderer.class).render(visitable));
+		return "%s{cypher=%s}".formatted(name,
+				Renderer.getRenderer(CONFIGURATION, GeneralizedRenderer.class).render(visitable));
 	}
 
-	private RendererBridge() {
-	}
 }

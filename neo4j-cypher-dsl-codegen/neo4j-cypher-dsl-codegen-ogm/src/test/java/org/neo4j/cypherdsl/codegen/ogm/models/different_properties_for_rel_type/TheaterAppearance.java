@@ -38,4 +38,5 @@ public class TheaterAppearance {
 	private Play play;
 
 	private List<String> roles = new ArrayList<>();
+
 }

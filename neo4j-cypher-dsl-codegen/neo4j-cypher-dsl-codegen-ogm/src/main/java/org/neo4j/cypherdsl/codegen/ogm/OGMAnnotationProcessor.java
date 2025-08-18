@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.codegen.ogm;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -67,24 +65,21 @@ import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 import org.neo4j.ogm.annotation.RelationshipEntity;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 /**
+ * This processors works on Neo4j-OGM annotations and creates a static metamodel based on
+ * CypherDSL for those classes.
+ *
  * @author Shinigami92 (Christopher Quadflieg)
  * @author Michael J. Simons
  * @since 2025.8.0
  */
 @API(status = EXPERIMENTAL, since = "2025.8.0")
-@SupportedAnnotationTypes({
-	OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
-	OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION
-})
-@SupportedOptions({
-	Configuration.PROPERTY_PREFIX,
-	Configuration.PROPERTY_SUFFIX,
-	Configuration.PROPERTY_INDENT_STYLE,
-	Configuration.PROPERTY_INDENT_SIZE,
-	Configuration.PROPERTY_TIMESTAMP,
-	Configuration.PROPERTY_ADD_AT_GENERATED
-})
+@SupportedAnnotationTypes({ OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
+		OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION })
+@SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,
+		Configuration.PROPERTY_INDENT_SIZE, Configuration.PROPERTY_TIMESTAMP, Configuration.PROPERTY_ADD_AT_GENERATED })
 public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProcessor {
 
 	static final String NODE_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.NodeEntity";
@@ -94,13 +89,39 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	private final List<TypeElement> convertAnnotationTypes = new ArrayList<>();
 
 	private TypeElement propertyAnnotationType;
+
 	private TypeElement nodeEntityAnnotationType;
+
 	private TypeElement relationshipEntityAnnotationType;
+
 	private TypeElement relationshipAnnotationType;
+
 	private TypeElement startNodeAnnotationType;
+
 	private TypeElement endNodeAnnotationType;
+
 	private TypeElement ogmIdAnnotationType;
+
 	private TypeElement generatedValueAnnotationType;
+
+	private static boolean declaredTypeContains(DeclaredType dt, Element annotatedEntity) {
+		// Single field
+		if (dt.equals(annotatedEntity.asType())) {
+			return true;
+		}
+		else {
+			// Treating anything that has a generic type argument for a collection shaped
+			// thing
+			// Most other mappings with OGM won't work anyhow, so this is good enough for
+			// now
+			for (var typeArgument : dt.getTypeArguments()) {
+				if (typeArgument.equals(annotatedEntity.asType())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	@Override
 	public void initFrameworkSpecific(ProcessingEnvironment processingEnv) {
@@ -113,8 +134,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		this.startNodeAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.StartNode");
 		this.endNodeAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.EndNode");
 		for (var name : List.of("Convert", "DateLong", "DateString", "EnumString", "NumberString")) {
-			this.convertAnnotationTypes.add(
-				elementUtils.getTypeElement("org.neo4j.ogm.annotation.typeconversion.%s".formatted(name)));
+			this.convertAnnotationTypes
+				.add(elementUtils.getTypeElement("org.neo4j.ogm.annotation.typeconversion.%s".formatted(name)));
 		}
 		this.propertyAnnotationType = elementUtils.getTypeElement("org.neo4j.ogm.annotation.Property");
 
@@ -147,20 +168,21 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		}
 
 		Map<TypeElement, NodeModelBuilder> nodeBuilders = populateListOfNodes(
-			getTypesAnnotatedWith(nodeEntityAnnotationType, roundEnv));
+				getTypesAnnotatedWith(this.nodeEntityAnnotationType, roundEnv));
 		Map<NodeModelBuilder, List<Element>> relationshipFields = populateNodePropertiesAndCollectRelationshipFields(
-			nodeBuilders);
+				nodeBuilders);
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties = collectRelationshipProperties(
-			relationshipFields, roundEnv);
+				relationshipFields, roundEnv);
 		Map<String, List<RelationshipModelBuilder>> relationshipBuilders = populateListOfRelationships(
-			computeRelationshipDefinitions(relationshipFields, relationshipProperties, nodeBuilders));
+				computeRelationshipDefinitions(relationshipFields, relationshipProperties, nodeBuilders));
 
 		List<ModelBuilder<?>> allBuilders = new ArrayList<>(nodeBuilders.values());
 		relationshipBuilders.values().forEach(allBuilders::addAll);
 		try {
 			writeSourceFiles(allBuilders);
-		} catch (IOException e) {
-			messager.printMessage(Diagnostic.Kind.ERROR, "Could not write source files: " + e.getMessage());
+		}
+		catch (IOException ex) {
+			this.messager.printMessage(Diagnostic.Kind.ERROR, "Could not write source files: " + ex.getMessage());
 		}
 
 		return true;
@@ -179,22 +201,25 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 		if (!typeValue.isEmpty() && !valueValue.isEmpty()) {
 			if (!typeValue.equals(valueValue)) {
-				messager.printMessage(Diagnostic.Kind.ERROR,
-					"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.RelationshipEntity]!",
-					annotatedEntity);
+				this.messager.printMessage(Diagnostic.Kind.ERROR,
+						"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.RelationshipEntity]!",
+						annotatedEntity);
 			}
 			relationshipType = typeValue;
-		} else if (!typeValue.isEmpty()) {
+		}
+		else if (!typeValue.isEmpty()) {
 			relationshipType = typeValue;
-		} else if (!valueValue.isEmpty()) {
+		}
+		else if (!valueValue.isEmpty()) {
 			relationshipType = valueValue;
 		}
 		return relationshipType;
 	}
 
-	// Tries to figure out the direction of this relationship, so that we can decide on how to treat start/end nodes
+	// Tries to figure out the direction of this relationship, so that we can decide on
+	// how to treat start/end nodes
 	private Optional<Relationship.Direction> findDirection(Element annotatedEntity, Element startElement,
-		Set<Element> allRelationshipFields) {
+			Set<Element> allRelationshipFields) {
 
 		return allRelationshipFields.stream().filter(element -> {
 
@@ -210,38 +235,23 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			return false;
 		}).map(element -> {
 			var relationship = element.getAnnotation(Relationship.class);
-			return relationship == null ? Relationship.Direction.OUTGOING : relationship.direction();
+			return (relationship != null) ? relationship.direction() : Relationship.Direction.OUTGOING;
 		}).findFirst();
 
 	}
 
-	private static boolean declaredTypeContains(DeclaredType dt, Element annotatedEntity) {
-		// Single field
-		if (dt.equals(annotatedEntity.asType())) {
-			return true;
-		} else {
-			// Treating anything that has a generic type argument for a collection shaped thing
-			// Most other mappings with OGM won't work anyhow, so this is good enough for now
-			for (var typeArgument : dt.getTypeArguments()) {
-				if (typeArgument.equals(annotatedEntity.asType())) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
 	private Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> collectRelationshipProperties(
-		Map<NodeModelBuilder, List<Element>> relationshipFields, RoundEnvironment roundEnvironment) {
+			Map<NodeModelBuilder, List<Element>> relationshipFields, RoundEnvironment roundEnvironment) {
 
-		var allRelationshipFields = relationshipFields.values().stream().flatMap(List::stream)
+		var allRelationshipFields = relationshipFields.values()
+			.stream()
+			.flatMap(List::stream)
 			.collect(Collectors.toSet());
 
 		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> result = new HashMap<>();
-		Set<TypeElement> annotatedEntities = getTypesAnnotatedWith(relationshipEntityAnnotationType, roundEnvironment);
+		Set<TypeElement> annotatedEntities = getTypesAnnotatedWith(this.relationshipEntityAnnotationType,
+				roundEnvironment);
 		annotatedEntities.forEach(annotatedEntity -> {
-
-			var relationshipType = getRelationshipEntityType(annotatedEntity);
 
 			List<PropertyDefinition> properties = new ArrayList<>();
 			Element startElement = null;
@@ -251,14 +261,19 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 				if (!enclosedElement.getKind().isField()) {
 					continue;
 				}
-				Set<Element> declaredAnnotations = enclosedElement.getAnnotationMirrors().stream()
-					.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
+				Set<Element> declaredAnnotations = enclosedElement.getAnnotationMirrors()
+					.stream()
+					.map(AnnotationMirror::getAnnotationType)
+					.map(DeclaredType::asElement)
+					.collect(Collectors.toSet());
 
-				if (declaredAnnotations.contains(startNodeAnnotationType)) {
+				if (declaredAnnotations.contains(this.startNodeAnnotationType)) {
 					startElement = enclosedElement;
-				} else if (declaredAnnotations.contains(endNodeAnnotationType)) {
+				}
+				else if (declaredAnnotations.contains(this.endNodeAnnotationType)) {
 					endElement = enclosedElement;
-				} else {
+				}
+				else {
 					properties.add(asPropertyDefinition(enclosedElement));
 				}
 			}
@@ -267,31 +282,34 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			Element relationshipDefiningElement = null;
 			if (startElement != null && endElement != null) {
 				var finalEndElement = endElement;
-				var direction = findDirection(annotatedEntity, startElement,
-					allRelationshipFields).or(
-						() -> findDirection(annotatedEntity, finalEndElement, allRelationshipFields))
+				var direction = findDirection(annotatedEntity, startElement, allRelationshipFields)
+					.or(() -> findDirection(annotatedEntity, finalEndElement, allRelationshipFields))
 					.orElse(Relationship.Direction.OUTGOING);
 
-				relationshipDefiningElement = direction == Relationship.Direction.OUTGOING ? endElement : startElement;
-			} else if (startElement != null) {
+				relationshipDefiningElement = (direction != Relationship.Direction.OUTGOING) ? startElement
+						: endElement;
+			}
+			else if (startElement != null) {
 				relationshipDefiningElement = startElement;
-			} else if (endElement != null) {
+			}
+			else if (endElement != null) {
 				relationshipDefiningElement = endElement;
 			}
 
 			if (relationshipDefiningElement != null) {
-				actualTargetType = typeUtils.asElement(relationshipDefiningElement.asType())
+				actualTargetType = this.typeUtils.asElement(relationshipDefiningElement.asType())
 					.accept(new TypeElementVisitor<>(Function.identity()), null);
 				if (actualTargetType == null) {
-					messager.printMessage(Diagnostic.Kind.WARNING,
-						"Cannot resolve generic type, not generating a property for relationships referring to "
-						+ annotatedEntity.getQualifiedName(), relationshipDefiningElement);
+					this.messager.printMessage(Diagnostic.Kind.WARNING,
+							"Cannot resolve generic type, not generating a property for relationships referring to "
+									+ annotatedEntity.getQualifiedName(),
+							relationshipDefiningElement);
 				}
 			}
 
 			if (actualTargetType != null) {
 				result.put(annotatedEntity,
-					new AbstractMap.SimpleEntry<>(actualTargetType, Collections.unmodifiableList(properties)));
+						new AbstractMap.SimpleEntry<>(actualTargetType, Collections.unmodifiableList(properties)));
 			}
 		});
 		return Collections.unmodifiableMap(result);
@@ -312,18 +330,22 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 			if (!nameValue.isEmpty() && !valueValue.isEmpty()) {
 				if (!nameValue.equals(valueValue)) {
-					messager.printMessage(Diagnostic.Kind.ERROR,
-						"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.Property]!", e);
+					this.messager.printMessage(Diagnostic.Kind.ERROR,
+							"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.Property]!", e);
 				}
 				propertyDefinition = PropertyDefinition.create(nameValue, fieldName);
-			} else if (!nameValue.isEmpty()) {
+			}
+			else if (!nameValue.isEmpty()) {
 				propertyDefinition = PropertyDefinition.create(nameValue, fieldName);
-			} else if (!valueValue.isEmpty()) {
+			}
+			else if (!valueValue.isEmpty()) {
 				propertyDefinition = PropertyDefinition.create(valueValue, fieldName);
-			} else {
+			}
+			else {
 				propertyDefinition = PropertyDefinition.create(fieldName, null);
 			}
-		} else {
+		}
+		else {
 			propertyDefinition = PropertyDefinition.create(fieldName, null);
 		}
 
@@ -332,10 +354,10 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 	@Override
 	protected RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
-		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
-		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
-		Optional<Relationship> optionalRelationshipAnnotation = Optional.ofNullable(
-			e.getAnnotation(Relationship.class));
+			Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
+			Map<TypeElement, NodeModelBuilder> nodeBuilders) {
+		Optional<Relationship> optionalRelationshipAnnotation = Optional
+			.ofNullable(e.getAnnotation(Relationship.class));
 
 		String fieldName = e.getSimpleName().toString();
 
@@ -353,18 +375,23 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 			if (!typeValue.isEmpty() && !valueValue.isEmpty()) {
 				if (!typeValue.equals(valueValue)) {
-					messager.printMessage(Diagnostic.Kind.ERROR,
-						"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.Relationship]!", e);
+					this.messager.printMessage(Diagnostic.Kind.ERROR,
+							"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.Relationship]!",
+							e);
 				}
 				relationshipType = typeValue;
-			} else if (!typeValue.isEmpty()) {
+			}
+			else if (!typeValue.isEmpty()) {
 				relationshipType = typeValue;
-			} else if (!valueValue.isEmpty()) {
+			}
+			else if (!valueValue.isEmpty()) {
 				relationshipType = valueValue;
-			} else {
+			}
+			else {
 				relationshipType = fieldName;
 			}
-		} else {
+		}
+		else {
 			relationshipType = fieldName;
 		}
 
@@ -382,18 +409,20 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		TypeMirror relatedType = null;
 		if (declaredType.getTypeArguments().size() == 1) {
 			relatedType = declaredType.getTypeArguments().get(0);
-		} else if (declaredType.getTypeArguments().isEmpty()) {
+		}
+		else if (declaredType.getTypeArguments().isEmpty()) {
 			relatedType = declaredType;
 		}
 
-		Element key = typeUtils.asElement(relatedType);
-		NodeModelBuilder end = key == null ? null : nodeBuilders.get(key);
+		Element key = this.typeUtils.asElement(relatedType);
+		NodeModelBuilder end = (key != null) ? nodeBuilders.get(key) : null;
 		List<PropertyDefinition> properties = null;
 		String optionalPropertyHolder = null;
 
 		if (key == null) {
 			return null;
-		} else if (end == null) {
+		}
+		else if (end == null) {
 			Map.Entry<TypeElement, List<PropertyDefinition>> typeAndProperties = relationshipProperties.get(key);
 			if (typeAndProperties != null) {
 				optionalPropertyHolder = key.toString();
@@ -404,12 +433,14 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 		if (end == null) {
 			return null;
-		} else if (isIncoming) {
+		}
+		else if (isIncoming) {
 			return RelationshipPropertyDefinition.create(relationshipType, optionalPropertyHolder, fieldName, end,
-				owner, properties);
-		} else {
+					owner, properties);
+		}
+		else {
 			return RelationshipPropertyDefinition.create(relationshipType, optionalPropertyHolder, fieldName, owner,
-				end, properties);
+					end, properties);
 		}
 	}
 
@@ -419,13 +450,14 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 	}
 
 	/**
-	 * Pre-groups fields into properties and relationships to avoid running the association check multiple times.
+	 * Pre-groups fields into properties and relationships to avoid running the
+	 * association check multiple times.
 	 */
 	// Silence Sonar complaining about the class hierarchy, which is given through
 	// the ElementKindVisitor8, which we need but cannot change
 	@SuppressWarnings("squid:S110")
-	class GroupPropertiesAndRelationships
-		extends ElementKindVisitor8<Map<FieldType, List<Element>>, Void> implements PropertiesAndRelationshipGrouping {
+	class GroupPropertiesAndRelationships extends ElementKindVisitor8<Map<FieldType, List<Element>>, Void>
+			implements PropertiesAndRelationshipGrouping {
 
 		private final Map<FieldType, List<Element>> result;
 
@@ -437,18 +469,20 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			this.result = Collections.unmodifiableMap(hlp);
 		}
 
+		@Override
 		public void apply(Element element) {
 			element.accept(this, null);
 		}
 
+		@Override
 		public Map<FieldType, List<Element>> getResult() {
-			return result;
+			return this.result;
 		}
 
 		@Override
 		public Map<FieldType, List<Element>> visitTypeAsRecord(TypeElement e, Void unused) {
 			// We must overwrite this or visitUnknown() in case we encounter a record
-			return result;
+			return this.result;
 		}
 
 		@Override
@@ -462,38 +496,47 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		}
 
 		private Map<FieldType, List<Element>> visitFieldOrRecordComponent(Element e) {
-			Set<Element> declaredAnnotations = e.getAnnotationMirrors().stream()
-				.map(AnnotationMirror::getAnnotationType).map(DeclaredType::asElement).collect(Collectors.toSet());
+			Set<Element> declaredAnnotations = e.getAnnotationMirrors()
+				.stream()
+				.map(AnnotationMirror::getAnnotationType)
+				.map(DeclaredType::asElement)
+				.collect(Collectors.toSet());
 
 			// Skip internal ids
 			if (isInternalId(e, declaredAnnotations)) {
-				return result;
+				return this.result;
 			}
 
-			result.get(isAssociation(declaredAnnotations, e) ? FieldType.R : FieldType.P).add(e);
-			return result;
+			this.result.get(isAssociation(declaredAnnotations, e) ? FieldType.R : FieldType.P).add(e);
+			return this.result;
 		}
 
 		private boolean isInternalId(Element e, Set<Element> declaredAnnotations) {
 
-			boolean idAnnotationPresent = declaredAnnotations.contains(ogmIdAnnotationType);
+			boolean idAnnotationPresent = declaredAnnotations.contains(OGMAnnotationProcessor.this.ogmIdAnnotationType);
 			if (!idAnnotationPresent) {
 				return false;
 			}
 
-			return e.getAnnotationMirrors().stream()
-				.filter(m -> m.getAnnotationType().asElement().equals(generatedValueAnnotationType)).findFirst()
-				.map(generatedValue -> isUsingInternalIdGenerator(e, generatedValue)).orElse(false);
+			return e.getAnnotationMirrors()
+				.stream()
+				.filter(m -> m.getAnnotationType()
+					.asElement()
+					.equals(OGMAnnotationProcessor.this.generatedValueAnnotationType))
+				.findFirst()
+				.map(generatedValue -> isUsingInternalIdGenerator(e, generatedValue))
+				.orElse(false);
 		}
 
 		private boolean isUsingInternalIdGenerator(Element e, AnnotationMirror generatedValue) {
 
-			Map<String, ? extends AnnotationValue> values = generatedValue.getElementValues().entrySet().stream()
+			Map<String, ? extends AnnotationValue> values = generatedValue.getElementValues()
+				.entrySet()
+				.stream()
 				.collect(Collectors.toMap(entry -> entry.getKey().getSimpleName().toString(), Map.Entry::getValue));
 
-			DeclaredType generatorClassValue = values.containsKey("strategy") ?
-				(DeclaredType) values.get("strategy").getValue() :
-				null;
+			DeclaredType generatorClassValue = values.containsKey("strategy")
+					? (DeclaredType) values.get("strategy").getValue() : null;
 
 			String name = null;
 			if (generatorClassValue != null) {
@@ -502,22 +545,24 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 
 			// The defaults will not be materialized
 			return (name == null || "org.neo4j.ogm.id.InternalIdStrategy".equals(name))
-				&& VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
+					&& VALID_GENERATED_ID_TYPES.contains(e.asType().toString());
 		}
 
 		/**
-		 * @param field A variable element describing a field. No further checks done if
-		 *              this is true or not
-		 * @return True if this field is an association
+		 * Returns true if this field is an association.
+		 * @param declaredAnnotations the declared annotations on this field
+		 * @param field a variable element describing a field. No further checks done if
+		 * this is true or not
+		 * @return true if this field is an association
 		 */
 		private boolean isAssociation(Set<Element> declaredAnnotations, Element field) {
 			TypeMirror typeMirrorOfField = field.asType();
 
-			if (declaredAnnotations.contains(relationshipAnnotationType)) {
+			if (declaredAnnotations.contains(OGMAnnotationProcessor.this.relationshipAnnotationType)) {
 				return true;
 			}
 
-			if (declaredAnnotations.contains(propertyAnnotationType)) {
+			if (declaredAnnotations.contains(OGMAnnotationProcessor.this.propertyAnnotationType)) {
 				return false;
 			}
 
@@ -529,7 +574,8 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 			// Strings, primitives and their boxed variants are never associations
 			if (typeMirrorOfField.getKind().isPrimitive()) {
 				return false;
-			} else {
+			}
+			else {
 				var type = typeMirrorOfField.accept(new TypeKindVisitor8<>() {
 					@Override
 					public String visitDeclared(DeclaredType t, Object o) {
@@ -540,24 +586,28 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 					return false;
 				}
 				try {
-					typeUtils.unboxedType(typeMirrorOfField);
+					OGMAnnotationProcessor.this.typeUtils.unboxedType(typeMirrorOfField);
 					return false;
-				} catch (IllegalArgumentException ex) {
+				}
+				catch (IllegalArgumentException ex) {
 					// Exception driven development for the win, yeah
 				}
 			}
 
 			// Stuff that is explicitly converted can't be an association either
-			for (var converterAnnotation : convertAnnotationTypes) {
+			for (var converterAnnotation : OGMAnnotationProcessor.this.convertAnnotationTypes) {
 				if (declaredAnnotations.contains(converterAnnotation)) {
 					return false;
 				}
 			}
 
-			// Unless it is a start / end node, it is by a big chance an implicit relationship and hence, an association
-			boolean isStartNode = declaredAnnotations.contains(startNodeAnnotationType);
-			boolean isEndNode = declaredAnnotations.contains(endNodeAnnotationType);
+			// Unless it is a start / end node, it is by a big chance an implicit
+			// relationship and hence, an association
+			boolean isStartNode = declaredAnnotations.contains(OGMAnnotationProcessor.this.startNodeAnnotationType);
+			boolean isEndNode = declaredAnnotations.contains(OGMAnnotationProcessor.this.endNodeAnnotationType);
 			return !(isStartNode || isEndNode);
 		}
+
 	}
+
 }

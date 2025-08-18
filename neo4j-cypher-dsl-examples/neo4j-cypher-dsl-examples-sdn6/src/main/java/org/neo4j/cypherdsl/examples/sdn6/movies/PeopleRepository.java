@@ -26,11 +26,15 @@ import org.springframework.data.neo4j.repository.support.CypherdslStatementExecu
 // end::additional-fragments[]
 
 /**
+ * Example repository.
+ *
  * @author Michael J. Simons
  */
 // tag::additional-fragments[]
-public interface PeopleRepository extends Neo4jRepository<Person, Long>,
-	CypherdslConditionExecutor<Person>, // <.>
-	CypherdslStatementExecutor<Person> { // <.>
+public interface PeopleRepository extends Neo4jRepository<Person, Long>, CypherdslConditionExecutor<Person>, // <.>
+		CypherdslStatementExecutor<Person> {
+
+	// <.>
+
 }
 // end::additional-fragments[]

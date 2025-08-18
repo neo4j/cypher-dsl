@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A list of literals.
@@ -42,7 +42,9 @@ public final class ListLiteral extends LiteralBase<Iterable<Literal<?>>> {
 	@Override
 	public String asString() {
 
-		return StreamSupport.stream(content.spliterator(), false).map(Literal::asString).collect(
-			Collectors.joining(", ", "[", "]"));
+		return StreamSupport.stream(this.content.spliterator(), false)
+			.map(Literal::asString)
+			.collect(Collectors.joining(", ", "[", "]"));
 	}
+
 }

@@ -24,5 +24,6 @@ import org.neo4j.ogm.typeconversion.AttributeConverter;
  * @author Michael J. Simons
  */
 public abstract class AnotherConverter
-	implements AttributeConverter<ConnectorTransport.InnerClass.InnerInnerClass, String> {
+		implements AttributeConverter<ConnectorTransport.InnerClass.InnerInnerClass, String> {
+
 }

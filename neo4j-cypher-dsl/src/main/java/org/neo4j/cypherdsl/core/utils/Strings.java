@@ -23,33 +23,38 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.apiguardian.api.API;
 
 /**
- * The usual, static class with helper methods centered around missing functionality in {@link String}.
- * Not supported for external use in any way.
+ * The usual, static class with helper methods centered around missing functionality in
+ * {@link String}. Not supported for external use in any way.
  *
  * @author Michael J. Simons
- * @soundtrack Genesis - We Can't Dance
  * @since 2020.1.0
  */
 @API(status = API.Status.INTERNAL, since = "2020.1.0")
 public final class Strings {
 
+	private Strings() {
+	}
+
 	/**
-	 * @param str A string to be checked for text.
-	 * @return True, if the string is neither null nor empty nor blank.
+	 * Returns true, if the string is neither null nor empty nor blank.
+	 * @param str a string to be checked for text.
+	 * @return true, if the string is neither null nor empty nor blank
 	 */
 	public static boolean hasText(String str) {
 		return str != null && !str.isBlank();
 	}
 
 	/**
-	 * @param length The length of the identifier to generate.
-	 * @return A random identifier that is a valid identifier
+	 * Returns a random identifier that is a valid identifier.
+	 * @param length the length of the identifier to generate.
+	 * @return a random identifier that is a valid identifier
 	 */
 	public static String randomIdentifier(int length) {
 
 		int leftLimit = 65; // letter 'A'
 		int rightLimit = 122; // letter 'z'
-		@SuppressWarnings("squid:S2245") // I really need only random string values, this is fine
+		// I really need only random string values, this is fine
+		@SuppressWarnings("squid:S2245")
 		ThreadLocalRandom random = ThreadLocalRandom.current();
 
 		return random.ints(leftLimit, rightLimit + 1)
@@ -59,6 +64,4 @@ public final class Strings {
 			.toString();
 	}
 
-	private Strings() {
-	}
 }

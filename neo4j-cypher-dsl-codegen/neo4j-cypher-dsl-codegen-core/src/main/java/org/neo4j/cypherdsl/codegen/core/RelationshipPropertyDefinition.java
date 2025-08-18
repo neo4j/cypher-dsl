@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -27,9 +25,12 @@ import java.util.Set;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 /**
- * This represents a property in the static metamodel for a relationship. Such a property can refer to several other
- * {@link PropertyDefinition property definitions} on its own when we detect properties stored on the relationship.
+ * This represents a property in the static metamodel for a relationship. Such a property
+ * can refer to several other {@link PropertyDefinition property definitions} on its own
+ * when we detect properties stored on the relationship.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
@@ -38,21 +39,9 @@ import org.apiguardian.api.API;
 public final class RelationshipPropertyDefinition {
 
 	/**
-	 * Creates a new definition
-	 * @param type The type of the relationship as stored in the database
-	 * @param optionalPropertyHolder The class name of the holder of the relationships properties
-	 * @param nameInDomain The name of the relationship in the domain class
-	 * @param start Builder for the start node in the domain
-	 * @param end Builder for the end node in the domain
-	 * @param optionalProperties A collection of properties, maybe null or empty
-	 * @return A valid definition
+	 * A set of properties to generate.
 	 */
-	public static RelationshipPropertyDefinition create(String type, String optionalPropertyHolder, String nameInDomain,
-		NodeModelBuilder start, NodeModelBuilder end, Collection<PropertyDefinition> optionalProperties) {
-
-		return new RelationshipPropertyDefinition(type, optionalPropertyHolder, nameInDomain, start, null, end,
-			optionalProperties == null ? Collections.emptySet() : new HashSet<>(optionalProperties));
-	}
+	private final Set<PropertyDefinition> properties;
 
 	/**
 	 * Relationship type as stored in the database.
@@ -67,12 +56,14 @@ public final class RelationshipPropertyDefinition {
 	private final String nameInDomain;
 
 	/**
-	 * Start of the relationship. Generated, static relationships are always left to right (start to end).
+	 * Start of the relationship. Generated, static relationships are always left to right
+	 * (start to end).
 	 */
 	private final NodeModelBuilder start;
 
 	/**
-	 * end of the relationship. Generated, static relationships are always left to right (start to end).
+	 * end of the relationship. Generated, static relationships are always left to right
+	 * (start to end).
 	 */
 	private final NodeModelBuilder end;
 
@@ -81,14 +72,9 @@ public final class RelationshipPropertyDefinition {
 	 */
 	private RelationshipModelBuilder relationshipBuilder;
 
-	/**
-	 * A set of properties to generate.
-	 */
-	protected final Set<PropertyDefinition> properties;
-
 	private RelationshipPropertyDefinition(String type, String optionalPropertyHolder, String nameInDomain,
-		NodeModelBuilder start, RelationshipModelBuilder relationshipBuilder, NodeModelBuilder end,
-		Set<PropertyDefinition> properties) {
+			NodeModelBuilder start, RelationshipModelBuilder relationshipBuilder, NodeModelBuilder end,
+			Set<PropertyDefinition> properties) {
 		this.type = type;
 		this.optionalPropertyHolder = optionalPropertyHolder;
 		this.nameInDomain = nameInDomain;
@@ -99,52 +85,71 @@ public final class RelationshipPropertyDefinition {
 	}
 
 	/**
+	 * Creates a new definition.
+	 * @param type the type of the relationship as stored in the database
+	 * @param optionalPropertyHolder the class name of the holder of the relationships
+	 * properties
+	 * @param nameInDomain the name of the relationship in the domain class
+	 * @param start builder for the start node in the domain
+	 * @param end builder for the end node in the domain
+	 * @param optionalProperties a collection of properties, maybe null or empty
+	 * @return a valid definition
+	 */
+	public static RelationshipPropertyDefinition create(String type, String optionalPropertyHolder, String nameInDomain,
+			NodeModelBuilder start, NodeModelBuilder end, Collection<PropertyDefinition> optionalProperties) {
+
+		return new RelationshipPropertyDefinition(type, optionalPropertyHolder, nameInDomain, start, null, end,
+				(optionalProperties != null) ? new HashSet<>(optionalProperties) : Collections.emptySet());
+	}
+
+	/**
 	 * Creates a new relationship definition with a new builder for it.
-	 *
-	 * @param newBuilder The new builder to use
-	 * @return A new instance, {@literal this} won't change
+	 * @param newBuilder the new builder to use
+	 * @return a new instance, {@literal this} won't change
 	 */
 	public RelationshipPropertyDefinition withBuilder(RelationshipModelBuilder newBuilder) {
-		return new RelationshipPropertyDefinition(type, optionalPropertyHolder, nameInDomain, start, newBuilder, end,
-			properties);
+		return new RelationshipPropertyDefinition(this.type, this.optionalPropertyHolder, this.nameInDomain, this.start,
+				newBuilder, this.end, this.properties);
 	}
 
 	/**
-	 * @return The type of the relationship
+	 * {@return the type of the relationship}
 	 */
 	public String getType() {
-		return type;
+		return this.type;
 	}
 
 	/**
-	 * @return The name in the domain model (most likely the field name)
+	 * Returns the name in the domain model (most likely the field name).
+	 * @return the name in the domain model
 	 */
 	public String getNameInDomain() {
-		return nameInDomain;
+		return this.nameInDomain;
 	}
 
 	/**
-	 * @return A builder for the start node
+	 * {@return a builder for the start node}
 	 */
 	public NodeModelBuilder getStart() {
-		return start;
+		return this.start;
 	}
 
 	/**
-	 * @return A builder for the end node
+	 * {@return a builder for the end node}
 	 */
 	public NodeModelBuilder getEnd() {
-		return end;
+		return this.end;
 	}
 
 	RelationshipModelBuilder getRelationshipBuilder() {
-		return relationshipBuilder;
+		return this.relationshipBuilder;
 	}
 
 	/**
-	 * @return A set of properties on this relationship
+	 * {@return a set of properties on this relationship}
 	 */
 	public Set<PropertyDefinition> getProperties() {
-		return Collections.unmodifiableSet(properties);
+		return Collections.unmodifiableSet(this.properties);
 	}
+
 }

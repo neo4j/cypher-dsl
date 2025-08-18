@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Represents a part of a union.
@@ -44,22 +44,22 @@ public final class UnionPart implements Visitable {
 	}
 
 	/**
-	 * @return True, if an {@code ALL} keyword should be rendered.
+	 * {@return <code>true</code>, if an <code>ALL</code> keyword should be rendered}
 	 */
 	@API(status = INTERNAL)
 	public boolean isAll() {
-		return all;
+		return this.all;
 	}
 
 	Statement getQuery() {
-		return query;
+		return this.query;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		query.accept(visitor);
+		this.query.accept(visitor);
 		visitor.leave(this);
 	}
 
@@ -67,4 +67,5 @@ public final class UnionPart implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

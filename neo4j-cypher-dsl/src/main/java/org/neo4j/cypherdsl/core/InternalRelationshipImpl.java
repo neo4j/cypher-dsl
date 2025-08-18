@@ -18,14 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * An internal implementation of the {@link RelationshipBase}. It's primary purpose is to have {@link RelationshipBase#named(SymbolicName)}
- * and {@link RelationshipBase#withProperties(MapExpression)} abstract method to enforce the correct return type. Otherwise, one
- * could extend {@link RelationshipBase} without overriding those, ignoring unchecked casts and eventually running into a {@link ClassCastException}.
+ * An internal implementation of the {@link RelationshipBase}. It's primary purpose is to
+ * have {@link RelationshipBase#named(SymbolicName)} and
+ * {@link RelationshipBase#withProperties(MapExpression)} abstract method to enforce the
+ * correct return type. Otherwise, one could extend {@link RelationshipBase} without
+ * overriding those, ignoring unchecked casts and eventually running into a
+ * {@link ClassCastException}.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
@@ -33,13 +36,13 @@ import org.apiguardian.api.API;
 @API(status = INTERNAL, since = "2021.1.0")
 final class InternalRelationshipImpl extends RelationshipBase<NodeBase<?>, NodeBase<?>, InternalRelationshipImpl> {
 
-	InternalRelationshipImpl(SymbolicName symbolicName, Node left,
-		Direction direction, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
+	InternalRelationshipImpl(SymbolicName symbolicName, Node left, Direction direction,
+			QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
 		super(symbolicName, left, direction, quantifier, right, types);
 	}
 
-	InternalRelationshipImpl(SymbolicName symbolicName, Node left,
-		Direction direction, Properties properties, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
+	InternalRelationshipImpl(SymbolicName symbolicName, Node left, Direction direction, Properties properties,
+			QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
 		super(symbolicName, left, direction, properties, quantifier, right, types);
 	}
 
@@ -50,12 +53,15 @@ final class InternalRelationshipImpl extends RelationshipBase<NodeBase<?>, NodeB
 	@Override
 	public InternalRelationshipImpl named(SymbolicName newSymbolicName) {
 
-		return new InternalRelationshipImpl(this.left, this.details.named(newSymbolicName), quantifier, this.right);
+		return new InternalRelationshipImpl(this.left, this.details.named(newSymbolicName), this.quantifier,
+				this.right);
 	}
 
 	@Override
 	public InternalRelationshipImpl withProperties(MapExpression newProperties) {
 
-		return new InternalRelationshipImpl(this.left, this.details.with(Properties.create(newProperties)), quantifier, this.right);
+		return new InternalRelationshipImpl(this.left, this.details.with(Properties.create(newProperties)),
+				this.quantifier, this.right);
 	}
+
 }

@@ -18,20 +18,28 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * Representation of the {@code SKIP} clause.
+ *
  * @author Gerrit Meier
  * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
 public final class Skip implements Visitable {
+
+	private final Expression expression;
+
+	private Skip(Expression expression) {
+		this.expression = expression;
+	}
 
 	static Skip create(Expression expression) {
 
@@ -40,16 +48,10 @@ public final class Skip implements Visitable {
 		return new Skip(expression);
 	}
 
-	private final Expression expression;
-
-	private Skip(Expression expression) {
-		this.expression = expression;
-	}
-
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		expression.accept(visitor);
+		this.expression.accept(visitor);
 		visitor.leave(this);
 	}
 
@@ -57,4 +59,5 @@ public final class Skip implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

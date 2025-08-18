@@ -27,19 +27,25 @@ import java.lang.annotation.Target;
 import org.apiguardian.api.API;
 
 /**
- * Simple version of the JSR 305 annotation that allows detecting accidentally omitted calls to
- * {@link org.neo4j.cypherdsl.core.Cypher#match(org.neo4j.cypherdsl.core.PatternElement...)} ()} and the likes in IntelliJ.
+ * Simple version of the JSR 305 annotation that allows detecting accidentally omitted
+ * calls to
+ * {@link org.neo4j.cypherdsl.core.Cypher#match(org.neo4j.cypherdsl.core.PatternElement...)}
+ * ()} and the likes in IntelliJ.
  * <p>
- * This annotation is {@link org.apiguardian.api.API.Status#INTERNAL}. Clients should not rely on its presence.
+ * This annotation is {@link org.apiguardian.api.API.Status#INTERNAL}. Clients should not
+ * rely on its presence.
  *
  * @author Lukas Eder
  * @author Michael J. Simons
- * @see <a href="https://github.com/jOOQ/jOOQ/issues/11718">https://github.com/jOOQ/jOOQ/issues/11718</a>
- * @see <a href="https://youtrack.jetbrains.com/issue/IDEA-265263">https://youtrack.jetbrains.com/issue/IDEA-265263</a>
+ * @see <a href=
+ * "https://github.com/jOOQ/jOOQ/issues/11718">https://github.com/jOOQ/jOOQ/issues/11718</a>
+ * @see <a href=
+ * "https://youtrack.jetbrains.com/issue/IDEA-265263">https://youtrack.jetbrains.com/issue/IDEA-265263</a>
  */
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
 @API(status = API.Status.INTERNAL, since = "2021.1.1")
 public @interface CheckReturnValue {
+
 }

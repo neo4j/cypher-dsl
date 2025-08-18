@@ -34,45 +34,25 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
- * A  mutable   tree  structure  providing   <a  href="https://en.wikipedia.org/wiki/Breadth-first_search">Breadth-first
- * search</a>         (aka         in-level         order          traversal)         and         pre-ordered         <a
- * href="https://en.wikipedia.org/wiki/Depth-first_search">depth-first search</a>. This class is thread-safe.
+ * A mutable tree structure providing
+ * <a href="https://en.wikipedia.org/wiki/Breadth-first_search">Breadth-first search</a>
+ * (aka in-level order traversal) and pre-ordered
+ * <a href="https://en.wikipedia.org/wiki/Depth-first_search">depth-first search</a>. This
+ * class is thread-safe.
  *
+ * @param <E> the type of each node value
  * @author Michael J. Simons
- * @param <E> The type of each node value
- * @soundtrack Black Sabbath - The End: Live in Birmingham
  * @since 2023.2.0
  */
 @API(status = API.Status.EXPERIMENTAL, since = "2023.2.0")
 public final class TreeNode<E> {
 
-	/**
-	 * Creates a  tree from a  {@link Statement}. This  allows to visit all  elements of statement  without implementing
-	 * custom {@link Visitor visitors.} The root of the returned tree will always be the statement.
-	 *
-	 * @param statement The statement that should be represented as a tree
-	 * @return A tree with the statement as root
-	 */
-	public static TreeNode<Visitable> from(Statement statement) {
-		var visitor = new TreeBuildingVisitor();
-		statement.accept(visitor);
-		return visitor.root;
-	}
-
-	/**
-	 * Creates a new tree, starting at the root.
-	 *
-	 * @param value The actual value
-	 * @param <E>   The type of the value
-	 * @return The new node
-	 */
-	static <E> TreeNode<E> root(E value) {
-		return new TreeNode<>(null, 0, value);
-	}
-
 	private final TreeNode<E> parent;
+
 	private final int level;
+
 	private final List<TreeNode<E>> children;
+
 	private final E value;
 
 	private TreeNode(TreeNode<E> parent, int level, E value) {
@@ -83,11 +63,33 @@ public final class TreeNode<E> {
 	}
 
 	/**
-	 * Appends a value to  this node and thus creating a new  child node. This node will be modified  and keeps track of
-	 * the child node.
-	 *
-	 * @param childValue The value of the new child node
-	 * @return The new child (this node will be the parent of the new node)
+	 * Creates a tree from a {@link Statement}. This allows to visit all elements of
+	 * statement without implementing custom {@link Visitor visitors.} The root of the
+	 * returned tree will always be the statement.
+	 * @param statement the statement that should be represented as a tree
+	 * @return a tree with the statement as root
+	 */
+	public static TreeNode<Visitable> from(Statement statement) {
+		var visitor = new TreeBuildingVisitor();
+		statement.accept(visitor);
+		return visitor.root;
+	}
+
+	/**
+	 * Creates a new tree, starting at the root.
+	 * @param value the actual value
+	 * @param <E> the type of the value
+	 * @return the new node
+	 */
+	static <E> TreeNode<E> root(E value) {
+		return new TreeNode<>(null, 0, value);
+	}
+
+	/**
+	 * Appends a value to this node and thus creating a new child node. This node will be
+	 * modified and keeps track of the child node.
+	 * @param childValue the value of the new child node
+	 * @return the new child (this node will be the parent of the new node)
 	 */
 	TreeNode<E> append(E childValue) {
 		var newChild = new TreeNode<>(this, this.level + 1, childValue);
@@ -96,65 +98,67 @@ public final class TreeNode<E> {
 	}
 
 	/**
-	 * @return {@literal true} if this is the root node
+	 * {@return <code>true</code> if this is the root node}
 	 */
 	public boolean isRoot() {
 		return this.parent == null;
 	}
 
 	/**
-	 * @return The level or the height in this tree ({@literal 0} is the level of the root node)
+	 * Returns the level or the height in this tree in which {@code 0} is the level of the
+	 * root node.
+	 * @return the level or the height in this tree
 	 */
 	public int getLevel() {
-		return level;
+		return this.level;
 	}
 
 	/**
-	 * @return The parent of this node or {@literal null} if this is a root node.
+	 * {@return the parent of this node or <code>null</code> if this is a root node}
 	 */
 	public TreeNode<E> getParent() {
-		return parent;
+		return this.parent;
 	}
 
 	/**
-	 * @return An immutable collection of this nodes children
+	 * {@return an immutable collection of this nodes children}
 	 */
 	public Collection<TreeNode<E>> getChildren() {
-		return List.copyOf(children);
+		return List.copyOf(this.children);
 	}
 
 	/**
-	 * @return The value of this node.
+	 * {@return the value of this node}
 	 */
 	public E getValue() {
-		return value;
+		return this.value;
 	}
 
 	/**
-	 * @return a breadth-first iterator of this node and it's children
+	 * {@return a breadth-first iterator of this node and it's children}
 	 */
 	public Iterator<TreeNode<E>> breadthFirst() {
 		return new BreadthFirstIterator<>(this);
 	}
 
 	/**
-	 * @return a depth-first, pre-ordered iterator of this node and it's children
+	 * {@return a depth-first, pre-ordered iterator of this node and it's children}
 	 */
 	public Iterator<TreeNode<E>> preOrder() {
 		return new PreOrderIterator<>(this);
 	}
 
 	/**
-	 * Creates an ASCII representation of this node and its children
-	 *
-	 * @param target   The target to which to print this tree to
-	 * @param toString How to format nodes if this type
+	 * Creates an ASCII representation of this node and its children.
+	 * @param target the target to which to print this tree to
+	 * @param toString how to format nodes if this type
 	 */
 	public void printTo(Consumer<CharSequence> target, Function<TreeNode<E>, String> toString) {
 		this.printTo0(target, toString, this, "", true);
 	}
 
-	private void printTo0(Consumer<CharSequence> target, Function<TreeNode<E>, String> toString, TreeNode<E> node, String prefix, boolean isTail) {
+	private void printTo0(Consumer<CharSequence> target, Function<TreeNode<E>, String> toString, TreeNode<E> node,
+			String prefix, boolean isTail) {
 
 		var localValue = toString.apply(node);
 		var connector = isTail ? "└── " : "├── ";
@@ -170,7 +174,7 @@ public final class TreeNode<E> {
 		}
 	}
 
-	private static class TreeBuildingVisitor implements Visitor {
+	private static final class TreeBuildingVisitor implements Visitor {
 
 		final Deque<TreeNode<Visitable>> nodes = new ArrayDeque<>();
 
@@ -178,20 +182,22 @@ public final class TreeNode<E> {
 
 		@Override
 		public void enter(Visitable segment) {
-			var currentParent = nodes.peek();
+			var currentParent = this.nodes.peek();
 			if (currentParent == null) {
 				currentParent = TreeNode.root(segment);
-			} else {
+			}
+			else {
 				currentParent = currentParent.append(segment);
 			}
 
-			nodes.push(currentParent);
+			this.nodes.push(currentParent);
 		}
 
 		@Override
 		public void leave(Visitable segment) {
-			root = nodes.pop();
+			this.root = this.nodes.pop();
 		}
+
 	}
 
 	private static final class BreadthFirstIterator<E> implements Iterator<TreeNode<E>> {
@@ -205,18 +211,19 @@ public final class TreeNode<E> {
 
 		@Override
 		public boolean hasNext() {
-			return !queue.isEmpty();
+			return !this.queue.isEmpty();
 		}
 
 		@Override
 		public TreeNode<E> next() {
-			if (queue.isEmpty()) {
+			if (this.queue.isEmpty()) {
 				throw new NoSuchElementException();
 			}
-			var n = queue.remove();
-			queue.addAll(n.children);
+			var n = this.queue.remove();
+			this.queue.addAll(n.children);
 			return n;
 		}
+
 	}
 
 	private static final class PreOrderIterator<E> implements Iterator<TreeNode<E>> {
@@ -230,26 +237,28 @@ public final class TreeNode<E> {
 
 		@Override
 		public boolean hasNext() {
-			return !stack.isEmpty() && stack.peek().hasNext();
+			return !this.stack.isEmpty() && this.stack.peek().hasNext();
 		}
 
 		@Override
 		public TreeNode<E> next() {
-			if (stack.isEmpty()) {
+			if (this.stack.isEmpty()) {
 				throw new NoSuchElementException();
 			}
-			var nodesUpNext = stack.peek();
+			var nodesUpNext = this.stack.peek();
 			var currentNode = nodesUpNext.next();
 
 			if (!nodesUpNext.hasNext()) {
-				stack.pop();
+				this.stack.pop();
 			}
 
 			if (!currentNode.children.isEmpty()) {
-				stack.push(currentNode.children.iterator());
+				this.stack.push(currentNode.children.iterator());
 			}
 
 			return currentNode;
 		}
+
 	}
+
 }

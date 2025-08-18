@@ -18,17 +18,19 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * An internal implementation of the {@link NodeBase}. It's primary purpose is to have {@link NodeBase#named(SymbolicName)}
- * and {@link NodeBase#withProperties(MapExpression)} abstract method to enforce the correct return type. Otherwise one
- * could extend {@link NodeBase} without overriding those, ignoring unchecked casts and eventually running into a {@link ClassCastException}.
+ * An internal implementation of the {@link NodeBase}. It's primary purpose is to have
+ * {@link NodeBase#named(SymbolicName)} and {@link NodeBase#withProperties(MapExpression)}
+ * abstract method to enforce the correct return type. Otherwise one could extend
+ * {@link NodeBase} without overriding those, ignoring unchecked casts and eventually
+ * running into a {@link ClassCastException}.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
@@ -47,12 +49,13 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 		super(primaryLabel, additionalLabels);
 	}
 
-	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties, Where innerPredicate) {
+	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression,
+			Properties properties, Where innerPredicate) {
 		super(symbolicName, labels, labelExpression, properties, innerPredicate);
 	}
 
-	InternalNodeImpl(SymbolicName symbolicName, String primaryLabel,
-		MapExpression properties, String... additionalLabels) {
+	InternalNodeImpl(SymbolicName symbolicName, String primaryLabel, MapExpression properties,
+			String... additionalLabels) {
 		super(symbolicName, primaryLabel, properties, additionalLabels);
 	}
 
@@ -60,14 +63,16 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	public InternalNodeImpl named(SymbolicName newSymbolicName) {
 
 		Assertions.notNull(newSymbolicName, "Symbolic name is required.");
-		return new InternalNodeImpl(newSymbolicName, labels, labelExpression, properties, innerPredicate);
+		return new InternalNodeImpl(newSymbolicName, this.labels, this.labelExpression, this.properties,
+				this.innerPredicate);
 
 	}
 
 	@Override
 	public InternalNodeImpl withProperties(MapExpression newProperties) {
 
-		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, Properties.create(newProperties), innerPredicate);
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), this.labels, this.labelExpression,
+				Properties.create(newProperties), this.innerPredicate);
 	}
 
 	@Override
@@ -76,7 +81,8 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 			return this;
 		}
 
-		return new InternalNodeImpl(this.getSymbolicName().orElse(null), labels, labelExpression, properties,
-			Where.from(predicate));
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), this.labels, this.labelExpression,
+				this.properties, Where.from(predicate));
 	}
+
 }

@@ -18,15 +18,15 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Literal;
-import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
+ * Representation of a namespace (i.e. for procedures) element.
+ *
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
@@ -39,15 +39,9 @@ public final class Namespace implements Literal<String[]> {
 	}
 
 	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		visitor.leave(this);
-	}
-
-	@Override
 	public String asString() {
 
-		return String.join(".", content);
+		return String.join(".", this.content);
 	}
+
 }

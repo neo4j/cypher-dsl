@@ -33,7 +33,9 @@ import org.neo4j.ogm.typeconversion.UuidStringConverter;
 @NodeEntity
 public class ExternalGeneratedId {
 
-	@Id @GeneratedValue(strategy = UuidStrategy.class)
+	@Id
+	@GeneratedValue(strategy = UuidStrategy.class)
 	@Convert(UuidStringConverter.class)
 	private UUID id;
+
 }

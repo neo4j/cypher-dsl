@@ -19,12 +19,14 @@
 package org.neo4j.cypherdsl.core;
 
 /**
- * A sub-query expression can either be an {@link ExistentialSubquery EXISTS-tential} or a {@link CountExpression COUNT}
- * expression as of Neo4j 5.
+ * A sub-query expression can either be an {@link ExistentialSubquery EXISTS-tential} or a
+ * {@link CountExpression COUNT} expression as of Neo4j 5.
  *
  * @author Michael J. Simons
  * @since 2023.0.0
- * @soundtrack In Flames - The Jester Race
+ *
  */
-public sealed interface SubqueryExpression extends Expression permits ExistentialSubquery, CountExpression, CollectExpression {
+public sealed interface SubqueryExpression extends Expression
+		permits ExistentialSubquery, CountExpression, CollectExpression {
+
 }

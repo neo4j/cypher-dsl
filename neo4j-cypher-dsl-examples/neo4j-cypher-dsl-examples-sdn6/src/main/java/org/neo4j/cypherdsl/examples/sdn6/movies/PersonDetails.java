@@ -26,9 +26,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * This is a DTO based projection, containing a couple of additional details,
- * like the list of movies a person acted in, the movies they direct and which other
- * people they acted with
+ * This is a DTO based projection, containing a couple of additional details, like the
+ * list of movies a person acted in, the movies they direct and which other people they
+ * acted with.
  *
  * @author Michael J. Simons
  */
@@ -45,9 +45,9 @@ public final class PersonDetails {
 	private final List<Person> related;
 
 	@JsonCreator
-	public PersonDetails(
-		@JsonProperty("name") String name, @JsonProperty("born") Integer born, @JsonProperty("actedIn") List<Movie> actedIn,
-		@JsonProperty("directed") List<Movie> directed, @JsonProperty("related") List<Person> related) {
+	public PersonDetails(@JsonProperty("name") String name, @JsonProperty("born") Integer born,
+			@JsonProperty("actedIn") List<Movie> actedIn, @JsonProperty("directed") List<Movie> directed,
+			@JsonProperty("related") List<Person> related) {
 		this.name = name;
 		this.born = born;
 		this.actedIn = new ArrayList<>(actedIn);
@@ -56,22 +56,23 @@ public final class PersonDetails {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public Integer getBorn() {
-		return born;
+		return this.born;
 	}
 
 	public List<Movie> getActedIn() {
-		return Collections.unmodifiableList(actedIn);
+		return Collections.unmodifiableList(this.actedIn);
 	}
 
 	public List<Movie> getDirected() {
-		return Collections.unmodifiableList(directed);
+		return Collections.unmodifiableList(this.directed);
 	}
 
 	public List<Person> getRelated() {
-		return Collections.unmodifiableList(related);
+		return Collections.unmodifiableList(this.related);
 	}
+
 }

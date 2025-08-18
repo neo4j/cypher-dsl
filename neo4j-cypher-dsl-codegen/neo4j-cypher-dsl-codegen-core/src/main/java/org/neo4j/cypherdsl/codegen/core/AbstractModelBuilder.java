@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
@@ -36,6 +34,12 @@ import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
 
+import com.squareup.javapoet.AnnotationSpec;
+import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
+import com.squareup.javapoet.FieldSpec;
+import com.squareup.javapoet.JavaFile;
+import com.squareup.javapoet.TypeSpec;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.codegen.core.Configuration.JavaVersion;
 import org.neo4j.cypherdsl.core.MapExpression;
@@ -45,36 +49,28 @@ import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
-import com.squareup.javapoet.AnnotationSpec;
-import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.CodeBlock;
-import com.squareup.javapoet.FieldSpec;
-import com.squareup.javapoet.JavaFile;
-import com.squareup.javapoet.TypeSpec;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Base class with some shared state and information for builders of {@link NodeBase} and
  * {@link RelationshipBase}.
  *
+ * @param <T> concrete type of this builder
  * @author Michael J. Simons
- * @param <T> Concrete type of this builder
- * @soundtrack Bear McCreary - Battlestar Galactica Season 2
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelBuilder<T> {
 
 	protected static final ClassName TYPE_NAME_NODE = ClassName.get(Node.class);
-	protected static final ClassName TYPE_NAME_NODE_BASE = ClassName.get(NodeBase.class);
-	protected static final ClassName TYPE_NAME_SYMBOLIC_NAME = ClassName.get(SymbolicName.class);
-	protected static final ClassName TYPE_NAME_LIST = ClassName.get(List.class);
-	protected static final ClassName TYPE_NAME_MAP_EXPRESSION = ClassName.get(MapExpression.class);
 
-	/**
-	 * Will be initialized with Double-checked locking into an unmodifiable {@link JavaFile}, no need to worry.
-	 */
-	@SuppressWarnings("squid:S3077")
-	private volatile JavaFile javaFile;
+	protected static final ClassName TYPE_NAME_NODE_BASE = ClassName.get(NodeBase.class);
+
+	protected static final ClassName TYPE_NAME_SYMBOLIC_NAME = ClassName.get(SymbolicName.class);
+
+	protected static final ClassName TYPE_NAME_LIST = ClassName.get(List.class);
+
+	protected static final ClassName TYPE_NAME_MAP_EXPRESSION = ClassName.get(MapExpression.class);
 
 	/**
 	 * Generator for field names.
@@ -100,11 +96,19 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 
 	private final String indent;
 
+	/**
+	 * Will be initialized with Double-checked locking into an unmodifiable
+	 * {@link JavaFile}, no need to worry.
+	 */
+	@SuppressWarnings("squid:S3077")
+	private volatile JavaFile javaFile;
+
 	private Clock clock = Clock.systemDefaultZone();
 
 	private boolean addAtGenerated = true;
 
-	AbstractModelBuilder(FieldNameGenerator fieldNameGenerator, ClassName className, String plainClassName, JavaVersion target, String indent) {
+	AbstractModelBuilder(FieldNameGenerator fieldNameGenerator, ClassName className, String plainClassName,
+			JavaVersion target, String indent) {
 
 		this.fieldNameGenerator = fieldNameGenerator;
 		this.className = className;
@@ -114,9 +118,32 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 	}
 
 	/**
-	 * Central method to trigger building of the {@link #javaFile} if that has not been done yet. {@link #buildJavaFile()} is
-	 * supposed to fail when it realizes the build has already been done.
-	 *
+	 * Internal utility method to extract the actual class name while trying to avoid best
+	 * guesses.
+	 * @param optionalSource the source from which to extract the class name to be
+	 * generated
+	 * @return a class name
+	 */
+	static ClassName extractClassName(ModelBuilder<?> optionalSource) {
+
+		if (optionalSource == null) {
+			return null;
+		}
+		else if (optionalSource instanceof NodeImplBuilder builder) {
+			return builder.getClassName();
+		}
+		else if (optionalSource instanceof RelationshipImplBuilder builder) {
+			return builder.getClassName();
+		}
+		else {
+			return ClassName.bestGuess(optionalSource.getCanonicalClassName());
+		}
+	}
+
+	/**
+	 * Central method to trigger building of the {@link #javaFile} if that has not been
+	 * done yet. {@link #buildJavaFile()} is supposed to fail when it realizes the build
+	 * has already been done.
 	 * @return a JavaPoet {@link JavaFile} that can be written to file or string.
 	 */
 	protected abstract JavaFile buildJavaFile();
@@ -145,17 +172,17 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 
 	@Override
 	public final String getPackageName() {
-		return className.packageName();
+		return this.className.packageName();
 	}
 
 	@Override
 	public final String getCanonicalClassName() {
-		return className.canonicalName();
+		return this.className.canonicalName();
 	}
 
 	@Override
 	public final String getPlainClassName() {
-		return plainClassName;
+		return this.plainClassName;
 	}
 
 	@Override
@@ -163,8 +190,9 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 
 		try {
 			getJavaFile().writeTo(path);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+		}
+		catch (IOException ex) {
+			throw new UncheckedIOException(ex);
 		}
 	}
 
@@ -172,8 +200,9 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 	public final void writeTo(Appendable appendable) {
 		try {
 			getJavaFile().writeTo(appendable);
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+		}
+		catch (IOException ex) {
+			throw new UncheckedIOException(ex);
 		}
 	}
 
@@ -184,14 +213,15 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 			StringBuilder out = new StringBuilder();
 			getJavaFile().writeTo(out);
 			return out.toString();
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
+		}
+		catch (IOException ex) {
+			throw new UncheckedIOException(ex);
 		}
 	}
 
 	@Override
 	public final String getFieldName() {
-		return fieldNameGenerator.generate(getPlainClassName());
+		return this.fieldNameGenerator.generate(getPlainClassName());
 	}
 
 	@SuppressWarnings("unchecked")
@@ -202,12 +232,15 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 	}
 
 	/**
-	 * Makes sure that no Java file has been created before modifying the builder
+	 * Makes sure that no Java file has been created before modifying the builder.
+	 * @param <V> the type of the value of the objects supplied
+	 * @param c a supplier of arbitrary code
+	 * @return the value created for a property unless a source file was already present
 	 */
 	final <V> V callOnlyWithoutJavaFilePresent(Supplier<V> c) {
 
 		synchronized (this) {
-			if (javaFile == null) {
+			if (this.javaFile == null) {
 				return c.get();
 			}
 		}
@@ -216,27 +249,30 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 
 	/**
 	 * Adds information about the generated class.
-	 * @param builder The builder that should be decorated
-	 * @return A type builder.
+	 * @param builder the builder that should be decorated
+	 * @return a type builder.
 	 */
 	final TypeSpec.Builder addGenerated(TypeSpec.Builder builder) {
 
 		ClassName nameOfAtGenerated;
-		if (target == JavaVersion.RELEASE_8) {
+		if (this.target == JavaVersion.RELEASE_8) {
 			nameOfAtGenerated = ClassName.get("javax.annotation", "Generated");
-		} else if (target == JavaVersion.RELEASE_11 && addAtGenerated) {
+		}
+		else if (this.target == JavaVersion.RELEASE_11 && this.addAtGenerated) {
 			nameOfAtGenerated = ClassName.get("javax.annotation.processing", "Generated");
-		} else {
+		}
+		else {
 			nameOfAtGenerated = null;
 		}
 
 		String comment = "This class is generated by the Neo4j Cypher-DSL. All changes to it will be lost after regeneration.";
 		if (nameOfAtGenerated == null) {
 			builder.addJavadoc(CodeBlock.of(comment));
-		} else {
+		}
+		else {
 			AnnotationSpec spec = AnnotationSpec.builder(nameOfAtGenerated)
 				.addMember("value", "$S", getClass().getName())
-				.addMember("date", "$S", ZonedDateTime.now(clock).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+				.addMember("date", "$S", ZonedDateTime.now(this.clock).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
 				.addMember("comments", "$S", comment)
 				.build();
 			builder.addAnnotation(spec);
@@ -245,66 +281,45 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 	}
 
 	/**
-	 * Turns the property definitions into field spec
-	 *
+	 * Turns the property definitions into field spec.
 	 * @return a stream of field specs
 	 */
 	final Stream<FieldSpec> generateFieldSpecsFromProperties() {
-		return properties.stream().map(p -> {
+		return this.properties.stream().map(p -> {
 
-				String fieldName;
-				CodeBlock initializer;
-				if (p.getNameInDomain() == null) {
-					fieldName = p.getNameInGraph();
-					initializer = CodeBlock.of("this.property($S)", p.getNameInGraph());
-				} else {
-					fieldName = p.getNameInDomain();
-					initializer = CodeBlock.of("this.property($S).referencedAs($S)", p.getNameInGraph(), p.getNameInDomain());
-				}
-
-				return FieldSpec
-					.builder(Property.class, fieldNameGenerator.generate(fieldName), Modifier.PUBLIC, Modifier.FINAL)
-					.initializer(initializer)
-					.build();
+			String fieldName;
+			CodeBlock initializer;
+			if (p.getNameInDomain() == null) {
+				fieldName = p.getNameInGraph();
+				initializer = CodeBlock.of("this.property($S)", p.getNameInGraph());
 			}
-		);
+			else {
+				fieldName = p.getNameInDomain();
+				initializer = CodeBlock.of("this.property($S).referencedAs($S)", p.getNameInGraph(),
+						p.getNameInDomain());
+			}
+
+			return FieldSpec
+				.builder(Property.class, this.fieldNameGenerator.generate(fieldName), Modifier.PUBLIC, Modifier.FINAL)
+				.initializer(initializer)
+				.build();
+		});
 	}
 
 	/**
 	 * Prepares a file builder for the given type.
-	 *
-	 * @param typeSpec The type that should be written
-	 * @return A builder with some shared settings like indent etc. applied.
+	 * @param typeSpec the type that should be written
+	 * @return a builder with some shared settings like indent etc. applied.
 	 */
 	final JavaFile.Builder prepareFileBuilder(TypeSpec typeSpec) {
-		return JavaFile.builder(getPackageName(), typeSpec)
-			.skipJavaLangImports(true)
-			.indent(indent);
+		return JavaFile.builder(getPackageName(), typeSpec).skipJavaLangImports(true).indent(this.indent);
 	}
 
 	/**
-	 * @return The internal class name used by JavaPoet
+	 * {@return the internal class name used by JavaPoet}
 	 */
 	final ClassName getClassName() {
-		return className;
-	}
-
-	/**
-	 * Internal utility method to extract the actual class name while trying to avoid best guesses.
-	 * @param optionalSource The source from which to extract the class name to be generated
-	 * @return A class name
-	 */
-	static final ClassName extractClassName(ModelBuilder<?> optionalSource) {
-
-		if (optionalSource == null) {
-			return null;
-		} else if (optionalSource instanceof NodeImplBuilder builder) {
-			return builder.getClassName();
-		} else if (optionalSource instanceof RelationshipImplBuilder builder) {
-			return builder.getClassName();
-		} else {
-			return ClassName.bestGuess(optionalSource.getCanonicalClassName());
-		}
+		return this.className;
 	}
 
 	private JavaFile getJavaFile() {
@@ -321,4 +336,5 @@ abstract class AbstractModelBuilder<T extends ModelBuilder<?>> implements ModelB
 		}
 		return result;
 	}
+
 }

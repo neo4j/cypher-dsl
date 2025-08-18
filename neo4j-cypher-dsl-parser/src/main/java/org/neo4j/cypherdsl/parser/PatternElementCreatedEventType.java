@@ -18,28 +18,33 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * The type of an event fired when a Cypher-DSL AST element is created.
+ *
  * @author Michael J. Simons
- * @soundtrack Black Sabbath - The End: Live in Birmingham
  * @since 2022.1.1
  */
 @API(status = STABLE, since = "2022.2.0")
 public enum PatternElementCreatedEventType {
 
 	/**
-	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of a {@code MATCH} clause.
+	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of
+	 * a {@code MATCH} clause.
 	 */
 	ON_MATCH,
 	/**
-	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of a {@code CREATE} clause.
+	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of
+	 * a {@code CREATE} clause.
 	 */
 	ON_CREATE,
 	/**
-	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of a {@code MERGE} clause.
+	 * A {@link org.neo4j.cypherdsl.core.PatternElement} is created during the creation of
+	 * a {@code MERGE} clause.
 	 */
 	ON_MERGE,
+
 }

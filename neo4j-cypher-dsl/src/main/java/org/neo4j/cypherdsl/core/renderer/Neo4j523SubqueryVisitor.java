@@ -29,23 +29,28 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
- * Rendering <a href="https://neo4j.com/docs/cypher-manual/5/subqueries/call-subquery/#variable-scope-clause">variable scope call clauses</a>.
+ * Rendering <a href=
+ * "https://neo4j.com/docs/cypher-manual/5/subqueries/call-subquery/#variable-scope-clause">variable
+ * scope call clauses</a>.
+ *
  * @author Michael J. Simons
  * @since 2024.1.0
  */
-@RegisterForReflection(allDeclaredConstructors = true) final class Neo4j523SubqueryVisitor extends VisitorWithResult {
+@RegisterForReflection(allDeclaredConstructors = true)
+final class Neo4j523SubqueryVisitor extends VisitorWithResult {
 
-	private final static GeneralizedRenderer RETURN_BODY_RENDERER = Renderer.getRenderer(
-		Configuration.newConfig().withDialect(Dialect.NEO4J_5_23).build(), GeneralizedRenderer.class);
+	private static final GeneralizedRenderer RETURN_BODY_RENDERER = Renderer
+		.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5_23).build(), GeneralizedRenderer.class);
 
 	private final DefaultVisitor delegate;
+
+	private With importing;
 
 	Neo4j523SubqueryVisitor(DefaultVisitor delegate) {
 		this.delegate = delegate;
 	}
 
-	private With importing;
-
+	@Override
 	public EnterResult enterWithResult(Visitable segment) {
 
 		if (segment instanceof Subquery subquery) {
@@ -59,13 +64,15 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 				});
 			}
 			replacement.append(") {");
-			delegate.enter(subquery);
-			delegate.builder
-				.replace(delegate.builder.length() - 1, delegate.builder.length(), replacement.toString());
-		} else if (segment instanceof With possibleImporting) {
+			this.delegate.enter(subquery);
+			this.delegate.builder.replace(this.delegate.builder.length() - 1, this.delegate.builder.length(),
+					replacement.toString());
+		}
+		else if (segment instanceof With possibleImporting) {
 			if (!Objects.equals(this.importing, possibleImporting)) {
-				delegate.enter(possibleImporting);
-			} else {
+				this.delegate.enter(possibleImporting);
+			}
+			else {
 				return EnterResult.SKIP_CHILDREN;
 			}
 		}
@@ -77,13 +84,16 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 	public void leave(Visitable segment) {
 
 		if (segment instanceof Subquery subquery) {
-			delegate.leave(subquery);
-		} else if (segment instanceof With possibleImporting) {
+			this.delegate.leave(subquery);
+		}
+		else if (segment instanceof With possibleImporting) {
 			if (Objects.equals(this.importing, possibleImporting)) {
 				this.importing = null;
-			} else {
-				delegate.leave(possibleImporting);
+			}
+			else {
+				this.delegate.leave(possibleImporting);
 			}
 		}
 	}
+
 }

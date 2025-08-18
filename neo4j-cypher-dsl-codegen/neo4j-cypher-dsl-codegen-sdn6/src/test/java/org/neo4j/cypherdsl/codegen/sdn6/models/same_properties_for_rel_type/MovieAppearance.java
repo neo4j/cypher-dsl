@@ -34,4 +34,5 @@ public class MovieAppearance {
 	private Movie movie;
 
 	private List<String> roles = new ArrayList<>();
+
 }

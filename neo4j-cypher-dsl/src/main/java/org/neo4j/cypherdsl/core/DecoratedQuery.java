@@ -18,34 +18,31 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Statement.UseStatement;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * A decorated statement. Used for <code>EXPLAIN</code> and <code>PROFILE</code>'d queries.
+ * A decorated statement. Used for <code>EXPLAIN</code> and <code>PROFILE</code>'d
+ * queries.
  *
- * @soundtrack Blind Guardian - Blind Guardian Live
+ * @author Michael J. Simons
  * @since 2020.1.2
  */
 @API(status = INTERNAL, since = "2020.1.2")
 sealed class DecoratedQuery extends AbstractStatement implements UseStatement {
 
-	private enum Decoration implements Visitable {
-
-		EXPLAIN, PROFILE;
-
-		@Override
-		public String toString() {
-			return RendererBridge.render(this);
-		}
-	}
-
 	private final Visitable decoration;
+
 	private final Statement target;
+
+	private DecoratedQuery(Statement target, Visitable decoration) {
+		this.decoration = decoration;
+		this.target = target;
+	}
 
 	static DecoratedQuery explain(Statement target) {
 
@@ -75,19 +72,16 @@ sealed class DecoratedQuery extends AbstractStatement implements UseStatement {
 		if (target instanceof DecoratedQuery decoratedQuery) {
 			String message;
 			if (decoratedQuery.decoration instanceof Decoration decoration) {
-				message = decoration.name() + (decoration.name().endsWith("E") ? "'" : "'e") + "d statements are not supported inside USE clauses";
-			} else { // Right now the only other decoration is the Use clause.
+				message = decoration.name() + (decoration.name().endsWith("E") ? "'" : "'e")
+						+ "d statements are not supported inside USE clauses";
+			}
+			else { // Right now the only other decoration is the Use clause.
 				message = "Nested USE clauses are not supported";
 			}
 			throw new IllegalArgumentException(message);
 		}
 
 		return new DecoratedQuery(target, use);
-	}
-
-	private DecoratedQuery(Statement target, Visitable decoration) {
-		this.decoration = decoration;
-		this.target = target;
 	}
 
 	@Override
@@ -107,14 +101,26 @@ sealed class DecoratedQuery extends AbstractStatement implements UseStatement {
 		return super.doesReturnOrYield();
 	}
 
+	private enum Decoration implements Visitable {
+
+		EXPLAIN, PROFILE;
+
+		@Override
+		public String toString() {
+			return RendererBridge.render(this);
+		}
+
+	}
+
 	/**
 	 * Only profiled queries can have a result statement.
-	 * Explained queries are only useful with {@link org.neo4j.cypherdsl.core.executables.ExecutableStatement#executeWith(org.neo4j.driver.SimpleQueryRunner)}.
 	 */
 	static final class DecoratedQueryWithResult extends DecoratedQuery implements ResultStatement {
 
 		private DecoratedQueryWithResult(Statement target) {
 			super(target, Decoration.PROFILE);
 		}
+
 	}
+
 }

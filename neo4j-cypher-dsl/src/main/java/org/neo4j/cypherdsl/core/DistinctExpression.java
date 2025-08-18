@@ -18,8 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.neo4j.cypherdsl.core.internal.Distinct;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.Distinct;
 
 /**
  * AST representation of the {@literal DISTINCT} keyword.
@@ -43,4 +43,5 @@ final class DistinctExpression implements Expression {
 		this.delegate.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

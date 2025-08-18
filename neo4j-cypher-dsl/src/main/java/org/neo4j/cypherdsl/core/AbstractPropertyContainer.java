@@ -18,20 +18,25 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.apiguardian.api.API;
-
 import java.util.List;
+
+import org.apiguardian.api.API;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
- * Abstract base class for all property containers to avoid default interface methods to be overridable in inheritors.
+ * Abstract base class for all property containers to avoid default interface methods to
+ * be overridable in inheritors.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractPropertyContainer implements PropertyContainer {
+
+	static IllegalStateException noNameException() {
+		return new IllegalStateException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_REQUIRES_NAME_FOR_MUTATION));
+	}
 
 	@Override
 	public final Property property(String name) {
@@ -48,28 +53,28 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 		return InternalPropertyImpl.create(this, lookup);
 	}
 
-	static IllegalStateException noNameException() {
-		return new IllegalStateException(Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_REQUIRES_NAME_FOR_MUTATION));
-	}
-
 	@Override
 	public final Operation mutate(Parameter<?> parameter) {
-		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), parameter);
+		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException),
+				parameter);
 	}
 
 	@Override
 	public final Operation mutate(MapExpression properties) {
-		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), properties);
+		return Operations.mutate(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException),
+				properties);
 	}
 
 	@Override
 	public final Operation set(Parameter<?> parameter) {
-		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), parameter);
+		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException),
+				parameter);
 	}
 
 	@Override
 	public final Operation set(MapExpression properties) {
-		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException), properties);
+		return Operations.set(this.getSymbolicName().orElseThrow(AbstractPropertyContainer::noNameException),
+				properties);
 	}
 
 	@Override
@@ -81,4 +86,5 @@ abstract class AbstractPropertyContainer implements PropertyContainer {
 	public final MapProjection project(Object... entries) {
 		return getRequiredSymbolicName().project(entries);
 	}
+
 }

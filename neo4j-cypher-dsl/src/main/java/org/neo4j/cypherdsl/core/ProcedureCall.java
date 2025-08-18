@@ -18,17 +18,18 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/StandaloneCall.html">StandaloneCall</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/StandaloneCall.html">StandaloneCall</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
 @API(status = STABLE, since = "2020.0.1")
 public interface ProcedureCall extends Statement, Clause {
+
 }

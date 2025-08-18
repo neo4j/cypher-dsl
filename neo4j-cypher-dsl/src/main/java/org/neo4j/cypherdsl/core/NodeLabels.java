@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Makes a list of {@link NodeLabel node labels} visitable.
@@ -44,11 +44,13 @@ final class NodeLabels implements Visitable {
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		values.forEach(value -> value.accept(visitor));
+		this.values.forEach(value -> value.accept(visitor));
 		visitor.leave(this);
 	}
 
+	@Override
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

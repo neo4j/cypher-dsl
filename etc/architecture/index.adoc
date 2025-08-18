@@ -9,7 +9,7 @@ The rendering feature is part of the core module.
 All other modules depend on the core. As the core reflects the Cypher language, it is not meant to be extendable.
 Therefore, there is little to know API to do so with the AST visitor being the exception.
 
-We document our rules structure with https://www.archunit.org[ArchUnit] within a single unittest named `org.neo4j.cypherdsl.core.PackageAndAPIStructureTest`.
+We document our rules structure with https://www.archunit.org[ArchUnit] within a single unittest named `org.neo4j.cypherdsl.core.PackageAndAPIStructureTests`.
 
 === Coding rules
 

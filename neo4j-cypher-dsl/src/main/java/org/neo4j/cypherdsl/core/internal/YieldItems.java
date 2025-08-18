@@ -18,27 +18,29 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Items yielded by a stand alone or in query call.
  *
  * @author Michael J. Simons
- * @soundtrack Brian May &amp; Kerry Ellis - Golden Days
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
 public final class YieldItems extends TypedSubtree<Expression> {
 
+	private YieldItems(Expression... children) {
+		super(children);
+	}
+
 	/**
-	 * Creates a new {@literal YIELD} expressions
-	 *
-	 * @param c The elements to yield
-	 * @return The new expression
+	 * Creates a new {@literal YIELD} expressions.
+	 * @param c the elements to yield
+	 * @return the new expression
 	 */
 	public static YieldItems yieldAllOf(Expression... c) {
 
@@ -49,7 +51,4 @@ public final class YieldItems extends TypedSubtree<Expression> {
 		return new YieldItems(c);
 	}
 
-	private YieldItems(Expression... children) {
-		super(children);
-	}
 }

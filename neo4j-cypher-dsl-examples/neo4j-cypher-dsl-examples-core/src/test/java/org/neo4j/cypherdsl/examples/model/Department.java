@@ -53,4 +53,5 @@ public final class Department extends AbstractNodeDefinition<Department> {
 	public Department withProperties(MapExpression newProperties) {
 		return new Department(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
 	}
+
 }

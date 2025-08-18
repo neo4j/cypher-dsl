@@ -45,6 +45,9 @@ import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.renderer.Configuration.IndentStyle;
 
 /**
+ * This visitor extends the default visitor and tries to pretty print a Cypher statement,
+ * i.e. using some indentation and linebreaks.
+ *
  * @author Andreas Berger
  * @author Michael J. Simons
  * @author Christophe Willemsen
@@ -56,39 +59,44 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	private final BiConsumer<StringBuilder, Integer> indentionProvider;
 
 	/**
-	 * In contrast to the current level in the {@link DefaultVisitor} that contains the level of elements in the tree.
+	 * In contrast to the current level in the {@link DefaultVisitor} that contains the
+	 * level of elements in the tree.
 	 */
 	private int indentationLevel;
+
 	private boolean passedFirstReadingOrUpdatingClause;
 
 	PrettyPrintingVisitor(StatementContext statementContext, Configuration configuration) {
 		this(statementContext, false, configuration);
 	}
 
-	PrettyPrintingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters, Configuration configuration) {
+	PrettyPrintingVisitor(StatementContext statementContext, boolean renderConstantsAsParameters,
+			Configuration configuration) {
 		super(statementContext, renderConstantsAsParameters, configuration);
 
 		IndentStyle indentStyle = configuration.getIndentStyle();
 		int indentSize = configuration.getIndentSize();
 
 		if (indentStyle == IndentStyle.TAB) {
-			indentionProvider = (builder, width) -> builder.append("\t".repeat(Math.max(0, width)));
-		} else {
-			indentionProvider = (builder, width) -> builder.append(" ".repeat(Math.max(0, width * indentSize)));
+			this.indentionProvider = (builder, width) -> builder.append("\t".repeat(Math.max(0, width)));
+		}
+		else {
+			this.indentionProvider = (builder, width) -> builder.append(" ".repeat(Math.max(0, width * indentSize)));
 		}
 	}
 
 	private void indent(int width) {
-		indentionProvider.accept(builder, width);
+		this.indentionProvider.accept(this.builder, width);
 	}
 
 	@Override
 	void enter(Where where) {
-		if (currentVisitedElements.stream().noneMatch(Return.class::isInstance)) {
-			builder.append("\n");
-			indent(indentationLevel);
-			builder.append("WHERE ");
-		} else {
+		if (this.currentVisitedElements.stream().noneMatch(Return.class::isInstance)) {
+			this.builder.append("\n");
+			indent(this.indentationLevel);
+			this.builder.append("WHERE ");
+		}
+		else {
 			super.enter(where);
 		}
 	}
@@ -96,71 +104,70 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	@Override
 	void enter(Return returning) {
 		trimNewline();
-		indent(indentationLevel);
+		indent(this.indentationLevel);
 		super.enter(returning);
 	}
 
 	@Override
 	void enter(Unwind unwind) {
 		trimNewline();
-		indent(indentationLevel);
+		indent(this.indentationLevel);
 		super.enter(unwind);
 	}
 
 	@Override
 	void enter(With with) {
-		if (passedFirstReadingOrUpdatingClause) {
+		if (this.passedFirstReadingOrUpdatingClause) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
-		passedFirstReadingOrUpdatingClause = true;
+		this.passedFirstReadingOrUpdatingClause = true;
 		super.enter(with);
 	}
 
 	@Override
 	void enter(Set set) {
-		if (currentVisitedElements.stream().noneMatch(MergeAction.class::isInstance)) {
+		if (this.currentVisitedElements.stream().noneMatch(MergeAction.class::isInstance)) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
 		super.enter(set);
 	}
 
 	@Override
 	void enter(Match match) {
-		if (passedFirstReadingOrUpdatingClause) {
+		if (this.passedFirstReadingOrUpdatingClause) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
-		passedFirstReadingOrUpdatingClause = true;
+		this.passedFirstReadingOrUpdatingClause = true;
 		super.enter(match);
 	}
 
 	@Override
 	void enter(Create create) {
-		if (passedFirstReadingOrUpdatingClause) {
+		if (this.passedFirstReadingOrUpdatingClause) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
-		passedFirstReadingOrUpdatingClause = true;
+		this.passedFirstReadingOrUpdatingClause = true;
 		super.enter(create);
 	}
 
 	@Override
 	void enter(PropertyLookup propertyLookup) {
-		if (currentVisitedElements.stream().skip(1).limit(1)
-				.anyMatch(MapExpression.class::isInstance)) {
+		if (this.currentVisitedElements.stream().skip(1).limit(1).anyMatch(MapExpression.class::isInstance)) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
 		super.enter(propertyLookup);
 	}
 
 	@Override
 	void enter(KeyValueMapEntry map) {
-		if (indentationLevel > 0) {
+		if (this.indentationLevel > 0) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
 		super.enter(map);
 	}
@@ -169,7 +176,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	void enter(Condition condition) {
 
 		if (condition instanceof ProvidesAffixes) {
-			indentationLevel++;
+			this.indentationLevel++;
 		}
 		super.enter(condition);
 	}
@@ -178,7 +185,7 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 	void leave(Condition condition) {
 
 		if (condition instanceof ProvidesAffixes) {
-			indentationLevel--;
+			this.indentationLevel--;
 		}
 		super.leave(condition);
 	}
@@ -190,39 +197,40 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 			return;
 		}
 		if (type != Operator.Type.PREFIX && operator != Operator.EXPONENTIATION) {
-			builder.append(" ");
+			this.builder.append(" ");
 		}
 		if (operator == Operator.OR || operator == Operator.AND || operator == Operator.XOR) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
-		builder.append(operator.getRepresentation());
+		this.builder.append(operator.getRepresentation());
 		if (type != Operator.Type.POSTFIX && operator != Operator.EXPONENTIATION) {
-			builder.append(" ");
+			this.builder.append(" ");
 		}
 	}
 
 	@Override
 	void enter(MapExpression map) {
-		indentationLevel++;
+		this.indentationLevel++;
 		int cnt = 0;
-		for (int i = builder.length() - 1; i >= 0; --i) {
-			if (Character.isWhitespace(builder.charAt(i))) {
+		for (int i = this.builder.length() - 1; i >= 0; --i) {
+			if (Character.isWhitespace(this.builder.charAt(i))) {
 				++cnt;
-			} else {
+			}
+			else {
 				break;
 			}
 		}
-		builder.setLength(builder.length() - cnt);
-		builder.append(" ");
+		this.builder.setLength(this.builder.length() - cnt);
+		this.builder.append(" ");
 		super.enter(map);
 	}
 
 	@Override
 	void leave(MapExpression map) {
-		indentationLevel--;
+		this.indentationLevel--;
 		trimNewline();
-		indent(indentationLevel);
+		indent(this.indentationLevel);
 		super.leave(map);
 	}
 
@@ -235,64 +243,64 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Merge merge) {
-		if (passedFirstReadingOrUpdatingClause) {
+		if (this.passedFirstReadingOrUpdatingClause) {
 			trimNewline();
-			indent(indentationLevel);
+			indent(this.indentationLevel);
 		}
-		passedFirstReadingOrUpdatingClause = true;
+		this.passedFirstReadingOrUpdatingClause = true;
 		super.enter(merge);
 	}
 
 	@Override
 	void enter(SubqueryExpression subquery) {
 		super.enter(subquery);
-		indentationLevel++;
+		this.indentationLevel++;
 	}
 
 	@Override
 	void leave(SubqueryExpression subquery) {
-		indentationLevel--;
+		this.indentationLevel--;
 		trimNewline();
-		indent(indentationLevel);
-		builder.append("}");
+		indent(this.indentationLevel);
+		this.builder.append("}");
 	}
 
 	@Override
 	void enter(Subquery subquery) {
-		passedFirstReadingOrUpdatingClause = true;
+		this.passedFirstReadingOrUpdatingClause = true;
 		trimNewline();
-		indent(indentationLevel);
-		indentationLevel++;
+		indent(this.indentationLevel);
+		this.indentationLevel++;
 		super.enter(subquery);
 	}
 
 	@Override
 	void enter(Use use) {
 		trimNewline();
-		indent(indentationLevel);
+		indent(this.indentationLevel);
 		super.enter(use);
 	}
 
 	@Override
 	void leave(Subquery subquery) {
-		indentationLevel--;
+		this.indentationLevel--;
 		trimNewline();
-		indent(indentationLevel);
+		indent(this.indentationLevel);
 
 		this.inSubquery = false;
-		builder.append("} ");
+		this.builder.append("} ");
 	}
 
-
 	private void trimNewline() {
-		for (int i = builder.length() - 1; i >= 0; i--) {
-			if (builder.charAt(i) == ' ') {
-				builder.deleteCharAt(i);
-			} else {
+		for (int i = this.builder.length() - 1; i >= 0; i--) {
+			if (this.builder.charAt(i) == ' ') {
+				this.builder.deleteCharAt(i);
+			}
+			else {
 				break;
 			}
 		}
-		builder.append("\n");
+		this.builder.append("\n");
 	}
 
 	@Override
@@ -300,9 +308,11 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 		Object value = parameter.getValue();
 		if (value instanceof ConstantParameterHolder constantParameterHolder) {
-			builder.append(constantParameterHolder.asString());
-		} else {
+			this.builder.append(constantParameterHolder.asString());
+		}
+		else {
 			super.enter(parameter);
 		}
 	}
+
 }

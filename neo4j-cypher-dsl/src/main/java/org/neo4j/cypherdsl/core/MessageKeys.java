@@ -25,30 +25,51 @@ package org.neo4j.cypherdsl.core;
  */
 final class MessageKeys {
 
-	public static final String ASSERTIONS_EXPRESSION_REQUIRED = "assertions.expression-required";
-	public static final String ASSERTIONS_EXPRESSIONS_REQUIRED = "assertions.expressions-required";
-	public static final String ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED = "assertions.at-least-one-expression-required";
-	public static final String ASSERTIONS_NODE_REQUIRED = "assertions.node-required";
-	public static final String ASSERTIONS_RELATIONSHIP_REQUIRED = "assertions.relationship-required";
-	public static final String ASSERTIONS_VARIABLE_REQUIRED = "assertions.variable-required";
-	public static final String ASSERTIONS_COMPONENTS_REQUIRED = "assertions.components-required";
-	public static final String ASSERTIONS_TEMPORAL_VALUE_REQUIRED = "assertions.temporal-value-required";
-	public static final String ASSERTIONS_YEAR_REQUIRED = "assertions.year-required";
-	public static final String ASSERTIONS_MONTH_REQUIRED = "assertions.month-required";
-	public static final String ASSERTIONS_DAY_REQUIRED = "assertions.day-required";
-	public static final String ASSERTIONS_TZ_REQUIRED = "assertions.tz-required";
-	public static final String ASSERTIONS_RANGE_TARGET_REQUIRED = "assertions.range-target-required";
-	public static final String ASSERTIONS_RANGE_INDEX_REQUIRED = "assertions.range-index-required";
-	public static final String ASSERTIONS_RANGE_START_REQUIRED = "assertions.range-start-required";
-	public static final String ASSERTIONS_RANGE_END_REQUIRED = "assertions.range-end-required";
-	public static final String ASSERTIONS_EXPRESSION_FOR_FUNCTION_REQUIRED = "assertions.expression-for-function-required";
-	public static final String ASSERTIONS_PATTERN_FOR_FUNCTION_REQUIRED = "assertions.pattern-for-function-required";
-	public static final String ASSERTIONS_AT_LEAST_ONE_ARG_REQUIRED = "assertions.at-least-one-arg-required";
-	public static final String ASSERTIONS_CORRECT_USAGE_OF_DISTINCT = "assertions.correct-usage-of-distinct";
-	public static final String ASSERTIONS_NAMED_PATH_REQUIRED = "assertions.named-path-required";
+	static final String ASSERTIONS_EXPRESSION_REQUIRED = "assertions.expression-required";
 
-	public static final String ASSERTIONS_REQUIRES_NAME_FOR_MUTATION = "assertions.requires-name-for-mutation";
+	static final String ASSERTIONS_EXPRESSIONS_REQUIRED = "assertions.expressions-required";
+
+	static final String ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED = "assertions.at-least-one-expression-required";
+
+	static final String ASSERTIONS_NODE_REQUIRED = "assertions.node-required";
+
+	static final String ASSERTIONS_RELATIONSHIP_REQUIRED = "assertions.relationship-required";
+
+	static final String ASSERTIONS_VARIABLE_REQUIRED = "assertions.variable-required";
+
+	static final String ASSERTIONS_COMPONENTS_REQUIRED = "assertions.components-required";
+
+	static final String ASSERTIONS_TEMPORAL_VALUE_REQUIRED = "assertions.temporal-value-required";
+
+	static final String ASSERTIONS_YEAR_REQUIRED = "assertions.year-required";
+
+	static final String ASSERTIONS_MONTH_REQUIRED = "assertions.month-required";
+
+	static final String ASSERTIONS_DAY_REQUIRED = "assertions.day-required";
+
+	static final String ASSERTIONS_TZ_REQUIRED = "assertions.tz-required";
+
+	static final String ASSERTIONS_RANGE_TARGET_REQUIRED = "assertions.range-target-required";
+
+	static final String ASSERTIONS_RANGE_INDEX_REQUIRED = "assertions.range-index-required";
+
+	static final String ASSERTIONS_RANGE_START_REQUIRED = "assertions.range-start-required";
+
+	static final String ASSERTIONS_RANGE_END_REQUIRED = "assertions.range-end-required";
+
+	static final String ASSERTIONS_EXPRESSION_FOR_FUNCTION_REQUIRED = "assertions.expression-for-function-required";
+
+	static final String ASSERTIONS_PATTERN_FOR_FUNCTION_REQUIRED = "assertions.pattern-for-function-required";
+
+	static final String ASSERTIONS_AT_LEAST_ONE_ARG_REQUIRED = "assertions.at-least-one-arg-required";
+
+	static final String ASSERTIONS_CORRECT_USAGE_OF_DISTINCT = "assertions.correct-usage-of-distinct";
+
+	static final String ASSERTIONS_NAMED_PATH_REQUIRED = "assertions.named-path-required";
+
+	static final String ASSERTIONS_REQUIRES_NAME_FOR_MUTATION = "assertions.requires-name-for-mutation";
 
 	private MessageKeys() {
 	}
+
 }

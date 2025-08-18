@@ -18,11 +18,13 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * Representation of a numeric literal.
+ *
  * @author Gerrit Meier
  * @author Michael J. Simons
  * @since 1.0
@@ -42,6 +44,7 @@ public final class NumberLiteral extends LiteralBase<Number> {
 
 	@Override
 	public Number getContent() {
-		return content;
+		return this.content;
 	}
+
 }

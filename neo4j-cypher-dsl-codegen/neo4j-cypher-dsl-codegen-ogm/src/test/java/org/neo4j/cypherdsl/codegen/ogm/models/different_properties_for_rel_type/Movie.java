@@ -28,7 +28,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class Movie {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Long id;
 
 	private String title;

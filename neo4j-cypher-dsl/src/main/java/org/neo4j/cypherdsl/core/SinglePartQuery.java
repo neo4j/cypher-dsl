@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +27,24 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SinglePartQuery.html">SinglePartQuery</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SinglePartQuery.html">SinglePartQuery</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
 class SinglePartQuery extends AbstractStatement implements SingleQuery {
+
+	private final List<Visitable> precedingClauses;
+
+	private SinglePartQuery(List<Visitable> precedingClauses) {
+
+		this.precedingClauses = new ArrayList<>(precedingClauses);
+	}
 
 	static SinglePartQuery create(List<Visitable> precedingClauses, Clause returnOrFinish) {
 
@@ -49,23 +57,17 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 				return new SinglePartQueryAsResultStatementWrapper(precedingClauses);
 			}
 			return new SinglePartQuery(precedingClauses);
-		} else {
+		}
+		else {
 			return new SinglePartQueryWithFinishingClause(precedingClauses, returnOrFinish);
 		}
-	}
-
-	private final List<Visitable> precedingClauses;
-
-	private SinglePartQuery(List<Visitable> precedingClauses) {
-
-		this.precedingClauses = new ArrayList<>(precedingClauses);
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		precedingClauses.forEach(c -> c.accept(visitor));
+		this.precedingClauses.forEach(c -> c.accept(visitor));
 		visitor.leave(this);
 	}
 
@@ -74,6 +76,7 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		private SinglePartQueryAsResultStatementWrapper(List<Visitable> precedingClauses) {
 			super(precedingClauses);
 		}
+
 	}
 
 	static final class SinglePartQueryWithFinishingClause extends SinglePartQuery implements ResultStatement {
@@ -90,7 +93,7 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		public void accept(Visitor visitor) {
 			visitor.enter(this);
 			super.precedingClauses.forEach(c -> c.accept(visitor));
-			finishingClause.accept(visitor);
+			this.finishingClause.accept(visitor);
 			visitor.leave(this);
 		}
 
@@ -98,5 +101,7 @@ class SinglePartQuery extends AbstractStatement implements SingleQuery {
 		public String toString() {
 			return RendererBridge.render(this);
 		}
+
 	}
+
 }

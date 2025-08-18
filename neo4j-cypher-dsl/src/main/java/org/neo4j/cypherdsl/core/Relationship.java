@@ -18,22 +18,23 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.internal.RelationshipLength;
-import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.internal.RelationshipLength;
+import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipPattern.html">RelationshipPattern</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipPattern.html">RelationshipPattern</a>.
  *
  * @author Michael J. Simons
  * @author Philipp Tölle
@@ -41,56 +42,104 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = STABLE, since = "1.0")
 public interface Relationship extends RelationshipPattern, PropertyContainer, ExposesProperties<Relationship>,
-	ExposesPatternLengthAccessors<Relationship> {
+		ExposesPatternLengthAccessors<Relationship> {
 
 	/**
-	 * While the direction in the schema package is centered around the node, the direction here is the direction between two nodes.
+	 * {@return the left-hand side of this relationship}
+	 */
+	Node getLeft();
+
+	/**
+	 * The details containing the types, properties and cardinality.
+	 * @return a wrapper around the details of this relationship.
+	 */
+	Details getDetails();
+
+	/**
+	 * {@return the right-hand side of this relationship}
+	 */
+	Node getRight();
+
+	/**
+	 * {@return the quantifier of this relationship if any}
+	 */
+	QuantifiedPathPattern.Quantifier getQuantifier();
+
+	/**
+	 * Creates a copy of this relationship with a new symbolic name.
+	 * @param newSymbolicName the new symbolic name.
+	 * @return the new relationship.
+	 */
+	Relationship named(String newSymbolicName);
+
+	/**
+	 * Creates a copy of this relationship with a new symbolic name.
+	 * @param newSymbolicName the new symbolic name.
+	 * @return the new relationship.
+	 */
+	Relationship named(SymbolicName newSymbolicName);
+
+	/**
+	 * Creates a new relationship, inverting the direction but keeping the semantics
+	 * intact ({@code (a) --> (b)} becomes {@code (b) <-- (a)}). A symbolic name will be
+	 * removed from this relationship if any, as the it wouldn't be the same pattern to
+	 * match against.
+	 * @return the new relationship
+	 */
+	Relationship inverse();
+
+	/**
+	 * While the direction in the schema package is centered around the node, the
+	 * direction here is the direction between two nodes.
 	 *
 	 * @since 1.0
 	 */
 	@API(status = INTERNAL, since = "1.0")
 	enum Direction {
+
 		/**
-		 * Left to right
+		 * Left to right.
 		 */
 		LTR("-", "->"),
 		/**
-		 * Right to left
+		 * Right to left.
 		 */
 		RTL("<-", "-"),
 		/**
-		 * None
+		 * None.
 		 */
 		UNI("-", "-");
+
+		private final String symbolLeft;
+
+		private final String symbolRight;
 
 		Direction(String symbolLeft, String symbolRight) {
 			this.symbolLeft = symbolLeft;
 			this.symbolRight = symbolRight;
 		}
 
-		private final String symbolLeft;
-
-		private final String symbolRight;
-
 		/**
-		 * @return The symbol to render on the left side of the relationship types.
+		 * {@return the symbol to render on the left side of the relationship types}
 		 */
 		@API(status = INTERNAL)
 		public String getSymbolLeft() {
-			return symbolLeft;
+			return this.symbolLeft;
 		}
 
 		/**
-		 * @return The symbol to render on the right side of the relationship types.
+		 * {@return the symbol to render on the right side of the relationship types}
 		 */
 		@API(status = INTERNAL)
 		public String getSymbolRight() {
-			return symbolRight;
+			return this.symbolRight;
 		}
+
 	}
 
 	/**
-	 * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html">RelationshipDetail</a>.
+	 * See <a href=
+	 * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html">RelationshipDetail</a>.
 	 */
 	@API(status = STABLE, since = "1.0")
 	final class Details implements Visitable {
@@ -100,9 +149,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		 */
 		private final Direction direction;
 
-		@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
-		private volatile SymbolicName symbolicName;
-
 		private final RelationshipTypes types;
 
 		private final RelationshipLength length;
@@ -111,26 +157,11 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 
 		private final Where innerPredicate;
 
-		static Details create(Direction direction, SymbolicName symbolicName, String... types) {
+		@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
+		private volatile SymbolicName symbolicName;
 
-			List<String> listOfTypes = Arrays.stream(types)
-				.filter(type -> !(type == null || type.isEmpty())).toList();
-
-			return create(direction, symbolicName, 	listOfTypes.isEmpty()  ? null : RelationshipTypes.of(types));
-		}
-
-		static Details create(Direction direction, SymbolicName symbolicName, RelationshipTypes types) {
-
-			return new Details(direction, symbolicName, types, null, null, null);
-		}
-
-		private Details(Direction direction,
-			SymbolicName symbolicName,
-			RelationshipTypes types,
-			RelationshipLength length,
-			Properties properties,
-			Where innerPredicate
-		) {
+		private Details(Direction direction, SymbolicName symbolicName, RelationshipTypes types,
+				RelationshipLength length, Properties properties, Where innerPredicate) {
 
 			this.direction = Optional.ofNullable(direction).orElse(Direction.UNI);
 			this.symbolicName = symbolicName;
@@ -140,9 +171,20 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			this.innerPredicate = innerPredicate;
 		}
 
+		static Details create(Direction direction, SymbolicName symbolicName, String... types) {
+
+			List<String> listOfTypes = Arrays.stream(types).filter(type -> !(type == null || type.isEmpty())).toList();
+
+			return create(direction, symbolicName, listOfTypes.isEmpty() ? null : RelationshipTypes.of(types));
+		}
+
+		static Details create(Direction direction, SymbolicName symbolicName, RelationshipTypes types) {
+
+			return new Details(direction, symbolicName, types, null, null, null);
+		}
+
 		/**
 		 * Internal helper method indicating whether the details have content or not.
-		 *
 		 * @return true if any of the details are filled
 		 */
 		public boolean hasContent() {
@@ -152,17 +194,20 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		Details named(SymbolicName newSymbolicName) {
 
 			Assertions.notNull(newSymbolicName, "Symbolic name is required.");
-			return new Details(this.direction, newSymbolicName, this.types, this.length, this.properties, this.innerPredicate);
+			return new Details(this.direction, newSymbolicName, this.types, this.length, this.properties,
+					this.innerPredicate);
 		}
 
 		Details with(Properties newProperties) {
 
-			return new Details(this.direction, this.symbolicName, this.types, this.length, newProperties, this.innerPredicate);
+			return new Details(this.direction, this.symbolicName, this.types, this.length, newProperties,
+					this.innerPredicate);
 		}
 
 		Details unbounded() {
 
-			return new Details(this.direction, this.symbolicName, this.types, RelationshipLength.unbounded(), this.properties, this.innerPredicate);
+			return new Details(this.direction, this.symbolicName, this.types, RelationshipLength.unbounded(),
+					this.properties, this.innerPredicate);
 		}
 
 		Details inverse() {
@@ -170,11 +215,13 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 			if (this.direction == Direction.UNI) {
 				return this;
 			}
-			return new Details(this.direction == Direction.LTR ? Direction.RTL : Direction.LTR, null, this.types, this.length, this.properties, this.innerPredicate);
+			return new Details((this.direction == Direction.LTR) ? Direction.RTL : Direction.LTR, null, this.types,
+					this.length, this.properties, this.innerPredicate);
 		}
 
 		Details where(Expression predicate) {
-			return new Details(this.direction, this.symbolicName, this.types, this.length, this.properties, Where.from(predicate));
+			return new Details(this.direction, this.symbolicName, this.types, this.length, this.properties,
+					Where.from(predicate));
 		}
 
 		Details min(Integer minimum) {
@@ -187,7 +234,8 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 				.map(l -> RelationshipLength.of(minimum, l.getMaximum()))
 				.orElseGet(() -> RelationshipLength.of(minimum, null));
 
-			return new Details(this.direction, this.symbolicName, this.types, newLength, properties, this.innerPredicate);
+			return new Details(this.direction, this.symbolicName, this.types, newLength, this.properties,
+					this.innerPredicate);
 		}
 
 		Details max(Integer maximum) {
@@ -200,19 +248,20 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 				.map(l -> RelationshipLength.of(l.getMinimum(), maximum))
 				.orElseGet(() -> RelationshipLength.of(null, maximum));
 
-			return new Details(this.direction, this.symbolicName, this.types, newLength, properties, this.innerPredicate);
+			return new Details(this.direction, this.symbolicName, this.types, newLength, this.properties,
+					this.innerPredicate);
 		}
 
 		/**
-		 * @return The direction of the relationship.
+		 * {@return the direction of the relationship}
 		 */
 		@API(status = INTERNAL)
 		public Direction getDirection() {
-			return direction;
+			return this.direction;
 		}
 
 		Optional<SymbolicName> getSymbolicName() {
-			return Optional.ofNullable(symbolicName);
+			return Optional.ofNullable(this.symbolicName);
 		}
 
 		SymbolicName getRequiredSymbolicName() {
@@ -231,19 +280,19 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		}
 
 		/**
-		 * @return The relationship types being matched.
+		 * {@return the relationship types being matched}
 		 */
 		@API(status = INTERNAL)
 		public List<String> getTypes() {
-			return types == null ? List.of() : List.copyOf(types.getValues());
+			return (this.types == null) ? List.of() : List.copyOf(this.types.getValues());
 		}
 
 		/**
-		 * @return The properties of this relationship.
+		 * {@return the properties of this relationship}
 		 */
 		@API(status = INTERNAL)
 		public Properties getProperties() {
-			return properties;
+			return this.properties;
 		}
 
 		@Override
@@ -262,53 +311,7 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 		public String toString() {
 			return RendererBridge.render(this);
 		}
+
 	}
 
-	/**
-	 * @return the left-hand side of this relationship
-	 */
-	Node getLeft();
-
-	/**
-	 * The details containing the types, properties and cardinality.
-	 *
-	 * @return A wrapper around the details of this relationship.
-	 */
-	Details getDetails();
-
-	/**
-	 * @return the right-hand side of this relationship
-	 */
-	Node getRight();
-
-	/**
-	 * {@return the quantifier of this relationship if any}
-	 */
-	QuantifiedPathPattern.Quantifier getQuantifier();
-
-	/**
-	 * Creates a copy of this relationship with a new symbolic name.
-	 *
-	 * @param newSymbolicName the new symbolic name.
-	 * @return The new relationship.
-	 */
-	Relationship named(String newSymbolicName);
-
-	/**
-	 * Creates a copy of this relationship with a new symbolic name.
-	 *
-	 * @param newSymbolicName the new symbolic name.
-	 * @return The new relationship.
-	 */
-	Relationship named(SymbolicName newSymbolicName);
-
-	/**
-	 * Creates a new relationship, inverting the direction but keeping the semantics intact
-	 * ({@code (a) --> (b)} becomes {@code (b) <-- (a)}).
-	 * A symbolic name will be removed from this relationship if any, as the it wouldn't be the same pattern to match
-	 * against.
-	 *
-	 * @return the new relationship
-	 */
-	Relationship inverse();
 }

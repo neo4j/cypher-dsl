@@ -30,48 +30,18 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
- * Some logic to rewrite a couple of functions for Neo4j 5, among them:
- * <ul>
- *     <li><pre>exists(n.prop)</pre></li>
- *     <li><pre>distance(p)</pre></li>
- * </ul>
+ * Some logic to rewrite a couple of functions for Neo4j 5.
  *
  * @author Michael J. Simons
- * @soundtrack Red Hot Chili Peppers - Unlimited Love
  * @since 2022.3.0
  */
-@RegisterForReflection(allDeclaredConstructors = true) final class Neo4j5FunctionInvocationVisitor implements Visitor {
+@RegisterForReflection(allDeclaredConstructors = true)
+final class Neo4j5FunctionInvocationVisitor implements Visitor {
 
 	private final DefaultVisitor delegate;
 
 	Neo4j5FunctionInvocationVisitor(DefaultVisitor delegate) {
 		this.delegate = delegate;
-	}
-
-	@Override
-	public void enter(Visitable visitable) {
-
-		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
-		if ("distance".equals(functionInvocation.getFunctionName())) {
-			delegate.builder.append("point.distance(");
-		} else if ("elementId".equals(functionInvocation.getFunctionName())) {
-			delegate.builder.append("elementId(");
-		} else if (!isNPropExists(visitable)) {
-			delegate.enter(functionInvocation);
-		}
-	}
-
-	@Override
-	public void leave(Visitable visitable) {
-
-		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
-		if (isNPropExists(visitable)) {
-			delegate.builder.append(" IS NOT NULL");
-		} else if ("elementId".equals(functionInvocation.getFunctionName())) {
-			delegate.builder.append(")");
-		} else {
-			delegate.leave(functionInvocation);
-		}
 	}
 
 	static boolean isNPropExists(Visitable visitable) {
@@ -102,12 +72,44 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 		return false;
 	}
 
+	@Override
+	public void enter(Visitable visitable) {
+
+		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
+		if ("distance".equals(functionInvocation.getFunctionName())) {
+			this.delegate.builder.append("point.distance(");
+		}
+		else if ("elementId".equals(functionInvocation.getFunctionName())) {
+			this.delegate.builder.append("elementId(");
+		}
+		else if (!isNPropExists(visitable)) {
+			this.delegate.enter(functionInvocation);
+		}
+	}
+
+	@Override
+	public void leave(Visitable visitable) {
+
+		FunctionInvocation functionInvocation = (FunctionInvocation) visitable;
+		if (isNPropExists(visitable)) {
+			this.delegate.builder.append(" IS NOT NULL");
+		}
+		else if ("elementId".equals(functionInvocation.getFunctionName())) {
+			this.delegate.builder.append(")");
+		}
+		else {
+			this.delegate.leave(functionInvocation);
+		}
+	}
+
 	static class SingleArgExtractor<T> extends VisitorWithResult {
 
 		final Class<T> expectedType;
 
 		boolean insideArguments;
+
 		int level = 0;
+
 		T singleArg;
 
 		SingleArgExtractor(Class<T> expectedType) {
@@ -121,19 +123,21 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 				return EnterResult.CONTINUE;
 			}
 
-			if (++level == 2) {
-				insideArguments = true;
+			if (++this.level == 2) {
+				this.insideArguments = true;
 			}
 
-			if (insideArguments && level == 3 && expectedType.isInstance(segment)) {
-				singleArg = singleArg == null ? (T) segment : null;
+			if (this.insideArguments && this.level == 3 && this.expectedType.isInstance(segment)) {
+				this.singleArg = (this.singleArg != null) ? null : (T) segment;
 			}
 			return EnterResult.CONTINUE;
 		}
 
 		@Override
 		public void leave(Visitable segment) {
-			insideArguments = level-- != 2;
+			this.insideArguments = this.level-- != 2;
 		}
+
 	}
+
 }

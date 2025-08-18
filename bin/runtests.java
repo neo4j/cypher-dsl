@@ -8,7 +8,9 @@ import org.junit.platform.console.ConsoleLauncher;
  * This script is mainly used to execute our tests standalone in CI with JDK 8.
  */
 public class runtests {
-	public static void main(String...a) {
+
+	public static void main(String... a) {
 		ConsoleLauncher.main(a);
 	}
+
 }

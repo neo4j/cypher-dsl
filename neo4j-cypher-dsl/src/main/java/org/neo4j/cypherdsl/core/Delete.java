@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,8 +25,12 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Delete.html">Delete</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Delete.html">Delete</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -37,12 +38,20 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = STABLE, since = "1.0")
 public final class Delete extends AbstractClause implements UpdatingClause {
 
+	private final ExpressionList deleteItems;
+
+	private final boolean detach;
+
+	Delete(ExpressionList deleteItems, boolean detach) {
+		this.deleteItems = deleteItems;
+		this.detach = detach;
+	}
+
 	/**
 	 * Creates a {@literal DELETE} clause deleting the given items.
-	 *
-	 * @param toBeDeleted The item to be deleted
-	 * @param more        More items to be deleted
-	 * @return A {@link Delete} clause
+	 * @param toBeDeleted the item to be deleted
+	 * @param more more items to be deleted
+	 * @return a {@link Delete} clause
 	 * @since 2023.4.0
 	 */
 	static Delete delete(Expression toBeDeleted, Expression... more) {
@@ -51,11 +60,11 @@ public final class Delete extends AbstractClause implements UpdatingClause {
 
 	/**
 	 * Creates a {@literal DELETE} clause deleting the given items.
-	 *
-	 * @param detach      Set to {@literal true} for {@literal DELETE} clause detaching all items
-	 * @param toBeDeleted The item to be deleted
-	 * @param more        More items to be deleted
-	 * @return A {@link Delete} clause
+	 * @param detach set to {@literal true} for {@literal DELETE} clause detaching all
+	 * items
+	 * @param toBeDeleted the item to be deleted
+	 * @param more more items to be deleted
+	 * @return a {@link Delete} clause
 	 * @since 2023.4.0
 	 */
 	static Delete delete(boolean detach, Expression toBeDeleted, Expression... more) {
@@ -72,37 +81,28 @@ public final class Delete extends AbstractClause implements UpdatingClause {
 
 	/**
 	 * Creates a detaching {@literal DELETE} clause deleting the given items.
-	 *
-	 * @param toBeDeleted The item to be deleted
-	 * @param more        More items to be deleted
-	 * @return A {@link Delete} clause
+	 * @param toBeDeleted the item to be deleted
+	 * @param more more items to be deleted
+	 * @return a {@link Delete} clause
 	 * @since 2023.4.0
 	 */
 	static Delete detachDelete(Expression toBeDeleted, Expression... more) {
 		return delete(true, toBeDeleted, more);
 	}
 
-	private final ExpressionList deleteItems;
-
-	private final boolean detach;
-
-	Delete(ExpressionList deleteItems, boolean detach) {
-		this.deleteItems = deleteItems;
-		this.detach = detach;
-	}
-
 	/**
-	 * @return True, if the {@code DETACH} keyword needs to be included.
+	 * {@return true, if the `DETACH` keyword needs to be included}
 	 */
 	@API(status = INTERNAL)
 	public boolean isDetach() {
-		return detach;
+		return this.detach;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		deleteItems.accept(visitor);
+		this.deleteItems.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

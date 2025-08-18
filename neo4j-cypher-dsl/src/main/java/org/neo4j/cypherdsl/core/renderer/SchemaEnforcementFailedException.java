@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.io.Serial;
 
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Thrown when schema validation fails.
@@ -42,4 +42,5 @@ public final class SchemaEnforcementFailedException extends RuntimeException {
 	public SchemaEnforcementFailedException() {
 		// Make the Java module system happy.
 	}
+
 }

@@ -18,14 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * This wraps a function into a condition so that it can be used in a where clause. The function is supposed to return a
- * boolean value.
+ * This wraps a function into a condition so that it can be used in a where clause. The
+ * function is supposed to return a boolean value.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -41,6 +41,7 @@ final class BooleanFunctionCondition implements Condition {
 
 	@Override
 	public void accept(Visitor visitor) {
-		delegate.accept(visitor);
+		this.delegate.accept(visitor);
 	}
+
 }

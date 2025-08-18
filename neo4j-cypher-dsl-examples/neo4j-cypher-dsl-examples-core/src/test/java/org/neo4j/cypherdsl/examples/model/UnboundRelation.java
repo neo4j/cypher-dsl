@@ -28,14 +28,14 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 /**
  * Basically only the holder of the type.
  *
+ * @param <S> start node
+ * @param <E> end node
  * @author Michael J. Simons
- * @param <S> Start node
- * @param <E> End node
  */
 public final class UnboundRelation<S extends NodeBase<?>, E extends NodeBase<?>>
-	extends RelationshipBase<S, E, UnboundRelation<S, E>> {
+		extends RelationshipBase<S, E, UnboundRelation<S, E>> {
 
-	public static final String $TYPE  = "UNBOUND";
+	public static final String $TYPE = "UNBOUND";
 
 	protected UnboundRelation(S start, E end) {
 		super(start, $TYPE, end);
@@ -54,7 +54,8 @@ public final class UnboundRelation<S extends NodeBase<?>, E extends NodeBase<?>>
 	@Override
 	public UnboundRelation<S, E> withProperties(MapExpression newProperties) {
 
-		return new UnboundRelation<>(getSymbolicName().orElse(null), getLeft(),
-			Properties.create(newProperties), getRight());
+		return new UnboundRelation<>(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties),
+				getRight());
 	}
+
 }

@@ -24,7 +24,10 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 public interface GenreRepository extends Neo4jRepository<Genre, UUID>, CypherdslStatementExecutor<Genre> {
+
 }

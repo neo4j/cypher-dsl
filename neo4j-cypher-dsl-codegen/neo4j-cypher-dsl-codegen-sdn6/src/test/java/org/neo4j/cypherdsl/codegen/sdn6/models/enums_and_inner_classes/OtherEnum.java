@@ -22,5 +22,7 @@ package org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes;
  * @author Michael J. Simons
  */
 public enum OtherEnum {
+
 	A, B
+
 }

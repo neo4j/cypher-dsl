@@ -57,7 +57,7 @@ They use the following imports:
 .Imports needed for the examples to compile
 [source, java]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-imports]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-imports]
 ----
 
 To match and return all the movie, build your statement like this:
@@ -65,7 +65,7 @@ To match and return all the movie, build your statement like this:
 .Simple match
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e1]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e1]
 ----
 <.> Declare a variable storing your node labeled `Movie` and named `m`, so that you can
 <.> reuse it in both the match and the return part.
@@ -78,7 +78,7 @@ Match all nodes with a given set of properties:
 .Find the actor named "Tom Hanks"...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e2]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e2]
 ----
 
 Limit the number of returned things and return only one attribute
@@ -86,7 +86,7 @@ Limit the number of returned things and return only one attribute
 .Find 10 people...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e4]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e4]
 ----
 
 Create complex conditions
@@ -94,7 +94,7 @@ Create complex conditions
 .Find movies released in the 1990s...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e5]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e5]
 ----
 
 ==== Query
@@ -104,25 +104,25 @@ Build relationships
 .List all Tom Hanks movies...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e6]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e6]
 ----
 
 .Who directed "Cloud Atlas"?
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e7]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e7]
 ----
 
 .Tom Hanks' co-actors...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e8]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e8]
 ----
 
 .How people are related to "Cloud Atlas"...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-e9]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-e9]
 ----
 
 ==== Solve
@@ -130,7 +130,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 .Movies and actors up to 4 "hops" away from Kevin Bacon
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-bacon]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-bacon]
 ----
 
 ==== Recommend
@@ -138,7 +138,7 @@ include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test
 .Extend Tom Hanks co-actors, to find co-co-actors who haven't worked with Tom Hanks...
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=cypher-dsl-r]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=cypher-dsl-r]
 ----
 
 === More features
@@ -157,7 +157,7 @@ The following example shows how to access them and how to use it:
 
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=collecting-params]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=collecting-params]
 ----
 <.> The names contain all placeholders, also those without a value
 <.> The parameter map contains only parameters with defined values
@@ -171,7 +171,7 @@ A statement can render itself as well:
 [source, java]
 ----
 var statement = Cypher.returning(literalTrue().as("t")).build();
-var cypher = statement.getCypher();
+var cypher = this.statement.getCypher();
 assertThat(cypher).isEqualTo("RETURN true AS t");
 ----
 
@@ -187,8 +187,6 @@ expressions are included. In addition, properties are also available.
 Those information can be used when dynamically building a query to verify the presence of required expressions
 or use them for further refinement.
 
-The feature plays well with the <<driver-integration,driver integration>> and could be directly used to define mapping functions.
-
 Statements parsed via the optional <<cypher-parser,parser module>> are also able to return their identifiable expressions.
 The use case here might be evaluating a statement defined by a user being parsed and then checked if everything required is returned.
 
@@ -202,7 +200,7 @@ The class offers a couple of static convenience methods for retrieving some vari
 
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=pretty-printing-examle]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=pretty-printing-examle]
 ----
 <.> Get a "pretty printing" instance of the renderer configuration and retrieve a renderer based on it
 <.> Enjoy formatted Cypher.
@@ -216,7 +214,7 @@ the pretty printing renderer:
 
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=escaping]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=escaping]
 ----
 
 ==== Inserting raw Cypher
@@ -226,7 +224,7 @@ Users discretion is advised:
 
 [source, java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTest.java[tag=raw-cypher]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-core/src/test/java/org/neo4j/cypherdsl/examples/core/CypherDSLExamplesTests.java[tag=raw-cypher]
 ----
 <.> The Cypher-DSL doesn't support a dynamic lookup of properties on expression at the moment.
     We use a raw Cypher string with the placeholder `$E` which resolves to the symbolic name also passed to the `raw` function.
@@ -261,7 +259,7 @@ The Cypher-DSL offers a catalog view on statements. After a statement has been b
 .Using the statement catalog from a constructed statement
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/StatementCatalogBuildingVisitorTest.java[tag=catalog-example]
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/StatementCatalogBuildingVisitorTests.java[tag=catalog-example]
 ----
 
 In the above example the catalog contains all labels and types used (`Movie`, `Person`, `ACTED_IN`) and all conditions
@@ -273,5 +271,5 @@ This becomes especially powerful when combining with the optional <<cypher-parse
 .Using the statement catalog from a parsed statement
 [source,java,indent=0,tabsize=4]
 ----
-include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/StatementCatalogBuildingVisitorViaParserTest.java[tag=catalog-example]
+include::../../neo4j-cypher-dsl-examples/neo4j-cypher-dsl-examples-parser/src/test/java/org/neo4j/cypherdsl/examples/parser/StatementCatalogBuildingVisitorViaParserTests.java[tag=catalog-example]
 ----

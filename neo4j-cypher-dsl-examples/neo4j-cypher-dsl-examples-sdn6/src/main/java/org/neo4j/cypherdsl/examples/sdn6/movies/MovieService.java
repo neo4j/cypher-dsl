@@ -19,16 +19,20 @@
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 // tag::as-property[]
+
 import java.util.Collection;
 import java.util.List;
 
 import org.neo4j.cypherdsl.core.Cypher;
+
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 // end::as-property[]
 
 /**
+ * Example service.
+ *
  * @author Michael J. Simons
  */
 // tag::as-property[]
@@ -43,8 +47,7 @@ final class MovieService {
 
 	List<Movie> findAll() {
 
-		return movieRepository
-			.findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); // <.>
+		return this.movieRepository.findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); // <.>
 	}
 	// end::as-property[]
 
@@ -61,16 +64,18 @@ final class MovieService {
 			.with(p)
 			.optionalMatch(new ActedIn_(p, a))
 			.optionalMatch(new Directed_(p, d))
-			.with(Cypher.collect(a).add(Cypher.collect(d))
-				.as("movies"))
-			.unwind("movies").as(m)
+			.with(Cypher.collect(a).add(Cypher.collect(d)).as("movies"))
+			.unwind("movies")
+			.as(m)
 			.returningDistinct(m)
-			.orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
+			.orderBy(Movie_.MOVIE.named(m).TITLE)
+			.ascending()
 			.build();
 
 		return this.movieRepository.findAll(statement);
 	}
 	// end::more-examples[]
 	// tag::as-property[]
+
 }
 // end::as-property[]

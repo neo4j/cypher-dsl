@@ -23,6 +23,7 @@ import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
  * Random test class.
+ *
  * @param value a value
  */
 @NodeEntity

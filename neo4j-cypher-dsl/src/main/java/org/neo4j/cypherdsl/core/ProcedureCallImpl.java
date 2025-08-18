@@ -18,32 +18,23 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * An internal implementation of a {@link ProcedureCall} to distinquish between calls that return ("yield") a set of things
- * and those who don't.
+ * An internal implementation of a {@link ProcedureCall} to distinguish between calls that
+ * return ("yield") a set of things and those who don't.
  *
  * @author Michael J. Simons
  * @since 2021.2.1
  */
 @API(status = INTERNAL, since = "2021.2.1")
 class ProcedureCallImpl extends AbstractStatement implements ProcedureCall {
-
-	static ProcedureCall create(ProcedureName name, Arguments arguments, YieldItems yieldItems, Where optionalWhere) {
-
-		if (yieldItems != null) {
-			return new ProcedureCallImplWithResult(name, arguments, yieldItems, optionalWhere);
-		} else {
-			return new ProcedureCallImpl(name, arguments, null, optionalWhere);
-		}
-	}
 
 	private final ProcedureName name;
 
@@ -56,9 +47,19 @@ class ProcedureCallImpl extends AbstractStatement implements ProcedureCall {
 	private ProcedureCallImpl(ProcedureName name, Arguments arguments, YieldItems yieldItems, Where optionalWhere) {
 
 		this.name = name;
-		this.arguments = arguments == null ? new Arguments() : arguments;
+		this.arguments = (arguments != null) ? arguments : new Arguments();
 		this.yieldItems = yieldItems;
 		this.optionalWhere = optionalWhere;
+	}
+
+	static ProcedureCall create(ProcedureName name, Arguments arguments, YieldItems yieldItems, Where optionalWhere) {
+
+		if (yieldItems != null) {
+			return new ProcedureCallImplWithResult(name, arguments, yieldItems, optionalWhere);
+		}
+		else {
+			return new ProcedureCallImpl(name, arguments, null, optionalWhere);
+		}
 	}
 
 	@Override
@@ -66,17 +67,19 @@ class ProcedureCallImpl extends AbstractStatement implements ProcedureCall {
 
 		visitor.enter(this);
 		this.name.accept(visitor);
-		Visitable.visitIfNotNull(arguments, visitor);
-		Visitable.visitIfNotNull(yieldItems, visitor);
-		Visitable.visitIfNotNull(optionalWhere, visitor);
+		Visitable.visitIfNotNull(this.arguments, visitor);
+		Visitable.visitIfNotNull(this.yieldItems, visitor);
+		Visitable.visitIfNotNull(this.optionalWhere, visitor);
 		visitor.leave(this);
 	}
 
 	static final class ProcedureCallImplWithResult extends ProcedureCallImpl implements ResultStatement {
 
-		private ProcedureCallImplWithResult(ProcedureName name, Arguments arguments,
-			YieldItems yieldItems, Where optionalWhere) {
+		private ProcedureCallImplWithResult(ProcedureName name, Arguments arguments, YieldItems yieldItems,
+				Where optionalWhere) {
 			super(name, arguments, yieldItems, optionalWhere);
 		}
+
 	}
+
 }

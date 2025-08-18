@@ -27,12 +27,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.BiFunction;
 
 import org.neo4j.cypherdsl.core.Statement;
-import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
-import org.neo4j.cypherdsl.core.ast.Visitable;
-import org.neo4j.cypherdsl.core.utils.LRUCache;
 import org.neo4j.cypherdsl.core.StatementContext;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
+import org.neo4j.cypherdsl.core.utils.LRUCache;
 
 /**
+ * The default renderer for any Cypher-DSL statement.
+ *
  * @author Michael J. Simons
  * @author Gerrit Meier
  * @since 1.0
@@ -40,28 +42,31 @@ import org.neo4j.cypherdsl.core.StatementContext;
 final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 
 	private static final Map<Configuration, ConfigurableRenderer> CONFIGURATIONS = new ConcurrentHashMap<>(8);
-	private static final int STATEMENT_CACHE_SIZE = 128;
 
-	/**
-	 * Creates a new instance of the configurable renderer or uses an existing one matching the  given configuration
-	 *
-	 * @param configuration The configuration for the render
-	 * @return A new renderer
-	 */
-	static ConfigurableRenderer create(Configuration configuration) {
-		return CONFIGURATIONS.computeIfAbsent(configuration, ConfigurableRenderer::new);
-	}
+	private static final int STATEMENT_CACHE_SIZE = 128;
 
 	private final LRUCache<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
-	private final Lock read = lock.readLock();
-	private final Lock write = lock.writeLock();
+
+	private final Lock read = this.lock.readLock();
+
+	private final Lock write = this.lock.writeLock();
 
 	private final Configuration configuration;
 
 	ConfigurableRenderer(Configuration configuration) {
 		this.configuration = configuration;
+	}
+
+	/**
+	 * Creates a new instance of the configurable renderer or uses an existing one
+	 * matching the given configuration.
+	 * @param configuration the configuration for the render
+	 * @return a new renderer
+	 */
+	static ConfigurableRenderer create(Configuration configuration) {
+		return CONFIGURATIONS.computeIfAbsent(configuration, ConfigurableRenderer::new);
 	}
 
 	@Override
@@ -70,8 +75,10 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 	}
 
 	@Override
-	// This is about not using map.computeIfAbsent. This is done very much on purpose to keep this
-	// class thread safe. The LRUCache is basically LinkedHashMap and the method wouldn't be threadsafe.
+	// This is about not using map.computeIfAbsent. This is done very much on purpose to
+	// keep this
+	// class thread safe. The LRUCache is basically LinkedHashMap and the method wouldn't
+	// be threadsafe.
 	@SuppressWarnings("squid:S3824")
 	public String render(Visitable visitable) {
 
@@ -82,33 +89,40 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 			var renderingVisitor = createVisitor(cfg.ctx, cfg.renderConstantsAsParameters);
 			v.accept(renderingVisitor);
 			var result = renderingVisitor.getRenderedContent().trim();
-			return configuration.getDialect().getPrefix().map(pv -> pv + result).orElse(result);
+			return this.configuration.getDialect().getPrefix().map(pv -> pv + result).orElse(result);
 		};
 
 		if (visitable instanceof Statement statement) {
 			String renderedContent;
 
-			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters(), configuration.getDialect());
+			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters(),
+					this.configuration.getDialect());
 			try {
-				read.lock();
-				renderedContent = renderedStatementCache.get(key);
-			} finally {
-				read.unlock();
+				this.read.lock();
+				renderedContent = this.renderedStatementCache.get(key);
+			}
+			finally {
+				this.read.unlock();
 			}
 
 			if (renderedContent == null) {
 				try {
-					write.lock();
-					renderedContent = renderOp.apply(new RenderingConfig(statement.getContext(), statement.isRenderConstantsAsParameters()), statement);
-					renderedStatementCache.put(key, renderedContent);
-				} catch (SchemaEnforcementFailedException e) {
+					this.write.lock();
+					renderedContent = renderOp.apply(
+							new RenderingConfig(statement.getContext(), statement.isRenderConstantsAsParameters()),
+							statement);
+					this.renderedStatementCache.put(key, renderedContent);
+				}
+				catch (SchemaEnforcementFailedException ex) {
 					renderedContent = "";
-				} finally {
-					write.unlock();
+				}
+				finally {
+					this.write.unlock();
 				}
 			}
 			return renderedContent;
-		} else {
+		}
+		else {
 			return renderOp.apply(new RenderingConfig(new DefaultStatementContext(), false), visitable);
 		}
 	}
@@ -117,7 +131,8 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 
 		if (!this.configuration.isPrettyPrint()) {
 			return new DefaultVisitor(statementContext, renderConstantsAsParameters, this.configuration);
-		} else {
+		}
+		else {
 			return new PrettyPrintingVisitor(statementContext, renderConstantsAsParameters, this.configuration);
 		}
 	}

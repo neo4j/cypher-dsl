@@ -21,21 +21,21 @@ package org.neo4j.cypherdsl.examples.sdn6.movies;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
+ * Demo class.
+ *
  * @author Michael J. Simons
  */
 @RelationshipProperties
 public final class Actor {
-
-	@Id @GeneratedValue Long id;
 
 	@TargetNode
 	@JsonIgnore
@@ -43,21 +43,26 @@ public final class Actor {
 
 	private final List<String> roles;
 
+	@Id
+	@GeneratedValue
+	Long id;
+
 	public Actor(Person person, List<String> roles) {
 		this.person = person;
 		this.roles = roles;
 	}
 
 	public Person getPerson() {
-		return person;
+		return this.person;
 	}
 
 	@JsonProperty
 	public String getName() {
-		return person.getName();
+		return this.person.getName();
 	}
 
 	public List<String> getRoles() {
-		return Collections.unmodifiableList(roles);
+		return Collections.unmodifiableList(this.roles);
 	}
+
 }

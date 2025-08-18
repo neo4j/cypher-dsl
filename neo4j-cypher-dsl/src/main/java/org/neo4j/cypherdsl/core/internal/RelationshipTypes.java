@@ -18,16 +18,17 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Arrays;
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html#RelationshipTypes">RelationshipTypes</a>
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipDetail.html#RelationshipTypes">RelationshipTypes</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -37,34 +38,34 @@ public final class RelationshipTypes implements Visitable {
 
 	private final List<String> values;
 
-	/**
-	 * Creates a new holder for relationship types from a set of raw strings
-	 *
-	 * @param types The types to be included in this value holder
-	 * @return A new value holder
-	 */
-	public static RelationshipTypes of(String... types) {
-
-		List<String> listOfTypes = Arrays.stream(types)
-			.filter(type -> !(type == null || type.isEmpty()))
-			.toList();
-
-		return new RelationshipTypes(listOfTypes);
-	}
-
 	private RelationshipTypes(List<String> values) {
 		this.values = values;
 	}
 
 	/**
-	 * @return the list of types. The types are not escaped and must be escaped prior to rendering.
+	 * Creates a new holder for relationship types from a set of raw strings.
+	 * @param types the types to be included in this value holder
+	 * @return a new value holder
+	 */
+	public static RelationshipTypes of(String... types) {
+
+		List<String> listOfTypes = Arrays.stream(types).filter(type -> !(type == null || type.isEmpty())).toList();
+
+		return new RelationshipTypes(listOfTypes);
+	}
+
+	/**
+	 * Returns the list of types. The types are not escaped and must be escaped prior to *
+	 * rendering.
+	 * @return the list of types
 	 */
 	public List<String> getValues() {
-		return values;
+		return this.values;
 	}
 
 	@Override
 	public String toString() {
-		return "RelationshipTypes{values=" + values + '}';
+		return "RelationshipTypes{values=" + this.values + '}';
 	}
+
 }

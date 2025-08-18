@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * This interface represents an element that has properties.
@@ -33,12 +33,11 @@ import org.apiguardian.api.API;
 public interface PropertyAccessor {
 
 	/**
-	 * Creates a new {@link Property} associated with this element. This property can be used as a lookup in
-	 * other expressions. It does not add a value to the property.
+	 * Creates a new {@link Property} associated with this element. This property can be
+	 * used as a lookup in other expressions. It does not add a value to the property.
 	 * <p>
-	 * Note: The element does not track property creation and there is no possibility to enumerate all
-	 * properties that have been created for this property container.
-	 *
+	 * Note: The element does not track property creation and there is no possibility to
+	 * enumerate all properties that have been created for this property container.
 	 * @param name property name, must not be {@literal null} or empty.
 	 * @return a new {@link Property} associated with this element
 	 */
@@ -47,25 +46,27 @@ public interface PropertyAccessor {
 	}
 
 	/**
+	 * Returns a new {@link Property} associated with this element.
 	 * @param names a list of nested property names
 	 * @return a new {@link Property} associated with this element
-	 * @see  #property(String)
+	 * @see #property(String)
 	 */
 	Property property(String... names);
 
 	/**
-	 * Creates a new {@link Property} associated with this element. This property can be used as a lookup in
-	 * other expressions. It does not add a value to the property.
+	 * Creates a new {@link Property} associated with this element. This property can be
+	 * used as a lookup in other expressions. It does not add a value to the property.
 	 * <p>
-	 * The new {@link Property} object is a dynamic lookup, based on the {@code expression} passed to this method. The
-	 * expression can be example another property, a function result or a Cypher parameter. A property defined in such a way will
-	 * render as {@code p[expression]}.
+	 * The new {@link Property} object is a dynamic lookup, based on the
+	 * {@code expression} passed to this method. The expression can be example another
+	 * property, a function result or a Cypher parameter. A property defined in such a way
+	 * will render as {@code p[expression]}.
 	 * <p>
-	 * Note: The element does not track property creation and there is no possibility to enumerate all
-	 * properties that have been created for this property container.
-	 *
+	 * Note: The element does not track property creation and there is no possibility to
+	 * enumerate all properties that have been created for this property container.
 	 * @param lookup the expression that is evaluated to lookup this property.
 	 * @return a new {@link Property} associated with this element
 	 */
 	Property property(Expression lookup);
+
 }

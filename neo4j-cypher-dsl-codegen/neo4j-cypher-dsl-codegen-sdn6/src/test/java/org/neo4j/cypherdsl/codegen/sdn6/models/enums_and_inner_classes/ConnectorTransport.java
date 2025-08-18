@@ -28,26 +28,6 @@ import org.springframework.data.neo4j.core.schema.Node;
 @Node(labels = "Transport")
 public class ConnectorTransport {
 
-	/**
-	 * Some enum
-	 */
-	public enum ConnectorTransportType {
-
-		HTTP, BOLT
-	}
-
-	/**
-	 * An inner class
-	 */
-	public static class InnerClass {
-
-		/**
-		 * With a nested inner class (used to check whether the recursive algorithm stops at some point)
-		 */
-		public static class InnerInnerClass {
-		}
-	}
-
 	@Id
 	private final ConnectorTransportType value;
 
@@ -61,4 +41,29 @@ public class ConnectorTransport {
 	public ConnectorTransport(ConnectorTransportType value) {
 		this.value = value;
 	}
+
+	/**
+	 * Some enum
+	 */
+	public enum ConnectorTransportType {
+
+		HTTP, BOLT
+
+	}
+
+	/**
+	 * An inner class
+	 */
+	public static class InnerClass {
+
+		/**
+		 * With a nested inner class (used to check whether the recursive algorithm stops
+		 * at some point)
+		 */
+		public static class InnerInnerClass {
+
+		}
+
+	}
+
 }

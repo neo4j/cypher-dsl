@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 "Neo4j,"
+ * Copyright (c) 2019-2025 "Neo4j,"
  * Neo4j Sweden AB [https://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -17,16 +17,18 @@
  * limitations under the License.
  */
 /**
- * Contains an internal DSL for creating Cypher. This API is in an experimental status at the moment and might change
- * without further notice.
+ * Contains an internal DSL for creating Cypher. This API is in an experimental status at
+ * the moment and might change without further notice.
  * <p>
- * While we have extensive tests in place to check that queries SDN needs are correctly generated, the AST itself is not
- * validated for type errors. That is, one could misuse the DSL here to create an AST that renders to a syntactically
- * correct Cypher statement, that will explode during runtime. For example using wrongly typed expression (an expression
- * referencing a list while a map is needed or something like that).
+ * While we have extensive tests in place to check that queries SDN needs are correctly
+ * generated, the AST itself is not validated for type errors. That is, one could misuse
+ * the DSL here to create an AST that renders to a syntactically correct Cypher statement,
+ * that will explode during runtime. For example using wrongly typed expression (an
+ * expression referencing a list while a map is needed or something like that).
  * <p>
- * With this in mind, please use this DSL consciously if you find it useful. It won't go away anytime soon, but might
- * change in ways that break your code without further notice.
+ * With this in mind, please use this DSL consciously if you find it useful. It won't go
+ * away anytime soon, but might change in ways that break your code without further
+ * notice.
  *
  * @author Michael J. Simons
  */

@@ -20,40 +20,40 @@ package org.neo4j.cypherdsl.core;
 
 import java.time.Duration;
 
-
 /**
- * A literal representing a duration value to be formatted in a way that Neo4j's Cypher understands it.
+ * A literal representing a duration value to be formatted in a way that Neo4j's Cypher
+ * understands it.
  *
  * @author Michael J. Simons
  * @since 2023.2.1
  */
 final class DurationLiteral extends LiteralBase<Duration> {
 
-	static Literal<Duration> of(Duration duration) {
-		return new DurationLiteral(duration);
-	}
-
 	private DurationLiteral(Duration content) {
 		super(content);
 	}
 
+	static Literal<Duration> of(Duration duration) {
+		return new DurationLiteral(duration);
+	}
+
 	@Override
 	public Duration getContent() {
-		return content;
+		return this.content;
 	}
 
 	@Override
 	public String asString() {
 		var result = new StringBuilder();
 		result.append("duration('P");
-		if (content.toDaysPart() != 0L) {
-			result.append(content.toDaysPart()).append("D");
+		if (this.content.toDaysPart() != 0L) {
+			result.append(this.content.toDaysPart()).append("D");
 		}
 
-		var hours = content.toHoursPart();
-		var minutes = content.toMinutesPart();
-		var seconds = content.toSecondsPart();
-		var nanos = content.toNanosPart();
+		var hours = this.content.toHoursPart();
+		var minutes = this.content.toMinutesPart();
+		var seconds = this.content.toSecondsPart();
+		var nanos = this.content.toNanosPart();
 
 		if (hours != 0 || minutes != 0 || seconds != 0 || nanos != 0) {
 			result.append("T");
@@ -67,7 +67,8 @@ final class DurationLiteral extends LiteralBase<Duration> {
 		if (seconds != 0 || nanos != 0) {
 			if (nanos == 0) {
 				result.append(seconds);
-			} else {
+			}
+			else {
 				result.append(seconds + nanos / 1_000_000_000.0);
 			}
 			result.append("S");
@@ -76,4 +77,5 @@ final class DurationLiteral extends LiteralBase<Duration> {
 		result.append("')");
 		return result.toString();
 	}
+
 }

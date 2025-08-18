@@ -25,8 +25,10 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
 /**
+ * Example type.
+ *
+ * @param <T> a type
  * @author Michael J. Simons
- * @param <T> A type
  */
 @RelationshipEntity
 public class Actor<T> {
@@ -39,4 +41,5 @@ public class Actor<T> {
 	public Actor(T person) {
 		this.person = person;
 	}
+
 }

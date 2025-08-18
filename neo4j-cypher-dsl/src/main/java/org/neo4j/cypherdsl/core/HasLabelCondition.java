@@ -18,14 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A condition checking for the presence of labels on nodes or types on relationships.
@@ -37,7 +37,13 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class HasLabelCondition implements Condition {
 
 	private final SymbolicName nodeName;
+
 	private final List<NodeLabel> nodeLabels;
+
+	private HasLabelCondition(SymbolicName nodeName, List<NodeLabel> nodeLabels) {
+		this.nodeName = nodeName;
+		this.nodeLabels = nodeLabels;
+	}
 
 	static HasLabelCondition create(SymbolicName nodeName, String... labels) {
 
@@ -53,17 +59,13 @@ public final class HasLabelCondition implements Condition {
 		return new HasLabelCondition(nodeName, nodeLabels);
 	}
 
-	private HasLabelCondition(SymbolicName nodeName, List<NodeLabel> nodeLabels) {
-		this.nodeName = nodeName;
-		this.nodeLabels = nodeLabels;
-	}
-
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		nodeName.accept(visitor);
+		this.nodeName.accept(visitor);
 		this.nodeLabels.forEach(label -> label.accept(visitor));
 		visitor.leave(this);
 	}
+
 }

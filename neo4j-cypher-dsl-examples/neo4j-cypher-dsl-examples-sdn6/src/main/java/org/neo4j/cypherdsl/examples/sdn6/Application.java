@@ -22,6 +22,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
+ * Main entry for a Spring application.
+ *
  * @author Michael J. Simons
  */
 @SpringBootApplication

@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Locale;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -27,9 +25,11 @@ import java.util.regex.Pattern;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * The string representation of a string literal will be a quoted Cypher string in single tickmarks with
- * escaped reserved characters.
+ * The string representation of a string literal will be a quoted Cypher string in single
+ * tickmarks with escaped reserved characters.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -38,25 +38,19 @@ import org.apiguardian.api.API;
 public final class StringLiteral extends LiteralBase<CharSequence> {
 
 	private static final Pattern RESERVED_CHARS = Pattern.compile("([" + Pattern.quote("\\'\"") + "])");
+
 	private static final String QUOTED_LITERAL_FORMAT = "'%s'";
 
 	StringLiteral(CharSequence content) {
 		super(content);
 	}
 
-	@Override
-	public String asString() {
-
-		final Optional<String> escapedContent = escapeString(getContent());
-		return String.format(Locale.ENGLISH, QUOTED_LITERAL_FORMAT, escapedContent.orElse(""));
-	}
-
 	/**
-	 * Escapes a string so that it can be used as a string literal in both single tickmarks ({@literal '})
-	 * and quotes ({@literal "}).
-	 *
-	 * @param unescapedString The string to escape
-	 * @return An empty optional when the unescaped string is {@literal null}, an escaped string otherwise
+	 * Escapes a string so that it can be used as a string literal in both single
+	 * tickmarks ({@literal '}) and quotes ({@literal "}).
+	 * @param unescapedString the string to escape
+	 * @return an empty optional when the unescaped string is {@literal null}, an escaped
+	 * string otherwise
 	 */
 	static Optional<String> escapeString(CharSequence unescapedString) {
 
@@ -74,7 +68,15 @@ public final class StringLiteral extends LiteralBase<CharSequence> {
 	}
 
 	@Override
-	public CharSequence getContent() {
-		return content;
+	public String asString() {
+
+		final Optional<String> escapedContent = escapeString(getContent());
+		return String.format(Locale.ENGLISH, QUOTED_LITERAL_FORMAT, escapedContent.orElse(""));
 	}
+
+	@Override
+	public CharSequence getContent() {
+		return this.content;
+	}
+
 }

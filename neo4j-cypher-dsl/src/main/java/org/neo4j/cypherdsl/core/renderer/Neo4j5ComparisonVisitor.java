@@ -33,8 +33,9 @@ import org.neo4j.cypherdsl.core.renderer.Neo4j5FunctionInvocationVisitor.SingleA
 /**
  * Takes care of
  * <ul>
- *     <li>Inverting <code>NOT EXISTS (n.prop)</code> into <code>n.prop IS NULL</code></li>
+ * <li>Inverting <code>NOT EXISTS (n.prop)</code> into <code>n.prop IS NULL</code></li>
  * </ul>
+ * .
  *
  * @author Michael J. Simons
  */
@@ -61,7 +62,8 @@ final class Neo4j5ComparisonVisitor extends VisitorWithResult {
 				if (isOneLevelBelow) {
 					if (visitable instanceof Operator operator) {
 						capture.compareAndSet(null, operator);
-					} else if (Neo4j5FunctionInvocationVisitor.isNPropExists(visitable)) {
+					}
+					else if (Neo4j5FunctionInvocationVisitor.isNPropExists(visitable)) {
 						nPropExists.compareAndSet(null, visitable);
 					}
 				}
@@ -77,11 +79,12 @@ final class Neo4j5ComparisonVisitor extends VisitorWithResult {
 		if (capture.get() == Operator.NOT && nPropExists.get() != null) {
 			SingleArgExtractor<Property> singleArgExtractor = new SingleArgExtractor<>(Property.class);
 			nPropExists.get().accept(singleArgExtractor);
-			singleArgExtractor.singleArg.accept(delegate);
-			delegate.builder.append(" IS NULL");
+			singleArgExtractor.singleArg.accept(this.delegate);
+			this.delegate.builder.append(" IS NULL");
 			return EnterResult.SKIP_CHILDREN;
 		}
 
 		return EnterResult.CONTINUE;
 	}
+
 }

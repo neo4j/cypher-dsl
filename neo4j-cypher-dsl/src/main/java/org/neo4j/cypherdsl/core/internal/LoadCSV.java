@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,12 +25,14 @@ import java.util.Optional;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Clause;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * A representation of the {@code LOAD CSV} clause, including it's periodic commit and field terminator configuration.
- * Not meant to be used outside the Cypher-DSL directly. Will be changed without further notice.
+ * A representation of the {@code LOAD CSV} clause, including it's periodic commit and
+ * field terminator configuration. Not meant to be used outside the Cypher-DSL directly.
+ * Will be changed without further notice.
  *
  * @author Michael J. Simons
- * @soundtrack Thees Uhlmann - #2
  * @since 2021.2.1
  */
 @API(status = INTERNAL, since = "2021.2.1")
@@ -48,10 +48,9 @@ public final class LoadCSV implements Clause {
 
 	/**
 	 * Constructs a new {@link LoadCSV} clause.
-	 *
-	 * @param uri Required uri
-	 * @param withHeaders With or without headers
-	 * @param alias The alias per row
+	 * @param uri required uri
+	 * @param withHeaders with or without headers
+	 * @param alias the alias per row
 	 */
 	public LoadCSV(URI uri, boolean withHeaders, String alias) {
 		this(uri, withHeaders, alias, null);
@@ -65,47 +64,47 @@ public final class LoadCSV implements Clause {
 	}
 
 	/**
-	 * @return The uri of the csv file.
+	 * {@return the uri of the csv file}
 	 */
 	public URI getUri() {
-		return uri;
+		return this.uri;
 	}
 
 	/**
-	 * @return {@literal true} if headers are to be evaluated
+	 * {@return <code>true</code> if headers are to be evaluated}
 	 */
 	public boolean isWithHeaders() {
-		return withHeaders;
+		return this.withHeaders;
 	}
 
 	/**
-	 * @return The field terminator to use
+	 * {@return the field terminator to use}
 	 */
 	public String getFieldTerminator() {
-		return fieldTerminator;
+		return this.fieldTerminator;
 	}
 
 	/**
-	 * @return The alias for one row in the csv file
+	 * {@return the alias for one row in the csv file}
 	 */
 	public String getAlias() {
-		return alias;
+		return this.alias;
 	}
 
 	/**
-	 * Creates a new {@link LoadCSV LOAD CSV clause} with the given field terminator
+	 * Creates a new {@link LoadCSV LOAD CSV clause} with the given field terminator.
 	 * @param newFieldTerminator the new field terminator
-	 * @return A new instance or this instance if the terminator hasn't changed
+	 * @return a new instance or this instance if the terminator hasn't changed
 	 */
 	public LoadCSV withFieldTerminator(final String newFieldTerminator) {
 
-		String value = Optional.ofNullable(newFieldTerminator).map(String::trim)
-			.filter(v -> !v.isEmpty()).orElse(null);
+		String value = Optional.ofNullable(newFieldTerminator).map(String::trim).filter(v -> !v.isEmpty()).orElse(null);
 
 		if (Objects.equals(this.fieldTerminator, value)) {
 			return this;
 		}
 
-		return new LoadCSV(uri, withHeaders, alias, value);
+		return new LoadCSV(this.uri, this.withHeaders, this.alias, value);
 	}
+
 }

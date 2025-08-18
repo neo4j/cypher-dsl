@@ -18,15 +18,15 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * Shared type name generator for the default naming strategies for generated node and relationship implementations.
+ * Shared type name generator for the default naming strategies for generated node and
+ * relationship implementations.
  *
  * @author Michael J. Simons
- * @soundtrack Bear McCreary - Battlestar Galactica Season 2
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
@@ -34,9 +34,8 @@ abstract class AbstractClassNameGenerator {
 
 	/**
 	 * Strips away invalid identifiers, returns an initial upper case name.
-	 *
-	 * @param suggestedName Some arbitrary suggested name
-	 * @return A String builder for further processing.
+	 * @param suggestedName some arbitrary suggested name
+	 * @return a String builder for further processing.
 	 */
 	final StringBuilder generateTypeName(String suggestedName) {
 
@@ -47,7 +46,7 @@ abstract class AbstractClassNameGenerator {
 		while (i < suggestedName.length()) {
 			codePoint = suggestedName.codePointAt(i);
 			if (Identifiers.isValidAt(i, codePoint)) {
-				if (sb.length() == 0) {
+				if (sb.isEmpty()) {
 					codePoint = Character.toUpperCase(codePoint);
 				}
 				sb.append(Character.toChars(codePoint));
@@ -57,4 +56,5 @@ abstract class AbstractClassNameGenerator {
 
 		return sb;
 	}
+
 }

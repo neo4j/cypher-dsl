@@ -18,14 +18,15 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * This is a more general renderer than {@link Renderer}. The generalized renderer will render any {@link Visitable}.
- * This renderer will not cache rendered results for visitables.
+ * This is a more general renderer than {@link Renderer}. The generalized renderer will
+ * render any {@link Visitable}. This renderer will not cache rendered results for
+ * visitables.
  *
  * @author Michael J. Simons
  * @since 2023.1.0
@@ -35,9 +36,10 @@ public sealed interface GeneralizedRenderer extends Renderer permits Configurabl
 
 	/**
 	 * Renders any {@link Visitable}.
-	 *
 	 * @param visitable the visitable to render
-	 * @return a Cypher fragment (in case of arbitrary visitables), a full statement in case a {@link org.neo4j.cypherdsl.core.Statement} was passed to the renderer.
+	 * @return a Cypher fragment (in case of arbitrary visitables), a full statement in
+	 * case a {@link org.neo4j.cypherdsl.core.Statement} was passed to the renderer.
 	 */
 	String render(Visitable visitable);
+
 }

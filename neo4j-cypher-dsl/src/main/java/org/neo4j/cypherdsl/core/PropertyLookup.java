@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/PropertyLookup.html">PropertyLookup</a>
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/PropertyLookup.html">PropertyLookup</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -37,16 +38,22 @@ public final class PropertyLookup implements Expression {
 	private static final PropertyLookup WILDCARD = new PropertyLookup(Asterisk.INSTANCE, false);
 
 	private final Expression propertyKeyName;
+
 	/** This flag is set to true for dynamic lookups via `p['x']` notation. */
 	private final boolean dynamicLookup;
 
+	private PropertyLookup(Expression propertyKeyName, boolean dynamicLookup) {
+
+		this.propertyKeyName = propertyKeyName;
+		this.dynamicLookup = dynamicLookup;
+	}
+
 	/**
-	 * This creates a property lookup for a given name. It is mostly usable when building an AST outside the fluent API.
-	 * If you need to create property lookup for a {@link SymbolicName symbolic name}, most likely you can just use the
-	 * symbolic name.
-	 *
-	 * @param name The name to lookup
-	 * @return A property lookup
+	 * This creates a property lookup for a given name. It is mostly usable when building
+	 * an AST outside the fluent API. If you need to create property lookup for a
+	 * {@link SymbolicName symbolic name}, most likely you can just use the symbolic name.
+	 * @param name the name to lookup
+	 * @return a property lookup
 	 * @since 2021.3.0
 	 */
 	public static PropertyLookup forName(String name) {
@@ -66,32 +73,26 @@ public final class PropertyLookup implements Expression {
 		return WILDCARD;
 	}
 
-	private PropertyLookup(Expression propertyKeyName, boolean dynamicLookup) {
-
-		this.propertyKeyName = propertyKeyName;
-		this.dynamicLookup = dynamicLookup;
-	}
-
 	@API(status = INTERNAL)
 	SymbolicName getPropertyKeyName() {
 
 		Assertions.isTrue(this != WILDCARD, "The wildcard property lookup does not reference a specific property!");
-		return (SymbolicName) propertyKeyName;
+		return (SymbolicName) this.propertyKeyName;
 	}
 
 	/**
-	 * @return {@literal true} if this is a dynamic property
+	 * {@return <code>true</code> if this is a dynamic property}
 	 */
 	@API(status = INTERNAL)
 	public boolean isDynamicLookup() {
-		return dynamicLookup;
+		return this.dynamicLookup;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		propertyKeyName.accept(visitor);
+		this.propertyKeyName.accept(visitor);
 		visitor.leave(this);
 	}
 
@@ -99,4 +100,5 @@ public final class PropertyLookup implements Expression {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

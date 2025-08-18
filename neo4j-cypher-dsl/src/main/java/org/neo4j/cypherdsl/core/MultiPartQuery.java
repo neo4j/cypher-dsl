@@ -18,32 +18,23 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/MultiPartQuery.html">MultiPartQuery</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/MultiPartQuery.html">MultiPartQuery</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Ferris MC - Ferris MC's Audiobiographie
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
 class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery {
-
-	static MultiPartQuery create(List<MultiPartElement> parts, SinglePartQuery remainder) {
-
-		if (remainder instanceof ResultStatement) {
-			return new MultiPartQueryWithResult(parts, remainder);
-		} else {
-			return new MultiPartQuery(parts, remainder);
-		}
-	}
 
 	private final List<MultiPartElement> parts;
 
@@ -55,11 +46,21 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 		this.remainder = remainder;
 	}
 
+	static MultiPartQuery create(List<MultiPartElement> parts, SinglePartQuery remainder) {
+
+		if (remainder instanceof ResultStatement) {
+			return new MultiPartQueryWithResult(parts, remainder);
+		}
+		else {
+			return new MultiPartQuery(parts, remainder);
+		}
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 
-		parts.forEach(p -> p.accept(visitor));
-		remainder.accept(visitor);
+		this.parts.forEach(p -> p.accept(visitor));
+		this.remainder.accept(visitor);
 	}
 
 	static final class MultiPartQueryWithResult extends MultiPartQuery implements ResultStatement {
@@ -67,5 +68,7 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 		private MultiPartQueryWithResult(List<MultiPartElement> parts, SinglePartQuery remainder) {
 			super(parts, remainder);
 		}
+
 	}
+
 }

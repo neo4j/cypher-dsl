@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -40,15 +38,19 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 import org.neo4j.cypherdsl.core.renderer.SchemaEnforcementFailedException;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * This is a convenience class implementing a {@link Visitor} and it takes care of choosing the right methods
- * to dispatch the {@link Visitor#enter(Visitable)} and {@link Visitor#leave(Visitable)} calls to.
+ * This is a convenience class implementing a {@link Visitor} and it takes care of
+ * choosing the right methods to dispatch the {@link Visitor#enter(Visitable)} and
+ * {@link Visitor#leave(Visitable)} calls to.
  * <p>
- * Classes extending this visitor need to provide corresponding {@code enter} and {@code leave} methods taking exactly
- * one argument of the type of {@link Visitable} they are interested it.
+ * Classes extending this visitor need to provide corresponding {@code enter} and
+ * {@code leave} methods taking exactly one argument of the type of {@link Visitable} they
+ * are interested it.
  * <p>
- * The type must be an exact match, this support class doesn't try to find a close match up in the class hierarchy if it
- * doesn't find an exact match.
+ * The type must be an exact match, this support class doesn't try to find a close match
+ * up in the class hierarchy if it doesn't find an exact match.
  *
  * @author Michael J. Simons
  * @author Gerrit Meier
@@ -58,102 +60,83 @@ import org.neo4j.cypherdsl.core.renderer.SchemaEnforcementFailedException;
 public abstract class ReflectiveVisitor extends VisitorWithResult {
 
 	/**
-	 * Private enum to specify a visiting phase.
-	 */
-	private enum Phase {
-		ENTER("enter"),
-		LEAVE("leave");
-
-		final String methodName;
-
-		Phase(String methodName) {
-			this.methodName = methodName;
-		}
-	}
-
-	/**
-	 * This class is an indicator of what should happen after a new visitable has been identified.
-	 */
-	public static final class PreEnterResult {
-
-		private static final PreEnterResult DO_ENTER = new PreEnterResult(null);
-		private static final PreEnterResult SKIP = new PreEnterResult(null);
-
-		/**
-		 * Do enter and treat as usual.
-		 *
-		 * @return the result
-		 */
-		public static PreEnterResult doEnter() {
-			return DO_ENTER;
-		}
-
-		/**
-		 * Skip the element completely.
-		 *
-		 * @return the result
-		 */
-		public static PreEnterResult skip() {
-			return SKIP;
-		}
-
-		/**
-		 * Enter to visit but delegate the visitation
-		 *
-		 * @param handler The delegate
-		 * @return the result
-		 */
-		public static PreEnterResult delegateTo(Visitor handler) {
-			return new PreEnterResult(handler);
-		}
-
-			private final Visitor delegate;
-
-		private PreEnterResult(Visitor delegate) {
-			this.delegate = delegate;
-		}
-	}
-
-	/**
-	 * A shared cache of unbound methods for entering and leaving phases.
-	 * The key is the concrete class of the visitor as well as the hierarchy of the visitable.
+	 * A shared cache of unbound methods for entering and leaving phases. The key is the
+	 * concrete class of the visitor as well as the hierarchy of the visitable.
 	 */
 	private static final Map<TargetAndPhase, Optional<Method>> VISITING_METHODS_CACHE = new ConcurrentHashMap<>();
+
+	/**
+	 * If theres any special delegate for a dialect or similar for a given visitable, it
+	 * will be tracked here.
+	 */
+	protected final Map<Visitable, Visitor> visitablesAndDelegates = new HashMap<>();
 
 	/**
 	 * Keeps track of the ASTs current level.
 	 */
 	protected Deque<Visitable> currentVisitedElements = new LinkedList<>();
 
-	/**
-	 * If theres any special delegate for a dialect or similar for a given visitable, it will be tracked here.
-	 */
-	protected final Map<Visitable, Visitor> visitablesAndDelegates = new HashMap<>();
+	@SuppressWarnings("PMD.EmptyCatchBlock")
+	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
+
+		Class<?> visitorClass = targetAndPhase.visitorClass;
+		do { // Loop over the hierarchy of visitors so that we catch overloaded and
+				// inherited methods.
+				// the loop goes from concrete to abstract, so that the most concrete
+				// visitor wins
+			for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
+				try {
+					Method method = getMethodInPhaseWithActualVisitor(targetAndPhase, visitorClass, clazz);
+					return Optional.of(method);
+				}
+				catch (NoSuchMethodException ex) {
+					// We don't do anything if the method doesn't exists
+					// Try the next parameter type in the hierarchy or the next visitor
+				}
+			}
+			visitorClass = visitorClass.getSuperclass();
+		}
+		while (visitorClass != null && visitorClass != ReflectiveVisitor.class);
+
+		return Optional.empty();
+	}
+
+	@SuppressWarnings("squid:S3011") // Very much the point of the whole thing
+	private static Method getMethodInPhaseWithActualVisitor(TargetAndPhase targetAndPhase, Class<?> visitorClass,
+			Class<?> clazz) throws NoSuchMethodException {
+		Method method = visitorClass.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
+		method.setAccessible(true);
+		return method;
+	}
 
 	/**
-	 * This is a hook that is called with the uncasted, raw visitable just before entering a visitable.
+	 * This is a hook that is called with the uncasted, raw visitable just before entering
+	 * a visitable.
 	 * <p>
 	 * The hook is called regardless wither a matching {@code enter} is found or not.
-	 *
-	 * @param visitable The visitable that is passed on to a matching enter after this call.
-	 * @return true, when visiting of elements should be stopped until this element is left again.
+	 * @param visitable the visitable that is passed on to a matching enter after this
+	 * call.
+	 * @return true, when visiting of elements should be stopped until this element is
+	 * left again.
 	 */
 	protected abstract boolean preEnter(Visitable visitable);
 
 	/**
-	 * @param visitable The visitable prior to entering it
-	 * @return An indicator whether the visitable can be skipped or must be visited
+	 * Returns an indicator whether the visitable can be skipped or must be visited.
+	 * @param visitable the visitable prior to entering it
+	 * @return an indicator whether the visitable can be skipped or must be visited
 	 */
 	protected PreEnterResult getPreEnterResult(Visitable visitable) {
 		return preEnter(visitable) ? PreEnterResult.doEnter() : PreEnterResult.skip();
 	}
 
 	/**
-	 * This is a hook that is called with the uncasted, raw visitable just after leaving the visitable.
+	 * This is a hook that is called with the uncasted, raw visitable just after leaving
+	 * the visitable.
 	 * <p>
 	 * The hook is called regardless wither a matching {@code leave} is found or not.
-	 *
-	 * @param visitable The visitable that is passed on to a matching leave after this call.
+	 * @param visitable the visitable that is passed on to a matching leave after this
+	 * call.
 	 */
 	protected abstract void postLeave(Visitable visitable);
 
@@ -162,11 +145,12 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 
 		PreEnterResult preEnterResult = getPreEnterResult(visitable);
 		if (preEnterResult != PreEnterResult.skip()) {
-			currentVisitedElements.push(visitable);
+			this.currentVisitedElements.push(visitable);
 			if (preEnterResult.delegate != null) {
-				visitablesAndDelegates.put(visitable, preEnterResult.delegate);
+				this.visitablesAndDelegates.put(visitable, preEnterResult.delegate);
 				return preEnterResult.delegate.enterWithResult(visitable);
-			} else {
+			}
+			else {
 				executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.ENTER), visitable);
 			}
 		}
@@ -176,27 +160,29 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 	@Override
 	public final void leave(Visitable visitable) {
 
-		if (visitable != null && currentVisitedElements.peek() == visitable) {
-			if (visitablesAndDelegates.containsKey(visitable)) {
-				Visitor delegate = visitablesAndDelegates.remove(visitable);
+		if (visitable != null && this.currentVisitedElements.peek() == visitable) {
+			if (this.visitablesAndDelegates.containsKey(visitable)) {
+				Visitor delegate = this.visitablesAndDelegates.remove(visitable);
 				delegate.leave(visitable);
-			} else {
+			}
+			else {
 				executeConcreteMethodIn(new TargetAndPhase(this, visitable.getClass(), Phase.LEAVE), visitable);
 			}
 			postLeave(visitable);
-			currentVisitedElements.pop();
+			this.currentVisitedElements.pop();
 		}
 	}
 
 	private void executeConcreteMethodIn(TargetAndPhase targetAndPhase, Visitable onVisitable) {
-		Optional<Method> optionalMethod = VISITING_METHODS_CACHE
-			.computeIfAbsent(targetAndPhase, ReflectiveVisitor::findHandleFor);
+		Optional<Method> optionalMethod = VISITING_METHODS_CACHE.computeIfAbsent(targetAndPhase,
+				ReflectiveVisitor::findHandleFor);
 		optionalMethod.ifPresent(handle -> {
 			try {
 				handle.invoke(this, onVisitable);
-			} catch (Throwable throwable) {
+			}
+			catch (Throwable throwable) {
 				if (throwable instanceof InvocationTargetException ite
-					&& ite.getCause() instanceof SchemaEnforcementFailedException sefe) {
+						&& ite.getCause() instanceof SchemaEnforcementFailedException sefe) {
 					throw sefe;
 				}
 				throw new HandlerException(throwable);
@@ -204,39 +190,70 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 		});
 	}
 
-	@SuppressWarnings("PMD.EmptyCatchBlock")
-	private static Optional<Method> findHandleFor(TargetAndPhase targetAndPhase) {
+	/**
+	 * Private enum to specify a visiting phase.
+	 */
+	private enum Phase {
 
-		Class<?> visitorClass = targetAndPhase.visitorClass;
-		do { // Loop over the hierarchy of visitors so that we catch overloaded and inherited methods.
-			// the loop goes from concrete to abstract, so that the most concrete visitor wins
-			for (Class<?> clazz : targetAndPhase.classHierarchyOfVisitable) {
-				try {
-					Method method = getMethodInPhaseWithActualVisitor(targetAndPhase, visitorClass, clazz);
-					return Optional.of(method);
-				} catch (NoSuchMethodException e) {
-					// We don't do anything if the method doesn't exists
-					// Try the next parameter type in the hierarchy or the next visitor
-				}
-			}
-			visitorClass = visitorClass.getSuperclass();
-		} while (visitorClass != null && visitorClass != ReflectiveVisitor.class);
+		ENTER("enter"), LEAVE("leave");
 
-		return Optional.empty();
+		final String methodName;
+
+		Phase(String methodName) {
+			this.methodName = methodName;
+		}
+
 	}
 
-	@SuppressWarnings("squid:S3011") // Very much the point of the whole thing
-	private static Method getMethodInPhaseWithActualVisitor(TargetAndPhase targetAndPhase, Class<?> visitorClass, Class<?> clazz) throws NoSuchMethodException {
-		Method method = visitorClass.getDeclaredMethod(targetAndPhase.phase.methodName, clazz);
-		method.setAccessible(true);
-		return method;
+	/**
+	 * This class is an indicator of what should happen after a new visitable has been
+	 * identified.
+	 */
+	public static final class PreEnterResult {
+
+		private static final PreEnterResult DO_ENTER = new PreEnterResult(null);
+
+		private static final PreEnterResult SKIP = new PreEnterResult(null);
+
+		private final Visitor delegate;
+
+		private PreEnterResult(Visitor delegate) {
+			this.delegate = delegate;
+		}
+
+		/**
+		 * Do enter and treat as usual.
+		 * @return the result
+		 */
+		public static PreEnterResult doEnter() {
+			return DO_ENTER;
+		}
+
+		/**
+		 * Skip the element completely.
+		 * @return the result
+		 */
+		public static PreEnterResult skip() {
+			return SKIP;
+		}
+
+		/**
+		 * Enter to visit but delegate the visitation.
+		 * @param handler the delegate
+		 * @return the result
+		 */
+		public static PreEnterResult delegateTo(Visitor handler) {
+			return new PreEnterResult(handler);
+		}
+
 	}
 
 	private static class TargetAndPhase {
 
 		/**
-		 * The most concrete visitor class. It may be that the handle that is eventually found will not be called
-		 * with that class, but with a parent. The attribute here is just a starting point and later on, a cache key.
+		 * The most concrete visitor class. It may be that the handle that is eventually
+		 * found will not be called with that class, but with a parent. The attribute here
+		 * is just a starting point and later on, a cache key.
 		 */
 		private final Class<? extends ReflectiveVisitor> visitorClass;
 
@@ -244,7 +261,8 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 
 		private final Phase phase;
 
-		<T extends ReflectiveVisitor> TargetAndPhase(T visitor, Class<? extends Visitable> concreteVisitableClass, Phase phase) {
+		<T extends ReflectiveVisitor> TargetAndPhase(T visitor, Class<? extends Visitable> concreteVisitableClass,
+				Phase phase) {
 			this.visitorClass = visitor.getClass();
 			this.phase = phase;
 			this.classHierarchyOfVisitable = new LinkedHashSet<>();
@@ -257,7 +275,8 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 					.filter(c -> c != Visitable.class)
 					.forEach(this.classHierarchyOfVisitable::add);
 				classOfVisitable = classOfVisitable.getSuperclass();
-			} while (classOfVisitable != null && classOfVisitable != Object.class);
+			}
+			while (classOfVisitable != null && classOfVisitable != Object.class);
 		}
 
 		@Override
@@ -269,14 +288,16 @@ public abstract class ReflectiveVisitor extends VisitorWithResult {
 				return false;
 			}
 			TargetAndPhase that = (TargetAndPhase) o;
-			return visitorClass.equals(that.visitorClass) &&
-				classHierarchyOfVisitable.equals(that.classHierarchyOfVisitable) &&
-				phase == that.phase;
+			return this.visitorClass.equals(that.visitorClass)
+					&& this.classHierarchyOfVisitable.equals(that.classHierarchyOfVisitable)
+					&& this.phase == that.phase;
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash(visitorClass, classHierarchyOfVisitable, phase);
+			return Objects.hash(this.visitorClass, this.classHierarchyOfVisitable, this.phase);
 		}
+
 	}
+
 }

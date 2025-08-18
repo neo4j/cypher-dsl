@@ -55,5 +55,7 @@ public class Movie {
 	}
 
 	static class SomeType {
+
 	}
+
 }

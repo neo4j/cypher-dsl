@@ -18,27 +18,27 @@
  */
 package org.neo4j.cypherdsl.core;
 
-
 /**
- * This interface represents an element that can be for example an identifiable part of the {@code WITH} clause.
- * It has been introduced to circumvent the absence of union types in Java
- * and to avoid an overload of {@link StatementBuilder#with(String...)} or other expressions with an {@code Object...}
- * parameter. This type here allows passing {@link Named named things}. {@link AliasedExpression aliased expression},
+ * This interface represents an element that can be for example an identifiable part of
+ * the {@code WITH} clause. It has been introduced to circumvent the absence of union
+ * types in Java and to avoid an overload of {@link StatementBuilder#with(String...)} or
+ * other expressions with an {@code Object...} parameter. This type here allows passing
+ * {@link Named named things}. {@link AliasedExpression aliased expression},
  * {@link SymbolicName symbolic names} into a pipeline.
  * <p>
  * There should be no need to implement this on your own.
  *
  * @author Michael J. Simons
- * @soundtrack Fatoni &amp; Edgar Wasser - Delirium
  * @since 2021.2.2
  */
 public sealed interface IdentifiableElement permits AliasedExpression, Asterisk, Named, Property, SymbolicName {
 
 	/**
-	 * Transform this element into an expression
-	 *
-	 * @return this element as an expression. Will return the same instance if it is already an expression.
+	 * Transform this element into an expression.
+	 * @return this element as an expression. Will return the same instance if it is
+	 * already an expression.
 	 * @since 2021.2.2
 	 */
 	Expression asExpression();
+
 }

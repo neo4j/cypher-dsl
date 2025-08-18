@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,17 +42,24 @@ import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * Default implementation of the {@link StatementBuilder} and related operations.
+ *
  * @author Michael J. Simons
  * @author Gerrit Meier
  * @author Romain Rossi
  * @since 1.0
  */
 @API(status = INTERNAL, since = "2021.2.1")
-class DefaultStatementBuilder implements StatementBuilder,
-	OngoingUpdate, OngoingMerge, OngoingReadingWithWhere, OngoingReadingWithoutWhere, OngoingMatchAndUpdate,
-	BuildableMatchAndUpdate,
-	BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall, StatementBuilder.Terminal {
+class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, OngoingMerge, OngoingReadingWithWhere,
+		OngoingReadingWithoutWhere, OngoingMatchAndUpdate, BuildableMatchAndUpdate, BuildableOngoingMergeAction,
+		ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall, StatementBuilder.Terminal {
+
+	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
+
+	private static final EnumSet<UpdateType> SET = EnumSet.of(UpdateType.SET, UpdateType.MUTATE);
 
 	/**
 	 * Current list of reading or update clauses to be generated.
@@ -62,24 +67,23 @@ class DefaultStatementBuilder implements StatementBuilder,
 	private final List<Visitable> currentSinglePartElements = new ArrayList<>();
 
 	/**
-	 * The latest ongoing match.
-	 */
-	private MatchBuilder currentOngoingMatch;
-
-	/**
-	 * The latest ongoing update to be build
-	 */
-	private DefaultStatementWithUpdateBuilder currentOngoingUpdate;
-
-	/**
 	 * A list of already build withs.
 	 */
 	private final List<MultiPartElement> multiPartElements = new ArrayList<>();
 
 	/**
+	 * The latest ongoing match.
+	 */
+	private MatchBuilder currentOngoingMatch;
+
+	/**
+	 * The latest ongoing update to be built.
+	 */
+	private DefaultStatementWithUpdateBuilder currentOngoingUpdate;
+
+	/**
 	 * Default constructor. Builder can be preloaded with visitables.
-	 *
-	 * @param visitables A set of visitables. {@literal NULL} values will be skipped.
+	 * @param visitables a set of visitables. {@literal NULL} values will be skipped.
 	 */
 	DefaultStatementBuilder(Visitable... visitables) {
 
@@ -87,9 +91,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 	}
 
 	/**
-	 * A copy constructor
-	 * @param source The source
-	 * @param visitables A set of additional visitables. {@literal NULL} values will be skipped.
+	 * A copy constructor.
+	 * @param source the source
+	 * @param visitables a set of additional visitables. {@literal NULL} values will be
+	 * skipped.
 	 */
 	DefaultStatementBuilder(DefaultStatementBuilder source, Visitable... visitables) {
 
@@ -99,6 +104,131 @@ class DefaultStatementBuilder implements StatementBuilder,
 		this.multiPartElements.addAll(source.multiPartElements);
 
 		addVisitables(visitables);
+	}
+
+	/**
+	 * Creates a builder for an UPDATE clause. The vargs is list of pattern or
+	 * expressions. In case {@code updateType} is of {@link UpdateType#MERGE} or
+	 * {@link UpdateType#CREATE} they will be treated as pattern, otherwise as expression.
+	 * @param updateType the update type to create
+	 * @param patternOrExpressions a list of pattern or expression
+	 * @param <T> the type of {@code patternOrExpressions}
+	 * @return ongoing builder
+	 */
+	@SafeVarargs
+	@SuppressWarnings("varargs") // WTH IDEA?
+	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(UpdateType updateType,
+			T... patternOrExpressions) {
+
+		boolean mergeOrCreate = MERGE_OR_CREATE.contains(updateType);
+		String message = mergeOrCreate ? "At least one pattern is required."
+				: "At least one modifying expressions is required.";
+		Assertions.notNull(patternOrExpressions, message);
+		Assertions.notEmpty(patternOrExpressions, message);
+
+		if (mergeOrCreate) {
+			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions)
+				.map(PatternElement.class::cast)
+				.toList();
+			if (updateType == UpdateType.CREATE) {
+				return new AbstractUpdatingClauseBuilder.CreateBuilder(patternElements);
+			}
+			else {
+				return new AbstractUpdatingClauseBuilder.MergeBuilder(patternElements);
+			}
+		}
+		else {
+			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast).toList();
+			ExpressionList expressionList = new ExpressionList(
+					SET.contains(updateType) ? prepareSetExpressions(updateType, expressions) : expressions);
+			return switch (updateType) {
+				case DETACH_DELETE -> () -> new Delete(expressionList, true);
+				case DELETE -> () -> new Delete(expressionList, false);
+				case SET, MUTATE -> () -> new Set(expressionList);
+				case REMOVE -> () -> new Remove(expressionList);
+				default -> throw new IllegalArgumentException("Unsupported update type " + updateType);
+			};
+		}
+	}
+
+	/**
+	 * Utility method to prepare a list of expression to work with the set clause.
+	 * @param updateType which kind of update is used while creating the {@literal SET}
+	 * operation
+	 * @param possibleSetOperations a mixed list of expressions (property and list
+	 * operations)
+	 * @return a reified list of expressions that all target properties
+	 */
+	private static List<Expression> prepareSetExpressions(UpdateType updateType,
+			List<Expression> possibleSetOperations) {
+
+		List<Expression> propertyOperations = new ArrayList<>();
+		List<Expression> listOfExpressions = new ArrayList<>();
+
+		for (Expression possibleSetOperation : possibleSetOperations) {
+			if (possibleSetOperation instanceof Operation) {
+				propertyOperations.add(possibleSetOperation);
+			}
+			else {
+				listOfExpressions.add(possibleSetOperation);
+			}
+		}
+
+		if (listOfExpressions.size() % 2 != 0) {
+			throw new IllegalArgumentException("The list of expression to set must be even.");
+		}
+
+		if (updateType == UpdateType.SET) {
+
+			for (int i = 0; i < listOfExpressions.size(); i += 2) {
+				propertyOperations.add(Operations.set(listOfExpressions.get(i), listOfExpressions.get(i + 1)));
+			}
+		}
+		else if (updateType == UpdateType.MUTATE) {
+
+			if (!(listOfExpressions.isEmpty() || propertyOperations.isEmpty())) {
+				throw new IllegalArgumentException(
+						"A mutating SET must be build through a single operation or through a pair of expression, not both.");
+			}
+
+			if (listOfExpressions.isEmpty()) {
+				for (Expression operation : propertyOperations) {
+					if (((Operation) operation).getOperator() != Operator.MUTATE) {
+						throw new IllegalArgumentException("Only property operations based on the " + Operator.MUTATE
+								+ " are supported inside a mutating SET.");
+					}
+				}
+			}
+			else {
+				for (int i = 0; i < listOfExpressions.size(); i += 2) {
+					Expression rhs = listOfExpressions.get(i + 1);
+					if (rhs instanceof Parameter) {
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), rhs));
+					}
+					else if (rhs instanceof MapExpression mapExpression) {
+						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), mapExpression));
+					}
+					else {
+						throw new IllegalArgumentException(
+								"A mutating SET operation can only be used with a named parameter or a map expression.");
+					}
+				}
+			}
+		}
+
+		if (updateType != UpdateType.REMOVE && propertyOperations.stream()
+			.anyMatch(e -> e instanceof Operation op && op.getOperator() == Operator.REMOVE_LABEL)) {
+			throw new IllegalArgumentException("REMOVE operations are not supported in a SET clause");
+		}
+		return propertyOperations;
+	}
+
+	private static Collection<Expression> extractIdentifiablesFromReturnList(List<Expression> returnList) {
+		return returnList.stream()
+			.filter(IdentifiableElement.class::isInstance)
+			.map(IdentifiableElement.class::cast)
+			.map(IdentifiableElement::asExpression)
+			.collect(Collectors.toSet());
 	}
 
 	private void addVisitables(Visitable[] visitables) {
@@ -154,7 +284,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		Assertions.notNull(this.currentOngoingUpdate, "MERGE must have been invoked before defining an event.");
 		Assertions.isTrue(this.currentOngoingUpdate.builder instanceof SupportsActionsOnTheUpdatingClause,
-			"MERGE must have been invoked before defining an event.");
+				"MERGE must have been invoked before defining an event.");
 		return new OngoingMergeAction() {
 
 			@Override
@@ -169,14 +299,14 @@ class DefaultStatementBuilder implements StatementBuilder,
 				return this.set(Operations.set(node, labels.toArray(new String[0])));
 			}
 
-					@Override
+			@Override
 			public BuildableOngoingMergeAction mutate(Expression target, Expression properties) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.MUTATE, target, properties);
 				return DefaultStatementBuilder.this;
 			}
 
-					@Override
+			@Override
 			public BuildableOngoingMergeAction set(Expression... expressions) {
 
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
@@ -184,7 +314,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 				return DefaultStatementBuilder.this;
 			}
 
-					@Override
+			@Override
 			public BuildableOngoingMergeAction set(Collection<? extends Expression> expressions) {
 				return set(expressions.toArray(new Expression[] {}));
 			}
@@ -209,7 +339,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		if (pattern.getClass().getComponentType() == PatternElement.class) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (PatternElement[]) pattern);
-		} else if (Expression.class.isAssignableFrom(pattern.getClass().getComponentType())) {
+		}
+		else if (Expression.class.isAssignableFrom(pattern.getClass().getComponentType())) {
 			this.currentOngoingUpdate = new DefaultStatementWithUpdateBuilder(updateType, (Expression[]) pattern);
 		}
 
@@ -234,7 +365,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithReturnBuilder(rawExpression);
 	}
 
-	private OngoingReadingAndReturn returning(boolean raw, boolean distinct, Collection<? extends Expression> elements) {
+	private OngoingReadingAndReturn returning(boolean raw, boolean distinct,
+			Collection<? extends Expression> elements) {
 
 		DefaultStatementWithReturnBuilder ongoingMatchAndReturn = new DefaultStatementWithReturnBuilder(raw, distinct);
 		ongoingMatchAndReturn.addExpressions(elements);
@@ -251,7 +383,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return with(true, elements);
 	}
 
-	private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Collection<IdentifiableElement> elements) {
+	private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct,
+			Collection<IdentifiableElement> elements) {
 
 		DefaultStatementWithWithBuilder ongoingMatchAndWith = new DefaultStatementWithWithBuilder(distinct);
 		ongoingMatchAndWith.addElements(elements);
@@ -312,7 +445,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@Override
 	public final BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
-		DefaultStatementWithUpdateBuilder result = new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE, Operations.mutate(target, properties));
+		DefaultStatementWithUpdateBuilder result = new DefaultStatementWithUpdateBuilder(UpdateType.MUTATE,
+				Operations.mutate(target, properties));
 		this.closeCurrentOngoingUpdate();
 		return result;
 	}
@@ -347,10 +481,10 @@ class DefaultStatementBuilder implements StatementBuilder,
 	public final OngoingReadingWithWhere where(Condition newCondition) {
 
 		if (this.currentOngoingMatch == null) {
-			if (!this.currentSinglePartElements.isEmpty() && this.currentSinglePartElements.get(
-				this.currentSinglePartElements.size() - 1) instanceof Subquery) {
+			if (!this.currentSinglePartElements.isEmpty() && this.currentSinglePartElements
+				.get(this.currentSinglePartElements.size() - 1) instanceof Subquery) {
 				throw new IllegalArgumentException(
-					"A CALL{} clause requires to WITH before you can add further conditions");
+						"A CALL{} clause requires to WITH before you can add further conditions");
 			}
 			throw new IllegalArgumentException("Cannot adda WHERE clause at this point");
 		}
@@ -380,13 +514,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 	protected final Statement buildImpl(Clause returnOrFinish) {
 
-		SinglePartQuery singlePartQuery = SinglePartQuery.create(
-			buildListOfVisitables(false), returnOrFinish);
+		SinglePartQuery singlePartQuery = SinglePartQuery.create(buildListOfVisitables(false), returnOrFinish);
 
-		if (multiPartElements.isEmpty()) {
+		if (this.multiPartElements.isEmpty()) {
 			return singlePartQuery;
-		} else {
-			return MultiPartQuery.create(multiPartElements, singlePartQuery);
+		}
+		else {
+			return MultiPartQuery.create(this.multiPartElements, singlePartQuery);
 		}
 	}
 
@@ -413,7 +547,8 @@ class DefaultStatementBuilder implements StatementBuilder,
 	@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 	protected final DefaultStatementBuilder addWith(Optional<With> optionalWith) {
 
-		optionalWith.ifPresent(with -> multiPartElements.add(new MultiPartElement(buildListOfVisitables(true), with)));
+		optionalWith
+			.ifPresent(with -> this.multiPartElements.add(new MultiPartElement(buildListOfVisitables(true), with)));
 		return this;
 	}
 
@@ -528,42 +663,50 @@ class DefaultStatementBuilder implements StatementBuilder,
 		return new DefaultStatementWithFinishBuilder();
 	}
 
-	final class ForeachBuilder implements ForeachSourceStep, ForeachUpdateStep {
+	@Override
+	public InQueryCallBuilder call(String... namespaceAndProcedure) {
 
-		private final SymbolicName variable;
+		Assertions.notEmpty(namespaceAndProcedure, "The procedure namespace and name must not be null or empty.");
 
-		private Expression list;
+		closeCurrentOngoingMatch();
 
-		ForeachBuilder(SymbolicName variable) {
-			this.variable = variable;
-		}
+		return new InQueryCallBuilder(ProcedureName.from(namespaceAndProcedure));
+	}
 
-		@Override
-		public ForeachUpdateStep in(Expression newVariableList) {
+	/**
+	 * A private enum for distinguishing updating clauses.
+	 */
+	enum UpdateType {
 
-			this.list = Objects.requireNonNull(newVariableList);
-			return this;
-		}
+		DELETE, DETACH_DELETE, SET, MUTATE, REMOVE, CREATE, MERGE
 
-		@Override
-		public OngoingUpdate apply(UpdatingClause... updatingClauses) {
-			if (Arrays.stream(updatingClauses).anyMatch(Foreach.class::isInstance)) {
-				throw new IllegalArgumentException("FOREACH clauses may not be nested");
-			}
+	}
 
-			DefaultStatementBuilder.this.addUpdatingClause(new Foreach(this.variable, this.list, Arrays.asList(updatingClauses)));
-			return DefaultStatementBuilder.this;
-		}
+	private interface UpdatingClauseBuilder {
+
+		UpdatingClause build();
+
+	}
+
+	interface SupportsActionsOnTheUpdatingClause {
+
+		SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, UpdateType updateType, Expression... expressions);
+
 	}
 
 	abstract static class ReturnListWrapper {
+
 		protected final List<Expression> returnList = new ArrayList<>();
 
 		protected final void addElements(Collection<IdentifiableElement> elements) {
 
 			Assertions.notNull(elements, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			var filteredElements = elements.stream().filter(Objects::nonNull).map(IdentifiableElement::asExpression).toList();
-			Assertions.isTrue(!filteredElements.isEmpty(), Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+			var filteredElements = elements.stream()
+				.filter(Objects::nonNull)
+				.map(IdentifiableElement::asExpression)
+				.toList();
+			Assertions.isTrue(!filteredElements.isEmpty(),
+					Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			this.returnList.addAll(filteredElements);
 		}
@@ -571,591 +714,21 @@ class DefaultStatementBuilder implements StatementBuilder,
 		protected final void addExpressions(Collection<? extends Expression> expressions) {
 
 			Assertions.notNull(expressions, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSIONS_REQUIRED));
-			Assertions.isTrue(!expressions.isEmpty() && expressions.stream().noneMatch(Objects::isNull), Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
+			Assertions.isTrue(!expressions.isEmpty() && expressions.stream().noneMatch(Objects::isNull),
+					Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_AT_LEAST_ONE_EXPRESSION_REQUIRED));
 
 			this.returnList.addAll(expressions);
 		}
-	}
 
-	protected class DefaultStatementWithReturnBuilder extends ReturnListWrapper
-		implements OngoingReadingAndReturn, TerminalOngoingOrderDefinition, OngoingMatchAndReturnWithOrder {
-
-		protected final OrderBuilder orderBuilder = new OrderBuilder();
-		protected boolean rawReturn;
-		protected boolean distinct;
-
-		protected DefaultStatementWithReturnBuilder(Expression rawReturnExpression) {
-			this.distinct = false;
-			this.rawReturn = true;
-			this.returnList.add(rawReturnExpression);
-		}
-
-		protected DefaultStatementWithReturnBuilder(boolean rawReturn, boolean distinct) {
-			this.distinct = distinct;
-			this.rawReturn = rawReturn;
-		}
-
-		@Override
-		public Collection<Expression> getIdentifiableExpressions() {
-			return extractIdentifiablesFromReturnList(returnList);
-		}
-
-			@Override
-		public final OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem) {
-			orderBuilder.orderBy(sortItem);
-			return this;
-		}
-
-			@Override
-		public final OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem) {
-			return orderBy(sortItem.toArray(new SortItem[] {}));
-		}
-
-			@Override
-		public final TerminalOngoingOrderDefinition orderBy(Expression expression) {
-			orderBuilder.orderBy(expression);
-			return this;
-		}
-
-			@Override
-		public final TerminalOngoingOrderDefinition and(Expression expression) {
-			orderBuilder.and(expression);
-			return this;
-		}
-
-			@Override
-		public final DefaultStatementWithReturnBuilder descending() {
-			orderBuilder.descending();
-			return this;
-		}
-
-			@Override
-		public final DefaultStatementWithReturnBuilder ascending() {
-			orderBuilder.ascending();
-			return this;
-		}
-
-			@Override
-		public final OngoingReadingAndReturn skip(Number number) {
-			return skip(number == null ? null : new NumberLiteral(number));
-		}
-
-			@Override
-		public final OngoingReadingAndReturn skip(Expression expression) {
-			orderBuilder.skip(expression);
-			return this;
-		}
-
-			@Override
-		public final OngoingReadingAndReturn limit(Number number) {
-			return limit(number == null ? null : new NumberLiteral(number));
-		}
-
-			@Override
-		public final OngoingReadingAndReturn limit(Expression expression) {
-			orderBuilder.limit(expression);
-			return this;
-		}
-
-			@Override
-		public ResultStatement build() {
-
-			Return returning = Return.create(rawReturn, distinct, returnList, orderBuilder);
-			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(returning);
-		}
-	}
-
-	protected final class DefaultStatementWithFinishBuilder implements Terminal {
-
-		@Override
-		public Statement build() {
-			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(Finish.create());
-		}
 	}
 
 	/**
-	 * Helper class aggregating a couple of interface, collecting conditions and returned objects.
-	 */
-	protected final class DefaultStatementWithWithBuilder extends ReturnListWrapper
-		implements OngoingOrderDefinition, OrderableOngoingReadingAndWithWithoutWhere,
-		OrderableOngoingReadingAndWithWithWhere, OngoingReadingAndWithWithWhereAndOrder, OngoingReadingAndWithWithSkip {
-
-		private final ConditionBuilder conditionBuilder = new ConditionBuilder();
-		private final OrderBuilder orderBuilder = new OrderBuilder();
-		private final boolean distinct;
-
-		private DefaultStatementWithWithBuilder(boolean distinct) {
-			this.distinct = distinct;
-		}
-
-		private Optional<With> buildWith() {
-
-			if (returnList.isEmpty()) {
-				return Optional.empty();
-			}
-
-			ExpressionList returnItems = new ExpressionList(returnList);
-
-			Where where = conditionBuilder.buildCondition().map(Where::new).orElse(null);
-
-			Optional<With> returnedWith = Optional
-				.of(new With(distinct, returnItems, orderBuilder.buildOrder().orElse(null), orderBuilder.getSkip(),
-					orderBuilder.getLimit(), where));
-			this.returnList.clear();
-			this.orderBuilder.reset();
-			return returnedWith;
-		}
-
-		@Override
-		public Collection<Expression> getIdentifiableExpressions() {
-			return extractIdentifiablesFromReturnList(returnList);
-		}
-
-			@Override
-		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.returning(expressions);
-		}
-
-			@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.returningDistinct(expressions);
-		}
-
-			@Override
-		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.returningRaw(rawExpression);
-		}
-
-			@Override
-		public OngoingUpdate delete(Expression... expressions) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.delete(expressions);
-		}
-
-			@Override
-		public OngoingUpdate delete(Collection<? extends Expression> expressions) {
-
-			return delete(expressions.toArray(new Expression[] {}));
-		}
-
-			@Override
-		public OngoingUpdate detachDelete(Expression... expressions) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.detachDelete(expressions);
-		}
-
-			@Override
-		public OngoingUpdate detachDelete(Collection<? extends Expression> expressions) {
-
-			return detachDelete(expressions.toArray(new Expression[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Expression... expressions) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.set(expressions);
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Collection<? extends Expression> expressions) {
-
-			return set(expressions.toArray(new Expression[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Node node, String... labels) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.set(node, labels);
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
-
-			return set(node, labels.toArray(new String[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.mutate(target, properties);
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Node node, String... labels) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.remove(node, labels);
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
-
-			return remove(node, labels.toArray(new String[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Property... properties) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.remove(properties);
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
-
-			return remove(properties.toArray(new Property[] {}));
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.with(elements);
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.withDistinct(elements);
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithWhere where(Condition newCondition) {
-
-			conditionBuilder.where(newCondition);
-			return this;
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithWhere and(Condition additionalCondition) {
-
-			conditionBuilder.and(additionalCondition);
-			return this;
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithWhere or(Condition additionalCondition) {
-
-			conditionBuilder.or(additionalCondition);
-			return this;
-		}
-
-			@Override
-		public OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.match(optional, pattern);
-		}
-
-			@Override
-		public OngoingUpdate create(PatternElement... pattern) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.create(pattern);
-		}
-
-			@Override
-		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
-
-			return create(pattern.toArray(new PatternElement[]{}));
-		}
-
-			@Override
-		public OngoingMerge merge(PatternElement... pattern) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.merge(pattern);
-		}
-
-		@Override
-		public OngoingUnwind unwind(Expression expression) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.unwind(expression);
-		}
-
-			@Override
-		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.call(statement, imports);
-		}
-
-		@Override
-		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.callRawCypher(rawCypher, args);
-		}
-
-			@Override
-		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.callInTransactions(statement, rows, imports);
-		}
-
-			@Override
-		public InQueryCallBuilder call(String... namespaceAndProcedure) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.call(namespaceAndProcedure);
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem) {
-			orderBuilder.orderBy(sortItem);
-			return this;
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem) {
-			return orderBy(sortItem.toArray(new SortItem[] {}));
-		}
-
-			@Override
-		public OngoingOrderDefinition orderBy(Expression expression) {
-			orderBuilder.orderBy(expression);
-			return this;
-		}
-
-			@Override
-		public OngoingOrderDefinition and(Expression expression) {
-			orderBuilder.and(expression);
-			return this;
-		}
-
-			@Override
-		public OngoingReadingAndWithWithWhereAndOrder descending() {
-			orderBuilder.descending();
-			return this;
-		}
-
-			@Override
-		public OngoingReadingAndWithWithWhereAndOrder ascending() {
-			orderBuilder.ascending();
-			return this;
-		}
-
-			@Override
-		public OngoingReadingAndWithWithSkip skip(Number number) {
-			return skip(number == null ? null : new NumberLiteral(number));
-		}
-
-			@Override
-		public OngoingReadingAndWithWithSkip skip(Expression expression) {
-			orderBuilder.skip(expression);
-			return this;
-		}
-
-			@Override
-		public OngoingReadingAndWith limit(Number number) {
-			return limit(number == null ? null : new NumberLiteral(number));
-		}
-
-			@Override
-		public OngoingReadingAndWith limit(Expression expression) {
-			orderBuilder.limit(expression);
-			return this;
-		}
-
-		@Override
-			public LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
-
-			DefaultStatementBuilder this0 = DefaultStatementBuilder.this.addWith(buildWith());
-			return new DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl(from, withHeaders, this0);
-		}
-
-		@Override
-		public ForeachSourceStep foreach(SymbolicName variable) {
-
-			return DefaultStatementBuilder.this
-				.addWith(buildWith())
-				.foreach(variable);
-		}
-
-		@Override
-		public StatementBuilder.Terminal finish() {
-			return DefaultStatementBuilder.this;
-		}
-	}
-
-	/**
-	 * A private enum for distinguishing updating clauses.
-	 */
-	enum UpdateType {
-		DELETE, DETACH_DELETE, SET, MUTATE, REMOVE,
-		CREATE, MERGE
-	}
-
-	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
-	private static final EnumSet<UpdateType> SET = EnumSet.of(UpdateType.SET, UpdateType.MUTATE);
-
-	private interface UpdatingClauseBuilder {
-
-		UpdatingClause build();
-	}
-
-	interface SupportsActionsOnTheUpdatingClause {
-
-		SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, UpdateType updateType, Expression... expressions);
-	}
-
-	/**
-	 * Creates a builder for an UPDATE clause. The vargs is list of pattern or expressions.
-	 * In case {@code updateType} is of {@link UpdateType#MERGE} or {@link UpdateType#CREATE} they will
-	 * be treated as pattern, otherwise as expression.
+	 * Infrastructure for building {@link UpdatingClause updating clauses}.
 	 *
-	 * @param updateType           The update type to create
-	 * @param patternOrExpressions A list of pattern or expression
-	 * @param <T>                  The type of {@code patternOrExpressions}
-	 * @return Ongoing builder
-	 */
-	@SafeVarargs
-	@SuppressWarnings("varargs") // WTH IDEA?
-	private static <T extends Visitable> UpdatingClauseBuilder getUpdatingClauseBuilder(
-		UpdateType updateType, T... patternOrExpressions
-	) {
-
-		boolean mergeOrCreate = MERGE_OR_CREATE.contains(updateType);
-		String message = mergeOrCreate ?
-			"At least one pattern is required." :
-			"At least one modifying expressions is required.";
-		Assertions.notNull(patternOrExpressions, message);
-		Assertions.notEmpty(patternOrExpressions, message);
-
-		if (mergeOrCreate) {
-			final List<PatternElement> patternElements = Arrays.stream(patternOrExpressions)
-				.map(PatternElement.class::cast).toList();
-			if (updateType == UpdateType.CREATE) {
-				return new AbstractUpdatingClauseBuilder.CreateBuilder(patternElements);
-			} else {
-				return new AbstractUpdatingClauseBuilder.MergeBuilder(patternElements);
-			}
-		} else {
-			List<Expression> expressions = Arrays.stream(patternOrExpressions).map(Expression.class::cast)
-				.toList();
-			ExpressionList expressionList = new ExpressionList(
-				SET.contains(updateType) ? prepareSetExpressions(updateType, expressions) : expressions);
-			return switch (updateType) {
-				case DETACH_DELETE -> () -> new Delete(expressionList, true);
-				case DELETE -> () -> new Delete(expressionList, false);
-				case SET, MUTATE -> () -> new Set(expressionList);
-				case REMOVE -> () -> new Remove(expressionList);
-				default -> throw new IllegalArgumentException("Unsupported update type " + updateType);
-			};
-		}
-	}
-
-	/**
-	 * Utility method to prepare a list of expression to work with the set clause.
-	 *
-	 * @param possibleSetOperations A mixed list of expressions (property and list operations)
-	 * @return A reified list of expressions that all target properties
-	 */
-	private static List<Expression> prepareSetExpressions(UpdateType updateType,
-		List<Expression> possibleSetOperations) {
-
-		List<Expression> propertyOperations = new ArrayList<>();
-		List<Expression> listOfExpressions = new ArrayList<>();
-
-		for (Expression possibleSetOperation : possibleSetOperations) {
-			if (possibleSetOperation instanceof Operation) {
-				propertyOperations.add(possibleSetOperation);
-			} else {
-				listOfExpressions.add(possibleSetOperation);
-			}
-		}
-
-		if (listOfExpressions.size() % 2 != 0) {
-			throw new IllegalArgumentException("The list of expression to set must be even.");
-		}
-
-		if (updateType == UpdateType.SET) {
-
-			for (int i = 0; i < listOfExpressions.size(); i += 2) {
-				propertyOperations.add(Operations.set(listOfExpressions.get(i), listOfExpressions.get(i + 1)));
-			}
-		} else if (updateType == UpdateType.MUTATE) {
-
-			if (!(listOfExpressions.isEmpty() || propertyOperations.isEmpty())) {
-				throw new IllegalArgumentException(
-					"A mutating SET must be build through a single operation or through a pair of expression, not both.");
-			}
-
-			if (listOfExpressions.isEmpty()) {
-				for (Expression operation : propertyOperations) {
-					if (((Operation) operation).getOperator() != Operator.MUTATE) {
-						throw new IllegalArgumentException(
-							"Only property operations based on the " + Operator.MUTATE + " are supported inside a mutating SET.");
-					}
-				}
-			} else {
-				for (int i = 0; i < listOfExpressions.size(); i += 2) {
-					Expression rhs = listOfExpressions.get(i + 1);
-					if (rhs instanceof Parameter) {
-						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), rhs));
-					} else if (rhs instanceof MapExpression mapExpression) {
-						propertyOperations.add(Operations.mutate(listOfExpressions.get(i), mapExpression));
-					} else {
-						throw new IllegalArgumentException(
-							"A mutating SET operation can only be used with a named parameter or a map expression.");
-					}
-				}
-			}
-		}
-
-		if (updateType != UpdateType.REMOVE && propertyOperations.stream().anyMatch(e -> e instanceof Operation op && op.getOperator() == Operator.REMOVE_LABEL)) {
-			throw new IllegalArgumentException("REMOVE operations are not supported in a SET clause");
-		}
-		return propertyOperations;
-	}
-
-	private static Collection<Expression> extractIdentifiablesFromReturnList(List<Expression> returnList) {
-		return returnList.stream()
-			.filter(IdentifiableElement.class::isInstance)
-			.map(IdentifiableElement.class::cast)
-			.map(IdentifiableElement::asExpression)
-			.collect(Collectors.toSet());
-	}
-
-	/**
-	 * Infrastructure for building {@link UpdatingClause updating clauses}
-	 *
-	 * @param <T> The type of the updating clause
+	 * @param <T> the type of the updating clause
 	 */
 	private abstract static class AbstractUpdatingClauseBuilder<T extends UpdatingClause>
-		implements UpdatingClauseBuilder {
+			implements UpdatingClauseBuilder {
 
 		protected final List<PatternElement> patternElements;
 
@@ -1167,7 +740,7 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		@Override
 		public T build() {
-			return getUpdatingClauseProvider().apply(Pattern.of(patternElements));
+			return getUpdatingClauseProvider().apply(Pattern.of(this.patternElements));
 		}
 
 		static class CreateBuilder extends AbstractUpdatingClauseBuilder<Create> {
@@ -1176,13 +749,15 @@ class DefaultStatementBuilder implements StatementBuilder,
 				super(patternElements);
 			}
 
-			@Override Function<Pattern, Create> getUpdatingClauseProvider() {
+			@Override
+			Function<Pattern, Create> getUpdatingClauseProvider() {
 				return Create::new;
 			}
+
 		}
 
-		static class MergeBuilder extends AbstractUpdatingClauseBuilder<Merge> implements
-			SupportsActionsOnTheUpdatingClause {
+		static class MergeBuilder extends AbstractUpdatingClauseBuilder<Merge>
+				implements SupportsActionsOnTheUpdatingClause {
 
 			private final List<MergeAction> mergeActions = new ArrayList<>();
 
@@ -1192,208 +767,22 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 			@Override
 			Function<Pattern, Merge> getUpdatingClauseProvider() {
-				return pattern -> new Merge(pattern, mergeActions);
+				return pattern -> new Merge(pattern, this.mergeActions);
 			}
 
 			@Override
 			public SupportsActionsOnTheUpdatingClause on(MergeAction.Type type, UpdateType updateType,
-				Expression... expressions) {
+					Expression... expressions) {
 
 				ExpressionList expressionList = new ExpressionList(
-					prepareSetExpressions(updateType, Arrays.asList(expressions)));
+						prepareSetExpressions(updateType, Arrays.asList(expressions)));
 				this.mergeActions.add(MergeAction.of(type, new Set(expressionList)));
 				return this;
 			}
+
 		}
+
 	}
-
-	protected final class DefaultStatementWithUpdateBuilder implements BuildableMatchAndUpdate {
-
-		final UpdatingClauseBuilder builder;
-
-		private DefaultStatementWithUpdateBuilder(UpdateType updateType, PatternElement... pattern) {
-
-			this.builder = getUpdatingClauseBuilder(updateType, pattern);
-		}
-
-		private DefaultStatementWithUpdateBuilder(UpdateType updateType, Expression... expressions) {
-
-			this.builder = getUpdatingClauseBuilder(updateType, expressions);
-		}
-
-			@Override
-		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
-
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-
-			DefaultStatementWithReturnBuilder delegate = new DefaultStatementWithReturnBuilder(false, false);
-			delegate.addExpressions(expressions);
-			return delegate;
-		}
-
-			@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> elements) {
-
-			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(elements);
-			delegate.distinct = true;
-			return delegate;
-		}
-
-			@Override
-		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
-
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return new DefaultStatementWithReturnBuilder(rawExpression);
-		}
-
-			@Override
-		public OngoingUpdate delete(Expression... deletedExpressions) {
-			return delete(false, deletedExpressions);
-		}
-
-			@Override
-		public OngoingUpdate delete(Collection<? extends Expression> deletedExpressions) {
-			return delete(deletedExpressions.toArray(new Expression[] {}));
-		}
-
-			@Override
-		public OngoingUpdate detachDelete(Expression... deletedExpressions) {
-			return delete(true, deletedExpressions);
-		}
-
-			@Override
-		public OngoingUpdate detachDelete(Collection<? extends Expression> deletedExpressions) {
-			return detachDelete(deletedExpressions.toArray(new Expression[] {}));
-		}
-
-			@Override
-		public OngoingMerge merge(PatternElement... pattern) {
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.merge(pattern);
-		}
-
-		private OngoingUpdate delete(boolean nextDetach, Expression... deletedExpressions) {
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this
-				.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE, deletedExpressions);
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Expression... keyValuePairs) {
-
-			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.SET, keyValuePairs);
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return result;
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Collection<? extends Expression> keyValuePairs) {
-
-			return set(keyValuePairs.toArray(new Expression[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Node node, String... labels) {
-
-			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
-				UpdateType.SET, Operations.set(node, labels));
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return result;
-		}
-
-			@Override
-		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
-
-			return set(node, labels.toArray(new String[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
-
-			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
-				UpdateType.MUTATE, Operations.mutate(target, properties));
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return result;
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Node node, String... labels) {
-
-			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE,
-				Operations.set(node, labels));
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return result;
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
-
-			return remove(node, labels.toArray(new String[] {}));
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Property... properties) {
-
-			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, properties);
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return result;
-		}
-
-			@Override
-		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
-
-			return remove(properties.toArray(new Property[] {}));
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> returnedExpressions) {
-			return this.with(false, returnedExpressions);
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
-			return this.with(true, elements);
-		}
-
-			@Override
-		public OngoingUpdate create(PatternElement... pattern) {
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.create(pattern);
-		}
-
-			@Override
-		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
-			return create(pattern.toArray(new PatternElement[] {}));
-		}
-
-		private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct, Collection<IdentifiableElement> elements) {
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.with(distinct, elements);
-		}
-
-			@Override
-		public Statement build() {
-
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.buildImpl(null);
-		}
-
-		@Override
-		public ForeachSourceStep foreach(SymbolicName variable) {
-
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return DefaultStatementBuilder.this.foreach(variable);
-		}
-
-		@Override
-		public StatementBuilder.Terminal finish() {
-
-			DefaultStatementBuilder.this.addUpdatingClause(builder.build());
-			return new DefaultStatementWithFinishBuilder();
-		}
-	}
-
-	// Static builder and support classes
 
 	static final class MatchBuilder {
 
@@ -1410,42 +799,19 @@ class DefaultStatementBuilder implements StatementBuilder,
 		}
 
 		Match buildMatch() {
-			return (Match) Clauses.match(optional, this.patternList, Where.from(conditionBuilder.buildCondition().orElse(null)), hints);
-		}
-	}
-
-	final class DefaultOngoingUnwind implements OngoingUnwind {
-
-		private final Expression expressionToUnwind;
-
-		DefaultOngoingUnwind(Expression expressionToUnwind) {
-			this.expressionToUnwind = expressionToUnwind;
+			return (Match) Clauses.match(this.optional, this.patternList,
+					Where.from(this.conditionBuilder.buildCondition().orElse(null)), this.hints);
 		}
 
-			@Override
-		public OngoingReading as(String variable) {
-			DefaultStatementBuilder.this.currentSinglePartElements.add(new Unwind(expressionToUnwind, variable));
-			return DefaultStatementBuilder.this;
-		}
-	}
-
-	@Override
-	public InQueryCallBuilder call(String... namespaceAndProcedure) {
-
-		Assertions.notEmpty(namespaceAndProcedure, "The procedure namespace and name must not be null or empty.");
-
-		closeCurrentOngoingMatch();
-
-		return new InQueryCallBuilder(ProcedureName.from(namespaceAndProcedure));
 	}
 
 	abstract static class AbstractCallBuilder {
 
 		protected final ProcedureName procedureName;
 
-		protected Expression[] arguments;
-
 		protected final DefaultStatementBuilder.ConditionBuilder conditionBuilder = new DefaultStatementBuilder.ConditionBuilder();
+
+		protected Expression[] arguments;
 
 		AbstractCallBuilder(ProcedureName procedureName) {
 			this(procedureName, null);
@@ -1458,56 +824,58 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		Arguments createArgumentList() {
 			Arguments argumentsList = null;
-			if (arguments != null && arguments.length > 0) {
-				argumentsList = new Arguments(arguments);
+			if (this.arguments != null && this.arguments.length > 0) {
+				argumentsList = new Arguments(this.arguments);
 			}
 			return argumentsList;
 		}
+
 	}
 
 	static final class StandaloneCallBuilder extends AbstractCallBuilder implements
 
-		OngoingStandaloneCallWithoutArguments,
-		OngoingStandaloneCallWithArguments {
+			OngoingStandaloneCallWithoutArguments, OngoingStandaloneCallWithArguments {
 
 		StandaloneCallBuilder(ProcedureName procedureName) {
 			super(procedureName);
 		}
 
-			@Override
+		@Override
 		public StandaloneCallBuilder withArgs(Expression... arguments) {
 
 			super.arguments = arguments;
 			return this;
 		}
 
-			public OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk) {
+		@Override
+		public OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk) {
 
-			return new YieldingStandaloneCallBuilder(procedureName, arguments, asterisk);
+			return new YieldingStandaloneCallBuilder(this.procedureName, this.arguments, asterisk);
 		}
 
-			@Override
+		@Override
 		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(SymbolicName... resultFields) {
 
-			return new YieldingStandaloneCallBuilder(procedureName, arguments, resultFields);
+			return new YieldingStandaloneCallBuilder(this.procedureName, this.arguments, resultFields);
 		}
 
-			@Override
+		@Override
 		public DefaultStatementBuilder.YieldingStandaloneCallBuilder yield(AliasedExpression... aliasedResultFields) {
 
-			return new YieldingStandaloneCallBuilder(procedureName,  arguments, aliasedResultFields);
+			return new YieldingStandaloneCallBuilder(this.procedureName, this.arguments, aliasedResultFields);
 		}
 
-			@Override
+		@Override
 		public Expression asFunction(boolean distinct) {
 
 			if (super.arguments == null || super.arguments.length == 0) {
-				return FunctionInvocation.create(procedureName::getQualifiedName);
+				return FunctionInvocation.create(this.procedureName::getQualifiedName);
 			}
 			if (distinct) {
-				return FunctionInvocation.createDistinct(procedureName::getQualifiedName, super.arguments);
-			} else {
-				return FunctionInvocation.create(procedureName::getQualifiedName, super.arguments);
+				return FunctionInvocation.createDistinct(this.procedureName::getQualifiedName, super.arguments);
+			}
+			else {
+				return FunctionInvocation.create(this.procedureName::getQualifiedName, super.arguments);
 			}
 		}
 
@@ -1516,22 +884,25 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return new DefaultStatementBuilder(this.build());
 		}
 
-			@Override
+		@Override
 		public ProcedureCall build() {
 
-			return ProcedureCallImpl.create(procedureName, createArgumentList(), null,
-				conditionBuilder.buildCondition().map(Where::new).orElse(null));
+			return ProcedureCallImpl.create(this.procedureName, createArgumentList(), null,
+					this.conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
+
 	}
 
 	static final class YieldingStandaloneCallBuilder extends AbstractCallBuilder
-		implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesFinish, OngoingStandaloneCallWithReturnFields {
+			implements ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesReturning, ExposesFinish,
+			OngoingStandaloneCallWithReturnFields {
 
 		private final YieldItems yieldItems;
 
 		private DefaultStatementBuilder delegate;
 
-		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, SymbolicName... resultFields) {
+		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments,
+				SymbolicName... resultFields) {
 			super(procedureName, arguments);
 			this.yieldItems = YieldItems.yieldAllOf(resultFields);
 		}
@@ -1541,46 +912,50 @@ class DefaultStatementBuilder implements StatementBuilder,
 			this.yieldItems = YieldItems.yieldAllOf(asterisk);
 		}
 
-		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments, AliasedExpression... aliasedResultFields) {
+		YieldingStandaloneCallBuilder(ProcedureName procedureName, Expression[] arguments,
+				AliasedExpression... aliasedResultFields) {
 			super(procedureName, arguments);
 			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
 		}
 
-			@Override
+		@Override
 		public StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returning(expressions);
 		}
 
-			@Override
-		public StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
+		@Override
+		public StatementBuilder.OngoingReadingAndReturn returningDistinct(
+				Collection<? extends Expression> expressions) {
 
 			return new DefaultStatementBuilder(this.buildCall()).returningDistinct(expressions);
 		}
 
-			@Override
+		@Override
 		public StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression) {
 			return new DefaultStatementBuilder(this.buildCall()).returningRaw(rawExpression);
 		}
 
-			@Override
+		@Override
 		public StatementBuilder.OngoingReadingWithWhere where(Condition newCondition) {
 
-			conditionBuilder.where(newCondition);
+			this.conditionBuilder.where(newCondition);
 			return new DefaultStatementBuilder(this.buildCall());
 		}
 
-			@Override
-		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere with(
+				Collection<IdentifiableElement> elements) {
 			return new DefaultStatementBuilder(this.buildCall()).with(elements);
 		}
 
-			@Override
-		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+		@Override
+		public StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere withDistinct(
+				Collection<IdentifiableElement> elements) {
 			return new DefaultStatementBuilder(this.buildCall()).withDistinct(elements);
 		}
 
-			@Override
+		@Override
 		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
 			return new DefaultStatementBuilder(this.buildCall()).call(statement, imports);
 		}
@@ -1590,28 +965,28 @@ class DefaultStatementBuilder implements StatementBuilder,
 			return new DefaultStatementBuilder(this.buildCall()).callRawCypher(rawCypher, args);
 		}
 
-			@Override
+		@Override
 		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
 			return new DefaultStatementBuilder(this.buildCall()).callInTransactions(statement, rows, imports);
 		}
 
-			@Override
+		@Override
 		public Statement build() {
 
 			if (this.delegate != null) {
 				return this.delegate.build();
 			}
 
-			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
-				conditionBuilder.buildCondition().map(Where::new).orElse(null));
+			return ProcedureCallImpl.create(this.procedureName, createArgumentList(), this.yieldItems,
+					this.conditionBuilder.buildCondition().map(Where::new).orElse(null));
 		}
 
 		Statement buildCall() {
 			return build();
 		}
 
-			@Override
-		public  StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
+		@Override
+		public StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
 			return new DefaultStatementBuilder(this.buildCall()).match(optional, pattern);
 		}
 
@@ -1628,137 +1003,13 @@ class DefaultStatementBuilder implements StatementBuilder,
 		public StatementBuilder.Terminal finish() {
 			return new DefaultStatementBuilder(this.buildCall());
 		}
+
 	}
 
-	final class InQueryCallBuilder extends AbstractCallBuilder implements
-
-		OngoingInQueryCallWithoutArguments,
-		OngoingInQueryCallWithArguments,
-		OngoingInQueryCallWithReturnFields {
-
-		private YieldItems yieldItems;
-
-		InQueryCallBuilder(ProcedureName procedureName) {
-			super(procedureName);
-		}
-
-		Statement buildCall() {
-
-			return ProcedureCallImpl.create(procedureName, createArgumentList(), yieldItems,
-				conditionBuilder.buildCondition().map(Where::new).orElse(null));
-		}
-
-			@Override
-		public InQueryCallBuilder withArgs(Expression... arguments) {
-
-			super.arguments = arguments;
-			return this;
-		}
-
-			@Override
-		public InQueryCallBuilder yield(SymbolicName... resultFields) {
-
-			this.yieldItems = YieldItems.yieldAllOf(resultFields);
-			return this;
-		}
-
-			@Override
-		public InQueryCallBuilder yield(AliasedExpression... aliasedResultFields) {
-
-			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
-			return this;
-		}
-
-			@Override
-		public OngoingReadingWithWhere where(Condition newCondition) {
-
-			conditionBuilder.where(newCondition);
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this;
-		}
-
-			@Override
-		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.returning(expressions);
-		}
-
-			@Override
-		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.returningDistinct(expressions);
-		}
-
-			@Override
-		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.returningRaw(rawExpression);
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.with(elements);
-		}
-
-			@Override
-		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.withDistinct(elements);
-		}
-
-			@Override
-		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.call(statement, imports);
-		}
-
-		@Override
-		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.callRawCypher(rawCypher, args);
-		}
-
-			@Override
-		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.callInTransactions(statement, rows, imports);
-		}
-
-			@Override
-		public
-		StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
-
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.match(optional, pattern);
-		}
-
-		@Override
-		public VoidCall withoutResults() {
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this;
-		}
-
-		@Override
-		public ForeachSourceStep foreach(SymbolicName variable) {
-			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
-			return DefaultStatementBuilder.this.foreach(variable);
-		}
-
-		@Override
-		public StatementBuilder.Terminal finish() {
-			return DefaultStatementBuilder.this;
-		}
-	}
+	// Static builder and support classes
 
 	static final class ConditionBuilder {
+
 		private Condition condition;
 
 		void where(Condition newCondition) {
@@ -1785,12 +1036,17 @@ class DefaultStatementBuilder implements StatementBuilder,
 		Optional<Condition> buildCondition() {
 			return hasCondition() ? Optional.of(this.condition) : Optional.empty();
 		}
+
 	}
 
 	static final class OrderBuilder {
+
 		final List<SortItem> sortItemList = new ArrayList<>();
+
 		SortItem lastSortItem;
+
 		Skip skip;
+
 		Limit limit;
 
 		void reset() {
@@ -1830,32 +1086,796 @@ class DefaultStatementBuilder implements StatementBuilder,
 
 		void skip(Expression expression) {
 			if (expression != null) {
-				skip = Skip.create(expression);
+				this.skip = Skip.create(expression);
 			}
 		}
 
 		void limit(Expression expression) {
 			if (expression != null) {
-				limit = Limit.create(expression);
+				this.limit = Limit.create(expression);
 			}
 		}
 
 		Optional<Order> buildOrder() {
-			if (lastSortItem != null) {
-				sortItemList.add(lastSortItem);
+			if (this.lastSortItem != null) {
+				this.sortItemList.add(this.lastSortItem);
 			}
-			Optional<Order> result = sortItemList.isEmpty() ? Optional.empty() : Optional.of(new Order(sortItemList));
-			sortItemList.clear();
-			lastSortItem = null;
+			Optional<Order> result = this.sortItemList.isEmpty() ? Optional.empty()
+					: Optional.of(new Order(this.sortItemList));
+			this.sortItemList.clear();
+			this.lastSortItem = null;
 			return result;
 		}
 
 		Skip getSkip() {
-			return skip;
+			return this.skip;
 		}
 
 		Limit getLimit() {
-			return limit;
+			return this.limit;
 		}
+
 	}
+
+	final class ForeachBuilder implements ForeachSourceStep, ForeachUpdateStep {
+
+		private final SymbolicName variable;
+
+		private Expression list;
+
+		ForeachBuilder(SymbolicName variable) {
+			this.variable = variable;
+		}
+
+		@Override
+		public ForeachUpdateStep in(Expression newVariableList) {
+
+			this.list = Objects.requireNonNull(newVariableList);
+			return this;
+		}
+
+		@Override
+		public OngoingUpdate apply(UpdatingClause... updatingClauses) {
+			if (Arrays.stream(updatingClauses).anyMatch(Foreach.class::isInstance)) {
+				throw new IllegalArgumentException("FOREACH clauses may not be nested");
+			}
+
+			DefaultStatementBuilder.this
+				.addUpdatingClause(new Foreach(this.variable, this.list, Arrays.asList(updatingClauses)));
+			return DefaultStatementBuilder.this;
+		}
+
+	}
+
+	protected class DefaultStatementWithReturnBuilder extends ReturnListWrapper
+			implements OngoingReadingAndReturn, TerminalOngoingOrderDefinition, OngoingMatchAndReturnWithOrder {
+
+		private final OrderBuilder orderBuilder = new OrderBuilder();
+
+		protected boolean rawReturn;
+
+		protected boolean distinct;
+
+		protected DefaultStatementWithReturnBuilder(Expression rawReturnExpression) {
+			this.distinct = false;
+			this.rawReturn = true;
+			this.returnList.add(rawReturnExpression);
+		}
+
+		protected DefaultStatementWithReturnBuilder(boolean rawReturn, boolean distinct) {
+			this.distinct = distinct;
+			this.rawReturn = rawReturn;
+		}
+
+		@Override
+		public Collection<Expression> getIdentifiableExpressions() {
+			return extractIdentifiablesFromReturnList(this.returnList);
+		}
+
+		@Override
+		public final OngoingMatchAndReturnWithOrder orderBy(SortItem... sortItem) {
+			this.orderBuilder.orderBy(sortItem);
+			return this;
+		}
+
+		@Override
+		public final OngoingMatchAndReturnWithOrder orderBy(Collection<SortItem> sortItem) {
+			return orderBy(sortItem.toArray(new SortItem[] {}));
+		}
+
+		@Override
+		public final TerminalOngoingOrderDefinition orderBy(Expression expression) {
+			this.orderBuilder.orderBy(expression);
+			return this;
+		}
+
+		@Override
+		public final TerminalOngoingOrderDefinition and(Expression expression) {
+			this.orderBuilder.and(expression);
+			return this;
+		}
+
+		@Override
+		public final DefaultStatementWithReturnBuilder descending() {
+			this.orderBuilder.descending();
+			return this;
+		}
+
+		@Override
+		public final DefaultStatementWithReturnBuilder ascending() {
+			this.orderBuilder.ascending();
+			return this;
+		}
+
+		@Override
+		public final OngoingReadingAndReturn skip(Number number) {
+			return skip((number != null) ? new NumberLiteral(number) : null);
+		}
+
+		@Override
+		public final OngoingReadingAndReturn skip(Expression expression) {
+			this.orderBuilder.skip(expression);
+			return this;
+		}
+
+		@Override
+		public final OngoingReadingAndReturn limit(Number number) {
+			return limit((number != null) ? new NumberLiteral(number) : null);
+		}
+
+		@Override
+		public final OngoingReadingAndReturn limit(Expression expression) {
+			this.orderBuilder.limit(expression);
+			return this;
+		}
+
+		@Override
+		public ResultStatement build() {
+
+			Return returning = Return.create(this.rawReturn, this.distinct, this.returnList, this.orderBuilder);
+			return (ResultStatement) DefaultStatementBuilder.this.buildImpl(returning);
+		}
+
+	}
+
+	protected final class DefaultStatementWithFinishBuilder implements Terminal {
+
+		@Override
+		public Statement build() {
+			return DefaultStatementBuilder.this.buildImpl(Finish.create());
+		}
+
+	}
+
+	/**
+	 * Helper class aggregating a couple of interface, collecting conditions and returned
+	 * objects.
+	 */
+	protected final class DefaultStatementWithWithBuilder extends ReturnListWrapper implements OngoingOrderDefinition,
+			OrderableOngoingReadingAndWithWithoutWhere, OrderableOngoingReadingAndWithWithWhere,
+			OngoingReadingAndWithWithWhereAndOrder, OngoingReadingAndWithWithSkip {
+
+		private final ConditionBuilder conditionBuilder = new ConditionBuilder();
+
+		private final OrderBuilder orderBuilder = new OrderBuilder();
+
+		private final boolean distinct;
+
+		private DefaultStatementWithWithBuilder(boolean distinct) {
+			this.distinct = distinct;
+		}
+
+		private Optional<With> buildWith() {
+
+			if (this.returnList.isEmpty()) {
+				return Optional.empty();
+			}
+
+			ExpressionList returnItems = new ExpressionList(this.returnList);
+
+			Where where = this.conditionBuilder.buildCondition().map(Where::new).orElse(null);
+
+			Optional<With> returnedWith = Optional
+				.of(new With(this.distinct, returnItems, this.orderBuilder.buildOrder().orElse(null),
+						this.orderBuilder.getSkip(), this.orderBuilder.getLimit(), where));
+			this.returnList.clear();
+			this.orderBuilder.reset();
+			return returnedWith;
+		}
+
+		@Override
+		public Collection<Expression> getIdentifiableExpressions() {
+			return extractIdentifiablesFromReturnList(this.returnList);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).returning(expressions);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).returningDistinct(expressions);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+			return DefaultStatementBuilder.this.addWith(buildWith()).returningRaw(rawExpression);
+		}
+
+		@Override
+		public OngoingUpdate delete(Expression... expressions) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).delete(expressions);
+		}
+
+		@Override
+		public OngoingUpdate delete(Collection<? extends Expression> expressions) {
+
+			return delete(expressions.toArray(new Expression[] {}));
+		}
+
+		@Override
+		public OngoingUpdate detachDelete(Expression... expressions) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).detachDelete(expressions);
+		}
+
+		@Override
+		public OngoingUpdate detachDelete(Collection<? extends Expression> expressions) {
+
+			return detachDelete(expressions.toArray(new Expression[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Expression... expressions) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).set(expressions);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Collection<? extends Expression> expressions) {
+
+			return set(expressions.toArray(new Expression[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Node node, String... labels) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).set(node, labels);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
+
+			return set(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).mutate(target, properties);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Node node, String... labels) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).remove(node, labels);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
+
+			return remove(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Property... properties) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).remove(properties);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
+
+			return remove(properties.toArray(new Property[] {}));
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).with(elements);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).withDistinct(elements);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithWhere where(Condition newCondition) {
+
+			this.conditionBuilder.where(newCondition);
+			return this;
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithWhere and(Condition additionalCondition) {
+
+			this.conditionBuilder.and(additionalCondition);
+			return this;
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithWhere or(Condition additionalCondition) {
+
+			this.conditionBuilder.or(additionalCondition);
+			return this;
+		}
+
+		@Override
+		public OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).match(optional, pattern);
+		}
+
+		@Override
+		public OngoingUpdate create(PatternElement... pattern) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).create(pattern);
+		}
+
+		@Override
+		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
+
+			return create(pattern.toArray(new PatternElement[] {}));
+		}
+
+		@Override
+		public OngoingMerge merge(PatternElement... pattern) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).merge(pattern);
+		}
+
+		@Override
+		public OngoingUnwind unwind(Expression expression) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).unwind(expression);
+		}
+
+		@Override
+		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).call(statement, imports);
+		}
+
+		@Override
+		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).callRawCypher(rawCypher, args);
+		}
+
+		@Override
+		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
+			return DefaultStatementBuilder.this.addWith(buildWith()).callInTransactions(statement, rows, imports);
+		}
+
+		@Override
+		public InQueryCallBuilder call(String... namespaceAndProcedure) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).call(namespaceAndProcedure);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithWhere orderBy(SortItem... sortItem) {
+			this.orderBuilder.orderBy(sortItem);
+			return this;
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithWhere orderBy(Collection<SortItem> sortItem) {
+			return orderBy(sortItem.toArray(new SortItem[] {}));
+		}
+
+		@Override
+		public OngoingOrderDefinition orderBy(Expression expression) {
+			this.orderBuilder.orderBy(expression);
+			return this;
+		}
+
+		@Override
+		public OngoingOrderDefinition and(Expression expression) {
+			this.orderBuilder.and(expression);
+			return this;
+		}
+
+		@Override
+		public OngoingReadingAndWithWithWhereAndOrder descending() {
+			this.orderBuilder.descending();
+			return this;
+		}
+
+		@Override
+		public OngoingReadingAndWithWithWhereAndOrder ascending() {
+			this.orderBuilder.ascending();
+			return this;
+		}
+
+		@Override
+		public OngoingReadingAndWithWithSkip skip(Number number) {
+			return skip((number != null) ? new NumberLiteral(number) : null);
+		}
+
+		@Override
+		public OngoingReadingAndWithWithSkip skip(Expression expression) {
+			this.orderBuilder.skip(expression);
+			return this;
+		}
+
+		@Override
+		public OngoingReadingAndWith limit(Number number) {
+			return limit((number != null) ? new NumberLiteral(number) : null);
+		}
+
+		@Override
+		public OngoingReadingAndWith limit(Expression expression) {
+			this.orderBuilder.limit(expression);
+			return this;
+		}
+
+		@Override
+		public LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders) {
+
+			DefaultStatementBuilder this0 = DefaultStatementBuilder.this.addWith(buildWith());
+			return new DefaultLoadCSVStatementBuilder.PrepareLoadCSVStatementImpl(from, withHeaders, this0);
+		}
+
+		@Override
+		public ForeachSourceStep foreach(SymbolicName variable) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).foreach(variable);
+		}
+
+		@Override
+		public StatementBuilder.Terminal finish() {
+			return DefaultStatementBuilder.this;
+		}
+
+	}
+
+	protected final class DefaultStatementWithUpdateBuilder implements BuildableMatchAndUpdate {
+
+		final UpdatingClauseBuilder builder;
+
+		private DefaultStatementWithUpdateBuilder(UpdateType updateType, PatternElement... pattern) {
+
+			this.builder = getUpdatingClauseBuilder(updateType, pattern);
+		}
+
+		private DefaultStatementWithUpdateBuilder(UpdateType updateType, Expression... expressions) {
+
+			this.builder = getUpdatingClauseBuilder(updateType, expressions);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
+
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+
+			DefaultStatementWithReturnBuilder delegate = new DefaultStatementWithReturnBuilder(false, false);
+			delegate.addExpressions(expressions);
+			return delegate;
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> elements) {
+
+			DefaultStatementWithReturnBuilder delegate = (DefaultStatementWithReturnBuilder) returning(elements);
+			delegate.distinct = true;
+			return delegate;
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return new DefaultStatementWithReturnBuilder(rawExpression);
+		}
+
+		@Override
+		public OngoingUpdate delete(Expression... deletedExpressions) {
+			return delete(false, deletedExpressions);
+		}
+
+		@Override
+		public OngoingUpdate delete(Collection<? extends Expression> deletedExpressions) {
+			return delete(deletedExpressions.toArray(new Expression[] {}));
+		}
+
+		@Override
+		public OngoingUpdate detachDelete(Expression... deletedExpressions) {
+			return delete(true, deletedExpressions);
+		}
+
+		@Override
+		public OngoingUpdate detachDelete(Collection<? extends Expression> deletedExpressions) {
+			return detachDelete(deletedExpressions.toArray(new Expression[] {}));
+		}
+
+		@Override
+		public OngoingMerge merge(PatternElement... pattern) {
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return DefaultStatementBuilder.this.merge(pattern);
+		}
+
+		private OngoingUpdate delete(boolean nextDetach, Expression... deletedExpressions) {
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return DefaultStatementBuilder.this.update(nextDetach ? UpdateType.DETACH_DELETE : UpdateType.DELETE,
+					deletedExpressions);
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Expression... keyValuePairs) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.SET, keyValuePairs);
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Collection<? extends Expression> keyValuePairs) {
+
+			return set(keyValuePairs.toArray(new Expression[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Node node, String... labels) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.SET, Operations.set(node, labels));
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
+
+			return set(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.MUTATE, Operations.mutate(target, properties));
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Node node, String... labels) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.REMOVE, Operations.set(node, labels));
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
+
+			return remove(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Property... properties) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.REMOVE, properties);
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Collection<Property> properties) {
+
+			return remove(properties.toArray(new Property[] {}));
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> returnedExpressions) {
+			return this.with(false, returnedExpressions);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+			return this.with(true, elements);
+		}
+
+		@Override
+		public OngoingUpdate create(PatternElement... pattern) {
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return DefaultStatementBuilder.this.create(pattern);
+		}
+
+		@Override
+		public OngoingUpdate create(Collection<? extends PatternElement> pattern) {
+			return create(pattern.toArray(new PatternElement[] {}));
+		}
+
+		private OrderableOngoingReadingAndWithWithoutWhere with(boolean distinct,
+				Collection<IdentifiableElement> elements) {
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return DefaultStatementBuilder.this.with(distinct, elements);
+		}
+
+		@Override
+		public Statement build() {
+
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return DefaultStatementBuilder.this.buildImpl(null);
+		}
+
+		@Override
+		public ForeachSourceStep foreach(SymbolicName variable) {
+
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return DefaultStatementBuilder.this.foreach(variable);
+		}
+
+		@Override
+		public StatementBuilder.Terminal finish() {
+
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return new DefaultStatementWithFinishBuilder();
+		}
+
+	}
+
+	final class DefaultOngoingUnwind implements OngoingUnwind {
+
+		private final Expression expressionToUnwind;
+
+		DefaultOngoingUnwind(Expression expressionToUnwind) {
+			this.expressionToUnwind = expressionToUnwind;
+		}
+
+		@Override
+		public OngoingReading as(String variable) {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(new Unwind(this.expressionToUnwind, variable));
+			return DefaultStatementBuilder.this;
+		}
+
+	}
+
+	final class InQueryCallBuilder extends AbstractCallBuilder implements
+
+			OngoingInQueryCallWithoutArguments, OngoingInQueryCallWithArguments, OngoingInQueryCallWithReturnFields {
+
+		private YieldItems yieldItems;
+
+		InQueryCallBuilder(ProcedureName procedureName) {
+			super(procedureName);
+		}
+
+		Statement buildCall() {
+
+			return ProcedureCallImpl.create(this.procedureName, createArgumentList(), this.yieldItems,
+					this.conditionBuilder.buildCondition().map(Where::new).orElse(null));
+		}
+
+		@Override
+		public InQueryCallBuilder withArgs(Expression... arguments) {
+
+			super.arguments = arguments;
+			return this;
+		}
+
+		@Override
+		public InQueryCallBuilder yield(SymbolicName... resultFields) {
+
+			this.yieldItems = YieldItems.yieldAllOf(resultFields);
+			return this;
+		}
+
+		@Override
+		public InQueryCallBuilder yield(AliasedExpression... aliasedResultFields) {
+
+			this.yieldItems = YieldItems.yieldAllOf(aliasedResultFields);
+			return this;
+		}
+
+		@Override
+		public OngoingReadingWithWhere where(Condition newCondition) {
+
+			this.conditionBuilder.where(newCondition);
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this;
+		}
+
+		@Override
+		public OngoingReadingAndReturn returning(Collection<? extends Expression> expressions) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.returning(expressions);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.returningDistinct(expressions);
+		}
+
+		@Override
+		public OngoingReadingAndReturn returningRaw(Expression rawExpression) {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.returningRaw(rawExpression);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.with(elements);
+		}
+
+		@Override
+		public OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> elements) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.withDistinct(elements);
+		}
+
+		@Override
+		public BuildableSubquery call(Statement statement, IdentifiableElement... imports) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.call(statement, imports);
+		}
+
+		@Override
+		public BuildableSubquery callRawCypher(String rawCypher, Object... args) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.callRawCypher(rawCypher, args);
+		}
+
+		@Override
+		public BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.callInTransactions(statement, rows, imports);
+		}
+
+		@Override
+		public StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern) {
+
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.match(optional, pattern);
+		}
+
+		@Override
+		public VoidCall withoutResults() {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this;
+		}
+
+		@Override
+		public ForeachSourceStep foreach(SymbolicName variable) {
+			DefaultStatementBuilder.this.currentSinglePartElements.add(this.buildCall());
+			return DefaultStatementBuilder.this.foreach(variable);
+		}
+
+		@Override
+		public StatementBuilder.Terminal finish() {
+			return DefaultStatementBuilder.this;
+		}
+
+	}
+
 }

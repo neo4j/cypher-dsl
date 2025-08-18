@@ -19,18 +19,14 @@
 package org.neo4j.cypherdsl.examples.model;
 
 // tag::simple-model[]
+
 import java.util.List;
 
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Properties;
-// end::simple-model[]
-// tag::add-properties[]
 import org.neo4j.cypherdsl.core.Property;
-
-// end::add-properties[]
-// tag::simple-model[]
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 // end::simple-model[]
@@ -40,7 +36,9 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  */
 // tag::simple-model[]
 // tag::add-properties[]
-public final class Movie extends NodeBase<Movie> { // <.>
+public final class Movie extends NodeBase<Movie> {
+
+	// <.>
 
 	// end::add-properties[]
 	public static final Movie MOVIE = new Movie(); // <.>
@@ -50,6 +48,7 @@ public final class Movie extends NodeBase<Movie> { // <.>
 
 	// tag::add-properties[]
 	public final Property TITLE = this.property("title"); // <.>
+
 	// end::add-properties[]
 
 	public final Property RELEASED = this.property("released");
@@ -75,6 +74,7 @@ public final class Movie extends NodeBase<Movie> { // <.>
 		return new Movie(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
 	}
 	// tag::add-properties[]
+
 }
 // end::simple-model[]
 // end::add-properties[]

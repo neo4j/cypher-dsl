@@ -18,13 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * Representation of quantified path patterns.
+ *
  * @author Michael J. Simons
  * @since 2023.9.0
  */
@@ -32,14 +34,17 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = STABLE, since = "2023.9.0")
 public final class QuantifiedPathPattern implements PatternElement {
 
-	/**
-	 * Quantifier for path patterns.
-	 */
-	public sealed interface Quantifier extends Visitable {
+	private final TargetPattern delegate;
+
+	private final Quantifier quantifier;
+
+	private QuantifiedPathPattern(TargetPattern delegate, Quantifier quantifier) {
+		this.delegate = delegate;
+		this.quantifier = quantifier;
 	}
 
 	/**
-	 * Creates an interval quantifier
+	 * Creates an interval quantifier.
 	 * @param lowerBound lower bound, must be greater than or equal to 0
 	 * @param upperBound upper bound, must be greater than or equal to the lower bound
 	 * @return a quantifier
@@ -65,27 +70,18 @@ public final class QuantifiedPathPattern implements PatternElement {
 		return StarQuantifier.INSTANCE;
 	}
 
-	private final TargetPattern delegate;
-
-	private final Quantifier quantifier;
-
 	static QuantifiedPathPattern of(PatternElement patternElement, Quantifier quantifier) {
 
-		var delegate = patternElement instanceof TargetPattern ppp ? ppp : new TargetPattern(patternElement, null);
+		var delegate = (patternElement instanceof TargetPattern ppp) ? ppp : new TargetPattern(patternElement, null);
 
 		return new QuantifiedPathPattern(delegate, quantifier);
-	}
-
-	private QuantifiedPathPattern(TargetPattern delegate, Quantifier quantifier) {
-		this.delegate = delegate;
-		this.quantifier = quantifier;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
 		this.delegate.accept(visitor);
-		Visitable.visitIfNotNull(quantifier, visitor);
+		Visitable.visitIfNotNull(this.quantifier, visitor);
 		visitor.leave(this);
 	}
 
@@ -94,7 +90,44 @@ public final class QuantifiedPathPattern implements PatternElement {
 		if (predicate == null) {
 			return this;
 		}
-		return of(delegate.where(predicate), quantifier);
+		return of(this.delegate.where(predicate), this.quantifier);
+	}
+
+	/**
+	 * Specialized quantifier for 1 or more iterations ({@literal +} quantifier).
+	 */
+	@SuppressWarnings("squid:S6548") // I do like enums as singletons, deal with it,
+	private enum PlusQuantifier implements Quantifier {
+
+		INSTANCE;
+
+		@Override
+		public String toString() {
+			return "+";
+		}
+
+	}
+
+	/**
+	 * Specialized quantifier for 0 or more iterations ({@literal *} quantifier).
+	 */
+	@SuppressWarnings("squid:S6548") // I do like enums as singletons, deal with it,
+	private enum StarQuantifier implements Quantifier {
+
+		INSTANCE;
+
+		@Override
+		public String toString() {
+			return "*";
+		}
+
+	}
+
+	/**
+	 * Quantifier for path patterns.
+	 */
+	public sealed interface Quantifier extends Visitable {
+
 	}
 
 	/**
@@ -105,7 +138,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 
 		private final PatternElement delegate;
 
-			private final Where innerPredicate;
+		private final Where innerPredicate;
 
 		private TargetPattern(PatternElement delegate, Where innerPredicate) {
 			this.delegate = delegate;
@@ -128,6 +161,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 			}
 			return new TargetPattern(this.delegate, Where.from(predicate));
 		}
+
 	}
 
 	/**
@@ -153,7 +187,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 		@Override
 		public String toString() {
 			var result = "{";
-			result += (lowerBound() == null ? "0" : lowerBound());
+			result += ((lowerBound() == null) ? "0" : lowerBound());
 			result += ",";
 			if (upperBound() != null) {
 				result += upperBound();
@@ -163,29 +197,4 @@ public final class QuantifiedPathPattern implements PatternElement {
 		}
 	}
 
-	/**
-	 * Specialized quantifier for 1 or more iterations ({@literal +} quantifier).
-	 */
-	@SuppressWarnings("squid:S6548") // I do like enums as singletons, deal with it,
-	private enum PlusQuantifier implements Quantifier {
-		INSTANCE;
-
-		@Override
-		public String toString() {
-			return "+";
-		}
-	}
-
-	/**
-	 * Specialized quantifier for 0 or more iterations ({@literal *} quantifier).
-	 */
-	@SuppressWarnings("squid:S6548") // I do like enums as singletons, deal with it,
-	private enum StarQuantifier implements Quantifier {
-		INSTANCE;
-
-		@Override
-		public String toString() {
-			return "*";
-		}
-	}
 }

@@ -47,6 +47,8 @@ public class NodeWithRecordProperties {
 	record RecordAsProperty(String value) {
 	}
 
-	static abstract class RecordConverter implements Neo4jPersistentPropertyConverter<RecordAsProperty> {
+	abstract static class RecordConverter implements Neo4jPersistentPropertyConverter<RecordAsProperty> {
+
 	}
+
 }

@@ -24,4 +24,5 @@ abstract class AbstractClause implements Clause {
 	public final String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

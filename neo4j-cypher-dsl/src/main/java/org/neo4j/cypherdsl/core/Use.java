@@ -19,8 +19,9 @@
 package org.neo4j.cypherdsl.core;
 
 /**
- * The {@literal USE} clause can be prepended to statements or be used in a {@literal CALL} subquery. It is meant to
- * select composite databases or constituents thereof.
+ * The {@literal USE} clause can be prepended to statements or be used in a
+ * {@literal CALL} subquery. It is meant to select composite databases or constituents
+ * thereof.
  *
  * @author Michael J. Simons
  * @since 2023.0.0
@@ -28,7 +29,8 @@ package org.neo4j.cypherdsl.core;
 public sealed interface Use extends Clause permits UseClauseImpl {
 
 	/**
-	 * @return {@literal true} if this instance requires dynamic graph lookups
+	 * {@return <code>true</code> if this instance requires dynamic graph lookups}
 	 */
 	boolean dynamic();
+
 }

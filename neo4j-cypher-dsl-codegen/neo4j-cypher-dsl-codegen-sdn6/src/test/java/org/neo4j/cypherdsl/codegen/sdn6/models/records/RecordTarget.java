@@ -23,6 +23,7 @@ import org.springframework.data.neo4j.core.schema.Node;
 
 /**
  * Random test class.
+ *
  * @param value a value
  */
 @Node

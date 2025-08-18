@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -29,8 +26,12 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Match.html">Match</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Match.html">Match</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -38,12 +39,13 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = STABLE, since = "1.0")
 public final class Match extends AbstractClause implements ReadingClause {
 
-	private final boolean optional;
-
 	final Pattern pattern;
 
+	private final boolean optional;
+
 	/**
-	 * A Neo4j extension to the match clause that allows to specify hints via the {@code USING} clause.
+	 * A Neo4j extension to the match clause that allows to specify hints via the
+	 * {@code USING} clause.
 	 */
 	private final List<Hint> hints;
 
@@ -53,15 +55,15 @@ public final class Match extends AbstractClause implements ReadingClause {
 		this.optional = optional;
 		this.pattern = pattern;
 		this.optionalWhere = optionalWhere;
-		this.hints = optionalHints == null ? Collections.emptyList() : new ArrayList<>(optionalHints);
+		this.hints = (optionalHints != null) ? new ArrayList<>(optionalHints) : Collections.emptyList();
 	}
 
 	/**
-	 * @return True if this is an optional match.
+	 * {@return true if this is an optional match}
 	 */
 	@API(status = INTERNAL)
 	public boolean isOptional() {
-		return optional;
+		return this.optional;
 	}
 
 	@Override
@@ -70,7 +72,8 @@ public final class Match extends AbstractClause implements ReadingClause {
 		visitor.enter(this);
 		this.pattern.accept(visitor);
 		this.hints.forEach(value -> value.accept(visitor));
-		Visitable.visitIfNotNull(optionalWhere, visitor);
+		Visitable.visitIfNotNull(this.optionalWhere, visitor);
 		visitor.leave(this);
 	}
+
 }

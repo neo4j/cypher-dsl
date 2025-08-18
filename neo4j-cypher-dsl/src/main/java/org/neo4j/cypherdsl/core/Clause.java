@@ -18,18 +18,18 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * This is a marker interface for top level clauses.
  *
  * @author Michael J. Simons
- * @soundtrack Chingon - Mexican Spaghetti Western
  * @since 2021.3.0
  */
 @API(status = STABLE, since = "2021.3.0")
 public interface Clause extends Visitable {
+
 }

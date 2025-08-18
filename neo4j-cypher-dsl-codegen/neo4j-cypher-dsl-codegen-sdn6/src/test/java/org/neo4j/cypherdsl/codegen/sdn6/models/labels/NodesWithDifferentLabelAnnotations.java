@@ -21,7 +21,8 @@ package org.neo4j.cypherdsl.codegen.sdn6.models.labels;
 import org.springframework.data.neo4j.core.schema.Node;
 
 /**
- * Tests various ways to define labels. The generated classes will end up in a subpackage as they are static, inner classes.
+ * Tests various ways to define labels. The generated classes will end up in a subpackage
+ * as they are static, inner classes.
  *
  * @author Michael J. Simons
  */
@@ -29,25 +30,34 @@ public class NodesWithDifferentLabelAnnotations {
 
 	@Node("ALabel")
 	static class LabelOnNode1 {
+
 	}
 
+	@SuppressWarnings("checkstyle:AnnotationUseStyle")
 	@Node(value = "ALabel")
 	static class LabelOnNode2 {
+
 	}
 
 	@Node(primaryLabel = "ALabel")
 	static class LabelOnNode3 {
+
 	}
 
+	@SuppressWarnings("checkstyle:AnnotationUseStyle")
 	@Node(value = { "Label1", "Label2" })
 	static class MultipleLabels1 {
+
 	}
 
 	@Node(primaryLabel = "PL", value = { "Label1", "Label2" })
 	static class MultipleLabels2 {
+
 	}
 
 	@Node(primaryLabel = "PL", value = { "Label1", "Label2" }, labels = "Some more")
 	static class MultipleLabels3 {
+
 	}
+
 }

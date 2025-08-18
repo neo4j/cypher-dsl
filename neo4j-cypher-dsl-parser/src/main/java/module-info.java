@@ -23,8 +23,6 @@
 @SuppressWarnings( {"requires-automatic"}) // Neo4j Cypher Parser
 module org.neo4j.cypherdsl.parser {
 
-
-
 	requires transitive org.apiguardian.api;
 	requires transitive org.neo4j.cypherdsl.core;
 

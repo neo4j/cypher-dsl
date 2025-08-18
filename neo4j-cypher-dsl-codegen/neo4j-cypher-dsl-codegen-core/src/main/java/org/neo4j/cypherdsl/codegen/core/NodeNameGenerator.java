@@ -18,16 +18,16 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * Default generator for creating names of node classes. Just creates a valid java identifier from a suggested name.
- * No further optimization is done. Suggested name can be a list of labels etc.
+ * Default generator for creating names of node classes. Just creates a valid java
+ * identifier from a suggested name. No further optimization is done. Suggested name can
+ * be a list of labels etc.
  *
  * @author Michael J. Simons
- * @soundtrack Daft Punk - TRON Legacy
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
@@ -38,4 +38,5 @@ final class NodeNameGenerator extends AbstractClassNameGenerator implements Clas
 
 		return generateTypeName(suggestedName).toString();
 	}
+
 }

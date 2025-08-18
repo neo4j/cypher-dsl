@@ -38,4 +38,5 @@ public class Person {
 
 	@Relationship("WROTE")
 	private List<Book> writtenBooks;
+
 }

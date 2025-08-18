@@ -22,10 +22,14 @@ import org.springframework.core.convert.converter.Converter;
 
 /**
  * Will be registered for some tests with the annotation processor.
+ *
  * @author Michael J. Simons
  */
 public class SpringBasedConverter implements Converter<ConnectorTransport.InnerClass.InnerInnerClass, String> {
-	@Override public String convert(ConnectorTransport.InnerClass.InnerInnerClass source) {
+
+	@Override
+	public String convert(ConnectorTransport.InnerClass.InnerInnerClass source) {
 		return null;
 	}
+
 }

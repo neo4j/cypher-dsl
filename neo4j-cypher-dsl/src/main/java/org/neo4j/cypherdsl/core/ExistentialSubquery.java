@@ -18,20 +18,20 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * An existential sub-query  can only be used in  a where clause. The  sub-query must consist only of  a match statement
- * which may have a {@code WHERE} clause on its own but is not allowed to return anything.
+ * An existential sub-query can only be used in a where clause. The sub-query must consist
+ * only of a match statement which may have a {@code WHERE} clause on its own but is not
+ * allowed to return anything.
  *
  * @author Michael J. Simons
- * @soundtrack Die Ärzte - Seitenhirsch
  * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
@@ -39,22 +39,11 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @Neo4jVersion(minimum = "4.0.0")
 public final class ExistentialSubquery implements SubqueryExpression, Condition {
 
-	static ExistentialSubquery exists(Match fragment) {
-
-		return new ExistentialSubquery(fragment);
-	}
-
-	static Condition exists(Statement statement, IdentifiableElement... imports) {
-		return new ExistentialSubquery(statement, imports);
-	}
-
-	static Condition exists(List<PatternElement> patternElements, Where innerWhere) {
-		return new ExistentialSubquery(patternElements, innerWhere);
-	}
-
 	private final ImportingWith importingWith;
+
 	private final List<Visitable> fragments;
-	private  final Where innerWhere;
+
+	private final Where innerWhere;
 
 	ExistentialSubquery(List<PatternElement> fragments, Where innerWhere) {
 		this.fragments = List.of(Pattern.of(fragments));
@@ -74,13 +63,27 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 		this.innerWhere = null;
 	}
 
+	static ExistentialSubquery exists(Match fragment) {
+
+		return new ExistentialSubquery(fragment);
+	}
+
+	static Condition exists(Statement statement, IdentifiableElement... imports) {
+		return new ExistentialSubquery(statement, imports);
+	}
+
+	static Condition exists(List<PatternElement> patternElements, Where innerWhere) {
+		return new ExistentialSubquery(patternElements, innerWhere);
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		importingWith.accept(visitor);
-		fragments.forEach(v -> v.accept(visitor));
-		Visitable.visitIfNotNull(innerWhere, visitor);
+		this.importingWith.accept(visitor);
+		this.fragments.forEach(v -> v.accept(visitor));
+		Visitable.visitIfNotNull(this.innerWhere, visitor);
 		visitor.leave(this);
 	}
+
 }

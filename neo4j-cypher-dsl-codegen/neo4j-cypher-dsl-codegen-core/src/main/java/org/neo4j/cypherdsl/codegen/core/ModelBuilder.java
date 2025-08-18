@@ -18,20 +18,20 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 /**
- * Shared interface for model builder. This interface and the concrete classes implementing it is considered to be public API.
+ * Shared interface for model builder. This interface and the concrete classes
+ * implementing it is considered to be public API.
  *
+ * @param <SELF> a type representing the concrete model builder itself
  * @author Michael J. Simons
- * @param <SELF> A type representing the concrete model builder itself
- * @soundtrack Queen - Queen Forever
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")
@@ -39,80 +39,88 @@ public interface ModelBuilder<SELF extends ModelBuilder<?>> {
 
 	/**
 	 * Adds a single new property to this model.
-	 *
-	 * @param newProperty The new property
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param newProperty the new property
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	SELF addProperty(String newProperty);
 
 	/**
 	 * Adds a single new property to this model.
-	 *
-	 * @param newProperty The new property
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param newProperty the new property
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	SELF addProperty(PropertyDefinition newProperty);
 
 	/**
 	 * Adds a collection of properties to this model.
-	 *
-	 * @param newProperties A new collection of properties
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param newProperties a new collection of properties
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	SELF addProperties(Collection<PropertyDefinition> newProperties);
 
 	/**
-	 * @return The qualified package name if any and an empty string for the default package.
+	 * {@return the qualified package name or an empty string for the default package}
 	 */
 	String getPackageName();
 
 	/**
-	 * @return The canonical class name (as in {@link Class#getCanonicalName()}.
+	 * {@return the canonical class name}
 	 */
 	String getCanonicalClassName();
 
 	/**
-	 * @return The simple class name without any pre- or suffix.
+	 * {@return the simple class name without any pre- or suffix}
 	 */
 	String getPlainClassName();
 
 	/**
-	 * Triggers the creation of the final model and writes it as a Java class file to the given path. It is safe to call
-	 * this method several times or any of the other {@code writeTo} methods, but changing the builder after this method
-	 * has been called will lead to an {@link IllegalStateException}.
-	 *
-	 * @param path The path to write this model to.
-	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
+	 * Triggers the creation of the final model and writes it as a Java class file to the
+	 * given path. It is safe to call this method several times or any of the other
+	 * {@code writeTo} methods, but changing the builder after this method has been called
+	 * will lead to an {@link IllegalStateException}.
+	 * @param path the path to write this model to.
+	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is
+	 * wrapped and rethrown.
 	 */
 	void writeTo(Path path);
 
 	/**
-	 * Triggers the creation of the final model and returns a Java class definition as string. It is safe to call
-	 * this method several times or any of the other {@code writeTo} methods, but changing the builder after this method
-	 * has been called will lead to an {@link IllegalStateException}.
-	 *
-	 * @return The generated class as a string
-	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
+	 * Triggers the creation of the final model and returns a Java class definition as
+	 * string. It is safe to call this method several times or any of the other
+	 * {@code writeTo} methods, but changing the builder after this method has been called
+	 * will lead to an {@link IllegalStateException}.
+	 * @return the generated class as a string
+	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is
+	 * wrapped and rethrown.
 	 */
 	String writeToString();
 
 	/**
-	 * Triggers the creation of the final model and appends it to the given {@link Appendable} as Java class.
-	 * It is safe to call this method several times or any of the other {@code writeTo} methods, but changing the builder
-	 * after this method has been called will lead to an {@link IllegalStateException}.
+	 * Triggers the creation of the final model and appends it to the given
+	 * {@link Appendable} as Java class. It is safe to call this method several times or
+	 * any of the other {@code writeTo} methods, but changing the builder after this
+	 * method has been called will lead to an {@link IllegalStateException}.
 	 * <p>
-	 * An appendable that is also closable will still be open after passing it to this method.
-	 *
-	 * @param appendable To where the generated source could should be appended to
-	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is wrapped and rethrown.
+	 * An appendable that is also closable will still be open after passing it to this
+	 * method.
+	 * @param appendable to where the generated source should be appended to
+	 * @throws java.io.UncheckedIOException in case IO fails, any {@link IOException} is
+	 * wrapped and rethrown.
 	 */
 	void writeTo(Appendable appendable);
 
 	/**
-	 * @return A field name that is hopefully suitable for storing an instance of the class generated by this builder.
+	 * Returns a field name suitable for storing an instance of the class generated by *
+	 * this builder.
+	 * @return a field name suitable for storing an instance of the class generated by
+	 * this builder
 	 */
 	String getFieldName();
+
 }

@@ -18,23 +18,26 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * Represents a finalizing `else` expression.
+ *
  * @author Gerrit Meier
  * @author Michael J. Simons
  */
 @API(status = INTERNAL, since = "1.0")
 public final class CaseElse implements Visitable {
+
 	private final Expression elseExpression;
 
 	/**
+	 * Starts creating the {@literal ELSE} part.
 	 * @param elseExpression finishing else part
 	 */
 	public CaseElse(Expression elseExpression) {
@@ -44,7 +47,8 @@ public final class CaseElse implements Visitable {
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		elseExpression.accept(visitor);
+		this.elseExpression.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

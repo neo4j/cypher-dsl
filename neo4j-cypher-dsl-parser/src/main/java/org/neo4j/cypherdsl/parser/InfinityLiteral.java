@@ -24,14 +24,15 @@ import org.neo4j.cypherdsl.core.Literal;
  * Custom literal for infinity.
  *
  * @author Michael J. Simons
- * @soundtrack The Prodigy - Music For The Jilted Generation
  * @since 2023.0.0
  */
 enum InfinityLiteral implements Literal<Double> {
+
 	INSTANCE;
 
 	@Override
 	public String asString() {
 		return "Infinity";
 	}
+
 }

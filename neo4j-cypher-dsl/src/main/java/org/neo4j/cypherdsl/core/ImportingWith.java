@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -27,14 +25,17 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * This type  is used  in sub-queries,  both for  sub-queries with  an implicit  scope such  as {@literal  EXISTS{}} and
- * {@literal  COUNT{}} and  full  sub-queries. In  the latter  case,  it will  create  and visite  multiple {@link  With
- * with-instances} so that the import actually shadows the outer scope.
+ * This type is used in sub-queries, both for sub-queries with an implicit scope such as
+ * {@literal EXISTS{}} and {@literal COUNT{}} and full sub-queries. In the latter case, it
+ * will create and visite multiple {@link With with-instances} so that the import actually
+ * shadows the outer scope.
  *
  * @author Michael J. Simons
- * @param imports The imported expressions
- * @param renames The renamed expressions, shadowing the outer scope
+ * @param imports the imported expressions
+ * @param renames the renamed expressions, shadowing the outer scope
  * @since 2023.1.0
  */
 @API(status = INTERNAL, since = "2023.1.0")
@@ -49,20 +50,18 @@ record ImportingWith(With imports, With renames) implements Visitable {
 		With optionalImports;
 		With optionalRenames;
 
-		ExpressionList returnItems = new ExpressionList(Arrays.stream(imports)
-			.map(i -> {
-				if (i instanceof AliasedExpression aliasedExpression) {
-					var delegate = aliasedExpression.getDelegate();
-					if (delegate instanceof Literal<?>) {
-						return null;
-					}
-					return delegate;
-				} else {
-					return i.asExpression();
+		ExpressionList returnItems = new ExpressionList(Arrays.stream(imports).map(i -> {
+			if (i instanceof AliasedExpression aliasedExpression) {
+				var delegate = aliasedExpression.getDelegate();
+				if (delegate instanceof Literal<?>) {
+					return null;
 				}
-			})
-			.filter(Objects::nonNull)
-			.toList());
+				return delegate;
+			}
+			else {
+				return i.asExpression();
+			}
+		}).filter(Objects::nonNull).toList());
 
 		optionalImports = returnItems.isEmpty() ? null : new With(false, returnItems, null, null, null, null);
 

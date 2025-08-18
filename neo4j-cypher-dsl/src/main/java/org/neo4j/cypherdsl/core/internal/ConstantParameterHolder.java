@@ -18,13 +18,14 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Cypher;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * An internal holder for a constant value that might be rendered as a parameter.
+ *
  * @author Michael J. Simons
  * @since 2021.1.0
  */
@@ -36,8 +37,8 @@ public final class ConstantParameterHolder {
 	private final String literalValue;
 
 	/**
-	 * New instance for a reference to a constant parameter. An additional literal for the parameter will be generated.
-	 *
+	 * New instance for a reference to a constant parameter. An additional literal for the
+	 * parameter will be generated.
 	 * @param value the value of the constant parameter
 	 */
 	public ConstantParameterHolder(Object value) {
@@ -46,16 +47,17 @@ public final class ConstantParameterHolder {
 	}
 
 	/**
-	 * @return the original value
+	 * {@return the original value}
 	 */
 	public Object getValue() {
-		return value;
+		return this.value;
 	}
 
 	/**
-	 * @return the value, but as a Cypher literal
+	 * {@return the value, but as a Cypher literal}
 	 */
 	public String asString() {
-		return literalValue;
+		return this.literalValue;
 	}
+
 }

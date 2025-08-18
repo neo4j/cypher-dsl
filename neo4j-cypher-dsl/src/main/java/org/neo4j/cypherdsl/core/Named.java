@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Optional;
 
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A named thing exposes {@link #getSymbolicName()}, making the thing identifiable.
@@ -34,19 +34,22 @@ import org.apiguardian.api.API;
 public non-sealed interface Named extends IdentifiableElement {
 
 	/**
-	 * @return An optional symbolic name.
+	 * {@return an optional symbolic name}
 	 */
 	Optional<SymbolicName> getSymbolicName();
 
 	/**
-	 * @return A symbolic name
-	 * @throws IllegalStateException If this has not been named yet.
+	 * Return a symbolic name.
+	 * @return a symbolic name
+	 * @throws IllegalStateException if this has not been named yet.
 	 */
 	default SymbolicName getRequiredSymbolicName() {
 		return getSymbolicName().orElseThrow(() -> new IllegalStateException("No name present."));
 	}
 
-	@Override default Expression asExpression() {
+	@Override
+	default Expression asExpression() {
 		return getRequiredSymbolicName();
 	}
+
 }

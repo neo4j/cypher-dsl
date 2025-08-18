@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import java.util.Collection;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
-import java.util.Collection;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
- * A step exposing a {@link #match(PatternElement...)} method. This is one of the main entry points of most Cypher queries.
+ * A step exposing a {@link #match(PatternElement...)} method. This is one of the main
+ * entry points of most Cypher queries.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -36,19 +37,20 @@ public interface ExposesMatch {
 
 	/**
 	 * Adds (another) {@code MATCH} clause.
-	 *
-	 * @param pattern The patterns to match
-	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @param pattern the patterns to match
+	 * @return an ongoing match that is used to specify an optional where and a required
+	 * return clause
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere match(PatternElement... pattern) {
 		return this.match(false, pattern);
 	}
+
 	/**
 	 * Adds (another) {@code MATCH} clause.
-	 *
-	 * @param pattern The patterns to match
-	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @param pattern the patterns to match
+	 * @return an ongoing match that is used to specify an optional where and a required
+	 * return clause
 	 * @since 2021.2.2
 	 */
 	@CheckReturnValue
@@ -58,9 +60,9 @@ public interface ExposesMatch {
 
 	/**
 	 * Adds (another) optional {@code MATCH} clause.
-	 *
-	 * @param pattern The patterns to match
-	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @param pattern the patterns to match
+	 * @return an ongoing match that is used to specify an optional where and a required
+	 * return clause
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingWithoutWhere optionalMatch(PatternElement... pattern) {
@@ -69,9 +71,9 @@ public interface ExposesMatch {
 
 	/**
 	 * Adds (another) optional {@code MATCH} clause.
-	 *
-	 * @param pattern The patterns to match
-	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @param pattern the patterns to match
+	 * @return an ongoing match that is used to specify an optional where and a required
+	 * return clause
 	 * @since 2021.2.2
 	 */
 	@CheckReturnValue
@@ -81,12 +83,14 @@ public interface ExposesMatch {
 
 	/**
 	 * Adds (another) {@code MATCH} clause.
-	 *
-	 * @param optional A flag whether the {@code MATCH} clause includes the {@code OPTIONAL} keyword.
-	 * @param pattern  The patterns to match
-	 * @return An ongoing match that is used to specify an optional where and a required return clause
+	 * @param optional a flag whether the {@code MATCH} clause includes the
+	 * {@code OPTIONAL} keyword.
+	 * @param pattern the patterns to match
+	 * @return an ongoing match that is used to specify an optional where and a required
+	 * return clause
 	 * @since 2020.1.3
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingReadingWithoutWhere match(boolean optional, PatternElement... pattern);
+
 }

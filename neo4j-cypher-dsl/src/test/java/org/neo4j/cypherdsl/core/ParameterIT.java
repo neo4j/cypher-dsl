@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -31,82 +28,72 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+
 /**
  * @author Andreas Berger
  * @author Michael J. Simons
  */
-@SuppressWarnings("removal") // This is for the parameter methods. I want to keep calling them this way until they are gone.
+@SuppressWarnings("removal") // This is for the parameter methods. I want to keep calling
+								// them this way until they are gone.
 class ParameterIT {
 
 	private static final Node userNode = Cypher.node("User").named("u");
 
+	private static Stream<Arguments> conflictingParameters() {
+		return Stream.of("x", null)
+			.flatMap(v -> Stream.of(
+					Arguments.of(Cypher.match(userNode)
+						.set(userNode.property("name").to(Cypher.parameter("param").withValue(v)),
+								userNode.property("firstName").to(Cypher.parameter("param")))
+						.returning(userNode)
+						.build()),
+					Arguments.of(Cypher.match(userNode)
+						.set(userNode.property("firstName").to(Cypher.parameter("param")),
+								userNode.property("name").to(Cypher.parameter("param").withValue(v)))
+						.returning(userNode)
+						.build())));
+	}
+
 	@Test
 	void shouldCollectParameters() {
-		Statement statement = Cypher
-				.match(userNode)
-				.where(userNode.property("name").isEqualTo(Cypher.parameter("name", "Neo")))
-				.returning(userNode)
-				.limit(Cypher.parameter("param").withValue(5)).build();
+		Statement statement = Cypher.match(userNode)
+			.where(userNode.property("name").isEqualTo(Cypher.parameter("name", "Neo")))
+			.returning(userNode)
+			.limit(Cypher.parameter("param").withValue(5))
+			.build();
 
-		assertThat(statement.getCatalog().getParameters())
-			.containsEntry("param", 5)
-			.containsEntry("name", "Neo");
+		assertThat(statement.getCatalog().getParameters()).containsEntry("param", 5).containsEntry("name", "Neo");
 
-		assertThat(statement.getCatalog().getParameterNames())
-			.containsExactlyInAnyOrder("param", "name");
+		assertThat(statement.getCatalog().getParameterNames()).containsExactlyInAnyOrder("param", "name");
 	}
 
 	@Test
 	void shouldDealWithNullValues() {
-		Statement statement = Cypher
-				.match(userNode)
-				.set(userNode.property("name").to(Cypher.parameter("param").withValue(null)))
-				.returning(userNode)
-				.build();
+		Statement statement = Cypher.match(userNode)
+			.set(userNode.property("name").to(Cypher.parameter("param").withValue(null)))
+			.returning(userNode)
+			.build();
 
 		assertThat(Renderer.getDefaultRenderer().render(statement))
-				.isEqualTo("MATCH (u:`User`) SET u.name = $param RETURN u");
+			.isEqualTo("MATCH (u:`User`) SET u.name = $param RETURN u");
 		assertThat(statement.getCatalog().getParameters()).containsEntry("param", null);
 	}
-
-	private static Stream<Arguments> conflictingParameters() {
-		return Stream.of("x", null)
-			.flatMap(v -> Stream.of(
-				Arguments.of(
-					Cypher.match(userNode)
-						.set(
-							userNode.property("name").to(Cypher.parameter("param").withValue(v)),
-							userNode.property("firstName").to(Cypher.parameter("param"))
-						).returning(userNode).build()
-				),
-				Arguments.of(
-					Cypher.match(userNode)
-						.set(
-							userNode.property("firstName").to(Cypher.parameter("param")),
-							userNode.property("name").to(Cypher.parameter("param").withValue(v))
-						).returning(userNode).build()
-				)
-			));
-	}
-
 
 	@ParameterizedTest
 	@MethodSource("conflictingParameters")
 	void shouldFailWithNoValueVsNull(Statement statement) {
 
-		assertThatExceptionOfType(ConflictingParametersException.class)
-			.isThrownBy(statement::getCatalog);
+		assertThatExceptionOfType(ConflictingParametersException.class).isThrownBy(statement::getCatalog);
 	}
 
 	@Test
 	void shouldNotFailWithSameNameAndMultipleNulLValues() {
 
-		Statement statement = Cypher
-			.match(userNode)
-			.set(
-				userNode.property("name").to(Cypher.parameter("param").withValue(null)),
-				userNode.property("firstName").to(Cypher.parameter("param").withValue(null))
-			)
+		Statement statement = Cypher.match(userNode)
+			.set(userNode.property("name").to(Cypher.parameter("param").withValue(null)),
+					userNode.property("firstName").to(Cypher.parameter("param").withValue(null)))
 			.returning(userNode)
 			.build();
 
@@ -118,12 +105,9 @@ class ParameterIT {
 	@Test
 	void shouldNotFailWithSameNameAndNoValue() {
 
-		Statement statement = Cypher
-			.match(userNode)
-			.set(
-				userNode.property("name").to(Cypher.parameter("param")),
-				userNode.property("firstName").to(Cypher.parameter("param"))
-			)
+		Statement statement = Cypher.match(userNode)
+			.set(userNode.property("name").to(Cypher.parameter("param")),
+					userNode.property("firstName").to(Cypher.parameter("param")))
 			.returning(userNode)
 			.build();
 
@@ -135,40 +119,38 @@ class ParameterIT {
 
 	@Test
 	void shouldFailOnDifferentBoundValues() {
-		Statement statement = Cypher
-				.match(userNode)
-				.returning(userNode)
-				.skip(Cypher.parameter("param").withValue(1))
-				.limit(Cypher.parameter("param").withValue(5)).build();
+		Statement statement = Cypher.match(userNode)
+			.returning(userNode)
+			.skip(Cypher.parameter("param").withValue(1))
+			.limit(Cypher.parameter("param").withValue(5))
+			.build();
 
-		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(statement::getCatalog)
-				.satisfies(e -> {
-					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
-					assertThat(erroneousParameters).containsKey("param");
-					Set<Object> values = erroneousParameters.get("param");
-					assertThat(values).containsExactlyInAnyOrder(1, 5);
-				});
+		assertThatExceptionOfType(ConflictingParametersException.class).isThrownBy(statement::getCatalog)
+			.satisfies(e -> {
+				Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
+				assertThat(erroneousParameters).containsKey("param");
+				Set<Object> values = erroneousParameters.get("param");
+				assertThat(values).containsExactlyInAnyOrder(1, 5);
+			});
 	}
 
 	@SuppressWarnings("deprecation")
 	@Test
 	void shouldFailOnDifferentBoundValuesWhenSameValueIsUsedTwice() {
-		Statement statement = Cypher
-				.match(userNode)
-				.where(userNode.internalId().isEqualTo(Cypher.parameter("param").withValue(5)))
-				.returning(userNode)
-				.skip(Cypher.parameter("param").withValue(1))
-				.limit(Cypher.parameter("param").withValue(1)).build();
+		Statement statement = Cypher.match(userNode)
+			.where(userNode.internalId().isEqualTo(Cypher.parameter("param").withValue(5)))
+			.returning(userNode)
+			.skip(Cypher.parameter("param").withValue(1))
+			.limit(Cypher.parameter("param").withValue(1))
+			.build();
 
-		assertThatExceptionOfType(ConflictingParametersException.class)
-				.isThrownBy(statement::getCatalog)
-				.satisfies(e -> {
-					Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
-					assertThat(erroneousParameters).containsKey("param");
-					Set<Object> values = erroneousParameters.get("param");
-					assertThat(values).containsExactlyInAnyOrder(1, 5);
-				});
+		assertThatExceptionOfType(ConflictingParametersException.class).isThrownBy(statement::getCatalog)
+			.satisfies(e -> {
+				Map<String, Set<Object>> erroneousParameters = e.getErroneousParameters();
+				assertThat(erroneousParameters).containsKey("param");
+				Set<Object> values = erroneousParameters.get("param");
+				assertThat(values).containsExactlyInAnyOrder(1, 5);
+			});
 	}
 
 	@Test
@@ -177,34 +159,30 @@ class ParameterIT {
 		final Node bikeNode = Cypher.node("Bike").named("b");
 
 		Statement statement1 = Cypher.match(bikeNode)
-				.where(bikeNode.property("a").isEqualTo(Cypher.parameter("p1").withValue("A")))
-				.returning(bikeNode)
-				.build();
+			.where(bikeNode.property("a").isEqualTo(Cypher.parameter("p1").withValue("A")))
+			.returning(bikeNode)
+			.build();
 		assertThat(statement1.getCatalog().getParameters()).containsEntry("p1", "A");
 
 		Statement statement2 = Cypher.match(bikeNode)
-				.where(bikeNode.property("b").isEqualTo(Cypher.parameter("p2").withValue("B")))
-				.returning(bikeNode)
-				.build();
+			.where(bikeNode.property("b").isEqualTo(Cypher.parameter("p2").withValue("B")))
+			.returning(bikeNode)
+			.build();
 		assertThat(statement2.getCatalog().getParameters()).containsEntry("p2", "B");
 
 		Statement statement3 = Cypher.match(bikeNode)
-				.where(bikeNode.property("c").isEqualTo(Cypher.parameter("p3").withValue("C")))
-				.returning(bikeNode)
-				.build();
+			.where(bikeNode.property("c").isEqualTo(Cypher.parameter("p3").withValue("C")))
+			.returning(bikeNode)
+			.build();
 		assertThat(statement3.getCatalog().getParameters()).containsEntry("p3", "C");
 
 		Statement statement = Cypher.union(statement1, statement2, statement3);
 
-		assertThat(Renderer.getDefaultRenderer().render(statement))
-				.isEqualTo(
-						"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b:`Bike`) WHERE b.b = $p2 RETURN b UNION MATCH (b:`Bike`) WHERE b.c = $p3 RETURN b");
+		assertThat(Renderer.getDefaultRenderer().render(statement)).isEqualTo(
+				"MATCH (b:`Bike`) WHERE b.a = $p1 RETURN b UNION MATCH (b:`Bike`) WHERE b.b = $p2 RETURN b UNION MATCH (b:`Bike`) WHERE b.c = $p3 RETURN b");
 
-		Map<String, Object> expectedParams = Map.of(
-			"p1", "A",
-			"p2", "B",
-			"p3", "C"
-		);
+		Map<String, Object> expectedParams = Map.of("p1", "A", "p2", "B", "p3", "C");
 		assertThat(statement.getCatalog().getParameters()).containsAllEntriesOf(expectedParams);
 	}
+
 }

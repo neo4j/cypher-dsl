@@ -18,27 +18,26 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Tests around GH-1153
  */
 class Cypher5IT {
 
-	private final Renderer renderer = Renderer.getRenderer(Configuration.newConfig()
-		.alwaysEscapeNames(false)
-		.withDialect(Dialect.NEO4J_5_26).build());
+	private final Renderer renderer = Renderer
+		.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).withDialect(Dialect.NEO4J_5_26).build());
 
 	@Test
 	void cypher5PrefixOnSimpleStatements() {
 		var n = Cypher.node("Movie").named("n");
 		var stmt = Cypher.match(n).returning(n).build();
-		assertThat(renderer.render(stmt)).isEqualTo("CYPHER 5 MATCH (n:Movie) RETURN n");
+		assertThat(this.renderer.render(stmt)).isEqualTo("CYPHER 5 MATCH (n:Movie) RETURN n");
 	}
 
 	@Test
@@ -60,8 +59,7 @@ class Cypher5IT {
 		Statement statement;
 		statement = Cypher.union(statement1, statement2, statement3);
 
-		assertThat(renderer.render(statement))
-			.isEqualTo(
+		assertThat(this.renderer.render(statement)).isEqualTo(
 				"CYPHER 5 MATCH (b:Bike) WHERE b.a = 'A' RETURN b UNION MATCH (b:Bike) WHERE b.b = 'B' RETURN b UNION MATCH (b:Bike) WHERE b.c = 'C' RETURN b");
 	}
 
@@ -69,7 +67,7 @@ class Cypher5IT {
 	void useShouldWork() {
 
 		var statement = Cypher.match(Cypher.anyNode("n")).returning("n").build();
-		var cypher = renderer.render(Cypher.use("neo4j", statement));
+		var cypher = this.renderer.render(Cypher.use("neo4j", statement));
 		assertThat(cypher).isEqualTo("CYPHER 5 USE neo4j MATCH (n) RETURN n");
 	}
 
@@ -77,7 +75,8 @@ class Cypher5IT {
 	void explainShouldWork() {
 
 		var statement = Cypher.match(Cypher.anyNode("n")).returning("n").build();
-		var cypher = renderer.render(DecoratedQuery.explain(statement));
+		var cypher = this.renderer.render(DecoratedQuery.explain(statement));
 		assertThat(cypher).isEqualTo("CYPHER 5 EXPLAIN MATCH (n) RETURN n");
 	}
+
 }

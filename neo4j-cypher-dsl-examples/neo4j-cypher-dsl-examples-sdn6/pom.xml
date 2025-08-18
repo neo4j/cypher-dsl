@@ -44,6 +44,7 @@
 		<license-maven-plugin.version>5.0.0</license-maven-plugin.version>
 		<maven-checkstyle-plugin.version>3.6.0</maven-checkstyle-plugin.version>
 		<sortpom-maven-plugin.version>4.0.0</sortpom-maven-plugin.version>
+		<spring-javaformat.version>0.0.47</spring-javaformat.version>
 		<testcontainers.version>1.21.3</testcontainers.version>
 	</properties>
 
@@ -184,10 +185,26 @@
 				</executions>
 			</plugin>
 			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+				<version>${spring-javaformat.version}</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>validate</goal>
+						</goals>
+						<phase>validate</phase>
+						<inherited>true</inherited>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-checkstyle-plugin</artifactId>
 				<version>${maven-checkstyle-plugin.version}</version>
 				<configuration>
+					<excludes>**/module-info.java</excludes>
+					<includeTestSourceDirectory>true</includeTestSourceDirectory>
 					<configLocation>../../etc/checkstyle/config.xml</configLocation>
 					<suppressionsLocation>../../etc/checkstyle/suppressions.xml</suppressionsLocation>
 					<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
@@ -201,7 +218,21 @@
 						<artifactId>checkstyle</artifactId>
 						<version>${checkstyle.version}</version>
 					</dependency>
+					<dependency>
+						<groupId>io.spring.javaformat</groupId>
+						<artifactId>spring-javaformat-checkstyle</artifactId>
+						<version>${spring-javaformat.version}</version>
+					</dependency>
 				</dependencies>
+				<executions>
+					<execution>
+						<id>validate</id>
+						<goals>
+							<goal>check</goal>
+						</goals>
+						<phase>validate</phase>
+					</execution>
+				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.github.ekryd.sortpom</groupId>

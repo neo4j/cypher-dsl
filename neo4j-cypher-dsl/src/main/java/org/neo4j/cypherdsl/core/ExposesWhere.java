@@ -18,19 +18,19 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
- * A step exposing a several {@code where} methods that are provide entry points of adding conditions.
+ * A step exposing a several {@code where} methods that are provide entry points of adding
+ * conditions.
  *
+ * @param <T> the type of the owner exposing the {@literal WHERE} clause
  * @author Michael J. Simons
- * @param <T> The type of the owner exposing the {@literal WHERE} clause
- * @soundtrack Smoke Blow - Dark Angel
  * @since 2020.0.1
  */
 @API(status = STABLE, since = "2020.0.1")
@@ -38,21 +38,20 @@ public interface ExposesWhere<T> {
 
 	/**
 	 * Adds a where clause to this fragement.
-	 *
-	 * @param condition The new condition, must not be {@literal null}
-	 * @return A match or call restricted by a where clause with no return items yet.
+	 * @param condition the new condition, must not be {@literal null}
+	 * @return a match or call restricted by a where clause with no return items yet.
 	 */
 	@CheckReturnValue
 	T where(Condition condition);
 
 	/**
-	 * Adds a where clause based on a path pattern to this match.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using path patterns in WHERE</a>.
-	 *
-	 * @param pathPattern The path pattern to add to the where clause.
-	 *                    This path pattern must not be {@literal null} and must
-	 *                    not introduce new variables not available in the match.
-	 * @return A match or a call restricted by a where clause with no return items yet.
+	 * Adds a where clause based on a path pattern to this match. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using
+	 * path patterns in WHERE</a>.
+	 * @param pathPattern the path pattern to add to the where clause. This path pattern
+	 * must not be {@literal null} and must not introduce new variables not available in
+	 * the match.
+	 * @return a match or a call restricted by a where clause with no return items yet.
 	 * @since 1.0.1
 	 */
 	@CheckReturnValue
@@ -61,4 +60,5 @@ public interface ExposesWhere<T> {
 		Assertions.notNull(pathPattern, "The path pattern must not be null.");
 		return this.where(RelationshipPatternCondition.of(pathPattern));
 	}
+
 }

@@ -32,7 +32,8 @@ import org.neo4j.ogm.annotation.Relationship;
 @NodeEntity
 public class Person {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Long id;
 
 	private String name;
@@ -44,4 +45,5 @@ public class Person {
 
 	@Relationship(type = "ACTED_IN")
 	private List<TheaterAppearance> plays = new ArrayList<>();
+
 }

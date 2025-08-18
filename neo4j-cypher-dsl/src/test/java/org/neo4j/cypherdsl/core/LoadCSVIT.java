@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.net.URI;
 
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michael J. Simons
@@ -40,7 +40,7 @@ class LoadCSVIT {
 			.build();
 
 		assertThat(statement.getCypher()).isEqualTo("LOAD CSV FROM 'file:///artists.csv' AS line "
-													+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
+				+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
 	}
 
 	@Test
@@ -54,7 +54,7 @@ class LoadCSVIT {
 			.build();
 
 		assertThat(statement.getCypher()).isEqualTo("LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line "
-													+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
+				+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
 	}
 
 	@Test
@@ -68,26 +68,22 @@ class LoadCSVIT {
 				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
-		assertThat(statement.getCypher()).isEqualTo(
-			"LOAD CSV FROM 'file:///artists.csv' AS line FIELDTERMINATOR ';' "
-			+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
+		assertThat(statement.getCypher()).isEqualTo("LOAD CSV FROM 'file:///artists.csv' AS line FIELDTERMINATOR ';' "
+				+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
 	}
 
 	@Test
 	void usingPeriodCommitShouldWork() {
 
 		SymbolicName l = SymbolicName.of("line");
-		Statement statement = Cypher
-			.usingPeriodicCommit()
+		Statement statement = Cypher.usingPeriodicCommit()
 			.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.create(Cypher.node("Artist")
 				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2))))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo(
-				"USING PERIODIC COMMIT LOAD CSV FROM 'file:///artists.csv' AS line "
+		assertThat(statement.getCypher()).isEqualTo("USING PERIODIC COMMIT LOAD CSV FROM 'file:///artists.csv' AS line "
 				+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
 	}
 
@@ -95,8 +91,7 @@ class LoadCSVIT {
 	void usingPeriodCommitWithRateShouldWork() {
 
 		SymbolicName l = SymbolicName.of("line");
-		Statement statement = Cypher
-			.usingPeriodicCommit(500)
+		Statement statement = Cypher.usingPeriodicCommit(500)
 			.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.create(Cypher.node("Artist")
@@ -104,17 +99,15 @@ class LoadCSVIT {
 			.build();
 
 		assertThat(statement.getCypher())
-			.isEqualTo(
-				"USING PERIODIC COMMIT 500 LOAD CSV FROM 'file:///artists.csv' AS line "
-				+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
+			.isEqualTo("USING PERIODIC COMMIT 500 LOAD CSV FROM 'file:///artists.csv' AS line "
+					+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2])})");
 	}
 
 	@Test
 	void usingLinenumberShouldWork() {
 
 		SymbolicName l = SymbolicName.of("line");
-		Statement statement = Cypher
-			.loadCSV(URI.create("file:///artists.csv"))
+		Statement statement = Cypher.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.returning(Cypher.linenumber().as("number"), l)
 			.build();
@@ -127,8 +120,7 @@ class LoadCSVIT {
 	void usingFileShouldWork() {
 
 		SymbolicName l = SymbolicName.of("line");
-		Statement statement = Cypher
-			.loadCSV(URI.create("file:///artists.csv"))
+		Statement statement = Cypher.loadCSV(URI.create("file:///artists.csv"))
 			.as(l)
 			.returning(Cypher.file().as("path"))
 			.build();
@@ -141,22 +133,18 @@ class LoadCSVIT {
 	void allOptionsCombinedShouldWork() {
 
 		SymbolicName l = SymbolicName.of("line");
-		Statement statement = Cypher
-			.usingPeriodicCommit(42)
+		Statement statement = Cypher.usingPeriodicCommit(42)
 			.loadCSV(URI.create("file:///artists.csv"), true)
 			.as(l)
 			.withFieldTerminator(";")
 			.create(Cypher.node("Artist")
-				.withProperties(
-					"name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2)),
-					"source", Cypher.file().concat(Cypher.literalOf("@")).concat(Cypher.linenumber())
-				))
+				.withProperties("name", Cypher.valueAt(l, 1), "year", Cypher.toInteger(Cypher.valueAt(l, 2)), "source",
+						Cypher.file().concat(Cypher.literalOf("@")).concat(Cypher.linenumber())))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo(
+		assertThat(statement.getCypher()).isEqualTo(
 				"USING PERIODIC COMMIT 42 LOAD CSV WITH HEADERS FROM 'file:///artists.csv' AS line FIELDTERMINATOR ';' "
-				+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2]), source: ((file() + '@') + linenumber())})");
+						+ "CREATE (:`Artist` {name: line[1], year: toInteger(line[2]), source: ((file() + '@') + linenumber())})");
 	}
 
 	@Test
@@ -164,18 +152,15 @@ class LoadCSVIT {
 
 		SymbolicName row = SymbolicName.of("row");
 		Property id = row.property("Id");
-		Statement statement = Cypher
-			.loadCSV(URI.create("file:///companies.csv"), true)
+		Statement statement = Cypher.loadCSV(URI.create("file:///companies.csv"), true)
 			.as(row)
-			.with(row).where(id.isNotNull())
+			.with(row)
+			.where(id.isNotNull())
 			.merge(Cypher.node("Company").named("c").withProperties("companyId", id))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo(
-				"LOAD CSV WITH HEADERS FROM 'file:///companies.csv' AS row "
-				+ "WITH row WHERE row.Id IS NOT NULL "
-				+ "MERGE (c:`Company` {companyId: row.Id})");
+		assertThat(statement.getCypher()).isEqualTo("LOAD CSV WITH HEADERS FROM 'file:///companies.csv' AS row "
+				+ "WITH row WHERE row.Id IS NOT NULL " + "MERGE (c:`Company` {companyId: row.Id})");
 	}
 
 	@Test
@@ -183,16 +168,15 @@ class LoadCSVIT {
 
 		SymbolicName row = SymbolicName.of("row");
 		Property id = row.property("Id");
-		Statement statement = Cypher
-			.loadCSV(URI.create("file:///companies.csv"), true)
+		Statement statement = Cypher.loadCSV(URI.create("file:///companies.csv"), true)
 			.as(row)
-			.merge(Cypher.node("Company").named("c").withProperties("companyId", id, "hqLocation",
-				Cypher.coalesce(row.property("Location"), Cypher.literalOf("Unknown"))))
+			.merge(Cypher.node("Company")
+				.named("c")
+				.withProperties("companyId", id, "hqLocation",
+						Cypher.coalesce(row.property("Location"), Cypher.literalOf("Unknown"))))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo(
-				"LOAD CSV WITH HEADERS FROM 'file:///companies.csv' AS row "
+		assertThat(statement.getCypher()).isEqualTo("LOAD CSV WITH HEADERS FROM 'file:///companies.csv' AS row "
 				+ "MERGE (c:`Company` {companyId: row.Id, hqLocation: coalesce(row.Location, 'Unknown')})");
 	}
 
@@ -205,19 +189,17 @@ class LoadCSVIT {
 
 		Node node = Cypher.node("Company").named("c").withProperties("companyId", id);
 
-		Statement statement = Cypher
-			.loadCSV(URI.create("file:///companies.csv"), true)
+		Statement statement = Cypher.loadCSV(URI.create("file:///companies.csv"), true)
 			.as(row)
 			.merge(node)
 			.set(node.property("emailAddress")
-				.to(Cypher.caseExpression(Cypher.trim(email)).when(Cypher.literalOf("")).then(NullLiteral.INSTANCE)
-					.elseDefault(
-						email)))
+				.to(Cypher.caseExpression(Cypher.trim(email))
+					.when(Cypher.literalOf(""))
+					.then(NullLiteral.INSTANCE)
+					.elseDefault(email)))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo(
-				"LOAD CSV WITH HEADERS FROM 'file:///companies.csv' AS row "
+		assertThat(statement.getCypher()).isEqualTo("LOAD CSV WITH HEADERS FROM 'file:///companies.csv' AS row "
 				+ "MERGE (c:`Company` {companyId: row.Id}) "
 				+ "SET c.emailAddress = CASE trim(row.Email) WHEN '' THEN NULL ELSE row.Email END");
 	}
@@ -234,23 +216,19 @@ class LoadCSVIT {
 		Node e = Cypher.node("Employee").named("e").withProperties("employeeId", id, "email", email);
 		Node s = Cypher.node("Skill").named("s").withProperties("name", skill);
 
-		Statement statement = Cypher
-			.loadCSV(URI.create("file:///employees.csv"), true)
+		Statement statement = Cypher.loadCSV(URI.create("file:///employees.csv"), true)
 			.as(row)
 			.merge(e)
 			.with(e, row)
-			.unwind(Cypher.split(row.property("Skills"), Cypher.literalOf(":"))).as(skill)
+			.unwind(Cypher.split(row.property("Skills"), Cypher.literalOf(":")))
+			.as(skill)
 			.merge(s)
 			.merge(e.relationshipTo(s, "HAS_EXPERIENCE").named("r"))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo(
-				"LOAD CSV WITH HEADERS FROM 'file:///employees.csv' AS row "
-				+ "MERGE (e:`Employee` {employeeId: row.Id, email: row.Email}) "
-				+ "WITH e, row "
-				+ "UNWIND split(row.Skills, ':') AS skill "
-				+ "MERGE (s:`Skill` {name: skill}) "
+		assertThat(statement.getCypher()).isEqualTo("LOAD CSV WITH HEADERS FROM 'file:///employees.csv' AS row "
+				+ "MERGE (e:`Employee` {employeeId: row.Id, email: row.Email}) " + "WITH e, row "
+				+ "UNWIND split(row.Skills, ':') AS skill " + "MERGE (s:`Skill` {name: skill}) "
 				+ "MERGE (e)-[r:`HAS_EXPERIENCE`]->(s)");
 	}
 
@@ -262,14 +240,15 @@ class LoadCSVIT {
 
 		Statement statement = Cypher.match(userNode)
 			.with(userNode)
-			.orderBy(userNode.property("name")).ascending()
+			.orderBy(userNode.property("name"))
+			.ascending()
 			.loadCSV(URI.create("file:///bikes.csv"))
 			.as(row)
 			.merge(userNode.relationshipTo(Cypher.node("Bike").withProperties("name", Cypher.valueAt(row, 0)), "OWNS"))
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (u:`User` {name: 'Michael'}) WITH u ORDER BY u.name ASC LOAD CSV FROM 'file:///bikes.csv' AS row MERGE (u)-[:`OWNS`]->(:`Bike` {name: row[0]})");
+		assertThat(statement.getCypher()).isEqualTo(
+				"MATCH (u:`User` {name: 'Michael'}) WITH u ORDER BY u.name ASC LOAD CSV FROM 'file:///bikes.csv' AS row MERGE (u)-[:`OWNS`]->(:`Bike` {name: row[0]})");
 	}
 
 	@Test
@@ -279,13 +258,15 @@ class LoadCSVIT {
 
 		Statement statement = Cypher.match(userNode)
 			.with(userNode)
-			.orderBy(userNode.property("name")).ascending()
+			.orderBy(userNode.property("name"))
+			.ascending()
 			.loadCSV(URI.create("file:///bikes.csv"))
 			.as(row)
 			.finish()
 			.build();
 
-		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (u:`User` {name: 'Michael'}) WITH u ORDER BY u.name ASC LOAD CSV FROM 'file:///bikes.csv' AS row FINISH");
+		assertThat(statement.getCypher()).isEqualTo(
+				"MATCH (u:`User` {name: 'Michael'}) WITH u ORDER BY u.name ASC LOAD CSV FROM 'file:///bikes.csv' AS row FINISH");
 	}
+
 }

@@ -39,4 +39,5 @@ public class Example {
 	public Example(long id) {
 		this.id = id;
 	}
+
 }

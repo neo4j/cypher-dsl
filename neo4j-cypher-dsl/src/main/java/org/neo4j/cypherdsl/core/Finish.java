@@ -18,12 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * Representation of the {@code FINISH} clause.
+ *
  * @author Gerrit Meier
  * @author Michael J. Simons
  */
@@ -46,4 +48,5 @@ public final class Finish implements Clause {
 		FINISH_EXPRESSION.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

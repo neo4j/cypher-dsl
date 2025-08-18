@@ -28,8 +28,10 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class Play {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Long id;
 
 	private String title;
+
 }

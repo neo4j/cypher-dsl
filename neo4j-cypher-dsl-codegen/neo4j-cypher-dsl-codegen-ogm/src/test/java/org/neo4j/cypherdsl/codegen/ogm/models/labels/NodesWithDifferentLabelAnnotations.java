@@ -21,7 +21,8 @@ package org.neo4j.cypherdsl.codegen.ogm.models.labels;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
- * Tests various ways to define labels. The generated classes will end up in a subpackage as they are static, inner classes.
+ * Tests various ways to define labels. The generated classes will end up in a subpackage
+ * as they are static, inner classes.
  *
  * @author Michael J. Simons
  */
@@ -29,10 +30,13 @@ public class NodesWithDifferentLabelAnnotations {
 
 	@NodeEntity("ALabel")
 	static class LabelOnNode1 {
+
 	}
 
+	@SuppressWarnings("checkstyle:AnnotationUseStyle")
 	@NodeEntity(value = "ALabel")
 	static class LabelOnNode2 {
+
 	}
 
 }

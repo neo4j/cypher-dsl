@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -31,9 +29,12 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * A condition that consists of one or two {@link Condition conditions} connected by a
- * <a href="https://en.wikipedia.org/wiki/Logical_connective">Logical connective (operator)</a>.
+ * <a href="https://en.wikipedia.org/wiki/Logical_connective">Logical connective
+ * (operator)</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -41,23 +42,31 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 @API(status = INTERNAL, since = "1.0")
 final class CompoundCondition implements Condition, ProvidesAffixes {
 
+	static final EnumSet<Operator> VALID_OPERATORS = EnumSet.of(Operator.AND, Operator.OR, Operator.XOR);
+
 	/**
 	 * The empty, compound condition.
 	 */
 	private static final CompoundCondition EMPTY_CONDITION = new CompoundCondition(null);
-	static final EnumSet<Operator> VALID_OPERATORS = EnumSet.of(Operator.AND, Operator.OR, Operator.XOR);
+
+	private final Operator operator;
+
+	private final List<Condition> conditions;
+
+	private CompoundCondition(Operator operator) {
+		this.operator = operator;
+		this.conditions = new ArrayList<>();
+	}
 
 	static CompoundCondition create(Condition left, Operator operator, Condition right) {
 
 		Assertions.isTrue(VALID_OPERATORS.contains(operator),
-			"Operator " + operator + " is not a valid operator for a compound condition.");
+				"Operator " + operator + " is not a valid operator for a compound condition.");
 
 		Assertions.notNull(left, "Left hand side condition is required.");
 		Assertions.notNull(operator, "Operator is required.");
 		Assertions.notNull(right, "Right hand side condition is required.");
-		return new CompoundCondition(operator)
-			.add(operator, left)
-			.add(operator, right);
+		return new CompoundCondition(operator).add(operator, left).add(operator, right);
 	}
 
 	static CompoundCondition copyOf(CompoundCondition other) {
@@ -72,13 +81,10 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 		return EMPTY_CONDITION;
 	}
 
-	private final Operator operator;
-
-	private final List<Condition> conditions;
-
-	private CompoundCondition(Operator operator) {
-		this.operator = operator;
-		this.conditions = new ArrayList<>();
+	private static void acceptVisitorWithOperatorForChildCondition(Visitor visitor, Operator operator,
+			Condition condition) {
+		Visitable.visitIfNotNull(operator, visitor);
+		condition.accept(visitor);
 	}
 
 	@Override
@@ -96,10 +102,7 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 		return this.add(Operator.XOR, condition);
 	}
 
-	private CompoundCondition add(
-		Operator chainingOperator,
-		Condition condition
-	) {
+	private CompoundCondition add(Operator chainingOperator, Condition condition) {
 		if (this == EMPTY_CONDITION) {
 			return new CompoundCondition(chainingOperator).add(chainingOperator, condition);
 		}
@@ -112,7 +115,8 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			CompoundCondition target;
 			if (this.operator == chainingOperator && chainingOperator == compoundCondition.operator) {
 				target = CompoundCondition.copyOf(this);
-			} else {
+			}
+			else {
 				CompoundCondition inner = new CompoundCondition(chainingOperator);
 				if (this.hasConditions()) {
 					inner.conditions.add(this);
@@ -121,7 +125,8 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 			}
 			if (compoundCondition.canBeFlattenedWith(chainingOperator)) {
 				target.conditions.addAll(compoundCondition.conditions);
-			} else {
+			}
+			else {
 				target.conditions.add(compoundCondition);
 			}
 
@@ -142,8 +147,11 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 	}
 
 	/**
-	 * @param operatorBefore The operator that is to be used before this condition
-	 * @return True if all conditions in this condition are either simple or compound annotation with the same boolean operator as {@code operatorBefore}
+	 * Returns true if this operation can be flattened into a single with another using
+	 * the given operator.
+	 * @param operatorBefore the operator that is to be used before this condition
+	 * @return true if all conditions in this condition are either simple or compound
+	 * annotation with the same boolean operator as {@code operatorBefore}
 	 */
 	private boolean canBeFlattenedWith(Operator operatorBefore) {
 
@@ -173,22 +181,15 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 		}
 
 		// The first nested condition does not need an operator
-		acceptVisitorWithOperatorForChildCondition(visitor, null, conditions.get(0));
+		acceptVisitorWithOperatorForChildCondition(visitor, null, this.conditions.get(0));
 
 		// All others do
 		if (hasManyConditions) {
-			for (Condition condition : conditions.subList(1, conditions.size())) {
-				acceptVisitorWithOperatorForChildCondition(visitor, operator, condition);
+			for (Condition condition : this.conditions.subList(1, this.conditions.size())) {
+				acceptVisitorWithOperatorForChildCondition(visitor, this.operator, condition);
 			}
 			visitor.leave(this);
 		}
-	}
-
-	private static void acceptVisitorWithOperatorForChildCondition(
-		Visitor visitor, Operator operator, Condition condition
-	) {
-		Visitable.visitIfNotNull(operator, visitor);
-		condition.accept(visitor);
 	}
 
 	@Override
@@ -205,4 +206,5 @@ final class CompoundCondition implements Condition, ProvidesAffixes {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

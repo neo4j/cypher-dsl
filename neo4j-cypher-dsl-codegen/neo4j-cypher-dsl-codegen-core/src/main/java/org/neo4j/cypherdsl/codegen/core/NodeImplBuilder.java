@@ -29,10 +29,6 @@ import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
 
-import org.neo4j.cypherdsl.core.NodeBase;
-import org.neo4j.cypherdsl.core.NodeLabel;
-import org.neo4j.cypherdsl.core.Properties;
-
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.CodeBlock;
@@ -45,55 +41,86 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
+import org.neo4j.cypherdsl.core.NodeBase;
+import org.neo4j.cypherdsl.core.NodeLabel;
+import org.neo4j.cypherdsl.core.Properties;
 
 /**
- * This is a builder. It builds classes extending {@link NodeBase}. The workflow is as follows: Create an instance via
- * {@link #create(Configuration, String, String)}, defining the target package (fully qualified name) as well as the type.
- * Unless {@link #writeTo(java.nio.file.Path)} or {@link #writeToString()} is called, additional labels and properties can be added
- * with {@link #addLabels(Collection)} and {@link #addProperty(String)}.
- * A call to any of the {@code writeToXXX} methods will trigger the generation of source code and after that, this instance
- * becomes effectively immutable.
+ * This is a builder. It builds classes extending {@link NodeBase}. The workflow is as
+ * follows: Create an instance via {@link #create(Configuration, String, String)},
+ * defining the target package (fully qualified name) as well as the type. Unless
+ * {@link #writeTo(java.nio.file.Path)} or {@link #writeToString()} is called, additional
+ * labels and properties can be added with {@link #addLabels(Collection)} and
+ * {@link #addProperty(String)}. A call to any of the {@code writeToXXX} methods will
+ * trigger the generation of source code and after that, this instance becomes effectively
+ * immutable.
  *
  * @author Michael J. Simons
  * @author Andreas Berger
  * @since 2021.1.0
  */
-final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
-	implements NodeModelBuilder {
+final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder> implements NodeModelBuilder {
 
 	private static final ClassName TYPE_NAME_NODE_LABEL = ClassName.get(NodeLabel.class);
 
 	private final Set<String> labels = new LinkedHashSet<>();
 
 	private final Set<RelationshipPropertyDefinition> relationshipDefinitions = new LinkedHashSet<>();
+
 	private final Set<RelationshipFactoryDefinition> relationshipMethodDefinitions = new LinkedHashSet<>();
 
 	private NodeModelBuilder baseModel;
+
 	private TypeVariableName self;
+
 	private boolean extensible;
+
+	private NodeImplBuilder(Configuration configuration, ClassName className, String fieldName) {
+		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
+				configuration.getIndent());
+		this.self = TypeVariableName.get("SELF", className);
+	}
 
 	static NodeModelBuilder create(Configuration configuration, String packageName, String suggestedTypeName) {
 
 		String className = configuration.getNodeNameGenerator().generate(suggestedTypeName);
-		String usedPackageName = packageName == null ? configuration.getDefaultPackage() : packageName;
-		NodeImplBuilder builder = new NodeImplBuilder(
-			configuration,
-			ClassName.get(usedPackageName, configuration.getTypeNameDecorator().apply(className)),
-			className
-		);
+		String usedPackageName = (packageName != null) ? packageName : configuration.getDefaultPackage();
+		NodeImplBuilder builder = new NodeImplBuilder(configuration,
+				ClassName.get(usedPackageName, configuration.getTypeNameDecorator().apply(className)), className);
 		return builder.apply(configuration);
 	}
 
-	private NodeImplBuilder(Configuration configuration, ClassName className, String fieldName) {
-		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
-			configuration.getIndent());
-		this.self = TypeVariableName.get("SELF", className);
+	private static boolean isSelfReferential(RelationshipPropertyDefinition rpd) {
+		return rpd.getStart() == rpd.getEnd();
+	}
+
+	private static boolean isNotSelfReferential(RelationshipPropertyDefinition rpd) {
+		return !isSelfReferential(rpd);
+	}
+
+	static String capitalize(String str) {
+
+		if (str == null || str.isBlank()) {
+			return str;
+		}
+		else {
+			char baseChar = str.charAt(0);
+			char updatedChar = Character.toUpperCase(baseChar);
+			if (baseChar == updatedChar) {
+				return str;
+			}
+			else {
+				char[] chars = str.toCharArray();
+				chars[0] = updatedChar;
+				return new String(chars);
+			}
+		}
 	}
 
 	@Override
 	public NodeModelBuilder addLabel(String newLabel) {
 
-		return addLabels(newLabel == null ? Collections.emptyList() : Collections.singleton(newLabel));
+		return addLabels((newLabel != null) ? Collections.singleton(newLabel) : Collections.emptyList());
 	}
 
 	@Override
@@ -143,9 +170,10 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 				this.extensible = isExtensible;
 				if (this.extensible) {
 					this.self = TypeVariableName.get("SELF",
-						ParameterizedTypeName.get(className, WildcardTypeName.subtypeOf(Object.class)));
-				} else {
-					this.self = TypeVariableName.get("SELF", className);
+							ParameterizedTypeName.get(this.className, WildcardTypeName.subtypeOf(Object.class)));
+				}
+				else {
+					this.self = TypeVariableName.get("SELF", this.className);
 				}
 				return this;
 			}
@@ -163,8 +191,8 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 		superCallBuilder.add(CodeBlock.of("$N", primaryLabelField));
 		if (this.labels.size() > 1) {
 			superCallBuilder.add(", ");
-			superCallBuilder.add(
-				CodeBlock.join(this.labels.stream().skip(1).map(l -> CodeBlock.of("$S", l)).toList(), ", "));
+			superCallBuilder
+				.add(CodeBlock.join(this.labels.stream().skip(1).map(l -> CodeBlock.of("$S", l)).toList(), ", "));
 		}
 		superCallBuilder.add(")");
 
@@ -182,17 +210,12 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 		CodeBlock.Builder superCallBuilder = CodeBlock.builder().add("super(");
 		superCallBuilder.add(CodeBlock.of("$N", primaryLabelParam));
 		superCallBuilder.add(", ");
-		superCallBuilder.add(CodeBlock.of("$T.concat($T.stream($N), $T.of($N",
-			Stream.class,
-			Arrays.class,
-			additionalLabels,
-			Stream.class,
-			primaryLabelField
-		));
+		superCallBuilder.add(CodeBlock.of("$T.concat($T.stream($N), $T.of($N", Stream.class, Arrays.class,
+				additionalLabels, Stream.class, primaryLabelField));
 		if (this.labels.size() > 1) {
 			superCallBuilder.add(", ");
-			superCallBuilder.add(
-				CodeBlock.join(this.labels.stream().skip(1).map(l -> CodeBlock.of("$S", l)).toList(), ", "));
+			superCallBuilder
+				.add(CodeBlock.join(this.labels.stream().skip(1).map(l -> CodeBlock.of("$S", l)).toList(), ", "));
 		}
 		superCallBuilder.add(")).toArray($T[]::new))", String.class);
 
@@ -208,7 +231,8 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	private MethodSpec buildCreateMethod() {
 		ParameterSpec symbolicName = ParameterSpec.builder(TYPE_NAME_SYMBOLIC_NAME, "symbolicName").build();
 		ParameterSpec labelsParameter = ParameterSpec
-			.builder(ParameterizedTypeName.get(TYPE_NAME_LIST, TYPE_NAME_NODE_LABEL), "labels").build();
+			.builder(ParameterizedTypeName.get(TYPE_NAME_LIST, TYPE_NAME_NODE_LABEL), "labels")
+			.build();
 		ParameterSpec properties = ParameterSpec.builder(ClassName.get(Properties.class), "properties").build();
 
 		MethodSpec.Builder builder = MethodSpec.methodBuilder("create")
@@ -219,15 +243,17 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 		if (this.baseModel != null) {
 			builder.addAnnotation(Override.class);
 		}
-		if (extensible) {
+		if (this.extensible) {
 			builder.addAnnotation(
-				AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
-			builder.addStatement("return ($T) new $T<>($N, $N, $N)", self, className, symbolicName, labelsParameter,
-					properties)
-				.returns(self);
-		} else {
-			builder.addStatement("return new $T($N, $N, $N)", className, symbolicName, labelsParameter, properties)
-				.returns(className);
+					AnnotationSpec.builder(SuppressWarnings.class).addMember("value", "\"unchecked\"").build());
+			builder
+				.addStatement("return ($T) new $T<>($N, $N, $N)", this.self, this.className, symbolicName,
+						labelsParameter, properties)
+				.returns(this.self);
+		}
+		else {
+			builder.addStatement("return new $T($N, $N, $N)", this.className, symbolicName, labelsParameter, properties)
+				.returns(this.className);
 		}
 		return builder.build();
 	}
@@ -236,10 +262,11 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 
 		ParameterSpec symbolicName = ParameterSpec.builder(TYPE_NAME_SYMBOLIC_NAME, "symbolicName").build();
 		ParameterSpec labelsParameter = ParameterSpec
-			.builder(ParameterizedTypeName.get(TYPE_NAME_LIST, TYPE_NAME_NODE_LABEL), "labels").build();
+			.builder(ParameterizedTypeName.get(TYPE_NAME_LIST, TYPE_NAME_NODE_LABEL), "labels")
+			.build();
 		ParameterSpec properties = ParameterSpec.builder(ClassName.get(Properties.class), "properties").build();
 		return MethodSpec.constructorBuilder()
-			.addModifiers(extensible ? Modifier.PROTECTED : Modifier.PRIVATE)
+			.addModifiers(this.extensible ? Modifier.PROTECTED : Modifier.PRIVATE)
 			.addParameter(symbolicName)
 			.addParameter(labelsParameter)
 			.addParameter(properties)
@@ -255,86 +282,77 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 			.addAnnotation(Override.class)
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(newSymbolicName);
-		if (extensible) {
-			builder
-				.returns(self)
-				.addStatement("return create($N, getLabels(), getProperties())", newSymbolicName);
-		} else {
-			builder.returns(className)
-				.addStatement("return new $T($N, getLabels(), getProperties())", className, newSymbolicName);
+		if (this.extensible) {
+			builder.returns(this.self).addStatement("return create($N, getLabels(), getProperties())", newSymbolicName);
+		}
+		else {
+			builder.returns(this.className)
+				.addStatement("return new $T($N, getLabels(), getProperties())", this.className, newSymbolicName);
 		}
 		return builder.build();
 	}
 
 	private MethodSpec buildWithPropertiesMethod() {
 
-		ParameterSpec newProperties = ParameterSpec.builder(TYPE_NAME_MAP_EXPRESSION, "newProperties")
-			.build();
+		ParameterSpec newProperties = ParameterSpec.builder(TYPE_NAME_MAP_EXPRESSION, "newProperties").build();
 		MethodSpec.Builder builder = MethodSpec.methodBuilder("withProperties")
 			.addAnnotation(Override.class)
 			.addModifiers(Modifier.PUBLIC)
 			.addParameter(newProperties);
-		if (extensible) {
-			builder
-				.returns(self)
+		if (this.extensible) {
+			builder.returns(this.self)
 				.addStatement("return create(getSymbolicName().orElse(null), getLabels(), Properties.create($N))",
-					newProperties);
-		} else {
-			builder.returns(className)
+						newProperties);
+		}
+		else {
+			builder.returns(this.className)
 				.addStatement("return new $T(getSymbolicName().orElse(null), getLabels(), Properties.create($N))",
-					className, newProperties);
+						this.className, newProperties);
 		}
 		return builder.build();
-	}
-
-	private static boolean isSelfReferential(RelationshipPropertyDefinition rpd) {
-		return rpd.getStart() == rpd.getEnd();
-	}
-
-	private static boolean isNotSelfReferential(RelationshipPropertyDefinition rpd) {
-		return !isSelfReferential(rpd);
 	}
 
 	private List<FieldSpec> buildFields(FieldSpec primaryLabelField) {
 
 		FieldSpec defaultInstance;
-		if (extensible) {
-			var type = ParameterizedTypeName.get(className,
-				ParameterizedTypeName.get(className, WildcardTypeName.subtypeOf(Object.class)));
-			defaultInstance = FieldSpec
-				.builder(type, getFieldName(), Modifier.PUBLIC,
-					Modifier.STATIC, Modifier.FINAL)
-				.initializer("new $T<>()", className)
+		if (this.extensible) {
+			var type = ParameterizedTypeName.get(this.className,
+					ParameterizedTypeName.get(this.className, WildcardTypeName.subtypeOf(Object.class)));
+			defaultInstance = FieldSpec.builder(type, getFieldName(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+				.initializer("new $T<>()", this.className)
 				.build();
 
-		} else {
+		}
+		else {
 			defaultInstance = FieldSpec
-				.builder(className, getFieldName(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
-				.initializer("new $T()", className)
+				.builder(this.className, getFieldName(), Modifier.PUBLIC, Modifier.STATIC, Modifier.FINAL)
+				.initializer("new $T()", this.className)
 				.build();
 
 		}
 
 		Stream<FieldSpec> properties = generateFieldSpecsFromProperties();
 
-		Stream<FieldSpec> relationships = relationshipDefinitions.stream().filter(NodeImplBuilder::isNotSelfReferential)
+		Stream<FieldSpec> relationships = this.relationshipDefinitions.stream()
+			.filter(NodeImplBuilder::isNotSelfReferential)
 			.map(p -> {
 
-				String fieldName = fieldNameGenerator.generate(
-					p.getNameInDomain() == null ? p.getType() : p.getNameInDomain());
+				String fieldName = this.fieldNameGenerator
+					.generate((p.getNameInDomain() != null) ? p.getNameInDomain() : p.getType());
 				ClassName startClass = extractClassName(p.getStart());
 				ClassName endClass = extractClassName(p.getEnd());
 
 				var relationshipClassName = getRelationTypeWithParameters(p.getRelationshipBuilder(), startClass,
-					endClass);
+						endClass);
 				FieldSpec.Builder builder = FieldSpec.builder(relationshipClassName, fieldName, Modifier.PUBLIC,
-					Modifier.FINAL);
+						Modifier.FINAL);
 				if (this == p.getStart()) {
 					builder.initializer("new $T(this, $T.$N)", relationshipClassName, endClass,
-						p.getEnd().getFieldName());
-				} else {
+							p.getEnd().getFieldName());
+				}
+				else {
 					builder.initializer("new $T($T.$N, this)", relationshipClassName, startClass,
-						p.getStart().getFieldName());
+							p.getStart().getFieldName());
 				}
 				return builder.build();
 			});
@@ -343,84 +361,63 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 			.toList();
 	}
 
-	static String capitalize(String str) {
-
-		if (str == null || str.isBlank()) {
-			return str;
-		} else {
-			char baseChar = str.charAt(0);
-			char updatedChar = Character.toUpperCase(baseChar);
-			if (baseChar == updatedChar) {
-				return str;
-			} else {
-				char[] chars = str.toCharArray();
-				chars[0] = updatedChar;
-				return new String(chars);
-			}
-		}
-	}
-
 	@Override
 	protected JavaFile buildJavaFile() {
 
 		if (this.labels.isEmpty()) {
 			throw new IllegalStateException("Cannot build NodeImpl without labels!");
 		}
-		var baseNode = baseModel == null ? TYPE_NAME_NODE_BASE : extractClassName(baseModel);
-		if (baseModel != null && (!(baseModel instanceof NodeImplBuilder nmb) || !nmb.extensible)) {
-			throw new IllegalStateException("Cannot extend non-extensible node " + baseModel.getCanonicalClassName());
+		var baseNode = (this.baseModel != null) ? extractClassName(this.baseModel) : TYPE_NAME_NODE_BASE;
+		if (this.baseModel != null && (!(this.baseModel instanceof NodeImplBuilder nmb) || !nmb.extensible)) {
+			throw new IllegalStateException(
+					"Cannot extend non-extensible node " + this.baseModel.getCanonicalClassName());
 		}
 
 		var primaryLabelField = FieldSpec
-			.builder(String.class, this.fieldNameGenerator.generate("$PRIMARY_LABEL"), Modifier.PUBLIC,
-				Modifier.FINAL, Modifier.STATIC)
-			.initializer("$S", labels.stream().findFirst().orElseThrow())
+			.builder(String.class, this.fieldNameGenerator.generate("$PRIMARY_LABEL"), Modifier.PUBLIC, Modifier.FINAL,
+					Modifier.STATIC)
+			.initializer("$S", this.labels.stream().findFirst().orElseThrow())
 			.build();
 
-		TypeSpec.Builder builder = addGenerated(TypeSpec.classBuilder(className));
+		TypeSpec.Builder builder = addGenerated(TypeSpec.classBuilder(this.className));
 		builder.addModifiers(Modifier.PUBLIC);
-		if (extensible) {
-			builder
-				.addTypeVariable(self)
-				.superclass(ParameterizedTypeName.get(baseNode, self));
-		} else {
-			builder
-				.addModifiers(Modifier.FINAL)
-				.superclass(ParameterizedTypeName.get(baseNode, className));
+		if (this.extensible) {
+			builder.addTypeVariable(this.self).superclass(ParameterizedTypeName.get(baseNode, this.self));
 		}
-		builder
-			.addFields(buildFields(primaryLabelField))
-			.addMethod(buildDefaultConstructor(primaryLabelField));
-		if (extensible) {
+		else {
+			builder.addModifiers(Modifier.FINAL).superclass(ParameterizedTypeName.get(baseNode, this.className));
+		}
+		builder.addFields(buildFields(primaryLabelField)).addMethod(buildDefaultConstructor(primaryLabelField));
+		if (this.extensible) {
 			builder.addMethod(buildConstructorForInheritance(primaryLabelField));
 		}
-		if (extensible || baseNode != TYPE_NAME_NODE_BASE) {
+		if (this.extensible || baseNode != TYPE_NAME_NODE_BASE) {
 			builder.addMethod(buildCreateMethod());
 		}
 		builder.addMethod(buildCopyConstructor());
 		if (baseNode == TYPE_NAME_NODE_BASE) {
-			builder.addMethod(buildNamedMethod())
-				.addMethod(buildWithPropertiesMethod());
+			builder.addMethod(buildNamedMethod()).addMethod(buildWithPropertiesMethod());
 		}
 
-		relationshipDefinitions.stream().filter(NodeImplBuilder::isSelfReferential).map(buildSelfReferentialAccessor())
+		this.relationshipDefinitions.stream()
+			.filter(NodeImplBuilder::isSelfReferential)
+			.map(buildSelfReferentialAccessor())
 			.forEach(builder::addMethod);
 
-		relationshipMethodDefinitions.stream().map(buildRelationshipFactoryMethod())
-			.forEach(builder::addMethod);
+		this.relationshipMethodDefinitions.stream().map(buildRelationshipFactoryMethod()).forEach(builder::addMethod);
 
-		TypeSpec newType = builder
-			.build();
+		TypeSpec newType = builder.build();
 
 		return prepareFileBuilder(newType).build();
 	}
 
 	private TypeName getRelationTypeWithParameters(RelationshipModelBuilder relationshipBuilder, TypeName startClass,
-		ClassName endClass) {
+			ClassName endClass) {
 		TypeName relationshipClassName;
 		if (relationshipBuilder instanceof RelationshipImplBuilder impl) {
 			relationshipClassName = impl.getTypeName(startClass, endClass);
-		} else {
+		}
+		else {
 			relationshipClassName = extractClassName(relationshipBuilder);
 		}
 		return relationshipClassName;
@@ -429,7 +426,7 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 	private Function<RelationshipPropertyDefinition, MethodSpec> buildSelfReferentialAccessor() {
 		return p -> {
 			ClassName relationshipClassName = extractClassName(p.getRelationshipBuilder());
-			ParameterSpec end = ParameterSpec.builder(className, p.getNameInDomain()).build();
+			ParameterSpec end = ParameterSpec.builder(this.className, p.getNameInDomain()).build();
 			return MethodSpec.methodBuilder("with" + capitalize(p.getNameInDomain()))
 				.addModifiers(Modifier.PUBLIC)
 				.returns(relationshipClassName)
@@ -445,20 +442,20 @@ final class NodeImplBuilder extends AbstractModelBuilder<NodeModelBuilder>
 			ClassName endClass = extractClassName(p.getEnd());
 
 			TypeName relationshipClassName = getRelationTypeWithParameters(p.getRelationshipBuilder(), startClass,
-				endClass);
+					endClass);
 			var b = MethodSpec.methodBuilder(p.getNameInDomain())
 				.addModifiers(Modifier.PUBLIC)
 				.returns(relationshipClassName);
 			if (this == p.getStart()) {
 				ParameterSpec param = ParameterSpec.builder(endClass, "end").build();
-				b.addParameter(param)
-					.addStatement("return new $T(this, $N)", relationshipClassName, param);
-			} else {
+				b.addParameter(param).addStatement("return new $T(this, $N)", relationshipClassName, param);
+			}
+			else {
 				ParameterSpec param = ParameterSpec.builder(startClass, "start").build();
-				b.addParameter(param)
-					.addStatement("return new $T($N, this)", relationshipClassName, param);
+				b.addParameter(param).addStatement("return new $T($N, this)", relationshipClassName, param);
 			}
 			return b.build();
 		};
 	}
+
 }

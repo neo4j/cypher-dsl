@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,17 +25,21 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Create.html">Create</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Create.html">Create</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Die Ärzte - Seitenhirsch
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
 public final class Merge extends AbstractClause implements UpdatingClause {
 
 	private final Pattern pattern;
+
 	private final List<Visitable> onCreateOrMatchEvents;
 
 	Merge(Pattern pattern, List<MergeAction> mergeActions) {
@@ -50,7 +51,7 @@ public final class Merge extends AbstractClause implements UpdatingClause {
 	}
 
 	/**
-	 * @return True if there are any events defined for the merge statement.
+	 * {@return true if there are any events defined for the merge statement}
 	 */
 	@API(status = INTERNAL)
 	public boolean hasEvents() {
@@ -65,4 +66,5 @@ public final class Merge extends AbstractClause implements UpdatingClause {
 		this.onCreateOrMatchEvents.forEach(s -> s.accept(visitor));
 		visitor.leave(this);
 	}
+
 }

@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.Collection;
 
 import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class IdentifiableExpressionsIT {
 
@@ -30,10 +30,10 @@ class IdentifiableExpressionsIT {
 	void simpleWith() {
 		Node b = Cypher.anyNode("b");
 		Collection<Expression> variables = Cypher.match(Cypher.node("Label").named("a").relationshipTo(b))
-			.with(Cypher.name("a"), b).getIdentifiableExpressions();
+			.with(Cypher.name("a"), b)
+			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("a", "b");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("a", "b");
 	}
 
 	@Test
@@ -46,8 +46,7 @@ class IdentifiableExpressionsIT {
 			.with(a, Cypher.name("c"))
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("a", "c");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("a", "c");
 	}
 
 	@Test
@@ -57,19 +56,15 @@ class IdentifiableExpressionsIT {
 		Collection<Expression> variables = Cypher.match(a.relationshipTo(b))
 			.with(a, b)
 			.optionalMatch(b.relationshipTo(Cypher.anyNode("c")))
-			.with(
-				a,
-				Cypher.name("c"),
-				Cypher.caseExpression()
-					.when(Cypher.name("c").isNull().or(Cypher.hasLabelsOrType(Cypher.name("c"), "Label")))
-					.then(Cypher.literalTrue())
-					.elseDefault(Cypher.literalFalse())
-					.as("isNullOrLabel")
-			)
+			.with(a, Cypher.name("c"),
+					Cypher.caseExpression()
+						.when(Cypher.name("c").isNull().or(Cypher.hasLabelsOrType(Cypher.name("c"), "Label")))
+						.then(Cypher.literalTrue())
+						.elseDefault(Cypher.literalFalse())
+						.as("isNullOrLabel"))
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("a", "c", "isNullOrLabel");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("a", "c", "isNullOrLabel");
 	}
 
 	@Test
@@ -80,21 +75,17 @@ class IdentifiableExpressionsIT {
 		Collection<Expression> variables = Cypher.match(a.relationshipTo(b))
 			.with(a, b)
 			.optionalMatch(b.relationshipTo(Cypher.anyNode("c")))
-			.returning(
-				a.getRequiredSymbolicName(),
-				Cypher.name("c"),
-				Cypher.caseExpression()
-					.when(Cypher.name("c").isNull().or(Cypher.hasLabelsOrType(Cypher.name("c"), "Label")))
-					.then(Cypher.literalTrue())
-					.elseDefault(Cypher.literalFalse())
-					.as("isNullOrLabel")
-			)
+			.returning(a.getRequiredSymbolicName(), Cypher.name("c"),
+					Cypher.caseExpression()
+						.when(Cypher.name("c").isNull().or(Cypher.hasLabelsOrType(Cypher.name("c"), "Label")))
+						.then(Cypher.literalTrue())
+						.elseDefault(Cypher.literalFalse())
+						.as("isNullOrLabel"))
 			.build()
 			.getCatalog()
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("a", "c", "isNullOrLabel");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("a", "c", "isNullOrLabel");
 	}
 
 	@Test
@@ -107,8 +98,7 @@ class IdentifiableExpressionsIT {
 			.getCatalog()
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("a");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("a");
 	}
 
 	@Test
@@ -119,8 +109,7 @@ class IdentifiableExpressionsIT {
 			.with(b.as("007"))
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("007");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("007");
 	}
 
 	@Test
@@ -129,20 +118,18 @@ class IdentifiableExpressionsIT {
 		Collection<Expression> variables = Cypher.returning(Cypher.literalOf(1), b.as("007"), b.property("f"))
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("007", "b.f");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("007", "b.f");
 	}
 
 	@Test
 	void returnedProperties() {
 
 		Node b = Cypher.anyNode("b");
-		Collection<Expression> variables = Cypher
-			.match(b)
+		Collection<Expression> variables = Cypher.match(b)
 			.returning(b.property("x"), b.as("007"))
 			.getIdentifiableExpressions();
 
-		assertThat(variables.stream().map(Cypher::format))
-			.containsExactlyInAnyOrder("b.x", "007");
+		assertThat(variables.stream().map(Cypher::format)).containsExactlyInAnyOrder("b.x", "007");
 	}
+
 }

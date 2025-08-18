@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -27,9 +25,12 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * Represents a structured Neo4j procedure name.
+ *
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
@@ -38,36 +39,6 @@ public final class ProcedureName implements Visitable {
 	private final Namespace optionalNamespace;
 
 	private final String value;
-
-	/**
-	 * Creates a new {@link ProcedureName} from an array of names: The last element will be the final procedure name,
-	 * the head items will be concatenated into a proper namespace.
-	 *
-	 * @param namespaceAndProcedure List of names
-	 * @return A new procedure
-	 */
-	public static ProcedureName from(String... namespaceAndProcedure) {
-		if (namespaceAndProcedure.length == 1) {
-			return new ProcedureName(namespaceAndProcedure[0]);
-		} else {
-			Namespace namespace = new Namespace(Arrays.copyOf(namespaceAndProcedure, namespaceAndProcedure.length - 1));
-			return new ProcedureName(namespace, namespaceAndProcedure[namespaceAndProcedure.length - 1]);
-		}
-	}
-
-	/**
-	 * Creates a new {@link ProcedureName} from a given namespace and name.
-	 * @param namespace Optional (nested) namespace
-	 * @param procedure The actual name of the procedure
-	 * @return A new procedure
-	 */
-	public static ProcedureName from(List<String> namespace, String procedure) {
-		if (namespace.isEmpty()) {
-			return new ProcedureName(procedure);
-		} else {
-			return new ProcedureName(new Namespace(namespace.toArray(new String[0])), procedure);
-		}
-	}
 
 	private ProcedureName(String value) {
 		this(null, value);
@@ -80,7 +51,39 @@ public final class ProcedureName implements Visitable {
 	}
 
 	/**
-	 * @return the fully qualified, Cypher name of this procedure
+	 * Creates a new {@link ProcedureName} from an array of names: The last element will
+	 * be the final procedure name, the head items will be concatenated into a proper
+	 * namespace.
+	 * @param namespaceAndProcedure list of names
+	 * @return a new procedure
+	 */
+	public static ProcedureName from(String... namespaceAndProcedure) {
+		if (namespaceAndProcedure.length == 1) {
+			return new ProcedureName(namespaceAndProcedure[0]);
+		}
+		else {
+			Namespace namespace = new Namespace(Arrays.copyOf(namespaceAndProcedure, namespaceAndProcedure.length - 1));
+			return new ProcedureName(namespace, namespaceAndProcedure[namespaceAndProcedure.length - 1]);
+		}
+	}
+
+	/**
+	 * Creates a new {@link ProcedureName} from a given namespace and name.
+	 * @param namespace optional (nested) namespace
+	 * @param procedure the actual name of the procedure
+	 * @return a new procedure
+	 */
+	public static ProcedureName from(List<String> namespace, String procedure) {
+		if (namespace.isEmpty()) {
+			return new ProcedureName(procedure);
+		}
+		else {
+			return new ProcedureName(new Namespace(namespace.toArray(new String[0])), procedure);
+		}
+	}
+
+	/**
+	 * {@return the fully qualified, Cypher name of this procedure}
 	 */
 	public String getQualifiedName() {
 
@@ -101,10 +104,10 @@ public final class ProcedureName implements Visitable {
 
 	/**
 	 * Use {@link #getQualifiedName()} to retrieve the full name, including the namespace.
-	 *
-	 * @return The actual name of the procedure, without any namespace.
+	 * @return the actual name of the procedure, without any namespace.
 	 */
 	public String getValue() {
-		return value;
+		return this.value;
 	}
+
 }

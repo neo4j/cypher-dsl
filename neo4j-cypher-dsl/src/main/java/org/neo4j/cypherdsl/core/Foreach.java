@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Collection;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents the {@literal FOREACH} clause and is currently only producible via the Cypher-Parser.
+ * Represents the {@literal FOREACH} clause and is currently only producible via the
+ * Cypher-Parser.
  *
  * @author Michael J. Simons
  * @since 2021.3.0
@@ -57,4 +58,5 @@ public final class Foreach extends AbstractClause implements UpdatingClause {
 		this.updatingClauses.forEach(clause -> clause.accept(visitor));
 		visitor.leave(this);
 	}
+
 }

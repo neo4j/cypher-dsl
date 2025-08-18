@@ -18,13 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Something that can build counting sub-queries. Might be used in the future for existential sub-queries, too.
+ * Something that can build counting sub-queries. Might be used in the future for
+ * existential sub-queries, too.
  *
+ * @author Michael J. Simons
  * @since 2023.9.0
  */
 @API(status = STABLE, since = "2023.9.0")
@@ -32,34 +34,34 @@ public interface SubqueryExpressionBuilder {
 
 	/**
 	 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
-	 *
-	 * @param requiredPattern One pattern is required
-	 * @param patternElement  Optional pattern
-	 * @return The immutable {@link CountExpression}
+	 * @param requiredPattern one pattern is required
+	 * @param patternElement optional pattern
+	 * @return the immutable {@link CountExpression}
 	 * @since 2023.9.0
 	 */
 	CountExpression count(PatternElement requiredPattern, PatternElement... patternElement);
 
 	/**
 	 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
-	 *
-	 * @param union The union that will be the source of the {@literal COUNT} sub-query
-	 * @return The immutable {@link CountExpression}
+	 * @param union the union that will be the source of the {@literal COUNT} sub-query
+	 * @return the immutable {@link CountExpression}
 	 * @since 2023.9.0
 	 */
 	CountExpression count(Statement.UnionQuery union);
 
 	/**
-	 * Creates a {@literal COLLECT} subquery from a statement, including  its filters and conditions. The statement must
-	 * return exactly one column. It must however not contain any updates. While it would render syntactically
-	 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
+	 * Creates a {@literal COLLECT} subquery from a statement, including its filters and
+	 * conditions. The statement must return exactly one column. It must however not
+	 * contain any updates. While it would render syntactically correct Cypher, Neo4j does
+	 * not support updates inside counting sub-queries.
 	 * <p>
-	 * To avoid confusion, shadowing of imported variables is not allowed. An outside scope variable is shadowed when
-	 * a newly introduced variable within the inner scope is defined with the same variable.
-	 *
+	 * To avoid confusion, shadowing of imported variables is not allowed. An outside
+	 * scope variable is shadowed when a newly introduced variable within the inner scope
+	 * is defined with the same variable.
 	 * @param statement the statement to be passed to {@code COLLECT{}}
 	 * @return a collecting sub-query.
 	 * @since 2023.9.0
 	 */
 	CollectExpression collect(Statement statement);
+
 }

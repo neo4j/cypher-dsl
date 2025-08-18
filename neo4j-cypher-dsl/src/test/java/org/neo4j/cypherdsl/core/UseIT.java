@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
-
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -36,31 +33,38 @@ import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+
 /**
  * @author Michael J. Simons
  */
 class UseIT {
 
-	private final Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
-	private final OngoingReadingAndReturn ongoingInnerStatementDefinition = Cypher.call(Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build()).returning("movie");
+	private final Renderer renderer = Renderer
+		.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
+
+	private final OngoingReadingAndReturn ongoingInnerStatementDefinition = Cypher
+		.call(Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build())
+		.returning("movie");
+
+	static Stream<Arguments> graphByNameShouldWork() {
+		return Stream.of(
+				Arguments.of(Cypher.literalOf("myComposite.myConstituent"),
+						"USE graph.byName('myComposite.myConstituent') MATCH (n) RETURN n"),
+				Arguments.of(Cypher.parameter("graphName"), "USE graph.byName($graphName) MATCH (n) RETURN n"));
+	}
 
 	@ParameterizedTest
 	@CsvSource(textBlock = """
-		       myDatabase, USE myDatabase MATCH (n) RETURN n
-		       myComposite.myConstituent, USE myComposite.myConstituent MATCH (n) RETURN n
-		""")
+			       myDatabase, USE myDatabase MATCH (n) RETURN n
+			       myComposite.myConstituent, USE myComposite.myConstituent MATCH (n) RETURN n
+			""")
 	void simpleUseShouldWork(String target, String expected) {
 
 		var statement = Cypher.match(Cypher.anyNode("n")).returning("n").build();
 		var cypher = Cypher.use(target, statement).getCypher();
 		assertThat(cypher).isEqualTo(expected);
-	}
-
-	static Stream<Arguments> graphByNameShouldWork() {
-		return Stream.of(
-			Arguments.of(Cypher.literalOf("myComposite.myConstituent"), "USE graph.byName('myComposite.myConstituent') MATCH (n) RETURN n"),
-			Arguments.of(Cypher.parameter("graphName"), "USE graph.byName($graphName) MATCH (n) RETURN n")
-		);
 	}
 
 	@ParameterizedTest
@@ -71,9 +75,11 @@ class UseIT {
 		var cypher = "";
 		if (target instanceof StringLiteral literal) {
 			cypher = Cypher.use(literal, statement).getCypher();
-		} else if (target instanceof Parameter<?> parameter) {
+		}
+		else if (target instanceof Parameter<?> parameter) {
 			cypher = Cypher.use(parameter, statement).getCypher();
-		} else {
+		}
+		else {
 			Assertions.fail("Unexpected expression type in test.");
 		}
 		assertThat(cypher).isEqualTo(expected);
@@ -83,28 +89,33 @@ class UseIT {
 	void usageInSubqueryShouldWork() {
 
 		var expected = """
-			UNWIND ['cineasts.latest', 'cineasts.upcoming'] AS graphName
-			CALL {
-			USE graph.byName(graphName)
-			  MATCH (movie:`Movie`)
-			  RETURN movie
-			}
-			RETURN movie.title AS title
-			""".lines().map(String::trim).collect(Collectors.joining(" ")).replace("CALL { ", "CALL {").replace(" }", "}");
-
+				UNWIND ['cineasts.latest', 'cineasts.upcoming'] AS graphName
+				CALL {
+				USE graph.byName(graphName)
+				  MATCH (movie:`Movie`)
+				  RETURN movie
+				}
+				RETURN movie.title AS title
+				""".lines()
+			.map(String::trim)
+			.collect(Collectors.joining(" "))
+			.replace("CALL { ", "CALL {")
+			.replace(" }", "}");
 
 		var innerStatement = Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build();
 		var cypher = Cypher.unwind(Cypher.literalOf(List.of("cineasts.latest", "cineasts.upcoming")))
 			.as("graphName")
 			.call(Cypher.use((Expression) Cypher.name("graphName"), innerStatement))
-			.returning(Cypher.name("movie").property("title").as("title")).build().getCypher();
+			.returning(Cypher.name("movie").property("title").as("title"))
+			.build()
+			.getCypher();
 		assertThat(cypher).isEqualTo(expected);
 	}
 
 	@Test
 	void useBeforeCall() {
 
-		var innerStatement = ongoingInnerStatementDefinition.build();
+		var innerStatement = this.ongoingInnerStatementDefinition.build();
 		var cypher = Cypher.use("cineasts.latest", innerStatement).getCypher();
 		assertThat(cypher).isEqualTo("USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
 	}
@@ -112,7 +123,7 @@ class UseIT {
 	@Test
 	void nestedUseShouldThrow() {
 
-		var innerStatement = Cypher.use("x", ongoingInnerStatementDefinition.build());
+		var innerStatement = Cypher.use("x", this.ongoingInnerStatementDefinition.build());
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.use("y", innerStatement))
 			.withMessage("Nested USE clauses are not supported");
 	}
@@ -122,29 +133,29 @@ class UseIT {
 
 		var title = Cypher.name("title");
 		var movie = Cypher.node("Movie", Cypher.mapOf("title", title)).named("m");
-		var innerStatement = Cypher
-			.unwind(Cypher.parameter("newMovies")).as(title)
-			.call(
-				Cypher.with(title).
-				merge(movie).returning(movie.elementId().as("id")).build()
-			).returning("id")
+		var innerStatement = Cypher.unwind(Cypher.parameter("newMovies"))
+			.as(title)
+			.call(Cypher.with(title).merge(movie).returning(movie.elementId().as("id")).build())
+			.returning("id")
 			.build();
-		var cypher = renderer.render(Cypher.use("cineasts.latest", innerStatement));
-		assertThat(cypher).isEqualTo("USE cineasts.latest UNWIND $newMovies AS title CALL {WITH title MERGE (m:`Movie` {title: title}) RETURN elementId(m) AS id} RETURN id");
+		var cypher = this.renderer.render(Cypher.use("cineasts.latest", innerStatement));
+		assertThat(cypher).isEqualTo(
+				"USE cineasts.latest UNWIND $newMovies AS title CALL {WITH title MERGE (m:`Movie` {title: title}) RETURN elementId(m) AS id} RETURN id");
 	}
 
 	@Test
 	void addExplain() {
 
-		var innerStatement = ongoingInnerStatementDefinition.build();
+		var innerStatement = this.ongoingInnerStatementDefinition.build();
 		var cypher = Cypher.use("cineasts.latest", innerStatement).explain().getCypher();
-		assertThat(cypher).isEqualTo("EXPLAIN USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
+		assertThat(cypher)
+			.isEqualTo("EXPLAIN USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
 	}
 
 	@Test
 	void innerProfileShouldThrow() {
 
-		var innerStatement = ongoingInnerStatementDefinition.profile();
+		var innerStatement = this.ongoingInnerStatementDefinition.profile();
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.use("x", innerStatement))
 			.withMessage("PROFILE'd statements are not supported inside USE clauses");
 	}
@@ -152,8 +163,9 @@ class UseIT {
 	@Test
 	void innerExplainShouldThrow() {
 
-		var innerStatement = ongoingInnerStatementDefinition.explain();
+		var innerStatement = this.ongoingInnerStatementDefinition.explain();
 		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.use("x", innerStatement))
 			.withMessage("EXPLAIN'ed statements are not supported inside USE clauses");
 	}
+
 }

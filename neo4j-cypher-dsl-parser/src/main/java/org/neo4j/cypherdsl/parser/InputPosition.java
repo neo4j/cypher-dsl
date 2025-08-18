@@ -18,11 +18,16 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * Needed for implementing the {@link org.neo4j.cypher.internal.ast.factory.ASTFactory}.
+ *
+ * @param offset the offset
+ * @param line the line number
+ * @param column the column number
  * @author Michael J. Simons
  * @since 2021.3.0
  */

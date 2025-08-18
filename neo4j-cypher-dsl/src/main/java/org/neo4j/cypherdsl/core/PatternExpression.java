@@ -19,9 +19,12 @@
 package org.neo4j.cypherdsl.core;
 
 /**
- * A marker interface used for pattern appearing in {@code exists} or {@code size} statements.
+ * A marker interface used for pattern appearing in {@code exists} or {@code size}
+ * statements.
+ *
  * @author Michael J. Simons
  * @since 2023.9.8
  */
 public sealed interface PatternExpression permits PatternExpressionImpl {
+
 }

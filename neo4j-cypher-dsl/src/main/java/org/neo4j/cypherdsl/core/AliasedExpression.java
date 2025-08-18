@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * An aliased expression, that deals with named expressions when accepting visitors.
@@ -45,14 +45,14 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 
 	@Override
 	public String getAlias() {
-		return alias;
+		return this.alias;
 	}
 
 	/**
-	 * This takes the originally aliased expression and re-aliases it. Aliases are not nested.
-	 *
-	 * @param newAlias The new alias to use
-	 * @return A new aliased, expression.
+	 * This takes the originally aliased expression and re-aliases it. Aliases are not
+	 * nested.
+	 * @param newAlias the new alias to use
+	 * @return a new aliased, expression.
 	 */
 	@Override
 	public AliasedExpression as(String newAlias) {
@@ -70,7 +70,7 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 	}
 
 	Expression getDelegate() {
-		return delegate;
+		return this.delegate;
 	}
 
 	@Override
@@ -82,4 +82,5 @@ public final class AliasedExpression implements Aliased, Expression, Identifiabl
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

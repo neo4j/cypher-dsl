@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,21 +30,19 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * This is the base class for all nodes. It can be used with generics, specifying a valid type.
- * This is useful when using it as a base class for a static meta model.
+ * This is the base class for all nodes. It can be used with generics, specifying a valid
+ * type. This is useful when using it as a base class for a static metamodel.
  *
+ * @param <SELF> the type of this node
  * @author Michael J. Simons
- * @param <SELF> The type of this node
- * @soundtrack Queen - The Miracle
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
 @SuppressWarnings("deprecation") // IDEA is stupid.
 public abstract class NodeBase<SELF extends Node> extends AbstractNode implements Node {
-
-	@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
-	private volatile SymbolicName symbolicName;
 
 	final List<NodeLabel> labels;
 
@@ -56,6 +52,9 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 	final Where innerPredicate;
 
+	@SuppressWarnings("squid:S3077") // Symbolic name is unmodifiable
+	private volatile SymbolicName symbolicName;
+
 	// ------------------------------------------------------------------------
 	// Public API to be used by the static meta model.
 	// Non-final methods are ok to be overwritten.
@@ -63,9 +62,8 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 	/**
 	 * Creates a new base object from a set of labels.
-	 *
-	 * @param primaryLabel The primary label
-	 * @param additionalLabels An optional list of additional ones.
+	 * @param primaryLabel the primary label
+	 * @param additionalLabels an optional list of additional ones.
 	 */
 	protected NodeBase(String primaryLabel, String... additionalLabels) {
 
@@ -73,99 +71,15 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	}
 
 	/**
-	 * Creates a new base object from a {@link SymbolicName} name, a list of labels and a set of properties
-	 *
-	 * @param symbolicName The symbolic name for this node object
-	 * @param labels The list of labels, no primary is given
-	 * @param properties A set of properties
+	 * Creates a new base object from a {@link SymbolicName} name, a list of labels and a
+	 * set of properties.
+	 * @param symbolicName the symbolic name for this node object
+	 * @param labels the list of labels, no primary is given
+	 * @param properties a set of properties
 	 */
 	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
 		this(symbolicName, new ArrayList<>(labels), null, properties, null);
 	}
-
-	@Override
-	public final SELF named(String newSymbolicName) {
-
-		Assertions.hasText(newSymbolicName, "Symbolic name is required.");
-		return named(SymbolicName.of(newSymbolicName));
-	}
-
-	/**
-	 * This method needs to be implemented to provide new, type safe instances of this node.
-	 * @param newSymbolicName the new symbolic name.
-	 * @return A new node
-	 */
-	@Override
-	@SuppressWarnings("squid:S3038") // This is overridden to make sure we allow a covariant return type
-	public abstract SELF named(SymbolicName newSymbolicName);
-
-	@Override
-	public final SELF withProperties(Object... keysAndValues) {
-
-		MapExpression newProperties = null;
-		if (keysAndValues != null && keysAndValues.length != 0) {
-			newProperties = MapExpression.create(false, keysAndValues);
-		}
-		return withProperties(newProperties);
-	}
-
-	/**
-	 * A new object with a new set of properties
-	 *
-	 * @param newProperties A map with the new properties
-	 * @return A new object
-	 */
-	@Override
-	public final SELF withProperties(Map<String, Object> newProperties) {
-
-		return withProperties(MapExpression.create(newProperties));
-	}
-
-	/**
-	 * This method needs to be implemented to provide new, type safe instances of this node.
-	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
-	 * @return A new node
-	 */
-	@Override
-	@SuppressWarnings("squid:S3038") // This is overridden to make sure we allow a covariant return type
-	public abstract SELF withProperties(MapExpression newProperties);
-
-	/**
-	 * @return Set of properties for this node
-	 */
-	protected final Properties getProperties() {
-		return properties;
-	}
-
-	@Override
-	public final List<NodeLabel> getLabels() {
-		return labels == null ? List.of() : List.copyOf(labels);
-	}
-
-	@Override
-	public final Optional<SymbolicName> getSymbolicName() {
-		return Optional.ofNullable(symbolicName);
-	}
-
-	@Override
-	public final SymbolicName getRequiredSymbolicName() {
-
-		SymbolicName requiredSymbolicName = this.symbolicName;
-		if (requiredSymbolicName == null) {
-			synchronized (this) {
-				requiredSymbolicName = this.symbolicName;
-				if (requiredSymbolicName == null) {
-					this.symbolicName = SymbolicName.unresolved();
-					requiredSymbolicName = this.symbolicName;
-				}
-			}
-		}
-		return requiredSymbolicName;
-	}
-
-	// ------------------------------------------------------------------------
-	// Internal API.
-	// ------------------------------------------------------------------------
 
 	NodeBase() {
 
@@ -177,27 +91,14 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 		this(symbolicName, assertLabels(primaryLabel, additionalLabels), Properties.create(properties));
 	}
 
-	NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties, Where innerPredicate) {
+	NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties,
+			Where innerPredicate) {
 
 		this.symbolicName = symbolicName;
 		this.labels = labels;
 		this.labelExpression = labelExpression;
 		this.properties = properties;
 		this.innerPredicate = innerPredicate;
-	}
-
-	@Override
-	public final void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		this.getSymbolicName().ifPresent(s -> s.accept(visitor));
-		if (this.labels != null) {
-			this.labels.forEach(label -> label.accept(visitor));
-		}
-		Visitable.visitIfNotNull(this.labelExpression, visitor);
-		Visitable.visitIfNotNull(this.properties, visitor);
-		Visitable.visitIfNotNull(this.innerPredicate, visitor);
-		visitor.leave(this);
 	}
 
 	private static List<NodeLabel> assertLabels(String primaryLabel, String[] additionalLabels) {
@@ -216,4 +117,107 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 		return labels;
 	}
+
+	@Override
+	public final SELF named(String newSymbolicName) {
+
+		Assertions.hasText(newSymbolicName, "Symbolic name is required.");
+		return named(SymbolicName.of(newSymbolicName));
+	}
+
+	/**
+	 * This method needs to be implemented to provide new, type safe instances of this
+	 * node.
+	 * @param newSymbolicName the new symbolic name.
+	 * @return a new node
+	 */
+	@Override
+	@SuppressWarnings("squid:S3038") // This is overridden to make sure we allow a
+										// covariant return type
+	public abstract SELF named(SymbolicName newSymbolicName);
+
+	@Override
+	public final SELF withProperties(Object... keysAndValues) {
+
+		MapExpression newProperties = null;
+		if (keysAndValues != null && keysAndValues.length != 0) {
+			newProperties = MapExpression.create(false, keysAndValues);
+		}
+		return withProperties(newProperties);
+	}
+
+	/**
+	 * A new object with a new set of properties.
+	 * @param newProperties a map with the new properties
+	 * @return a new object
+	 */
+	@Override
+	public final SELF withProperties(Map<String, Object> newProperties) {
+
+		return withProperties(MapExpression.create(newProperties));
+	}
+
+	/**
+	 * This method needs to be implemented to provide new, type safe instances of this
+	 * node.
+	 * @param newProperties the new properties (can be {@literal null} to remove exiting
+	 * properties).
+	 * @return a new node
+	 */
+	@Override
+	// This is overridden to make sure we allow a covariant return type
+	@SuppressWarnings("squid:S3038")
+	public abstract SELF withProperties(MapExpression newProperties);
+
+	// ------------------------------------------------------------------------
+	// Internal API.
+	// ------------------------------------------------------------------------
+
+	/**
+	 * {@return set of properties for this node}
+	 */
+	protected final Properties getProperties() {
+		return this.properties;
+	}
+
+	@Override
+	public final List<NodeLabel> getLabels() {
+		return (this.labels != null) ? List.copyOf(this.labels) : List.of();
+	}
+
+	@Override
+	public final Optional<SymbolicName> getSymbolicName() {
+		return Optional.ofNullable(this.symbolicName);
+	}
+
+	@Override
+	public final SymbolicName getRequiredSymbolicName() {
+
+		SymbolicName requiredSymbolicName = this.symbolicName;
+		if (requiredSymbolicName == null) {
+			synchronized (this) {
+				requiredSymbolicName = this.symbolicName;
+				if (requiredSymbolicName == null) {
+					this.symbolicName = SymbolicName.unresolved();
+					requiredSymbolicName = this.symbolicName;
+				}
+			}
+		}
+		return requiredSymbolicName;
+	}
+
+	@Override
+	public final void accept(Visitor visitor) {
+
+		visitor.enter(this);
+		this.getSymbolicName().ifPresent(s -> s.accept(visitor));
+		if (this.labels != null) {
+			this.labels.forEach(label -> label.accept(visitor));
+		}
+		Visitable.visitIfNotNull(this.labelExpression, visitor);
+		Visitable.visitIfNotNull(this.properties, visitor);
+		Visitable.visitIfNotNull(this.innerPredicate, visitor);
+		visitor.leave(this);
+	}
+
 }

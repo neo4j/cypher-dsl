@@ -18,18 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Used for subqueries {@literal IN TRANSACTIONS}
+ * Used for subqueries {@code IN TRANSACTIONS}.
  *
  * @author Michael J. Simons
- * @soundtrack Korn - Greatest Hits, Vol. 1
  * @since 2022.3.0
  */
 @API(status = STABLE, since = "2022.3.0")
@@ -46,17 +45,17 @@ public final class InTransactions implements Visitable {
 	}
 
 	/**
-	 * @return number of rows in this transaction
+	 * {@return number of rows in this transaction}
 	 */
 	@API(status = INTERNAL)
 	public Integer getRows() {
-		return rows;
+		return this.rows;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		subquery.accept(visitor);
+		this.subquery.accept(visitor);
 		visitor.leave(this);
 	}
 
@@ -64,4 +63,5 @@ public final class InTransactions implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

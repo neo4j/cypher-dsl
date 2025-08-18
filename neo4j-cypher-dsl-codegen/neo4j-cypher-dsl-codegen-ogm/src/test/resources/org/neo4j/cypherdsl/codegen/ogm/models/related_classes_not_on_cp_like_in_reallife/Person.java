@@ -28,7 +28,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public final class Person {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private final Long id;
 
 	private final String name;
@@ -60,4 +61,5 @@ public final class Person {
 	public void setBorn(Integer born) {
 		this.born = born;
 	}
+
 }

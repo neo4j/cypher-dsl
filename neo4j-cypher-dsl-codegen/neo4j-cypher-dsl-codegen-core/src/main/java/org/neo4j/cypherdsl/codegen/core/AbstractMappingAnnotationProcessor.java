@@ -52,7 +52,8 @@ import javax.lang.model.util.Types;
 import javax.tools.JavaFileObject;
 
 /**
- * Base class to build generators based on Neo4j supported object mapping frameworks (we ship with support for SDN6+ and Neo4j-OGM).
+ * Base class to build generators based on Neo4j supported object mapping frameworks (we
+ * ship with support for SDN6+ and Neo4j-OGM).
  *
  * @author Michael J. Simons
  * @since 2025.8.0
@@ -60,8 +61,11 @@ import javax.tools.JavaFileObject;
 public abstract class AbstractMappingAnnotationProcessor extends AbstractProcessor {
 
 	protected Messager messager;
+
 	protected Types typeUtils;
+
 	protected Filer filer;
+
 	protected Configuration configuration;
 
 	/**
@@ -71,10 +75,10 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	/**
-	 * Reads all supported from the processing environment and creates a suitable {@link Configuration}.
-	 *
-	 * @param processingEnv The processing environment
-	 * @return A working configuration
+	 * Reads all supported from the processing environment and creates a suitable
+	 * {@link Configuration}.
+	 * @param processingEnv the processing environment
+	 * @return a working configuration
 	 */
 	protected static Configuration createConfiguration(ProcessingEnvironment processingEnv) {
 		Configuration.Builder builder = Configuration.newConfig();
@@ -92,21 +96,21 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 		if (options.containsKey(Configuration.PROPERTY_INDENT_SIZE)) {
 			builder.withIndentSize(Integer.parseInt(options.get(Configuration.PROPERTY_INDENT_SIZE)));
 		}
-		return builder
-			.withTimestamp(options.getOrDefault(Configuration.PROPERTY_TIMESTAMP, null))
+		return builder.withTimestamp(options.getOrDefault(Configuration.PROPERTY_TIMESTAMP, null))
 			.withAddAtGenerated(
-				Boolean.parseBoolean(options.getOrDefault(Configuration.PROPERTY_ADD_AT_GENERATED, "true")))
-			.withTarget(processingEnv.getSourceVersion().equals(SourceVersion.RELEASE_8) ?
-				Configuration.JavaVersion.RELEASE_8 : Configuration.JavaVersion.RELEASE_11)
+					Boolean.parseBoolean(options.getOrDefault(Configuration.PROPERTY_ADD_AT_GENERATED, "true")))
+			.withTarget(processingEnv.getSourceVersion().equals(SourceVersion.RELEASE_8)
+					? Configuration.JavaVersion.RELEASE_8 : Configuration.JavaVersion.RELEASE_11)
 			.build();
 	}
 
 	/**
-	 * @param definitions A list of all relationship definitions for one owning node
-	 * @return True if all definitions have no or the same set of properties
+	 * Checks if the definitions contain either all the same or no properties at all.
+	 * @param definitions a list of all relationship definitions for one owning node
+	 * @return true if all definitions have no or the same set of properties
 	 */
 	protected static boolean sameOrNoProperties(
-		List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>> definitions) {
+			List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>> definitions) {
 
 		boolean same = true;
 		Set<PropertyDefinition> properties = null;
@@ -114,7 +118,8 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 			Set<PropertyDefinition> newProperties = definition.getValue().getProperties();
 			if (properties == null) {
 				properties = newProperties;
-			} else if (properties.size() != newProperties.size() || !properties.containsAll(newProperties)) {
+			}
+			else if (properties.size() != newProperties.size() || !properties.containsAll(newProperties)) {
 				same = false;
 				break;
 			}
@@ -123,11 +128,11 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	/**
-	 * Returns all types annotated with {@code annotation} found in the environment of this round.
-	 *
-	 * @param annotation The annotation to search for
-	 * @param from       The environment to extract from
-	 * @return A set of type elements that match the given annotation
+	 * Returns all types annotated with {@code annotation} found in the environment of
+	 * this round.
+	 * @param annotation the annotation to search for
+	 * @param from the environment to extract from
+	 * @return a set of type elements that match the given annotation
 	 */
 	protected static Set<TypeElement> getTypesAnnotatedWith(TypeElement annotation, RoundEnvironment from) {
 		return from.getElementsAnnotatedWith(annotation)
@@ -151,8 +156,8 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	/**
-	 * Do your framework specific initialisation here, such as figuring out your actual annotations.
-	 *
+	 * Do your framework specific initialisation here, such as figuring out your actual
+	 * annotations.
 	 * @param processingEnv the current processing env
 	 */
 	protected abstract void initFrameworkSpecific(ProcessingEnvironment processingEnv);
@@ -163,15 +168,17 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	/**
-	 * Creates {@link NodeModelBuilder node builder} for all classes annotated with {@code @Node}. The node builders won't
-	 * have any properties associated with them. This is done in the next step.
+	 * Creates {@link NodeModelBuilder node builder} for all classes annotated with
+	 * {@code @Node}. The node builders won't have any properties associated with them.
+	 * This is done in the next step.
 	 * <p>
-	 * The reason for not populating the properties in one go in this step is simple: When one annotated node class refers
-	 * to another, we can be sure that this property is not a simple property but a relationship property, without going
-	 * through other expensive checks. But to be able to do this, we must know the annotated classes upfront.
-	 *
-	 * @param classesAnnotatedWithNode The set of annotated classes
-	 * @return A map from type to a node builder for that type
+	 * The reason for not populating the properties in one go in this step is simple: When
+	 * one annotated node class refers to another, we can be sure that this property is
+	 * not a simple property but a relationship property, without going through other
+	 * expensive checks. But to be able to do this, we must know the annotated classes
+	 * upfront.
+	 * @param classesAnnotatedWithNode the set of annotated classes
+	 * @return a map from type to a node builder for that type
 	 */
 	protected final Map<TypeElement, NodeModelBuilder> populateListOfNodes(Set<TypeElement> classesAnnotatedWithNode) {
 
@@ -194,12 +201,13 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 				if (lastDot > 0) {
 					packageName = qualifiedName.substring(0, lastDot);
 				}
-			} else if (enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
+			}
+			else if (enclosingElement.getKind().equals(ElementKind.PACKAGE)) {
 				String q = ((PackageElement) enclosingElement).getQualifiedName().toString();
-				packageName = q + (q.isEmpty() || subpackages.isEmpty() ? "" : ".") + String.join(".", subpackages);
+				packageName = q + ((q.isEmpty() || subpackages.isEmpty()) ? "" : ".") + String.join(".", subpackages);
 			}
 
-			NodeModelBuilder builder = NodeModelBuilder.create(configuration, packageName, suggestedTypeName)
+			NodeModelBuilder builder = NodeModelBuilder.create(this.configuration, packageName, suggestedTypeName)
 				.addLabels(getLabel(annotatedClass));
 
 			result.put(annotatedClass, builder);
@@ -208,49 +216,44 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	/**
-	 * Finds labels on the annotated element. If there's no label specified on the node annotation, the simple class name
-	 * is used. Otherwise, all labels in declaration order (primary, value, labels) are used.
-	 *
-	 * @param annotatedClass The annotated class
-	 * @return A collection of labels
+	 * Finds labels on the annotated element. If there's no label specified on the node
+	 * annotation, the simple class name is used. Otherwise, all labels in declaration
+	 * order (primary, value, labels) are used.
+	 * @param annotatedClass the annotated class
+	 * @return a collection of labels
 	 */
 	protected abstract Collection<String> getLabel(TypeElement annotatedClass);
 
 	protected final void writeSourceFiles(Collection<ModelBuilder<?>> builders) throws IOException {
 
 		for (ModelBuilder<?> nodeModelBuilder : builders) {
-			JavaFileObject jfo = filer.createSourceFile(nodeModelBuilder.getCanonicalClassName());
+			JavaFileObject jfo = this.filer.createSourceFile(nodeModelBuilder.getCanonicalClassName());
 			try (Writer writer = jfo.openWriter()) {
 				nodeModelBuilder.writeTo(writer);
 			}
 		}
 	}
 
-	protected interface PropertiesAndRelationshipGrouping {
-		void apply(Element element);
-
-		Map<FieldType, List<Element>> getResult();
-	}
-
 	protected abstract PropertiesAndRelationshipGrouping newPropertiesAndRelationshipGrouping();
 
 	/**
-	 * Turns an element into a property description
+	 * Turns an element into a property description.
 	 * @param e the element to transform
 	 * @return a new property description
 	 */
 	protected abstract PropertyDefinition asPropertyDefinition(Element e);
 
 	/**
-	 * This populates the properties of all node builders and returns all identifiable relationships. Why is this done
-	 * as a side effect? The tests for relationships are rather expensive and may need to instantiate classes. When this
-	 * is unavoidable, it makes sense to use that information right away and not do it a second time later one-
-	 *
-	 * @param nodeBuilders The map of all node builders for all annotated classes
-	 * @return A map from a node builder to a list of fields describing relationships
+	 * This populates the properties of all node builders and returns all identifiable
+	 * relationships. Why is this done as a side effect? The tests for relationships are
+	 * rather expensive and may need to instantiate classes. When this is unavoidable, it
+	 * makes sense to use that information right away and not do it a second time later
+	 * one-
+	 * @param nodeBuilders the map of all node builders for all annotated classes
+	 * @return a map from a node builder to a list of fields describing relationships
 	 */
 	protected final Map<NodeModelBuilder, List<Element>> populateNodePropertiesAndCollectRelationshipFields(
-		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
+			Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 
 		Map<NodeModelBuilder, List<Element>> relationshipFields = new HashMap<>();
 		nodeBuilders.forEach((type, nodeImplBuilder) -> {
@@ -267,27 +270,29 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	protected abstract RelationshipPropertyDefinition asRelationshipDefinition(NodeModelBuilder owner, Element e,
-		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
-		Map<TypeElement, NodeModelBuilder> nodeBuilders);
+			Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
+			Map<TypeElement, NodeModelBuilder> nodeBuilders);
 
 	/**
-	 * This takes the list of all know fields pointing to relationships and computes a map with relationship types and
-	 * their definitions. A specific relationship type may have been used between several other nodes.
-	 *
-	 * @param allRelationshipFields  All known relationship files
+	 * This takes the list of all know fields pointing to relationships and computes a map
+	 * with relationship types and their definitions. A specific relationship type may
+	 * have been used between several other nodes.
+	 * @param allRelationshipFields all known relationship files
 	 * @param relationshipProperties a map of properties discovered for relationships
-	 * @return A map from a relationship type to a list of definitions. The definition including the node builders themselves.
-	 * The entry in the list is (start, definition)
+	 * @param nodeBuilders the current list of node builders to work with
+	 * @return a map from a relationship type to a list of definitions. The definition
+	 * including the node builders themselves. The entry in the list is (start,
+	 * definition)
 	 */
 	protected final Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> computeRelationshipDefinitions(
-		Map<NodeModelBuilder, List<Element>> allRelationshipFields,
-		Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
-		Map<TypeElement, NodeModelBuilder> nodeBuilders) {
+			Map<NodeModelBuilder, List<Element>> allRelationshipFields,
+			Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
+			Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 
 		Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> definitions = new HashMap<>();
 		allRelationshipFields.forEach((start, l) -> l.forEach(f -> {
 			RelationshipPropertyDefinition propertyDefinition = asRelationshipDefinition(start, f,
-				relationshipProperties, nodeBuilders);
+					relationshipProperties, nodeBuilders);
 			if (propertyDefinition != null) {
 				definitions.computeIfAbsent(propertyDefinition.getType(), k -> new ArrayList<>())
 					.add(new AbstractMap.SimpleEntry<>(start, propertyDefinition));
@@ -297,14 +302,15 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	/**
-	 * Creates and populates the list of relationships from their definitions. It also registered the freshly generated
-	 * relationship builders with the previously created node builders.
-	 *
-	 * @param relationshipDefinitions Definitions by type and owner
-	 * @return Map of builder per type. Can be multiple builders in case of different relationship property classes with different properties.
+	 * Creates and populates the list of relationships from their definitions. It also
+	 * registered the freshly generated relationship builders with the previously created
+	 * node builders.
+	 * @param relationshipDefinitions definitions by type and owner
+	 * @return map of builder per type. Can be multiple builders in case of different
+	 * relationship property classes with different properties.
 	 */
 	protected final Map<String, List<RelationshipModelBuilder>> populateListOfRelationships(
-		Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
+			Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
 		Map<String, List<RelationshipModelBuilder>> result = new HashMap<>();
 
 		relationshipDefinitions.forEach((type, definitions) -> {
@@ -316,11 +322,12 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 				NodeModelBuilder owner = definitions.get(0).getKey();
 				RelationshipPropertyDefinition definition = definitions.get(0).getValue();
 
-				relationshipBuilder = RelationshipModelBuilder.create(configuration, owner.getPackageName(), type);
+				relationshipBuilder = RelationshipModelBuilder.create(this.configuration, owner.getPackageName(), type);
 				relationshipBuilder.setStartNode(definition.getStart());
 				relationshipBuilder.setEndNode(definition.getEnd());
 				relationshipBuilder.addProperties(definition.getProperties());
-			} else {
+			}
+			else {
 				Set<NodeModelBuilder> owners = definitions.stream().map(Map.Entry::getKey).collect(Collectors.toSet());
 
 				// Exactly one owner, but variable targets
@@ -329,30 +336,34 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 					NodeModelBuilder owner = owners.stream().findFirst().get();
 
 					Map<Boolean, List<RelationshipPropertyDefinition>> ownerAtStartOrEnd = definitions.stream()
-						.map(Map.Entry::getValue).collect(Collectors.partitioningBy(p -> p.getStart() == owner));
+						.map(Map.Entry::getValue)
+						.collect(Collectors.partitioningBy(p -> p.getStart() == owner));
 
 					if (sameOrNoProperties(definitions)) {
-						relationshipBuilder = RelationshipModelBuilder.create(configuration, owner.getPackageName(),
-							type);
+						relationshipBuilder = RelationshipModelBuilder.create(this.configuration,
+								owner.getPackageName(), type);
 						relationshipBuilder.addProperties(definitions.get(0).getValue().getProperties());
 						if (ownerAtStartOrEnd.get(true).isEmpty()) {
 							relationshipBuilder.setEndNode(owner);
-						} else if (ownerAtStartOrEnd.get(false).isEmpty()) {
+						}
+						else if (ownerAtStartOrEnd.get(false).isEmpty()) {
 							relationshipBuilder.setStartNode(owner);
 						}
-					} else {
+					}
+					else {
 						List<RelationshipModelBuilder> newBuilders = new ArrayList<>();
 						for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
 
 							RelationshipPropertyDefinition propertyDefinition = definition.getValue();
-							RelationshipModelBuilder newBuilder = RelationshipModelBuilder.create(configuration,
-								owner.getPackageName(), type,
-								type + "_" + propertyDefinition.getEnd().getPlainClassName().toUpperCase(Locale.ROOT));
+							RelationshipModelBuilder newBuilder = RelationshipModelBuilder.create(this.configuration,
+									owner.getPackageName(), type, type + "_"
+											+ propertyDefinition.getEnd().getPlainClassName().toUpperCase(Locale.ROOT));
 							newBuilder.addProperties(propertyDefinition.getProperties());
 							if (ownerAtStartOrEnd.get(true).isEmpty()) {
 								newBuilder.setStartNode(propertyDefinition.getStart());
 								newBuilder.setEndNode(owner);
-							} else if (ownerAtStartOrEnd.get(false).isEmpty()) {
+							}
+							else if (ownerAtStartOrEnd.get(false).isEmpty()) {
 								newBuilder.setStartNode(owner);
 								newBuilder.setEndNode(propertyDefinition.getEnd());
 							}
@@ -362,16 +373,22 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 						}
 						result.put(type, Collections.unmodifiableList(newBuilders));
 					}
-				} else if (owners.size() > 1) {
-					List<NodeModelBuilder> startNodes = definitions.stream().map(d -> d.getValue().getStart())
-						.distinct().toList();
-					List<NodeModelBuilder> endNodes = definitions.stream().map(d -> d.getValue().getStart()).distinct()
+				}
+				else if (owners.size() > 1) {
+					List<NodeModelBuilder> startNodes = definitions.stream()
+						.map(d -> d.getValue().getStart())
+						.distinct()
 						.toList();
-					relationshipBuilder = RelationshipModelBuilder.create(configuration,
-						owners.stream().findFirst().get().getPackageName(), type);
+					List<NodeModelBuilder> endNodes = definitions.stream()
+						.map(d -> d.getValue().getStart())
+						.distinct()
+						.toList();
+					relationshipBuilder = RelationshipModelBuilder.create(this.configuration,
+							owners.stream().findFirst().get().getPackageName(), type);
 					if (startNodes.size() == 1) {
 						relationshipBuilder.setStartNode(startNodes.get(0));
-					} else if (endNodes.size() == 1) {
+					}
+					else if (endNodes.size() == 1) {
 						relationshipBuilder.setStartNode(endNodes.get(0));
 					}
 				}
@@ -392,7 +409,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	protected final boolean describesEnum(TypeMirror typeMirror) {
-		List<? extends TypeMirror> superTypes = typeUtils.directSupertypes(typeMirror);
+		List<? extends TypeMirror> superTypes = this.typeUtils.directSupertypes(typeMirror);
 		if (!(superTypes.size() == 1 && superTypes.get(0).getKind().equals(TypeKind.DECLARED))) {
 			return false;
 		}
@@ -408,30 +425,44 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	}
 
 	protected enum FieldType {
+
 		P, R
+
+	}
+
+	protected interface PropertiesAndRelationshipGrouping {
+
+		void apply(Element element);
+
+		Map<FieldType, List<Element>> getResult();
+
 	}
 
 	/**
-	 * Recursively extracts a loadable and instantiable name from a canonical class name by checking whether the current
-	 * element is a nesting type. If so, the enclosing element will be visited and this elements simple name will be
-	 * appended with a {@literal $}.
+	 * Recursively extracts a loadable and instantiable name from a canonical class name
+	 * by checking whether the current element is a nesting type. If so, the enclosing
+	 * element will be visited and the elements simple name will be appended with a
+	 * {@literal $}.
 	 */
-	private static class TypeElementNameFunction implements Function<TypeElement, String> {
+	private static final class TypeElementNameFunction implements Function<TypeElement, String> {
+
 		@Override
 		public String apply(TypeElement typeElement) {
 			NestingKind nestingKind = typeElement.getNestingKind();
 			if (nestingKind.isNested()) {
-				return typeElement.getEnclosingElement().accept(new TypeElementVisitor<>(this), null) + "$" + typeElement.getSimpleName();
+				return typeElement.getEnclosingElement().accept(new TypeElementVisitor<>(this), null) + "$"
+						+ typeElement.getSimpleName();
 			}
 			return typeElement.getQualifiedName().toString();
 		}
+
 	}
 
 	/**
-	 * Utility class that can be used to extract a {@link TypeElement} from a type or anything else that one can retrieve
-	 * from the actual element.
+	 * Utility class that can be used to extract a {@link TypeElement} from a type or
+	 * anything else that one can retrieve from the actual element.
 	 *
-	 * @param <E> The type of the returned value
+	 * @param <E> the type of the returned value
 	 */
 	protected static class TypeElementVisitor<E> extends SimpleElementVisitor8<E, Void> {
 
@@ -443,7 +474,9 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 
 		@Override
 		public E visitType(TypeElement e, Void unused) {
-			return delegate.apply(e);
+			return this.delegate.apply(e);
 		}
+
 	}
+
 }

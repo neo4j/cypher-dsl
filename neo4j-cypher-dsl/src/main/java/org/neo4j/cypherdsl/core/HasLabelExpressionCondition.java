@@ -18,14 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * A condition checking for the presence of label expressions on nodes.
  *
+ * @param nodeName the object that is to be checked for the given label
+ * @param labelExpression the expression to be checked for
  * @author Michael J. Simons
  * @since 2024.3.0
  */

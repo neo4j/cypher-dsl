@@ -53,4 +53,5 @@ public class Connector {
 		this.uri = uri;
 		this.official = official;
 	}
+
 }

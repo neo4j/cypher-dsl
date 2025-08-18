@@ -18,36 +18,35 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 
 /**
- * A step exposing logical operators {@code and} and {@code or} after a {@code where} clause.
+ * A step exposing logical operators {@code and} and {@code or} after a {@code where}
+ * clause.
  *
+ * @param <T> the type being returned after the new condition has been chained
  * @author Michael J. Simons
- * @param <T> The type being returned after the new condition has been chained
  * @since 1.1
  */
 public interface ExposesLogicalOperators<T> {
 
 	/**
-	 * Adds an additional condition to the existing conditions, connected by an {@literal and}.
-	 * Existing conditions will be logically grouped by using {@code ()} in the statement if previous
-	 * conditions used another logical operator.
-	 *
-	 * @param condition An additional condition
-	 * @return The ongoing definition of a match
+	 * Adds a condition to the existing conditions, connected by an {@code AND}. Existing
+	 * conditions will be logically grouped by using {@code ()} in the statement if
+	 * previous conditions used another logical operator.
+	 * @param condition an additional condition
+	 * @return the ongoing definition of a match
 	 */
 	@CheckReturnValue
 	T and(Condition condition);
 
 	/**
-	 * Adds an additional condition based on a path pattern to the existing conditions, connected by an {@literal and}.
-	 * Existing conditions will be logically grouped by using {@code ()} in the statement if previous
-	 * conditions used another logical operator.
-	 *
-	 * @param pathPattern An additional pattern to include in the conditions
-	 * @return The ongoing definition of a match
+	 * Adds a condition based on a path pattern to the existing conditions, connected by
+	 * an {@code AND}. Existing conditions will be logically grouped by using {@code ()}
+	 * in the statement if previous conditions used another logical operator.
+	 * @param pathPattern an additional pattern to include in the conditions
+	 * @return the ongoing definition of a match
 	 */
 	@CheckReturnValue
 	default T and(RelationshipPattern pathPattern) {
@@ -55,26 +54,25 @@ public interface ExposesLogicalOperators<T> {
 	}
 
 	/**
-	 * Adds an additional condition to the existing conditions, connected by an {@literal or}.
-	 * Existing conditions will be logically grouped by using {@code ()} in the statement if previous
-	 * conditions used another logical operator.
-	 *
-	 * @param condition An additional condition
-	 * @return The ongoing definition of a match
+	 * Adds a condition to the existing conditions, connected by an {@code OR}. Existing
+	 * conditions will be logically grouped by using {@code ()} in the statement if
+	 * previous conditions used another logical operator.
+	 * @param condition an additional condition
+	 * @return the ongoing definition of a match
 	 */
 	@CheckReturnValue
 	T or(Condition condition);
 
 	/**
-	 * Adds an additional condition based on a path pattern to the existing conditions, connected by an {@literal or}.
-	 * Existing conditions will be logically grouped by using {@code ()} in the statement if previous
-	 * conditions used another logical operator.
-	 *
-	 * @param pathPattern An additional pattern to include in the conditions
-	 * @return The ongoing definition of a match
+	 * Adds a condition based on a path pattern to the existing conditions, connected by
+	 * an {@code OR}. Existing conditions will be logically grouped by using {@code ()} in
+	 * the statement if previous conditions used another logical operator.
+	 * @param pathPattern an additional pattern to include in the conditions
+	 * @return the ongoing definition of a match
 	 */
 	@CheckReturnValue
 	default T or(RelationshipPattern pathPattern) {
 		return this.or(RelationshipPatternCondition.of(pathPattern));
 	}
+
 }

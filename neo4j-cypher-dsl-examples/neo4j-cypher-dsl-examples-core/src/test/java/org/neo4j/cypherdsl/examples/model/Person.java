@@ -29,7 +29,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
  * @author Michael J. Simons
- * @soundtrack Höhner - Die ersten 30 Jahre
+ *
  */
 // tag::simple-model[]
 public final class Person extends NodeBase<Person> {
@@ -45,6 +45,7 @@ public final class Person extends NodeBase<Person> {
 	public final Property FIRST_NAME = this.property("firstName");
 
 	public final Property BORN = this.property("born");
+
 	// end::simple-model[]
 
 	public Person() {
@@ -67,5 +68,6 @@ public final class Person extends NodeBase<Person> {
 		return new Person(getSymbolicName().orElse(null), getLabels(), Properties.create(newProperties));
 	}
 	// tag::simple-model[]
+
 }
 // end::simple-model[]

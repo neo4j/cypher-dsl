@@ -24,10 +24,12 @@ import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
- * Represents a list of expressions. When visited, the expressions are treated as named expression if they have declared
- * a symbolic name as variable or as unnamed expression when nameless.
+ * Represents a list of expressions. When visited, the expressions are treated as named
+ * expression if they have declared a symbolic name as variable or as unnamed expression
+ * when nameless.
  * <p>
- * Not to be mixed up with the actual {@link ListExpression}, which itself is an expression.
+ * Not to be mixed up with the actual {@link ListExpression}, which itself is an
+ * expression.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -60,4 +62,5 @@ class ExpressionList extends TypedSubtree<Expression> {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

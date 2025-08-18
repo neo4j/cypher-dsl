@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import java.util.Arrays;
+import java.util.Collection;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
-import java.util.Arrays;
-import java.util.Collection;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Return part of a statement.
@@ -36,11 +36,11 @@ import java.util.Collection;
 public interface ExposesReturning {
 
 	/**
-	 * Creates the {@code RETURN} clause. All variables passed via {@code variables} must be valid
-	 * {@link SymbolicName symbolic names}. {@link Expression#property(String...)} must be used to return single properties.
-	 *
-	 * @param variables The named things to return
-	 * @return A build step with a defined list of things to return.
+	 * Creates the {@code RETURN} clause. All variables passed via {@code variables} must
+	 * be valid {@link SymbolicName symbolic names}.
+	 * {@link Expression#property(String...)} must be used to return single properties.
+	 * @param variables the named things to return
+	 * @return a build step with a defined list of things to return.
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(String... variables) {
@@ -49,9 +49,8 @@ public interface ExposesReturning {
 
 	/**
 	 * Creates the {@code RETURN} clause.
-	 *
-	 * @param variables The named things to return
-	 * @return A build step with a defined list of things to return.
+	 * @param variables the named things to return
+	 * @return a build step with a defined list of things to return.
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(Named... variables) {
@@ -60,31 +59,31 @@ public interface ExposesReturning {
 
 	/**
 	 * Create a match that returns one or more expressions.
-	 *
-	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-	 * @return A match that can be build now
+	 * @param expressions the expressions to be returned. Must not be null and be at least
+	 * one expression.
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returning(Expression... expressions) {
-		return returning(expressions == null ? null : Arrays.asList(expressions));
+		return returning((expressions != null) ? Arrays.asList(expressions) : null);
 	}
 
 	/**
 	 * Create a match that returns one or more expressions.
-	 *
-	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-	 * @return A match that can be build now
+	 * @param expressions the expressions to be returned. Must not be null and be at least
+	 * one expression.
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returning(Collection<? extends Expression> expressions);
 
 	/**
-	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword. All variables passed via {@code variables}
-	 * must be valid {@link SymbolicName symbolic names}. {@link Expression#property(String...)} must be used to return
-	 * single properties.
-	 *
-	 * @param variables The variables to return
-	 * @return A build step with a defined list of things to return.
+	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword. All
+	 * variables passed via {@code variables} must be valid {@link SymbolicName symbolic
+	 * names}. {@link Expression#property(String...)} must be used to return single
+	 * properties.
+	 * @param variables the variables to return
+	 * @return a build step with a defined list of things to return.
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(String... variables) {
@@ -93,9 +92,8 @@ public interface ExposesReturning {
 
 	/**
 	 * Creates a {@code RETURN} clause containing the {@code DISTINCT} keyword.
-	 *
-	 * @param variables The named things to return
-	 * @return A build step with a defined list of things to return.
+	 * @param variables the named things to return
+	 * @return a build step with a defined list of things to return.
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Named... variables) {
@@ -103,34 +101,37 @@ public interface ExposesReturning {
 	}
 
 	/**
-	 * Creates a {@code RETURN} clause returning the distinct set of one or more expressions.
-	 *
-	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-	 * @return A match that can be build now
+	 * Creates a {@code RETURN} clause returning the distinct set of one or more
+	 * expressions.
+	 * @param expressions the expressions to be returned. Must not be null and be at least
+	 * one expression.
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingReadingAndReturn returningDistinct(Expression... expressions) {
-		return returningDistinct(expressions == null ? null : Arrays.asList(expressions));
+		return returningDistinct((expressions != null) ? Arrays.asList(expressions) : null);
 	}
 
 	/**
-	 * Creates a {@code RETURN} clause returning the distinct set of one or more expressions.
-	 *
-	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-	 * @return A match that can be build now
+	 * Creates a {@code RETURN} clause returning the distinct set of one or more
+	 * expressions.
+	 * @param expressions the expressions to be returned. Must not be null and be at least
+	 * one expression.
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returningDistinct(Collection<? extends Expression> expressions);
 
 	/**
-	 * Creates a {@code RETURN} clause from a raw Cypher expression created via {@link Cypher#raw(String, Object...)}.
-	 * The expression maybe aliased but it must resolve to a raw element
-	 *
-	 * @param rawExpression Must be a plain raw or an aliased raw expression. To eventually render as valid Cypher, it must
-	 *                      contain the {@code RETURN} keyword.
-	 * @return A match that can be build now
+	 * Creates a {@code RETURN} clause from a raw Cypher expression created via
+	 * {@link Cypher#raw(String, Object...)}. The expression maybe aliased, but it must
+	 * resolve to a raw element
+	 * @param rawExpression must be a plain raw or an aliased raw expression. To
+	 * eventually render as valid Cypher, it must contain the {@code RETURN} keyword.
+	 * @return a match that can be build now
 	 * @since 2021.2.1
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingReadingAndReturn returningRaw(Expression rawExpression);
+
 }

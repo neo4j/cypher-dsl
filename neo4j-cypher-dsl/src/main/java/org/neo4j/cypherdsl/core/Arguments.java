@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Optional;
 
 import org.apiguardian.api.API;
@@ -27,11 +25,12 @@ import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * Specialized list of expressions that represents the arguments of a procedure call.
  *
  * @author Michael J. Simons
- * @soundtrack Apocalyptica - Cell-0
  * @since 2020.0.1
  */
 @API(status = INTERNAL, since = "2020.0.1")
@@ -60,4 +59,5 @@ final class Arguments extends TypedSubtree<Expression> implements ProvidesAffixe
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

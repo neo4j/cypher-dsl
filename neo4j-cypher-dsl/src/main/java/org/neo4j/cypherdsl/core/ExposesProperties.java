@@ -20,40 +20,39 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.Map;
 
-
 /**
- * A container that exposes methods to add properties with values to nodes or relationships.
+ * A container that exposes methods to add properties with values to nodes or
+ * relationships.
  *
- * @author Michael J. Simons
  * @param <T> type of the object holding the specified properties
- * @soundtrack Daft Punk - Homework
+ * @author Michael J. Simons
  * @since 1.1
  */
 public interface ExposesProperties<T extends ExposesProperties<?> & PropertyContainer> {
 
 	/**
-	 * Creates a copy of this property container with additional properties.
-	 * Creates a property container without properties when no properties are passed to this method.
-	 *
-	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
-	 * @return The new property container.
+	 * Creates a copy of this property container with additional properties. Creates a
+	 * property container without properties when no properties are passed to this method.
+	 * @param newProperties the new properties (can be {@literal null} to remove exiting
+	 * properties).
+	 * @return the new property container.
 	 */
 	T withProperties(MapExpression newProperties);
 
 	/**
-	 * Creates a copy of this property container with additional properties.
-	 * Creates a property container without properties when no properties are passed to this method.
-	 *
-	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
-	 * @return The new property container.
+	 * Creates a copy of this property container with additional properties. Creates a
+	 * property container without properties when no properties are passed to this method.
+	 * @param keysAndValues a list of key and values. Must be an even number, with
+	 * alternating {@link String} and {@link Expression}.
+	 * @return the new property container.
 	 */
 	T withProperties(Object... keysAndValues);
 
 	/**
 	 * Creates a copy of this property container with additional properties.
-	 *
-	 * @param newProperties A map with the new properties
-	 * @return The new property container.
+	 * @param newProperties a map with the new properties
+	 * @return the new property container.
 	 */
 	T withProperties(Map<String, Object> newProperties);
+
 }

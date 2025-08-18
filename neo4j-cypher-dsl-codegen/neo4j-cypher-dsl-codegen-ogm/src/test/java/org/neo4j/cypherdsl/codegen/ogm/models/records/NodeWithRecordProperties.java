@@ -47,6 +47,8 @@ public class NodeWithRecordProperties {
 	record RecordAsProperty(String value) {
 	}
 
-	static abstract class RecordConverter implements AttributeConverter<RecordAsProperty, String> {
+	abstract static class RecordConverter implements AttributeConverter<RecordAsProperty, String> {
+
 	}
+
 }

@@ -28,6 +28,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 @NodeEntity
 public class InternalGeneratedPrimitiveLongId {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private long id;
+
 }

@@ -18,22 +18,23 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Type of an event when a relationship type is parsed.
  *
  * @author Michael J. Simons
- * @soundtrack ZSK - Lieblingslieder
  * @since 2021.3.0
  */
 @API(status = STABLE, since = "2021.3.0")
 public enum TypeParsedEventType {
 
 	/**
-	 * Parsed when creating a {@link org.neo4j.cypherdsl.core.RelationshipPattern relationship pattern}.
+	 * Parsed when creating a {@link org.neo4j.cypherdsl.core.RelationshipPattern
+	 * relationship pattern}.
 	 */
 	ON_RELATIONSHIP_PATTERN
+
 }

@@ -23,7 +23,7 @@ import org.neo4j.ogm.typeconversion.AttributeConverter;
 /**
  * @author Michael J. Simons
  */
-public abstract class InnerInnerClassConverter implements
-	AttributeConverter<ConnectorTransport.InnerClass.InnerInnerClass, String> {
+public abstract class InnerInnerClassConverter
+		implements AttributeConverter<ConnectorTransport.InnerClass.InnerInnerClass, String> {
 
 }

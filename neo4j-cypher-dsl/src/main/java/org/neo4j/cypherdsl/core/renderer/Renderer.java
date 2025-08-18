@@ -18,14 +18,14 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Statement;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Instances of this class are supposed to be thread-safe. Please use {@link Renderer#getDefaultRenderer()} to get hold
- * of an implementation.
+ * Instances of this class are supposed to be thread-safe. Please use
+ * {@link Renderer#getDefaultRenderer()} to get hold of an implementation.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -34,17 +34,9 @@ import org.neo4j.cypherdsl.core.Statement;
 public sealed interface Renderer permits ConfigurableRenderer, GeneralizedRenderer {
 
 	/**
-	 * Renders a statement.
-	 *
-	 * @param statement the statement to render
-	 * @return The rendered Cypher statement.
-	 */
-	String render(Statement statement);
-
-	/**
-	 * Provides the default renderer. This method may or may not provide shared instances of the renderer.
-	 *
-	 * @return The default renderer.
+	 * Provides the default renderer. This method may or may not provide shared instances
+	 * of the renderer.
+	 * @return the default renderer.
 	 */
 	static Renderer getDefaultRenderer() {
 		return getRenderer(Configuration.defaultConfig());
@@ -52,9 +44,8 @@ public sealed interface Renderer permits ConfigurableRenderer, GeneralizedRender
 
 	/**
 	 * Creates a new renderer for the given configuration.
-	 *
-	 * @param configuration The configuration for this renderer
-	 * @return A new renderer (might be a shared instance).
+	 * @param configuration the configuration for this renderer
+	 * @return a new renderer (might be a shared instance).
 	 */
 	static Renderer getRenderer(Configuration configuration) {
 		return getRenderer(configuration, Renderer.class);
@@ -62,14 +53,21 @@ public sealed interface Renderer permits ConfigurableRenderer, GeneralizedRender
 
 	/**
 	 * Creates a new renderer for the given configuration.
-	 *
-	 * @param <T> The specific type of the renderer
-	 * @param configuration The configuration for this renderer
-	 * @param type Reification of the renderers type
-	 * @return A new renderer (might be a shared instance).
+	 * @param <T> the specific type of the renderer
+	 * @param configuration the configuration for this renderer
+	 * @param type reification of the renderers type
+	 * @return a new renderer (might be a shared instance).
 	 * @since 2023.1.0
 	 */
 	static <T extends Renderer> T getRenderer(Configuration configuration, Class<T> type) {
 		return type.cast(ConfigurableRenderer.create(configuration));
 	}
+
+	/**
+	 * Renders a statement.
+	 * @param statement the statement to render
+	 * @return the rendered Cypher statement.
+	 */
+	String render(Statement statement);
+
 }

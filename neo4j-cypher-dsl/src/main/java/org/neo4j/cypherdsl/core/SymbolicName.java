@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -30,14 +28,19 @@ import org.apiguardian.api.API.Status;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.utils.LRUCache;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * A symbolic name to identify nodes, relationships and aliased items.
  * <p>
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SchemaName.html">SchemaName</a>
- * <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SymbolicName.html">SymbolicName</a>
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SchemaName.html">SchemaName</a>
+ * <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/SymbolicName.html">SymbolicName</a>
  * <p>
- * While OpenCypher extends the <a href="https://unicode.org/reports/tr31/">UNICODE IDENTIFIER AND PATTERN SYNTAX</a>
- * with some characters, this DSL uses the same identifier Java itself uses for simplicity and until otherwise needed.
+ * While OpenCypher extends the <a href="https://unicode.org/reports/tr31/">UNICODE
+ * IDENTIFIER AND PATTERN SYNTAX</a> with some characters, this DSL uses the same
+ * identifier Java itself uses for simplicity and until otherwise needed.
  *
  * @author Michael J. Simons
  * @author Andreas Berger
@@ -47,6 +50,12 @@ import org.neo4j.cypherdsl.core.utils.LRUCache;
 public final class SymbolicName implements Expression, IdentifiableElement {
 
 	private static final Map<String, SymbolicName> CACHE = Collections.synchronizedMap(new LRUCache<>(32));
+
+	private final String value;
+
+	private SymbolicName(String value) {
+		this.value = value;
+	}
 
 	static SymbolicName of(String name) {
 
@@ -65,26 +74,19 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 		return new SymbolicName(null);
 	}
 
-	private final String value;
-
-	private SymbolicName(String value) {
-		this.value = value;
-	}
-
 	/**
-	 * @return The value of this symbolic name.
+	 * {@return the value of this symbolic name}
 	 */
 	@API(status = INTERNAL)
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	/**
-	 * Creates a new symbolic name by concatenating {@code otherValue} to this names value.
-	 * Returns {@literal this} if {@code otherValue} is empty.
-	 *
-	 * @param otherValue The value to concat.
-	 * @return A new symbolic name
+	 * Creates a new symbolic name by concatenating {@code otherValue} to this names
+	 * value. Returns {@literal this} if {@code otherValue} is empty.
+	 * @param otherValue the value to concat.
+	 * @return a new symbolic name
 	 */
 	public SymbolicName concat(String otherValue) {
 
@@ -96,11 +98,11 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 	}
 
 	/**
-	 * A list will never be a valid entry for a map projection, so this convenient method prevents trying to create one
-	 * from a list of objects. It will delegate to {@link #project(Object...)} with the content of the list.
-	 *
-	 * @param entries A list of entries for the projection
-	 * @return A map projection.
+	 * A list will never be a valid entry for a map projection, so this convenient method
+	 * prevents trying to create one from a list of objects. It will delegate to
+	 * {@link #project(Object...)} with the content of the list.
+	 * @param entries a list of entries for the projection
+	 * @return a map projection.
 	 * @since 2021.0.0
 	 */
 	public MapProjection project(List<Object> entries) {
@@ -108,22 +110,18 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 	}
 
 	/**
-	 * Creates a map projection based on this node. The node needs a symbolic name for this to work.
+	 * Creates a map projection based on this node. The node needs a symbolic name for
+	 * this to work.
 	 * <p>
-	 * Entries of type {@code String} in {@code entries} followed by an {@link Expression} will be treated as map keys
-	 * pointing to the expression in the projection, {@code String} entries alone will be treated as property lookups on the node.
-	 *
-	 * @param entries A list of entries for the projection
-	 * @return A map projection.
+	 * Entries of type {@code String} in {@code entries} followed by an {@link Expression}
+	 * will be treated as map keys pointing to the expression in the projection,
+	 * {@code String} entries alone will be treated as property lookups on the node.
+	 * @param entries a list of entries for the projection
+	 * @return a map projection.
 	 * @since 2021.0.0
 	 */
 	public MapProjection project(Object... entries) {
 		return MapProjection.create(this, entries);
-	}
-
-	@Override
-	public String toString() {
-		return value != null ? RendererBridge.render(this) : "Unresolved SymbolicName";
 	}
 
 	@Override
@@ -135,20 +133,26 @@ public final class SymbolicName implements Expression, IdentifiableElement {
 			return false;
 		}
 		// Unresolved values are only equal to themselves
-		if (value == null) {
+		if (this.value == null) {
 			return false;
 		}
 		SymbolicName that = (SymbolicName) o;
-		return value.equals(that.value);
+		return this.value.equals(that.value);
 	}
 
 	@Override
 	public int hashCode() {
-		return value == null ? super.hashCode() : Objects.hash(value);
+		return (this.value != null) ? Objects.hash(this.value) : super.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return (this.value != null) ? RendererBridge.render(this) : "Unresolved SymbolicName";
 	}
 
 	@Override
 	public Expression asExpression() {
 		return this;
 	}
+
 }

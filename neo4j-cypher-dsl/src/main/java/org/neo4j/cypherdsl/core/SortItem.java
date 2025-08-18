@@ -18,17 +18,18 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Optional;
 
 import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.utils.Assertions;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
- * A sort item can be used in an {@code ORDER BY} clause and changes the order of the items being returned from a query.
+ * A sort item can be used in an {@code ORDER BY} clause and changes the order of the
+ * items being returned from a query.
  *
  * @author Gerrit Meier
  * @author Michael J. Simons
@@ -38,7 +39,13 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class SortItem implements Visitable {
 
 	private final Expression expression;
+
 	private final Direction direction;
+
+	private SortItem(Expression expression, Direction direction) {
+		this.expression = expression;
+		this.direction = direction;
+	}
 
 	static SortItem create(Expression expression, Direction direction) {
 
@@ -46,22 +53,19 @@ public final class SortItem implements Visitable {
 		return new SortItem(expression, Optional.ofNullable(direction).orElse(SortItem.Direction.UNDEFINED));
 	}
 
-	private SortItem(Expression expression, Direction direction) {
-		this.expression = expression;
-		this.direction = direction;
-	}
-
 	/**
-	 * Creates a new sort item from {@literal this} instance, setting the sort direction to ascending.
-	 * @return A new sort item.
+	 * Creates a new sort item from {@literal this} instance, setting the sort direction
+	 * to ascending.
+	 * @return a new sort item.
 	 */
 	public SortItem ascending() {
 		return new SortItem(this.expression, Direction.ASC);
 	}
 
 	/**
-	 * Creates a new sort item from {@literal this} instance, setting the sort direction to descending.
-	 * @return A new sort item.
+	 * Creates a new sort item from {@literal this} instance, setting the sort direction
+	 * to descending.
+	 * @return a new sort item.
 	 */
 	public SortItem descending() {
 		return new SortItem(this.expression, Direction.DESC);
@@ -86,10 +90,12 @@ public final class SortItem implements Visitable {
 
 	/**
 	 * Sort direction.
+	 *
 	 * @since 1.0
 	 */
 	@API(status = STABLE)
 	public enum Direction implements Visitable {
+
 		/** Undefined direction. */
 		UNDEFINED(""),
 		/** Ascending order. */
@@ -104,7 +110,7 @@ public final class SortItem implements Visitable {
 		}
 
 		/**
-		 * @return The database internal symbol for a direction.
+		 * {@return the database internal symbol for a direction}
 		 */
 		public String getSymbol() {
 			return this.symbol;
@@ -114,5 +120,7 @@ public final class SortItem implements Visitable {
 		public String toString() {
 			return RendererBridge.render(this);
 		}
+
 	}
+
 }

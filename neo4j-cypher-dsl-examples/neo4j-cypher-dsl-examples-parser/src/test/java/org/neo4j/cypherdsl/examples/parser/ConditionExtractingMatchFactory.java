@@ -44,12 +44,14 @@ import org.neo4j.cypherdsl.parser.MatchDefinition;
 abstract class ConditionExtractingMatchFactory implements Function<MatchDefinition, Match> {
 
 	/**
-	 * Conditions extracted from matching properties on nodes aka {@code (n:Movie {title: 'WHATEVER'}) }.
+	 * Conditions extracted from matching properties on nodes aka {@code (n:Movie {title:
+	 * 'WHATEVER'}) }.
 	 */
 	protected final Map<Node, List<Condition>> nodeConditions = new LinkedHashMap<>();
 
 	/**
-	 * Conditions extracted from matching properties on nodes aka {@code () -[r:ACTED_IN {as: 'WHATEVER'}] ->() }.
+	 * Conditions extracted from matching properties on nodes aka {@code () -[r:ACTED_IN
+	 * {as: 'WHATEVER'}] ->() }.
 	 */
 	protected final Map<Relationship, List<Condition>> relationshipConditions = new LinkedHashMap<>();
 
@@ -67,15 +69,16 @@ abstract class ConditionExtractingMatchFactory implements Function<MatchDefiniti
 					});
 				}
 				if (outer instanceof Node node && node.getSymbolicName().isPresent()) {
-					nodeConditions.computeIfAbsent(node, key -> new ArrayList<>()).addAll(extractedConditions);
-				} else if (outer instanceof Relationship relationship && relationship.getSymbolicName().isPresent()) {
-					relationshipConditions.computeIfAbsent(relationship, key -> new ArrayList<>()).addAll(extractedConditions);
+					this.nodeConditions.computeIfAbsent(node, key -> new ArrayList<>()).addAll(extractedConditions);
+				}
+				else if (outer instanceof Relationship relationship && relationship.getSymbolicName().isPresent()) {
+					this.relationshipConditions.computeIfAbsent(relationship, key -> new ArrayList<>())
+						.addAll(extractedConditions);
 				}
 			});
 		});
 
-		Optional.ofNullable(matchDefinition.optionalWhere())
-			.ifPresent(e -> e.accept(extractPropertyComparisons()));
+		Optional.ofNullable(matchDefinition.optionalWhere()).ifPresent(e -> e.accept(extractPropertyComparisons()));
 		return apply0(matchDefinition);
 	}
 
@@ -90,14 +93,15 @@ abstract class ConditionExtractingMatchFactory implements Function<MatchDefiniti
 						p.accept(new VisitorWithResult() {
 							@Override
 							public EnterResult enterWithResult(Visitable propertyContent) {
-								if (propertyContent instanceof SymbolicName symbolicName && reference.compareAndSet(null, symbolicName)) {
+								if (propertyContent instanceof SymbolicName symbolicName
+										&& reference.compareAndSet(null, symbolicName)) {
 									return EnterResult.SKIP_CHILDREN;
 								}
 								return EnterResult.CONTINUE;
 							}
 						});
 						if (reference.get() != null) {
-							nodeConditions.forEach((k, v) -> {
+							this.nodeConditions.forEach((k, v) -> {
 								if (k.getSymbolicName().filter(reference.get()::equals).isPresent()) {
 									v.add(c);
 								}
@@ -108,4 +112,5 @@ abstract class ConditionExtractingMatchFactory implements Function<MatchDefiniti
 			}
 		};
 	}
+
 }

@@ -35,4 +35,5 @@ public class Person {
 
 	@Relationship("WROTE")
 	private List<Movie> writtenMovies;
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 "Neo4j,"
+ * Copyright (c) 2019-2025 "Neo4j,"
  * Neo4j Sweden AB [https://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 /**
- * A renderer for {@link org.neo4j.cypherdsl.core.Statement statements} in the simplest form possible.
+ * A renderer for {@link org.neo4j.cypherdsl.core.Statement statements} in the simplest
+ * form possible.
  */
 package org.neo4j.cypherdsl.core.renderer;

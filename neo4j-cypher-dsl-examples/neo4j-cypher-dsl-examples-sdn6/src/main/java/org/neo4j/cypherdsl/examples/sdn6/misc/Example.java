@@ -24,6 +24,8 @@ import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @Node
@@ -39,4 +41,5 @@ public class Example {
 	public Example(long id) {
 		this.id = id;
 	}
+
 }

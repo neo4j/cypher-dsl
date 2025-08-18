@@ -18,35 +18,38 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.SortItem;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A value object containing the necessary pieces for creating a {@link org.neo4j.cypherdsl.core.Return RETURN clause}.
- * One possible producer after fiddling with the elements is {@link org.neo4j.cypherdsl.core.Clauses#returning(boolean, List, List, Expression, Expression)}.
+ * A value object containing the necessary pieces for creating a
+ * {@link org.neo4j.cypherdsl.core.Return RETURN clause}. One possible producer after
+ * fiddling with the elements is
+ * {@link org.neo4j.cypherdsl.core.Clauses#returning(boolean, List, List, Expression, Expression)}.
  *
  * @author Michael J. Simons
- * @soundtrack Various - Just The Best 90s
  * @since 2021.3.0
  */
 @API(status = STABLE, since = "2021.3.0")
 public final class ReturnDefinition {
 
 	private final boolean distinct;
+
 	private final List<Expression> expressions;
+
 	private final List<SortItem> optionalSortItems;
+
 	private final Expression optionalSkip;
+
 	private final Expression optionalLimit;
 
-	ReturnDefinition(boolean distinct, List<Expression> expressions,
-		List<SortItem> optionalSortItems,
-		Expression optionalSkip,
-		Expression optionalLimit) {
+	ReturnDefinition(boolean distinct, List<Expression> expressions, List<SortItem> optionalSortItems,
+			Expression optionalSkip, Expression optionalLimit) {
 		this.distinct = distinct;
 		this.expressions = expressions;
 		this.optionalSortItems = optionalSortItems;
@@ -55,37 +58,40 @@ public final class ReturnDefinition {
 	}
 
 	/**
-	 * @return {@literal true} to indicate this return clause should return only distinct elements
+	 * Returns <code>true</code> to indicate this return clause should return only
+	 * distinct elements.
+	 * @return <code>true</code> if the <code>DISTINCT</code> clause is present
 	 */
 	public boolean isDistinct() {
-		return distinct;
+		return this.distinct;
 	}
 
 	/**
-	 * @return List of expressions to be returned.
+	 * {@return list of expressions to be returned}
 	 */
 	public List<Expression> getExpressions() {
-		return expressions;
+		return this.expressions;
 	}
 
 	/**
-	 * @return List of expressions to sort the result by.
+	 * {@return list of expressions to sort the result by}
 	 */
 	public List<SortItem> getOptionalSortItems() {
-		return optionalSortItems;
+		return this.optionalSortItems;
 	}
 
 	/**
-	 * @return Numerical expression how many items to skip
+	 * {@return numerical expression how many items to skip}
 	 */
 	public Expression getOptionalSkip() {
-		return optionalSkip;
+		return this.optionalSkip;
 	}
 
 	/**
-	 * @return Numerical expression how many items to return
+	 * {@return numerical expression how many items to return}
 	 */
 	public Expression getOptionalLimit() {
-		return optionalLimit;
+		return this.optionalLimit;
 	}
+
 }

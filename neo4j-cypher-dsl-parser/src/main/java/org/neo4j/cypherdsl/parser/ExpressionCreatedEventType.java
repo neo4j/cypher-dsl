@@ -18,17 +18,17 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Operation;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * The type of the event when a new expression is parsed and instantiated. Callbacks are tied to this type.
+ * The type of the event when a new expression is parsed and instantiated. Callbacks are
+ * tied to this type.
  *
  * @author Michael J. Simons
- * @soundtrack Swiss + Die Andern - Linksradikaler Schlager
  * @since 2021.3.0
  */
 @API(status = STABLE, since = "2021.3.0")
@@ -86,9 +86,10 @@ public enum ExpressionCreatedEventType {
 	}
 
 	/**
-	 * @return the actual type that will be produced, might be a specialization.
+	 * {@return the actual type that will be produced, might be a specialization}
 	 */
 	Class<? extends Expression> getTypeProduced() {
-		return typeProduced;
+		return this.typeProduced;
 	}
+
 }

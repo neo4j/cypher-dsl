@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,34 +62,16 @@ import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * A strategy to keep track of {@link Named named variables} inside a scope.
  *
  * @author Michael J. Simons
- * @soundtrack Knorkator - The Schlechtst Of Knorkator
  * @since 2021.3.2
  */
 @API(status = INTERNAL, since = "2021.3.2")
 public final class ScopingStrategy {
-
-	/**
-	 * @return an empty scoping strategy, for internal use only.
-	 */
-	public static ScopingStrategy create() {
-		return new ScopingStrategy();
-	}
-
-	/**
-	 * @param onScopeEntered Event handlers to be called after entering local or implicit scope
-	 * @param onScopeLeft    Event handlers to b called after leaving local or implicit scope
-	 * @return an empty scoping strategy, for internal use only.
-	 */
-	public static ScopingStrategy create(List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered, List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft) {
-		var strategy = create();
-		strategy.onScopeEntered.addAll(onScopeEntered);
-		strategy.onScopeLeft.addAll(onScopeLeft);
-		return strategy;
-	}
 
 	/**
 	 * Keeps track of named objects that have been already visited.
@@ -99,9 +79,26 @@ public final class ScopingStrategy {
 	private final Deque<Set<IdentifiableElement>> dequeOfVisitedNamed = new ArrayDeque<>();
 
 	/**
-	 * Some expressions have implicit scopes, we might not clear that after returning from inner statements or returns.
+	 * Some expressions have implicit scopes, we might not clear that after returning from
+	 * inner statements or returns.
 	 */
 	private final Deque<Set<IdentifiableElement>> implicitScope = new ArrayDeque<>();
+
+	private final Deque<Set<String>> currentImports = new ArrayDeque<>();
+
+	private final Deque<Set<String>> definedInSubquery = new ArrayDeque<>();
+
+	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
+
+	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
+
+	/**
+	 * A flag if we can skip aliasing. This is currently the case in exactly one scenario:
+	 * A aliased expression passed to a map project. In that case, the alias is already
+	 * defined by the key to use in the projected map, and we cannot define him in `AS
+	 * xxx` fragment.
+	 */
+	private final Deque<Boolean> skipAliasing = new ArrayDeque<>();
 
 	private Set<IdentifiableElement> afterStatement = Collections.emptySet();
 
@@ -115,27 +112,80 @@ public final class ScopingStrategy {
 
 	private boolean inListFunctionPredicate = false;
 
-	private final Deque<Set<String>> currentImports = new ArrayDeque<>();
-	private final Deque<Set<String>> definedInSubquery = new ArrayDeque<>();
-
-	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered = new ArrayList<>();
-	private final List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft = new ArrayList<>();
-
-	/**
-	 * A flag if we can skip aliasing. This is currently the case in exactly one scenario: A aliased expression passed
-	 * to a map project. In that case, the alias is already defined by the key to use in the projected map, and we
-	 * cannot define him in `AS xxx` fragment.
-	 */
-	private final Deque<Boolean> skipAliasing = new ArrayDeque<>();
-
 	private ScopingStrategy() {
 		this.dequeOfVisitedNamed.push(new LinkedHashSet<>());
 	}
 
 	/**
-	 * Called when visiting a {@link Visitable}
-	 *
-	 * @param visitable Element to be checked for new scope
+	 * {@return an empty scoping strategy, for internal use only}
+	 */
+	public static ScopingStrategy create() {
+		return new ScopingStrategy();
+	}
+
+	/**
+	 * Returns an empty scoping strategy, for internal use only.
+	 * @param onScopeEntered event handlers to be called after entering local or implicit
+	 * scope
+	 * @param onScopeLeft event handlers to b called after leaving local or implicit scope
+	 * @return an empty scoping strategy, for internal use only
+	 */
+	public static ScopingStrategy create(List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeEntered,
+			List<BiConsumer<Visitable, Collection<IdentifiableElement>>> onScopeLeft) {
+		var strategy = create();
+		strategy.onScopeEntered.addAll(onScopeEntered);
+		strategy.onScopeLeft.addAll(onScopeLeft);
+		return strategy;
+	}
+
+	/**
+	 * Anything that might import variables from the outside, without using an explicit
+	 * {@code WITH} clause.
+	 * @param visitable the element to be checked whether it implicitly imports named
+	 * elements.
+	 * @return {@literal true} if named elements are imported
+	 */
+	private static boolean hasImplicitScope(Visitable visitable) {
+		return visitable instanceof SubqueryExpression || visitable instanceof Statement.UnionQuery;
+	}
+
+	private static Predicate<IdentifiableElement> byHasAName() {
+		Predicate<IdentifiableElement> hasAName = Named.class::isInstance;
+		hasAName = hasAName.or(AliasedExpression.class::isInstance);
+		hasAName = hasAName.or(SymbolicName.class::isInstance);
+		return hasAName;
+	}
+
+	/**
+	 * Extracts an identifier from an {@link IdentifiableElement identifiable element}.
+	 * @param i the identifiable element
+	 * @return the identifier
+	 */
+	private static String extractIdentifier(IdentifiableElement i) {
+		String value;
+		if (i instanceof Named named) {
+			value = named.getSymbolicName().map(SymbolicName::getValue).orElse(null);
+		}
+		else if (i instanceof Aliased aliased) {
+			value = aliased.getAlias();
+		}
+		else if (i instanceof SymbolicName symbolicName) {
+			value = symbolicName.getValue();
+		}
+		else {
+			value = null;
+		}
+		return value;
+	}
+
+	private static boolean hasLocalScope(Visitable visitable) {
+		return visitable instanceof PatternComprehension || visitable instanceof Subquery
+				|| visitable instanceof SubqueryExpression || visitable instanceof Foreach;
+	}
+
+	/**
+	 * Called when visiting a {@link Visitable}.
+	 * @param visitable element to be checked for new scope
 	 */
 	public void doEnter(Visitable visitable) {
 
@@ -157,7 +207,8 @@ public final class ScopingStrategy {
 			Set<String> imports = new LinkedHashSet<>();
 			this.currentImports.push(imports);
 			if (with != null) {
-				with.getItems().stream()
+				with.getItems()
+					.stream()
 					.filter(IdentifiableElement.class::isInstance)
 					.map(IdentifiableElement.class::cast)
 					.map(ScopingStrategy::extractIdentifier)
@@ -172,24 +223,26 @@ public final class ScopingStrategy {
 
 		if (visitable instanceof MapProjection) {
 			this.skipAliasing.push(true);
-		} else if (visitable instanceof SubqueryExpression) {
+		}
+		else if (visitable instanceof SubqueryExpression) {
 			this.skipAliasing.push(false);
 		}
 
 		boolean notify = false;
-		Set<IdentifiableElement> scopeSeed = dequeOfVisitedNamed.isEmpty() ? Collections.emptySet() : dequeOfVisitedNamed.peek();
+		Set<IdentifiableElement> scopeSeed = this.dequeOfVisitedNamed.isEmpty() ? Collections.emptySet()
+				: this.dequeOfVisitedNamed.peek();
 		if (hasLocalScope(visitable)) {
 			notify = true;
-			dequeOfVisitedNamed.push(new LinkedHashSet<>(scopeSeed));
+			this.dequeOfVisitedNamed.push(new LinkedHashSet<>(scopeSeed));
 		}
 
 		if (hasImplicitScope(visitable)) {
 			notify = true;
-			implicitScope.push(new LinkedHashSet<>(scopeSeed));
+			this.implicitScope.push(new LinkedHashSet<>(scopeSeed));
 		}
 
 		if (notify) {
-			scopeSeed.addAll(afterStatement);
+			scopeSeed.addAll(this.afterStatement);
 			var importsAndScope = new LinkedHashSet<IdentifiableElement>();
 			var current = this.currentImports.peek();
 			if (current != null) {
@@ -205,8 +258,10 @@ public final class ScopingStrategy {
 	}
 
 	/**
-	 * @param namedItem An item that might have been visited in the current scope
-	 * @return {@literal true} if the named item has been visited in the current scope before
+	 * Returns {@code true} if the named item has been visited in the current scope
+	 * before.
+	 * @param namedItem an item that might have been visited in the current scope
+	 * @return {@code true} if the named item has been visited in the current scope before
 	 */
 	public boolean hasVisitedBefore(Named namedItem) {
 
@@ -214,21 +269,19 @@ public final class ScopingStrategy {
 			return false;
 		}
 
-		Set<IdentifiableElement> scope = dequeOfVisitedNamed.peek();
+		Set<IdentifiableElement> scope = this.dequeOfVisitedNamed.peek();
 		return hasVisitedInScope(scope, namedItem);
 	}
 
 	private boolean isListFunctionPredicate(Visitable visitable) {
 
-		return visitable instanceof FunctionInvocation fi && Set.of("all", "any", "none", "single")
-			.contains(fi.getFunctionName().toLowerCase(
-				Locale.ROOT));
+		return visitable instanceof FunctionInvocation fi
+				&& Set.of("all", "any", "none", "single").contains(fi.getFunctionName().toLowerCase(Locale.ROOT));
 	}
 
 	/**
-	 * Called when leaving a {@link Visitable}
-	 *
-	 * @param visitable Element to be checked for a scope to be closed
+	 * Called when leaving a {@link Visitable}.
+	 * @param visitable element to be checked for a scope to be closed
 	 */
 	public void doLeave(Visitable visitable) {
 
@@ -236,12 +289,14 @@ public final class ScopingStrategy {
 			return;
 		}
 
-		if (visitable instanceof IdentifiableElement identifiableElement && !inOrder && (!inProperty || visitable instanceof Property)) {
-			if (identifiableElement instanceof SymbolicName && inListFunctionPredicate) {
+		if (visitable instanceof IdentifiableElement identifiableElement && !this.inOrder
+				&& (!this.inProperty || visitable instanceof Property)) {
+			if (identifiableElement instanceof SymbolicName && this.inListFunctionPredicate) {
 				this.inListFunctionPredicate = false;
-			} else {
-				dequeOfVisitedNamed.peek().add(identifiableElement);
-				if (inSubquery) {
+			}
+			else {
+				this.dequeOfVisitedNamed.peek().add(identifiableElement);
+				if (this.inSubquery) {
 					var identifier = extractIdentifier(identifiableElement);
 					if (identifier != null) {
 						this.definedInSubquery.peek().add(identifier);
@@ -257,13 +312,15 @@ public final class ScopingStrategy {
 		boolean notify = false;
 		if (visitable instanceof Statement) {
 			leaveStatement(visitable);
-		} else if (hasLocalScope(visitable)) {
+		}
+		else if (hasLocalScope(visitable)) {
 			notify = true;
 			Set<IdentifiableElement> lastVisitedNames = this.dequeOfVisitedNamed.pop();
 			if (visitable instanceof ExistentialSubquery) {
 				this.afterStatement.retainAll(lastVisitedNames);
 			}
-		} else {
+		}
+		else {
 			clearPreviouslyVisitedNamed(visitable);
 		}
 
@@ -289,35 +346,27 @@ public final class ScopingStrategy {
 			this.implicitScope.pop();
 		}
 
-		previous = visitable;
+		this.previous = visitable;
 
 		if (notify) {
-			Set<IdentifiableElement> retainedElements = new HashSet<>(afterStatement);
+			Set<IdentifiableElement> retainedElements = new HashSet<>(this.afterStatement);
 			this.onScopeLeft.forEach(c -> c.accept(visitable, retainedElements));
 		}
-	}
-
-	/**
-	 * Anything that might import variables from the outside, without using an explicit {@code WITH} clause.
-	 *
-	 * @param visitable the element to be checked whether it implicitly imports named elements.
-	 * @return {@literal true} if named elements are imported
-	 */
-	private static boolean hasImplicitScope(Visitable visitable) {
-		return visitable instanceof SubqueryExpression || visitable instanceof Statement.UnionQuery;
 	}
 
 	private void leaveStatement(Visitable visitable) {
 
 		Set<IdentifiableElement> lastScope = this.dequeOfVisitedNamed.peek();
 		// We keep properties only around when they have been actually returned
-		if (previous instanceof UnionPart && afterStatement != null) {
-			lastScope.stream().filter(i -> !(i instanceof Property))
-				.forEach(afterStatement::add);
-		} else if (!(previous instanceof Return || previous instanceof YieldItems)) {
-			this.afterStatement = lastScope.stream().filter(i -> !(i instanceof Property))
+		if (this.previous instanceof UnionPart && this.afterStatement != null) {
+			lastScope.stream().filter(i -> !(i instanceof Property)).forEach(this.afterStatement::add);
+		}
+		else if (!(this.previous instanceof Return || this.previous instanceof YieldItems)) {
+			this.afterStatement = lastScope.stream()
+				.filter(i -> !(i instanceof Property))
 				.collect(Collectors.toCollection(LinkedHashSet::new));
-		} else {
+		}
+		else {
 			this.afterStatement = new LinkedHashSet<>(lastScope);
 		}
 
@@ -342,55 +391,23 @@ public final class ScopingStrategy {
 			.anyMatch(identifiedBy(needle));
 	}
 
-	private static Predicate<IdentifiableElement> byHasAName() {
-		Predicate<IdentifiableElement> hasAName = Named.class::isInstance;
-		hasAName = hasAName.or(AliasedExpression.class::isInstance);
-		hasAName = hasAName.or(SymbolicName.class::isInstance);
-		return hasAName;
-	}
-
-	/**
-	 * Extracts an identifier from an {@link IdentifiableElement identifiable element}.
-	 * @param i The identifiable element
-	 * @return The identifier
-	 */
-	private static String extractIdentifier(IdentifiableElement i) {
-		String value;
-		if (i instanceof Named named) {
-			value = named.getSymbolicName().map(SymbolicName::getValue).orElse(null);
-		} else if (i instanceof Aliased aliased) {
-			value = aliased.getAlias();
-		} else if (i instanceof SymbolicName symbolicName) {
-			value = symbolicName.getValue();
-		} else {
-			value = null;
-		}
-		return value;
-	}
-
 	private Predicate<String> identifiedBy(Named needle) {
 		return i -> {
 			boolean result = i.equals(needle.getRequiredSymbolicName().getValue());
-			if (result && inSubquery) {
-				var imported = Optional.ofNullable(currentImports.peek()).orElseGet(Set::of).contains(i);
+			if (result && this.inSubquery) {
+				var imported = Optional.ofNullable(this.currentImports.peek()).orElseGet(Set::of).contains(i);
 				return imported || this.definedInSubquery.peek().contains(i);
 			}
 			return result;
 		};
 	}
 
-	private static boolean hasLocalScope(Visitable visitable) {
-		return visitable instanceof PatternComprehension ||
-			visitable instanceof Subquery ||
-			visitable instanceof SubqueryExpression ||
-			visitable instanceof Foreach;
-	}
-
 	private void clearPreviouslyVisitedNamed(Visitable visitable) {
 
 		if (visitable instanceof With with) {
 			clearPreviouslyVisitedAfterWith(with);
-		} else if (visitable instanceof Return || visitable instanceof YieldItems) {
+		}
+		else if (visitable instanceof Return || visitable instanceof YieldItems) {
 			clearPreviouslyVisitedAfterReturnish(visitable);
 		}
 	}
@@ -400,29 +417,30 @@ public final class ScopingStrategy {
 		// We need to clear the named cache after defining a with.
 		// Everything not taken into the next step has to go.
 		Set<IdentifiableElement> retain = new HashSet<>();
-		Set<IdentifiableElement> visitedNamed = dequeOfVisitedNamed.peek();
+		Set<IdentifiableElement> visitedNamed = this.dequeOfVisitedNamed.peek();
 		if (visitedNamed == null) {
 			return;
 		}
 		with.accept(segment -> {
 			if (segment instanceof SymbolicName symbolicName) {
-				visitedNamed.stream()
-					.filter(element -> {
-						if (element instanceof Named named) {
-							return named.getRequiredSymbolicName().equals(segment);
-						} else if (element instanceof Aliased aliased) {
-							return aliased.getAlias().equals((symbolicName).getValue());
-						} else {
-							return element.equals(segment);
-						}
-					})
-					.forEach(retain::add);
-			} else if (segment instanceof Asterisk) {
+				visitedNamed.stream().filter(element -> {
+					if (element instanceof Named named) {
+						return named.getRequiredSymbolicName().equals(segment);
+					}
+					else if (element instanceof Aliased aliased) {
+						return aliased.getAlias().equals((symbolicName).getValue());
+					}
+					else {
+						return element.equals(segment);
+					}
+				}).forEach(retain::add);
+			}
+			else if (segment instanceof Asterisk) {
 				retain.addAll(visitedNamed);
 			}
 		});
 
-		retain.addAll(Optional.ofNullable(implicitScope.peek()).orElseGet(Set::of));
+		retain.addAll(Optional.ofNullable(this.implicitScope.peek()).orElseGet(Set::of));
 		visitedNamed.retainAll(retain);
 	}
 
@@ -430,7 +448,7 @@ public final class ScopingStrategy {
 
 		// Everything not returned has to go.
 		Set<IdentifiableElement> retain = new HashSet<>();
-		Set<IdentifiableElement> visitedNamed = dequeOfVisitedNamed.peek();
+		Set<IdentifiableElement> visitedNamed = this.dequeOfVisitedNamed.peek();
 		returnish.accept(new Visitor() {
 
 			int level = 0;
@@ -439,17 +457,17 @@ public final class ScopingStrategy {
 
 			@Override
 			public void enter(Visitable segment) {
-				if (entranceLevel1 == null && segment instanceof TypedSubtree) {
-					entranceLevel1 = segment;
+				if (this.entranceLevel1 == null && segment instanceof TypedSubtree) {
+					this.entranceLevel1 = segment;
 					return;
 				}
 
-				if (entranceLevel1 != null) {
-					++level;
+				if (this.entranceLevel1 != null) {
+					++this.level;
 				}
 
 				// Only collect things exactly one level into the list of returned items
-				if (level == 1 && segment instanceof IdentifiableElement identifiableElement) {
+				if (this.level == 1 && segment instanceof IdentifiableElement identifiableElement) {
 					retain.add(identifiableElement);
 				}
 			}
@@ -457,23 +475,23 @@ public final class ScopingStrategy {
 			@Override
 			public void leave(Visitable segment) {
 
-				if (entranceLevel1 != null) {
-					level = Math.max(0, level - 1);
-					if (segment == entranceLevel1) {
-						entranceLevel1 = null;
+				if (this.entranceLevel1 != null) {
+					this.level = Math.max(0, this.level - 1);
+					if (segment == this.entranceLevel1) {
+						this.entranceLevel1 = null;
 					}
 				}
 			}
 		});
 
-		retain.addAll(Optional.ofNullable(implicitScope.peek()).orElseGet(Set::of));
+		retain.addAll(Optional.ofNullable(this.implicitScope.peek()).orElseGet(Set::of));
 		if (visitedNamed != null) {
 			visitedNamed.retainAll(retain);
 		}
 	}
 
 	/**
-	 * @return An unmodifiable collections with identifiables in the current scope
+	 * {@return an unmodifiable collections with identifiable in the current scope}
 	 */
 	public Collection<Expression> getIdentifiables() {
 
@@ -481,18 +499,18 @@ public final class ScopingStrategy {
 			return Collections.emptySet();
 		}
 
-		Predicate<IdentifiableElement> allNamedElementsHaveResolvedNames = e ->
-			!(e instanceof Named named) || named.getSymbolicName().filter(s -> s.getValue() != null).isPresent();
+		Predicate<IdentifiableElement> allNamedElementsHaveResolvedNames = e -> !(e instanceof Named named)
+				|| named.getSymbolicName().filter(s -> s.getValue() != null).isPresent();
 
 		Set<IdentifiableElement> items = Optional.ofNullable(this.dequeOfVisitedNamed.peek())
 			.filter(scope -> !scope.isEmpty())
-			.orElse(afterStatement);
+			.orElse(this.afterStatement);
 
-		return items
-			.stream()
+		return items.stream()
 			.filter(allNamedElementsHaveResolvedNames)
 			.map(IdentifiableElement::asExpression)
-			.collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new), Collections::unmodifiableSet));
+			.collect(Collectors.collectingAndThen(Collectors.toCollection(LinkedHashSet::new),
+					Collections::unmodifiableSet));
 	}
 
 	public PatternElement lookup(Named node) {
@@ -501,27 +519,22 @@ public final class ScopingStrategy {
 			return null;
 		}
 
-		var scope = dequeOfVisitedNamed.peek();
+		var scope = this.dequeOfVisitedNamed.peek();
 		var identifiedBy = identifiedBy(node);
-		return scope.stream()
-			.filter(byHasAName())
-			.filter(PatternElement.class::isInstance)
-			.filter(i -> {
-				var identifier = extractIdentifier(i);
-				return identifier != null && identifiedBy.test(identifier);
-			})
-			.map(PatternElement.class::cast)
-			.findFirst()
-			.orElse(null);
+		return scope.stream().filter(byHasAName()).filter(PatternElement.class::isInstance).filter(i -> {
+			var identifier = extractIdentifier(i);
+			return identifier != null && identifiedBy.test(identifier);
+		}).map(PatternElement.class::cast).findFirst().orElse(null);
 	}
 
 	/**
-	 * @return The set of current imports
+	 * {@return the set of current imports}
 	 */
 	public Set<SymbolicName> getCurrentImports() {
-		return Optional.ofNullable(this.currentImports.peek()).stream()
-			.flatMap(v -> v.stream()
-				.map(Cypher::name))
+		return Optional.ofNullable(this.currentImports.peek())
+			.stream()
+			.flatMap(v -> v.stream().map(Cypher::name))
 			.collect(Collectors.toSet());
 	}
+
 }

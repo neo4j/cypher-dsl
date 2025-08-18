@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.io.Serial;
 import java.util.Collections;
 import java.util.HashMap;
@@ -31,9 +29,11 @@ import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Exception thrown when extracting parameters from a statement leads to one parameter with a given name appearing
- * with different values.
+ * Exception thrown when extracting parameters from a statement leads to one parameter
+ * with a given name appearing with different values.
  *
  * @author Andreas Berger
  * @author Michael J. Simons
@@ -53,29 +53,31 @@ public final class ConflictingParametersException extends RuntimeException {
 		erroneousParameters.forEach((k, v) -> this.erroneousParameters.put(k, new HashSet<>(v)));
 	}
 
-	/**
-	 * @return the conflicting parameters
-	 */
-	public Map<String, Set<Object>> getErroneousParameters() {
-		return Collections.unmodifiableMap(erroneousParameters);
-	}
-
 	private static String createMessage(Map<String, Set<Object>> errors) {
 		StringBuilder sb = new StringBuilder();
 		String prefix;
 		if (errors.size() > 1) {
 			sb.append("There are conflicting parameter values:");
 			prefix = "\n\t";
-		} else {
+		}
+		else {
 			prefix = "";
 		}
 		errors.forEach((param, values) -> {
 			sb.append(prefix);
 			sb.append("Parameter '").append(param).append("' is defined multiple times with different bound values: ");
 			sb.append(values.stream()
-				.map(o -> o == Parameter.NO_VALUE ? "(UNDEFINED VALUE)" : Objects.toString(o))
+				.map(o -> (o != Parameter.NO_VALUE) ? Objects.toString(o) : "(UNDEFINED VALUE)")
 				.collect(Collectors.joining(" != ")));
 		});
 		return sb.toString();
 	}
+
+	/**
+	 * {@return the conflicting parameters}
+	 */
+	public Map<String, Set<Object>> getErroneousParameters() {
+		return Collections.unmodifiableMap(this.erroneousParameters);
+	}
+
 }

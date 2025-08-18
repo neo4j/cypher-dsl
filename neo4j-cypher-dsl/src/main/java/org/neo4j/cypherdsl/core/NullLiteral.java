@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Represents the literal value {@literal null}.
@@ -43,4 +43,5 @@ public final class NullLiteral extends LiteralBase<Void> {
 	public String asString() {
 		return "NULL";
 	}
+
 }
