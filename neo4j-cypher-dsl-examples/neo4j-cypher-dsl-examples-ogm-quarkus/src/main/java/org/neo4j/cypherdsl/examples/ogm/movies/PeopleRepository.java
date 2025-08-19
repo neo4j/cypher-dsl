@@ -19,10 +19,11 @@
 package org.neo4j.cypherdsl.examples.ogm.movies;
 
 import jakarta.enterprise.context.ApplicationScoped;
-
 import org.neo4j.ogm.session.SessionFactory;
 
 /**
+ * Example repository.
+ *
  * @author Michael J. Simons
  */
 @ApplicationScoped
@@ -36,8 +37,9 @@ class PeopleRepository {
 
 	Person save(Person person) {
 
-		var session = sessionFactory.openSession();
+		var session = this.sessionFactory.openSession();
 		session.save(person);
 		return person;
 	}
+
 }

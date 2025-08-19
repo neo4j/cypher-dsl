@@ -26,6 +26,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
 /**
+ * Example resource.
+ *
  * @author Michael J. Simons
  */
 @RequestScoped
@@ -35,6 +37,7 @@ public class PeopleResource {
 	private final PeopleRepository peopleRepository;
 
 	/**
+	 * Creates a new instance with based on the given repository.
 	 * @param peopleRepository the repository to retrieve people from
 	 */
 	public PeopleResource(PeopleRepository peopleRepository) {
@@ -42,8 +45,7 @@ public class PeopleResource {
 	}
 
 	/**
-	 * Creates a new person
-	 *
+	 * Creates a new person.
 	 * @param newPerson the new person
 	 * @return response containing the new person
 	 */
@@ -51,7 +53,8 @@ public class PeopleResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createNewPerson(Person newPerson) {
 
-		var savedPerson = peopleRepository.save(newPerson);
+		var savedPerson = this.peopleRepository.save(newPerson);
 		return Response.status(Response.Status.CREATED).entity(savedPerson).build();
 	}
+
 }

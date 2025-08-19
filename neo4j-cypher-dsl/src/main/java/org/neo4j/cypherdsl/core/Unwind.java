@@ -18,16 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Unwind.html">Unwind</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Unwind.html">Unwind</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Queen - Jazz
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -37,13 +37,16 @@ public final class Unwind extends AbstractClause implements ReadingClause {
 
 	Unwind(Expression expressionToUnwind, String variable) {
 
-		this.expressionToUnwind = (expressionToUnwind instanceof Aliased aliased ? aliased.asName() : expressionToUnwind).as(variable);
+		this.expressionToUnwind = ((expressionToUnwind instanceof Aliased aliased) ? aliased.asName()
+				: expressionToUnwind)
+			.as(variable);
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		expressionToUnwind.accept(visitor);
+		this.expressionToUnwind.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

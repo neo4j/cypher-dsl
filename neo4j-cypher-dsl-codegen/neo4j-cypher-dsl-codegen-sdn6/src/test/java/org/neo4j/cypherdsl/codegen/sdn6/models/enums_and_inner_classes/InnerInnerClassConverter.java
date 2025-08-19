@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes;
 
 import org.neo4j.cypherdsl.codegen.sdn6.models.enums_and_inner_classes.ConnectorTransport.InnerClass.InnerInnerClass;
 import org.neo4j.driver.Value;
+
 import org.springframework.data.neo4j.core.convert.Neo4jPersistentPropertyConverter;
 
 /**
@@ -27,11 +28,14 @@ import org.springframework.data.neo4j.core.convert.Neo4jPersistentPropertyConver
  */
 public class InnerInnerClassConverter implements Neo4jPersistentPropertyConverter<InnerInnerClass> {
 
-	@Override public Value write(InnerInnerClass innerInnerClass) {
+	@Override
+	public Value write(InnerInnerClass innerInnerClass) {
 		return null;
 	}
 
-	@Override public InnerInnerClass read(Value value) {
+	@Override
+	public InnerInnerClass read(Value value) {
 		return null;
 	}
+
 }

@@ -18,10 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A step to finish the query without the need to return anything.

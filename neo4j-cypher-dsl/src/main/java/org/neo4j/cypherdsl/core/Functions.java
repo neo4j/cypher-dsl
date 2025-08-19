@@ -38,17 +38,20 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 final class Functions {
 
+	private Functions() {
+	}
+
 	/**
-	 * Creates a function invocation for {@code id{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-id">id</a>.
-	 *
-	 * @param node The node for which the internal id should be retrieved
-	 * @return A function call for {@code id()} on a node.
-	 * @deprecated see {@link #elementId(Node)} for a replacement. Neo4j the database will remove support for {@code id(n)}
-	 * at some point.
+	 * Creates a function invocation for {@code id{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-id">id</a>.
+	 * @param node the node for which the internal id should be retrieved
+	 * @return a function call for {@code id()} on a node.
+	 * @deprecated see {@link #elementId(Node)} for a replacement. Neo4j the database will
+	 * remove support for {@code id(n)} at some point.
 	 */
 	@Deprecated(since = "2023.3.0")
-	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some point, but not yet.
+	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some
+											// point, but not yet.
 	static FunctionInvocation id(Node node) {
 
 		Assertions.notNull(node, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NODE_REQUIRED));
@@ -57,16 +60,16 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code id{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-id">id</a>.
-	 *
-	 * @param relationship The relationship for which the internal id should be retrieved
-	 * @return A function call for {@code id()} on a relationship.
-	 * @deprecated see {@link #elementId(Relationship)} for a replacement. Neo4j the database will remove support for
-	 * {@code id(n)} at some point.
+	 * Creates a function invocation for {@code id{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-id">id</a>.
+	 * @param relationship the relationship for which the internal id should be retrieved
+	 * @return a function call for {@code id()} on a relationship.
+	 * @deprecated see {@link #elementId(Relationship)} for a replacement. Neo4j the
+	 * database will remove support for {@code id(n)} at some point.
 	 */
 	@Deprecated(since = "2023.3.0")
-	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some point, but not yet.
+	@SuppressWarnings({ "squid:S1133" }) // Yes, I promise, this will be removed at some
+											// point, but not yet.
 	static FunctionInvocation id(Relationship relationship) {
 
 		Assertions.notNull(relationship, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_RELATIONSHIP_REQUIRED));
@@ -76,9 +79,8 @@ final class Functions {
 
 	/**
 	 * Creates a function invocation for {@code elementId{}}.
-	 *
-	 * @param node The node for which the element id should be retrieved
-	 * @return A function call for {@code elementId()} on a node.
+	 * @param node the node for which the element id should be retrieved
+	 * @return a function call for {@code elementId()} on a node.
 	 */
 	@Neo4jVersion(minimum = "5.0.0")
 	static FunctionInvocation elementId(Node node) {
@@ -90,9 +92,8 @@ final class Functions {
 
 	/**
 	 * Creates a function invocation for {@code elementId{}}.
-	 *
-	 * @param relationship The relationship for which the element id should be retrieved
-	 * @return A function call for {@code elementId()} on a relationship.
+	 * @param relationship the relationship for which the element id should be retrieved
+	 * @return a function call for {@code elementId()} on a relationship.
 	 */
 	@Neo4jVersion(minimum = "5.0.0")
 	static FunctionInvocation elementId(Relationship relationship) {
@@ -103,11 +104,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code keys{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
-	 *
-	 * @param node The node which keys should be returned.
-	 * @return A function call for {@code keys()} on an expression.
+	 * Creates a function invocation for {@code keys{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
+	 * @param node the node which keys should be returned.
+	 * @return a function call for {@code keys()} on an expression.
 	 * @since 2021.0.2
 	 */
 	static FunctionInvocation keys(Node node) {
@@ -117,11 +117,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code keys{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
-	 *
-	 * @param relationship The relationship which keys should be returned.
-	 * @return A function call for {@code keys()} on an expression.
+	 * Creates a function invocation for {@code keys{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
+	 * @param relationship the relationship which keys should be returned.
+	 * @return a function call for {@code keys()} on an expression.
 	 * @since 2021.0.2
 	 */
 	static FunctionInvocation keys(Relationship relationship) {
@@ -131,27 +130,26 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code keys{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
-	 *
-	 * @param expression The expressions which keys should be returned. Must resolve to a node, relationship or map.
-	 * @return A function call for {@code keys()} on an expression.
+	 * Creates a function invocation for {@code keys{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-keys">keys</a>.
+	 * @param expression the expressions which keys should be returned. Must resolve to a
+	 * node, relationship or map.
+	 * @return a function call for {@code keys()} on an expression.
 	 * @since 2021.0.2
 	 */
 	static FunctionInvocation keys(Expression expression) {
 
 		Assertions.notNull(expression, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_EXPRESSION_REQUIRED));
 
-		Expression param = expression instanceof Named named ? named.getRequiredSymbolicName() : expression;
+		Expression param = (expression instanceof Named named) ? named.getRequiredSymbolicName() : expression;
 		return FunctionInvocation.create(Lists.KEYS, param);
 	}
 
 	/**
-	 * Creates a function invocation for {@code labels{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-labels">labels</a>.
-	 *
-	 * @param node The node for which the labels should be retrieved
-	 * @return A function call for {@code labels()} on a node.
+	 * Creates a function invocation for {@code labels{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-labels">labels</a>.
+	 * @param node the node for which the labels should be retrieved
+	 * @return a function call for {@code labels()} on a node.
 	 */
 	static FunctionInvocation labels(Node node) {
 
@@ -161,13 +159,14 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a  function invocation for  {@code labels{}}.  The {@link SymbolicName  symbolic name} {@code  node} must
-	 * point to a node. This can't be checked during compile time, so please make sure of that.
+	 * Creates a function invocation for {@code labels{}}. The {@link SymbolicName
+	 * symbolic name} {@code  node} must point to a node. This can't be checked during
+	 * compile time, so please make sure of that.
 	 * <p>
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-labels">labels</a>.
-	 *
-	 * @param node The node for which the labels should be retrieved
-	 * @return A function call for {@code labels()} on a node.
+	 * See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-labels">labels</a>.
+	 * @param node the node for which the labels should be retrieved
+	 * @return a function call for {@code labels()} on a node.
 	 * @since 2023.2.0
 	 */
 	static FunctionInvocation labels(SymbolicName node) {
@@ -178,11 +177,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code type{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-type">type</a>.
-	 *
-	 * @param relationship The relationship for which the type should be retrieved
-	 * @return A function call for {@code type()} on a relationship.
+	 * Creates a function invocation for {@code type{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-type">type</a>.
+	 * @param relationship the relationship for which the type should be retrieved
+	 * @return a function call for {@code type()} on a relationship.
 	 */
 	static FunctionInvocation type(Relationship relationship) {
 
@@ -192,13 +190,14 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a  function invocation for  {@code type{}}. The {@link  SymbolicName symbolic name}  {@code relationship}
-	 * must point to a relationship. This can't be checked during compile time, so please make sure of that.
+	 * Creates a function invocation for {@code type{}}. The {@link SymbolicName symbolic
+	 * name} {@code relationship} must point to a relationship. This can't be checked
+	 * during compile time, so please make sure of that.
 	 * <p>
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-type">type</a>.
-	 *
-	 * @param relationship The relationship for which the type should be retrieved
-	 * @return A function call for {@code type()} on a relationship.
+	 * See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-type">type</a>.
+	 * @param relationship the relationship for which the type should be retrieved
+	 * @return a function call for {@code type()} on a relationship.
 	 * @since 2023.2.0
 	 */
 	static FunctionInvocation type(SymbolicName relationship) {
@@ -209,8 +208,9 @@ final class Functions {
 	}
 
 	/**
-	 * @param node The named node to be counted
-	 * @return A function call for {@code count()} for one named node
+	 * Returns a function call for {@code count()} for one named node.
+	 * @param node the named node to be counted
+	 * @return a function call for {@code count()} for one named node
 	 * @see #count(Expression)
 	 */
 	static FunctionInvocation count(Node node) {
@@ -221,11 +221,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code count()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-count">count</a>.
-	 *
-	 * @param expression An expression describing the things to count.
-	 * @return A function call for {@code count()} for an expression like {@link Cypher#asterisk()} etc.
+	 * Creates a function invocation for the {@code count()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-count">count</a>.
+	 * @param expression an expression describing the things to count.
+	 * @return a function call for {@code count()} for an expression like
+	 * {@link Cypher#asterisk()} etc.
 	 */
 	static FunctionInvocation count(Expression expression) {
 
@@ -233,10 +233,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for a {@code count()} function with {@code DISTINCT} added.
-	 *
-	 * @param node The named node to be counted
-	 * @return A function call for {@code count()} for one named node
+	 * Creates a function invocation for a {@code count()} function with {@code DISTINCT}
+	 * added.
+	 * @param node the named node to be counted
+	 * @return a function call for {@code count()} for one named node
 	 * @see #countDistinct(Expression)
 	 */
 	static FunctionInvocation countDistinct(Node node) {
@@ -247,11 +247,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for a {@code count()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-count">count</a>.
-	 *
-	 * @param expression An expression describing the things to count.
-	 * @return A function call for {@code count()} for an expression like {@link Cypher#asterisk()} etc.
+	 * Creates a function invocation for a {@code count()} function with {@code DISTINCT}
+	 * added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-count">count</a>.
+	 * @param expression an expression describing the things to count.
+	 * @return a function call for {@code count()} for an expression like
+	 * {@link Cypher#asterisk()} etc.
 	 */
 	static FunctionInvocation countDistinct(Expression expression) {
 
@@ -260,9 +261,8 @@ final class Functions {
 
 	/**
 	 * Creates a function invocation for {@code properties())} on nodes.
-	 *
-	 * @param node The node who's properties should be returned.
-	 * @return A function call for {@code properties())}
+	 * @param node the node who's properties should be returned.
+	 * @return a function call for {@code properties())}
 	 */
 	static FunctionInvocation properties(Node node) {
 
@@ -273,9 +273,8 @@ final class Functions {
 
 	/**
 	 * Creates a function invocation for {@code properties())} on relationships.
-	 *
-	 * @param relationship The relationship who's properties should be returned.
-	 * @return A function call for {@code properties())}
+	 * @param relationship the relationship who's properties should be returned.
+	 * @return a function call for {@code properties())}
 	 */
 	static FunctionInvocation properties(Relationship relationship) {
 
@@ -286,9 +285,8 @@ final class Functions {
 
 	/**
 	 * Creates a function invocation for {@code properties())} on maps.
-	 *
-	 * @param map The map who's properties should be returned.
-	 * @return A function call for {@code properties())}
+	 * @param map the map who's properties should be returned.
+	 * @return a function call for {@code properties())}
 	 */
 	static FunctionInvocation properties(MapExpression map) {
 
@@ -296,11 +294,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code coalesce()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-coalesce">coalesce</a>.
-	 *
-	 * @param expressions One or more expressions to be coalesced
-	 * @return A function call for {@code coalesce}.
+	 * Creates a function invocation for the {@code coalesce()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-coalesce">coalesce</a>.
+	 * @param expressions one or more expressions to be coalesced
+	 * @return a function call for {@code coalesce}.
 	 */
 	static FunctionInvocation coalesce(Expression... expressions) {
 
@@ -308,12 +305,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code left()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">left</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @param length     desired length
-	 * @return A function call for {@code left()}
+	 * Creates a function invocation for the {@code left()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">left</a>.
+	 * @param expression an expression resolving to a string
+	 * @param length desired length
+	 * @return a function call for {@code left()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation left(Expression expression, Expression length) {
@@ -321,18 +317,14 @@ final class Functions {
 		if (expression != null && length == null) {
 			throw new IllegalArgumentException("length might not be null when the expression is not null");
 		}
-		return FunctionInvocation.create(Strings.LEFT,
-			expressionOrNullLit(expression),
-			expressionOrNullLit(length)
-		);
+		return FunctionInvocation.create(Strings.LEFT, expressionOrNullLit(expression), expressionOrNullLit(length));
 	}
 
 	/**
-	 * Creates a function invocation for the {@code ltrim()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">ltrim</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @return A function call for {@code ltrim()}
+	 * Creates a function invocation for the {@code ltrim()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">ltrim</a>.
+	 * @param expression an expression resolving to a string
+	 * @return a function call for {@code ltrim()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation ltrim(Expression expression) {
@@ -342,27 +334,26 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code replace()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">replace</a>.
-	 *
-	 * @param original An expression that returns a string
-	 * @param search   An expression that specifies the string to be replaced in {@code original}.
-	 * @param replace  An expression that specifies the replacement string.
-	 * @return A function call for {@code replace()}
+	 * Creates a function invocation for the {@code replace()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-ltrim">replace</a>.
+	 * @param original an expression that returns a string
+	 * @param search an expression that specifies the string to be replaced in
+	 * {@code original}.
+	 * @param replace an expression that specifies the replacement string.
+	 * @return a function call for {@code replace()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation replace(Expression original, Expression search, Expression replace) {
 
 		return FunctionInvocation.create(Strings.REPLACE, expressionOrNullLit(original), expressionOrNullLit(search),
-			expressionOrNullLit(replace));
+				expressionOrNullLit(replace));
 	}
 
 	/**
-	 * Creates a function invocation for the {@code reverse()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-reverse">reverse</a>.
-	 *
-	 * @param original An expression that returns a string
-	 * @return A function call for {@code reverse()}
+	 * Creates a function invocation for the {@code reverse()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-reverse">reverse</a>.
+	 * @param original an expression that returns a string
+	 * @return a function call for {@code reverse()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation reverse(Expression original) {
@@ -372,12 +363,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code right()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">right</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @param length     desired length
-	 * @return A function call for {@code right()}
+	 * Creates a function invocation for the {@code right()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-left">right</a>.
+	 * @param expression an expression resolving to a string
+	 * @param length desired length
+	 * @return a function call for {@code right()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation right(Expression expression, Expression length) {
@@ -385,18 +375,14 @@ final class Functions {
 		if (expression != null && length == null) {
 			throw new IllegalArgumentException("length might not be null when the expression is not null");
 		}
-		return FunctionInvocation.create(Strings.RIGHT,
-			expressionOrNullLit(expression),
-			expressionOrNullLit(length)
-		);
+		return FunctionInvocation.create(Strings.RIGHT, expressionOrNullLit(expression), expressionOrNullLit(length));
 	}
 
 	/**
-	 * Creates a function invocation for the {@code rtrim()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-rtrim">rtrim</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @return A function call for {@code rtrim()}
+	 * Creates a function invocation for the {@code rtrim()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-rtrim">rtrim</a>.
+	 * @param expression an expression resolving to a string
+	 * @return a function call for {@code rtrim()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation rtrim(Expression expression) {
@@ -406,13 +392,14 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code substring()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-substring">rtrim</a>.
-	 *
-	 * @param original An expression resolving to a string
-	 * @param start    An expression that returns a positive integer, denoting the position at which the substring will begin.
-	 * @param length   An expression that returns a positive integer, denoting how many characters of original will be returned.
-	 * @return A function call for {@code substring()}
+	 * Creates a function invocation for the {@code substring()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-substring">rtrim</a>.
+	 * @param original an expression resolving to a string
+	 * @param start an expression that returns a positive integer, denoting the position
+	 * at which the substring will begin.
+	 * @param length an expression that returns a positive integer, denoting how many
+	 * characters of original will be returned.
+	 * @return a function call for {@code substring()}
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation substring(Expression original, Expression start, Expression length) {
@@ -425,15 +412,14 @@ final class Functions {
 	}
 
 	private static Expression expressionOrNullLit(Expression expression) {
-		return expression == null ? Cypher.literalNull() : expression;
+		return (expression != null) ? expression : Cypher.literalNull();
 	}
 
 	/**
-	 * Creates a function invocation for the {@code toLower()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toLower">toLower</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @return A function call for {@code toLower()} for one expression
+	 * Creates a function invocation for the {@code toLower()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toLower">toLower</a>.
+	 * @param expression an expression resolving to a string
+	 * @return a function call for {@code toLower()} for one expression
 	 */
 	static FunctionInvocation toLower(Expression expression) {
 
@@ -442,11 +428,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code toUpper()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toUpper">toUpper</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @return A function call for {@code toLower()} for one expression
+	 * Creates a function invocation for the {@code toUpper()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toUpper">toUpper</a>.
+	 * @param expression an expression resolving to a string
+	 * @return a function call for {@code toLower()} for one expression
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation toUpper(Expression expression) {
@@ -456,11 +441,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code trim()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-trim">trim</a>.
-	 *
-	 * @param expression An expression resolving to a string
-	 * @return A function call for {@code trim()} for one expression
+	 * Creates a function invocation for the {@code trim()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-trim">trim</a>.
+	 * @param expression an expression resolving to a string
+	 * @return a function call for {@code trim()} for one expression
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation trim(Expression expression) {
@@ -470,12 +454,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code split()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-split">split</a>.
-	 *
-	 * @param expression An expression resolving to a string that should be split
-	 * @param delimiter  The delimiter on which to split
-	 * @return A function call for {@code split()}
+	 * Creates a function invocation for the {@code split()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-split">split</a>.
+	 * @param expression an expression resolving to a string that should be split
+	 * @param delimiter the delimiter on which to split
+	 * @return a function call for {@code split()}
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation split(Expression expression, Expression delimiter) {
@@ -486,12 +469,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code split()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-split">split</a>.
-	 *
-	 * @param expression An expression resolving to a string that should be split
-	 * @param delimiter  The delimiter on which to split
-	 * @return A function call for {@code split()}
+	 * Creates a function invocation for the {@code split()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-split">split</a>.
+	 * @param expression an expression resolving to a string that should be split
+	 * @param delimiter the delimiter on which to split
+	 * @return a function call for {@code split()}
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation split(Expression expression, String delimiter) {
@@ -502,14 +484,18 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code size()} function. {@code size} can be applied to
+	 * Creates a function invocation for the {@code size()} function. {@code size} can be
+	 * applied to
 	 * <ul>
-	 * <li><a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size">a list</a></li>
-	 * <li><a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-string">to a string</a></li>
+	 * <li><a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size">a
+	 * list</a></li>
+	 * <li><a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-string">to
+	 * a string</a></li>
 	 * </ul>
-	 *
-	 * @param expression The expression who's size is to be returned
-	 * @return A function call for {@code size()} for one expression
+	 * @param expression the expression who's size is to be returned
+	 * @return a function call for {@code size()} for one expression
 	 */
 	static FunctionInvocation size(Expression expression) {
 
@@ -517,13 +503,15 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code size()} function. {@code size} can be applied to
+	 * Creates a function invocation for the {@code size()} function. {@code size} can be
+	 * applied to
 	 * <ul>
-	 * <li><a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-pattern-expression">to a pattern expression</a></li>
+	 * <li><a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-size-of-pattern-expression">to
+	 * a pattern expression</a></li>
 	 * </ul>
-	 *
-	 * @param pattern The pattern for which {@code size()} should be invoked.
-	 * @return A function call for {@code size()} for a pattern
+	 * @param pattern the pattern for which {@code size()} should be invoked.
+	 * @return a function call for {@code size()} for a pattern
 	 */
 	static FunctionInvocation size(RelationshipPattern pattern) {
 
@@ -531,11 +519,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code exists()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-exists">exists</a>.
-	 *
-	 * @param expression The expression who's existence is to be evaluated
-	 * @return A function call for {@code exists()} for one expression
+	 * Creates a function invocation for the {@code exists()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/predicate/#functions-exists">exists</a>.
+	 * @param expression the expression who's existence is to be evaluated
+	 * @return a function call for {@code exists()} for one expression
 	 */
 	static FunctionInvocation exists(Expression expression) {
 
@@ -543,13 +530,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code distance()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-distance">exists</a>.
+	 * Creates a function invocation for the {@code distance()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-distance">exists</a>.
 	 * Both points need to be in the same coordinate system.
-	 *
-	 * @param point1 Point 1
-	 * @param point2 Point 2
-	 * @return A function call for {@code distance()}
+	 * @param point1 point 1
+	 * @param point2 point 2
+	 * @return a function call for {@code distance()}
 	 */
 	static FunctionInvocation distance(Expression point1, Expression point2) {
 
@@ -560,11 +546,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code point()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
-	 *
-	 * @param parameterMap The map of parameters for {@code point()}
-	 * @return A function call for {@code point()}
+	 * Creates a function invocation for the {@code point()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
+	 * @param parameterMap the map of parameters for {@code point()}
+	 * @return a function call for {@code point()}
 	 */
 	static FunctionInvocation point(MapExpression parameterMap) {
 
@@ -572,13 +557,14 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code point()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
+	 * Creates a function invocation for the {@code point()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
 	 * <p>
-	 * This generic expression variant is useful for referencing a point inside a parameter or another map.
-	 *
-	 * @param expression An expression resolving to a valid map of parameters for {@code point()}
-	 * @return A function call for {@code point()}
+	 * This generic expression variant is useful for referencing a point inside a
+	 * parameter or another map.
+	 * @param expression an expression resolving to a valid map of parameters for
+	 * {@code point()}
+	 * @return a function call for {@code point()}
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation point(Expression expression) {
@@ -587,11 +573,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code point()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
-	 *
-	 * @param parameter A parameter referencing a {@code point()}
-	 * @return A function call for {@code point()}
+	 * Creates a function invocation for the {@code point()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-point">point</a>.
+	 * @param parameter a parameter referencing a {@code point()}
+	 * @return a function call for {@code point()}
 	 * @since 2022.7.3
 	 */
 	static FunctionInvocation point(Parameter<?> parameter) {
@@ -600,11 +585,10 @@ final class Functions {
 	}
 
 	/**
-	 * Convenience method for creating a 2d cartesian point
-	 *
-	 * @param x The x coordinate
-	 * @param y The y coordinate
-	 * @return A function call for {@code point()}
+	 * Convenience method for creating a 2d cartesian point.
+	 * @param x the x coordinate
+	 * @param y the y coordinate
+	 * @return a function call for {@code point()}
 	 * @since 2022.7.3
 	 */
 	static FunctionInvocation cartesian(double x, double y) {
@@ -613,11 +597,10 @@ final class Functions {
 	}
 
 	/**
-	 * Convenience method for creating a 2d coordinate in the WGS 84 coordinate system
-	 *
-	 * @param longitude The longitude
-	 * @param latitude  The latitude
-	 * @return A function call for {@code point()}
+	 * Convenience method for creating a 2d coordinate in the WGS 84 coordinate system.
+	 * @param longitude the longitude
+	 * @param latitude the latitude
+	 * @return a function call for {@code point()}
 	 * @since 2022.7.3
 	 */
 	static FunctionInvocation coordinate(double longitude, double latitude) {
@@ -626,13 +609,13 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code point.withinBBox} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-withinBBox">point.withinBBox</a>.
-	 *
-	 * @param point      The point to check
-	 * @param lowerLeft  The lower left point of the bounding box (south-west coordinate)
-	 * @param upperRight The upper right point of the bounding box (north-east coordinate)
-	 * @return A function call for {@code point.withinBBox}
+	 * Creates a function invocation for the {@code point.withinBBox} function. See
+	 * <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/spatial/#functions-withinBBox">point.withinBBox</a>.
+	 * @param point the point to check
+	 * @param lowerLeft the lower left point of the bounding box (south-west coordinate)
+	 * @param upperRight the upper right point of the bounding box (north-east coordinate)
+	 * @return a function call for {@code point.withinBBox}
 	 * @since 2022.7.3
 	 */
 	static FunctionInvocation withinBBox(Expression point, Expression lowerLeft, Expression upperRight) {
@@ -641,11 +624,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code avg()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-avg">avg</a>.
-	 *
-	 * @param expression The things to average
-	 * @return A function call for {@code avg()}
+	 * Creates a function invocation for the {@code avg()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-avg">avg</a>.
+	 * @param expression the things to average
+	 * @return a function call for {@code avg()}
 	 */
 	static FunctionInvocation avg(Expression expression) {
 
@@ -653,11 +635,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code avg()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-avg">avg</a>.
-	 *
-	 * @param expression The things to average
-	 * @return A function call for {@code avg()}
+	 * Creates a function invocation for the {@code avg()} function with {@code DISTINCT}
+	 * added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-avg">avg</a>.
+	 * @param expression the things to average
+	 * @return a function call for {@code avg()}
 	 */
 	static FunctionInvocation avgDistinct(Expression expression) {
 
@@ -666,9 +648,8 @@ final class Functions {
 
 	/**
 	 * Creates a function invocation for the {@code collect()} function.
-	 *
-	 * @param variable The named thing to collect
-	 * @return A function call for {@code collect()}
+	 * @param variable the named thing to collect
+	 * @return a function call for {@code collect()}
 	 * @see #collect(Expression)
 	 */
 	static FunctionInvocation collect(Named variable) {
@@ -679,10 +660,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code collect()} function with {@code DISTINCT} added.
-	 *
-	 * @param variable The named thing to collect
-	 * @return A function call for {@code collect()}
+	 * Creates a function invocation for the {@code collect()} function with
+	 * {@code DISTINCT} added.
+	 * @param variable the named thing to collect
+	 * @return a function call for {@code collect()}
 	 * @see #collect(Expression)
 	 */
 	static FunctionInvocation collectDistinct(Named variable) {
@@ -693,11 +674,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code collect()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-collect">collect</a>.
-	 *
-	 * @param expression The things to collect
-	 * @return A function call for {@code collect()}
+	 * Creates a function invocation for the {@code collect()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-collect">collect</a>.
+	 * @param expression the things to collect
+	 * @return a function call for {@code collect()}
 	 */
 	static FunctionInvocation collect(Expression expression) {
 
@@ -705,11 +685,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code collect()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-collect">collect</a>.
-	 *
-	 * @param expression The things to collect
-	 * @return A function call for {@code collect()}
+	 * Creates a function invocation for the {@code collect()} function with
+	 * {@code DISTINCT} added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-collect">collect</a>.
+	 * @param expression the things to collect
+	 * @return a function call for {@code collect()}
 	 */
 	static FunctionInvocation collectDistinct(Expression expression) {
 
@@ -717,11 +697,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code max()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-max">max</a>.
-	 *
-	 * @param expression A list from which the maximum element value is returned
-	 * @return A function call for {@code max()}
+	 * Creates a function invocation for the {@code max()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-max">max</a>.
+	 * @param expression a list from which the maximum element value is returned
+	 * @return a function call for {@code max()}
 	 */
 	static FunctionInvocation max(Expression expression) {
 
@@ -729,11 +708,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code max()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-max">max</a>.
-	 *
-	 * @param expression A list from which the maximum element value is returned
-	 * @return A function call for {@code max()}
+	 * Creates a function invocation for the {@code max()} function with {@code DISTINCT}
+	 * added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-max">max</a>.
+	 * @param expression a list from which the maximum element value is returned
+	 * @return a function call for {@code max()}
 	 */
 	static FunctionInvocation maxDistinct(Expression expression) {
 
@@ -741,11 +720,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code min()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-min">min</a>.
-	 *
-	 * @param expression A list from which the minimum element value is returned
-	 * @return A function call for {@code min()}
+	 * Creates a function invocation for the {@code min()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-min">min</a>.
+	 * @param expression a list from which the minimum element value is returned
+	 * @return a function call for {@code min()}
 	 */
 	static FunctionInvocation min(Expression expression) {
 
@@ -753,11 +731,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code min()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-min">min</a>.
-	 *
-	 * @param expression A list from which the minimum element value is returned
-	 * @return A function call for {@code min()}
+	 * Creates a function invocation for the {@code min()} function with {@code DISTINCT}
+	 * added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-min">min</a>.
+	 * @param expression a list from which the minimum element value is returned
+	 * @return a function call for {@code min()}
 	 */
 	static FunctionInvocation minDistinct(Expression expression) {
 
@@ -765,21 +743,21 @@ final class Functions {
 	}
 
 	private static void assertPercentileArguments(Aggregates builtIn, Expression expression, Number percentile) {
-		Assertions
-			.notNull(expression, "The numeric expression for " + builtIn.getImplementationName() + " is required.");
+		Assertions.notNull(expression,
+				"The numeric expression for " + builtIn.getImplementationName() + " is required.");
 		Assertions.notNull(percentile, "The percentile for " + builtIn.getImplementationName() + " is required.");
 		final double p = percentile.doubleValue();
 		Assertions.isTrue(p >= 0D && p <= 1D,
-			"The percentile for " + builtIn.getImplementationName() + " must be between 0.0 and 1.0.");
+				"The percentile for " + builtIn.getImplementationName() + " must be between 0.0 and 1.0.");
 	}
 
 	/**
-	 * Creates a function invocation for the {@code percentileCont()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentilecont">percentileCont</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @param percentile A numeric value between 0.0 and 1.0
-	 * @return A function call for {@code percentileCont()}
+	 * Creates a function invocation for the {@code percentileCont()} function. See
+	 * <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentilecont">percentileCont</a>.
+	 * @param expression a numeric expression
+	 * @param percentile a numeric value between 0.0 and 1.0
+	 * @return a function call for {@code percentileCont()}
 	 */
 	static FunctionInvocation percentileCont(Expression expression, Number percentile) {
 
@@ -789,12 +767,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code percentileCont()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentilecont">percentileCont</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @param percentile A numeric value between 0.0 and 1.0
-	 * @return A function call for {@code percentileCont()}
+	 * Creates a function invocation for the {@code percentileCont()} function with
+	 * {@code DISTINCT} added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentilecont">percentileCont</a>.
+	 * @param expression a numeric expression
+	 * @param percentile a numeric value between 0.0 and 1.0
+	 * @return a function call for {@code percentileCont()}
 	 */
 	static FunctionInvocation percentileContDistinct(Expression expression, Number percentile) {
 
@@ -804,12 +782,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code percentileDisc()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentiledisc">percentileDisc</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @param percentile A numeric value between 0.0 and 1.0
-	 * @return A function call for {@code percentileDisc()}
+	 * Creates a function invocation for the {@code percentileDisc()} function. See
+	 * <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentiledisc">percentileDisc</a>.
+	 * @param expression a numeric expression
+	 * @param percentile a numeric value between 0.0 and 1.0
+	 * @return a function call for {@code percentileDisc()}
 	 */
 	static FunctionInvocation percentileDisc(Expression expression, Number percentile) {
 
@@ -819,12 +797,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code percentileDisc()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentiledisc">percentileDisc</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @param percentile A numeric value between 0.0 and 1.0
-	 * @return A function call for {@code percentileDisc()}
+	 * Creates a function invocation for the {@code percentileDisc()} function with
+	 * {@code DISTINCT} added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-percentiledisc">percentileDisc</a>.
+	 * @param expression a numeric expression
+	 * @param percentile a numeric value between 0.0 and 1.0
+	 * @return a function call for {@code percentileDisc()}
 	 */
 	static FunctionInvocation percentileDiscDistinct(Expression expression, Number percentile) {
 
@@ -834,11 +812,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code stDev()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdev">stDev</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @return A function call for {@code stDev()}
+	 * Creates a function invocation for the {@code stDev()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdev">stDev</a>.
+	 * @param expression a numeric expression
+	 * @return a function call for {@code stDev()}
 	 */
 	static FunctionInvocation stDev(Expression expression) {
 
@@ -846,11 +823,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code stDev()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdev">stDev</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @return A function call for {@code stDev()}
+	 * Creates a function invocation for the {@code stDev()} function with
+	 * {@code DISTINCT} added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdev">stDev</a>.
+	 * @param expression a numeric expression
+	 * @return a function call for {@code stDev()}
 	 */
 	static FunctionInvocation stDevDistinct(Expression expression) {
 
@@ -858,11 +835,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code stDevP()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdevp">stDevP</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @return A function call for {@code stDevP()}
+	 * Creates a function invocation for the {@code stDevP()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdevp">stDevP</a>.
+	 * @param expression a numeric expression
+	 * @return a function call for {@code stDevP()}
 	 */
 	static FunctionInvocation stDevP(Expression expression) {
 
@@ -870,11 +846,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code stDevP()} function with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdevp">stDevP</a>.
-	 *
-	 * @param expression A numeric expression
-	 * @return A function call for {@code stDevP()}
+	 * Creates a function invocation for the {@code stDevP()} function with
+	 * {@code DISTINCT} added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-stdevp">stDevP</a>.
+	 * @param expression a numeric expression
+	 * @return a function call for {@code stDevP()}
 	 */
 	static FunctionInvocation stDevPDistinct(Expression expression) {
 
@@ -882,11 +858,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code sum()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-sum">sum</a>.
-	 *
-	 * @param expression An expression returning a set of numeric values
-	 * @return A function call for {@code sum()}
+	 * Creates a function invocation for the {@code sum()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-sum">sum</a>.
+	 * @param expression an expression returning a set of numeric values
+	 * @return a function call for {@code sum()}
 	 */
 	static FunctionInvocation sum(Expression expression) {
 
@@ -894,11 +869,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code sum()} function  with {@code DISTINCT} added.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-sum">sum</a>.
-	 *
-	 * @param expression An expression returning a set of numeric values
-	 * @return A function call for {@code sum()}
+	 * Creates a function invocation for the {@code sum()} function with {@code DISTINCT}
+	 * added. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/aggregating/#functions-sum">sum</a>.
+	 * @param expression an expression returning a set of numeric values
+	 * @return a function call for {@code sum()}
 	 */
 	static FunctionInvocation sumDistinct(Expression expression) {
 
@@ -906,9 +881,10 @@ final class Functions {
 	}
 
 	/**
+	 * Returns a function call for {@code range()}.
 	 * @param start the range's start
-	 * @param end   the range's end
-	 * @return A function call for {@code range()}
+	 * @param end the range's end
+	 * @return a function call for {@code range()}
 	 * @see #range(Expression, Expression)
 	 */
 	static FunctionInvocation range(Integer start, Integer end) {
@@ -917,9 +893,10 @@ final class Functions {
 	}
 
 	/**
+	 * Return a function call for {@code range()}.
 	 * @param start the range's start
-	 * @param end   the range's end
-	 * @return A function call for {@code range()}
+	 * @param end the range's end
+	 * @return a function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
 	 */
 	static FunctionInvocation range(Expression start, Expression end) {
@@ -927,13 +904,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code range()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range">range</a>.
-	 *
+	 * Creates a function invocation for the {@code range()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range">range</a>.
 	 * @param start the range's start
-	 * @param end   the range's end
-	 * @param step  the range's step
-	 * @return A function call for {@code range()}
+	 * @param end the range's end
+	 * @param step the range's step
+	 * @return a function call for {@code range()}
 	 * @see #range(Expression, Expression, Expression)
 	 */
 	static FunctionInvocation range(Integer start, Integer end, Integer step) {
@@ -942,13 +918,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code range()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range">range</a>.
-	 *
+	 * Creates a function invocation for the {@code range()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-range">range</a>.
 	 * @param start the range's start
-	 * @param end   the range's end
-	 * @param step  the range's step
-	 * @return A function call for {@code range()}
+	 * @param end the range's end
+	 * @param step the range's step
+	 * @return a function call for {@code range()}
 	 */
 	static FunctionInvocation range(Expression start, Expression end, Expression step) {
 
@@ -957,17 +932,17 @@ final class Functions {
 
 		if (step == null) {
 			return FunctionInvocation.create(Lists.RANGE, start, end);
-		} else {
+		}
+		else {
 			return FunctionInvocation.create(Lists.RANGE, start, end, step);
 		}
 	}
 
 	/**
-	 * Creates a function invocation for the {@code head()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-head">head</a>.
-	 *
-	 * @param expression A list from which the head element is returned
-	 * @return A function call for {@code head()}
+	 * Creates a function invocation for the {@code head()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-head">head</a>.
+	 * @param expression a list from which the head element is returned
+	 * @return a function call for {@code head()}
 	 */
 	static FunctionInvocation head(Expression expression) {
 
@@ -975,11 +950,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for the {@code last()} function.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-last">last</a>.
-	 *
-	 * @param expression A list from which the last element is returned
-	 * @return A function call for {@code last()}
+	 * Creates a function invocation for the {@code last()} function. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-last">last</a>.
+	 * @param expression a list from which the last element is returned
+	 * @return a function call for {@code last()}
 	 */
 	static FunctionInvocation last(Expression expression) {
 
@@ -987,27 +961,28 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code nodes{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-nodes">nodes</a>.
-	 *
-	 * @param path The path for which the number of nodes should be retrieved
-	 * @return A function call for {@code nodes()} on a path.
+	 * Creates a function invocation for {@code nodes{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-nodes">nodes</a>.
+	 * @param path the path for which the number of nodes should be retrieved
+	 * @return a function call for {@code nodes()} on a path.
 	 * @since 1.1
 	 */
 	static FunctionInvocation nodes(NamedPath path) {
 
 		Assertions.notNull(path, "The path for nodes is required.");
 		return FunctionInvocation.create(Lists.NODES,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(
-				Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
+				path.getSymbolicName()
+					.orElseThrow(() -> new IllegalArgumentException(
+							Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
-	 * Creates a function invocation for {@code nodes{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-nodes">nodes</a>.
-	 *
-	 * @param symbolicName The symbolic name of a path for which the number of nodes should be retrieved
-	 * @return A function call for {@code nodes{}} on a path represented by a symbolic name.
+	 * Creates a function invocation for {@code nodes{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-nodes">nodes</a>.
+	 * @param symbolicName the symbolic name of a path for which the number of nodes
+	 * should be retrieved
+	 * @return a function call for {@code nodes{}} on a path represented by a symbolic
+	 * name.
 	 * @since 2020.1.5
 	 */
 	static FunctionInvocation nodes(SymbolicName symbolicName) {
@@ -1017,27 +992,28 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code relationships{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
-	 *
-	 * @param path The path for which the relationships should be retrieved
-	 * @return A function call for {@code relationships()} on a path.
+	 * Creates a function invocation for {@code relationships{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
+	 * @param path the path for which the relationships should be retrieved
+	 * @return a function call for {@code relationships()} on a path.
 	 * @since 2020.0.2
 	 */
 	static FunctionInvocation relationships(NamedPath path) {
 
 		Assertions.notNull(path, "The path for relationships is required.");
 		return FunctionInvocation.create(Lists.RELATIONSHIPS,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(
-				Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
+				path.getSymbolicName()
+					.orElseThrow(() -> new IllegalArgumentException(
+							Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
-	 * Creates a function invocation for {@code relationships{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
-	 *
-	 * @param symbolicName The symbolic name of a path for which the relationships should be retrieved
-	 * @return A function call for {@code relationships()} on a path represented by a symbolic name.
+	 * Creates a function invocation for {@code relationships{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/list/#functions-relationships">relationships</a>.
+	 * @param symbolicName the symbolic name of a path for which the relationships should
+	 * be retrieved
+	 * @return a function call for {@code relationships()} on a path represented by a
+	 * symbolic name.
 	 * @since 2020.1.5
 	 */
 	static FunctionInvocation relationships(SymbolicName symbolicName) {
@@ -1047,43 +1023,38 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code startNode{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-startnode">startNode</a>.
-	 *
-	 * @param relationship The relationship for which the start node be retrieved
-	 * @return A function call for {@code startNode()} on a path.
+	 * Creates a function invocation for {@code startNode{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-startnode">startNode</a>.
+	 * @param relationship the relationship for which the start node be retrieved
+	 * @return a function call for {@code startNode()} on a path.
 	 * @since 2020.0.2
 	 */
 	static FunctionInvocation startNode(Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship for endNode is required.");
-		return FunctionInvocation.create(Scalars.START_NODE,
-			relationship.getSymbolicName()
-				.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+		return FunctionInvocation.create(Scalars.START_NODE, relationship.getSymbolicName()
+			.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
 	}
 
 	/**
-	 * Creates a function invocation for {@code endNode{}}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-endnode">endNode</a>.
-	 *
-	 * @param relationship The relationship for which the end node be retrieved
-	 * @return A function call for {@code endNode()} on a path.
+	 * Creates a function invocation for {@code endNode{}}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-endnode">endNode</a>.
+	 * @param relationship the relationship for which the end node be retrieved
+	 * @return a function call for {@code endNode()} on a path.
 	 * @since 2020.0.2
 	 */
 	static FunctionInvocation endNode(Relationship relationship) {
 
 		Assertions.notNull(relationship, "The relationship for endNode is required.");
-		return FunctionInvocation.create(Scalars.END_NODE,
-			relationship.getSymbolicName()
-				.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
+		return FunctionInvocation.create(Scalars.END_NODE, relationship.getSymbolicName()
+			.orElseThrow(() -> new IllegalArgumentException("The relationship needs to be named!")));
 	}
 
 	/**
-	 * Creates a function invocation for {@code date()}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * Creates a function invocation for {@code date()}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
 	 * This is the most simple form.
-	 *
-	 * @return A function call for {@code date()}.
+	 * @return a function call for {@code date()}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation date() {
@@ -1092,13 +1063,12 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
-	 *
-	 * @param year  The year
-	 * @param month The month
-	 * @param day   The day
-	 * @return A function call for {@code date({})}.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * @param year the year
+	 * @param month the month
+	 * @param day the day
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation calendarDate(Integer year, Integer month, Integer day) {
@@ -1106,24 +1076,23 @@ final class Functions {
 		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
 		Assertions.notNull(month, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_MONTH_REQUIRED));
 		Assertions.notNull(day, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_DAY_REQUIRED));
-		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher
-			.mapOf("year", Cypher.literalOf(year), "month", Cypher.literalOf(month), "day", Cypher.literalOf(day)));
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATE, Cypher.mapOf("year", Cypher.literalOf(year),
+				"month", Cypher.literalOf(month), "day", Cypher.literalOf(day)));
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
-	 *
-	 * @param year      The year
-	 * @param week      The optional week
-	 * @param dayOfWeek The optional day of the week
-	 * @return A function call for {@code date({})}.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * @param year the year
+	 * @param week the optional week
+	 * @param dayOfWeek the optional day of the week
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation weekDate(Integer year, Integer week, Integer dayOfWeek) {
 
 		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
-		Object[] parameters = new Object[2 + (week == null ? 0 : 2) + (dayOfWeek == null ? 0 : 2)];
+		Object[] parameters = new Object[2 + ((week != null) ? 2 : 0) + ((dayOfWeek != null) ? 2 : 0)];
 		int i = 0;
 		parameters[i++] = "year";
 		parameters[i++] = Cypher.literalOf(year);
@@ -1142,19 +1111,18 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
-	 *
-	 * @param year         The year
-	 * @param quarter      The optional week
-	 * @param dayOfQuarter The optional day of the week
-	 * @return A function call for {@code date({})}.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * @param year the year
+	 * @param quarter the optional week
+	 * @param dayOfQuarter the optional day of the week
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation quarterDate(Integer year, Integer quarter, Integer dayOfQuarter) {
 
 		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
-		Object[] parameters = new Object[2 + (quarter == null ? 0 : 2) + (dayOfQuarter == null ? 0 : 2)];
+		Object[] parameters = new Object[2 + ((quarter != null) ? 2 : 0) + ((dayOfQuarter != null) ? 2 : 0)];
 		int i = 0;
 		parameters[i++] = "year";
 		parameters[i++] = Cypher.literalOf(year);
@@ -1170,18 +1138,17 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
-	 *
-	 * @param year       The year
-	 * @param ordinalDay The ordinal day of the year.
-	 * @return A function call for {@code date({})}.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * @param year the year
+	 * @param ordinalDay the ordinal day of the year.
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation ordinalDate(Integer year, Integer ordinalDay) {
 
 		Assertions.notNull(year, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_YEAR_REQUIRED));
-		Object[] parameters = new Object[2 + (ordinalDay == null ? 0 : 2)];
+		Object[] parameters = new Object[2 + ((ordinalDay != null) ? 2 : 0)];
 		int i = 0;
 		parameters[i++] = "year";
 		parameters[i++] = Cypher.literalOf(year);
@@ -1193,12 +1160,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
 	 * This is the most generic form.
-	 *
-	 * @param components The map to pass to {@code date({})}
-	 * @return A function call for {@code date({})}.
+	 * @param components the map to pass to {@code date({})}
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation date(MapExpression components) {
@@ -1208,12 +1174,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
 	 * This creates a date from a string.
-	 *
-	 * @param temporalValue A string representing a temporal value.
-	 * @return A function call for {@code date({})}.
+	 * @param temporalValue a string representing a temporal value.
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation date(String temporalValue) {
@@ -1223,12 +1188,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code date({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
+	 * Creates a function invocation for {@code date({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">date</a>.
 	 * This creates a date from a string.
-	 *
-	 * @param temporalValue An expression representing a temporal value.
-	 * @return A function call for {@code date({})}.
+	 * @param temporalValue an expression representing a temporal value.
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation date(Expression temporalValue) {
@@ -1238,10 +1202,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code datetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
-	 *
-	 * @return A function call for {@code datetime({})}.
+	 * Creates a function invocation for {@code datetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
+	 * @return a function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation datetime() {
@@ -1250,27 +1213,24 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code datetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
-	 *
-	 * @param timeZone The timezone to use when creating the temporal instance
-	 * @return A function call for {@code datetime({})}.
+	 * Creates a function invocation for {@code datetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
+	 * @param timeZone the timezone to use when creating the temporal instance
+	 * @return a function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation datetime(TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
-		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.DATETIME, timezoneMapLiteralOf(timeZone));
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.DATETIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	/**
-	 * Creates a function invocation for {@code datetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
+	 * Creates a function invocation for {@code datetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/datetime/">datetime</a>.
 	 * This is the most generic form.
-	 *
-	 * @param components The map to pass to {@code datetime({})}
-	 * @return A function call for {@code datetime({})}.
+	 * @param components the map to pass to {@code datetime({})}
+	 * @return a function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation datetime(MapExpression components) {
@@ -1280,12 +1240,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code datetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">datetime</a>.
+	 * Creates a function invocation for {@code datetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">datetime</a>.
 	 * This creates a datetime from a string.
-	 *
-	 * @param temporalValue A string representing a temporal value.
-	 * @return A function call for {@code datetime({})}.
+	 * @param temporalValue a string representing a temporal value.
+	 * @return a function call for {@code datetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation datetime(String temporalValue) {
@@ -1295,12 +1254,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code datetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">datetime</a>.
+	 * Creates a function invocation for {@code datetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/date/">datetime</a>.
 	 * This creates a datetime from a string.
-	 *
-	 * @param temporalValue An expression representing a temporal value.
-	 * @return A function call for {@code date({})}.
+	 * @param temporalValue an expression representing a temporal value.
+	 * @return a function call for {@code date({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation datetime(Expression temporalValue) {
@@ -1310,10 +1268,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localdatetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
-	 *
-	 * @return A function call for {@code localdatetime({})}.
+	 * Creates a function invocation for {@code localdatetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * @return a function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localdatetime() {
@@ -1322,27 +1279,24 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localdatetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
-	 *
-	 * @param timeZone The timezone to use when creating the temporal instance
-	 * @return A function call for {@code localdatetime({})}.
+	 * Creates a function invocation for {@code localdatetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * @param timeZone the timezone to use when creating the temporal instance
+	 * @return a function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localdatetime(TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
-		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.LOCALDATETIME, timezoneMapLiteralOf(timeZone));
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALDATETIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	/**
-	 * Creates a function invocation for {@code localdatetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * Creates a function invocation for {@code localdatetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
 	 * This is the most generic form.
-	 *
-	 * @param components The map to pass to {@code localdatetime({})}
-	 * @return A function call for {@code localdatetime({})}.
+	 * @param components the map to pass to {@code localdatetime({})}
+	 * @return a function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localdatetime(MapExpression components) {
@@ -1352,12 +1306,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localdatetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * Creates a function invocation for {@code localdatetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
 	 * This creates a localdatetime from a string.
-	 *
-	 * @param temporalValue A string representing a temporal value.
-	 * @return A function call for {@code localdatetime({})}.
+	 * @param temporalValue a string representing a temporal value.
+	 * @return a function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localdatetime(String temporalValue) {
@@ -1367,12 +1320,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localdatetime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
+	 * Creates a function invocation for {@code localdatetime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localdatetime</a>.
 	 * This creates a localdatetime from a string.
-	 *
-	 * @param temporalValue An expression representing a temporal value.
-	 * @return A function call for {@code localdatetime({})}.
+	 * @param temporalValue an expression representing a temporal value.
+	 * @return a function call for {@code localdatetime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localdatetime(Expression temporalValue) {
@@ -1382,10 +1334,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localtime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
-	 *
-	 * @return A function call for {@code localtime({})}.
+	 * Creates a function invocation for {@code localtime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
+	 * @return a function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localtime() {
@@ -1394,27 +1345,24 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localtime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
-	 *
-	 * @param timeZone The timezone to use when creating the temporal instance
-	 * @return A function call for {@code localtime({})}.
+	 * Creates a function invocation for {@code localtime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
+	 * @param timeZone the timezone to use when creating the temporal instance
+	 * @return a function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localtime(TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
-		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.LOCALTIME, timezoneMapLiteralOf(timeZone));
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.LOCALTIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	/**
-	 * Creates a function invocation for {@code localtime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
+	 * Creates a function invocation for {@code localtime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localdatetime/">localtime</a>.
 	 * This is the most generic form.
-	 *
-	 * @param components The map to pass to {@code localtime({})}
-	 * @return A function call for {@code localtime({})}.
+	 * @param components the map to pass to {@code localtime({})}
+	 * @return a function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localtime(MapExpression components) {
@@ -1424,12 +1372,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localtime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
+	 * Creates a function invocation for {@code localtime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
 	 * This creates a localtime from a string.
-	 *
-	 * @param temporalValue A string representing a temporal value.
-	 * @return A function call for {@code localtime({})}.
+	 * @param temporalValue a string representing a temporal value.
+	 * @return a function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localtime(String temporalValue) {
@@ -1439,12 +1386,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code localtime({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
+	 * Creates a function invocation for {@code localtime({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/localtime/">localtime</a>.
 	 * This creates a localtime from a string.
-	 *
-	 * @param temporalValue An expression representing a temporal value.
-	 * @return A function call for {@code localtime({})}.
+	 * @param temporalValue an expression representing a temporal value.
+	 * @return a function call for {@code localtime({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation localtime(Expression temporalValue) {
@@ -1454,10 +1400,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code time({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
-	 *
-	 * @return A function call for {@code time({})}.
+	 * Creates a function invocation for {@code time({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * @return a function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation time() {
@@ -1466,18 +1411,16 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code time({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
-	 *
-	 * @param timeZone The timezone to use when creating the temporal instance
-	 * @return A function call for {@code time({})}.
+	 * Creates a function invocation for {@code time({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * @param timeZone the timezone to use when creating the temporal instance
+	 * @return a function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation time(TimeZone timeZone) {
 
 		Assertions.notNull(timeZone, Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_TZ_REQUIRED));
-		return FunctionInvocation
-			.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
+		return FunctionInvocation.create(BuiltInFunctions.Temporals.TIME, timezoneMapLiteralOf(timeZone));
 	}
 
 	private static Expression timezoneMapLiteralOf(TimeZone timeZone) {
@@ -1485,12 +1428,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code time({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * Creates a function invocation for {@code time({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
 	 * This is the most generic form.
-	 *
-	 * @param components The map to pass to {@code time({})}
-	 * @return A function call for {@code time({})}.
+	 * @param components the map to pass to {@code time({})}
+	 * @return a function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation time(MapExpression components) {
@@ -1500,12 +1442,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code time({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * Creates a function invocation for {@code time({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
 	 * This creates a time from a string.
-	 *
-	 * @param temporalValue A string representing a temporal value.
-	 * @return A function call for {@code time({})}.
+	 * @param temporalValue a string representing a temporal value.
+	 * @return a function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation time(String temporalValue) {
@@ -1515,12 +1456,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code time({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
+	 * Creates a function invocation for {@code time({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/time/">time</a>.
 	 * This creates a time from a string.
-	 *
-	 * @param temporalValue An expression representing a temporal value.
-	 * @return A function call for {@code time({})}.
+	 * @param temporalValue an expression representing a temporal value.
+	 * @return a function call for {@code time({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation time(Expression temporalValue) {
@@ -1530,12 +1470,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code duration({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
+	 * Creates a function invocation for {@code duration({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
 	 * This is the most generic form.
-	 *
-	 * @param components The map to pass to {@code duration({})}
-	 * @return A function call for {@code duration({})}.
+	 * @param components the map to pass to {@code duration({})}
+	 * @return a function call for {@code duration({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation duration(MapExpression components) {
@@ -1545,12 +1484,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code duration({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
+	 * Creates a function invocation for {@code duration({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
 	 * This creates a duration from a string.
-	 *
-	 * @param temporalAmount A string representing a temporal amount.
-	 * @return A function call for {@code duration({})}.
+	 * @param temporalAmount a string representing a temporal amount.
+	 * @return a function call for {@code duration({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation duration(String temporalAmount) {
@@ -1560,12 +1498,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code duration({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
+	 * Creates a function invocation for {@code duration({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/temporal/duration/">duration</a>.
 	 * This creates a duration from a string.
-	 *
-	 * @param temporalAmount An expression representing a temporal amount.
-	 * @return A function call for {@code duration({})}.
+	 * @param temporalAmount an expression representing a temporal amount.
+	 * @return a function call for {@code duration({})}.
 	 * @since 2020.1.0
 	 */
 	static FunctionInvocation duration(Expression temporalAmount) {
@@ -1575,22 +1512,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code shortestPath({})}.
-	 *
-	 * @param relationship The relationship to be passed to {@code shortestPath}.
-	 * @return A function call for {@code shortestPath({})}.
-	 * @since 2020.0.0
-	 */
-	static FunctionInvocation shortestPath(Relationship relationship) {
-
-		return FunctionInvocation.create(Scalars.SHORTEST_PATH, relationship);
-	}
-
-	/**
 	 * Starts building a function invocation for {@code reduce({})}.
-	 *
-	 * @param variable The closure will have a variable introduced in its context. We decide here which variable to use.
-	 * @return An ongoing definition for a function call to {@code reduce({})}.
+	 * @param variable the closure will have a variable introduced in its context. We
+	 * decide here which variable to use.
+	 * @return an ongoing definition for a function call to {@code reduce({})}.
 	 * @since 2020.1.5
 	 */
 	static Reduction.OngoingDefinitionWithVariable reduce(SymbolicName variable) {
@@ -1599,11 +1524,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code abs({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-abs">abs</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code abs({})}.
+	 * Creates a function invocation for {@code abs({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-abs">abs</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code abs({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation abs(Expression expression) {
@@ -1613,11 +1537,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code ceil({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-ceil">ceil</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code ceil({})}.
+	 * Creates a function invocation for {@code ceil({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-ceil">ceil</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code ceil({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation ceil(Expression expression) {
@@ -1627,11 +1550,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code floor({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-floor">floor</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code floor({})}.
+	 * Creates a function invocation for {@code floor({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-floor">floor</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code floor({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation floor(Expression expression) {
@@ -1641,10 +1563,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code rand({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-rand">rand</a>.
-	 *
-	 * @return A function call for {@code rand({})}.
+	 * Creates a function invocation for {@code rand({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-rand">rand</a>.
+	 * @return a function call for {@code rand({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation rand() {
@@ -1653,36 +1574,37 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code round({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-round">round</a>.
-	 *
-	 * @param value      The value to round
-	 * @param expression Additional parameters, length must be 0, 1 or 2:
-	 *                   First entry is the precision, second is the rounding mode
-	 * @return A function call for {@code round({})}.
+	 * Creates a function invocation for {@code round({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-round">round</a>.
+	 * @param value the value to round
+	 * @param expression additional parameters, length must be 0, 1 or 2: First entry is
+	 * the precision, second is the rounding mode
+	 * @return a function call for {@code round({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation round(Expression value, Expression... expression) {
 
 		if (expression == null || expression.length == 0) {
 			return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ROUND, value);
-		} else if (expression.length == 1) {
+		}
+		else if (expression.length == 1) {
 			return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ROUND, value, expression[0]);
-		} else if (expression.length == 2) {
-			return FunctionInvocation
-				.create(BuiltInFunctions.MathematicalFunctions.ROUND, value, expression[0], expression[1]);
-		} else {
+		}
+		else if (expression.length == 2) {
+			return FunctionInvocation.create(BuiltInFunctions.MathematicalFunctions.ROUND, value, expression[0],
+					expression[1]);
+		}
+		else {
 			throw new IllegalArgumentException(
-				"round() must be called with 1, 2 or 3 arguments (value, value + precision or value + precision + rounding mode.");
+					"round() must be called with 1, 2 or 3 arguments (value, value + precision or value + precision + rounding mode.");
 		}
 	}
 
 	/**
-	 * Creates a function invocation for {@code sign({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sign">sign</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code sign({})}.
+	 * Creates a function invocation for {@code sign({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sign">sign</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code sign({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation sign(Expression expression) {
@@ -1692,10 +1614,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code e({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-e">e</a>.
-	 *
-	 * @return A function call for {@code e({})}.
+	 * Creates a function invocation for {@code e({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-e">e</a>.
+	 * @return a function call for {@code e({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation e() {
@@ -1704,11 +1625,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code exp({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-exp">exp</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code exp({})}.
+	 * Creates a function invocation for {@code exp({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-exp">exp</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code exp({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation exp(Expression expression) {
@@ -1718,11 +1638,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code log({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-log">log</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code log({})}.
+	 * Creates a function invocation for {@code log({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-log">log</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code log({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation log(Expression expression) {
@@ -1732,11 +1651,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code log10({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-log10">log10</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code log10({})}.
+	 * Creates a function invocation for {@code log10({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-log10">log10</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code log10({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation log10(Expression expression) {
@@ -1746,11 +1664,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code sqrt({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sqrt">sqrt</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code sqrt({})}.
+	 * Creates a function invocation for {@code sqrt({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sqrt">sqrt</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code sqrt({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation sqrt(Expression expression) {
@@ -1760,11 +1677,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code acos({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-acos">acos</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code acos({})}.
+	 * Creates a function invocation for {@code acos({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-acos">acos</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code acos({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation acos(Expression expression) {
@@ -1774,11 +1690,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code asin({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-asin">asin</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code asin({})}.
+	 * Creates a function invocation for {@code asin({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-asin">asin</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code asin({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation asin(Expression expression) {
@@ -1788,11 +1703,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code atan({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan">atan</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code atan({})}.
+	 * Creates a function invocation for {@code atan({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan">atan</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code atan({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation atan(Expression expression) {
@@ -1802,12 +1716,11 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code atan2({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan2">atan2</a>.
-	 *
+	 * Creates a function invocation for {@code atan2({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-atan2">atan2</a>.
 	 * @param y the y value of a point
 	 * @param x the x value of a point
-	 * @return A function call for {@code atan2({})}.
+	 * @return a function call for {@code atan2({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation atan2(Expression y, Expression x) {
@@ -1818,11 +1731,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code cos({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-cos">cos</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code cos({})}.
+	 * Creates a function invocation for {@code cos({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-cos">cos</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code cos({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation cos(Expression expression) {
@@ -1832,11 +1744,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code cot({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-cot">cot</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code cot({})}.
+	 * Creates a function invocation for {@code cot({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-cot">cot</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code cot({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation cot(Expression expression) {
@@ -1846,11 +1757,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code degrees({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-degrees">degrees</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code degrees({})}.
+	 * Creates a function invocation for {@code degrees({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-degrees">degrees</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code degrees({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation degrees(Expression expression) {
@@ -1860,11 +1770,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code haversin({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-haversin">haversin</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code haversin({})}.
+	 * Creates a function invocation for {@code haversin({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-haversin">haversin</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code haversin({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation haversin(Expression expression) {
@@ -1874,10 +1783,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code pi({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-pi">pi</a>.
-	 *
-	 * @return A function call for {@code pi({})}.
+	 * Creates a function invocation for {@code pi({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-pi">pi</a>.
+	 * @return a function call for {@code pi({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation pi() {
@@ -1886,11 +1794,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code radians({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-radians">radians</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code radians({})}.
+	 * Creates a function invocation for {@code radians({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-radians">radians</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code radians({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation radians(Expression expression) {
@@ -1900,11 +1807,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code sin({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sin">sin</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code sin({})}.
+	 * Creates a function invocation for {@code sin({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-sin">sin</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code sin({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation sin(Expression expression) {
@@ -1914,11 +1820,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code tan({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-tan">tan</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code tan({})}.
+	 * Creates a function invocation for {@code tan({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/mathematical-numeric/#functions-tan">tan</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code tan({})}.
 	 * @since 2021.0.0
 	 */
 	static FunctionInvocation tan(Expression expression) {
@@ -1928,11 +1833,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code toInteger({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tointeger">toInteger</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code toInteger({})}.
+	 * Creates a function invocation for {@code toInteger({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tointeger">toInteger</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code toInteger({})}.
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation toInteger(Expression expression) {
@@ -1942,11 +1846,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code toString({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-tostring">toString</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code toString({})}.
+	 * Creates a function invocation for {@code toString({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-tostring">toString</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code toString({})}.
 	 * @since 2022.3.0
 	 */
 	static FunctionInvocation toString(Expression expression) {
@@ -1956,11 +1859,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code toStringOrNull({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toStringOrNull">toStringOrNull</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code toStringOrNull({})}.
+	 * Creates a function invocation for {@code toStringOrNull({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/string/#functions-toStringOrNull">toStringOrNull</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code toStringOrNull({})}.
 	 * @since 2023.0.2
 	 */
 	static FunctionInvocation toStringOrNull(Expression expression) {
@@ -1970,11 +1872,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code toFloat({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tofloat">toFloat</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code toFloat({})}.
+	 * Creates a function invocation for {@code toFloat({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-tofloat">toFloat</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code toFloat({})}.
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation toFloat(Expression expression) {
@@ -1984,11 +1885,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code toBoolean({})}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-toboolean">toBoolean</a>.
-	 *
-	 * @param expression The value to pass to the function.
-	 * @return A function call for {@code toBoolean({})}.
+	 * Creates a function invocation for {@code toBoolean({})}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-toboolean">toBoolean</a>.
+	 * @param expression the value to pass to the function.
+	 * @return a function call for {@code toBoolean({})}.
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation toBoolean(Expression expression) {
@@ -1998,9 +1898,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code linenumber({})}. Only applicable inside an {@code LOAD CSV} clause.
-	 *
-	 * @return A function call for {@code linenumber({})}.
+	 * Creates a function invocation for {@code linenumber({})}. Only applicable inside an
+	 * {@code LOAD CSV} clause.
+	 * @return a function call for {@code linenumber({})}.
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation linenumber() {
@@ -2009,9 +1909,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code file({})}. Only applicable inside an {@code LOAD CSV} clause.
-	 *
-	 * @return A function call for {@code file({})}.
+	 * Creates a function invocation for {@code file({})}. Only applicable inside an
+	 * {@code LOAD CSV} clause.
+	 * @return a function call for {@code file({})}.
 	 * @since 2021.2.1
 	 */
 	static FunctionInvocation file() {
@@ -2020,9 +1920,9 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code randomUUID({})}. Only applicable inside an {@code LOAD CSV} clause.
-	 *
-	 * @return A function call for {@code randomUUID({})}.
+	 * Creates a function invocation for {@code randomUUID({})}. Only applicable inside an
+	 * {@code LOAD CSV} clause.
+	 * @return a function call for {@code randomUUID({})}.
 	 * @since 2022.2.1
 	 */
 	static FunctionInvocation randomUUID() {
@@ -2030,26 +1930,25 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code length()}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-length">length</a>.
-	 *
-	 * @param path The path for which the length should be retrieved
-	 * @return A function call for {@code length()} on a path.
+	 * Creates a function invocation for {@code length()}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/scalar/#functions-length">length</a>.
+	 * @param path the path for which the length should be retrieved
+	 * @return a function call for {@code length()} on a path.
 	 * @since 2023.0.1
 	 */
 	static FunctionInvocation length(NamedPath path) {
 
 		Assertions.notNull(path, "The path for length is required.");
 		return FunctionInvocation.create(Scalars.LENGTH,
-			path.getSymbolicName().orElseThrow(() -> new IllegalArgumentException(
-				Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
+				path.getSymbolicName()
+					.orElseThrow(() -> new IllegalArgumentException(
+							Cypher.MESSAGES.getString(MessageKeys.ASSERTIONS_NAMED_PATH_REQUIRED))));
 	}
 
 	/**
-	 * Creates a function invocation for {@code graph.names()}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-names">graph.names</a>.
-	 *
-	 * @return A function call for {@code graph.names()}.
+	 * Creates a function invocation for {@code graph.names()}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-names">graph.names</a>.
+	 * @return a function call for {@code graph.names()}.
 	 * @since 2023.4.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0")
@@ -2059,11 +1958,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code graph.propertiesByName()}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-propertiesByName">graph.propertiesByName</a>.
-	 *
-	 * @param name The name of the graph
-	 * @return A function call for {@code graph.propertiesByName()}.
+	 * Creates a function invocation for {@code graph.propertiesByName()}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-propertiesByName">graph.propertiesByName</a>.
+	 * @param name the name of the graph
+	 * @return a function call for {@code graph.propertiesByName()}.
 	 * @since 2023.4.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0")
@@ -2073,11 +1971,10 @@ final class Functions {
 	}
 
 	/**
-	 * Creates a function invocation for {@code graph.byName()}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-byname">graph.byName</a>.
-	 *
-	 * @param name The name of the graph
-	 * @return A function call for {@code graph.byName()}.
+	 * Creates a function invocation for {@code graph.byName()}. See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/current/functions/graph/#functions-graph-byname">graph.byName</a>.
+	 * @param name the name of the graph
+	 * @return a function call for {@code graph.byName()}.
 	 * @since 2023.4.0
 	 */
 	@Neo4jVersion(minimum = "5.0.0")
@@ -2086,6 +1983,4 @@ final class Functions {
 		return FunctionInvocation.create(BuiltInFunctions.Graph.BY_NAME, name);
 	}
 
-	private Functions() {
-	}
 }

@@ -18,14 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import java.util.Arrays;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
-import java.util.Arrays;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
  * @author Michael J. Simons
@@ -51,7 +51,7 @@ class ProcedureCallsIT {
 
 		String expected = "CALL db.labels()";
 
-		String[] prodecureCallPart = {"db", "labels"};
+		String[] prodecureCallPart = { "db", "labels" };
 		Statement call = Cypher.call(Arrays.asList(prodecureCallPart)).build();
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
 
@@ -62,20 +62,17 @@ class ProcedureCallsIT {
 	void shouldGenerateStatementsOfCorrectType() {
 
 		Statement call = Cypher.call("db", "labels").build();
-		assertThat(call)
-			.isInstanceOf(ProcedureCall.class)
+		assertThat(call).isInstanceOf(ProcedureCall.class)
 			.isInstanceOf(Statement.class)
 			.isNotInstanceOf(ResultStatement.class);
 
 		call = Cypher.call("db", "labels").yield("label").build();
-		assertThat(call)
-			.isInstanceOf(ProcedureCall.class)
+		assertThat(call).isInstanceOf(ProcedureCall.class)
 			.isInstanceOf(Statement.class)
 			.isInstanceOf(ResultStatement.class);
 
 		call = Cypher.call("db", "labels").yield("label").returning("label").build();
-		assertThat(call)
-			.isInstanceOf(Statement.SingleQuery.class)
+		assertThat(call).isInstanceOf(Statement.SingleQuery.class)
 			.isInstanceOf(Statement.class)
 			.isInstanceOf(ResultStatement.class);
 	}
@@ -83,8 +80,7 @@ class ProcedureCallsIT {
 	@Test
 	void withArgs() {
 
-		Statement call = Cypher
-			.call("dbms.security.createUser")
+		Statement call = Cypher.call("dbms.security.createUser")
 			.withArgs(Cypher.literalOf("johnsmith"), Cypher.literalOf("h6u4%kr"), BooleanLiteral.FALSE)
 			.build();
 		assertThat(cypherRenderer.render(call))
@@ -99,31 +95,24 @@ class ProcedureCallsIT {
 		Statement call = Cypher.call("dbms.procedures").yield("name", "signature").build();
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
 
-		call = Cypher.call("dbms.procedures").yield(Cypher.name("name"), Cypher.name("signature"))
-			.build();
+		call = Cypher.call("dbms.procedures").yield(Cypher.name("name"), Cypher.name("signature")).build();
 		assertThat(cypherRenderer.render(call)).isEqualTo(expected);
 
-		assertThat(call.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(Cypher.name("name"), Cypher.name("signature"));
+		assertThat(call.getCatalog().getIdentifiableExpressions()).containsExactlyInAnyOrder(Cypher.name("name"),
+				Cypher.name("signature"));
 	}
 
 	@Test
 	void yieldItemsRenamed() {
 
-		Statement call = Cypher
-			.call("db.propertyKeys")
-			.yield(Cypher.name("propertyKey").as("prop"))
-			.build();
+		Statement call = Cypher.call("db.propertyKeys").yield(Cypher.name("propertyKey").as("prop")).build();
 		assertThat(cypherRenderer.render(call)).isEqualTo("CALL db.propertyKeys() YIELD propertyKey AS prop");
 	}
 
 	@Test
 	void withArgsAndYield() {
 
-		Statement call = Cypher
-			.call("dbms.listConfig")
-			.withArgs(Cypher.literalOf("browser"))
-			.yield("name")
-			.build();
+		Statement call = Cypher.call("dbms.listConfig").withArgs(Cypher.literalOf("browser")).yield("name").build();
 		assertThat(cypherRenderer.render(call)).isEqualTo("CALL dbms.listConfig('browser') YIELD name");
 	}
 
@@ -131,8 +120,7 @@ class ProcedureCallsIT {
 	void where() {
 
 		SymbolicName name = Cypher.name("name");
-		Statement call = Cypher
-			.call("dbms.listConfig")
+		Statement call = Cypher.call("dbms.listConfig")
 			.withArgs(Cypher.literalOf("browser"))
 			.yield(name)
 			.where(name.matches("browser\\.allow.*"))
@@ -146,11 +134,7 @@ class ProcedureCallsIT {
 	void returning() {
 
 		SymbolicName label = Cypher.name("label");
-		Statement call = Cypher
-			.call("db.labels")
-			.yield(label)
-			.returning(Cypher.count(label).as("numLabels"))
-			.build();
+		Statement call = Cypher.call("db.labels").yield(label).returning(Cypher.count(label).as("numLabels")).build();
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL db.labels() YIELD label RETURN count(label) AS numLabels");
 	}
@@ -159,8 +143,7 @@ class ProcedureCallsIT {
 	void withThanReturning() {
 
 		SymbolicName label = Cypher.name("label");
-		Statement call = Cypher
-			.call("db.labels")
+		Statement call = Cypher.call("db.labels")
 			.yield(label)
 			.with(label)
 			.returning(Cypher.count(label).as("numLabels"))
@@ -168,20 +151,17 @@ class ProcedureCallsIT {
 		assertThat(cypherRenderer.render(call))
 			.isEqualTo("CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels");
 
-		assertThat(call.getCatalog().getIdentifiableExpressions())
-			.hasSize(1)
-			.first().satisfies(i -> {
-				assertThat(i).isInstanceOf(AliasedExpression.class);
-				assertThat(((AliasedExpression) i).getAlias()).isEqualTo("numLabels");
-			});
+		assertThat(call.getCatalog().getIdentifiableExpressions()).hasSize(1).first().satisfies(i -> {
+			assertThat(i).isInstanceOf(AliasedExpression.class);
+			assertThat(((AliasedExpression) i).getAlias()).isEqualTo("numLabels");
+		});
 	}
 
 	@Test
 	void withThanReturningInQuery() {
 
 		SymbolicName label = Cypher.name("label");
-		Statement call = Cypher
-			.match(Cypher.anyNode().named("n"))
+		Statement call = Cypher.match(Cypher.anyNode().named("n"))
 			.with("n")
 			.call("db.labels")
 			.yield(label)
@@ -196,28 +176,29 @@ class ProcedureCallsIT {
 	void shouldBeUsableAsExpression() {
 
 		Node p = Cypher.node("Person").named("p");
-		Statement stmt = Cypher.merge(p.withProperties(Cypher.mapOf("id", Cypher.call("apoc.create.uuid").asFunction())))
-			.set(
-				p.property("firstName").to(Cypher.literalOf("Michael")),
-				p.property("surname").to(Cypher.literalOf("Hunger"))
-			)
+		Statement stmt = Cypher
+			.merge(p.withProperties(Cypher.mapOf("id", Cypher.call("apoc.create.uuid").asFunction())))
+			.set(p.property("firstName").to(Cypher.literalOf("Michael")),
+					p.property("surname").to(Cypher.literalOf("Hunger")))
 			.returning(p)
 			.build();
-		assertThat(cypherRenderer.render(stmt))
-			.isEqualTo("MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.firstName = 'Michael', p.surname = 'Hunger' RETURN p");
+		assertThat(cypherRenderer.render(stmt)).isEqualTo(
+				"MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.firstName = 'Michael', p.surname = 'Hunger' RETURN p");
 	}
 
 	@Test
 	void dynamicDistinct() {
 
-		assertThat(cypherRenderer.render(Cypher.returning(Cypher.call("aVg").withArgs(Cypher.literalOf(1)).asFunction(true)).build()))
+		assertThat(cypherRenderer
+			.render(Cypher.returning(Cypher.call("aVg").withArgs(Cypher.literalOf(1)).asFunction(true)).build()))
 			.isEqualTo("RETURN aVg(DISTINCT 1)");
 	}
 
 	@Test
 	void dynamicDistinctUnsupported() {
 
-		assertThatIllegalArgumentException().isThrownBy(() -> Cypher.call("foobar").withArgs(Cypher.literalOf(1)).asFunction(true))
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> Cypher.call("foobar").withArgs(Cypher.literalOf(1)).asFunction(true))
 			.withMessage("The distinct operator can only be applied within aggregate functions.");
 	}
 
@@ -225,14 +206,19 @@ class ProcedureCallsIT {
 	void shouldBeUsableWithParametersAsExpression() {
 
 		Node p = Cypher.node("Person").named("p");
-		Statement stmt = Cypher.merge(p.withProperties(Cypher.mapOf("id", Cypher.call("apoc.create.uuid").asFunction())))
+		Statement stmt = Cypher
+			.merge(p.withProperties(Cypher.mapOf("id", Cypher.call("apoc.create.uuid").asFunction())))
 			.set(p.property("surname").to(Cypher.literalOf("Simons")))
 			.with(p)
-			.call("apoc.create.setProperty").withArgs(p.getRequiredSymbolicName(), Cypher.call("apoc.text.camelCase").withArgs(Cypher.literalOf("first name")).asFunction(), Cypher.literalOf("Michael")).yield("node")
+			.call("apoc.create.setProperty")
+			.withArgs(p.getRequiredSymbolicName(),
+					Cypher.call("apoc.text.camelCase").withArgs(Cypher.literalOf("first name")).asFunction(),
+					Cypher.literalOf("Michael"))
+			.yield("node")
 			.returning("node")
 			.build();
-		assertThat(cypherRenderer.render(stmt))
-			.isEqualTo("MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.surname = 'Simons' WITH p CALL apoc.create.setProperty(p, apoc.text.camelCase('first name'), 'Michael') YIELD node RETURN node");
+		assertThat(cypherRenderer.render(stmt)).isEqualTo(
+				"MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.surname = 'Simons' WITH p CALL apoc.create.setProperty(p, apoc.text.camelCase('first name'), 'Michael') YIELD node RETURN node");
 	}
 
 	@Nested
@@ -242,8 +228,7 @@ class ProcedureCallsIT {
 		void unrelated() {
 
 			SymbolicName name = Cypher.name("name");
-			Statement call = Cypher
-				.call("dbms.listConfig")
+			Statement call = Cypher.call("dbms.listConfig")
 				.withArgs(Cypher.literalOf("browser"))
 				.yield(name)
 				.where(name.matches("browser\\.allow.*"))
@@ -251,8 +236,7 @@ class ProcedureCallsIT {
 				.with(name)
 				.returning(Cypher.asterisk())
 				.build();
-			assertThat(cypherRenderer.render(call))
-				.isEqualTo(
+			assertThat(cypherRenderer.render(call)).isEqualTo(
 					"CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser\\\\.allow.*' MATCH (n) WITH name RETURN *");
 		}
 
@@ -261,8 +245,7 @@ class ProcedureCallsIT {
 
 			SymbolicName name = Cypher.name("name");
 			SymbolicName description = Cypher.name("description");
-			Statement call = Cypher
-				.call("dbms.listConfig")
+			Statement call = Cypher.call("dbms.listConfig")
 				.withArgs(Cypher.literalOf("browser"))
 				.yield(name, description)
 				.where(name.matches("browser\\.allow.*"))
@@ -270,8 +253,7 @@ class ProcedureCallsIT {
 				.create(Cypher.node("Config").withProperties("name", name, "description", description).named("n"))
 				.returning(Cypher.name("n"))
 				.build();
-			assertThat(cypherRenderer.render(call))
-				.isEqualTo(
+			assertThat(cypherRenderer.render(call)).isEqualTo(
 					"CALL dbms.listConfig('browser') YIELD name, description WHERE name =~ 'browser\\\\.allow.*' WITH * CREATE (n:`Config` {name: name, description: description}) RETURN n");
 		}
 
@@ -279,19 +261,23 @@ class ProcedureCallsIT {
 		void relatedInner() {
 
 			SymbolicName name = Cypher.name("name");
-			AliasedExpression parameters = Cypher.listOf(Cypher.literalOf("browser"), Cypher.literalOf("causal_clustering"))
+			AliasedExpression parameters = Cypher
+				.listOf(Cypher.literalOf("browser"), Cypher.literalOf("causal_clustering"))
 				.as("parameters");
 			Statement call = Cypher.with(parameters)
-				.unwind(parameters).as("p")
-				.call("dbms.listConfig").withArgs(Cypher.name("p"))
+				.unwind(parameters)
+				.as("p")
+				.call("dbms.listConfig")
+				.withArgs(Cypher.name("p"))
 				.yield(name)
 				.where(name.matches(".*allow.*"))
 				.returning(name)
 				.build();
 
-			assertThat(cypherRenderer.render(call))
-				.isEqualTo(
+			assertThat(cypherRenderer.render(call)).isEqualTo(
 					"WITH ['browser', 'causal_clustering'] AS parameters UNWIND parameters AS p CALL dbms.listConfig(p) YIELD name WHERE name =~ '.*allow.*' RETURN name");
 		}
+
 	}
+
 }

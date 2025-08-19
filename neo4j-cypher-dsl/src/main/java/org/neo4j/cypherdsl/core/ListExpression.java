@@ -18,21 +18,27 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents a list expression as in {@code [expression1, expression2, ..., expressionN]}
+ * Represents a list expression as in
+ * {@code [expression1, expression2, ..., expressionN]}.
  *
  * @author Michael J. Simons
- * @soundtrack Queen - Jazz
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
 public final class ListExpression implements Expression {
+
+	private final ExpressionList content;
+
+	private ListExpression(ExpressionList content) {
+		this.content = content;
+	}
 
 	static Expression listOrSingleExpression(Expression... expressions) {
 
@@ -41,7 +47,8 @@ public final class ListExpression implements Expression {
 
 		if (expressions.length == 1) {
 			return expressions[0];
-		} else {
+		}
+		else {
 			return ListExpression.create(expressions);
 		}
 	}
@@ -49,12 +56,6 @@ public final class ListExpression implements Expression {
 	static ListExpression create(Expression... expressions) {
 
 		return new ListExpression(new ExpressionList(expressions));
-	}
-
-	private final ExpressionList content;
-
-	private ListExpression(ExpressionList content) {
-		this.content = content;
 	}
 
 	@Override
@@ -69,4 +70,5 @@ public final class ListExpression implements Expression {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

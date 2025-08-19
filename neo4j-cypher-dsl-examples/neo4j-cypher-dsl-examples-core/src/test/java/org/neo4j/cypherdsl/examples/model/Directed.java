@@ -26,16 +26,16 @@ import org.neo4j.cypherdsl.core.RelationshipBase;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
- * I modelled the relationships "DIRECTED" and "ACTED_IN" in this test slightly different to get a feeling how to deal
- * with the same type of relationship between different nodes. A person might as well be the director of a musical etc.
+ * I modelled the relationships "DIRECTED" and "ACTED_IN" in this test slightly different
+ * to get a feeling how to deal with the same type of relationship between different
+ * nodes. A person might as well be the director of a musical etc.
  *
+ * @param <E> end node
  * @author Michael J. Simons
- * @soundtrack Höhner - Die ersten 30 Jahre
- * @param <E> End node
  */
 public final class Directed<E extends NodeBase<?>> extends RelationshipBase<Person, E, Directed<E>> {
 
-	public static final String $TYPE  = "DIRECTED";
+	public static final String $TYPE = "DIRECTED";
 
 	protected Directed(Person start, E end) {
 		super(start, $TYPE, end);
@@ -56,4 +56,5 @@ public final class Directed<E extends NodeBase<?>> extends RelationshipBase<Pers
 
 		return new Directed<>(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties), getRight());
 	}
+
 }

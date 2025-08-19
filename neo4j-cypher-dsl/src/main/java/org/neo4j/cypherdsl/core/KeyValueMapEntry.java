@@ -18,18 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Helper class, only for internal use.
  *
  * @author Michael J. Simons
- * @soundtrack Rammstein - RAMMSTEIN
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -39,13 +38,17 @@ public final class KeyValueMapEntry implements Expression {
 
 	private final Expression value;
 
+	private KeyValueMapEntry(String key, Expression value) {
+		this.key = key;
+		this.value = value;
+	}
+
 	/**
-	 * Create a new {@link KeyValueMapEntry}. This is hardly useful in direct usage, but might be handy to compose clauses
-	 * outside the fluent api.
-	 *
-	 * @param key   the key of this entry
+	 * Create a new {@link KeyValueMapEntry}. This is hardly useful in direct usage, but
+	 * might be handy to compose clauses outside the fluent api.
+	 * @param key the key of this entry
 	 * @param value the value of this entry
-	 * @return A new, immutable map entry.
+	 * @return a new, immutable map entry.
 	 * @since 2021.2.3
 	 */
 	@API(status = STABLE, since = "2021.2.3")
@@ -57,32 +60,27 @@ public final class KeyValueMapEntry implements Expression {
 		return new KeyValueMapEntry(key, value);
 	}
 
-	private KeyValueMapEntry(String key, Expression value) {
-		this.key = key;
-		this.value = value;
-	}
-
 	/**
-	 * @return The key of this entry.
+	 * {@return the key of this entry}
 	 */
 	@API(status = INTERNAL)
 	public String getKey() {
-		return key;
+		return this.key;
 	}
 
 	/**
-	 * @return The value of this entry.
+	 * {@return the value of this entry}
 	 */
 	@API(status = INTERNAL)
 	public Expression getValue() {
-		return value;
+		return this.value;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		value.accept(visitor);
+		this.value.accept(visitor);
 		visitor.leave(this);
 	}
 
@@ -90,4 +88,5 @@ public final class KeyValueMapEntry implements Expression {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

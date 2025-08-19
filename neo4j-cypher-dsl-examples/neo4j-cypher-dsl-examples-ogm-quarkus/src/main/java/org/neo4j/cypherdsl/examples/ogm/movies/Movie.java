@@ -29,6 +29,8 @@ import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @NodeEntity
@@ -48,9 +50,10 @@ public final class Movie {
 
 	private LocalDate watchedOn;
 
+	private Integer released;
+
 	/**
-	 * A new movie
-	 *
+	 * A new movie.
 	 * @param title the unmodifiable title
 	 */
 	public Movie(String title) {
@@ -63,44 +66,43 @@ public final class Movie {
 	Movie() {
 	}
 
-	private Integer released;
-
 	/**
-	 * @return the title
+	 * {@return the title}
 	 */
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	/**
-	 * @return the description
+	 * {@return the description}
 	 */
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	/**
-	 * @return Read only view of the actors.
+	 * {@return read only view of the actors}
 	 */
 	public List<Actor> getActors() {
 		return List.copyOf(this.actors);
 	}
 
 	/**
-	 * @return Read only view of the directors.
+	 * {@return read only view of the directors}
 	 */
 	public List<Person> getDirectors() {
 		return List.copyOf(this.directors);
 	}
 
 	/**
-	 * @return Release year
+	 * {@return release year}
 	 */
 	public Integer getReleased() {
-		return released;
+		return this.released;
 	}
 
 	/**
+	 * Sets the release year.
 	 * @param released new release year
 	 */
 	public void setReleased(Integer released) {
@@ -108,8 +110,7 @@ public final class Movie {
 	}
 
 	/**
-	 * Adds new actors
-	 *
+	 * Adds new actors.
 	 * @param newActors list of new actors
 	 * @return this instance
 	 */
@@ -119,8 +120,7 @@ public final class Movie {
 	}
 
 	/**
-	 * Adds new directors
-	 *
+	 * Adds new directors.
 	 * @param newDirectors list of new actors
 	 * @return this instance
 	 */
@@ -130,10 +130,11 @@ public final class Movie {
 	}
 
 	public LocalDate getWatchedOn() {
-		return watchedOn;
+		return this.watchedOn;
 	}
 
 	public void setWatchedOn(LocalDate watchedOn) {
 		this.watchedOn = watchedOn;
 	}
+
 }

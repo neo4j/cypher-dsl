@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,8 +25,11 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Set.html">Set</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Set.html">Set</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -36,13 +37,18 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 @API(status = STABLE, since = "1.0")
 public final class Set extends AbstractClause implements UpdatingClause {
 
+	private final ExpressionList setItems;
+
+	Set(ExpressionList setItems) {
+		this.setItems = setItems;
+	}
+
 	/**
-	 * Creates a {@literal SET} clause based on the given updates. No runtime checks are whether those expressions are
-	 * actually updates. Please be mindful here.
-	 *
-	 * @param update The update to apply
+	 * Creates a {@literal SET} clause based on the given updates. No runtime checks are
+	 * whether those expressions are actually updates. Please be mindful here.
+	 * @param update the update to apply
 	 * @param more additional updates
-	 * @return A {@link Set} clause
+	 * @return a {@link Set} clause
 	 * @since 2023.4.0
 	 */
 	static Set set(Expression update, Expression... more) {
@@ -58,17 +64,12 @@ public final class Set extends AbstractClause implements UpdatingClause {
 		return new Set(new ExpressionList(finalExpressionList));
 	}
 
-	private final ExpressionList setItems;
-
-	Set(ExpressionList setItems) {
-		this.setItems = setItems;
-	}
-
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		setItems.accept(visitor);
+		this.setItems.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

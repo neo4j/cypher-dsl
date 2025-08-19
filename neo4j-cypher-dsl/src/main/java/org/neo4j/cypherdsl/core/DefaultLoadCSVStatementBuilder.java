@@ -18,25 +18,59 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.net.URI;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * A builder for the {@literal LOAD CSV} statement.
+ *
  * @author Michael J. Simons
- * @soundtrack Thees Uhlmann - #2
  * @since 2021.2.1
  */
 @API(status = INTERNAL, since = "2021.2.1")
 final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder implements LoadCSVStatementBuilder {
 
+	private final UsingPeriodicCommit usingPeriodicCommit;
+
+	private final LoadCSV loadCSV;
+
+	private DefaultLoadCSVStatementBuilder(UsingPeriodicCommit usingPeriodicCommit, LoadCSV loadCSV) {
+		super(usingPeriodicCommit, loadCSV);
+
+		this.usingPeriodicCommit = usingPeriodicCommit;
+		this.loadCSV = loadCSV;
+	}
+
+	private DefaultLoadCSVStatementBuilder(DefaultStatementBuilder source, UsingPeriodicCommit usingPeriodicCommit,
+			LoadCSV loadCSV) {
+		super(source, usingPeriodicCommit, loadCSV);
+		this.usingPeriodicCommit = usingPeriodicCommit;
+		this.loadCSV = loadCSV;
+	}
+
+	static DefaultLoadCSVStatementBuilder create(PrepareLoadCSVStatementImpl config, String alias,
+			DefaultStatementBuilder source) {
+
+		// It should be reasonable safe to keep that immutable object around
+		final LoadCSV loadCSV = new LoadCSV(config.uri, config.withHeaders, alias);
+		return (source != null) ? new DefaultLoadCSVStatementBuilder(source, config.usingPeriodicCommit, loadCSV)
+				: new DefaultLoadCSVStatementBuilder(config.usingPeriodicCommit, loadCSV);
+	}
+
+	@Override
+	public StatementBuilder withFieldTerminator(String fieldTerminator) {
+		return new DefaultStatementBuilder(this.usingPeriodicCommit, this.loadCSV.withFieldTerminator(fieldTerminator));
+	}
+
 	static final class PrepareLoadCSVStatementImpl implements ExposesLoadCSV, OngoingLoadCSV {
 
 		private final UsingPeriodicCommit usingPeriodicCommit;
+
 		private final DefaultStatementBuilder source;
 
 		private URI uri;
@@ -63,50 +97,20 @@ final class DefaultLoadCSVStatementBuilder extends DefaultStatementBuilder imple
 			this.source = source;
 		}
 
-			@Override
+		@Override
 		public LoadCSVStatementBuilder as(String alias) {
 
-			return DefaultLoadCSVStatementBuilder.create(this, alias, source);
+			return DefaultLoadCSVStatementBuilder.create(this, alias, this.source);
 		}
 
-			@Override
+		@Override
 		public OngoingLoadCSV loadCSV(URI newUri, boolean newWithHeaders) {
 
 			this.uri = newUri;
 			this.withHeaders = newWithHeaders;
 			return this;
 		}
+
 	}
 
-	static DefaultLoadCSVStatementBuilder create(PrepareLoadCSVStatementImpl config, String alias,
-		DefaultStatementBuilder source) {
-
-		// It should be reasonable safe to keep that immutable object around
-		final LoadCSV loadCSV = new LoadCSV(config.uri, config.withHeaders, alias);
-		return source == null ? new DefaultLoadCSVStatementBuilder(config.usingPeriodicCommit, loadCSV) :
-			new DefaultLoadCSVStatementBuilder(source, config.usingPeriodicCommit, loadCSV);
-	}
-
-	private final UsingPeriodicCommit usingPeriodicCommit;
-
-	private final LoadCSV loadCSV;
-
-	private DefaultLoadCSVStatementBuilder(UsingPeriodicCommit usingPeriodicCommit, LoadCSV loadCSV) {
-		super(usingPeriodicCommit, loadCSV);
-
-		this.usingPeriodicCommit = usingPeriodicCommit;
-		this.loadCSV = loadCSV;
-	}
-
-	private DefaultLoadCSVStatementBuilder(
-		DefaultStatementBuilder source, UsingPeriodicCommit usingPeriodicCommit, LoadCSV loadCSV) {
-		super(source, usingPeriodicCommit, loadCSV);
-		this.usingPeriodicCommit = usingPeriodicCommit;
-		this.loadCSV = loadCSV;
-	}
-
-	@Override
-	public StatementBuilder withFieldTerminator(String fieldTerminator) {
-		return new DefaultStatementBuilder(this.usingPeriodicCommit, this.loadCSV.withFieldTerminator(fieldTerminator));
-	}
 }

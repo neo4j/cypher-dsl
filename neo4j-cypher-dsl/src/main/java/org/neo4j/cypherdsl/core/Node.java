@@ -18,118 +18,115 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/NodePattern.html">NodePattern</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/NodePattern.html">NodePattern</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
-public interface Node extends PatternElement, PropertyContainer, ExposesProperties<Node>, ExposesRelationships<Relationship> {
+public interface Node
+		extends PatternElement, PropertyContainer, ExposesProperties<Node>, ExposesRelationships<Relationship> {
 
 	/**
-	 * @return The labels associated with this {@link Node}
+	 * {@return the labels associated with this <code>Node</code>}
 	 */
 	List<NodeLabel> getLabels();
 
 	/**
 	 * Creates a copy of this node with a new symbolic name.
-	 *
 	 * @param newSymbolicName the new symbolic name.
-	 * @return The new node.
+	 * @return the new node.
 	 */
 	Node named(String newSymbolicName);
 
 	/**
 	 * Creates a copy of this node with a new symbolic name.
-	 *
 	 * @param newSymbolicName the new symbolic name.
-	 * @return The new node.
+	 * @return the new node.
 	 */
 	Node named(SymbolicName newSymbolicName);
 
 	/**
 	 * A condition that checks for the presence of labels on a node.
-	 *
-	 * @param labelsToQuery A list of labels to query
-	 * @return A condition that checks whether this node has all the labels to query
+	 * @param labelsToQuery a list of labels to query
+	 * @return a condition that checks whether this node has all the labels to query
 	 */
 	Condition hasLabels(String... labelsToQuery);
 
 	/**
-	 * A condition that checks for the presence of a label expression on a node
+	 * Returns a condition that checks for the presence of a label expression on a node.
+	 * @param labels the labels to check
+	 * @return a condition that checks whether this node has all the labels to query
 	 * @since 2024.3.0
 	 */
 	Condition hasLabels(LabelExpression labels);
 
 	/**
 	 * Creates a new condition whether this node is equal to {@literal otherNode}.
-	 *
-	 * @param otherNode The node to compare this node to.
-	 * @return A condition.
+	 * @param otherNode the node to compare this node to.
+	 * @return a condition.
 	 */
 	Condition isEqualTo(Node otherNode);
 
 	/**
 	 * Creates a new condition whether this node is not equal to {@literal otherNode}.
-	 *
-	 * @param otherNode The node to compare this node to.
-	 * @return A condition.
+	 * @param otherNode the node to compare this node to.
+	 * @return a condition.
 	 */
 	Condition isNotEqualTo(Node otherNode);
 
 	/**
 	 * Creates a new condition based on this node whether it is null.
-	 *
-	 * @return A condition.
+	 * @return a condition.
 	 */
 	Condition isNull();
 
 	/**
 	 * Creates a new condition based on this node whether it is not null.
-	 *
-	 * @return A condition.
+	 * @return a condition.
 	 */
 	Condition isNotNull();
 
 	/**
 	 * Creates a new sort item of this node in descending order.
-	 *
-	 * @return A sort item.
+	 * @return a sort item.
 	 */
 	SortItem descending();
 
 	/**
 	 * Creates a new sort item of this node in ascending order.
-	 *
-	 * @return A sort item.
+	 * @return a sort item.
 	 */
 	SortItem ascending();
 
 	/**
 	 * Creates an alias for this node.
-	 *
-	 * @param alias The alias to use.
-	 * @return The aliased expression.
+	 * @param alias the alias to use.
+	 * @return the aliased expression.
 	 */
 	AliasedExpression as(String alias);
 
 	/**
-	 * @return A new function invocation returning the internal id of this node.
+	 * Returns a new function invocation returning the internal id of this node.
+	 * @return a new function invocation returning the internal id of this node
 	 * @deprecated Use {@link #elementId}
 	 */
 	@Deprecated(since = "2022.6.0")
-	@SuppressWarnings({ "DeprecatedIsStillUsed", "squid:S1133" }) // The deprecation warning on any client code calling this is actually the point.
+	// The deprecation warning on any client code calling this is actually the point.
+	@SuppressWarnings({ "DeprecatedIsStillUsed", "squid:S1133" })
 	FunctionInvocation internalId();
 
 	/**
-	 * @return A new function invocation returning the element id of this node.
+	 * Returns a new function invocation returning the element id of this node.
+	 * @return a new function invocation returning the element id of this node
 	 * @since 2022.6.0
 	 */
 	default FunctionInvocation elementId() {
@@ -137,7 +134,8 @@ public interface Node extends PatternElement, PropertyContainer, ExposesProperti
 	}
 
 	/**
-	 * @return A new function invocation returning the labels of this node.
+	 * {@return a new function invocation returning the labels of this node}
 	 */
 	FunctionInvocation labels();
+
 }

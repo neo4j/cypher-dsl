@@ -28,12 +28,30 @@ import org.neo4j.ogm.annotation.typeconversion.Convert;
 @NodeEntity(label = "Transport")
 public class ConnectorTransport {
 
+	@Id
+	private final ConnectorTransportType value;
+
+	private OtherEnum otherEnum;
+
+	@SuppressWarnings("checkstyle:AnnotationUseStyle")
+	@Convert(value = AnotherConverter.class)
+	private InnerClass.InnerInnerClass innerInnerClass;
+
+	@SuppressWarnings("checkstyle:AnnotationUseStyle")
+	@Convert(value = InnerInnerClassConverter.class)
+	private InnerClass.InnerInnerClass innerInnerClassButWithoutConverter;
+
+	public ConnectorTransport(ConnectorTransportType value) {
+		this.value = value;
+	}
+
 	/**
 	 * Some enum
 	 */
 	public enum ConnectorTransportType {
 
 		HTTP, BOLT
+
 	}
 
 	/**
@@ -42,24 +60,13 @@ public class ConnectorTransport {
 	public static class InnerClass {
 
 		/**
-		 * With a nested inner class (used to check whether the recursive algorithm stops at some point)
+		 * With a nested inner class (used to check whether the recursive algorithm stops
+		 * at some point)
 		 */
 		public static class InnerInnerClass {
+
 		}
+
 	}
 
-	@Id
-	private final ConnectorTransportType value;
-
-	private OtherEnum otherEnum;
-
-	@Convert(value = AnotherConverter.class)
-	private InnerClass.InnerInnerClass innerInnerClass;
-
-	@Convert(value = InnerInnerClassConverter.class)
-	private InnerClass.InnerInnerClass innerInnerClassButWithoutConverter;
-
-	public ConnectorTransport(ConnectorTransportType value) {
-		this.value = value;
-	}
 }

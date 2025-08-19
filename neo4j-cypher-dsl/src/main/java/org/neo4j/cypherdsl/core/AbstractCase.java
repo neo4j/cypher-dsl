@@ -23,10 +23,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.CaseElse;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
 /**
  * Abstract base class for a {@link Case}.
@@ -37,14 +37,13 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
  */
 abstract class AbstractCase implements Case {
 
-	private CaseElse caseElse;
 	private final List<CaseWhenThen> caseWhenThens;
-	private Optional<String> prefix = Optional.empty();
-	private Optional<String> suffix = Optional.empty();
 
-	public static Case create(Expression expression) {
-		return expression == null ? new GenericCaseImpl() : new SimpleCaseImpl(expression);
-	}
+	private CaseElse caseElse;
+
+	private Optional<String> prefix = Optional.empty();
+
+	private Optional<String> suffix = Optional.empty();
 
 	AbstractCase(List<CaseWhenThen> caseWhenThens) {
 		this.caseWhenThens = new ArrayList<>(caseWhenThens);
@@ -63,9 +62,8 @@ abstract class AbstractCase implements Case {
 
 	/**
 	 * Creates a new case/when expression with an additional {@code WHEN} block.
-	 *
-	 * @param nextExpression The next expression to use.
-	 * @return An ongoing when builder.
+	 * @param nextExpression the next expression to use.
+	 * @return an ongoing when builder.
 	 */
 	@Override
 	@CheckReturnValue
@@ -76,12 +74,12 @@ abstract class AbstractCase implements Case {
 
 	@Override
 	public Optional<String> getPrefix() {
-		return prefix;
+		return this.prefix;
 	}
 
 	@Override
 	public Optional<String> getSuffix() {
-		return suffix;
+		return this.suffix;
 	}
 
 	@Override
@@ -90,6 +88,22 @@ abstract class AbstractCase implements Case {
 		this.prefix = Optional.of("(");
 		this.suffix = Optional.of(")");
 		return Case.super.property(names);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		if (getCaseExpression() != null) {
+			getCaseExpression().accept(visitor);
+		}
+
+		this.caseWhenThens.forEach(caseWhenThen -> caseWhenThen.accept(visitor));
+
+		if (this.caseElse != null) {
+			this.caseElse.accept(visitor);
+		}
+
+		visitor.leave(this);
 	}
 
 	static class SimpleCaseImpl extends AbstractCase implements SimpleCase {
@@ -107,7 +121,7 @@ abstract class AbstractCase implements Case {
 
 		@Override
 		Expression getCaseExpression() {
-			return caseExpression;
+			return this.caseExpression;
 		}
 
 		/**
@@ -119,12 +133,14 @@ abstract class AbstractCase implements Case {
 				super(caseExpression, caseWhenThens);
 			}
 
-					@Override
+			@Override
 			public Case elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
 			}
+
 		}
+
 	}
 
 	static class GenericCaseImpl extends AbstractCase implements GenericCase {
@@ -152,28 +168,13 @@ abstract class AbstractCase implements Case {
 			}
 
 			@Override
-			public
-			Case elseDefault(Expression defaultExpression) {
+			public Case elseDefault(Expression defaultExpression) {
 				this.setCaseElse(new CaseElse(defaultExpression));
 				return this;
 			}
-		}
-	}
 
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		if (getCaseExpression() != null) {
-			getCaseExpression().accept(visitor);
 		}
 
-		caseWhenThens.forEach(caseWhenThen -> caseWhenThen.accept(visitor));
-
-		if (caseElse != null) {
-			caseElse.accept(visitor);
-		}
-
-		visitor.leave(this);
 	}
 
 	private final class DefaultOngoingWhenThen implements OngoingWhenThen {
@@ -186,21 +187,24 @@ abstract class AbstractCase implements Case {
 
 		/**
 		 * Ends this {@code WHEN} block with an expression.
-		 *
-		 * @param expression The expression for the ongoing {@code WHEN} block.
-		 * @return An ongoing when builder.
+		 * @param expression the expression for the ongoing {@code WHEN} block.
+		 * @return an ongoing when builder.
 		 */
 		@Override
 		@CheckReturnValue
 		public CaseEnding then(Expression expression) {
 
-			CaseWhenThen caseWhenThen = new CaseWhenThen(whenExpression, expression);
-			caseWhenThens.add(caseWhenThen);
+			CaseWhenThen caseWhenThen = new CaseWhenThen(this.whenExpression, expression);
+			AbstractCase.this.caseWhenThens.add(caseWhenThen);
 			if (getCaseExpression() != null) {
-				return new SimpleCaseImpl.EndingSimpleCase(AbstractCase.this.getCaseExpression(), caseWhenThens);
-			} else {
-				return new GenericCaseImpl.EndingGenericCase(caseWhenThens);
+				return new SimpleCaseImpl.EndingSimpleCase(AbstractCase.this.getCaseExpression(),
+						AbstractCase.this.caseWhenThens);
+			}
+			else {
+				return new GenericCaseImpl.EndingGenericCase(AbstractCase.this.caseWhenThens);
 			}
 		}
+
 	}
+
 }

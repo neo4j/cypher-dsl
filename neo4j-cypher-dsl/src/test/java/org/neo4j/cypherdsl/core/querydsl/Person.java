@@ -25,6 +25,7 @@ import com.querydsl.core.annotations.QueryEntity;
  */
 @QueryEntity
 public class Person {
+
 	String firstName;
 
 	String lastName;
@@ -32,14 +33,15 @@ public class Person {
 	int age;
 
 	public String getFirstName() {
-		return firstName;
+		return this.firstName;
 	}
 
 	public int getAge() {
-		return age;
+		return this.age;
 	}
 
 	public String getLastName() {
-		return lastName;
+		return this.lastName;
 	}
+
 }

@@ -18,19 +18,18 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
  * Added for supporting the Neo4j v5 parser.
  *
  * @author Michael J. Simons
- * @soundtrack The Prodigy - Invaders Must Die
  * @since 2023.0.0
  */
 @API(status = STABLE, since = "2023.0.0")
@@ -38,8 +37,34 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class CountExpression implements SubqueryExpression, ExposesWhere<Expression> {
 
 	private final ImportingWith importingWith;
+
 	private final List<Visitable> fragments;
+
 	private final Where innerWhere;
+
+	private CountExpression(ImportingWith optionalWith, List<? extends Visitable> fragments, Where innerWhere) {
+
+		var patternOrUnion = (fragments.size() != 1) ? null : fragments.get(0);
+
+		if (patternOrUnion instanceof Statement.UnionQuery && innerWhere != null) {
+			throw new IllegalArgumentException("Cannot use a UNION with a WHERE clause inside a COUNT {} expression");
+		}
+		this.importingWith = optionalWith;
+		var imports = optionalWith.imports();
+
+		if (imports != null && patternOrUnion instanceof Pattern pattern) {
+			this.fragments = List.of(new Match(false, pattern, innerWhere, null));
+			this.innerWhere = null;
+		}
+		else if (imports != null && patternOrUnion instanceof Match match) {
+			this.fragments = List.of(new Match(false, match.pattern, innerWhere, null));
+			this.innerWhere = null;
+		}
+		else {
+			this.fragments = List.copyOf(fragments);
+			this.innerWhere = innerWhere;
+		}
+	}
 
 	static CountExpression count(Statement statement, IdentifiableElement... imports) {
 
@@ -58,50 +83,28 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 		return new CountExpression(new ImportingWith(), patternElements, innerWhere);
 	}
 
-	private CountExpression(ImportingWith optionalWith, List<? extends Visitable> fragments, Where innerWhere) {
-
-		var patternOrUnion = fragments.size() == 1 ? fragments.get(0) : null;
-
-		if (patternOrUnion instanceof Statement.UnionQuery && innerWhere != null) {
-			throw new IllegalArgumentException("Cannot use a UNION with a WHERE clause inside a COUNT {} expression");
-		}
-		this.importingWith = optionalWith;
-		var imports = optionalWith.imports();
-
-		if (imports != null && patternOrUnion instanceof Pattern pattern) {
-			this.fragments = List.of(new Match(false, pattern, innerWhere, null));
-			this.innerWhere = null;
-		} else if (imports != null && patternOrUnion instanceof Match match) {
-			this.fragments = List.of(new Match(false, match.pattern, innerWhere, null));
-			this.innerWhere = null;
-		} else {
-			this.fragments = List.copyOf(fragments);
-			this.innerWhere = innerWhere;
-		}
-	}
-
 	/**
-	 * Creates a new {@link CountExpression count expression} with additional conditions
-	 *
+	 * Creates a new {@link CountExpression count expression} with additional conditions.
 	 * @param condition the condition to apply in the count expression
-	 * @return A new {@link CountExpression}
+	 * @return a new {@link CountExpression}
 	 */
 	public CountExpression where(Condition condition) {
 
-		if (fragments.size() == 1 && fragments.get(0) instanceof Statement) {
+		if (this.fragments.size() == 1 && this.fragments.get(0) instanceof Statement) {
 			throw new IllegalArgumentException(
-				"This count expression is build upon a full statement, adding a condition to it is not supported.");
+					"This count expression is build upon a full statement, adding a condition to it is not supported.");
 		}
-		return new CountExpression(importingWith, fragments, new Where(condition));
+		return new CountExpression(this.importingWith, this.fragments, new Where(condition));
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		importingWith.accept(visitor);
-		fragments.forEach(v -> v.accept(visitor));
-		Visitable.visitIfNotNull(innerWhere, visitor);
+		this.importingWith.accept(visitor);
+		this.fragments.forEach(v -> v.accept(visitor));
+		Visitable.visitIfNotNull(this.innerWhere, visitor);
 		visitor.leave(this);
 	}
+
 }

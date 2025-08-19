@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.core.querydsl;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.querydsl.core.types.Operator;
+import com.querydsl.core.types.Template;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
@@ -32,12 +32,12 @@ import org.neo4j.cypherdsl.core.Literal.UnsupportedLiteralException;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 
-import com.querydsl.core.types.Operator;
-import com.querydsl.core.types.Template;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
+ * Context of a Cypher-DSL statement, holding all known expressions and parameters.
+ *
  * @author Michael J. Simons
- * @soundtrack Iron Maiden - The Book Of Souls: Live Chapter
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
@@ -77,14 +77,16 @@ public final class CypherContext {
 
 	Parameter<?> getOrCreateParameterFor(Object object) {
 
-		return parameters.computeIfAbsent(object, o -> {
+		return this.parameters.computeIfAbsent(object, o -> {
 			Object value;
 			try {
 				value = new ConstantParameterHolder(o);
-			} catch (UnsupportedLiteralException e) {
+			}
+			catch (UnsupportedLiteralException ex) {
 				value = o;
 			}
 			return Cypher.anonParameter(value);
 		});
 	}
+
 }

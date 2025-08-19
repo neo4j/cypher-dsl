@@ -18,10 +18,10 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Expresses the length of a relationship.
@@ -38,26 +38,6 @@ public final class RelationshipLength implements Visitable {
 
 	private final boolean unbounded;
 
-	/**
-	 * Creates an unbounded {@link RelationshipLength}.
-	 *
-	 * @return The new length definition
-	 */
-	public static RelationshipLength unbounded() {
-		return new RelationshipLength(null, null);
-	}
-
-	/**
-	 * Creates a {@link RelationshipLength} with given minimum and maximum values.
-	 *
-	 * @param minimum Minimum length
-	 * @param maximum Maximum length
-	 * @return The new length definition
-	 */
-	public static RelationshipLength of(Integer minimum, Integer maximum) {
-		return new RelationshipLength(minimum, maximum);
-	}
-
 	private RelationshipLength(Integer minimum, Integer maximum) {
 		this.minimum = minimum;
 		this.maximum = maximum;
@@ -65,26 +45,45 @@ public final class RelationshipLength implements Visitable {
 	}
 
 	/**
-	 * @return Minimum number of hops to match.
+	 * Creates an unbounded {@link RelationshipLength}.
+	 * @return the new length definition
+	 */
+	public static RelationshipLength unbounded() {
+		return new RelationshipLength(null, null);
+	}
+
+	/**
+	 * Creates a {@link RelationshipLength} with given minimum and maximum values.
+	 * @param minimum minimum length
+	 * @param maximum maximum length
+	 * @return the new length definition
+	 */
+	public static RelationshipLength of(Integer minimum, Integer maximum) {
+		return new RelationshipLength(minimum, maximum);
+	}
+
+	/**
+	 * {@return minimum number of hops to match}
 	 */
 	@API(status = INTERNAL)
 	public Integer getMinimum() {
-		return minimum;
+		return this.minimum;
 	}
 
 	/**
-	 * @return Maximum number of hops to match.
+	 * {@return maximum number of hops to match}
 	 */
 	@API(status = INTERNAL)
 	public Integer getMaximum() {
-		return maximum;
+		return this.maximum;
 	}
 
 	/**
-	 * @return True if neither minimum nor maximum number of hops are set.
+	 * {@return true if neither minimum nor maximum number of hops are set}
 	 */
 	@API(status = INTERNAL)
 	public boolean isUnbounded() {
-		return unbounded;
+		return this.unbounded;
 	}
+
 }

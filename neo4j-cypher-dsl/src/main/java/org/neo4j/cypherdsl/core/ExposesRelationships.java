@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A marker interface for things that expose methods to create new relationships to other elements.
+ * A marker interface for things that expose methods to create new relationships to other
+ * elements.
  *
+ * @param <T> the type of the resulting {@link RelationshipPattern}
  * @author Michael J. Simons
- * @param <T> The type of the resulting {@link RelationshipPattern}.
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -34,39 +35,38 @@ public interface ExposesRelationships<T extends RelationshipPattern & ExposesPat
 
 	/**
 	 * Starts building an outgoing relationship to the {@code other} {@link Node node}.
-	 *
-	 * @param other The other end of the outgoing relationship
-	 * @param types The types to match
-	 * @return An ongoing relationship definition, that can be used to specify the type
+	 * @param other the other end of the outgoing relationship
+	 * @param types the types to match
+	 * @return an ongoing relationship definition, that can be used to specify the type
 	 */
 	T relationshipTo(Node other, String... types);
 
 	/**
-	 * Starts building an incoming relationship starting at the {@code other} {@link Node node}.
-	 *
-	 * @param other The source of the incoming relationship
-	 * @param types The types to match
-	 * @return An ongoing relationship definition, that can be used to specify the type
+	 * Starts building an incoming relationship starting at the {@code other} {@link Node
+	 * node}.
+	 * @param other the source of the incoming relationship
+	 * @param types the types to match
+	 * @return an ongoing relationship definition, that can be used to specify the type
 	 */
 	T relationshipFrom(Node other, String... types);
 
 	/**
-	 * Starts building an undirected relationship between this {@link Node node} and the {@code other}.
-	 *
-	 * @param other The other end of the relationship
-	 * @param types The types to match
-	 * @return An ongoing relationship definition, that can be used to specify the type
+	 * Starts building an undirected relationship between this {@link Node node} and the
+	 * {@code other}.
+	 * @param other the other end of the relationship
+	 * @param types the types to match
+	 * @return an ongoing relationship definition, that can be used to specify the type
 	 */
 	T relationshipBetween(Node other, String... types);
 
 	/**
-	 * A convenience method for creating relationships between nodes avoiding going through the fluent API by allowing
-	 * to pass in the type directly.
-	 *
-	 * @param other The other end of the relationship
-	 * @param direction The direction of the relationship, seen from {@code this} node
-	 * @param types The type of the relationship to create or the types to match
-	 * @return An ongoing relationship definition, that can be used to specify details of the relationship
+	 * A convenience method for creating relationships between nodes avoiding going
+	 * through the fluent API by allowing to pass in the type directly.
+	 * @param other the other end of the relationship
+	 * @param direction the direction of the relationship, seen from {@code this} node
+	 * @param types the type of the relationship to create or the types to match
+	 * @return an ongoing relationship definition, that can be used to specify details of
+	 * the relationship
 	 * @since 2023.5.0
 	 */
 	default T relationshipWith(Node other, Relationship.Direction direction, String... types) {
@@ -76,4 +76,5 @@ public interface ExposesRelationships<T extends RelationshipPattern & ExposesPat
 			case UNI -> this.relationshipBetween(other, types);
 		};
 	}
+
 }

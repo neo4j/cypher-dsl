@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.PatternElement;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Necessary for {@code shortestPath} and friends.
@@ -40,12 +40,13 @@ final class ExpressionAsPatternElementWrapper implements PatternElement {
 		this.expression = expression;
 	}
 
-	public Expression getExpression() {
-		return expression;
+	Expression getExpression() {
+		return this.expression;
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		this.expression.accept(visitor);
 	}
+
 }

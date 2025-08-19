@@ -18,32 +18,35 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A typed subtree representing the arguments of a call to the {@code reduce()} function.
  *
  * @author Gerrit Meier
  * @author Michael J. Simons
- * @soundtrack Metallica - Metallica
- * @see Cypher#reduce(SymbolicName)
  * @since 2020.1.5
+ * @see Cypher#reduce(SymbolicName)
  */
 @API(status = STABLE, since = "2020.1.5")
 public final class Reduction extends TypedSubtree<Visitable> {
 
+	private Reduction(Visitable... children) {
+		super(children);
+	}
+
 	/**
-	 * Step 1: Define the variable of the reduction
-	 *
-	 * @param variable The closure will have a variable introduced in its context. We decide here which variable to use.
-	 * @return An ongoing definition
+	 * Step 1: Define the variable of the reduction.
+	 * @param variable the closure will have a variable introduced in its context. We
+	 * decide here which variable to use.
+	 * @return an ongoing definition
 	 */
 	static OngoingDefinitionWithVariable of(SymbolicName variable) {
 
@@ -51,68 +54,77 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		return new Builder(variable);
 	}
 
-	private Reduction(Visitable... children) {
-		super(children);
-	}
-
 	/**
-	 * Step 2: Define the list
+	 * Step 2: Define the list.
 	 */
 	public interface OngoingDefinitionWithVariable {
 
 		/**
-		 * @param list The list that is the subject of the reduction
-		 * @return An ongoing definition
+		 * Returns an ongoing definition.
+		 * @param list the list that is the subject of the reduction
+		 * @return an ongoing definition
 		 */
 		@CheckReturnValue
 		OngoingDefinitionWithList in(Expression list);
+
 	}
 
 	/**
-	 * Step 3: Define the map expression
+	 * Step 3: Define the map expression.
 	 */
 	public interface OngoingDefinitionWithList {
 
 		/**
-		 * @param mapper This expression will run once per value in the list, and produce the result value.
-		 * @return An ongoing definition
+		 * Return an ongoing definition.
+		 * @param mapper this expression will run once per value in the list, and produce
+		 * the result value.
+		 * @return an ongoing definition
 		 */
 		@CheckReturnValue
 		OngoingDefinitionWithReducer map(Expression mapper);
+
 	}
 
 	/**
-	 * Step 4a: Define the accumulator
+	 * Step 4a: Define the accumulator.
 	 */
 	public interface OngoingDefinitionWithReducer {
 
 		/**
-		 * @param accumulator A variable that will hold the result and the partial results as the list is iterated.
-		 * @return An ongoing definition
+		 * Return an ongoing definition.
+		 * @param accumulator a variable that will hold the result and the partial results
+		 * as the list is iterated.
+		 * @return an ongoing definition
 		 */
 		@CheckReturnValue
 		OngoingDefinitionWithInitial accumulateOn(Expression accumulator);
+
 	}
 
 	/**
-	 * Step 4b: Define the initial value
+	 * Step 4b: Define the initial value.
 	 */
 	public interface OngoingDefinitionWithInitial {
 
 		/**
-		 * @param initialValue An expression that runs once to give a starting value to the accumulator.
-		 * @return An ongoing definition
+		 * Return an ongoing definition.
+		 * @param initialValue an expression that runs once to give a starting value to
+		 * the accumulator.
+		 * @return an ongoing definition
 		 */
 		FunctionInvocation withInitialValueOf(Expression initialValue);
+
 	}
 
-	private static class Builder
-		implements OngoingDefinitionWithVariable, OngoingDefinitionWithList, OngoingDefinitionWithInitial,
-		OngoingDefinitionWithReducer {
+	private static final class Builder implements OngoingDefinitionWithVariable, OngoingDefinitionWithList,
+			OngoingDefinitionWithInitial, OngoingDefinitionWithReducer {
+
+		private final SymbolicName variable;
 
 		private Expression accumulatorExpression;
-		private final SymbolicName variable;
+
 		private Expression listExpression;
+
 		private Expression mapExpression;
 
 		private Builder(SymbolicName variable) {
@@ -143,18 +155,22 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		@Override
 		public FunctionInvocation withInitialValueOf(Expression initialValue) {
 
-			Expression accumulatorAssignment = accumulatorExpression.isEqualTo(initialValue);
-			ReductionPipeline reductionPipeline = new ReductionPipeline(variable, listExpression, mapExpression);
+			Expression accumulatorAssignment = this.accumulatorExpression.isEqualTo(initialValue);
+			ReductionPipeline reductionPipeline = new ReductionPipeline(this.variable, this.listExpression,
+					this.mapExpression);
 
 			Reduction reduction = new Reduction(accumulatorAssignment, reductionPipeline);
 			return FunctionInvocation.create(BuiltInFunctions.Lists.REDUCE, reduction);
 		}
+
 	}
 
 	private static final class ReductionPipeline implements Visitable {
 
 		private final SymbolicName variable;
+
 		private final Expression list;
+
 		private final Expression expression;
 
 		ReductionPipeline(SymbolicName variable, Expression list, Expression expression) {
@@ -179,5 +195,7 @@ public final class Reduction extends TypedSubtree<Visitable> {
 		public String toString() {
 			return RendererBridge.render(this);
 		}
+
 	}
+
 }

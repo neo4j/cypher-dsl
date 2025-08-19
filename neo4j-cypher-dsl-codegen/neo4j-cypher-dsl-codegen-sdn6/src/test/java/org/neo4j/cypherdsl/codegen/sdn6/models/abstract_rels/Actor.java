@@ -25,8 +25,10 @@ import org.springframework.data.neo4j.core.schema.RelationshipProperties;
 import org.springframework.data.neo4j.core.schema.TargetNode;
 
 /**
+ * Example type.
+ *
+ * @param <T> a type
  * @author Michael J. Simons
- * @param <T> A type
  */
 @RelationshipProperties
 public class Actor<T> {
@@ -39,4 +41,5 @@ public class Actor<T> {
 	public Actor(T person) {
 		this.person = person;
 	}
+
 }

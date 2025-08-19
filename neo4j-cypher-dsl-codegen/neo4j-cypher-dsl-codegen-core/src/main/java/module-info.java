@@ -20,7 +20,7 @@
  * @author Michael J. Simons
  * @since 2023.0.0
  */
-@SuppressWarnings( {"requires-automatic"}) // javapoet
+@SuppressWarnings({"requires-automatic"}) // javapoet
 module org.neo4j.cypherdsl.codegen.core {
 
 	requires java.compiler;

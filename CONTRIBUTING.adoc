@@ -21,13 +21,9 @@ Many things are contributions, among them issues, code, documentation and exampl
 
 For the full project, including examples and native tests:
 
-* GraalVM based on JDK 17: https://www.graalvm.org/downloads/
+* https://www.graalvm.org/release-notes/JDK_24/[GraalVM for JDK 24]
 
-NOTE: At least GraalVM *22.3.0* is required due to restrictions in `org.graalvm.buildtools:native-maven-plugin`.
-      The rationale behind that is explained https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#long_classpath_and_shading_support[here]
-      and we don't do apply any of the suggested workarounds as the releases are done with GraalVM 22.3.0 anyway.
-
-For the project, including examples but skipping native tests
+For the project, including examples but skipping native tests:
 
 * JDK 17+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
 
@@ -74,9 +70,9 @@ The output should be similar:
 .Verify your JDK
 ----
 $ java -version
-openjdk version "17.0.5" 2022-10-18
-OpenJDK Runtime Environment GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08)
-OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed mode, sharing)
+openjdk version "24" 2025-03-18
+OpenJDK Runtime Environment GraalVM CE 24+36.1 (build 24+36-jvmci-b01)
+OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, sharing)
 ----
 
 Check whether GraalVM `native-image` is present with:
@@ -85,15 +81,11 @@ Check whether GraalVM `native-image` is present with:
 [[verify-native-image]]
 .Check for the present of `native-image`
 ----
-$ gu list
-ComponentId              Version             Component name                Stability                     Origin
--------------------------------------------------------------------------------------------------------------------
-graalvm                  22.3.0              GraalVM Core                  Experimental
-js                       22.3.0              Graal.js                      Experimental                  github.com
-native-image             22.3.0              Native Image                  Experimental                  github.com
+$ which native-image
+/Users/msimons/.sdkman/candidates/java/24-graalce/bin/native-image
 ----
 
-You should see `native-image` in the list. If not, install it via `gu install native-image`.
+You should see `native-image` in the list. If not, you are most likely on a GraalVM version we don't support with this project.
 
 After that, use `./mvnw` on a Unix-like operating system to build the Cypher-DSL:
 
@@ -126,7 +118,7 @@ $ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests
 
 === Build only the core module
 
-The core module can be build on plain JDK 17 with:
+The core module can be built on plain JDK 17 with:
 
 [source,console,subs="verbatim,attributes"]
 [[build-only-core-bash]]
@@ -157,6 +149,43 @@ Prepare a release with:
 
 and then let do Teamcity the rest, but chose the same version number there, too.
 // end::building-manual[]
+
+== Tasks
+
+=== Keep the build descriptor (`pom.xml`) sorted
+
+[source,bash]
+----
+./mvnw sortpom:sort
+----
+
+=== Formatting sources / adding headers
+
+When you add new files, you can run
+
+[source,bash]
+----
+./mvnw license:format
+----
+
+to add required headers automatically.
+
+We use https://github.com/spring-io/spring-javaformat[spring-javaformat] to format the source files.
+
+[source,bash]
+----
+./mvnw spring-javaformat:apply
+----
+
+TIP: The Spring Developers write: "The source formatter does not fundamentally change your code. For example, it will not change the order of import statements. It is effectively limited to adding or removing whitespace and line feeds."
+This means the following checkstyle check might still fail.
+Some common errors include the wrong import order.
+
+There are plugins for https://github.com/spring-io/spring-javaformat#eclipse[Eclipse] and https://github.com/spring-io/spring-javaformat#intellij-idea[IntelliJ IDEA] and the Checkstyle settings https://github.com/spring-io/spring-javaformat#checkstyle-idea-plugin[can be imported as well].
+We took those "as is" and just disabled the lambda check (requiring even single parameters to have parenthesis).
+
+Public classes do require an author tag.
+Please add yourself as an `@author` to the `.java` files you added or that modified substantially (more than cosmetic changes).
 
 == General considerations
 

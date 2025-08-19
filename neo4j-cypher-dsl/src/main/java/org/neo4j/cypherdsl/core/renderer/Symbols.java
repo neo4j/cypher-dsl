@@ -26,10 +26,13 @@ package org.neo4j.cypherdsl.core.renderer;
  */
 final class Symbols {
 
-	public static final String NODE_LABEL_START = ":";
-	public static final String REL_TYPE_START = ":";
-	public static final String REL_TYP_SEPARATOR = "|";
+	static final String NODE_LABEL_START = ":";
+
+	static final String REL_TYPE_START = ":";
+
+	static final String REL_TYP_SEPARATOR = "|";
 
 	private Symbols() {
 	}
+
 }

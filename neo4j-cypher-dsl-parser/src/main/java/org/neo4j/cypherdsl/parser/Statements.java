@@ -24,6 +24,6 @@ import org.neo4j.cypherdsl.core.Statement;
 
 record Statements(List<Statement> value) {
 	Statements {
-		value = value == null ? List.of() : List.copyOf(value);
+		value = (value != null) ? List.copyOf(value) : List.of();
 	}
 }

@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Represents the list of sort items that make up the order of records in a result set.
@@ -38,4 +38,5 @@ public final class Order extends TypedSubtree<SortItem> {
 	Order(List<SortItem> sortItems) {
 		super(sortItems);
 	}
+
 }

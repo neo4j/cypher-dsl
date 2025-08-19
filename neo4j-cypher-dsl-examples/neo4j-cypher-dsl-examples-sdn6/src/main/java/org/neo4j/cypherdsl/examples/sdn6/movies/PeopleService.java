@@ -19,18 +19,18 @@
 package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 // tag::using-person-repo[]
+
 import java.util.Optional;
 import java.util.function.Function;
 
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
-// end::using-person-repo[]
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.ExpressionCreatedEventType;
 import org.neo4j.cypherdsl.parser.Options;
+
 import org.springframework.data.domain.Example;
-// tag::using-person-repo[]
 import org.springframework.data.neo4j.core.mapping.Constants;
 import org.springframework.data.neo4j.core.mapping.Neo4jMappingContext;
 import org.springframework.stereotype.Service;
@@ -38,6 +38,8 @@ import org.springframework.stereotype.Service;
 // end::using-person-repo[]
 
 /**
+ * Example service.
+ *
  * @author Michael J. Simons
  */
 // tag::using-person-repo[]
@@ -45,29 +47,28 @@ import org.springframework.stereotype.Service;
 final class PeopleService {
 
 	private final Person_ person;
+
 	private final SymbolicName personRootName;
 
 	private final PeopleRepository peopleRepository;
 
 	PeopleService(PeopleRepository peopleRepository, Neo4jMappingContext mappingContext) {
 		this.peopleRepository = peopleRepository;
-		this.personRootName = Constants.NAME_OF_TYPED_ROOT_NODE.apply(
-			mappingContext.getRequiredPersistentEntity(Person.class));
-		this.person = Person_.PERSON.named(personRootName);
+		this.personRootName = Constants.NAME_OF_TYPED_ROOT_NODE
+			.apply(mappingContext.getRequiredPersistentEntity(Person.class));
+		this.person = Person_.PERSON.named(this.personRootName);
 	}
 
 	// end::using-person-repo[]
 	Optional<Person> findOne(Example<Person> example) {
-		return peopleRepository.findOne(example);
+		return this.peopleRepository.findOne(example);
 	}
-
 
 	// tag::using-parser-with-spring[]
 	Iterable<Person> findPeopleBornAfterThe70tiesAnd(String additionalConditions) {
 
-		return peopleRepository.findAll(
-			person.BORN.gte(Cypher.literalOf(1980))
-				.and(CypherParser.parseExpression(additionalConditions).asCondition()) // <.>
+		return this.peopleRepository.findAll(this.person.BORN.gte(Cypher.literalOf(1980))
+			.and(CypherParser.parseExpression(additionalConditions).asCondition()) // <.>
 		);
 	}
 	// end::using-parser-with-spring[]
@@ -75,35 +76,25 @@ final class PeopleService {
 	// tag::using-parser-with-spring2[]
 	Iterable<Person> findPeopleBornAfterThe70tiesAndV2(String additionalConditions) {
 
-		Function<Expression, Expression> enforceReference =
-			e -> personRootName.property(((SymbolicName) e).getValue()); // <.>
+		Function<Expression, Expression> enforceReference = e -> this.personRootName
+			.property(((SymbolicName) e).getValue()); // <.>
 		var parserOptions = Options.newOptions()
-			.withCallback(
-				ExpressionCreatedEventType.ON_NEW_VARIABLE,
-				Expression.class,
-				enforceReference
-			) // <.>
+			.withCallback(ExpressionCreatedEventType.ON_NEW_VARIABLE, Expression.class, enforceReference) // <.>
 			.build();
 
-		return peopleRepository.findAll(
-			person.BORN.gte(Cypher.literalOf(1980)).and(
-				CypherParser.parseExpression(
-					additionalConditions,
-					parserOptions // <.>
-				).asCondition()
-			)
-		);
+		return this.peopleRepository.findAll(this.person.BORN.gte(Cypher.literalOf(1980))
+			.and(CypherParser.parseExpression(additionalConditions, parserOptions // <.>
+			).asCondition()));
 	}
 	// end::using-parser-with-spring2[]
 
 	// tag::using-person-repo[]
 	Iterable<Person> findPeopleBornInThe70tiesOr(Optional<String> optionalName) {
 
-		return peopleRepository.findAll(
-			person.BORN.gte(Cypher.literalOf(1970)).and(person.BORN.lt(Cypher.literalOf(1980))) // <.>
-				.or(optionalName
-					.map(name -> person.NAME.isEqualTo(Cypher.anonParameter(name))) // <.>
-					.orElseGet(Cypher::noCondition)) // <.>
+		return this.peopleRepository.findAll(this.person.BORN.gte(Cypher.literalOf(1970))
+			.and(this.person.BORN.lt(Cypher.literalOf(1980))) // <.>
+			.or(optionalName.map(name -> this.person.NAME.isEqualTo(Cypher.anonParameter(name))) // <.>
+				.orElseGet(Cypher::noCondition)) // <.>
 		);
 	}
 
@@ -117,32 +108,31 @@ final class PeopleService {
 			.optionalMatch(d.DIRECTORS)
 			.optionalMatch(a.ACTORS)
 			.optionalMatch(Person_.PERSON.relationshipTo(m).relationshipFrom(r, ActedIn_.$TYPE))
-			.returningDistinct(
-				Person_.PERSON.getRequiredSymbolicName(),
-				Cypher.collectDistinct(d).as("directed"),
-				Cypher.collectDistinct(a).as("actedIn"),
-				Cypher.collectDistinct(r).as("related")).build();
+			.returningDistinct(Person_.PERSON.getRequiredSymbolicName(), Cypher.collectDistinct(d).as("directed"),
+					Cypher.collectDistinct(a).as("actedIn"), Cypher.collectDistinct(r).as("related"))
+			.build();
 
-		return peopleRepository.findOne(statement, PersonDetails.class); // <.>
+		return this.peopleRepository.findOne(statement, PersonDetails.class); // <.>
 	}
 	// end::using-person-repo[]
 
 	// tag::using-temporals[]
 	Optional<Person> createNewPerson(NewPersonCmd newPersonCmd) {
-		var p = Person_.PERSON.withProperties(
-			Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName()) // <.>
+		var p = Person_.PERSON.withProperties(Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName()) // <.>
 		).named("p");
 
 		var statement = Cypher.merge(p)
-			.onCreate().set(
-				p.BORN, Cypher.parameter("arbitraryName")
-					.withValue(newPersonCmd.getDob().getYear()), // <.>
-				p.DOB, Cypher.anonParameter(newPersonCmd.getDob()) // <.>
-			).returning(p).build();
-		return peopleRepository.findOne(statement);
+			.onCreate()
+			.set(p.BORN, Cypher.parameter("arbitraryName").withValue(newPersonCmd.getDob().getYear()), // <.>
+					p.DOB, Cypher.anonParameter(newPersonCmd.getDob()) // <.>
+			)
+			.returning(p)
+			.build();
+		return this.peopleRepository.findOne(statement);
 	}
 	// end::using-temporals[]
 
 	// tag::using-person-repo[]
+
 }
 // end::using-person-repo[]

@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,14 +27,17 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * This is the base class for all relationships. It can be used with generics, specifying valid start and end nodes.
- * This is useful when using it as a base class for a static meta model.
+ * This is the base class for all relationships. It can be used with generics, specifying
+ * valid start and end nodes. This is useful when using it as a base class for a static
+ * metamodel.
  *
+ * @param <S> the type at the start of the relationship
+ * @param <E> the type at the pointy end of the relationship
+ * @param <SELF> the type of the persistent relationship itself
  * @author Michael J. Simons
- * @param <S> The type at the start of the relationship
- * @param <E> The type at the pointy end of the relationship
- * @param <SELF> The type of the persistent relationship itself
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
@@ -52,21 +53,73 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	final QuantifiedPathPattern.Quantifier quantifier;
 
 	// ------------------------------------------------------------------------
-	// Public API to be used by the static meta model.
+	// Public API to be used by the static metamodel.
 	// Non-final methods are ok to be overwritten.
 	// ------------------------------------------------------------------------
 
 	/**
 	 * Always creates a relationship from start to end (left to right).
-	 *
-	 * @param start           start node
-	 * @param end             end node
-	 * @param type            type of the relationship
+	 * @param start start node
+	 * @param end end node
+	 * @param type type of the relationship
 	 * @param additionalTypes additional types to add to the relationship
 	 */
 	protected RelationshipBase(S start, String type, E end, String... additionalTypes) {
 
 		this(null, start, Direction.LTR, null, end, mergeTypesIfNecessary(type, additionalTypes));
+	}
+
+	/**
+	 * Always creates a relationship from start to end (left to right).
+	 * @param symbolicName an optional symbolic name
+	 * @param start start node
+	 * @param properties the properties for the relationship
+	 * @param end end node
+	 * @param type type of the relationship
+	 * @param additionalTypes additional types to be added to the relationship, only
+	 * meaningful when the object is used for querying, when used in a {@code CREATE} or
+	 * {@code MERGE} clause the runtime will throw an exception.
+	 */
+	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end,
+			String... additionalTypes) {
+
+		this(symbolicName, start, Direction.LTR, properties, null, end, mergeTypesIfNecessary(type, additionalTypes));
+	}
+
+	/**
+	 * Always creates a relationship from start to end (left to right).
+	 * @param symbolicName an optional symbolic name
+	 * @param start start node
+	 * @param properties the properties for the relationship
+	 * @param end end node
+	 * @param type type of the relationship
+	 */
+	protected RelationshipBase(SymbolicName symbolicName, String type, Node start, Properties properties, Node end) {
+		this(symbolicName, start, Direction.LTR, properties, null, end, type);
+	}
+
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction,
+			QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
+
+		this(symbolicName, left, direction, null, quantifier, right, types);
+	}
+
+	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties,
+			QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
+
+		this(left, Details.create(direction, symbolicName, types).with(properties), quantifier, right);
+	}
+
+	RelationshipBase(Node left, Details details, QuantifiedPathPattern.Quantifier quantifier, Node right) {
+
+		Assertions.notNull(left, "Left node is required.");
+		Assertions.notNull(details, "Details are required.");
+		Assertions.notNull(right, "Right node is required.");
+
+		this.left = left;
+		this.right = right;
+		this.details = details;
+		this.quantifier = quantifier;
 	}
 
 	private static String[] mergeTypesIfNecessary(String type, String... additionalTypes) {
@@ -80,37 +133,6 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		return new String[] { type };
 	}
 
-	/**
-	 * Always creates a relationship from start to end (left to right).
-	 *
-	 * @param symbolicName    an optional symbolic name
-	 * @param start           start node
-	 * @param properties      The properties for the relationship
-	 * @param end             end node
-	 * @param type            type of the relationship
-	 * @param additionalTypes Additional types to be added to the relationship, only meaningfull when the object is used
-	 *                        for querying, when used in a {@literal CREATE} or {@literal MERGE} clause the runtime will
-	 *                        throw an exception.
-	 */
-	protected RelationshipBase(SymbolicName symbolicName, Node start, String type, Properties properties, Node end,
-		String... additionalTypes) {
-
-		this(symbolicName, start, Direction.LTR, properties, null, end, mergeTypesIfNecessary(type, additionalTypes));
-	}
-
-	/**
-	 * Always creates a relationship from start to end (left to right).
-	 *
-	 * @param symbolicName an optional symbolic name
-	 * @param start        start node
-	 * @param properties   The properties for the relationship
-	 * @param end          end node
-	 * @param type         type of the relationship
-	 */
-	protected RelationshipBase(SymbolicName symbolicName, String type, Node start, Properties properties, Node end) {
-		this(symbolicName, start, Direction.LTR, properties, null, end, type);
-	}
-
 	@Override
 	public final SELF named(String newSymbolicName) {
 
@@ -119,9 +141,10 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	}
 
 	/**
-	 * This method needs to be implemented to provide new, type safe instances of this relationship.
+	 * This method needs to be implemented to provide new, type safe instances of this
+	 * relationship.
 	 * @param newSymbolicName the new symbolic name.
-	 * @return A new relationship
+	 * @return a new relationship
 	 */
 	@Override
 	public abstract SELF named(SymbolicName newSymbolicName);
@@ -143,31 +166,33 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	}
 
 	/**
-	 * This method needs to be implemented to provide new, type safe instances of this relationship.
-	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
-	 * @return A new relationship
+	 * This method needs to be implemented to provide new, type safe instances of this
+	 * relationship.
+	 * @param newProperties the new properties (can be {@literal null} to remove exiting
+	 * properties).
+	 * @return a new relationship
 	 */
 	@Override
 	public abstract SELF withProperties(MapExpression newProperties);
 
 	@Override
 	public final Node getLeft() {
-		return left;
+		return this.left;
 	}
 
 	@Override
 	public final Node getRight() {
-		return right;
+		return this.right;
 	}
 
 	@Override
 	public final QuantifiedPathPattern.Quantifier getQuantifier() {
-		return quantifier;
+		return this.quantifier;
 	}
 
 	@Override
 	public final Details getDetails() {
-		return details;
+		return this.details;
 	}
 
 	@Override
@@ -191,7 +216,8 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 	@Override
 	public final Relationship length(Integer minimum, Integer maximum) {
 
-		return new InternalRelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.quantifier, this.right);
+		return new InternalRelationshipImpl(this.left, this.details.min(minimum).max(maximum), this.quantifier,
+				this.right);
 	}
 
 	@Override
@@ -202,33 +228,31 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 	@Override
 	public final Optional<SymbolicName> getSymbolicName() {
-		return details.getSymbolicName();
+		return this.details.getSymbolicName();
 	}
 
 	@Override
 	public final SymbolicName getRequiredSymbolicName() {
-		return details.getRequiredSymbolicName();
+		return this.details.getRequiredSymbolicName();
 	}
 
 	@Override
 	public final RelationshipChain relationshipTo(Node other, String... types) {
-		return RelationshipChain
-				.create(this)
-				.add(this.right.relationshipTo(other, types));
+		return RelationshipChain.create(this).add(this.right.relationshipTo(other, types));
 	}
+
+	// ------------------------------------------------------------------------
+	// Internal API.
+	// ------------------------------------------------------------------------
 
 	@Override
 	public final RelationshipChain relationshipFrom(Node other, String... types) {
-		return RelationshipChain
-				.create(this)
-				.add(this.right.relationshipFrom(other, types));
+		return RelationshipChain.create(this).add(this.right.relationshipFrom(other, types));
 	}
 
 	@Override
 	public final RelationshipChain relationshipBetween(Node other, String... types) {
-		return RelationshipChain
-				.create(this)
-				.add(this.right.relationshipBetween(other, types));
+		return RelationshipChain.create(this).add(this.right.relationshipBetween(other, types));
 	}
 
 	@Override
@@ -236,41 +260,15 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 		return RelationshipPatternCondition.of(this);
 	}
 
-	// ------------------------------------------------------------------------
-	// Internal API.
-	// ------------------------------------------------------------------------
-
-	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
-
-		this(symbolicName, left, direction, null, quantifier, right, types);
-	}
-
-	RelationshipBase(SymbolicName symbolicName, Node left, Direction direction, Properties properties, QuantifiedPathPattern.Quantifier quantifier, Node right, String... types) {
-
-		this(left, Details.create(direction, symbolicName, types).with(properties), quantifier, right);
-	}
-
-	RelationshipBase(Node left, Details details, QuantifiedPathPattern.Quantifier quantifier, Node right) {
-
-		Assertions.notNull(left, "Left node is required.");
-		Assertions.notNull(details, "Details are required.");
-		Assertions.notNull(right, "Right node is required.");
-
-		this.left = left;
-		this.right = right;
-		this.details = details;
-		this.quantifier = quantifier;
-	}
-
 	@Override
 	public final void accept(Visitor visitor) {
 
 		visitor.enter(this);
 
-		left.accept(visitor);
-		details.accept(visitor);
+		this.left.accept(visitor);
+		this.details.accept(visitor);
 		Visitable.visitIfNotNull(this.quantifier, visitor);
-		right.accept(visitor);
+		this.right.accept(visitor);
 
 		visitor.leave(this);
 	}
@@ -302,4 +300,5 @@ public abstract class RelationshipBase<S extends NodeBase<?>, E extends NodeBase
 
 		return QuantifiedPathPattern.of(this, newQuantifier);
 	}
+
 }

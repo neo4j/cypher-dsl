@@ -26,11 +26,13 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
 /**
+ * Connects several visitables into one element.
+ *
  * @author Michael J. Simons
- * @soundtrack Deichkind - Bitte ziehen Sie durch
  * @since 1.0
  */
 class MultiPartElement implements Visitable {
+
 	private final List<Visitable> precedingClauses;
 
 	private final With with;
@@ -39,7 +41,8 @@ class MultiPartElement implements Visitable {
 
 		if (precedingClauses == null || precedingClauses.isEmpty()) {
 			this.precedingClauses = Collections.emptyList();
-		} else {
+		}
+		else {
 			this.precedingClauses = new ArrayList<>(precedingClauses);
 		}
 
@@ -50,8 +53,8 @@ class MultiPartElement implements Visitable {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		precedingClauses.forEach(c -> c.accept(visitor));
-		with.accept(visitor);
+		this.precedingClauses.forEach(c -> c.accept(visitor));
+		this.with.accept(visitor);
 		visitor.leave(this);
 	}
 
@@ -59,4 +62,5 @@ class MultiPartElement implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

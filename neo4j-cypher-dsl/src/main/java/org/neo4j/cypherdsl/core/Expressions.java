@@ -31,12 +31,14 @@ import org.neo4j.cypherdsl.core.Statement.UnionQuery;
  */
 final class Expressions {
 
+	private Expressions() {
+	}
+
 	/**
 	 * Creates a {@literal COUNT} sub-query expressions from at least one pattern.
-	 *
-	 * @param requiredPattern One pattern is required
-	 * @param patternElement  Optional pattern
-	 * @return The immutable {@link CountExpression}
+	 * @param requiredPattern one pattern is required
+	 * @param patternElement optional pattern
+	 * @return the immutable {@link CountExpression}
 	 * @since 2023.0.0
 	 */
 	static CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
@@ -45,9 +47,8 @@ final class Expressions {
 
 	/**
 	 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
-	 *
-	 * @param union The union that will be the source of the {@literal COUNT} sub-query
-	 * @return The immutable {@link CountExpression}
+	 * @param union the union that will be the source of the {@literal COUNT} sub-query
+	 * @return the immutable {@link CountExpression}
 	 * @since 2023.0.0
 	 */
 	static CountExpression count(UnionQuery union) {
@@ -55,13 +56,14 @@ final class Expressions {
 	}
 
 	/**
-	 * Creates a {@literal COUNT} from a full statement, including  its filters and conditions. The statement may or may
-	 * not have a {@literal RETURN} clause. It must however not contain any updates. While it would render syntactically
-	 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
-	 *
-	 * @param statement The statement to be passed to {@code count{}}
-	 * @param imports   Optional imports to be used in the statement (will be imported with {@literal WITH})
-	 * @return A counting sub-query.
+	 * Creates a {@literal COUNT} from a full statement, including its filters and
+	 * conditions. The statement may or may not have a {@literal RETURN} clause. It must
+	 * however not contain any updates. While it would render syntactically correct
+	 * Cypher, Neo4j does not support updates inside counting sub-queries.
+	 * @param statement the statement to be passed to {@code count{}}
+	 * @param imports optional imports to be used in the statement (will be imported with
+	 * {@literal WITH})
+	 * @return a counting sub-query.
 	 * @since 2023.1.0
 	 */
 	static CountExpression count(Statement statement, IdentifiableElement... imports) {
@@ -69,10 +71,9 @@ final class Expressions {
 	}
 
 	/**
-	 * Creates a {@literal COUNT} expression based on a list of pattern
-	 *
+	 * Creates a {@literal COUNT} expression based on a list of pattern.
 	 * @param pattern the list of patterns that shall be counted
-	 * @param where   an optional where-clause
+	 * @param where an optional where-clause
 	 * @return a count expression.
 	 * @since 2023.9.0
 	 */
@@ -82,23 +83,25 @@ final class Expressions {
 	}
 
 	/**
-	 * Start building a new sub-query expression by importing variables into the scope with a {@literal WITH} clause.
-	 *
-	 * @param identifiableElements The identifiable elements to import
-	 * @return A builder for creating the concrete sub-query
+	 * Start building a new sub-query expression by importing variables into the scope
+	 * with a {@literal WITH} clause.
+	 * @param identifiableElements the identifiable elements to import
+	 * @return a builder for creating the concrete sub-query
 	 * @since 2023.0.0
 	 */
 	static SubqueryExpressionBuilder with(IdentifiableElement... identifiableElements) {
 
 		var returnItems = new ExpressionList(
-			Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
+				Arrays.stream(identifiableElements).map(IdentifiableElement::asExpression).toList());
 		var with = new With(false, returnItems, null, null, null, null);
 		return new SubqueryExpressionBuilder() {
-			@Override 		public CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
+			@Override
+			public CountExpression count(PatternElement requiredPattern, PatternElement... patternElement) {
 				return CountExpression.count(with, Pattern.of(requiredPattern, patternElement));
 			}
 
-			@Override 		public CountExpression count(UnionQuery union) {
+			@Override
+			public CountExpression count(UnionQuery union) {
 				return CountExpression.count(with, union);
 			}
 
@@ -110,10 +113,10 @@ final class Expressions {
 	}
 
 	/**
-	 * Creates a {@literal COLLECT} subquery from a statement, including  its filters and conditions. The statement must
-	 * return exactly one column. It must however not contain any updates. While it would render syntactically
-	 * correct Cypher, Neo4j does not support updates inside counting sub-queries.
-	 *
+	 * Creates a {@literal COLLECT} subquery from a statement, including its filters and
+	 * conditions. The statement must return exactly one column. It must however not
+	 * contain any updates. While it would render syntactically correct Cypher, Neo4j does
+	 * not support updates inside counting sub-queries.
 	 * @param statement the statement to be passed to {@code COLLECT{}}
 	 * @return a collecting sub-query.
 	 * @since 2023.8.0
@@ -122,22 +125,26 @@ final class Expressions {
 
 		if (!statement.doesReturnOrYield()) {
 			throw new IllegalArgumentException(
-				"The final RETURN clause in a subquery used with COLLECT is mandatory and the RETURN clause must return exactly one column.");
+					"The final RETURN clause in a subquery used with COLLECT is mandatory and the RETURN clause must return exactly one column.");
 		}
 
 		return CollectExpression.collect(statement);
 	}
 
 	/**
-	 * @param expression Possibly named with a non-empty symbolic name.
-	 * @param <T>        The type being returned
-	 * @return The name of the expression if the expression is named or the expression itself.
+	 * Returns the name of the expression if the expression is named or the expression
+	 * itself.
+	 * @param expression possibly named with a non-empty symbolic name.
+	 * @param <T> the type being returned
+	 * @return the name of the expression if the expression is named or the expression
+	 * itself
 	 */
 	static <T extends Expression> Expression nameOrExpression(T expression) {
 
 		if (expression instanceof Named named) {
 			return named.getSymbolicName().map(Expression.class::cast).orElse(expression);
-		} else {
+		}
+		else {
 			return expression;
 		}
 	}
@@ -147,19 +154,21 @@ final class Expressions {
 	}
 
 	static SymbolicName[] createSymbolicNames(Named[] variables) {
-		return Arrays.stream(variables).map(Named::getRequiredSymbolicName)
-			.toArray(SymbolicName[]::new);
+		return Arrays.stream(variables).map(Named::getRequiredSymbolicName).toArray(SymbolicName[]::new);
 	}
 
 	static String format(Expression expression) {
 
 		if (expression instanceof Named named) {
 			return named.getRequiredSymbolicName().getValue();
-		} else if (expression instanceof AliasedExpression aliasedExpression) {
+		}
+		else if (expression instanceof AliasedExpression aliasedExpression) {
 			return aliasedExpression.getAlias();
-		} else if (expression instanceof SymbolicName symbolicName) {
+		}
+		else if (expression instanceof SymbolicName symbolicName) {
 			return symbolicName.getValue();
-		} else if (expression instanceof Property) {
+		}
+		else if (expression instanceof Property) {
 			StringBuilder ref = new StringBuilder();
 			expression.accept(segment -> {
 				if (segment instanceof SymbolicName symbolicName) {
@@ -176,6 +185,4 @@ final class Expressions {
 		throw new IllegalArgumentException("Cannot format expression " + expression.toString());
 	}
 
-	private Expressions() {
-	}
 }

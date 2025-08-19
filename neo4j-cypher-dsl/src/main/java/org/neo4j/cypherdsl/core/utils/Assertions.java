@@ -24,21 +24,25 @@ import java.util.Objects;
 import org.apiguardian.api.API;
 
 /**
- * Assertions used throughout the Cypher-DSL. Mostly copied over from {@literal org.springframework.util.Assert}. Thanks
- * to the original authors: Keith Donald, Juergen Hoeller, Sam Brannen, Colin Sampaleanu and Rob Harrop.
- * Not supported for external use in any way.
+ * Assertions used throughout the Cypher-DSL. Mostly copied over from
+ * {@literal org.springframework.util.Assert}. Thanks to the original authors: Keith
+ * Donald, Juergen Hoeller, Sam Brannen, Colin Sampaleanu and Rob Harrop. Not supported
+ * for external use in any way.
  *
+ * @author Michael J. Simons
  * @since 2020.0.0
  */
 @API(status = API.Status.INTERNAL, since = "2020.0.0")
 public final class Assertions {
 
+	private Assertions() {
+	}
+
 	/**
-	 * Assert that the given String contains valid text content; that is, it must not
-	 * be {@code null} and must contain at least one non-whitespace character.
+	 * Assert that the given String contains valid text content; that is, it must not be
+	 * {@code null} and must contain at least one non-whitespace character.
 	 * <pre class="code">Assert.hasText(name, "'name' must not be empty");</pre>
-	 *
-	 * @param text    the String to check
+	 * @param text the String to check
 	 * @param message the exception message to use if the assertion fails
 	 * @throws IllegalArgumentException if the text does not contain valid text content
 	 */
@@ -49,12 +53,11 @@ public final class Assertions {
 	}
 
 	/**
-	 * Assert a boolean expression, throwing an {@code IllegalArgumentException}
-	 * if the expression evaluates to {@code false}.
-	 * <pre class="code">Assert.isTrue(i &gt; 0, "The value must be greater than zero");</pre>
-	 *
+	 * Assert a boolean expression, throwing an {@code IllegalArgumentException} if the
+	 * expression evaluates to {@code false}. <pre class=
+	 * "code">Assert.isTrue(i &gt; 0, "The value must be greater than zero");</pre>
 	 * @param expression a boolean expression
-	 * @param message    the exception message to use if the assertion fails
+	 * @param message the exception message to use if the assertion fails
 	 * @throws IllegalArgumentException if {@code expression} is {@code false}
 	 */
 	public static void isTrue(boolean expression, String message) {
@@ -66,8 +69,7 @@ public final class Assertions {
 	/**
 	 * Assert that an object is not {@code null}.
 	 * <pre class="code">Assert.notNull(clazz, "The class must not be null");</pre>
-	 *
-	 * @param object  the object to check
+	 * @param object the object to check
 	 * @param message the exception message to use if the assertion fails
 	 * @throws IllegalArgumentException if the object is {@code null}
 	 */
@@ -80,9 +82,8 @@ public final class Assertions {
 	/**
 	 * Assert that the provided object is an instance of the provided class.
 	 * <pre class="code">Assert.instanceOf(Foo.class, foo, "Foo expected");</pre>
-	 *
-	 * @param type    the type to check against
-	 * @param obj     the object to check
+	 * @param type the type to check against
+	 * @param obj the object to check
 	 * @param message the exception message to use if the assertion fails
 	 * @throws IllegalArgumentException if the object is not an instance of type
 	 */
@@ -94,13 +95,13 @@ public final class Assertions {
 	}
 
 	/**
-	 * Assert that an array contains elements; that is, it must not be
-	 * {@code null} and must contain at least one element.
+	 * Assert that an array contains elements; that is, it must not be {@code null} and
+	 * must contain at least one element.
 	 * <pre class="code">Assert.notEmpty(array, "The array must contain elements");</pre>
-	 *
-	 * @param array   the array to check
+	 * @param array the array to check
 	 * @param message the exception message to use if the assertion fails
-	 * @throws IllegalArgumentException if the object array is {@code null} or contains no elements
+	 * @throws IllegalArgumentException if the object array is {@code null} or contains no
+	 * elements
 	 */
 	public static void notEmpty(Object[] array, String message) {
 		if (isEmpty(array)) {
@@ -112,6 +113,4 @@ public final class Assertions {
 		return array == null || array.length == 0 || Arrays.stream(array).allMatch(Objects::isNull);
 	}
 
-	private Assertions() {
-	}
 }

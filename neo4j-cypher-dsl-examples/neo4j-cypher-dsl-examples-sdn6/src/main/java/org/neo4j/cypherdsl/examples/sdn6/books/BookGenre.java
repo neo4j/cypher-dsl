@@ -23,9 +23,15 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @Node
 public class BookGenre {
-	@Id @GeneratedValue String id;
+
+	@Id
+	@GeneratedValue
+	String id;
+
 }

@@ -19,7 +19,7 @@ explicitly specifying a renderer:
 [source,java,indent=0,tabsize=4]
 .The Cypher-DSL core package must not depend on the rendering infrastructure
 ----
-include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTest.java[tag=arch-rules.structure:core-must-not-depend-on-renderer]
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTests.java[tag=arch-rules.structure:core-must-not-depend-on-renderer]
 ----
 
 The `renderer` package is not only free to use the whole `core`, it must do so to fulfill its purpose.
@@ -29,5 +29,5 @@ The `ast` and `utils` packages however should not have dependencies outside thei
 [source,java,indent=0,tabsize=4]
 .Supporting packages must not depend on anything from the outside
 ----
-include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTest.java[tag=arch-rules.structure:supporting-packages-are-dependency-free]
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTests.java[tag=arch-rules.structure:supporting-packages-are-dependency-free]
 ----

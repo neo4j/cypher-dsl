@@ -35,23 +35,29 @@ import javax.tools.Diagnostic;
 import javax.tools.FileObject;
 import javax.tools.StandardLocation;
 
-import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 
 /**
+ * Processor reacting on {@code @RegisterForReflection}.
+ *
  * @author Michael J. Simons
- * @soundtrack Ben Foster - Torchwood (Original Television Soundtrack)
  * @since 2022.2.2
  */
 @SupportedAnnotationTypes("org.neo4j.cypherdsl.build.annotations.RegisterForReflection")
 @SupportedOptions(RegisterForReflectionProcessor.NATIVE_IMAGE_SUBDIR_OPTION)
 public final class RegisterForReflectionProcessor extends AbstractProcessor {
 
-	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
 	static final String NATIVE_IMAGE_SUBDIR_OPTION = "org.neo4j.cypherdsl.build.native_config_dir";
+
+	private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+
 	private final Collection<Entry> entries = new TreeSet<>(Comparator.comparing(Entry::getName));
+
+	static boolean registersElements(RegisterForReflection registerForReflection) {
+		return registerForReflection.allDeclaredMethods() || registerForReflection.allDeclaredConstructors();
+	}
 
 	@Override
 	public SourceVersion getSupportedSourceVersion() {
@@ -61,21 +67,24 @@ public final class RegisterForReflectionProcessor extends AbstractProcessor {
 	@Override
 	public boolean process(Set<? extends TypeElement> annotations, RoundEnvironment roundEnv) {
 
-		if (roundEnv.processingOver() && !entries.isEmpty()) {
+		if (roundEnv.processingOver() && !this.entries.isEmpty()) {
 			try {
-				String subDir = processingEnv.getOptions().getOrDefault(NATIVE_IMAGE_SUBDIR_OPTION, "");
+				String subDir = this.processingEnv.getOptions().getOrDefault(NATIVE_IMAGE_SUBDIR_OPTION, "");
 				if (!(subDir.isEmpty() || subDir.endsWith("/"))) {
 					subDir += "/";
 				}
 				String reflectionConfigPath = String.format("META-INF/native-image/%sreflection-config.json", subDir);
-				FileObject fileObject = processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", reflectionConfigPath);
+				FileObject fileObject = this.processingEnv.getFiler()
+					.createResource(StandardLocation.CLASS_OUTPUT, "", reflectionConfigPath);
 				try (OutputStream oos = fileObject.openOutputStream()) {
-					OBJECT_MAPPER.writeValue(oos, entries);
+					OBJECT_MAPPER.writeValue(oos, this.entries);
 				}
-			} catch (IOException e) {
-				processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, e.getMessage());
 			}
-		} else if (!annotations.isEmpty()) {
+			catch (IOException ex) {
+				this.processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, ex.getMessage());
+			}
+		}
+		else if (!annotations.isEmpty()) {
 			roundEnv.getElementsAnnotatedWith(RegisterForReflection.class)
 				.stream()
 				.filter(e -> e.getKind().isClass() && registersElements(e.getAnnotation(RegisterForReflection.class)))
@@ -87,13 +96,10 @@ public final class RegisterForReflectionProcessor extends AbstractProcessor {
 					entry.setAllDeclaredConstructors(registerForReflection.allDeclaredConstructors());
 					return entry;
 				})
-				.forEach(entries::add);
+				.forEach(this.entries::add);
 		}
 
 		return true;
 	}
 
-	static boolean registersElements(RegisterForReflection registerForReflection) {
-		return registerForReflection.allDeclaredMethods() || registerForReflection.allDeclaredConstructors();
-	}
 }

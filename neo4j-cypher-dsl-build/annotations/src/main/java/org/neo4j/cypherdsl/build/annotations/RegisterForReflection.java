@@ -24,23 +24,23 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Used to mark classes to be included in `reflection-config.json` so that it doesn't need updates when new reflective visitors
- * and the like are added.
+ * Used to mark classes to be included in `reflection-config.json` so that it doesn't need
+ * updates when new reflective visitors and the like are added.
  * <p>
- * A thin documentation about the file format can be found <a href="https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/Reflection.md">here</a>.
+ * A thin documentation about the file format can be found <a href=
+ * "https://github.com/oracle/graal/blob/master/docs/reference-manual/native-image/Reflection.md">here</a>.
  * For now, only {@code allDeclaredMethods} is supported.
  * <p>
  * In the future, support can be added for
  * <ul>
- *     <li><code>allPublicConstructors</code></li>
- *     <li><code>allPublicMethods</code></li>
- *     <li><code>allPublicFields</code></li>
- *     <li><code>allDeclaredConstructors</code></li>
- *     <li><code>allDeclaredFields</code></li>
+ * <li><code>allPublicConstructors</code></li>
+ * <li><code>allPublicMethods</code></li>
+ * <li><code>allPublicFields</code></li>
+ * <li><code>allDeclaredConstructors</code></li>
+ * <li><code>allDeclaredFields</code></li>
  * </ul>
  *
  * @author Michael J. Simons
- * @soundtrack Ben Foster - Torchwood (Original Television Soundtrack)
  * @since 2022.2.2
  */
 @Retention(RetentionPolicy.CLASS)
@@ -48,12 +48,13 @@ import java.lang.annotation.Target;
 public @interface RegisterForReflection {
 
 	/**
-	 * @return true if all declared methods should be marked for inclusion in a native image.
+	 * {@return true if all declared methods should be marked for inclusion}
 	 */
 	boolean allDeclaredMethods() default true;
 
 	/**
-	 * @return true if all declared constructors should be marked for inclusions in a native image.
+	 * {@return true if all declared constructors should be marked for inclusion}
 	 */
 	boolean allDeclaredConstructors() default false;
+
 }

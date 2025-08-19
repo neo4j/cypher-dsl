@@ -38,4 +38,5 @@ final class PatternExpressionImpl implements PatternExpression, Visitable {
 		this.pattern.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,15 +28,19 @@ import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.utils.Strings;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * The default implementation of the {@link StatementContext}.
+ *
  * @author Michael J. Simons
- * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
 public final class DefaultStatementContext implements StatementContext {
 
 	private final AtomicInteger parameterCount = new AtomicInteger();
+
 	private final Map<Parameter<?>, String> parameterNames = new ConcurrentHashMap<>();
 
 	/**
@@ -49,9 +51,8 @@ public final class DefaultStatementContext implements StatementContext {
 	@Override
 	public String getParameterName(Parameter<?> parameter) {
 
-		return parameterNames
-			.computeIfAbsent(parameter,
-				p -> p.isAnon() ? String.format("pcdsl%02d", parameterCount.incrementAndGet()) : p.getName());
+		return this.parameterNames.computeIfAbsent(parameter,
+				p -> p.isAnon() ? String.format("pcdsl%02d", this.parameterCount.incrementAndGet()) : p.getName());
 	}
 
 	@Override
@@ -62,7 +63,7 @@ public final class DefaultStatementContext implements StatementContext {
 			if (Strings.hasText(value)) {
 				return SchemaNamesBridge.sanitize(value, false).orElse(value);
 			}
-			return String.format("%s%03d", Strings.randomIdentifier(8), resolvedSymbolicNames.size());
+			return String.format("%s%03d", Strings.randomIdentifier(8), this.resolvedSymbolicNames.size());
 		});
 	}
 
@@ -70,4 +71,5 @@ public final class DefaultStatementContext implements StatementContext {
 	public boolean isResolved(SymbolicName symbolicName) {
 		return this.resolvedSymbolicNames.containsKey(symbolicName);
 	}
+
 }

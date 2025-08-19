@@ -24,13 +24,18 @@ import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 
 /**
+ * Helper to deal with quantified path patterns.
+ *
+ * @param patternElement the pattern element in parentheses
+ * @param quantifier the quantifier
+ * @param predicate any predicate
  * @author Michael J. Simons
  */
-record ParenthesizedPathPatternAtom(RelationshipPattern patternElement, QuantifiedPathPattern.Quantifier quantifier, Expression predicate)
-	implements PatternAtom {
+record ParenthesizedPathPatternAtom(RelationshipPattern patternElement, QuantifiedPathPattern.Quantifier quantifier,
+		Expression predicate) implements PatternAtom {
 
 	PatternElement asPatternElement() {
 
-		return patternElement.quantify(quantifier).where(predicate);
+		return this.patternElement.quantify(this.quantifier).where(this.predicate);
 	}
 }

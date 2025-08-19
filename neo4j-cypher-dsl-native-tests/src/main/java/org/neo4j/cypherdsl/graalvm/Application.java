@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.querydsl.core.types.dsl.Expressions;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Node;
@@ -37,15 +38,18 @@ import org.neo4j.cypherdsl.parser.CypherParser;
 import org.neo4j.cypherdsl.parser.Options;
 import org.neo4j.driver.Values;
 
-import com.querydsl.core.types.dsl.Expressions;
-
 /**
+ * A random application which will be complied into a native binary. The testing will
+ * check the expected output.
+ *
  * @author Michael J. Simons
- * @soundtrack Bad Religion - Faith Alone 2020
  */
-public class Application {
+public final class Application {
 
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+
+	private Application() {
+	}
 
 	@SuppressWarnings("checkstyle:regexp")
 	public static void main(String... a) {
@@ -59,16 +63,19 @@ public class Application {
 		System.out.println(cypherRenderer.render(generateComplexQuery()));
 		System.out.println(CypherParser.parse("MATCH (p:Parser) RETURN p").getCypher());
 		try {
-			//noinspection ResultOfMethodCallIgnored
+			// noinspection ResultOfMethodCallIgnored
 			Cypher.returning((Expression) null);
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
+		}
+		catch (Exception ex) {
+			System.out.println(ex.getMessage());
 		}
 		System.out.println(useParserForRewrite());
 		System.out.println(generateDialectBasedQuery());
-		statement = CypherParser.parseStatement("MATCH (m:Movie {title: 'The Matrix'}) <- [a:ACTED_IN] - (p:Person) WHERE p.born >= 1979 RETURN m, a, p");
+		statement = CypherParser.parseStatement(
+				"MATCH (m:Movie {title: 'The Matrix'}) <- [a:ACTED_IN] - (p:Person) WHERE p.born >= 1979 RETURN m, a, p");
 		catalog = statement.getCatalog();
-		catalog.getIdentifiableExpressions().stream()
+		catalog.getIdentifiableExpressions()
+			.stream()
 			.filter(SymbolicName.class::isInstance)
 			.map(SymbolicName.class::cast)
 			.map(SymbolicName::getValue)
@@ -76,18 +83,23 @@ public class Application {
 			.forEach(System.out::println);
 		catalog.getAllPropertyFilters()
 			.entrySet()
-			.stream().sorted(Comparator.comparing(o -> o.getKey().name()))
-			.forEach(e -> System.out.println(e.getKey().name() + ": " + e.getValue().stream().limit(1).map(cc -> cc.right().toString()).collect(Collectors.joining())));
-		System.out.println(Cypher.adapt(Values.value(LocalDateTime.of(LocalDate.of(2023, 3, 24), LocalTime.of(10, 50, 23)))).asExpression());
-		System.out.println(Cypher.returning(Cypher.adapt(Expressions.TRUE.isTrue().and(Expressions.FALSE.isTrue())).asExpression()).build().getCypher());
+			.stream()
+			.sorted(Comparator.comparing(o -> o.getKey().name()))
+			.forEach(e -> System.out.println(e.getKey().name() + ": "
+					+ e.getValue().stream().limit(1).map(cc -> cc.right().toString()).collect(Collectors.joining())));
+		System.out
+			.println(Cypher.adapt(Values.value(LocalDateTime.of(LocalDate.of(2023, 3, 24), LocalTime.of(10, 50, 23))))
+				.asExpression());
+		System.out.println(
+				Cypher.returning(Cypher.adapt(Expressions.TRUE.isTrue().and(Expressions.FALSE.isTrue())).asExpression())
+					.build()
+					.getCypher());
 	}
 
 	private static Statement findAllMovies() {
 
 		var m = Cypher.node("Movie").named("m");
-		return Cypher.match(m)
-			.returning(m)
-			.build();
+		return Cypher.match(m).returning(m).build();
 	}
 
 	private static Statement generateQueryWithParams() {
@@ -106,26 +118,23 @@ public class Application {
 		var person = Cypher.node("Person").named("person");
 		var location = Cypher.node("Location").named("personLivesIn");
 		return Cypher.match(person)
-			.returning(
-				person.project(
-					"livesIn",
+			.returning(person.project("livesIn",
 					Cypher.subList(
-						Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN"))
-							.returning(location.project("name")),
-						Cypher.parameter("personLivedInOffset"),
-						Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst"))
-					)
-				)
-			).build();
+							Cypher.listBasedOn(person.relationshipTo(location, "LIVES_IN"))
+								.returning(location.project("name")),
+							Cypher.parameter("personLivedInOffset"),
+							Cypher.parameter("personLivedInOffset").add(Cypher.parameter("personLivedInFirst")))))
+			.build();
 	}
 
 	private static String useParserForRewrite() {
 
 		return CypherParser
 			.parseStatement("MATCH (p:Person) -[:HAT_GESPIELT_IN] -> (n:Movie) RETURN n",
-				Options.newOptions()
-					.withTypeFilter((e, t) -> t.size() == 1 && t.contains("HAT_GESPIELT_IN") ? Set.of("ACTED_IN") : t)
-					.build())
+					Options.newOptions()
+						.withTypeFilter(
+								(e, t) -> ((t.size() == 1) && t.contains("HAT_GESPIELT_IN")) ? Set.of("ACTED_IN") : t)
+						.build())
 			.getCypher();
 	}
 
@@ -133,7 +142,7 @@ public class Application {
 
 		Node n = Cypher.anyNode("n");
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_5).build());
-		return renderer.render(
-			Cypher.match(n).returning(Cypher.distance(n.property("a"), n.property("b"))).build());
+		return renderer.render(Cypher.match(n).returning(Cypher.distance(n.property("a"), n.property("b"))).build());
 	}
+
 }

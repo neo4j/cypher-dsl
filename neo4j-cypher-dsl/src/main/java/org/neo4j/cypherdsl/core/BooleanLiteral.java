@@ -18,15 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * The boolean literal.
  *
  * @author Michael J. Simons
- * @soundtrack Bad Religion - Age Of Unreason
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -35,17 +34,18 @@ public final class BooleanLiteral extends LiteralBase<Boolean> {
 	static final BooleanLiteral TRUE = new BooleanLiteral(true);
 	static final BooleanLiteral FALSE = new BooleanLiteral(false);
 
+	private BooleanLiteral(boolean content) {
+		super(content);
+	}
+
 	static Literal<Boolean> of(Boolean value) {
 
 		if (value != null && value) {
 			return TRUE;
-		} else {
+		}
+		else {
 			return FALSE;
 		}
-	}
-
-	private BooleanLiteral(boolean content) {
-		super(content);
 	}
 
 	@Override
@@ -55,6 +55,7 @@ public final class BooleanLiteral extends LiteralBase<Boolean> {
 
 	@Override
 	public Boolean getContent() {
-		return content;
+		return this.content;
 	}
+
 }

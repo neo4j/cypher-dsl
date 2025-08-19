@@ -25,4 +25,5 @@ package org.neo4j.cypherdsl.parser;
  * @since 2023.0.0
  */
 interface PatternAtom {
+
 }

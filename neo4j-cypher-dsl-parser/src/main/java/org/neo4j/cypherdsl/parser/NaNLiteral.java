@@ -24,14 +24,15 @@ import org.neo4j.cypherdsl.core.Literal;
  * Custom literal for {@link Double#NaN}.
  *
  * @author Michael J. Simons
- * @soundtrack The Prodigy - Music For The Jilted Generation
  * @since 2023.0.0
  */
 enum NaNLiteral implements Literal<Double> {
+
 	INSTANCE;
 
 	@Override
 	public String asString() {
 		return "NaN";
 	}
+
 }

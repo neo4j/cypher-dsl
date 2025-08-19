@@ -18,51 +18,49 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * This interface is used to derive new relationship patterns from existing {@link Relationship relationships} or {@link RelationshipChain chains of relationships}
+ * This interface is used to derive new relationship patterns from existing
+ * {@link Relationship relationships} or {@link RelationshipChain chains of relationships}
  * with new lengths (min, max or unbounded) configured.
  *
+ * @param <T> the type of the patterns whose lengths can be adjusted.
  * @author Michael J. Simons
- * @param <T> The type of the patterns whose lengths can be adjusted.
  * @since 2021.2.3
  */
 @API(status = STABLE, since = "2021.2.3")
 public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 
 	/**
-	 * Creates a new relationship pattern with an unbound length minimum length
-	 *
+	 * Creates a new relationship pattern with an unbound length minimum length.
 	 * @return the new relationship
 	 * @since 1.1.1
 	 */
 	T unbounded();
 
 	/**
-	 * Creates a new relationship pattern with a new minimum length
-	 *
+	 * Creates a new relationship pattern with a new minimum length.
 	 * @param minimum the new minimum
 	 * @return the new relationship
 	 */
 	T min(Integer minimum);
 
 	/**
-	 * Creates a new relationship pattern with a new maximum length
-	 *
+	 * Creates a new relationship pattern with a new maximum length.
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
 	T max(Integer maximum);
 
 	/**
-	 * Creates a new relationship pattern with a new length
-	 *
+	 * Creates a new relationship pattern with a new length.
 	 * @param minimum the new minimum
 	 * @param maximum the new maximum
 	 * @return the new relationship
 	 */
 	T length(Integer minimum, Integer maximum);
+
 }

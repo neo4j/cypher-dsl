@@ -23,7 +23,8 @@ import org.neo4j.cypherdsl.core.Expression;
 /**
  * Value object for expressions representing database names.
  *
- * @param value Representing a database name.
+ * @param value representing a database name.
+ * @author Michael J. Simons
  */
 public record DatabaseName(Expression value) {
 }

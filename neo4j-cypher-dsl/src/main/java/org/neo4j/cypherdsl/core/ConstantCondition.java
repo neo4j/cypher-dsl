@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A constant condition that is either always {@literal true} or {@literal false}.
@@ -38,4 +38,5 @@ public final class ConstantCondition extends ExpressionCondition {
 	private ConstantCondition(BooleanLiteral value) {
 		super(value);
 	}
+
 }

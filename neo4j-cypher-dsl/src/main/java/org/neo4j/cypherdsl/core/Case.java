@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/CaseExpression.html">CaseExpression</a>.
  *
  * @author Gerrit Meier
  * @author Michael J. Simons
@@ -36,19 +37,29 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 public interface Case extends Expression, ProvidesAffixes {
 
 	/**
+	 * Creates a new {@link Case} {@link Expression}.
+	 * @param expression starting expression for the simple case
+	 * @return the new expression
+	 */
+	static Case create(Expression expression) {
+		return (expression != null) ? new AbstractCase.SimpleCaseImpl(expression) : new AbstractCase.GenericCaseImpl();
+	}
+
+	/**
 	 * Creates a new case/when expression with an additional {@code WHEN} block.
-	 *
-	 * @param nextExpression The next expression to use.
-	 * @return An ongoing when builder.
+	 * @param nextExpression the next expression to use.
+	 * @return an ongoing when builder.
 	 */
 	@CheckReturnValue
 	OngoingWhenThen when(Expression nextExpression);
 
 	/**
-	 * Extension the {@link Case} interface to support simple case with an initial expression / condition.
+	 * Extension the {@link Case} interface to support simple case with an initial
+	 * expression / condition.
 	 */
 	@API(status = STABLE, since = "1.0")
 	interface SimpleCase extends Case {
+
 	}
 
 	/**
@@ -56,55 +67,48 @@ public interface Case extends Expression, ProvidesAffixes {
 	 */
 	@API(status = STABLE, since = "1.0")
 	interface GenericCase extends Case {
+
 	}
 
 	/**
-	 * Creates a new {@link Case} {@link Expression}
-	 * @param expression starting expression for the simple case
-	 * @return The new expression
-	 */
-	static Case create(Expression expression) {
-		return expression == null ? new AbstractCase.GenericCaseImpl() : new AbstractCase.SimpleCaseImpl(expression);
-	}
-
-	/**
-	 * Specification for a renderable, complete CASE statement
+	 * Specification for a renderable, complete CASE statement.
 	 */
 	@API(status = STABLE, since = "1.0")
 	interface CaseEnding extends Case {
 
 		/**
 		 * Adds a new {@code WHEN} block.
-		 *
-		 * @param expression A new when expression.
-		 * @return An ongoing when builder.
+		 * @param expression a2 new when expression.
+		 * @return an ongoing when builder.
 		 */
 		@CheckReturnValue
 		OngoingWhenThen when(Expression expression);
 
 		/**
 		 * Ends this case expression with a default expression to evaluate.
-		 *
-		 * @param defaultExpression The new default expression
-		 * @return An ongoing when builder.
+		 * @param defaultExpression the new default expression
+		 * @return an ongoing when builder.
 		 */
 		@CheckReturnValue
 		Case elseDefault(Expression defaultExpression);
+
 	}
 
 	/**
-	 * Helper class to collect `when` expressions and create {@link CaseWhenThen} instances when the `then` is provided.
+	 * Helper class to collect `when` expressions and create {@link CaseWhenThen}
+	 * instances when the `then` is provided.
 	 */
 	@API(status = STABLE, since = "1.0")
 	interface OngoingWhenThen {
 
 		/**
 		 * Ends this {@code WHEN} block with an expression.
-		 *
-		 * @param expression The expression for the ongoing {@code WHEN} block.
-		 * @return An ongoing when builder.
+		 * @param expression the expression for the ongoing {@code WHEN} block.
+		 * @return an ongoing when builder.
 		 */
 		@CheckReturnValue
 		CaseEnding then(Expression expression);
+
 	}
+
 }

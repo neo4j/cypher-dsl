@@ -18,13 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A step exposing a {@link #unwind(Expression...)},{@link #unwind(Expression)}, {@link #unwind(String)} and method.
+ * A step exposing a {@link #unwind(Expression...)},{@link #unwind(Expression)},
+ * {@link #unwind(String)} and method.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -34,9 +35,8 @@ public interface ExposesUnwind {
 
 	/**
 	 * Starts building a new {@code UNWIND} clause.
-	 *
-	 * @param expressions The things to unwind.
-	 * @return An ongoing definition of an unwind.
+	 * @param expressions the things to unwind.
+	 * @return an ongoing definition of an unwind.
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingUnwind unwind(Expression... expressions) {
@@ -45,9 +45,8 @@ public interface ExposesUnwind {
 
 	/**
 	 * Starts building a new {@code UNWIND} clause.
-	 *
-	 * @param variable The thing to unwind.
-	 * @return An ongoing definition of an unwind.
+	 * @param variable the thing to unwind.
+	 * @return an ongoing definition of an unwind.
 	 */
 	@CheckReturnValue
 	default StatementBuilder.OngoingUnwind unwind(String variable) {
@@ -56,9 +55,9 @@ public interface ExposesUnwind {
 
 	/**
 	 * Starts building a new {@code UNWIND} clause.
-	 *
-	 * @param expression The things to unwind.
-	 * @return An ongoing definition of an unwind.
+	 * @param expression the things to unwind.
+	 * @return an ongoing definition of an unwind.
 	 */
 	StatementBuilder.OngoingUnwind unwind(Expression expression);
+
 }

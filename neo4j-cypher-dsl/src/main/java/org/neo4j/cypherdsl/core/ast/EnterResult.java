@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.core.ast;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Result of entering a {@link Visitable}. Visitables are not required to check the result and can enter their child elements
- * nevertheless.
+ * Result of entering a {@link Visitable}. Visitables are not required to check the result
+ * and can enter their child elements nevertheless.
  *
  * @author Michael J. Simons
  * @since 2022.3.0
@@ -33,12 +33,13 @@ import org.apiguardian.api.API;
 public enum EnterResult {
 
 	/**
-	 * Continue with all child elements
+	 * Continue with all child elements.
 	 */
 	CONTINUE,
 
 	/**
-	 * Skip child elements
+	 * Skip child elements.
 	 */
 	SKIP_CHILDREN
+
 }

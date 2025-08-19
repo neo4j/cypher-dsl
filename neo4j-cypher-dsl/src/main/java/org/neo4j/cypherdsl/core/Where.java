@@ -18,14 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Roughly corresponding to <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Match.html#Where">Where</a>.
+ * Roughly corresponding to <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Match.html#Where">Where</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -35,19 +36,20 @@ public final class Where implements Visitable {
 
 	private final Condition condition;
 
+	Where(Condition condition) {
+		this.condition = condition;
+	}
+
 	/**
-	 * Creates a new {@literal WHERE}
-	 *
-	 * @param optionalWhere An optional expression that must be usable {@link Expression#asCondition() "as condition"}.
-	 * @return A {@literal WHERE} expression or null when {@code optionalWhere} has been {@literal NULL}
+	 * Creates a new {@literal WHERE}.
+	 * @param optionalWhere an optional expression that must be usable
+	 * {@link Expression#asCondition() "as condition"}.
+	 * @return a {@literal WHERE} expression or null when {@code optionalWhere} has been
+	 * {@literal NULL}
 	 * @since 2022.0.0
 	 */
 	public static Where from(Expression optionalWhere) {
-		return optionalWhere == null ? null : new Where(optionalWhere.asCondition());
-	}
-
-	Where(Condition condition) {
-		this.condition = condition;
+		return (optionalWhere != null) ? new Where(optionalWhere.asCondition()) : null;
 	}
 
 	@Override
@@ -64,4 +66,5 @@ public final class Where implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

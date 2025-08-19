@@ -25,9 +25,11 @@ import com.querydsl.core.annotations.QueryEntity;
  */
 @QueryEntity
 public class Stuff {
+
 	String name;
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
+
 }

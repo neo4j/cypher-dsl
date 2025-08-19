@@ -20,26 +20,26 @@ package org.neo4j.cypherdsl.core;
 
 import java.time.Period;
 
-
 /**
- * A literal representing a period value to be formatted in a way that Neo4j's Cypher understands it.
+ * A literal representing a period value to be formatted in a way that Neo4j's Cypher
+ * understands it.
  *
  * @author Michael J. Simons
  * @since 2023.2.1
  */
 final class PeriodLiteral extends LiteralBase<Period> {
 
-	static Literal<Period> of(Period duration) {
-		return new PeriodLiteral(duration);
-	}
-
 	private PeriodLiteral(Period content) {
 		super(content);
 	}
 
+	static Literal<Period> of(Period duration) {
+		return new PeriodLiteral(duration);
+	}
+
 	@Override
 	public Period getContent() {
-		return content;
+		return this.content;
 	}
 
 	@Override
@@ -47,16 +47,17 @@ final class PeriodLiteral extends LiteralBase<Period> {
 		var result = new StringBuilder();
 		result.append("duration('P");
 
-		if (content.getYears() != 0) {
-			result.append(content.getYears()).append("Y");
+		if (this.content.getYears() != 0) {
+			result.append(this.content.getYears()).append("Y");
 		}
-		if (content.getMonths() != 0) {
-			result.append(content.getMonths()).append("M");
+		if (this.content.getMonths() != 0) {
+			result.append(this.content.getMonths()).append("M");
 		}
-		if (content.getDays() != 0) {
-			result.append(content.getDays()).append("D");
+		if (this.content.getDays() != 0) {
+			result.append(this.content.getDays()).append("D");
 		}
 		result.append("')");
 		return result.toString();
 	}
+
 }

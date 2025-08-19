@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Arrays;
 
 import org.apiguardian.api.API;
@@ -27,11 +25,13 @@ import org.neo4j.cypherdsl.core.StatementBuilder.BuildableStatement;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * This exposes a call method taking in a statement that represents a valid, correlated subquery.
+ * This exposes a call method taking in a statement that represents a valid, correlated
+ * subquery.
  *
  * @author Michael J. Simons
- * @soundtrack Die Ärzte - Seitenhirsch
  * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
@@ -40,26 +40,17 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 public interface ExposesSubqueryCall {
 
 	/**
-	 * Subqueries can be valid without any further return statement (i.e when the subquery is a {@literal void} ({@literal unit})
-	 * one, meaning it doesn't yield or return its results. The Cypher-DSL doesn't do any checking here, so please be
-	 * careful when using that construct.
-	 *
-	 * @since 2022.3.0
-	 */
-	interface BuildableSubquery extends OngoingReadingWithoutWhere, BuildableStatement<Statement> {
-	}
-
-	/**
 	 * The {@link Statement subquery} parameter must be a valid subquery.
 	 * <ul>
 	 * <li>can be a unit statement</li>
 	 * <li>cannot refer to variables from the enclosing query</li>
-	 * <li>cannot return variables with the same names as variables in the enclosing query</li>
-	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
+	 * <li>cannot return variables with the same names as variables in the enclosing
+	 * query</li>
+	 * <li>All variables that are returned from a subquery are afterwards available in the
+	 * enclosing query</li>
 	 * </ul>
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @return An ongoing reading
+	 * @param statement the statement representing the subquery.
+	 * @return an ongoing reading
 	 */
 	@CheckReturnValue
 	default BuildableSubquery call(Statement statement) {
@@ -71,13 +62,14 @@ public interface ExposesSubqueryCall {
 	 * <ul>
 	 * <li>must end with a RETURN clause</li>
 	 * <li>cannot refer to variables from the enclosing query</li>
-	 * <li>cannot return variables with the same names as variables in the enclosing query</li>
-	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
+	 * <li>cannot return variables with the same names as variables in the enclosing
+	 * query</li>
+	 * <li>All variables that are returned from a subquery are afterwards available in the
+	 * enclosing query</li>
 	 * </ul>
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @param imports   Additional things that should be imported into the subquery.
-	 * @return An ongoing reading
+	 * @param statement the statement representing the subquery.
+	 * @param imports additional things that should be imported into the subquery.
+	 * @return an ongoing reading
 	 * @since 2021.3.0
 	 */
 	@CheckReturnValue
@@ -90,15 +82,16 @@ public interface ExposesSubqueryCall {
 	 * <ul>
 	 * <li>must end with a RETURN clause</li>
 	 * <li>cannot refer to variables from the enclosing query</li>
-	 * <li>cannot return variables with the same names as variables in the enclosing query</li>
-	 * <li>All variables that are returned from a subquery are afterwards available in the enclosing query</li>
+	 * <li>cannot return variables with the same names as variables in the enclosing
+	 * query</li>
+	 * <li>All variables that are returned from a subquery are afterwards available in the
+	 * enclosing query</li>
 	 * </ul>
-	 *
-	 * @param statement The statement representing the sub-query.
-	 * @param imports   Additional things that  should be imported into the sub-query.  {@link AliasedExpression aliased
-	 *                  expressions} will automatically be  importe twice (once as {@code WITH a}, then  {code WITH a AS
-	 *                  alias}).
-	 * @return An ongoing reading
+	 * @param statement the statement representing the sub-query.
+	 * @param imports additional things that should be imported into the sub-query.
+	 * {@link AliasedExpression aliased expressions} will automatically be importe twice
+	 * (once as {@code WITH a}, then {code WITH a AS alias}).
+	 * @return an ongoing reading
 	 * @since 2021.3.0
 	 */
 	@CheckReturnValue
@@ -106,8 +99,8 @@ public interface ExposesSubqueryCall {
 
 	/**
 	 * Starts building a new sub-query from a {@code CALL ... IN TRANSACTIONS} clause
-	 * @param statement The sub-query to be called in transactions
-	 * @return Ongoing sub-query definition
+	 * @param statement the sub-query to be called in transactions
+	 * @return ongoing sub-query definition
 	 */
 	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement) {
@@ -115,24 +108,26 @@ public interface ExposesSubqueryCall {
 	}
 
 	/**
-	 * Starts building a new sub-query from a raw Cypher string that might also have arguments as supported through {@link Cypher#raw(String, Object...)}.
-	 * Use this method as your own risk and be aware that no checks are done on the Cypher.
+	 * Starts building a new sub-query from a raw Cypher string that might also have
+	 * arguments as supported through {@link Cypher#raw(String, Object...)}. Use this
+	 * method as your own risk and be aware that no checks are done on the Cypher.
 	 * @param rawCypher the raw Cypher statement to call
 	 * @param args optional args that replace placeholders in the {@code rawCypher}
-	 * @return Ongoing sub-query definition
+	 * @return ongoing sub-query definition
 	 * @since 2023.10.0
 	 */
 	@CheckReturnValue
 	BuildableSubquery callRawCypher(String rawCypher, Object... args);
 
 	/**
-	 * Creates a subquery running in its own transactions. The statement won't be checked for a {@literal RETURN} or
-	 * {@literal YIELD} clause to accommodate for {@literal CREATE} or other clauses that are void and work in a subquery
-	 * if the outer query is void, too.
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @param rows      The number of rows per transactional batch, leave {@literal NULL} for the default value
-	 * @return An ongoing reading, that is also buildable for outer queries that are void.
+	 * Creates a subquery running in its own transactions. The statement won't be checked
+	 * for a {@literal RETURN} or {@literal YIELD} clause to accommodate for
+	 * {@literal CREATE} or other clauses that are void and work in a subquery if the
+	 * outer query is void, too.
+	 * @param statement the statement representing the subquery.
+	 * @param rows the number of rows per transactional batch, leave {@literal NULL} for
+	 * the default value
+	 * @return an ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
 	@CheckReturnValue
@@ -141,45 +136,49 @@ public interface ExposesSubqueryCall {
 	}
 
 	/**
-	 * Creates a subquery running in its own transactions. The statement won't be checked for a {@literal RETURN} or
-	 * {@literal YIELD} clause to accommodate for {@literal CREATE} or other clauses that are void and work in a subquery
-	 * if the outer query is void, too.
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @param imports   Additional things that should be imported into the subquery.
-	 * @return An ongoing reading, that is also buildable for outer queries that are void.
+	 * Creates a subquery running in its own transactions. The statement won't be checked
+	 * for a {@literal RETURN} or {@literal YIELD} clause to accommodate for
+	 * {@literal CREATE} or other clauses that are void and work in a subquery if the
+	 * outer query is void, too.
+	 * @param statement the statement representing the subquery.
+	 * @param imports additional things that should be imported into the subquery.
+	 * @return an ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
 	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement, String... imports) {
-		return callInTransactions(statement, null, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
+		return callInTransactions(statement, null,
+				Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
 
 	/**
-	 * Creates a subquery running in its own transactions. The statement won't be checked for a {@literal RETURN} or
-	 * {@literal YIELD} clause to accommodate for {@literal CREATE} or other clauses that are void and work in a subquery
-	 * if the outer query is void, too.
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @param rows      The number of rows per transactional batch, leave {@literal NULL} for the default value
-	 * @param imports   Additional things that should be imported into the subquery.
-	 * @return An ongoing reading, that is also buildable for outer queries that are void.
+	 * Creates a subquery running in its own transactions. The statement won't be checked
+	 * for a {@literal RETURN} or {@literal YIELD} clause to accommodate for
+	 * {@literal CREATE} or other clauses that are void and work in a subquery if the
+	 * outer query is void, too.
+	 * @param statement the statement representing the subquery.
+	 * @param rows the number of rows per transactional batch, leave {@literal NULL} for
+	 * the default value
+	 * @param imports additional things that should be imported into the subquery.
+	 * @return an ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
 	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement, Integer rows, String... imports) {
-		return callInTransactions(statement, rows, Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
+		return callInTransactions(statement, rows,
+				Arrays.stream(imports).map(SymbolicName::of).toArray(SymbolicName[]::new));
 	}
 
 	/**
-	 * Creates a subquery running in its own transactions. The statement won't be checked for a {@literal RETURN} or
-	 * {@literal YIELD} clause to accommodate for {@literal CREATE} or other clauses that are void and work in a subquery
-	 * if the outer query is void, too.
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @param imports   Additional things that should be imported into the subquery. {@link AliasedExpression aliased expressions}
-	 *                  will automatically imported twice (once as WITH a, then WITH a AS alias).
-	 * @return An ongoing reading, that is also buildable for outer queries that are void.
+	 * Creates a subquery running in its own transactions. The statement won't be checked
+	 * for a {@literal RETURN} or {@literal YIELD} clause to accommodate for
+	 * {@literal CREATE} or other clauses that are void and work in a subquery if the
+	 * outer query is void, too.
+	 * @param statement the statement representing the subquery.
+	 * @param imports additional things that should be imported into the subquery.
+	 * {@link AliasedExpression aliased expressions} will automatically imported twice
+	 * (once as WITH a, then WITH a AS alias).
+	 * @return an ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
 	default BuildableSubquery callInTransactions(Statement statement, IdentifiableElement... imports) {
@@ -187,17 +186,32 @@ public interface ExposesSubqueryCall {
 	}
 
 	/**
-	 * Creates a subquery running in its own transactions. The statement won't be checked for a {@literal RETURN} or
-	 * {@literal YIELD} clause to accommodate for {@literal CREATE} or other clauses that are void and work in a subquery
-	 * if the outer query is void, too.
-	 *
-	 * @param statement The statement representing the subquery.
-	 * @param rows      The number of rows per transactional batch, leave {@literal NULL} for the default value
-	 * @param imports   Additional things that should be imported into the subquery. {@link AliasedExpression aliased expressions}
-	 *                  will automatically imported twice (once as WITH a, then WITH a AS alias).
-	 * @return An ongoing reading, that is also buildable for outer queries that are void.
+	 * Creates a subquery running in its own transactions. The statement won't be checked
+	 * for a {@literal RETURN} or {@literal YIELD} clause to accommodate for
+	 * {@literal CREATE} or other clauses that are void and work in a subquery if the
+	 * outer query is void, too.
+	 * @param statement the statement representing the subquery.
+	 * @param rows the number of rows per transactional batch, leave {@literal NULL} for
+	 * the default value
+	 * @param imports additional things that should be imported into the subquery.
+	 * {@link AliasedExpression aliased expressions} will automatically imported twice
+	 * (once as WITH a, then WITH a AS alias).
+	 * @return an ongoing reading, that is also buildable for outer queries that are void.
 	 * @since 2022.3.0
 	 */
 	@CheckReturnValue
 	BuildableSubquery callInTransactions(Statement statement, Integer rows, IdentifiableElement... imports);
+
+	/**
+	 * Subqueries can be valid without any further return statement (i.e when the subquery
+	 * is a {@literal void} ({@literal unit}) one, meaning it doesn't yield or return its
+	 * results. The Cypher-DSL doesn't do any checking here, so please be careful when
+	 * using that construct.
+	 *
+	 * @since 2022.3.0
+	 */
+	interface BuildableSubquery extends OngoingReadingWithoutWhere, BuildableStatement<Statement> {
+
+	}
+
 }

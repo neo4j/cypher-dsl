@@ -25,7 +25,7 @@ import org.neo4j.cypherdsl.core.PatternElement;
  * A value object for {@link Node nodes}.
  *
  * @author Michael J. Simons
- * @param value The actual node
+ * @param value the actual node
  * @since 2023.0.0
  */
 record NodeAtom(Node value) implements PatternAtom, PatternElement {

@@ -18,18 +18,18 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Neo4jVersion;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * A visitable representing a {@code USING PERIODIC COMMIT} clause. Not meant to be used outside the Cypher-DSL directly.
- * Will be changed without further notice.
+ * A visitable representing a {@code USING PERIODIC COMMIT} clause. Not meant to be used
+ * outside the Cypher-DSL directly. Will be changed without further notice.
  *
  * @author Michael J. Simons
- * @param rate The rate to be applied
+ * @param rate the rate to be applied
  * @since 2021.2.1
  */
 @API(status = INTERNAL, since = "2021.2.1")

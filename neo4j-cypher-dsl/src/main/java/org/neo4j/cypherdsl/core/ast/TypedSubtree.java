@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.ast;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,12 +25,14 @@ import java.util.List;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * This class helps to group items of the same type on the same level of the tree into a list structure that can be
- * recognized by visitors.
+ * This class helps to group items of the same type on the same level of the tree into a
+ * list structure that can be recognized by visitors.
  *
+ * @param <T> the children's type
  * @author Michael J. Simons
- * @param <T>    The children's type
  * @since 1.0
  */
 @API(status = INTERNAL, since = "1.0")
@@ -45,8 +45,7 @@ public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 
 	/**
 	 * Creates a new typed subtree with the given content.
-	 *
-	 * @param children The content of this subtree.
+	 * @param children the content of this subtree.
 	 */
 	@SafeVarargs
 	@SuppressWarnings("varargs")
@@ -57,8 +56,7 @@ public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 
 	/**
 	 * Creates a new typed subtree with the given content.
-	 *
-	 * @param children The content of this subtree.
+	 * @param children the content of this subtree.
 	 */
 	protected TypedSubtree(Collection<T> children) {
 
@@ -75,9 +73,8 @@ public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 
 	/**
 	 * A hook for interfere with the visitation of child elements.
-	 *
-	 * @param child The current child element
-	 * @return The visitable that has been prepared
+	 * @param child the current child element
+	 * @return the visitable that has been prepared
 	 */
 	protected Visitable prepareVisit(T child) {
 		return child;
@@ -85,11 +82,12 @@ public abstract class TypedSubtree<T extends Visitable> implements Visitable {
 
 	@API(status = INTERNAL)
 	protected List<T> getChildren() {
-		return children;
+		return this.children;
 	}
 
 	@API(status = INTERNAL)
 	public String separator() {
 		return ", ";
 	}
+
 }

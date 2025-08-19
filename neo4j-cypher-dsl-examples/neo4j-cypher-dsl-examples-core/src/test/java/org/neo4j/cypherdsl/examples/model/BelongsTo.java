@@ -49,7 +49,7 @@ public final class BelongsTo extends AbstractRelationshipDefinition<Department, 
 	@Override
 	public BelongsTo withProperties(MapExpression newProperties) {
 
-		return new BelongsTo(getSymbolicName().orElse(null), getLeft(),
-			Properties.create(newProperties), getRight());
+		return new BelongsTo(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties), getRight());
 	}
+
 }

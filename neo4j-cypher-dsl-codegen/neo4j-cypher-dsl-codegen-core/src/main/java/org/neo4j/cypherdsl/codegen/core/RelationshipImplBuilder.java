@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -29,10 +27,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import javax.lang.model.element.Modifier;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.Properties;
-import org.neo4j.cypherdsl.core.RelationshipBase;
 
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -44,37 +38,29 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeVariableName;
 import com.squareup.javapoet.WildcardTypeName;
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Properties;
+import org.neo4j.cypherdsl.core.RelationshipBase;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * This is a builder. It builds classes extending {@link RelationshipImplBuilder}.
  *
  * @author Michael J. Simons
- * @soundtrack Bear McCreary - Battlestar Galactica Season 2
  * @since 2021.1.0
  */
-@API(status = INTERNAL, since = "2021.1.0") final class RelationshipImplBuilder
-	extends AbstractModelBuilder<RelationshipModelBuilder> implements RelationshipModelBuilder {
+@API(status = INTERNAL, since = "2021.1.0")
+final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipModelBuilder>
+		implements RelationshipModelBuilder {
 
 	private static final ClassName TYPE_NAME_RELATIONSHIP_BASE = ClassName.get(RelationshipBase.class);
+
 	private static final TypeVariableName S = TypeVariableName.get("S",
-		ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+			ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
+
 	private static final TypeVariableName E = TypeVariableName.get("E",
-		ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
-
-	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType,
-		String alternateClassNameSuggestion) {
-
-		String className = configuration.getRelationshipNameGenerator()
-			.generate(alternateClassNameSuggestion != null ? alternateClassNameSuggestion : relationshipType);
-		String usedPackageName = packageName == null ? configuration.getDefaultPackage() : packageName;
-		RelationshipImplBuilder builder = new RelationshipImplBuilder(
-			configuration,
-			relationshipType,
-			ClassName.get(usedPackageName, configuration.getTypeNameDecorator().apply(className)),
-			className
-		);
-		return builder.apply(configuration);
-	}
+			ParameterizedTypeName.get(TYPE_NAME_NODE_BASE, WildcardTypeName.subtypeOf(Object.class)));
 
 	/**
 	 * The required relationship type.
@@ -82,14 +68,14 @@ import com.squareup.javapoet.WildcardTypeName;
 	private final FieldSpec relationshipTypeField;
 
 	/**
-	 * The possible start- and end-node connections
+	 * The possible start- and end-node connections.
 	 */
 	private final Deque<Edge> edges = new ArrayDeque<>();
 
 	private RelationshipImplBuilder(Configuration configuration, String relationshipType, ClassName className,
-		String fieldName) {
+			String fieldName) {
 		super(configuration.getConstantFieldNameGenerator(), className, fieldName, configuration.getTarget(),
-			configuration.getIndent());
+				configuration.getIndent());
 
 		if (relationshipType == null) {
 			throw new IllegalStateException("Cannot build a RelationshipImpl without a single relationship type!");
@@ -97,9 +83,29 @@ import com.squareup.javapoet.WildcardTypeName;
 
 		this.relationshipTypeField = FieldSpec
 			.builder(String.class, configuration.getConstantFieldNameGenerator().generate("$TYPE"), Modifier.PUBLIC,
-				Modifier.FINAL, Modifier.STATIC)
+					Modifier.FINAL, Modifier.STATIC)
 			.initializer("$S", relationshipType)
 			.build();
+	}
+
+	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType,
+			String alternateClassNameSuggestion) {
+
+		String className = configuration.getRelationshipNameGenerator()
+			.generate((alternateClassNameSuggestion != null) ? alternateClassNameSuggestion : relationshipType);
+		String usedPackageName = (packageName != null) ? packageName : configuration.getDefaultPackage();
+		RelationshipImplBuilder builder = new RelationshipImplBuilder(configuration, relationshipType,
+				ClassName.get(usedPackageName, configuration.getTypeNameDecorator().apply(className)), className);
+		return builder.apply(configuration);
+	}
+
+	static Edge pickDefault(Collection<Edge> relations) {
+		var startNodes = relations.stream().map(edge -> edge.start).collect(Collectors.toSet());
+		var endNodes = relations.stream().map(edge -> edge.end).collect(Collectors.toSet());
+
+		var expectedStartNode = (startNodes.size() == 1) ? startNodes.iterator().next() : S;
+		var expectedEndNode = (endNodes.size() == 1) ? endNodes.iterator().next() : E;
+		return new Edge(expectedStartNode, expectedEndNode);
 	}
 
 	@Override
@@ -141,16 +147,19 @@ import com.squareup.javapoet.WildcardTypeName;
 		if (relation.start != expectedTypes.start) {
 			if (relation.end != expectedTypes.end) {
 				builder.addStatement("super(($T) $N, $N, ($T) $N)", expectedTypes.start, startNodeParam,
-					relationshipTypeField, expectedTypes.end, endNodeParam);
-			} else {
-				builder.addStatement("super(($T) $N, $N, $N)", expectedTypes.start, startNodeParam,
-					relationshipTypeField, endNodeParam);
+						this.relationshipTypeField, expectedTypes.end, endNodeParam);
 			}
-		} else if (relation.end != expectedTypes.end) {
-			builder.addStatement("super($N, $N, ($T) $N)", startNodeParam, relationshipTypeField, expectedTypes.end,
-				endNodeParam);
-		} else {
-			builder.addStatement("super($N, $N, $N)", startNodeParam, relationshipTypeField, endNodeParam);
+			else {
+				builder.addStatement("super(($T) $N, $N, $N)", expectedTypes.start, startNodeParam,
+						this.relationshipTypeField, endNodeParam);
+			}
+		}
+		else if (relation.end != expectedTypes.end) {
+			builder.addStatement("super($N, $N, ($T) $N)", startNodeParam, this.relationshipTypeField,
+					expectedTypes.end, endNodeParam);
+		}
+		else {
+			builder.addStatement("super($N, $N, $N)", startNodeParam, this.relationshipTypeField, endNodeParam);
 		}
 		return builder.build();
 	}
@@ -160,16 +169,14 @@ import com.squareup.javapoet.WildcardTypeName;
 		return callOnlyWithoutJavaFilePresent(() -> {
 			TypeName startNode = S;
 			if (newStartNode != null) {
-				startNode = newStartNode.isExtensible() ? ParameterizedTypeName
-					.get(extractClassName(newStartNode), WildcardTypeName.subtypeOf(Object.class)) :
-					extractClassName(newStartNode);
+				startNode = newStartNode.isExtensible() ? ParameterizedTypeName.get(extractClassName(newStartNode),
+						WildcardTypeName.subtypeOf(Object.class)) : extractClassName(newStartNode);
 			}
 
 			TypeName endNode = E;
 			if (newEndNode != null) {
-				endNode = newEndNode.isExtensible() ? ParameterizedTypeName
-					.get(extractClassName(newEndNode), WildcardTypeName.subtypeOf(Object.class)) :
-					extractClassName(newEndNode);
+				endNode = newEndNode.isExtensible() ? ParameterizedTypeName.get(extractClassName(newEndNode),
+						WildcardTypeName.subtypeOf(Object.class)) : extractClassName(newEndNode);
 			}
 
 			this.edges.add(new Edge(startNode, endNode));
@@ -186,7 +193,7 @@ import com.squareup.javapoet.WildcardTypeName;
 		return MethodSpec.constructorBuilder()
 			.addModifiers(Modifier.PRIVATE)
 			.addParameters(Arrays.asList(symbolicName, start, properties, end))
-			.addStatement("super($N, $N, $N, $N, $N)", symbolicName, start, relationshipTypeField, properties, end)
+			.addStatement("super($N, $N, $N, $N, $N)", symbolicName, start, this.relationshipTypeField, properties, end)
 			.build();
 
 	}
@@ -199,34 +206,33 @@ import com.squareup.javapoet.WildcardTypeName;
 			.addModifiers(Modifier.PUBLIC)
 			.returns(typeName)
 			.addParameter(newSymbolicName)
-			.addStatement("return new $T$L($N, getLeft(), getDetails().getProperties(), getRight())",
-				super.className, typeName == super.className ? "" : "<>", newSymbolicName)
+			.addStatement("return new $T$L($N, getLeft(), getDetails().getProperties(), getRight())", super.className,
+					(typeName == super.className) ? "" : "<>", newSymbolicName)
 			.build();
 	}
 
 	private MethodSpec buildWithPropertiesMethod(TypeName typeName) {
 
-		ParameterSpec newProperties = ParameterSpec.builder(TYPE_NAME_MAP_EXPRESSION, "newProperties")
-			.build();
+		ParameterSpec newProperties = ParameterSpec.builder(TYPE_NAME_MAP_EXPRESSION, "newProperties").build();
 		return MethodSpec.methodBuilder("withProperties")
 			.addAnnotation(Override.class)
 			.addModifiers(Modifier.PUBLIC)
 			.returns(typeName)
 			.addParameter(newProperties)
 			.addStatement(
-				"return new $T$L(getSymbolicName().orElse(null), getLeft(), Properties.create($N), getRight())",
-				super.className, typeName == super.className ? "" : "<>", newProperties)
+					"return new $T$L(getSymbolicName().orElse(null), getLeft(), Properties.create($N), getRight())",
+					super.className, (typeName == super.className) ? "" : "<>", newProperties)
 			.build();
 	}
 
 	private List<FieldSpec> buildFields() {
-		return Stream.concat(Stream.of(relationshipTypeField), generateFieldSpecsFromProperties()).toList();
+		return Stream.concat(Stream.of(this.relationshipTypeField), generateFieldSpecsFromProperties()).toList();
 	}
 
 	@Override
 	protected JavaFile buildJavaFile() {
 
-		var expectedTypes = pickDefault(edges);
+		var expectedTypes = pickDefault(this.edges);
 		var builder = TypeSpec.classBuilder(super.className);
 		var typeName = getTypeName(expectedTypes);
 		if (typeName instanceof ParameterizedTypeName pt) {
@@ -239,15 +245,15 @@ import com.squareup.javapoet.WildcardTypeName;
 
 		addGenerated(builder)
 			.superclass(ParameterizedTypeName.get(TYPE_NAME_RELATIONSHIP_BASE, expectedTypes.start, expectedTypes.end,
-				typeName))
+					typeName))
 			.addModifiers(Modifier.PUBLIC, Modifier.FINAL)
 			.addFields(buildFields());
 
-		(edges.isEmpty() ? Stream.of(new Edge(S, E)) : edges.stream())
-			.map(relation -> buildConstructor(relation, expectedTypes)).forEach(builder::addMethod);
+		(this.edges.isEmpty() ? Stream.of(new Edge(S, E)) : this.edges.stream())
+			.map(relation -> buildConstructor(relation, expectedTypes))
+			.forEach(builder::addMethod);
 
-		var newType = builder
-			.addMethod(buildCopyConstructor())
+		var newType = builder.addMethod(buildCopyConstructor())
 			.addMethod(buildNamedMethod(typeName))
 			.addMethod(buildWithPropertiesMethod(typeName))
 			.build();
@@ -265,37 +271,33 @@ import com.squareup.javapoet.WildcardTypeName;
 
 	private TypeName getTypeName(Edge expectedEdge, TypeName concreteStartType, TypeName concreteEndType) {
 
-		var concreteOrDefaultStart = concreteStartType == null ? S : concreteStartType;
-		var concreteOrDefaultEnd = concreteEndType == null ? E : concreteEndType;
+		var concreteOrDefaultStart = (concreteStartType != null) ? concreteStartType : S;
+		var concreteOrDefaultEnd = (concreteEndType != null) ? concreteEndType : E;
 		if (expectedEdge.start == S && expectedEdge.end == E) {
 			return ParameterizedTypeName.get(super.className, concreteOrDefaultStart, concreteOrDefaultEnd);
-		} else if (expectedEdge.start == S) {
+		}
+		else if (expectedEdge.start == S) {
 			return ParameterizedTypeName.get(super.className, concreteOrDefaultStart);
-		} else if (expectedEdge.end == E) {
+		}
+		else if (expectedEdge.end == E) {
 			return ParameterizedTypeName.get(super.className, concreteOrDefaultEnd);
-		} else {
+		}
+		else {
 			return super.className;
 		}
 	}
 
-	private static class Edge {
+	private static final class Edge {
+
+		TypeName start;
+
+		TypeName end;
+
 		private Edge(TypeName start, TypeName end) {
 			this.start = start;
 			this.end = end;
 		}
 
-		TypeName start;
-		TypeName end;
 	}
 
-	static Edge pickDefault(Collection<Edge> relations) {
-		var startNodes = relations.stream().map(edge -> edge.start)
-			.collect(Collectors.toSet());
-		var endNodes = relations.stream().map(edge -> edge.end)
-			.collect(Collectors.toSet());
-
-		var expectedStartNode = startNodes.size() == 1 ? startNodes.iterator().next() : S;
-		var expectedEndNode = endNodes.size() == 1 ? endNodes.iterator().next() : E;
-		return new Edge(expectedStartNode, expectedEndNode);
-	}
 }

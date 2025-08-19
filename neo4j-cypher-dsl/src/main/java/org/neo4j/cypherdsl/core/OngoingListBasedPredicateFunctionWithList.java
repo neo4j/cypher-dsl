@@ -18,7 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-
 /**
  * Allows to specify the where condition for the list based predicate.
  *
@@ -28,8 +27,10 @@ package org.neo4j.cypherdsl.core;
 public interface OngoingListBasedPredicateFunctionWithList {
 
 	/**
-	 * @param condition The condition for the list based predicate.
-	 * @return The final list based predicate function
+	 * Returns the final list based predicate function.
+	 * @param condition the condition for the list based predicate.
+	 * @return the final list based predicate function
 	 */
 	Condition where(Condition condition);
+
 }

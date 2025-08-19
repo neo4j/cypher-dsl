@@ -18,9 +18,9 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 /**
  * This represents a method in the static metamodel that creates a relationship.
@@ -30,19 +30,6 @@ import org.apiguardian.api.API;
  */
 @API(status = EXPERIMENTAL, since = "2023.9.0")
 public final class RelationshipFactoryDefinition {
-
-	/**
-	 * Creates a new definition
-	 *
-	 * @param nameInDomain The name of the relationship in the domain class
-	 * @param start        Builder for the start node in the domain
-	 * @param end          Builder for the end node in the domain
-	 * @return A valid definition
-	 */
-	public static RelationshipFactoryDefinition create(String nameInDomain, NodeModelBuilder start,
-		NodeModelBuilder end) {
-		return new RelationshipFactoryDefinition(nameInDomain, null, start, end);
-	}
 
 	/**
 	 * Optional name in the domain, for example a field name.
@@ -64,8 +51,8 @@ public final class RelationshipFactoryDefinition {
 	 */
 	private final RelationshipModelBuilder relationshipBuilder;
 
-	private RelationshipFactoryDefinition(String nameInDomain,
-		RelationshipModelBuilder relationshipBuilder, NodeModelBuilder start, NodeModelBuilder end) {
+	private RelationshipFactoryDefinition(String nameInDomain, RelationshipModelBuilder relationshipBuilder,
+			NodeModelBuilder start, NodeModelBuilder end) {
 		this.nameInDomain = nameInDomain;
 		this.start = start;
 		this.end = end;
@@ -73,38 +60,50 @@ public final class RelationshipFactoryDefinition {
 	}
 
 	/**
+	 * Creates a new definition.
+	 * @param nameInDomain the name of the relationship in the domain class
+	 * @param start builder for the start node in the domain
+	 * @param end builder for the end node in the domain
+	 * @return a valid definition
+	 */
+	public static RelationshipFactoryDefinition create(String nameInDomain, NodeModelBuilder start,
+			NodeModelBuilder end) {
+		return new RelationshipFactoryDefinition(nameInDomain, null, start, end);
+	}
+
+	/**
 	 * Creates a new relationship definition with a new builder for it.
-	 *
-	 * @param newBuilder The new builder to use
-	 * @return A new instance, {@literal this} won't change
+	 * @param newBuilder the new builder to use
+	 * @return a new instance, {@literal this} won't change
 	 */
 	public RelationshipFactoryDefinition withBuilder(RelationshipModelBuilder newBuilder) {
-		return new RelationshipFactoryDefinition(nameInDomain, newBuilder, start, end);
+		return new RelationshipFactoryDefinition(this.nameInDomain, newBuilder, this.start, this.end);
 	}
 
 	/**
-	 * @return The name in the domain model (most likely the field name)
+	 * Returns the name in the domain model (most likely the field name).
+	 * @return the name in the domain model
 	 */
 	public String getNameInDomain() {
-		return nameInDomain;
+		return this.nameInDomain;
 	}
 
 	/**
-	 * @return A builder for the start node
+	 * {@return a builder for the start node}
 	 */
 	public NodeModelBuilder getStart() {
-		return start;
+		return this.start;
 	}
 
 	/**
-	 * @return A builder for the end node
+	 * {@return a builder for the end node}
 	 */
 	public NodeModelBuilder getEnd() {
-		return end;
+		return this.end;
 	}
 
 	RelationshipModelBuilder getRelationshipBuilder() {
-		return relationshipBuilder;
+		return this.relationshipBuilder;
 	}
 
 }

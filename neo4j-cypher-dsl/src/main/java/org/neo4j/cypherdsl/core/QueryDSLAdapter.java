@@ -18,25 +18,26 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.querydsl.CypherContext;
 import org.neo4j.cypherdsl.core.querydsl.ToCypherFormatStringVisitor;
 
-import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Path;
-import com.querydsl.core.types.Predicate;
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
- * This is a utility class to turn a several Query-DSL {@link com.querydsl.core.types.Expression expressions} into something
- * the Cypher-DSL can understand. It can only be used when `com.querydsl:querydsl-core` is on the classpath. While we
- * try our best to translate as many expression as possible into syntactically correct Cypher, we don't provide any guarantees
- * that the expressions and conditions generated are semantically correct in the context of the final query generated.
+ * This is a utility class to turn a several Query-DSL
+ * {@link com.querydsl.core.types.Expression expressions} into something the Cypher-DSL
+ * can understand. It can only be used when `com.querydsl:querydsl-core` is on the
+ * classpath. While we try our best to translate as many expression as possible into
+ * syntactically correct Cypher, we don't provide any guarantees that the expressions and
+ * conditions generated are semantically correct in the context of the final query
+ * generated.
  *
  * @author Michael J. Simons
- * @soundtrack Paul Kalkbrenner - Berlin Calling
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
@@ -53,16 +54,16 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	@Override
 	public Condition asCondition() {
 
-		if (!(expression instanceof Predicate)) {
+		if (!(this.expression instanceof Predicate)) {
 			throw new IllegalArgumentException("Only Query-DSL predicates can be turned into Cypher-DSL's predicates.");
 		}
 
-		if (expression instanceof BooleanBuilder booleanBuilder && !booleanBuilder.hasValue()) {
+		if (this.expression instanceof BooleanBuilder booleanBuilder && !booleanBuilder.hasValue()) {
 			return Conditions.noCondition();
 		}
 
 		CypherContext context = new CypherContext();
-		String formatString = expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
+		String formatString = this.expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
 
 		return new ExpressionCondition(Cypher.raw(formatString, (Object[]) context.getExpressions()));
 	}
@@ -71,7 +72,7 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	public Expression asExpression() {
 
 		CypherContext context = new CypherContext();
-		String formatString = expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
+		String formatString = this.expression.accept(ToCypherFormatStringVisitor.INSTANCE, context);
 
 		return Cypher.raw(formatString, (Object[]) context.getExpressions());
 	}
@@ -79,7 +80,7 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	@Override
 	public Node asNode() {
 
-		if (!(expression instanceof Path<?> entityPath)) {
+		if (!(this.expression instanceof Path<?> entityPath)) {
 			throw new IllegalArgumentException("Only Query-DSL paths can be turned into nodes.");
 		}
 
@@ -95,10 +96,11 @@ final class QueryDSLAdapter implements ForeignAdapter<com.querydsl.core.types.Ex
 	@Override
 	public SymbolicName asName() {
 
-		if (!(expression instanceof Path<?> entityPath)) {
+		if (!(this.expression instanceof Path<?> entityPath)) {
 			throw new IllegalArgumentException("Only Query-DSL paths can be turned into names.");
 		}
 
 		return Cypher.name(entityPath.getMetadata().getName());
 	}
+
 }

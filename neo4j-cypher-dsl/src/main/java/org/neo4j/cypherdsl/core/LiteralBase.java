@@ -18,17 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Objects;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * Represents a literal with an optional content.
  *
- * @author Michael J. Simons
  * @param <T> type of content
+ * @author Michael J. Simons
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
@@ -40,7 +40,7 @@ abstract class LiteralBase<T> implements Literal<T> {
 	static final Literal<String> BLANK = new LiteralBase<>(" ") {
 		@Override
 		public String asString() {
-			return content;
+			return this.content;
 		}
 	};
 
@@ -50,16 +50,11 @@ abstract class LiteralBase<T> implements Literal<T> {
 	protected final T content;
 
 	/**
-	 * Creates a new literal from the given content
-	 * @param content The content of the new literal
+	 * Creates a new literal from the given content.
+	 * @param content the content of the new literal
 	 */
 	protected LiteralBase(T content) {
 		this.content = content;
-	}
-
-	@Override
-	public String toString() {
-		return RendererBridge.render(this);
 	}
 
 	@Override
@@ -71,12 +66,17 @@ abstract class LiteralBase<T> implements Literal<T> {
 			return false;
 		}
 		LiteralBase<?> that = (LiteralBase<?>) o;
-		return content.equals(that.content);
+		return this.content.equals(that.content);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(content);
+		return Objects.hash(this.content);
 	}
-}
 
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
+
+}

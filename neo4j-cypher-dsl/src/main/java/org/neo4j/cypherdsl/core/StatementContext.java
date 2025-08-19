@@ -18,34 +18,32 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Context for while rendering a statement.
  *
  * @author Michael J. Simons
- * @soundtrack Various - Guardians Of The Galaxy: Awesome Mix Vol. 1
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
 public sealed interface StatementContext permits DefaultStatementContext {
 
 	/**
-	 * Gets or creates the name of a parameter
-	 *
-	 * @param parameter The parameter whose name should be retrieved
-	 * @return The name of the parameter or a generated name
+	 * Gets or creates the name of a parameter.
+	 * @param parameter the parameter whose name should be retrieved
+	 * @return the name of the parameter or a generated name
 	 */
 	String getParameterName(Parameter<?> parameter);
 
 	/**
-	 * Resolves a {@link SymbolicName symbolic name} into a string: A symbolic name can be a placeholder without an actual
-	 * value. In such cases a value is randomly generated and will stay constant for that name as long as the statement exists.
-	 * In case the {@code symbolicName} has a constant value it will be returned,
-	 *
+	 * Resolves a {@link SymbolicName symbolic name} into a string: A symbolic name can be
+	 * a placeholder without an actual value. In such cases a value is randomly generated
+	 * and will stay constant for that name as long as the statement exists. In case the
+	 * {@code symbolicName} has a constant value it will be returned,
 	 * @param symbolicName the symbolic name to resolve
 	 * @return a value for the given name
 	 * @since 2023.0.3
@@ -53,11 +51,12 @@ public sealed interface StatementContext permits DefaultStatementContext {
 	String resolve(SymbolicName symbolicName);
 
 	/**
-	 * Checks whether a given {@link SymbolicName symbolic name} has been resolved in this {@link StatementContext context}.
-	 *
+	 * Checks whether a given {@link SymbolicName symbolic name} has been resolved in this
+	 * {@link StatementContext context}.
 	 * @param symbolicName the symbolic name to check
 	 * @return true if the given name has already been resolved in this context
 	 * @since 2023.0.3
 	 */
 	boolean isResolved(SymbolicName symbolicName);
+
 }

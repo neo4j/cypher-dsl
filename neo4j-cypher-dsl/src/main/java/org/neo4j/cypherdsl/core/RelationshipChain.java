@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,9 +27,11 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents a chain of relationships. The chain is meant to be in order and the right node of an element is related to
- * the left node of the next element.
+ * Represents a chain of relationships. The chain is meant to be in order and the right
+ * node of an element is related to the left node of the next element.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -40,11 +40,6 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
 public final class RelationshipChain implements RelationshipPattern, ExposesPatternLengthAccessors<RelationshipChain> {
 
 	private final LinkedList<Relationship> relationships;
-
-	static RelationshipChain create(Relationship firstElement) {
-
-		return new RelationshipChain(firstElement);
-	}
 
 	private RelationshipChain(Relationship firstElement) {
 		this.relationships = new LinkedList<>();
@@ -58,6 +53,11 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 	private RelationshipChain(List<Relationship> elements) {
 		this.relationships = new LinkedList<>(elements);
+	}
+
+	static RelationshipChain create(Relationship firstElement) {
+
+		return new RelationshipChain(firstElement);
 	}
 
 	RelationshipChain add(Relationship element) {
@@ -91,10 +91,10 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	}
 
 	/**
-	 * Replaces the last element of this chains with a copy of the relationship with the new symbolic name.
-	 *
-	 * @param newSymbolicName The new symbolic name to use
-	 * @return A new chain
+	 * Replaces the last element of this chains with a copy of the relationship with the
+	 * new symbolic name.
+	 * @param newSymbolicName the new symbolic name to use
+	 * @return a new chain
 	 */
 	@Override
 	public RelationshipChain named(String newSymbolicName) {
@@ -104,10 +104,10 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	}
 
 	/**
-	 * Replaces the last element of this chains with a copy of the relationship with the new symbolic name.
-	 *
-	 * @param newSymbolicName The new symbolic name to use
-	 * @return A new chain
+	 * Replaces the last element of this chains with a copy of the relationship with the
+	 * new symbolic name.
+	 * @param newSymbolicName the new symbolic name to use
+	 * @return a new chain
 	 * @since 2021.1.1
 	 */
 	@Override
@@ -147,8 +147,7 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 	/**
 	 * Changes the length of the last element of this chain to an unbounded pattern.
-	 *
-	 * @return A new chain
+	 * @return a new chain
 	 * @since 1.1.1
 	 */
 	@Override
@@ -159,10 +158,9 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	}
 
 	/**
-	 * Changes the length of the last element of this chain to a new minimum length
-	 *
+	 * Changes the length of the last element of this chain to a new minimum length.
 	 * @param minimum the new minimum
-	 * @return A new chain
+	 * @return a new chain
 	 */
 	@Override
 	public RelationshipChain min(Integer minimum) {
@@ -172,10 +170,9 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	}
 
 	/**
-	 * Changes the length of the last element of this chain to a new maximum length
-	 *
+	 * Changes the length of the last element of this chain to a new maximum length.
 	 * @param maximum the new maximum
-	 * @return A new chain
+	 * @return a new chain
 	 */
 	@Override
 	public RelationshipChain max(Integer maximum) {
@@ -185,11 +182,10 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	}
 
 	/**
-	 * Changes the length of the last element of this chain
-	 *
+	 * Changes the length of the last element of this chain.
 	 * @param minimum the new minimum
 	 * @param maximum the new maximum
-	 * @return A new chain
+	 * @return a new chain
 	 */
 	@Override
 	public RelationshipChain length(Integer minimum, Integer maximum) {
@@ -200,9 +196,9 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 	/**
 	 * Adds properties to the last element of this chain.
-	 *
-	 * @param newProperties the new properties (can be {@literal null} to remove exiting properties).
-	 * @return A new chain
+	 * @param newProperties the new properties (can be {@literal null} to remove exiting
+	 * properties).
+	 * @return a new chain
 	 */
 	public RelationshipChain properties(MapExpression newProperties) {
 
@@ -212,9 +208,9 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 
 	/**
 	 * Adds properties to the last element of this chain.
-	 *
-	 * @param keysAndValues A list of key and values. Must be an even number, with alternating {@link String} and {@link Expression}.
-	 * @return A new chain
+	 * @param keysAndValues a list of key and values. Must be an even number, with
+	 * alternating {@link String} and {@link Expression}.
+	 * @return a new chain
 	 */
 	public RelationshipChain properties(Object... keysAndValues) {
 
@@ -233,7 +229,7 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 		visitor.enter(this);
 
 		Node lastNode = null;
-		for (Relationship relationship : relationships) {
+		for (Relationship relationship : this.relationships) {
 
 			visitor.enter(relationship);
 			relationship.getLeft().accept(visitor);
@@ -253,4 +249,5 @@ public final class RelationshipChain implements RelationshipPattern, ExposesPatt
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

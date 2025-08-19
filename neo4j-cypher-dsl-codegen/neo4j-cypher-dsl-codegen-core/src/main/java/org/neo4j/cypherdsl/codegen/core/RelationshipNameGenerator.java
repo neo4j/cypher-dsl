@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * Default generator for creating names of relationship classes. It uses the given type as class name, generates a valid type
- * from it and then tries to derive a camel cased name.
+ * Default generator for creating names of relationship classes. It uses the given type as
+ * class name, generates a valid type from it and then tries to derive a camel cased name.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
@@ -43,7 +43,8 @@ final class RelationshipNameGenerator extends AbstractClassNameGenerator impleme
 				char copy = sb.charAt(last);
 				sb.setCharAt(last, Character.toUpperCase(sb.charAt(last)));
 				while (++last < i) {
-					boolean flip = last + 1 == i && Character.isUpperCase(copy) || last + 1 < i && Character.isUpperCase(sb.charAt(last + 1));
+					boolean flip = last + 1 == i && Character.isUpperCase(copy)
+							|| last + 1 < i && Character.isUpperCase(sb.charAt(last + 1));
 					copy = sb.charAt(last);
 					if (flip) {
 						sb.setCharAt(last, Character.toLowerCase(sb.charAt(last)));
@@ -59,4 +60,5 @@ final class RelationshipNameGenerator extends AbstractClassNameGenerator impleme
 
 		return sb.toString();
 	}
+
 }

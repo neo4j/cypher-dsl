@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents the properties of a {@link Node node} or a {@link Relationship relationship} when used as part of the
- * whole pattern (inside a {@code MATCH}, {@code CREATE} or {@code MERGE} clause as {@code {p1: v1, p2: v2, pn: vn}}.
+ * Represents the properties of a {@link Node node} or a {@link Relationship relationship}
+ * when used as part of the whole pattern (inside a {@code MATCH}, {@code CREATE} or
+ * {@code MERGE} clause as {@code {p1: v1, p2: v2, pn: vn}}.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -36,19 +37,18 @@ public final class Properties implements Visitable {
 
 	private final MapExpression value;
 
+	private Properties(MapExpression value) {
+		this.value = value;
+	}
+
 	/**
 	 * Wraps an expression into a {@link Properties} node.
-	 *
-	 * @param expression Nullable expression
-	 * @return A properties expression
+	 * @param expression nullable expression
+	 * @return a properties expression
 	 */
 	public static Properties create(MapExpression expression) {
 
-		return expression == null ? null : new Properties(expression);
-	}
-
-	private Properties(MapExpression value) {
-		this.value = value;
+		return (expression != null) ? new Properties(expression) : null;
 	}
 
 	@Override
@@ -62,4 +62,5 @@ public final class Properties implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

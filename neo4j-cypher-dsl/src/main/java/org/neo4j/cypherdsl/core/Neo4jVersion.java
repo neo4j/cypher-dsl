@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -28,12 +26,14 @@ import java.lang.annotation.Target;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * This annotation provides information which Neo4j version is required to be able to successfully run a query containing
- * a fragment generated via a method annotated with it.
+ * This annotation provides information which Neo4j version is required to be able to
+ * successfully run a query containing a fragment generated via a method annotated with
+ * it.
  *
  * @author Michael J. Simons
- * @soundtrack Die Ärzte - Seitenhirsch
  * @since 2020.1.2
  */
 @Retention(RetentionPolicy.RUNTIME)
@@ -43,12 +43,13 @@ import org.apiguardian.api.API;
 public @interface Neo4jVersion {
 
 	/**
-	 * @return The minimum version of Neo4j required to run the annotated construct.
+	 * {@return the minimum version of Neo4j required to run the annotated construct}
 	 */
 	String minimum();
 
 	/**
-	 * @return The last version of Neo4j that supports running the annotated construct.
+	 * {@return the last version of Neo4j that supports running the annotated construct}
 	 */
 	String last() default "";
+
 }

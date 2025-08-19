@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -33,7 +31,11 @@ import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Statement;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * Main entrypoint to a Cypher parser that produces Cypher-DSL statements.
+ *
  * @author Michael J. Simons
  * @since 2021.3.0
  */
@@ -41,8 +43,15 @@ import org.neo4j.cypherdsl.core.Statement;
 public final class CypherParser {
 
 	/**
-	 * @param input A Cypher fragment
-	 * @return A node
+	 * Not to be instantiated.
+	 */
+	private CypherParser() {
+	}
+
+	/**
+	 * Parses a single node.
+	 * @param input a Cypher fragment
+	 * @return a node
 	 * @see #parseNode(String, Options)
 	 */
 	public static Node parseNode(String input) {
@@ -51,21 +60,21 @@ public final class CypherParser {
 
 	/**
 	 * Parses a Cypher fragment describing a Node-pattern into a {@link Node} instance.
-	 *
-	 * @param input   A Cypher fragment
-	 * @param options Options for the parser
-	 * @return A node
+	 * @param input a Cypher fragment
+	 * @param options options for the parser
+	 * @return a node
 	 */
 	public static Node parseNode(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
-			CypherDslASTExceptionFactory.INSTANCE,
-			getCharStream(input)).NodePattern()).value();
+				CypherDslASTExceptionFactory.INSTANCE, getCharStream(input))
+			.NodePattern()).value();
 	}
 
 	/**
-	 * @param input A Cypher fragment
-	 * @return A relationship pattern or chain of relationship pattern
+	 * Parses a single relationship.
+	 * @param input a Cypher fragment
+	 * @return a relationship pattern or chain of relationship pattern
 	 * @see #parseNode(String, Options)
 	 */
 	public static RelationshipPattern parseRelationship(String input) {
@@ -73,22 +82,23 @@ public final class CypherParser {
 	}
 
 	/**
-	 * Parses a Cypher fragment describing a relationship into a {@link RelationshipPattern} instance.
-	 *
-	 * @param input   A Cypher fragment
-	 * @param options Options for the parser
-	 * @return A relationship pattern or chain of relationship pattern
+	 * Parses a Cypher fragment describing a relationship into a
+	 * {@link RelationshipPattern} instance.
+	 * @param input a Cypher fragment
+	 * @param options options for the parser
+	 * @return a relationship pattern or chain of relationship pattern
 	 */
 	public static RelationshipPattern parseRelationship(String input, Options options) {
 
 		return handle(input, () -> (RelationshipPattern) new Cypher<>(CypherDslASTFactory.getInstance(options),
-			CypherDslASTExceptionFactory.INSTANCE,
-			getCharStream(input)).Pattern());
+				CypherDslASTExceptionFactory.INSTANCE, getCharStream(input))
+			.Pattern());
 	}
 
 	/**
-	 * @param input A Cypher fragment of an expression
-	 * @return A valid Cypher-DSL expression instance
+	 * Parses a full expression.
+	 * @param input a Cypher fragment of an expression
+	 * @return a valid Cypher-DSL expression instance
 	 * @see #parseExpression(String, Options)
 	 */
 	public static Expression parseExpression(String input) {
@@ -97,21 +107,21 @@ public final class CypherParser {
 
 	/**
 	 * Parses a Cypher expression into an {@link Expression}.
-	 *
-	 * @param input   A Cypher fragment of an expression
-	 * @param options Options for the parser
-	 * @return A valid Cypher-DSL expression instance
+	 * @param input a Cypher fragment of an expression
+	 * @param options options for the parser
+	 * @return a valid Cypher-DSL expression instance
 	 */
 	public static Expression parseExpression(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
-			CypherDslASTExceptionFactory.INSTANCE,
-			getCharStream(input)).Expression());
+				CypherDslASTExceptionFactory.INSTANCE, getCharStream(input))
+			.Expression());
 	}
 
 	/**
-	 * @param input A Cypher fragment containing a valid clause
-	 * @return A {@link Clause} instance
+	 * Parses a single clause.
+	 * @param input a Cypher fragment containing a valid clause
+	 * @return a {@link Clause} instance
 	 * @see #parseClause(String, Options)
 	 */
 	public static Clause parseClause(String input) {
@@ -119,22 +129,23 @@ public final class CypherParser {
 	}
 
 	/**
-	 * Parses a fragment into a {@link Clause} that can be put together into a whole statement via {@link Statement#of(List)}.
-	 *
-	 * @param input   A Cypher fragment containing a valid clause
-	 * @param options Options for the parser
-	 * @return A {@link Clause} instance
+	 * Parses a fragment into a {@link Clause} that can be put together into a whole
+	 * statement via {@link Statement#of(List)}.
+	 * @param input a Cypher fragment containing a valid clause
+	 * @param options options for the parser
+	 * @return a {@link Clause} instance
 	 */
 	public static Clause parseClause(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
-			CypherDslASTExceptionFactory.INSTANCE,
-			getCharStream(input)).Clause());
+				CypherDslASTExceptionFactory.INSTANCE, getCharStream(input))
+			.Clause());
 	}
 
 	/**
-	 * @param input String representing a statement
-	 * @return A {@link Statement} statement.
+	 * Parses a full statement.
+	 * @param input string representing a statement
+	 * @return a {@link Statement} statement.
 	 * @see #parseStatement(String, Options)
 	 */
 	public static Statement parseStatement(String input) {
@@ -142,25 +153,23 @@ public final class CypherParser {
 	}
 
 	/**
-	 * Parses a whole statement into a renderable Cypher-DSL {@link Statement}. The statement might be used in a subquery,
-	 * with a union or maybe just rewritten.
-	 *
-	 * @param input   String representing a statement
-	 * @param options Options for the parser
-	 * @return A {@link Statement} statement.
+	 * Parses a whole statement into a renderable Cypher-DSL {@link Statement}. The
+	 * statement might be used in a subquery, with a union or maybe just rewritten.
+	 * @param input string representing a statement
+	 * @param options options for the parser
+	 * @return a {@link Statement} statement.
 	 */
 	public static Statement parseStatement(String input, Options options) {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
-			CypherDslASTExceptionFactory.INSTANCE,
-			getCharStream(input)).Statement());
+				CypherDslASTExceptionFactory.INSTANCE, getCharStream(input))
+			.Statement());
 	}
 
 	/**
 	 * Parses a {@link String} into a {@link Statement}.
-	 *
-	 * @param input String representing a statement
-	 * @return A {@link Statement} statement.
+	 * @param input string representing a statement
+	 * @return a {@link Statement} statement.
 	 * @see #parseStatement(String)
 	 */
 	public static Statement parse(String input) {
@@ -169,10 +178,9 @@ public final class CypherParser {
 
 	/**
 	 * Parses a {@link String} into a {@link Statement}.
-	 *
-	 * @param input   String representing a statement
-	 * @param options Options for the parser
-	 * @return A {@link Statement} statement.
+	 * @param input string representing a statement
+	 * @param options options for the parser
+	 * @return a {@link Statement} statement.
 	 * @see #parseStatement(String, Options)
 	 */
 	public static Statement parse(String input, Options options) {
@@ -182,30 +190,30 @@ public final class CypherParser {
 	private static <T> T handle(String input, ThrowingParser<T> parser) {
 		try {
 			return parser.parse();
-		} catch (ParseException e) {
-			throw new CyperDslParseException(e);
-		} catch (IllegalArgumentException e) {
-			throw e;
-		} catch (UnsupportedOperationException e) {
-			throw new UnsupportedCypherException(input, e);
-		} catch (Exception e) {
-			throw new RuntimeException("Unexpected exception", e);
 		}
-	}
-
-	@FunctionalInterface
-	private interface ThrowingParser<T> {
-
-		T parse() throws Exception;
+		catch (ParseException ex) {
+			throw new CyperDslParseException(ex);
+		}
+		catch (IllegalArgumentException ex) {
+			throw ex;
+		}
+		catch (UnsupportedOperationException ex) {
+			throw new UnsupportedCypherException(input, ex);
+		}
+		catch (Exception ex) {
+			throw new RuntimeException("Unexpected exception", ex);
+		}
 	}
 
 	private static CharStream getCharStream(String input) {
 		return new CypherCharStream(input);
 	}
 
-	/**
-	 * Not to be instantiated.
-	 */
-	private CypherParser() {
+	@FunctionalInterface
+	private interface ThrowingParser<T> {
+
+		T parse() throws Exception;
+
 	}
+
 }

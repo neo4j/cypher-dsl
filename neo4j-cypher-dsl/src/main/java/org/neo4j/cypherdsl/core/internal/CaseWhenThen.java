@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Represents a pair of `when-then` expressions.
@@ -35,9 +35,11 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class CaseWhenThen implements Visitable {
 
 	private final Expression whenExpression;
+
 	private final Expression thenExpression;
 
 	/**
+	 * Creates w new instance.
 	 * @param whenExpression intermediate when part
 	 * @param thenExpression the then part to happen after matching when above
 	 */
@@ -50,8 +52,9 @@ public final class CaseWhenThen implements Visitable {
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		whenExpression.accept(visitor);
+		this.whenExpression.accept(visitor);
 		visitor.leave(this);
-		thenExpression.accept(visitor);
+		this.thenExpression.accept(visitor);
 	}
+
 }

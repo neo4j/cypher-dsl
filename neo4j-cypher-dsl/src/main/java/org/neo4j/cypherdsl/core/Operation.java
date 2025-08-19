@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -29,6 +26,9 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A binary operation.
@@ -43,9 +43,32 @@ public final class Operation implements Expression {
 	 * A set of operators triggering operations on labels.
 	 */
 	private static final EnumSet<Operator> LABEL_OPERATORS = EnumSet.of(Operator.SET_LABEL, Operator.REMOVE_LABEL);
+
 	private static final EnumSet<Operator.Type> NEEDS_GROUPING_BY_TYPE = EnumSet
 		.complementOf(EnumSet.of(Operator.Type.PROPERTY, Operator.Type.LABEL));
-	private static final EnumSet<Operator> DONT_GROUP = EnumSet.of(Operator.EXPONENTIATION, Operator.PIPE, Operator.UNARY_MINUS, Operator.UNARY_PLUS);
+
+	private static final EnumSet<Operator> DONT_GROUP = EnumSet.of(Operator.EXPONENTIATION, Operator.PIPE,
+			Operator.UNARY_MINUS, Operator.UNARY_PLUS);
+
+	private final Expression left;
+
+	private final Operator operator;
+
+	private final Visitable right;
+
+	Operation(Expression left, Operator operator, Expression right) {
+
+		this.left = left;
+		this.operator = operator;
+		this.right = right;
+	}
+
+	Operation(Expression left, Operator operator, NodeLabels right) {
+
+		this.left = left;
+		this.operator = operator;
+		this.right = right;
+	}
 
 	static Operation create(Operator operator, Expression expression) {
 
@@ -74,47 +97,28 @@ public final class Operation implements Expression {
 		Assertions.notNull(op1, "The first operand must not be null.");
 		Assertions.isTrue(op1.getSymbolicName().isPresent(), "The node must have a name.");
 		Assertions.isTrue(LABEL_OPERATORS.contains(operator),
-			String.format("Only operators %s can be used to modify labels", LABEL_OPERATORS));
+				String.format("Only operators %s can be used to modify labels", LABEL_OPERATORS));
 		Assertions.notEmpty(nodeLabels, "The labels cannot be empty.");
 
 		List<NodeLabel> listOfNodeLabels = Arrays.stream(nodeLabels).map(NodeLabel::new).toList();
 		return new Operation(op1.getRequiredSymbolicName(), operator, new NodeLabels(listOfNodeLabels));
 	}
 
-	private final Expression left;
-	private final Operator operator;
-	private final Visitable right;
-
-	Operation(Expression left, Operator operator, Expression right) {
-
-		this.left = left;
-		this.operator = operator;
-		this.right = right;
-	}
-
-	Operation(Expression left, Operator operator, NodeLabels right) {
-
-		this.left = left;
-		this.operator = operator;
-		this.right = right;
-	}
-
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		if (left != null) {
-			Expressions.nameOrExpression(left).accept(visitor);
+		if (this.left != null) {
+			Expressions.nameOrExpression(this.left).accept(visitor);
 		}
-		operator.accept(visitor);
-		Visitable.visitIfNotNull(right, visitor);
+		this.operator.accept(visitor);
+		Visitable.visitIfNotNull(this.right, visitor);
 		visitor.leave(this);
 	}
 
 	/**
 	 * Checks, whether this operation needs grouping.
-	 *
-	 * @return True, if this operation needs grouping.
+	 * @return true, if this operation needs grouping.
 	 */
 	public boolean needsGrouping() {
 		return NEEDS_GROUPING_BY_TYPE.contains(this.operator.getType()) && !DONT_GROUP.contains(this.operator);
@@ -122,11 +126,12 @@ public final class Operation implements Expression {
 
 	@API(status = INTERNAL)
 	Operator getOperator() {
-		return operator;
+		return this.operator;
 	}
 
 	@Override
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

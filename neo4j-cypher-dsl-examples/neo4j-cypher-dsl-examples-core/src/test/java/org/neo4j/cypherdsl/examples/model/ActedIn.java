@@ -29,10 +29,12 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 // end::simple-model[]
 /**
  * @author Michael J. Simons
- * @soundtrack Höhner - Die ersten 30 Jahre
+ *
  */
 // tag::simple-model[]
-public final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> { // <.>
+public final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> {
+
+	// <.>
 
 	public static final String $TYPE = "ACTED_IN";
 
@@ -57,5 +59,6 @@ public final class ActedIn extends RelationshipBase<Person, Movie, ActedIn> { //
 
 		return new ActedIn(getSymbolicName().orElse(null), getLeft(), Properties.create(newProperties), getRight());
 	}
+
 }
 // end::simple-model[]

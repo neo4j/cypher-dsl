@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import java.util.Collection;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
-import java.util.Collection;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A step exposing a {@link #create(PatternElement...)} method.
@@ -35,19 +35,22 @@ import java.util.Collection;
 public interface ExposesCreate {
 
 	/**
+	 * Starts building a {@code CREATE} clause.
 	 * @param pattern patterns to create
-	 * @return An ongoing merge
+	 * @return an ongoing merge
 	 * @see Cypher#create(PatternElement...)
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingUpdate create(PatternElement... pattern);
 
 	/**
+	 * Starts building a {@code CREATE} clause.
 	 * @param pattern patterns to create
-	 * @return An ongoing merge
-	 * @see Cypher#create(Collection)
+	 * @return an ongoing merge
 	 * @since 2021.2.2
+	 * @see Cypher#create(Collection)
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingUpdate create(Collection<? extends PatternElement> pattern);
+
 }

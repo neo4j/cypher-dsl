@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,11 +26,14 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * A pattern is something that can be matched. It consists of one or more pattern elements. Those can be nodes or chains
- * of nodes and relationships.
+ * A pattern is something that can be matched. It consists of one or more pattern
+ * elements. Those can be nodes or chains of nodes and relationships.
  * <p>
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Pattern.html">Pattern</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Pattern.html">Pattern</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -40,11 +41,16 @@ import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 @API(status = INTERNAL, since = "1.0")
 final class Pattern extends TypedSubtree<PatternElement> {
 
+	private Pattern(List<PatternElement> patternElements) {
+		super(patternElements);
+	}
+
 	static Pattern of(PatternElement requiredPattern, PatternElement... patternElement) {
 		List<PatternElement> elements;
 		if (patternElement == null || patternElement.length == 0) {
 			elements = List.of(requiredPattern);
-		} else {
+		}
+		else {
 			elements = new ArrayList<>();
 			elements.add(requiredPattern);
 			elements.addAll(Arrays.asList(patternElement));
@@ -56,12 +62,9 @@ final class Pattern extends TypedSubtree<PatternElement> {
 		return new Pattern(elements.stream().map(PatternElement.class::cast).toList());
 	}
 
-	private Pattern(List<PatternElement> patternElements) {
-		super(patternElements);
-	}
-
 	@Override
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

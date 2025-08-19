@@ -29,8 +29,8 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 /**
  * An example for a set of shared properties for the nodes in a domain.
  *
+ * @param <T> the final type of what is described here
  * @author Michael J. Simons
- * @param <T> The final type of what is described here
  */
 public abstract class AbstractNodeDefinition<T extends AbstractNodeDefinition<T>> extends NodeBase<T> {
 
@@ -47,4 +47,5 @@ public abstract class AbstractNodeDefinition<T extends AbstractNodeDefinition<T>
 	protected AbstractNodeDefinition(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) { // <.>
 		super(symbolicName, labels, properties);
 	}
+
 }

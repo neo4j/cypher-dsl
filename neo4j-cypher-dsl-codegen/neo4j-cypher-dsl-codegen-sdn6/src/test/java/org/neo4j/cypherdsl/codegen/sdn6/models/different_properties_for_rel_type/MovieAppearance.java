@@ -36,4 +36,5 @@ public class MovieAppearance {
 	private List<String> roles = new ArrayList<>();
 
 	private String stuntDouble;
+
 }

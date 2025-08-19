@@ -18,23 +18,25 @@
  */
 package org.neo4j.cypherdsl.core.querydsl;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
-import org.apiguardian.api.API;
+import java.io.Serial;
 
 import com.querydsl.core.types.Operator;
+import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Thrown when a QueryDSL operator cannot be used with the Cypher-DSL predicate converter.
  *
  * @author Michael J. Simons
- * @soundtrack Fritz Kalkbrenner - Drown
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
 public final class UnsupportedOperatorException extends IllegalArgumentException {
 
+	@Serial
 	private static final long serialVersionUID = 2025849674095086421L;
+
 	private final Operator unsupportedOperator;
 
 	public UnsupportedOperatorException(Operator unsupportedOperator) {
@@ -43,6 +45,7 @@ public final class UnsupportedOperatorException extends IllegalArgumentException
 	}
 
 	public Operator getUnsupportedOperator() {
-		return unsupportedOperator;
+		return this.unsupportedOperator;
 	}
+
 }

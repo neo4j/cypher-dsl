@@ -22,10 +22,11 @@ import java.util.Collection;
 import java.util.Map;
 
 import jakarta.enterprise.context.ApplicationScoped;
-
 import org.neo4j.ogm.session.SessionFactory;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @ApplicationScoped
@@ -39,14 +40,14 @@ class MovieRepository {
 
 	Collection<Movie> findAll() {
 
-		return sessionFactory.openSession().loadAll(Movie.class);
+		return this.sessionFactory.openSession().loadAll(Movie.class);
 	}
 
 	Movie findByTitle(String title) {
 
-		return sessionFactory.openSession().queryForObject(Movie.class,
-			"MATCH (m:$($label)) WHERE m[$property] = $propertyValue RETURN m",
-			Map.of("label", Movie_.$PRIMARY_LABEL, "property", Movie_.MOVIE.TITLE.getName(), "propertyValue", title)
-		);
+		return this.sessionFactory.openSession()
+			.queryForObject(Movie.class, "MATCH (m:$($label)) WHERE m[$property] = $propertyValue RETURN m", Map
+				.of("label", Movie_.$PRIMARY_LABEL, "property", Movie_.MOVIE.TITLE.getName(), "propertyValue", title));
 	}
+
 }

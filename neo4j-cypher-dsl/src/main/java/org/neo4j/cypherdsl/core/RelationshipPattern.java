@@ -18,19 +18,22 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A shared, public interface for  {@link Relationship relationships} and {@link RelationshipChain chains of relationships}.
- * This interface reassembles the <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipPattern.html">RelationshipPattern</a>.
+ * A shared, public interface for {@link Relationship relationships} and
+ * {@link RelationshipChain chains of relationships}. This interface reassembles the
+ * <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/RelationshipPattern.html">RelationshipPattern</a>.
  * <p>
- * This interface can be used synonymous with the concept of a <a href="https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Path Pattern</a>.
+ * This interface can be used synonymous with the concept of a <a href=
+ * "https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Path
+ * Pattern</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Mine &amp; Fatoni - Alle Liebe nachträglich
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -38,34 +41,33 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 
 	/**
 	 * Turns the pattern into a named chain of relationships.
-	 *
-	 * @param name The name to be used.
-	 * @return A named relationship that can be chained with more relationship definitions.
+	 * @param name the name to be used.
+	 * @return a named relationship that can be chained with more relationship
+	 * definitions.
 	 */
 	@CheckReturnValue
 	ExposesRelationships<RelationshipChain> named(String name);
 
 	/**
 	 * Turns the pattern into a named chain of relationships.
-	 *
-	 * @param name The name to be used.
-	 * @return A named relationship that can be chained with more relationship definitions.
+	 * @param name the name to be used.
+	 * @return a named relationship that can be chained with more relationship
+	 * definitions.
 	 */
 	@CheckReturnValue
 	ExposesRelationships<RelationshipChain> named(SymbolicName name);
 
 	/**
-	 * Transform this pattern into a condition. All names of the patterns must be known upfront in the final statement,
-	 * as PatternExpressions are not allowed to introduce new variables.
-	 *
-	 * @return A condition based on this pattern.
+	 * Transform this pattern into a condition. All names of the patterns must be known
+	 * upfront in the final statement, as PatternExpressions are not allowed to introduce
+	 * new variables.
+	 * @return a condition based on this pattern.
 	 * @since 2021.0.0
 	 */
 	Condition asCondition();
 
 	/**
 	 * Quantifies the relationship.
-	 *
 	 * @param quantifier the quantifier to use
 	 * @return a quantified relationship
 	 * @since 2023.9.0
@@ -76,7 +78,6 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 
 	/**
 	 * Quantifies the pattern.
-	 *
 	 * @param quantifier the quantifier to use
 	 * @return a quantified path pattern
 	 * @since 2023.9.0
@@ -84,4 +85,5 @@ public interface RelationshipPattern extends PatternElement, ExposesRelationship
 	default PatternElement quantify(QuantifiedPathPattern.Quantifier quantifier) {
 		throw new UnsupportedOperationException();
 	}
+
 }

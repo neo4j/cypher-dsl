@@ -22,7 +22,10 @@ import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 interface MovieRepository extends Neo4jRepository<Movie, String>, CypherdslStatementExecutor<Movie> {
+
 }

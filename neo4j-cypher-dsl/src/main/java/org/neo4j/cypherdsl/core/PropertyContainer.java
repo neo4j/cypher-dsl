@@ -18,15 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A container having properties. A property container must be {@link Named} with a non empty name to be able to refer
- * to properties.
+ * A container having properties. A property container must be {@link Named} with a non
+ * empty name to be able to refer to properties.
  *
  * @author Andreas Berger
  * @author Michael J. Simons
@@ -36,60 +36,58 @@ import org.apiguardian.api.API;
 public interface PropertyContainer extends Named, PropertyAccessor {
 
 	/**
-	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not
-	 * track the operations created with this method.
-	 *
+	 * Creates an {@link Operation} mutating the properties of this container to a new
+	 * value. The container does not track the operations created with this method.
 	 * @param parameter the new properties
-	 * @return A new operation.
+	 * @return a new operation.
 	 * @since 2020.1.5
 	 */
 	Operation mutate(Parameter<?> parameter);
 
 	/**
-	 * Creates an {@link Operation} mutating the properties of this container to a new value. The container does not
-	 * track the operations created with this method.
-	 *
+	 * Creates an {@link Operation} mutating the properties of this container to a new
+	 * value. The container does not track the operations created with this method.
 	 * @param properties the new properties
-	 * @return A new operation.
+	 * @return a new operation.
 	 * @since 2020.1.5
 	 */
 	Operation mutate(MapExpression properties);
 
 	/**
-	 * Creates an {@link Operation SET operation} setting the properties of this container to a new value. The container does not
-	 * track the operations created with this method.
-	 *
+	 * Creates an {@link Operation SET operation} setting the properties of this container
+	 * to a new value. The container does not track the operations created with this
+	 * method.
 	 * @param parameter the new properties
-	 * @return A new operation.
+	 * @return a new operation.
 	 * @since 2022.5.0
 	 */
 	Operation set(Parameter<?> parameter);
 
 	/**
-	 * Creates an {@link Operation SET operation} setting the properties of this container to a new value. The container does not
-	 * track the operations created with this method.
-	 *
+	 * Creates an {@link Operation SET operation} setting the properties of this container
+	 * to a new value. The container does not track the operations created with this
+	 * method.
 	 * @param properties the new properties
-	 * @return A new operation.
+	 * @return a new operation.
 	 * @since 2022.5.0
 	 */
 	Operation set(MapExpression properties);
 
 	/**
 	 * Unwraps the list of entries into an array before creating a projection out of it.
-	 *
-	 * @param entries A list of entries for the projection
-	 * @return A map projection.
+	 * @param entries a list of entries for the projection
+	 * @return a map projection.
 	 * @see SymbolicName#project(List)
 	 */
 	MapProjection project(List<Object> entries);
 
 	/**
-	 * Creates a map projection based on this container. The container needs a symbolic name for this to work.
-	 *
-	 * @param entries A list of entries for the projection
-	 * @return A map projection.
+	 * Creates a map projection based on this container. The container needs a symbolic
+	 * name for this to work.
+	 * @param entries a list of entries for the projection
+	 * @return a map projection.
 	 * @see SymbolicName#project(Object...)
 	 */
 	MapProjection project(Object... entries);
+
 }

@@ -23,6 +23,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
@@ -30,10 +33,9 @@ import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
 import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @Node
@@ -62,22 +64,20 @@ public final class Movie {
 
 	@JsonCreator
 	@PersistenceCreator
-	public Movie(@JsonProperty("title") String title,
-		@JsonProperty("description") String description,
-		@JsonProperty("actors") List<Actor> actors,
-		@JsonProperty("directors") List<Person> directors) {
+	public Movie(@JsonProperty("title") String title, @JsonProperty("description") String description,
+			@JsonProperty("actors") List<Actor> actors, @JsonProperty("directors") List<Person> directors) {
 		this.title = title;
 		this.description = description;
-		this.actors = actors == null ? List.of() : new ArrayList<>(actors);
-		this.directors = directors == null ? List.of() : new ArrayList<>(directors);
+		this.actors = (actors != null) ? new ArrayList<>(actors) : List.of();
+		this.directors = (directors != null) ? new ArrayList<>(directors) : List.of();
 	}
 
 	public String getTitle() {
-		return title;
+		return this.title;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public List<Actor> getActors() {
@@ -89,7 +89,7 @@ public final class Movie {
 	}
 
 	public Integer getReleased() {
-		return released;
+		return this.released;
 	}
 
 	public void setReleased(Integer released) {
@@ -105,4 +105,5 @@ public final class Movie {
 		this.directors.addAll(newDirectors);
 		return this;
 	}
+
 }

@@ -28,9 +28,17 @@ package org.neo4j.cypherdsl.codegen.core;
 public interface FieldNameGenerator {
 
 	/**
+	 * Generates a new name for constant field.
+	 * @param name the name of a node or relationship
+	 * @return a valid constant field name
+	 */
+	String generate(String name);
+
+	/**
 	 * Single instance of the default {@link FieldNameGenerator}.
 	 */
 	enum Default implements FieldNameGenerator {
+
 		/**
 		 * Singleton holder.
 		 */
@@ -55,8 +63,9 @@ public interface FieldNameGenerator {
 							sb.append("_");
 						}
 						codePoint = Character.toUpperCase(codePoint);
-					} else if (!sb.isEmpty() && (prevWasLower || i + 1 < name.length() && Character.isLowerCase(
-						name.codePointAt(i + 1)))) {
+					}
+					else if (!sb.isEmpty() && (prevWasLower
+							|| i + 1 < name.length() && Character.isLowerCase(name.codePointAt(i + 1)))) {
 						sb.append("_");
 						nextIsLower = true;
 					}
@@ -67,13 +76,7 @@ public interface FieldNameGenerator {
 			}
 			return sb.toString();
 		}
+
 	}
 
-	/**
-	 * Generates a new name for constant field.
-	 *
-	 * @param name the name of a node or relationship
-	 * @return a valid constant field name
-	 */
-	String generate(String name);
 }

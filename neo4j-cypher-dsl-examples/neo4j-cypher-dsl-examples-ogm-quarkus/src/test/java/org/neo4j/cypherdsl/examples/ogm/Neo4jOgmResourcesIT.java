@@ -18,25 +18,22 @@
  */
 package org.neo4j.cypherdsl.examples.ogm;
 
-import io.quarkus.test.junit.QuarkusTest;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import jakarta.inject.Inject;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
+import io.quarkus.test.junit.QuarkusTest;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.neo4j.driver.Driver;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michael J. Simons
@@ -45,18 +42,18 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class Neo4jOgmResourcesIT {
 
-	private final static int NUMBER_OF_INITIAL_MOVIES = 38;
+	private static final int NUMBER_OF_INITIAL_MOVIES = 38;
 
-	@Inject Driver driver;
+	@Inject
+	Driver driver;
 
 	@BeforeAll
 	public void createData() throws IOException {
 
 		var movies = Files.readString(
-			Path.of(Objects.requireNonNull(Neo4jOgmResourcesIT.class.getResource("/movies.cypher"))
-				.getPath()));
+				Path.of(Objects.requireNonNull(Neo4jOgmResourcesIT.class.getResource("/movies.cypher")).getPath()));
 
-		try (var session = driver.session(); var tx = session.beginTransaction()) {
+		try (var session = this.driver.session(); var tx = session.beginTransaction()) {
 			tx.run("MATCH (n) DETACH DELETE n");
 			tx.run(movies);
 			tx.commit();
@@ -65,28 +62,26 @@ public class Neo4jOgmResourcesIT {
 
 	@Test
 	public void getMoviesShouldWork() {
-		var response = RestAssured.given()
-			.when().get("/api/movies")
-			.then()
-			.statusCode(200)
-			.extract().response();
+		var response = RestAssured.given().when().get("/api/movies").then().statusCode(200).extract().response();
 
 		var json = response.jsonPath();
-		assertEquals(NUMBER_OF_INITIAL_MOVIES, json.<List<?>>getJsonObject("$").size());
+		assertThat(json.<List<?>>getJsonObject("$").size()).isEqualTo(NUMBER_OF_INITIAL_MOVIES);
 		var allTitles = json.<List<String>>getJsonObject("title");
-		assertTrue(allTitles.contains("Cloud Atlas"));
+		assertThat(allTitles.contains("Cloud Atlas")).isTrue();
 	}
 
 	@Test
 	public void getMovieWithANativeTypeShouldWork() {
 		var response = RestAssured.given()
-			.when().get("/api/movies/The Matrix")
+			.when()
+			.get("/api/movies/The Matrix")
 			.then()
 			.statusCode(200)
-			.extract().response();
+			.extract()
+			.response();
 
 		var json = response.jsonPath();
-		assertNotNull(json.get("watchedOn"));
+		assertThat(json.<String>get("watchedOn")).isNotNull();
 	}
 
 	@Test
@@ -95,11 +90,15 @@ public class Neo4jOgmResourcesIT {
 		var response = RestAssured.given()
 			.body("{\"name\":\"Lieschen Müller\",\"born\":2020}")
 			.contentType(ContentType.JSON)
-			.when().post("/api/people")
-			.then().statusCode(201)
-			.extract().response();
+			.when()
+			.post("/api/people")
+			.then()
+			.statusCode(201)
+			.extract()
+			.response();
 
 		var json = response.jsonPath();
-		assertNotNull(json.getObject("id", Long.class));
+		assertThat(json.getObject("id", Long.class)).isNotNull();
 	}
+
 }

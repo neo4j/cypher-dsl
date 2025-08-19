@@ -18,10 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A step exposing a {@link #merge(PatternElement...)} method.
@@ -33,10 +33,12 @@ import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 public interface ExposesMerge {
 
 	/**
+	 * Starts building a {@code MERGE} clause.
 	 * @param pattern patterns to merge
-	 * @return An ongoing merge
+	 * @return an ongoing merge
 	 * @see Cypher#merge(PatternElement...)
 	 */
 	@CheckReturnValue
 	StatementBuilder.OngoingMerge merge(PatternElement... pattern);
+
 }

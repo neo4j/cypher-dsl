@@ -18,12 +18,14 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
+ * A nested expression.
+ *
  * @author Michael J. Simons
  * @since 1.0
  */
@@ -48,4 +50,5 @@ public final class NestedExpression implements Expression {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

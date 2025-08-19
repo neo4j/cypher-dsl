@@ -31,13 +31,10 @@ class StaticModelIT {
 	void simpleMatchShouldWork() {
 
 		// tag::simple-model[]
-		var cypher = Cypher.match(Movie.MOVIE)
-			.returning(Movie.MOVIE)
-			.build().getCypher();
+		var cypher = Cypher.match(Movie.MOVIE).returning(Movie.MOVIE).build().getCypher();
 		// end::simple-model[]
 
-		Assertions.assertThat(cypher)
-			.matches("MATCH \\(\\w+:`Movie`\\) RETURN \\w+");
+		Assertions.assertThat(cypher).matches("MATCH \\(\\w+:`Movie`\\) RETURN \\w+");
 	}
 
 	@Test
@@ -45,9 +42,7 @@ class StaticModelIT {
 
 		// tag::simple-model-renamed[]
 		var movie = Movie.MOVIE.named("m");
-		var cypher = Cypher.match(movie)
-			.returning(movie)
-			.build().getCypher();
+		var cypher = Cypher.match(movie).returning(movie).build().getCypher();
 		// end::simple-model-renamed[]
 
 		Assertions.assertThat(cypher).isEqualTo("MATCH (m:`Movie`) RETURN m");
@@ -61,10 +56,10 @@ class StaticModelIT {
 		var cypher = Cypher.match(movie)
 			.where(movie.TITLE.isEqualTo(Cypher.literalOf("The Matrix"))) // <.>
 			.returning(movie)
-			.build().getCypher();
+			.build()
+			.getCypher();
 
-		Assertions.assertThat(cypher)
-			.isEqualTo("MATCH (m:`Movie`) WHERE m.title = 'The Matrix' RETURN m");
+		Assertions.assertThat(cypher).isEqualTo("MATCH (m:`Movie`) WHERE m.title = 'The Matrix' RETURN m");
 		// end::add-properties[]
 	}
 
@@ -73,12 +68,9 @@ class StaticModelIT {
 
 		// tag::query-node-by-properties[]
 		var movie = Movie.MOVIE.withProperties(Movie.MOVIE.TITLE, Cypher.literalOf("The Matrix")).named("m1");
-		var cypher = Cypher.match(movie)
-			.returning(movie)
-			.build().getCypher();
+		var cypher = Cypher.match(movie).returning(movie).build().getCypher();
 
-		Assertions.assertThat(cypher)
-			.isEqualTo("MATCH (m1:`Movie` {title: 'The Matrix'}) RETURN m1");
+		Assertions.assertThat(cypher).isEqualTo("MATCH (m1:`Movie` {title: 'The Matrix'}) RETURN m1");
 		// end::query-node-by-properties[]
 	}
 
@@ -87,9 +79,7 @@ class StaticModelIT {
 
 		var actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf("Neo"))
 			.named("n");
-		var cypher = Cypher.match(actedIn)
-			.returning(Movie.MOVIE)
-			.build().getCypher();
+		var cypher = Cypher.match(actedIn).returning(Movie.MOVIE).build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Person`\\)-\\[n:`ACTED_IN` \\{role: 'Neo'}]->\\(\\w+:`Movie`\\) RETURN \\w+");
@@ -100,9 +90,7 @@ class StaticModelIT {
 
 		// tag::query-rel-by-properties[]
 		var actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf("Neo"));
-		var cypher = Cypher.match(actedIn)
-			.returning(Movie.MOVIE)
-			.build().getCypher();
+		var cypher = Cypher.match(actedIn).returning(Movie.MOVIE).build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Person`\\)-\\[\\w+:`ACTED_IN` \\{role: 'Neo'}]->\\(\\w+:`Movie`\\) RETURN \\w+");
@@ -113,9 +101,7 @@ class StaticModelIT {
 	void renamingRelationshipsShouldWork() {
 
 		var directed = Person.PERSON.DIRECTED.named("d");
-		var cypher = Cypher.match(directed)
-			.returning(Movie.MOVIE)
-			.build().getCypher();
+		var cypher = Cypher.match(directed).returning(Movie.MOVIE).build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Person`\\)-\\[d:`DIRECTED`]->\\(\\w+:`Movie`\\) RETURN \\w+");
@@ -124,9 +110,7 @@ class StaticModelIT {
 	@Test
 	void matchOnRelationshipsShouldWork() {
 
-		var cypher = Cypher.match(Person.PERSON.DIRECTED)
-			.returning(Movie.MOVIE)
-			.build().getCypher();
+		var cypher = Cypher.match(Person.PERSON.DIRECTED).returning(Movie.MOVIE).build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Person`\\)-\\[\\w+:`DIRECTED`]->\\(\\w+:`Movie`\\) RETURN \\w+");
@@ -135,9 +119,7 @@ class StaticModelIT {
 	@Test
 	void matchOnRelationshipsShouldWorkInverse() {
 
-		var cypher = Cypher.match(Person.PERSON.DIRECTED.inverse())
-			.returning(Person.PERSON)
-			.build().getCypher();
+		var cypher = Cypher.match(Person.PERSON.DIRECTED.inverse()).returning(Person.PERSON).build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches("MATCH \\(\\w+:`Movie`\\)<-\\[:`DIRECTED`]-\\(\\w+:`Person`\\) RETURN \\w+");
@@ -150,12 +132,13 @@ class StaticModelIT {
 		var cypher = Cypher.match(Person.PERSON.DIRECTED)
 			.match(Person.PERSON.ACTED_IN)
 			.returning(Person.PERSON.DIRECTED, Person.PERSON.ACTED_IN)
-			.build().getCypher();
+			.build()
+			.getCypher();
 		// end::multiple-relationships[]
 
 		Assertions.assertThat(cypher)
 			.matches(
-				"MATCH \\(\\w+:`Person`\\)-\\[\\w+:`DIRECTED`]->\\(\\w+:`Movie`\\) MATCH \\(\\w+\\)-\\[\\w+:`ACTED_IN`]->\\(\\w+\\) RETURN \\w+, \\w+");
+					"MATCH \\(\\w+:`Person`\\)-\\[\\w+:`DIRECTED`]->\\(\\w+:`Movie`\\) MATCH \\(\\w+\\)-\\[\\w+:`ACTED_IN`]->\\(\\w+\\) RETURN \\w+, \\w+");
 	}
 
 	@Test
@@ -163,17 +146,12 @@ class StaticModelIT {
 
 		// tag::chaining-relationships[]
 		var otherPerson = Person.PERSON.named("o");
-		var cypher = Cypher.match(
-				Person.PERSON.DIRECTED.inverse()
-					.relationshipTo(otherPerson, "FOLLOWS") // <.>
-			)
-			.where(otherPerson.NAME.isEqualTo(Cypher.literalOf("Someone")))
-			.returning(Person.PERSON)
-			.build().getCypher();
+		var cypher = Cypher.match(Person.PERSON.DIRECTED.inverse().relationshipTo(otherPerson, "FOLLOWS") // <.>
+		).where(otherPerson.NAME.isEqualTo(Cypher.literalOf("Someone"))).returning(Person.PERSON).build().getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches(
-				"MATCH \\(\\w+:`Movie`\\)<-\\[:`DIRECTED`]-\\(\\w+:`Person`\\)-\\[:`FOLLOWS`]->\\(o:`Person`\\) WHERE o\\.name = 'Someone' RETURN \\w+");
+					"MATCH \\(\\w+:`Movie`\\)<-\\[:`DIRECTED`]-\\(\\w+:`Person`\\)-\\[:`FOLLOWS`]->\\(o:`Person`\\) WHERE o\\.name = 'Someone' RETURN \\w+");
 		// end::chaining-relationships[]
 	}
 
@@ -181,12 +159,9 @@ class StaticModelIT {
 	void workWithPropertiesShouldBePossible() {
 
 		// tag::work-with-properties[]
-		var cypher = Cypher.match(Person.PERSON)
-			.returning(Person.PERSON.NAME, Person.PERSON.BORN)
-			.build().getCypher();
+		var cypher = Cypher.match(Person.PERSON).returning(Person.PERSON.NAME, Person.PERSON.BORN).build().getCypher();
 
-		Assertions.assertThat(cypher)
-			.matches("MATCH \\(\\w+:`Person`\\) RETURN \\w+\\.name, \\w+\\.born");
+		Assertions.assertThat(cypher).matches("MATCH \\(\\w+:`Person`\\) RETURN \\w+\\.name, \\w+\\.born");
 		// end::work-with-properties[]
 	}
 
@@ -194,14 +169,16 @@ class StaticModelIT {
 	void queryingNonStaticInformationAndPathsShouldWork() {
 
 		var otherPerson = Person.PERSON.named("o");
-		var cypher = Cypher.match(Person.PERSON.withProperties(Person.PERSON.NAME, Cypher.literalOf("Tom Hanks"))
-			.relationshipTo(otherPerson, "WORKED_WITH")) // <.>
+		var cypher = Cypher
+			.match(Person.PERSON.withProperties(Person.PERSON.NAME, Cypher.literalOf("Tom Hanks"))
+				.relationshipTo(otherPerson, "WORKED_WITH")) // <.>
 			.returning(otherPerson.NAME)
-			.build().getCypher();
+			.build()
+			.getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches(
-				"MATCH \\(\\w+:`Person` \\{name: 'Tom Hanks'}\\)-\\[:`WORKED_WITH`]->\\(o:`Person`\\) RETURN o\\.name");
+					"MATCH \\(\\w+:`Person` \\{name: 'Tom Hanks'}\\)-\\[:`WORKED_WITH`]->\\(o:`Person`\\) RETURN o\\.name");
 	}
 
 	@Test
@@ -210,10 +187,10 @@ class StaticModelIT {
 		// tag::deriving-new-properties[]
 		var cypher = Cypher.match(Person.PERSON)
 			.returning(Person.PERSON.NAME.concat(Cypher.literalOf(" whatever")))
-			.build().getCypher();
+			.build()
+			.getCypher();
 
-		Assertions.assertThat(cypher)
-			.matches("MATCH \\(\\w+:`Person`\\) RETURN \\(\\w+\\.name \\+ ' whatever'\\)");
+		Assertions.assertThat(cypher).matches("MATCH \\(\\w+:`Person`\\) RETURN \\(\\w+\\.name \\+ ' whatever'\\)");
 		// end::deriving-new-properties[]
 	}
 
@@ -221,22 +198,21 @@ class StaticModelIT {
 	void oldQueryDSLExampleRevisited() {
 
 		var person = new Person().named("person");
-		Assertions.assertThat(
-			Cypher.match(person)
-				.where(person.FIRST_NAME.eq(Cypher.literalOf("P")).
-					and(person.property("age").gt(Cypher.literalOf(25)))).returning(person).build().getCypher()
-		).isEqualTo("MATCH (person:`Person`) WHERE (person.firstName = 'P' AND person.age > 25) RETURN person");
+		Assertions
+			.assertThat(Cypher.match(person)
+				.where(person.FIRST_NAME.eq(Cypher.literalOf("P")).and(person.property("age").gt(Cypher.literalOf(25))))
+				.returning(person)
+				.build()
+				.getCypher())
+			.isEqualTo("MATCH (person:`Person`) WHERE (person.firstName = 'P' AND person.age > 25) RETURN person");
 	}
 
 	@Test
 	void inheritanceMappingExampleNodes() {
 
-		var cypher = Cypher.match(Division.DIVISION)
-			.returning(Division.DIVISION.NAME)
-			.build().getCypher();
+		var cypher = Cypher.match(Division.DIVISION).returning(Division.DIVISION.NAME).build().getCypher();
 
-		Assertions.assertThat(cypher)
-			.matches("MATCH \\(\\w+:`DefaultNode`:`Division`\\) RETURN \\w+\\.name");
+		Assertions.assertThat(cypher).matches("MATCH \\(\\w+:`DefaultNode`:`Division`\\) RETURN \\w+\\.name");
 	}
 
 	@Test
@@ -244,12 +220,9 @@ class StaticModelIT {
 
 		var division = Division.DIVISION.named("d");
 
-		var cypher = Cypher.match(division)
-			.returning(division.NAME)
-			.build().getCypher();
+		var cypher = Cypher.match(division).returning(division.NAME).build().getCypher();
 
-		Assertions.assertThat(cypher)
-			.matches("MATCH \\(d:`DefaultNode`:`Division`\\) RETURN d\\.name");
+		Assertions.assertThat(cypher).matches("MATCH \\(d:`DefaultNode`:`Division`\\) RETURN d\\.name");
 	}
 
 	@Test
@@ -257,11 +230,12 @@ class StaticModelIT {
 
 		var cypher = Cypher.match(Department.DEPARTMENT.BELONGS_TO)
 			.returning(Division.DIVISION.asExpression(), Department.DEPARTMENT.BELONGS_TO.CREATED_AT)
-			.build().getCypher();
+			.build()
+			.getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches(
-				"MATCH \\(\\w+:`DefaultNode`:`Department`\\)-\\[\\w+:`COOP_REL`\\|`BELONGS_TO`]->\\(\\w+:`DefaultNode`:`Division`\\) RETURN \\w+, \\w+\\.createdAt");
+					"MATCH \\(\\w+:`DefaultNode`:`Department`\\)-\\[\\w+:`COOP_REL`\\|`BELONGS_TO`]->\\(\\w+:`DefaultNode`:`Division`\\) RETURN \\w+, \\w+\\.createdAt");
 	}
 
 	@Test
@@ -269,12 +243,15 @@ class StaticModelIT {
 
 		var inversRelationship = Department.DEPARTMENT.BELONGS_TO.inverse();
 		var cypher = Cypher.match(inversRelationship)
-			.returning(Division.DIVISION.asExpression(), Department.DEPARTMENT.BELONGS_TO.CREATED_AT
-				.referencedAs(inversRelationship.getRequiredSymbolicName().getValue()))
-			.build().getCypher();
+			.returning(Division.DIVISION.asExpression(),
+					Department.DEPARTMENT.BELONGS_TO.CREATED_AT
+						.referencedAs(inversRelationship.getRequiredSymbolicName().getValue()))
+			.build()
+			.getCypher();
 
 		Assertions.assertThat(cypher)
 			.matches(
-				"MATCH \\(\\w+:`DefaultNode`:`Division`\\)<-\\[\\w+:`COOP_REL`\\|`BELONGS_TO`]-\\(\\w+:`DefaultNode`:`Department`\\) RETURN \\w+, \\w+\\.createdAt");
+					"MATCH \\(\\w+:`DefaultNode`:`Division`\\)<-\\[\\w+:`COOP_REL`\\|`BELONGS_TO`]-\\(\\w+:`DefaultNode`:`Department`\\) RETURN \\w+, \\w+\\.createdAt");
 	}
+
 }

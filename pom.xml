@@ -202,6 +202,7 @@
 		<sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>4.0.0</sortpom-maven-plugin.version>
 		<spring-data-neo4j.version>7.5.3</spring-data-neo4j.version>
+		<spring-javaformat.version>0.0.47</spring-javaformat.version>
 		<testcontainers.version>1.21.3</testcontainers.version>
 		<use-latest-version-for-docs>0</use-latest-version-for-docs>
 	</properties>
@@ -257,11 +258,6 @@
 				<version>${archunit.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.neo4j</groupId>
-				<artifactId>neo4j-ogm-quarkus</artifactId>
-				<version>${neo4j-ogm-quarkus.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>javax.xml.bind</groupId>
 				<artifactId>jaxb-api</artifactId>
 				<version>${jaxb.version}</version>
@@ -304,6 +300,11 @@
 				<groupId>org.neo4j</groupId>
 				<artifactId>neo4j-ogm-core</artifactId>
 				<version>${neo4j-ogm.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-ogm-quarkus</artifactId>
+				<version>${neo4j-ogm-quarkus.version}</version>
 			</dependency>
 			<dependency>
 				<groupId>org.neo4j.driver</groupId>
@@ -508,11 +509,6 @@
 						<release>${java.version}</release>
 						<tags>
 							<tag>
-								<name>soundtrack</name>
-								<placement>X</placement>
-								<head>Soundtrack</head>
-							</tag>
-							<tag>
 								<name>neo4j.version</name>
 								<placement>a</placement>
 								<head>Neo4j version required</head>
@@ -526,10 +522,17 @@
 					<version>${maven-jar-plugin.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>io.spring.javaformat</groupId>
+					<artifactId>spring-javaformat-maven-plugin</artifactId>
+					<version>${spring-javaformat.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${maven-checkstyle-plugin.version}</version>
 					<configuration>
+						<excludes>**/module-info.java</excludes>
+						<includeTestSourceDirectory>true</includeTestSourceDirectory>
 						<configLocation>etc/checkstyle/config.xml</configLocation>
 						<suppressionsLocation>etc/checkstyle/suppressions.xml</suppressionsLocation>
 						<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
@@ -542,6 +545,11 @@
 							<groupId>com.puppycrawl.tools</groupId>
 							<artifactId>checkstyle</artifactId>
 							<version>${checkstyle.version}</version>
+						</dependency>
+						<dependency>
+							<groupId>io.spring.javaformat</groupId>
+							<artifactId>spring-javaformat-checkstyle</artifactId>
+							<version>${spring-javaformat.version}</version>
 						</dependency>
 					</dependencies>
 				</plugin>
@@ -713,8 +721,6 @@
 								<exclude>**/.flattened-pom.xml</exclude>
 								<exclude>**/org.mockito.plugins.MockMaker</exclude>
 								<exclude>bin/runtests.java</exclude>
-								<exclude>**/package-info.java</exclude>
-								<!-- Expected generated classes -->
 								<exclude>**/src/test/resources/**/*_.java</exclude>
 							</excludes>
 						</licenseSet>
@@ -836,6 +842,19 @@
 								<DependencyConvergence/>
 							</rules>
 						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>io.spring.javaformat</groupId>
+				<artifactId>spring-javaformat-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>validate</goal>
+						</goals>
+						<phase>validate</phase>
+						<inherited>true</inherited>
 					</execution>
 				</executions>
 			</plugin>
@@ -1030,6 +1049,7 @@
 				<skipITs>true</skipITs>
 				<skipNativeBuild>true</skipNativeBuild>
 				<skipTests>true</skipTests>
+				<spring-javaformat.skip>true</spring-javaformat.skip>
 			</properties>
 		</profile>
 

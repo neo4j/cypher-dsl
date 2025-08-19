@@ -24,6 +24,8 @@ import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.SymbolicName;
 
 /**
+ * A strategy that will always use fixed names for aliased expressions.
+ *
  * @author Michael J. Simons
  * @since 2023.2.0
  */
@@ -37,7 +39,7 @@ final class FixedNamesStrategy implements NameResolvingStrategy {
 
 	@Override
 	public String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup) {
-		return context.resolve(symbolicName);
+		return this.context.resolve(symbolicName);
 	}
 
 	@Override
@@ -47,11 +49,12 @@ final class FixedNamesStrategy implements NameResolvingStrategy {
 
 	@Override
 	public boolean isResolved(SymbolicName symbolicName) {
-		return context.isResolved(symbolicName);
+		return this.context.isResolved(symbolicName);
 	}
 
 	@Override
 	public String resolve(Parameter<?> parameter) {
-		return context.getParameterName(parameter);
+		return this.context.getParameterName(parameter);
 	}
+
 }

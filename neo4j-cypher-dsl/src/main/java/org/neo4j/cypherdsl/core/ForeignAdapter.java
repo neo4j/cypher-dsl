@@ -18,59 +18,60 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents an adapter that allows to turn foreign expressions into Cypher-DSL {@link Expression expressions}.
+ * Represents an adapter that allows to turn foreign expressions into Cypher-DSL
+ * {@link Expression expressions}.
  *
+ * @param <FE> the type of the foreign expression.
  * @author Michael J. Simons
- * @param <FE> The type of the foreign expression.
- * @soundtrack Paul Kalkbrenner - Berlin Calling
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
 public interface ForeignAdapter<FE> {
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link Condition}. The memoized expression should be something  that
-	 * can be evaluated into something boolean.
-	 *
-	 * @return A condition
-	 * @throws IllegalArgumentException if the expression doesn't resolve into something boolean
+	 * Adapts a foreign expression into a Cypher-DSL {@link Condition}. The memoized
+	 * expression should be something that can be evaluated into something boolean.
+	 * @return a condition
+	 * @throws IllegalArgumentException if the expression doesn't resolve into something
+	 * boolean
 	 */
 	Condition asCondition();
 
 	/**
 	 * Adapts a foreign expression into a Cypher-DSL {@link Expression}.
-	 *
-	 * @return A native expression
+	 * @return a native expression
 	 */
 	Expression asExpression();
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link Node}, that allows to address it further down in queries.
-	 *
-	 * @return A node
-	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
+	 * Adapts a foreign expression into a Cypher-DSL {@link Node}, that allows to address
+	 * it further down in queries.
+	 * @return a node
+	 * @throws IllegalArgumentException if the expression doesn't describe something that
+	 * can be used to describe a node
 	 */
 	Node asNode();
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link Relationship}, that allows to address it further down in queries.
-	 *
-	 * @return A node
-	 * @throws IllegalArgumentException if the expression doesn't describe something that can be used to describe a node
+	 * Adapts a foreign expression into a Cypher-DSL {@link Relationship}, that allows to
+	 * address it further down in queries.
+	 * @return a node
+	 * @throws IllegalArgumentException if the expression doesn't describe something that
+	 * can be used to describe a node
 	 */
 	Relationship asRelationship();
 
 	/**
-	 * Adapts a foreign expression into a Cypher-DSL {@link SymbolicName}. The memoized expression should ideally be something
-	 * that is named or resolves to an alias.
-	 *
-	 * @return A symbolic name
+	 * Adapts a foreign expression into a Cypher-DSL {@link SymbolicName}. The memoized
+	 * expression should ideally be something that is named or resolves to an alias.
+	 * @return a symbolic name
 	 * @throws IllegalArgumentException if a name cannot be derived from the expression.
 	 */
 	SymbolicName asName();
+
 }

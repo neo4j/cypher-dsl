@@ -23,6 +23,8 @@ import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @NodeEntity
@@ -37,4 +39,5 @@ public class Example {
 	public Example(long id) {
 		this.id = id;
 	}
+
 }

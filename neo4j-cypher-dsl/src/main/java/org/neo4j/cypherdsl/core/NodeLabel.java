@@ -18,16 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Expression for a single Node label.
  *
  * @author Michael J. Simons
- * @soundtrack Richard Gibbs - Battlestar Galactica OST
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -40,16 +39,15 @@ public final class NodeLabel implements Visitable {
 	}
 
 	/**
-	 * @return The actual value of this label. Needs to be escaped before rendering.
+	 * {@return the actual value of this label. Needs to be escaped before rendering}
 	 */
 	public String getValue() {
-		return value;
+		return this.value;
 	}
 
 	@Override
 	public String toString() {
-		return "NodeLabel{" +
-			"value='" + value + '\'' +
-			'}';
+		return "NodeLabel{" + "value='" + this.value + '\'' + '}';
 	}
+
 }

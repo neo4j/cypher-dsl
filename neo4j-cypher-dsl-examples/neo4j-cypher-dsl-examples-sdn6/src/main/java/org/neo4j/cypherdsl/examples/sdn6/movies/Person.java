@@ -20,21 +20,24 @@ package org.neo4j.cypherdsl.examples.sdn6.movies;
 
 import java.time.ZonedDateTime;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.neo4j.core.schema.GeneratedValue;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 /**
+ * OGM example type.
+ *
  * @author Michael J. Simons
  */
 @Node
 public final class Person {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private final Long id;
 
 	private final String name;
@@ -56,15 +59,15 @@ public final class Person {
 	}
 
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public Integer getBorn() {
-		return born;
+		return this.born;
 	}
 
 	public void setBorn(Integer born) {
@@ -72,10 +75,11 @@ public final class Person {
 	}
 
 	public ZonedDateTime getDob() {
-		return dob;
+		return this.dob;
 	}
 
 	public void setDob(ZonedDateTime dob) {
 		this.dob = dob;
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 "Neo4j,"
+ * Copyright (c) 2019-2025 "Neo4j,"
  * Neo4j Sweden AB [https://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -17,10 +17,11 @@
  * limitations under the License.
  */
 /**
- * This is basically the kitchen sink for all classes that must be public but are not actually part of the public API.
- * We will change them at will and don't give any guarantees about them. All classes inside that package are marked as
- * {@link org.apiguardian.api.API.Status#INTERNAL}. The {@code internal} package won't be exported when the Cypher-DSL
- * is run on the module path.
+ * This is basically the kitchen sink for all classes that must be public but are not
+ * actually part of the public API. We will change them at will and don't give any
+ * guarantees about them. All classes inside that package are marked as
+ * {@link org.apiguardian.api.API.Status#INTERNAL}. The {@code internal} package won't be
+ * exported when the Cypher-DSL is run on the module path.
  *
  * @author Michael J. Simons
  */

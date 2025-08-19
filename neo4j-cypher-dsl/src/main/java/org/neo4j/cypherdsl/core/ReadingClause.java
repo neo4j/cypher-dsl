@@ -19,8 +19,11 @@
 package org.neo4j.cypherdsl.core;
 
 /**
+ * A reading clause does not do any updates.
+ *
  * @author Michael J. Simons
  * @since 1.0
  */
 interface ReadingClause extends Clause {
+
 }

@@ -18,13 +18,8 @@
  */
 package org.neo4j.cypherdsl.core.querydsl;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Arrays;
 import java.util.List;
-
-import org.apiguardian.api.API;
-import org.neo4j.cypherdsl.core.Cypher;
 
 import com.querydsl.core.types.Constant;
 import com.querydsl.core.types.Expression;
@@ -36,25 +31,36 @@ import com.querydsl.core.types.SubQueryExpression;
 import com.querydsl.core.types.Template;
 import com.querydsl.core.types.TemplateExpression;
 import com.querydsl.core.types.Visitor;
+import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.Cypher;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
- * This is basically a copy of Query-DSL's {@link com.querydsl.core.types.ToStringVisitor}. The main purpose of the string
- * generated here is to be used with our {@link Cypher#raw(String, Object...)} feature, that allows to insert arbitrary
- * query fragments into the AST. It is easier to render the Query-DSL fragments than recreating our AST from Query-DSL.
+ * This is basically a copy of Query-DSL's
+ * {@link com.querydsl.core.types.ToStringVisitor}. The main purpose of the string
+ * generated here is to be used with our {@link Cypher#raw(String, Object...)} feature,
+ * that allows to insert arbitrary query fragments into the AST. It is easier to render
+ * the Query-DSL fragments than recreating our AST from Query-DSL.
  * <p>
- * The main difference in the original {@code ToStringVisitor} is to be found in {@link #visit(ParamExpression, CypherContext)}
- * and {@link #visit(Constant, CypherContext)}. Both methods will use the {@literal $E} notation to indicate an expression
- * for the {@code RawLiteral} and add the expression (either a literal or parameter) to the {@link CypherContext}. After
- * all rendering has been done by Query-DSL, the adapter will take the renderer string as a format string and pass it on
- * to {@link Cypher#raw(String, Object...)} along with all expressions collected along the way.
+ * The main difference in the original {@code ToStringVisitor} is to be found in
+ * {@link #visit(ParamExpression, CypherContext)} and
+ * {@link #visit(Constant, CypherContext)}. Both methods will use the {@literal $E}
+ * notation to indicate an expression for the {@code RawLiteral} and add the expression
+ * (either a literal or parameter) to the {@link CypherContext}. After all rendering has
+ * been done by Query-DSL, the adapter will take the renderer string as a format string
+ * and pass it on to {@link Cypher#raw(String, Object...)} along with all expressions
+ * collected along the way.
  *
  * @author Michael J. Simons
- * @soundtrack Iron Maiden - The Book Of Souls: Live Chapter
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
 public final class ToCypherFormatStringVisitor implements Visitor<String, CypherContext> {
 
+	/**
+	 * Global instance of this visitor.
+	 */
 	public static final ToCypherFormatStringVisitor INSTANCE = new ToCypherFormatStringVisitor();
 
 	private ToCypherFormatStringVisitor() {
@@ -87,21 +93,22 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 			for (Template.Element element : template.getElements()) {
 				final Object rv = element.convert(o.getArgs());
 				if (rv instanceof Expression) {
-					if (precedence > -1 && rv instanceof Operation && precedence < context.getPrecedence(((Operation<?>) rv).getOperator())) {
-						builder
-							.append("(")
-							.append(((Expression<?>) rv).accept(this, context))
-							.append(")");
+					if (precedence > -1 && rv instanceof Operation
+							&& precedence < context.getPrecedence(((Operation<?>) rv).getOperator())) {
+						builder.append("(").append(((Expression<?>) rv).accept(this, context)).append(")");
 						continue;
 					}
 					builder.append(((Expression<?>) rv).accept(this, context));
-				} else {
+				}
+				else {
 					builder.append(rv.toString());
 				}
 			}
 			return builder.toString();
-		} else {
-			throw new IllegalArgumentException("unknown operation with operator " + o.getOperator().name() + " and args " + o.getArgs());
+		}
+		else {
+			throw new IllegalArgumentException(
+					"unknown operation with operator " + o.getOperator().name() + " and args " + o.getArgs());
 		}
 	}
 
@@ -126,15 +133,18 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 					Object rv = element.convert(args);
 					if (rv instanceof Expression) {
 						builder.append(((Expression<?>) rv).accept(this, context));
-					} else {
+					}
+					else {
 						builder.append(rv.toString());
 					}
 				}
 				return builder.toString();
-			} else {
+			}
+			else {
 				throw new IllegalArgumentException("No pattern for " + p.getMetadata().getPathType());
 			}
-		} else {
+		}
+		else {
 			return elem.toString();
 		}
 	}
@@ -152,7 +162,8 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 			Object rv = element.convert(expr.getArgs());
 			if (rv instanceof Expression) {
 				builder.append(((Expression<?>) rv).accept(this, context));
-			} else {
+			}
+			else {
 				builder.append(rv.toString());
 			}
 		}
@@ -165,12 +176,15 @@ public final class ToCypherFormatStringVisitor implements Visitor<String, Cypher
 		Object constantValue = expr.getConstant();
 		if (constantValue == null) {
 			context.add(Cypher.literalOf(null));
-		} else if (constantValue instanceof Boolean) {
+		}
+		else if (constantValue instanceof Boolean) {
 			context.add(Cypher.literalOf(constantValue));
-		} else {
+		}
+		else {
 			context.add(context.getOrCreateParameterFor(constantValue));
 		}
 
 		return "$E";
 	}
+
 }

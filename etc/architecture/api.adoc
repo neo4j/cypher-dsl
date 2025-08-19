@@ -13,7 +13,7 @@ and annotations.
 [source,java,indent=0,tabsize=4]
 .@API Guardian annotations must not be used on fields
 ----
-include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTest.java[tag=arch-rules.structure:core-must-not-depend-on-renderer]
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTests.java[tag=arch-rules.structure:core-must-not-depend-on-renderer]
 ----
 
 ===== Internal API
@@ -30,5 +30,5 @@ This package won't be exported via `module-info.java`.
 [source,java,indent=0,tabsize=4]
 .Non abstract, public classes that are only part of internal API must be final
 ----
-include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTest.java[tag=arch-rules.api:internal]
+include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/PackageAndAPIStructureTests.java[tag=arch-rules.api:internal]
 ----

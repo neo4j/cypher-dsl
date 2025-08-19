@@ -22,7 +22,6 @@ import java.util.List;
 
 import jakarta.json.bind.annotation.JsonbProperty;
 import jakarta.json.bind.annotation.JsonbTransient;
-
 import org.neo4j.ogm.annotation.EndNode;
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
@@ -30,12 +29,15 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import org.neo4j.ogm.annotation.StartNode;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @RelationshipEntity("ACTED_IN")
 public final class Actor {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@JsonbTransient
 	private Long id;
 
@@ -45,20 +47,22 @@ public final class Actor {
 	@JsonbTransient
 	private Person person;
 
-	@EndNode private Movie movie;
+	@EndNode
+	private Movie movie;
 
 	/**
-	 * @return Name of this actor
+	 * {@return name of this actor}
 	 */
 	@JsonbProperty
 	public String getName() {
-		return person.getName();
+		return this.person.getName();
 	}
 
 	/**
-	 * @return Read only view of all the roles this actor played
+	 * {@return read only view of all the roles this actor played}
 	 */
 	public List<String> getRoles() {
-		return List.copyOf(roles);
+		return List.copyOf(this.roles);
 	}
+
 }

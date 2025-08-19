@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.examples.sdn6;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.time.ZoneId;
@@ -36,11 +34,15 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.examples.sdn6.movies.GenreRepository;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Genre_;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Movie;
+import org.neo4j.cypherdsl.examples.sdn6.movies.NewPersonCmd;
 import org.neo4j.cypherdsl.examples.sdn6.movies.Person;
 import org.neo4j.cypherdsl.examples.sdn6.movies.PersonDetails;
-import org.neo4j.cypherdsl.examples.sdn6.movies.NewPersonCmd;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
+import org.testcontainers.containers.Neo4jContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
@@ -53,9 +55,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.util.FileCopyUtils;
-import org.testcontainers.containers.Neo4jContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michael J. Simons
@@ -71,22 +72,24 @@ class ApplicationIT {
 	@SuppressWarnings("unused") // It is used via {@code @EnableIf}
 	static boolean is606OrHigher() {
 		String version = Optional.of(EnableNeo4jRepositories.class)
-			.map(Class::getPackage).map(Package::getImplementationVersion)
+			.map(Class::getPackage)
+			.map(Package::getImplementationVersion)
 			.map(String::trim)
 			.filter(v -> !v.isEmpty())
 			.orElse("0");
 		var matcher = Pattern.compile("(\\d+)\\.(\\d+)\\.(\\d+)(?:.*)").matcher(version);
-		return matcher.matches() && Integer.parseInt(matcher.group(1)) >= 6 &&
-			(Integer.parseInt(matcher.group(2)) == 0 && Integer.parseInt(matcher.group(3)) >= 6 || Integer.parseInt(matcher.group(2)) >= 1);
+		return matcher.matches() && Integer.parseInt(matcher.group(1)) >= 6
+				&& (Integer.parseInt(matcher.group(2)) == 0 && Integer.parseInt(matcher.group(3)) >= 6
+						|| Integer.parseInt(matcher.group(2)) >= 1);
 	}
 
 	@BeforeAll
 	static void loadMovies() throws IOException {
 		ResourceLoader r = new DefaultResourceLoader();
 		try (var in = new InputStreamReader(r.getResource("classpath:movies.cypher").getInputStream());
-			var driver = GraphDatabase.driver(neo4j.getBoltUrl(), AuthTokens.basic("neo4j", neo4j.getAdminPassword()));
-			var session = driver.session()
-		) {
+				var driver = GraphDatabase.driver(neo4j.getBoltUrl(),
+						AuthTokens.basic("neo4j", neo4j.getAdminPassword()));
+				var session = driver.session()) {
 			var movies = FileCopyUtils.copyToString(in);
 			session.run(movies);
 		}
@@ -104,15 +107,12 @@ class ApplicationIT {
 	@DisplayName("Retrieving mapped objects sorted by a static field.")
 	void getMoviesShouldWork(@Autowired TestRestTemplate restTemplate) {
 
-		var exchange = restTemplate
-			.exchange("/api/movies", HttpMethod.GET, null, new ParameterizedTypeReference<List<Movie>>() {
-			});
+		var exchange = restTemplate.exchange("/api/movies", HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<Movie>>() {
+				});
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
-		assertThat(exchange.getBody())
-			.hasSize(38)
-			.element(0).extracting(Movie::getTitle).isEqualTo("A Few Good Men");
-		assertThat(exchange.getBody())
-			.last().extracting(Movie::getTitle).isEqualTo("You've Got Mail");
+		assertThat(exchange.getBody()).hasSize(38).element(0).extracting(Movie::getTitle).isEqualTo("A Few Good Men");
+		assertThat(exchange.getBody()).last().extracting(Movie::getTitle).isEqualTo("You've Got Mail");
 	}
 
 	@Test
@@ -120,32 +120,21 @@ class ApplicationIT {
 	void getRelatedToShouldWork(@Autowired TestRestTemplate restTemplate) {
 
 		var exchange = restTemplate.exchange("/api/movies/relatedTo/{name}", HttpMethod.GET, null,
-			new ParameterizedTypeReference<List<Movie>>() {
-			}, "Tom Hanks");
+				new ParameterizedTypeReference<List<Movie>>() {
+				}, "Tom Hanks");
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(exchange.getBody()).extracting(Movie::getTitle)
-			.containsAll(List.of(
-				"A League of Their Own",
-				"Apollo 13",
-				"Cast Away",
-				"Charlie Wilson's War",
-				"Cloud Atlas",
-				"Joe Versus the Volcano",
-				"Sleepless in Seattle",
-				"That Thing You Do",
-				"The Da Vinci Code",
-				"The Green Mile",
-				"The Polar Express",
-				"You've Got Mail"
-			));
+			.containsAll(List.of("A League of Their Own", "Apollo 13", "Cast Away", "Charlie Wilson's War",
+					"Cloud Atlas", "Joe Versus the Volcano", "Sleepless in Seattle", "That Thing You Do",
+					"The Da Vinci Code", "The Green Mile", "The Polar Express", "You've Got Mail"));
 	}
 
 	@Test
 	@DisplayName("Running a complex query for a projection via the Cypher DSL executor")
 	void getDetailsShouldWork(@Autowired TestRestTemplate restTemplate) {
 
-		var exchange = restTemplate
-			.exchange("/api/people/details/{name}", HttpMethod.GET, null, PersonDetails.class, "Tom Hanks");
+		var exchange = restTemplate.exchange("/api/people/details/{name}", HttpMethod.GET, null, PersonDetails.class,
+				"Tom Hanks");
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var details = exchange.getBody();
 
@@ -161,9 +150,9 @@ class ApplicationIT {
 	@DisplayName("Using conditions pt1.")
 	void findPeopleBornInThe70tiesOrShouldWork1(@Autowired TestRestTemplate restTemplate) {
 
-		var exchange = restTemplate
-			.exchange("/api/people/findPeopleBornInThe70tiesOr", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
-			});
+		var exchange = restTemplate.exchange("/api/people/findPeopleBornInThe70tiesOr", HttpMethod.GET, null,
+				new ParameterizedTypeReference<List<Person>>() {
+				});
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(17);
@@ -173,9 +162,9 @@ class ApplicationIT {
 	@DisplayName("Using conditions pt2.")
 	void findPeopleBornInThe70tiesOrShouldWork2(@Autowired TestRestTemplate restTemplate) {
 
-		var exchange = restTemplate
-			.exchange("/api/people/findPeopleBornInThe70tiesOr?name={name}", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
-			}, "Natalie Portman");
+		var exchange = restTemplate.exchange("/api/people/findPeopleBornInThe70tiesOr?name={name}", HttpMethod.GET,
+				null, new ParameterizedTypeReference<List<Person>>() {
+				}, "Natalie Portman");
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(18);
@@ -186,12 +175,9 @@ class ApplicationIT {
 	void findPeopleBornAfterThe70tiesShouldWork(@Autowired TestRestTemplate restTemplate) {
 
 		// tag::exchange1[]
-		var exchange = restTemplate.exchange(
-			"/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}",
-			HttpMethod.GET,
-			null, new ParameterizedTypeReference<List<Person>>() { },
-			"person.name contains \"Ricci\" OR person.name ends with 'Hirsch'"
-		);
+		var exchange = restTemplate.exchange("/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}",
+				HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+				}, "person.name contains \"Ricci\" OR person.name ends with 'Hirsch'");
 		// end::exchange1[]
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
@@ -202,9 +188,9 @@ class ApplicationIT {
 	@DisplayName("Using conditions pt4.")
 	void findPeopleBornAfterThe70tiesV2ShouldWork(@Autowired TestRestTemplate restTemplate) {
 
-		var exchange = restTemplate
-			.exchange("/api/people/v2/findPeopleBornAfterThe70ties?conditions={conditions}", HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
-			}, "name contains \"Ricci\" OR name ends with 'Hirsch'");
+		var exchange = restTemplate.exchange("/api/people/v2/findPeopleBornAfterThe70ties?conditions={conditions}",
+				HttpMethod.GET, null, new ParameterizedTypeReference<List<Person>>() {
+				}, "name contains \"Ricci\" OR name ends with 'Hirsch'");
 		assertThat(exchange.getStatusCode()).isEqualTo(HttpStatus.OK);
 		var people = exchange.getBody();
 		assertThat(people).hasSize(2);
@@ -215,9 +201,8 @@ class ApplicationIT {
 	void usingTemporalsAsParameterShouldWork(@Autowired TestRestTemplate restTemplate) {
 
 		var dob = ZonedDateTime.of(1990, 10, 31, 23, 42, 0, 0, ZoneId.of("Europe/Berlin"));
-		var result = restTemplate.postForObject("/api/people/createNewPerson", new NewPersonCmd(
-			"Liv Lisa Fries", dob),
-			Person.class);
+		var result = restTemplate.postForObject("/api/people/createNewPerson", new NewPersonCmd("Liv Lisa Fries", dob),
+				Person.class);
 
 		assertThat(result.getBorn()).isEqualTo(1990);
 		assertThat(result.getDob()).isEqualTo(dob);
@@ -226,8 +211,7 @@ class ApplicationIT {
 	@Test // GH-315
 	void usingCypherDSLExecutor(@Autowired GenreRepository genreRepository) {
 
-		var genreModel = Genre_.GENRE
-			.withProperties(Genre_.GENRE.NAME, Cypher.literalOf("Comedy"));
+		var genreModel = Genre_.GENRE.withProperties(Genre_.GENRE.NAME, Cypher.literalOf("Comedy"));
 		var byStatment = Cypher.merge(genreModel)
 			.onCreate()
 			.set(genreModel.ID.to(Cypher.randomUUID()))
@@ -239,4 +223,5 @@ class ApplicationIT {
 			assertThat(genre.getName()).isEqualTo("Comedy");
 		});
 	}
+
 }

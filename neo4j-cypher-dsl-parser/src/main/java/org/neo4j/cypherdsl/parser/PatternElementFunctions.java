@@ -21,14 +21,14 @@ package org.neo4j.cypherdsl.parser;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 
 /**
- * A list of additional pattern element functions, to avoid opening up or extending the Cypher-DSLs build in API
+ * A list of additional pattern element functions, to avoid opening up or extending the
+ * Cypher-DSLs build in API.
+ *
  * @author Michael J. Simons
- * @soundtrack Chingon - Mexican Spaghetti Western
  */
 enum PatternElementFunctions implements FunctionInvocation.FunctionDefinition {
 
-	SHORTEST_PATH("shortestPath"),
-	ALL_SHORTEST_PATHS("allShortestPaths");
+	SHORTEST_PATH("shortestPath"), ALL_SHORTEST_PATHS("allShortestPaths");
 
 	private final String implementationName;
 
@@ -38,6 +38,7 @@ enum PatternElementFunctions implements FunctionInvocation.FunctionDefinition {
 
 	@Override
 	public String getImplementationName() {
-		return implementationName;
+		return this.implementationName;
 	}
+
 }

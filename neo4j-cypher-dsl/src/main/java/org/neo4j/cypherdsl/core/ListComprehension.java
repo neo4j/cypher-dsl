@@ -18,26 +18,30 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
-import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
- * See <a href="https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Atom.html#ListComprehension">ListComprehension</a>
- * and <a href="https://neo4j.com/docs/cypher-manual/current/syntax/lists/#cypher-list-comprehension">the corresponding cypher manual entry</a>.
+ * See <a href=
+ * "https://s3.amazonaws.com/artifacts.opencypher.org/M15/railroad/Atom.html#ListComprehension">ListComprehension</a>
+ * and <a href=
+ * "https://neo4j.com/docs/cypher-manual/current/syntax/lists/#cypher-list-comprehension">the
+ * corresponding cypher manual entry</a>.
  *
  * @author Michael J. Simons
- * @soundtrack Corrosion Of Conformity - America's Volume Dealer
  * @since 1.0.1
  */
 @API(status = STABLE, since = "1.0.1")
 public final class ListComprehension implements Expression {
 
-	// Modelling from the FilterExpression: https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/FilterExpression.html */
+	// Modelling from the FilterExpression:
+	// https://s3.amazonaws.com/artifacts.opencypher.org/M14/railroad/FilterExpression.html
+	// */
 
 	/**
 	 * The variable for the where part.
@@ -45,7 +49,8 @@ public final class ListComprehension implements Expression {
 	private final SymbolicName variable;
 
 	/**
-	 * The list expression. No further assertions are taken to check beforehand if it is actually a Cypher List atm.
+	 * The list expression. No further assertions are taken to check beforehand if it is
+	 * actually a Cypher List atm.
 	 */
 	private final Expression listExpression;
 
@@ -59,10 +64,32 @@ public final class ListComprehension implements Expression {
 	 */
 	private final Expression listDefinition;
 
+	private ListComprehension(SymbolicName variable, Expression listExpression, Where where,
+			Expression listDefinition) {
+		this.variable = variable;
+		this.listExpression = listExpression;
+		this.where = where;
+		this.listDefinition = listDefinition;
+	}
+
 	static OngoingDefinitionWithVariable with(SymbolicName variable) {
 
 		Assertions.notNull(variable, "A variable is required");
 		return new Builder(variable);
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		this.variable.accept(visitor);
+		Operator.IN.accept(visitor);
+		this.listExpression.accept(visitor);
+		Visitable.visitIfNotNull(this.where, visitor);
+		if (this.listDefinition != null) {
+			Operator.PIPE.accept(visitor);
+			this.listDefinition.accept(visitor);
+		}
+		visitor.leave(this);
 	}
 
 	/**
@@ -72,12 +99,12 @@ public final class ListComprehension implements Expression {
 
 		/**
 		 * Create a list comprehension past on a literal list.
-		 *
-		 * @param list The source list.
-		 * @return An ongoing definition
+		 * @param list the source list.
+		 * @return an ongoing definition
 		 */
 		@CheckReturnValue
 		OngoingDefinitionWithList in(Expression list);
+
 	}
 
 	/**
@@ -87,12 +114,12 @@ public final class ListComprehension implements Expression {
 
 		/**
 		 * Adds a {@code WHERE} clause to this comprehension.
-		 *
 		 * @param condition the condition to start the {@code WHERE} clause with.
-		 * @return An ongoing definition
+		 * @return an ongoing definition
 		 */
 		@CheckReturnValue
 		OngoingDefinitionWithoutReturn where(Condition condition);
+
 	}
 
 	/**
@@ -101,8 +128,9 @@ public final class ListComprehension implements Expression {
 	public interface OngoingDefinitionWithoutReturn {
 
 		/**
+		 * Defines the {@code RETURN} clause.
 		 * @param variables the elements to be returned from the list
-		 * @return The final definition of the list comprehension
+		 * @return the final definition of the list comprehension
 		 * @see #returning(Expression...)
 		 */
 		default ListComprehension returning(Named... variables) {
@@ -110,23 +138,27 @@ public final class ListComprehension implements Expression {
 		}
 
 		/**
-		 * @param listDefinition Defines the elements to be returned from the pattern
-		 * @return The final definition of the list comprehension
+		 * Defines the {@code RETURN} clause.
+		 * @param listDefinition defines the elements to be returned from the pattern
+		 * @return the final definition of the list comprehension
 		 */
 		ListComprehension returning(Expression... listDefinition);
 
 		/**
-		 * @return Returns the list comprehension as is, without a {@literal WHERE} and returning each element of the
-		 * original list
+		 * Defines an empty {@code RETURN} clause.
+		 * @return returns the list comprehension as is, without a {@literal WHERE} and
+		 * returning each element of the original list
 		 */
 		ListComprehension returning();
+
 	}
 
-	private static class Builder
-		implements OngoingDefinitionWithVariable, OngoingDefinitionWithList {
+	private static final class Builder implements OngoingDefinitionWithVariable, OngoingDefinitionWithList {
 
 		private final SymbolicName variable;
+
 		private Expression listExpression;
+
 		private Where where;
 
 		private Builder(SymbolicName variable) {
@@ -145,39 +177,19 @@ public final class ListComprehension implements Expression {
 			return this;
 		}
 
-			@Override
+		@Override
 		public ListComprehension returning() {
 
-			return new ListComprehension(variable, listExpression, where, null);
+			return new ListComprehension(this.variable, this.listExpression, this.where, null);
 		}
 
-			@Override
+		@Override
 		public ListComprehension returning(Expression... expressions) {
 
-			return new ListComprehension(variable, listExpression, where,
-				ListExpression.listOrSingleExpression(expressions));
+			return new ListComprehension(this.variable, this.listExpression, this.where,
+					ListExpression.listOrSingleExpression(expressions));
 		}
+
 	}
 
-	private ListComprehension(SymbolicName variable, Expression listExpression,
-		Where where, Expression listDefinition) {
-		this.variable = variable;
-		this.listExpression = listExpression;
-		this.where = where;
-		this.listDefinition = listDefinition;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		this.variable.accept(visitor);
-		Operator.IN.accept(visitor);
-		this.listExpression.accept(visitor);
-		Visitable.visitIfNotNull(this.where, visitor);
-		if (this.listDefinition != null) {
-			Operator.PIPE.accept(visitor);
-			this.listDefinition.accept(visitor);
-		}
-		visitor.leave(this);
-	}
 }

@@ -18,9 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -30,8 +27,12 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents a map projection as described <a href="https://medium.com/neo4j/loading-graph-data-for-an-object-graph-mapper-or-graphql-5103b1a8b66e">here</a>.
+ * Represents a map projection as described <a href=
+ * "https://medium.com/neo4j/loading-graph-data-for-an-object-graph-mapper-or-graphql-5103b1a8b66e">here</a>.
  *
  * @author Michael J. Simons
  */
@@ -42,11 +43,16 @@ public final class MapProjection implements Expression {
 
 	private final MapExpression map;
 
+	MapProjection(SymbolicName name, MapExpression map) {
+		this.name = name;
+		this.map = map;
+	}
+
 	/**
-	 * Create a new map projection with the given, mixed content
-	 * @param name The symbolic name of this project
-	 * @param content The projected content
-	 * @return A new map projection
+	 * Create a new map projection with the given, mixed content.
+	 * @param name the symbolic name of this project
+	 * @param content the projected content
+	 * @return a new map projection
 	 * @since 2021.2.3
 	 */
 	@API(status = INTERNAL, since = "2023.9.0")
@@ -56,10 +62,10 @@ public final class MapProjection implements Expression {
 	}
 
 	/**
-	 * Create a new map projection with the given, mixed content
-	 * @param name The symbolic name of this project
-	 * @param content The projected content
-	 * @return A new map projection
+	 * Create a new map projection with the given, mixed content.
+	 * @param name the symbolic name of this project
+	 * @param content the projected content
+	 * @return a new map projection
 	 * @since 2024.1.1
 	 */
 	@API(status = INTERNAL, since = "2024.1.1")
@@ -68,35 +74,13 @@ public final class MapProjection implements Expression {
 		return new MapProjection(name, MapExpression.withEntries(createNewContent(true, content)));
 	}
 
-	MapProjection(SymbolicName name, MapExpression map) {
-		this.name = name;
-		this.map = map;
-	}
-
-	/**
-	 * Adds additional content. The current projection is left unchanged and a new one is returned.
-	 *
-	 * @param content The additional content for a new projection.
-	 * @return A new map projection with additional content.
-	 */
-	public MapProjection and(Object... content) {
-		return new MapProjection(this.name, this.map.addEntries(createNewContent(false, content)));
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-		visitor.enter(this);
-		this.name.accept(visitor);
-		this.map.accept(visitor);
-		visitor.leave(this);
-	}
-
 	private static Object contentAt(Object[] content, int i) {
 
 		Object currentObject = content[i];
 		if (currentObject instanceof Expression expression) {
 			return Expressions.nameOrExpression(expression);
-		} else if (currentObject instanceof Named named) {
+		}
+		else if (currentObject instanceof Named named) {
 			return named.getSymbolicName().map(Object.class::cast).orElse(currentObject);
 		}
 		return currentObject;
@@ -114,7 +98,8 @@ public final class MapProjection implements Expression {
 			Object next;
 			if (i + 1 >= content.length) {
 				next = null;
-			} else {
+			}
+			else {
 				next = contentAt(content, i + 1);
 			}
 			Object current = contentAt(content, i);
@@ -124,11 +109,13 @@ public final class MapProjection implements Expression {
 					lastKey = stringValue;
 					lastExpression = expression;
 					i += 2;
-				} else {
+				}
+				else {
 					lastExpression = PropertyLookup.forName((String) current);
 					i += 1;
 				}
-			} else if (current instanceof Expression expression) {
+			}
+			else if (current instanceof Expression expression) {
 				lastExpression = expression;
 				i += 1;
 			}
@@ -140,23 +127,29 @@ public final class MapProjection implements Expression {
 				Assertions.isTrue(!knownKeys.contains(lastKey), "Duplicate key '" + lastKey + "'");
 				newContent.add(KeyValueMapEntry.create(lastKey, lastExpression));
 				knownKeys.add(lastKey);
-			} else if (lastExpression instanceof SymbolicName || lastExpression instanceof PropertyLookup) {
+			}
+			else if (lastExpression instanceof SymbolicName || lastExpression instanceof PropertyLookup) {
 				newContent.add(lastExpression);
-			} else if (lastExpression instanceof Property property) {
+			}
+			else if (lastExpression instanceof Property property) {
 				List<PropertyLookup> names = property.getNames();
 				if (names.size() > 1) {
 					throw new IllegalArgumentException("Cannot project nested properties!");
 				}
 				newContent.addAll(names);
-			} else if (lastExpression instanceof AliasedExpression aliasedExpression) {
+			}
+			else if (lastExpression instanceof AliasedExpression aliasedExpression) {
 				newContent.add(KeyValueMapEntry.create(aliasedExpression.getAlias(), aliasedExpression));
-			} else if (lastExpression instanceof KeyValueMapEntry) {
+			}
+			else if (lastExpression instanceof KeyValueMapEntry) {
 				newContent.add(lastExpression);
-			} else if (lastExpression == null) {
+			}
+			else if (lastExpression == null) {
 				throw new IllegalArgumentException("Could not determine an expression from the given content!");
-			} else {
+			}
+			else {
 				throw new IllegalArgumentException(lastExpression + " of type " + lastExpression.getClass()
-					+ " cannot be used with an implicit name as map entry.");
+						+ " cannot be used with an implicit name as map entry.");
 			}
 
 			lastKey = null;
@@ -167,14 +160,17 @@ public final class MapProjection implements Expression {
 			newContent.sort((o1, o2) -> {
 				if (o1 instanceof KeyValueMapEntry kvm1 && o2 instanceof KeyValueMapEntry kvm2) {
 					return kvm1.getKey().compareTo(kvm2.getKey());
-				} else if (o1 instanceof PropertyLookup pl1 && o2 instanceof PropertyLookup pl2) {
+				}
+				else if (o1 instanceof PropertyLookup pl1 && o2 instanceof PropertyLookup pl2) {
 					if (pl1 == PropertyLookup.wildcard()) {
 						return -1;
-					} else if (pl2 == PropertyLookup.wildcard()) {
+					}
+					else if (pl2 == PropertyLookup.wildcard()) {
 						return 1;
 					}
 					return pl1.getPropertyKeyName().getValue().compareTo(pl2.getPropertyKeyName().getValue());
-				} else if (o1 instanceof PropertyLookup) {
+				}
+				else if (o1 instanceof PropertyLookup) {
 					return 1;
 				}
 				return -1;
@@ -184,8 +180,27 @@ public final class MapProjection implements Expression {
 		return newContent;
 	}
 
+	/**
+	 * Adds additional content. The current projection is left unchanged and a new one is
+	 * returned.
+	 * @param content the additional content for a new projection.
+	 * @return a new map projection with additional content.
+	 */
+	public MapProjection and(Object... content) {
+		return new MapProjection(this.name, this.map.addEntries(createNewContent(false, content)));
+	}
+
+	@Override
+	public void accept(Visitor visitor) {
+		visitor.enter(this);
+		this.name.accept(visitor);
+		this.map.accept(visitor);
+		visitor.leave(this);
+	}
+
 	@Override
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

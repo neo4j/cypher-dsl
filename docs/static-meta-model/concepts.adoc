@@ -33,7 +33,7 @@ When you use Cypher-DSL like this:
 [source,java]
 ----
 var m = Cypher.node("Movie").named("m");
-var statement = Cypher.match(m).returning(m).build();
+var statement = Cypher.match(m).returning(this.m).build();
 ----
 
 `m` will be a `Node` instance having the label `Movie` and an alias of `m`. `m` can be used everywhere where a pattern element

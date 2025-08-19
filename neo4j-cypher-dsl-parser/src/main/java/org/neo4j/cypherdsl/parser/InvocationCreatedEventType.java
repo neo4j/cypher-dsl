@@ -46,6 +46,7 @@ public enum InvocationCreatedEventType {
 	}
 
 	Class<?> getTypeProduced() {
-		return typeProduced;
+		return this.typeProduced;
 	}
+
 }

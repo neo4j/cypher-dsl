@@ -18,16 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Implementing <a href="https://neo4j.com/docs/cypher-manual/current/subqueries/collect/">COLLECT subqueries</a>
+ * Implements
+ * <a href="https://neo4j.com/docs/cypher-manual/current/subqueries/collect/">COLLECT
+ * subqueries</a>.
  *
  * @author Michael J. Simons
- * @soundtrack The Cross - Blue Rock
  * @since 2023.8.0
  */
 @API(status = STABLE, since = "2023.0.0")
@@ -38,10 +39,10 @@ public final class CollectExpression implements SubqueryExpression {
 
 	private final Statement resultStatement;
 
+	private CollectExpression(ImportingWith optionalWith, Statement resultStatement) {
 
-	static CollectExpression collect(Statement statement, IdentifiableElement... imports) {
-
-		return new CollectExpression(ImportingWith.of(imports), statement);
+		this.optionalWith = optionalWith;
+		this.resultStatement = resultStatement;
 	}
 
 	static CollectExpression collect(Statement resultStatement) {
@@ -52,12 +53,6 @@ public final class CollectExpression implements SubqueryExpression {
 		return new CollectExpression(new ImportingWith(optionalWith, null), resultStatement);
 	}
 
-	private CollectExpression(ImportingWith optionalWith, Statement resultStatement) {
-
-		this.optionalWith = optionalWith;
-		this.resultStatement = resultStatement;
-	}
-
 	@Override
 	public void accept(Visitor visitor) {
 
@@ -66,4 +61,5 @@ public final class CollectExpression implements SubqueryExpression {
 		this.resultStatement.accept(visitor);
 		visitor.leave(this);
 	}
+
 }

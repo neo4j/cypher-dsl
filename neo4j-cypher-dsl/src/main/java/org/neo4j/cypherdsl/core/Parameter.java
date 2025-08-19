@@ -18,21 +18,21 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.Objects;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
  * Represents a named parameter inside a Cypher statement.
  *
+ * @param <T> the type of the parameter. Defaults to {@link Object} for a parameter
+ * without a value from which to derive the actual type.
  * @author Michael J. Simons
  * @author Andreas Berger
- * @param <T> The type of the parameter. Defaults to {@link Object} for a parameter without a value from which to derive
- *            the actual type.
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
@@ -41,7 +41,14 @@ public final class Parameter<T> implements Expression {
 	static final Object NO_VALUE = new Object();
 
 	private final String name;
+
 	private final T value;
+
+	private Parameter(String name, T value) {
+
+		this.name = name;
+		this.value = value;
+	}
 
 	static Parameter<Object> create(String name) {
 		return create(name, NO_VALUE);
@@ -63,16 +70,9 @@ public final class Parameter<T> implements Expression {
 		return new Parameter<>(null, value);
 	}
 
-	private Parameter(String name, T value) {
-
-		this.name = name;
-		this.value = value;
-	}
-
 	/**
 	 * Query method to check if this is an anonymous parameter.
-	 *
-	 * @return True if this is an anonymous parameter
+	 * @return true if this is an anonymous parameter
 	 * @since 2021.1.0
 	 */
 	@API(status = STABLE, since = "2021.0.0")
@@ -81,42 +81,39 @@ public final class Parameter<T> implements Expression {
 	}
 
 	/**
-	 * @return The name of this parameter.
+	 * Returns the name of this parameter.
+	 * @return the name of this parameter
 	 * @since 2023.1.0
 	 */
 	@API(status = STABLE, since = "2023.1.0")
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	/**
-	 * @param newValue The new value that should be bound by this parameter
-	 * @return A new parameter with a bound value
+	 * Returns a new parameter with a bound value.
+	 * @param newValue the new value that should be bound by this parameter
+	 * @return a new parameter with a bound value
 	 * @since 2021.0.0
 	 */
 	@API(status = STABLE, since = "2021.0.0")
 	public Parameter<?> withValue(Object newValue) {
-		return create(name, newValue);
+		return create(this.name, newValue);
 	}
 
 	/**
-	 * @return the value bound to this parameter
+	 * {@return the value bound to this parameter}
 	 */
 	@API(status = INTERNAL, since = "2021.1.0")
 	public T getValue() {
-		return value;
+		return this.value;
 	}
 
 	/**
-	 * @return true if the Parameter has a bound value
+	 * {@return true if the Parameter has a bound value}
 	 */
 	boolean hasValue() {
-		return !Objects.equals(value, NO_VALUE);
-	}
-
-	@Override
-	public String toString() {
-		return RendererBridge.render(this);
+		return !Objects.equals(this.value, NO_VALUE);
 	}
 
 	@Override
@@ -131,11 +128,17 @@ public final class Parameter<T> implements Expression {
 			return super.equals(o);
 		}
 		Parameter<?> parameter = (Parameter<?>) o;
-		return Objects.equals(name, parameter.name);
+		return Objects.equals(this.name, parameter.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.isAnon() ? super.hashCode() : Objects.hash(name);
+		return this.isAnon() ? super.hashCode() : Objects.hash(this.name);
 	}
+
+	@Override
+	public String toString() {
+		return RendererBridge.render(this);
+	}
+
 }

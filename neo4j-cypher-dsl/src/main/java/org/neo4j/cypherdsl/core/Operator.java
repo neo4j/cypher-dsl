@@ -18,14 +18,15 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * An operator. See <a href="https://neo4j.com/docs/cypher-manual/current/syntax/operators/#query-operators-summary">Operators</a>.
+ * An operator. See <a href=
+ * "https://neo4j.com/docs/cypher-manual/current/syntax/operators/#query-operators-summary">Operators</a>.
  *
  * @author Michael J. Simons
  * @since 1.0
@@ -174,11 +175,11 @@ public enum Operator implements Visitable {
 
 	// Misc
 	/**
-	 * The assigment operator (Read as in `p := (a)--&gt;(b)`)
+	 * The assigment operator (Read as in `p := (a)--&gt;(b)`).
 	 */
 	ASSIGMENT("="),
 	/**
-	 * The pipe operator
+	 * The pipe operator.
 	 */
 	PIPE("|");
 
@@ -196,26 +197,26 @@ public enum Operator implements Visitable {
 	}
 
 	/**
-	 * @return The operators textual representation.
+	 * {@return the operators textual representation}
 	 */
 	@API(status = INTERNAL)
 	public String getRepresentation() {
-		return representation;
+		return this.representation;
 	}
 
 	/**
-	 * @return True if this is a unary operator.
+	 * {@return true if this is a unary operator}
 	 */
 	boolean isUnary() {
-		return type != Type.BINARY;
+		return this.type != Type.BINARY;
 	}
 
 	/**
-	 * @return The type of this operator.
+	 * {@return the type of this operator}
 	 */
 	@API(status = INTERNAL)
 	public Type getType() {
-		return type;
+		return this.type;
 	}
 
 	@Override
@@ -229,16 +230,19 @@ public enum Operator implements Visitable {
 	 * @since 1.0
 	 */
 	public enum Type {
+
 		/**
 		 * Describes a binary operator (An operator with to operands).
 		 */
 		BINARY,
 		/**
-		 * Describes a unary prefix operator (An operator with one operand after the operator).
+		 * Describes a unary prefix operator (An operator with one operand after the
+		 * operator).
 		 */
 		PREFIX,
 		/**
-		 * Describes a unary postfix operator (An operator with one operand before the operator).
+		 * Describes a unary postfix operator (An operator with one operand before the
+		 * operator).
 		 */
 		POSTFIX,
 		/**
@@ -249,5 +253,7 @@ public enum Operator implements Visitable {
 		 * The binary operator modifying labels of nodes.
 		 */
 		LABEL
+
 	}
+
 }

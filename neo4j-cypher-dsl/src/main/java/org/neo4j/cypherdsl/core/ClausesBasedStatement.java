@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
@@ -27,12 +25,14 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * This variant of a {@link Statement} takes in a plain list of clauses without any further checks. During rendering they
- * are visited in the same order as originally provided.
+ * This variant of a {@link Statement} takes in a plain list of clauses without any
+ * further checks. During rendering they are visited in the same order as originally
+ * provided.
  *
  * @author Michael J. Simons
- * @soundtrack Black Sabbath - Master Of Reality
  * @since 2021.3.0
  */
 @API(status = INTERNAL, since = "2021.3.0")
@@ -51,8 +51,8 @@ class ClausesBasedStatement extends AbstractStatement {
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
-		Visitable.visitIfNotNull(optionalPeriodicCommit, visitor);
-		clauses.forEach(c -> c.accept(visitor));
+		Visitable.visitIfNotNull(this.optionalPeriodicCommit, visitor);
+		this.clauses.forEach(c -> c.accept(visitor));
 		visitor.leave(this);
 	}
 
@@ -67,6 +67,7 @@ class ClausesBasedStatement extends AbstractStatement {
 
 	@API(status = INTERNAL)
 	List<Clause> getClauses() {
-		return clauses;
+		return this.clauses;
 	}
+
 }

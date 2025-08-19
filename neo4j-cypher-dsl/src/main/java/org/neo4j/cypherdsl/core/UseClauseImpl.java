@@ -22,8 +22,11 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 
 /**
- * The factory methods are on the concrete class, as they should not be exposed to the outside via the interface.
+ * The factory methods are on the concrete class, as they should not be exposed to the
+ * outside via the interface.
  *
+ * @param target the target of the {@code USE} clause
+ * @param dynamic {@code true} if dynamic graph lookups are to be used
  * @author Michael J. Simons
  * @since 2023.0.0
  */
@@ -34,7 +37,8 @@ record UseClauseImpl(Expression target, boolean dynamic) implements Use {
 		Expression targetExpression;
 		if (components.length == 1) {
 			targetExpression = Cypher.raw(SchemaNamesBridge.sanitize(components[0], false).orElseThrow());
-		} else {
+		}
+		else {
 			targetExpression = Cypher.raw(SchemaNamesBridge.sanitize(components[0], false)
 				.flatMap(composite -> SchemaNamesBridge.sanitize(components[1], false).map(v -> composite + "." + v))
 				.orElseThrow());
@@ -44,13 +48,14 @@ record UseClauseImpl(Expression target, boolean dynamic) implements Use {
 	}
 
 	static Use of(Expression target) {
-		return new UseClauseImpl(target, !(target instanceof FunctionInvocation fi) || !"graph.byName".equals(fi.getFunctionName()));
+		return new UseClauseImpl(target,
+				!(target instanceof FunctionInvocation fi) || !"graph.byName".equals(fi.getFunctionName()));
 	}
 
 	@Override
 	public void accept(Visitor visitor) {
 		visitor.enter(this);
-		target.accept(visitor);
+		this.target.accept(visitor);
 		visitor.leave(this);
 	}
 }

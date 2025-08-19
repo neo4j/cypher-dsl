@@ -18,15 +18,14 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Type of an event when a label is parsed and created.
  *
  * @author Michael J. Simons
- * @soundtrack Queen - The Game
  * @since 2021.3.0
  */
 @API(status = STABLE, since = "2021.3.0")
@@ -46,4 +45,5 @@ public enum LabelParsedEventType {
 	 * Parsed in the context of removing labels.
 	 */
 	ON_REMOVE
+
 }

@@ -18,30 +18,34 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.List;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypher.internal.parser.common.ast.factory.ASTExceptionFactory;
 import org.neo4j.gqlstatus.ErrorGqlStatusObject;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
+ * Implementation of the exception factory for Neo4j 5s JavaCC based parser.
+ *
  * @author Michael J. Simons
  * @since 2021.3.0
  */
 @API(status = INTERNAL, since = "2021.3.0")
 enum CypherDslASTExceptionFactory implements ASTExceptionFactory {
+
 	INSTANCE;
 
 	@Override
 	public Exception syntaxException(ErrorGqlStatusObject errorGqlStatusObject, String s, List<String> list,
-		Exception e, int i, int i1, int i2) {
+			Exception e, int i, int i1, int i2) {
 		return new RuntimeException(errorGqlStatusObject.getMessage());
 	}
 
 	@Override
-	public Exception syntaxException(String got, List<String> expected, Exception source, int offset, int line, int column) {
+	public Exception syntaxException(String got, List<String> expected, Exception source, int offset, int line,
+			int column) {
 		return new RuntimeException(source.getMessage());
 	}
 
@@ -54,4 +58,5 @@ enum CypherDslASTExceptionFactory implements ASTExceptionFactory {
 	public Exception syntaxException(ErrorGqlStatusObject errorGqlStatusObject, Exception e, int i, int i1, int i2) {
 		return new RuntimeException(errorGqlStatusObject.getMessage());
 	}
+
 }

@@ -23,34 +23,39 @@ import java.lang.reflect.Method;
 
 /**
  * @author Michael J. Simons
- * @soundtrack Helge Schneider - The Last Jazz
+ *
  */
 final class TestUtils {
+
+	private TestUtils() {
+	}
 
 	static Method findMethod(Class<?> clazz, String name, Class<?>... paramTypes) {
 		try {
 			return clazz.getDeclaredMethod(name, paramTypes);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
+		}
+		catch (NoSuchMethodException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
 	static Object invokeMethod(Method method, Object target, Object... args) {
 		try {
 			return method.invoke(target, args);
-		} catch (InvocationTargetException e) {
-			Throwable targetException = e.getTargetException();
+		}
+		catch (InvocationTargetException ex) {
+			Throwable targetException = ex.getTargetException();
 			if (targetException instanceof RuntimeException) {
 				throw ((RuntimeException) targetException);
-			} else {
+			}
+			else {
 				throw new RuntimeException(targetException);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception ex) {
 
-			throw new RuntimeException(e);
+			throw new RuntimeException(ex);
 		}
 	}
 
-	private TestUtils() {
-	}
 }

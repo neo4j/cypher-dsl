@@ -18,25 +18,18 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Value object for the lenght of a path.
  *
  * @author Michael J. Simons
- * @soundtrack Pink Floyd - Atom Heart Mother
  * @since 2021.3.0
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class PathLength {
-
-	static PathLength of(String minimum, String maximum) {
-		Integer min = minimum == null || minimum.isBlank() ? null : Integer.valueOf(minimum.trim());
-		Integer max = maximum == null || maximum.isBlank() ? null : Integer.valueOf(maximum.trim());
-		return new PathLength(min, max);
-	}
 
 	private final Integer minimum;
 
@@ -50,15 +43,22 @@ final class PathLength {
 		this.unbounded = minimum == null && maximum == null;
 	}
 
-	public Integer getMinimum() {
-		return minimum;
+	static PathLength of(String minimum, String maximum) {
+		Integer min = ((minimum == null) || minimum.isBlank()) ? null : Integer.valueOf(minimum.trim());
+		Integer max = ((maximum == null) || maximum.isBlank()) ? null : Integer.valueOf(maximum.trim());
+		return new PathLength(min, max);
 	}
 
-	public Integer getMaximum() {
-		return maximum;
+	Integer getMinimum() {
+		return this.minimum;
 	}
 
-	public boolean isUnbounded() {
-		return unbounded;
+	Integer getMaximum() {
+		return this.maximum;
 	}
+
+	boolean isUnbounded() {
+		return this.unbounded;
+	}
+
 }

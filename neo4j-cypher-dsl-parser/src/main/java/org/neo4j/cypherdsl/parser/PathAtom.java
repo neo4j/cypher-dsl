@@ -34,30 +34,9 @@ import org.neo4j.cypherdsl.core.SymbolicName;
  * A value object for the details of a path.
  *
  * @author Michael J. Simons
- * @soundtrack Pink Floyd - The Division Bell
  * @since 2021.3.0
  */
 final class PathAtom implements PatternAtom {
-
-	@SuppressWarnings("squid:S107") // Totally fine with that number of args for this internal API.
-	static PathAtom of(SymbolicName name, PathLength length, boolean left, boolean right,
-		String[] relTypes, MapExpression properties, boolean negatedType, Expression predicate) {
-
-		if (left && right) {
-			throw new IllegalArgumentException("Only left-to-right, right-to-left or unidirectional path elements are supported.");
-		}
-
-		Direction direction;
-		if (left) {
-			direction = Direction.RTL;
-		} else if (right) {
-			direction = Direction.LTR;
-		} else {
-			direction = Direction.UNI;
-		}
-
-		return new PathAtom(name, length, direction, negatedType, relTypes, properties, predicate, null);
-	}
 
 	private final SymbolicName name;
 
@@ -76,7 +55,7 @@ final class PathAtom implements PatternAtom {
 	private final QuantifiedPathPattern.Quantifier quantifier;
 
 	private PathAtom(SymbolicName name, PathLength length, Direction direction, boolean negatedType, String[] types,
-		MapExpression properties, Expression predicate, QuantifiedPathPattern.Quantifier quantifier) {
+			MapExpression properties, Expression predicate, QuantifiedPathPattern.Quantifier quantifier) {
 		this.name = name;
 		this.length = length;
 		this.direction = direction;
@@ -87,13 +66,37 @@ final class PathAtom implements PatternAtom {
 		this.quantifier = quantifier;
 	}
 
-	ExposesRelationships<?> asRelationshipBetween(ExposesRelationships<?> previous, NodeAtom nodeAtom, boolean alwaysLtr) {
+	@SuppressWarnings("squid:S107") // Totally fine with that number of args for this
+									// internal API.
+	static PathAtom of(SymbolicName name, PathLength length, boolean left, boolean right, String[] relTypes,
+			MapExpression properties, boolean negatedType, Expression predicate) {
+
+		if (left && right) {
+			throw new IllegalArgumentException(
+					"Only left-to-right, right-to-left or unidirectional path elements are supported.");
+		}
+
+		Direction direction;
+		if (left) {
+			direction = Direction.RTL;
+		}
+		else if (right) {
+			direction = Direction.LTR;
+		}
+		else {
+			direction = Direction.UNI;
+		}
+
+		return new PathAtom(name, length, direction, negatedType, relTypes, properties, predicate, null);
+	}
+
+	ExposesRelationships<?> asRelationshipBetween(ExposesRelationships<?> previous, NodeAtom nodeAtom,
+			boolean alwaysLtr) {
 		var node = nodeAtom.value();
 		ExposesRelationships<?> relationshipPattern = switch (this.getDirection()) {
 			case LTR -> previous.relationshipTo(node, this.getTypes());
-			case RTL -> alwaysLtr ?
-				node.relationshipTo((Node) previous, this.getTypes()) :
-				previous.relationshipFrom(node, this.getTypes());
+			case RTL -> alwaysLtr ? node.relationshipTo((Node) previous, this.getTypes())
+					: previous.relationshipFrom(node, this.getTypes());
 			case UNI -> previous.relationshipBetween(node, this.getTypes());
 		};
 		relationshipPattern = applyOptionalName(relationshipPattern);
@@ -104,74 +107,67 @@ final class PathAtom implements PatternAtom {
 	}
 
 	private ExposesRelationships<?> applyOptionalLength(ExposesRelationships<?> relationshipPattern) {
-		if (length == null) {
+		if (this.length == null) {
 			return relationshipPattern;
 		}
-		if (length.isUnbounded()) {
+		if (this.length.isUnbounded()) {
 			return ((ExposesPatternLengthAccessors<?>) relationshipPattern).unbounded();
 		}
-		return ((ExposesPatternLengthAccessors<?>) relationshipPattern).length(length.getMinimum(), length.getMaximum());
+		return ((ExposesPatternLengthAccessors<?>) relationshipPattern).length(this.length.getMinimum(),
+				this.length.getMaximum());
 	}
 
 	private ExposesRelationships<?> applyOptionalProperties(ExposesRelationships<?> relationshipPattern) {
-		if (properties == null) {
+		if (this.properties == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof ExposesProperties<?> exposesProperties) {
-			return (ExposesRelationships<?>) exposesProperties.withProperties(properties);
+			return (ExposesRelationships<?>) exposesProperties.withProperties(this.properties);
 		}
-		return ((RelationshipChain) relationshipPattern).properties(properties);
+		return ((RelationshipChain) relationshipPattern).properties(this.properties);
 	}
 
 	private ExposesRelationships<?> applyOptionalName(ExposesRelationships<?> relationshipPattern) {
-		if (name == null) {
+		if (this.name == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof Relationship relationship) {
-			return relationship.named(name);
+			return relationship.named(this.name);
 		}
-		return ((RelationshipChain) relationshipPattern).named(name);
+		return ((RelationshipChain) relationshipPattern).named(this.name);
 	}
 
 	private ExposesRelationships<?> applyOptionalPredicate(ExposesRelationships<?> relationshipPattern) {
-		if (predicate == null) {
+		if (this.predicate == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof Relationship relationship) {
-			return (ExposesRelationships<?>) relationship.where(predicate);
+			return (ExposesRelationships<?>) relationship.where(this.predicate);
 		}
-		return ((RelationshipChain) relationshipPattern).where(predicate);
+		return ((RelationshipChain) relationshipPattern).where(this.predicate);
 	}
 
 	private ExposesRelationships<?> applyOptionalQuantifier(ExposesRelationships<?> relationshipPattern) {
-		if (quantifier == null) {
+		if (this.quantifier == null) {
 			return relationshipPattern;
 		}
 		if (relationshipPattern instanceof Relationship relationship) {
-			return (ExposesRelationships<?>) relationship.quantifyRelationship(quantifier);
+			return (ExposesRelationships<?>) relationship.quantifyRelationship(this.quantifier);
 		}
-		return ((RelationshipChain) relationshipPattern).quantifyRelationship(quantifier);
+		return ((RelationshipChain) relationshipPattern).quantifyRelationship(this.quantifier);
 	}
 
-	public Direction getDirection() {
-		return direction;
+	Direction getDirection() {
+		return this.direction;
 	}
 
-	public String[] getTypes() {
-		return types;
+	String[] getTypes() {
+		return this.types;
 	}
 
-	public MapExpression getProperties() {
-		return this.properties;
+	PathAtom withQuantifier(QuantifiedPathPattern.Quantifier newQuantifier) {
+		return (newQuantifier != null) ? new PathAtom(this.name, this.length, this.direction, this.negatedType,
+				this.types, this.properties, this.predicate, newQuantifier) : this;
 	}
 
-	public SymbolicName getName() {
-		return name;
-	}
-
-	public PathAtom withQuantifier(QuantifiedPathPattern.Quantifier newQuantifier) {
-		return newQuantifier == null ?
-			this :
-			new PathAtom(name, length, direction, negatedType, types, properties, predicate, newQuantifier);
-	}
 }

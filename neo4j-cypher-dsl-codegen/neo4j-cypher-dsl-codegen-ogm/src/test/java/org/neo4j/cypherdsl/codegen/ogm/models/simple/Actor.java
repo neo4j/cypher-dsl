@@ -42,4 +42,5 @@ public class Actor {
 	public Actor(Person person) {
 		this.person = person;
 	}
+
 }

@@ -23,8 +23,8 @@ import org.apiguardian.api.API;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
- * Abstract base class for the {@link NodeBase node implementation} to avoid default interface methods to be overridable
- * in inheritors.
+ * Abstract base class for the {@link NodeBase node implementation} to avoid default
+ * interface methods to be overridable in inheritors.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
@@ -34,16 +34,18 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
 	@Override
 	public final Condition hasLabels(String... labelsToQuery) {
-		return HasLabelCondition.create(this.getSymbolicName()
-						.orElseThrow(() -> new IllegalStateException("Cannot query a node without a symbolic name.")),
+		return HasLabelCondition.create(
+				this.getSymbolicName()
+					.orElseThrow(() -> new IllegalStateException("Cannot query a node without a symbolic name.")),
 				labelsToQuery);
 	}
 
 	@Override
 	public final Condition hasLabels(LabelExpression labels) {
-		return new HasLabelExpressionCondition(this.getSymbolicName()
-			.orElseThrow(() -> new IllegalStateException("Cannot query a node without a symbolic name.")),
-			labels);
+		return new HasLabelExpressionCondition(
+				this.getSymbolicName()
+					.orElseThrow(() -> new IllegalStateException("Cannot query a node without a symbolic name.")),
+				labels);
 	}
 
 	@Override
@@ -118,4 +120,5 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

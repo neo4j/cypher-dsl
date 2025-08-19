@@ -18,15 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.internal.DefaultStatementContext;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * The abstract statement provides possible state shared across various statement implementations. Use cases are collecting
- * bound parameter values, possible configuration of the renderer and similar.
+ * The abstract statement provides possible state shared across various statement
+ * implementations. Use cases are collecting bound parameter values, possible
+ * configuration of the renderer and similar.
  *
  * @author Michael J. Simons
  * @author Andreas Berger
@@ -41,8 +42,8 @@ abstract class AbstractStatement implements Statement {
 	private final StatementContext context = new DefaultStatementContext();
 
 	/**
-	 * A flag that indicates whether parameters coming from QueryDSL integration should be rendered as Cypher {@link  Literal literals}
-	 * or as actual parameters.
+	 * A flag that indicates whether parameters coming from QueryDSL integration should be
+	 * rendered as Cypher {@link Literal literals} or as actual parameters.
 	 */
 	private boolean renderConstantsAsParameters = false;
 
@@ -52,14 +53,15 @@ abstract class AbstractStatement implements Statement {
 	private volatile String cypher;
 
 	/**
-	 * The catalog for this statement, will be lazily available and needs refreshment if parameter rendering changes.
+	 * The catalog for this statement, will be lazily available and needs refreshment if
+	 * parameter rendering changes.
 	 */
 	@SuppressWarnings("squid:S3077")
 	private volatile StatementCatalog statementCatalog;
 
 	@Override
 	public StatementContext getContext() {
-		return context;
+		return this.context;
 	}
 
 	@Override
@@ -115,4 +117,5 @@ abstract class AbstractStatement implements Statement {
 		this.accept(catalogBuildingVisitor);
 		return catalogBuildingVisitor.getResult();
 	}
+
 }

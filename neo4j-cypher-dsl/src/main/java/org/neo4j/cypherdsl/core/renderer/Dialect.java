@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -31,23 +29,24 @@ import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
  * The dialect to be used when rendering a statement into Cypher.
  *
  * @author Michael J. Simons
- * @soundtrack Red Hot Chili Peppers - Unlimited Love
  * @since 2022.3.0
  */
 @API(status = STABLE, since = "2022.3.0")
 public enum Dialect {
 
 	/**
-	 * Neo4j 4.4 and earlier
+	 * Neo4j 4.4 and earlier.
 	 */
 	NEO4J_4,
 
 	/**
-	 * Neo4j 5
+	 * Neo4j 5.
 	 */
 	NEO4J_5 {
 
@@ -55,12 +54,13 @@ public enum Dialect {
 
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+			return this.handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 	},
 
 	/**
-	 * Enhanced Neo4j 5 dialect that renders importing with statements for call subqueries as variable scoped subqueries.
+	 * Enhanced Neo4j 5 dialect that renders importing with statements for call subqueries
+	 * as variable scoped subqueries.
 	 *
 	 * @since 2024.1.0
 	 */
@@ -69,12 +69,13 @@ public enum Dialect {
 
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+			return this.handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 	},
 
 	/**
-	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 5} preamble on generated statements.
+	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 5}
+	 * preamble on generated statements.
 	 *
 	 * @since 2024.5.0
 	 */
@@ -83,7 +84,7 @@ public enum Dialect {
 
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+			return this.handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 
 		@Override
@@ -101,21 +102,23 @@ public enum Dialect {
 	}
 
 	private static class DefaultNeo4j5HandlerSupplier
-		implements Function<Visitable, Optional<Class<? extends Visitor>>> {
+			implements Function<Visitable, Optional<Class<? extends Visitor>>> {
 
 		@Override
 		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
 			if (visitable instanceof FunctionInvocation) {
 				return Optional.of(Neo4j5FunctionInvocationVisitor.class);
-			} else if (visitable instanceof Comparison) {
+			}
+			else if (visitable instanceof Comparison) {
 				return Optional.of(Neo4j5ComparisonVisitor.class);
 			}
 			return Optional.empty();
 		}
+
 	}
 
-	private static class DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport
-		extends DefaultNeo4j5HandlerSupplier {
+	private static final class DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport
+			extends DefaultNeo4j5HandlerSupplier {
 
 		@Override
 		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
@@ -126,5 +129,7 @@ public enum Dialect {
 				return Optional.empty();
 			});
 		}
+
 	}
+
 }

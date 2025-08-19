@@ -23,10 +23,11 @@ import com.querydsl.core.types.PathType;
 import com.querydsl.core.types.Templates;
 
 /**
+ * Static holder for Cypher templates for the QueryDSL adapter.
+ *
  * @author Michael J. Simons
- * @soundtrack Die Toten Hosen - Learning English, Lesson Three: Mersey Beat! The Sound Of Liverpool
  */
-class CypherTemplates extends Templates {
+final class CypherTemplates extends Templates {
 
 	static final String UNSUPPORTED_MARKER = "__UNSUPPORTED__";
 	static final Templates DEFAULT = new CypherTemplates();
@@ -202,28 +203,23 @@ class CypherTemplates extends Templates {
 		add(PathType.DELEGATE, "{0}");
 		add(Ops.ORDINAL, UNSUPPORTED_MARKER);
 
-		for (PathType type : new PathType[] {
-			PathType.LISTVALUE,
-			PathType.MAPVALUE,
-			PathType.ARRAYVALUE}) {
+		for (PathType type : new PathType[] { PathType.LISTVALUE, PathType.MAPVALUE, PathType.ARRAYVALUE }) {
 			add(type, "{0}[{1}]");
 		}
-		for (PathType type : new PathType[] {
-			PathType.LISTVALUE_CONSTANT,
-			PathType.MAPVALUE_CONSTANT,
-			PathType.ARRAYVALUE_CONSTANT}) {
+		for (PathType type : new PathType[] { PathType.LISTVALUE_CONSTANT, PathType.MAPVALUE_CONSTANT,
+				PathType.ARRAYVALUE_CONSTANT }) {
 			add(type, "{0}[{1s}]");
 		}
 
 		// case
 		add(Ops.CASE, "CASE {0} END", Precedence.CASE);
-		add(Ops.CASE_WHEN,  "WHEN {0} THEN {1} {2}", Precedence.CASE);
-		add(Ops.CASE_ELSE,  "ELSE {0}", Precedence.CASE);
+		add(Ops.CASE_WHEN, "WHEN {0} THEN {1} {2}", Precedence.CASE);
+		add(Ops.CASE_ELSE, "ELSE {0}", Precedence.CASE);
 
 		// case for
 		add(Ops.CASE_EQ, "CASE {0} {1} END", Precedence.CASE);
-		add(Ops.CASE_EQ_WHEN,  "WHEN {1} THEN {2} {3}", Precedence.CASE);
-		add(Ops.CASE_EQ_ELSE,  "ELSE {0}", Precedence.CASE);
+		add(Ops.CASE_EQ_WHEN, "WHEN {1} THEN {2} {3}", Precedence.CASE);
+		add(Ops.CASE_EQ_ELSE, "ELSE {0}", Precedence.CASE);
 
 		// coalesce
 		add(Ops.COALESCE, "coalesce({0})");
@@ -253,4 +249,5 @@ class CypherTemplates extends Templates {
 		add(Ops.QuantOps.ANY, "any {0}");
 		add(Ops.QuantOps.ALL, "all {0}");
 	}
+
 }

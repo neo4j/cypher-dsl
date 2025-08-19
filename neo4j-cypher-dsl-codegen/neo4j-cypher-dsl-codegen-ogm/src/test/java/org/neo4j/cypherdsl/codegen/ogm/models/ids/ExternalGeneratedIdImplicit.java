@@ -32,7 +32,9 @@ import org.neo4j.ogm.typeconversion.UuidStringConverter;
 @NodeEntity
 public class ExternalGeneratedIdImplicit {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	@Convert(UuidStringConverter.class)
 	private UUID id;
+
 }

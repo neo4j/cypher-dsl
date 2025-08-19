@@ -18,9 +18,11 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import java.io.Serial;
 
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Thrown when the parser detects a clause which is not yet supported.
@@ -31,6 +33,7 @@ import org.apiguardian.api.API;
 @API(status = STABLE, since = "2021.3.0")
 public final class UnsupportedCypherException extends UnsupportedOperationException {
 
+	@Serial
 	private static final long serialVersionUID = 2871262762217922044L;
 
 	/**
@@ -39,16 +42,17 @@ public final class UnsupportedCypherException extends UnsupportedOperationExcept
 	private final String input;
 
 	UnsupportedCypherException(String input, UnsupportedOperationException cause) {
-		super(String.format("You used one Cypher construct not yet supported by the Cypher-DSL:%n%n\t%s%n%n" +
-							"Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new",
-			input), cause);
+		super(String.format("You used one Cypher construct not yet supported by the Cypher-DSL:%n%n\t%s%n%n"
+				+ "Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new",
+				input), cause);
 		this.input = input;
 	}
 
 	/**
-	 * @return The original Cypher input handled to the parser.
+	 * {@return the original Cypher input handled to the parser}
 	 */
 	public String getInput() {
-		return input;
+		return this.input;
 	}
+
 }

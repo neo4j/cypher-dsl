@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019-2022 "Neo4j,"
+ * Copyright (c) 2019-2025 "Neo4j,"
  * Neo4j Sweden AB [https://neo4j.com]
  *
  * This file is part of Neo4j.
@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 /**
- * The same relationship type ACTED_IN is used with same properties. Only one type needs to be generated.
+ * The same relationship type ACTED_IN is used with same properties. Only one type needs
+ * to be generated.
  */
 package org.neo4j.cypherdsl.codegen.sdn6.models.same_properties_for_rel_type;

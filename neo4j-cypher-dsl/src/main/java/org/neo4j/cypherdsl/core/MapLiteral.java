@@ -18,12 +18,12 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A map of literals.
@@ -40,8 +40,10 @@ public final class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 
 	@Override
 	public String asString() {
-		return content.entrySet().stream()
+		return this.content.entrySet()
+			.stream()
 			.map(entry -> entry.getKey() + ": " + entry.getValue().asString())
 			.collect(Collectors.joining(", ", "{", "}"));
 	}
+
 }

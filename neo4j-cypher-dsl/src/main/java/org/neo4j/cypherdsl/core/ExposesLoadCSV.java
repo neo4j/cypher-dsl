@@ -18,11 +18,11 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.net.URI;
 
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Exposes methods to configure a {@code LOAD CSV} clause.
@@ -35,9 +35,9 @@ public interface ExposesLoadCSV {
 
 	/**
 	 * Starts building a {@code LOAD CSV}.
-	 *
-	 * @param from The {@link URI} to load data from. Any uri that is resolvable by the database itself is valid.
-	 * @return An ongoing definition of a {@code LOAD CSV} clause
+	 * @param from the {@link URI} to load data from. Any uri that is resolvable by the
+	 * database itself is valid.
+	 * @return an ongoing definition of a {@code LOAD CSV} clause
 	 */
 	default LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from) {
 		return loadCSV(from, false);
@@ -45,10 +45,11 @@ public interface ExposesLoadCSV {
 
 	/**
 	 * Starts building a {@code LOAD CSV}.
-	 *
-	 * @param from        The {@link URI} to load data from. Any uri that is resolvable by the database itself is valid.
-	 * @param withHeaders Set to {@literal true} if the csv file contains header
-	 * @return An ongoing definition of a {@code LOAD CSV} clause
+	 * @param from the {@link URI} to load data from. Any uri that is resolvable by the
+	 * database itself is valid.
+	 * @param withHeaders set to {@literal true} if the csv file contains header
+	 * @return an ongoing definition of a {@code LOAD CSV} clause
 	 */
 	LoadCSVStatementBuilder.OngoingLoadCSV loadCSV(URI from, boolean withHeaders);
+
 }

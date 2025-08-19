@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -71,6 +69,7 @@ import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PatternComprehension;
 import org.neo4j.cypherdsl.core.PatternElement;
+import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
@@ -78,7 +77,6 @@ import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
-import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.SortItem;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.StringLiteral;
@@ -87,92 +85,20 @@ import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
- * An implementation of Neo4j's {@link ASTFactory} that creates Cypher-DSL AST elements that can be used for creating
- * conditions, patterns to match etc.
+ * An implementation of Neo4j's {@link ASTFactory} that creates Cypher-DSL AST elements
+ * that can be used for creating conditions, patterns to match etc.
  *
  * @author Michael J. Simons
  * @since 2021.3.0
  */
 @API(status = INTERNAL, since = "2021.3.0")
-final class CypherDslASTFactory implements ASTFactory<
-	Statements,
-	Statement,
-	Statement,
-	Clause,
-	Finish,
-	Return,
-	Expression,
-	List<Expression>,
-	SortItem,
-	PatternElement,
-	NodeAtom,
-	PathAtom,
-	PathLength,
-	Clause,
-	Expression,
-	Expression,
-	Expression,
-	Hint,
-	Expression,
-	LabelExpression,
-	Expression,
-	Parameter<?>,
-	Expression,
-	Property,
-	Expression,
-	Clause,
-	Statement,
-	Statement,
-	Statement,
-	Clause,
-	Where,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	NULL,
-	InputPosition,
-	EntityType,
-	QuantifiedPathPattern.Quantifier,
-	PatternAtom,
-	DatabaseName,
-	PatternSelector,
-	NULL,
-	PatternElement> {
+final class CypherDslASTFactory implements
+		ASTFactory<Statements, Statement, Statement, Clause, Finish, Return, Expression, List<Expression>, SortItem, PatternElement, NodeAtom, PathAtom, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, LabelExpression, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Statement, Statement, Clause, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition, EntityType, QuantifiedPathPattern.Quantifier, PatternAtom, DatabaseName, PatternSelector, NULL, PatternElement> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
-
-	static CypherDslASTFactory getInstance(Options options) {
-
-		CypherDslASTFactory instance;
-
-		if (options != null && !options.areDefault()) {
-			instance = new CypherDslASTFactory(options);
-		} else {
-			instance = instanceFromDefaultOptions;
-			if (instance == null) {
-				synchronized (CypherDslASTFactory.class) {
-					instance = instanceFromDefaultOptions;
-					if (instance == null) {
-						instanceFromDefaultOptions = new CypherDslASTFactory(Optional.ofNullable(options).orElseGet(Options::defaultOptions));
-						instance = instanceFromDefaultOptions;
-					}
-				}
-			}
-		}
-
-		return instance;
-	}
 
 	private final Options options;
 
@@ -180,53 +106,28 @@ final class CypherDslASTFactory implements ASTFactory<
 		this.options = options;
 	}
 
-	private String[] computeFinalLabelList(LabelParsedEventType event, List<StringPos<InputPosition>> inputLabels) {
+	static CypherDslASTFactory getInstance(Options options) {
 
-		return inputLabels == null ? new String[0] : this.options.getLabelFilter()
-			.apply(event, inputLabels.stream().map(v -> v.string).toList())
-			.toArray(new String[0]);
-	}
+		CypherDslASTFactory instance;
 
-	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, LabelExpression inputLabels) {
-
-		if (inputLabels == null) {
-			return Optional.of(new String[0]);
+		if (options != null && !options.areDefault()) {
+			instance = new CypherDslASTFactory(options);
+		}
+		else {
+			instance = instanceFromDefaultOptions;
+			if (instance == null) {
+				synchronized (CypherDslASTFactory.class) {
+					instance = instanceFromDefaultOptions;
+					if (instance == null) {
+						instanceFromDefaultOptions = new CypherDslASTFactory(
+								Optional.ofNullable(options).orElseGet(Options::defaultOptions));
+						instance = instanceFromDefaultOptions;
+					}
+				}
+			}
 		}
 
-		if (inputLabels.type() == LabelExpression.Type.COLON_CONJUNCTION || (inputLabels.type() == LabelExpression.Type.LEAF && inputLabels.value() != null)) {
-			return Optional.of(this.options.getLabelFilter()
-				.apply(event, inputLabels.value())
-				.toArray(new String[0]));
-		}
-		return Optional.empty();
-	}
-
-	private String[] computeFinalTypeList(TypeParsedEventType event, LabelExpression inputTypes) {
-
-		if (inputTypes == null) {
-			return new String[0];
-		}
-
-		if ((inputTypes.negated() && inputTypes.value().size() > 1) || inputTypes.type() == LabelExpression.Type.CONJUNCTION) {
-			throw new UnsupportedOperationException("Expressions for relationship types are not supported in Cypher-DSL");
-		}
-
-		List<String> types = new ArrayList<>();
-		traverseTypeExpression(types, inputTypes);
-
-		return this.options.getTypeFilter()
-			.apply(event, types)
-			.toArray(new String[0]);
-	}
-
-	void traverseTypeExpression(List<String> types, LabelExpression expression) {
-
-		if (expression.type() == LabelExpression.Type.LEAF || expression.type() == LabelExpression.Type.COLON_DISJUNCTION) {
-			types.addAll(expression.value());
-		} else {
-			traverseTypeExpression(types, expression.lhs());
-			traverseTypeExpression(types, expression.rhs());
-		}
+		return instance;
 	}
 
 	static void isInstanceOf(Class<?> type, Object obj, String message) {
@@ -241,6 +142,76 @@ final class CypherDslASTFactory implements ASTFactory<
 	private static void notNull(Object object, String message) {
 		if (object == null) {
 			throw new IllegalArgumentException(message);
+		}
+	}
+
+	private static SymbolicName assertSymbolicName(Expression v) {
+
+		if (v == null) {
+			return null;
+		}
+
+		isInstanceOf(SymbolicName.class, v,
+				"An invalid type has been generated where a SymbolicName was required. Generated type was "
+						+ v.getClass().getName());
+		return (SymbolicName) v;
+	}
+
+	private static LabelExpression colonJunjction(LabelExpression lhs, LabelExpression rhs,
+			LabelExpression.Type colonDisjunction) {
+		List<String> value = new ArrayList<>();
+		value.addAll(lhs.value());
+		value.addAll(rhs.value());
+		return new LabelExpression(colonDisjunction, false, value, null, null);
+	}
+
+	private String[] computeFinalLabelList(LabelParsedEventType event, List<StringPos<InputPosition>> inputLabels) {
+
+		return (inputLabels != null) ? this.options.getLabelFilter()
+			.apply(event, inputLabels.stream().map(v -> v.string).toList())
+			.toArray(new String[0]) : new String[0];
+	}
+
+	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, LabelExpression inputLabels) {
+
+		if (inputLabels == null) {
+			return Optional.of(new String[0]);
+		}
+
+		if (inputLabels.type() == LabelExpression.Type.COLON_CONJUNCTION
+				|| (inputLabels.type() == LabelExpression.Type.LEAF && inputLabels.value() != null)) {
+			return Optional.of(this.options.getLabelFilter().apply(event, inputLabels.value()).toArray(new String[0]));
+		}
+		return Optional.empty();
+	}
+
+	private String[] computeFinalTypeList(TypeParsedEventType event, LabelExpression inputTypes) {
+
+		if (inputTypes == null) {
+			return new String[0];
+		}
+
+		if ((inputTypes.negated() && inputTypes.value().size() > 1)
+				|| inputTypes.type() == LabelExpression.Type.CONJUNCTION) {
+			throw new UnsupportedOperationException(
+					"Expressions for relationship types are not supported in Cypher-DSL");
+		}
+
+		List<String> types = new ArrayList<>();
+		traverseTypeExpression(types, inputTypes);
+
+		return this.options.getTypeFilter().apply(event, types).toArray(new String[0]);
+	}
+
+	void traverseTypeExpression(List<String> types, LabelExpression expression) {
+
+		if (expression.type() == LabelExpression.Type.LEAF
+				|| expression.type() == LabelExpression.Type.COLON_DISJUNCTION) {
+			types.addAll(expression.value());
+		}
+		else {
+			traverseTypeExpression(types, expression.lhs());
+			traverseTypeExpression(types, expression.rhs());
 		}
 	}
 
@@ -275,16 +246,6 @@ final class CypherDslASTFactory implements ASTFactory<
 		return (T) result;
 	}
 
-	private static SymbolicName assertSymbolicName(Expression v) {
-
-		if (v == null) {
-			return null;
-		}
-
-		isInstanceOf(SymbolicName.class, v,  "An invalid type has been generated where a SymbolicName was required. Generated type was " + v.getClass().getName());
-		return (SymbolicName) v;
-	}
-
 	@Override
 	public Statements statements(List<Statement> statements) {
 		return new Statements(statements);
@@ -304,7 +265,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Statement newUnion(InputPosition p, Statement lhs, Statement rhs, boolean all) {
 		if (all) {
 			return Cypher.unionAll(lhs, rhs);
-		} else {
+		}
+		else {
 			return Cypher.union(lhs, rhs);
 		}
 	}
@@ -324,6 +286,7 @@ final class CypherDslASTFactory implements ASTFactory<
 		return Finish.create();
 	}
 
+	@Override
 	public List<Expression> newReturnItems(InputPosition p, boolean returnAll, List<Expression> returnItems) {
 		var finalReturnItems = returnItems;
 
@@ -341,11 +304,12 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Return newReturnClause(InputPosition p, boolean distinct, List<Expression> returnItems, List<SortItem> sortItems,
-		InputPosition orderPos, Expression skip, InputPosition skipPosition, Expression limit,
-		InputPosition limitPosition) {
+	public Return newReturnClause(InputPosition p, boolean distinct, List<Expression> returnItems,
+			List<SortItem> sortItems, InputPosition orderPos, Expression skip, InputPosition skipPosition,
+			Expression limit, InputPosition limitPosition) {
 
-		return options.getReturnClauseFactory().apply(new ReturnDefinition(distinct, returnItems, sortItems, skip, limit));
+		return this.options.getReturnClauseFactory()
+			.apply(new ReturnDefinition(distinct, returnItems, sortItems, skip, limit));
 	}
 
 	@Override
@@ -376,47 +340,49 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause matchClause(InputPosition p, boolean optional, NULL matchMode, List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where whereIn) {
+	public Clause matchClause(InputPosition p, boolean optional, NULL matchMode, List<PatternElement> patternElements,
+			InputPosition patternPos, List<Hint> hints, Where whereIn) {
 
-		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
+		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks()
+			.getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
 		List<PatternElement> openForTransformation = new ArrayList<>();
 		for (PatternElement patternElement : patternElements) {
 			if (patternElement instanceof NodeAtom nodeAtom) {
 				openForTransformation.add(nodeAtom.value());
-			} else {
+			}
+			else {
 				openForTransformation.add(patternElement);
 			}
 		}
 		var transformedPatternElements = transformIfPossible(patternElementCallbacks, openForTransformation);
 
-		return options.getMatchClauseFactory().apply(new MatchDefinition(optional, transformedPatternElements, whereIn, hints));
+		return this.options.getMatchClauseFactory()
+			.apply(new MatchDefinition(optional, transformedPatternElements, whereIn, hints));
 	}
 
-
-
 	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
-		List<PatternElement> patternElements) {
+			List<PatternElement> patternElements) {
 		if (callbacks.isEmpty()) {
 			return patternElements;
 		}
 
-		@SuppressWarnings("squid:S4276") // The function is needed due to the assigment below
+		@SuppressWarnings("squid:S4276") // The function is needed due to the assigment
+											// below
 		var transformer = Function.<PatternElement>identity();
 		for (UnaryOperator<PatternElement> callback : callbacks) {
 			transformer = transformer.andThen(callback);
 		}
-		return patternElements.stream().map(transformer)
-			.filter(Objects::nonNull)
-			.toList();
+		return patternElements.stream().map(transformer).filter(Objects::nonNull).toList();
 	}
 
 	@Override
 	public Hint usingIndexHint(InputPosition p, Expression v, String labelOrRelType, List<String> properties,
-		boolean seekOnly, HintIndexType indexType) {
+			boolean seekOnly, HintIndexType indexType) {
 
 		// We build nodes here. As of now, the node isn't used anyway, but only the label
 		// will be used down further the AST.
-		// It is easier than introduce a new common abstraction of label and relationship type (probably
+		// It is easier than introduce a new common abstraction of label and relationship
+		// type (probably
 		// in line with the decision made for the parser)
 		var node = Cypher.node(labelOrRelType).named(assertSymbolicName(v));
 		return Hint.useIndexFor(seekOnly, properties.stream().map(node::property).toArray(Property[]::new));
@@ -425,7 +391,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Hint usingJoin(InputPosition p, List<Expression> joinVariables) {
 
-		return Hint.useJoinOn(joinVariables.stream().map(CypherDslASTFactory::assertSymbolicName).toArray(SymbolicName[]::new));
+		return Hint.useJoinOn(
+				joinVariables.stream().map(CypherDslASTFactory::assertSymbolicName).toArray(SymbolicName[]::new));
 	}
 
 	@Override
@@ -439,8 +406,10 @@ final class CypherDslASTFactory implements ASTFactory<
 	@Override
 	public Clause createClause(InputPosition p, List<PatternElement> patternElements) {
 
-		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_CREATE, List.of());
-		return Clauses.create(transformIfPossible(callbacks, patternElements.stream().map(v -> v instanceof NodeAtom n ? n.value() : v).toList()));
+		var callbacks = this.options.getOnNewPatternElementCallbacks()
+			.getOrDefault(PatternElementCreatedEventType.ON_CREATE, List.of());
+		return Clauses.create(transformIfPossible(callbacks,
+				patternElements.stream().map(v -> (v instanceof NodeAtom n) ? n.value() : v).toList()));
 	}
 
 	@Override
@@ -475,7 +444,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression setLabels(Expression v, List<StringPos<InputPosition>> values, List<Expression> dynamicLabels, boolean containsIs) {
+	public Expression setLabels(Expression v, List<StringPos<InputPosition>> values, List<Expression> dynamicLabels,
+			boolean containsIs) {
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
@@ -498,12 +468,13 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values,
-		List<Expression> dynamicLabels, boolean containsIs) {
+	public Expression removeLabels(Expression v, List<StringPos<InputPosition>> values, List<Expression> dynamicLabels,
+			boolean containsIs) {
 
 		var s = assertSymbolicName(v);
 		var labels = computeFinalLabelList(LabelParsedEventType.ON_REMOVE, values);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS, Cypher.removeLabel(Cypher.anyNode(s), labels));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_REMOVE_LABELS,
+				Cypher.removeLabel(Cypher.anyNode(s), labels));
 	}
 
 	@Override
@@ -518,9 +489,9 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause mergeClause(InputPosition p, PatternElement patternElementIn, List<Clause> setClauses,
-		List<MergeActionType> actionTypes, List<InputPosition> positions) {
+			List<MergeActionType> actionTypes, List<InputPosition> positions) {
 
-		var patternElement = patternElementIn instanceof NodeAtom n ? n.value() : patternElementIn;
+		var patternElement = (patternElementIn instanceof NodeAtom n) ? n.value() : patternElementIn;
 		var mergeActions = new ArrayList<MergeAction>();
 		if (setClauses != null && !setClauses.isEmpty() && actionTypes != null && !actionTypes.isEmpty()) {
 
@@ -538,16 +509,17 @@ final class CypherDslASTFactory implements ASTFactory<
 			}
 		}
 
-		var callbacks = this.options.getOnNewPatternElementCallbacks().getOrDefault(PatternElementCreatedEventType.ON_MERGE, List.of());
+		var callbacks = this.options.getOnNewPatternElementCallbacks()
+			.getOrDefault(PatternElementCreatedEventType.ON_MERGE, List.of());
 		return Clauses.merge(transformIfPossible(callbacks, List.of(patternElement)), mergeActions);
 	}
 
 	@Override
 	public Clause callClause(InputPosition p, InputPosition namespacePosition, InputPosition procedureNamePosition,
-		InputPosition procedureResultPosition, List<String> namespace, String name, List<Expression> arguments,
-		boolean yieldAll, List<Expression> resultItems, Where where, boolean optional) {
+			InputPosition procedureResultPosition, List<String> namespace, String name, List<Expression> arguments,
+			boolean yieldAll, List<Expression> resultItems, Where where, boolean optional) {
 		var intermediateResult = Clauses.callClause(namespace, name, arguments,
-			yieldAll && resultItems == null ? List.of(Cypher.asterisk()) : resultItems, where);
+				(!yieldAll || (resultItems != null)) ? resultItems : List.of(Cypher.asterisk()), where);
 		if (optional) {
 			throw new IllegalArgumentException("Cannot render optional call clause");
 		}
@@ -577,20 +549,20 @@ final class CypherDslASTFactory implements ASTFactory<
 	public PatternElement shortestPathPattern(InputPosition p, PatternElement patternElement) {
 
 		isInstanceOf(RelationshipPattern.class, patternElement,
-			"Only relationship patterns are supported for the shortestPath function.");
+				"Only relationship patterns are supported for the shortestPath function.");
 
 		return new ExpressionAsPatternElementWrapper(
-			FunctionInvocation.create(PatternElementFunctions.SHORTEST_PATH, patternElement));
+				FunctionInvocation.create(PatternElementFunctions.SHORTEST_PATH, patternElement));
 	}
 
 	@Override
 	public PatternElement allShortestPathsPattern(InputPosition p, PatternElement patternElement) {
 
 		isInstanceOf(RelationshipPattern.class, patternElement,
-			"Only relationship patterns are supported for the allShortestPaths function.");
+				"Only relationship patterns are supported for the allShortestPaths function.");
 
 		return new ExpressionAsPatternElementWrapper(
-			FunctionInvocation.create(PatternElementFunctions.ALL_SHORTEST_PATHS, patternElement));
+				FunctionInvocation.create(PatternElementFunctions.ALL_SHORTEST_PATHS, patternElement));
 	}
 
 	@Override
@@ -603,30 +575,12 @@ final class CypherDslASTFactory implements ASTFactory<
 		throw new UnsupportedOperationException();
 	}
 
-	static class PatternJuxtaposition extends TypedSubtree<PatternElement> implements PatternElement {
-		PatternJuxtaposition(Collection<PatternElement> children) {
-			super(children);
-		}
-
-		@Override
-		public String separator() {
-			return " ";
-		}
-	}
-
-	static class PatternList extends TypedSubtree<PatternElement> implements PatternElement {
-		PatternList(Collection<PatternElement> children) {
-			super(children);
-		}
-	}
-
 	@SuppressWarnings("squid:S3776") // Yep, it's complex
 	@Override
 	public PatternElement patternElement(List<PatternAtom> atoms) {
 
 		if (atoms.isEmpty()) {
-			throw new IllegalArgumentException(
-				"Cannot create a PatternElement from an empty list of patterns.");
+			throw new IllegalArgumentException("Cannot create a PatternElement from an empty list of patterns.");
 		}
 
 		if (atoms.size() == 1 && atoms.get(0) instanceof ParenthesizedPathPatternAtom atom) {
@@ -655,21 +609,25 @@ final class CypherDslASTFactory implements ASTFactory<
 				relationshipPattern = null;
 				patternList = null;
 				patternElements.add(specificAtom.asPatternElement());
-			} else if (atom instanceof NodeAtom nodeAtom) {
+			}
+			else if (atom instanceof NodeAtom nodeAtom) {
 				if (relationshipPattern != null) {
 					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom,
-						options.isAlwaysCreateRelationshipsLTR());
-				} else if (lastNodeAtom == null) {
+							this.options.isAlwaysCreateRelationshipsLTR());
+				}
+				else if (lastNodeAtom == null) {
 					lastNodeAtom = nodeAtom;
-				} else {
+				}
+				else {
 					relationshipPattern = lastNodeAtom.value();
 					lastNodeAtom = null;
-					// Will be added to the pattern elements either on the occurrence of a parenthesized pattern or
+					// Will be added to the pattern elements either on the occurrence of a
+					// parenthesized pattern or
 					// after iterating all atoms.
 					relationshipPattern = lastPathAtom.asRelationshipBetween(relationshipPattern, nodeAtom,
-						options.isAlwaysCreateRelationshipsLTR());
+							this.options.isAlwaysCreateRelationshipsLTR());
 					if ((lastPathAtom.getDirection() == Relationship.Direction.RTL || patternList != null)
-						&& options.isAlwaysCreateRelationshipsLTR()) {
+							&& this.options.isAlwaysCreateRelationshipsLTR()) {
 						if (patternList == null) {
 							patternList = new ArrayList<>();
 						}
@@ -678,25 +636,29 @@ final class CypherDslASTFactory implements ASTFactory<
 						lastNodeAtom = nodeAtom;
 					}
 				}
-			} else if (atom instanceof PathAtom pathAtom) {
+			}
+			else if (atom instanceof PathAtom pathAtom) {
 				lastPathAtom = pathAtom;
 			}
 		}
 
-		if (relationshipPattern == null && patternList != null && patternList.size() == 1 && patternList.get(0) instanceof RelationshipPattern singleListItem) {
+		if (relationshipPattern == null && patternList != null && patternList.size() == 1
+				&& patternList.get(0) instanceof RelationshipPattern singleListItem) {
 			relationshipPattern = singleListItem;
 			patternList = null;
 		}
 
 		if (relationshipPattern != null) {
 			patternElements.add((PatternElement) relationshipPattern);
-		} else if (patternList != null) {
+		}
+		else if (patternList != null) {
 			patternElements.add(new PatternList(patternList));
-		} else if (lastNodeAtom != null) {
+		}
+		else if (lastNodeAtom != null) {
 			patternElements.add(lastNodeAtom.value());
 		}
 
-		return patternElements.size() == 1 ? patternElements.get(0) : new PatternJuxtaposition(patternElements);
+		return (patternElements.size() == 1) ? patternElements.get(0) : new PatternJuxtaposition(patternElements);
 	}
 
 	@Override
@@ -736,12 +698,14 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public NodeAtom nodePattern(InputPosition p, Expression v, LabelExpression labels, Expression properties, Expression predicate) {
+	public NodeAtom nodePattern(InputPosition p, Expression v, LabelExpression labels, Expression properties,
+			Expression predicate) {
 
 		Node node;
 		if (labels == null) {
 			node = Cypher.anyNode();
-		} else {
+		}
+		else {
 			var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
 			node = finalLabels.map(l -> {
 				var primaryLabel = l[0];
@@ -763,22 +727,25 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v, LabelExpression relTypes, PathLength pathLength, Expression properties, Expression predicate) {
+	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v,
+			LabelExpression relTypes, PathLength pathLength, Expression properties, Expression predicate) {
 		return PathAtom.of(assertSymbolicName(v), pathLength, left, right,
-			computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties,
-			relTypes != null && relTypes.negated(), predicate);
+				computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties,
+				relTypes != null && relTypes.negated(), predicate);
 	}
 
 	@Override
 	public PathLength pathLength(InputPosition p, InputPosition pMin, InputPosition pMax, String minLength,
-		String maxLength) {
+			String maxLength) {
 		return PathLength.of(minLength, maxLength);
 	}
 
 	@Override
-	public QuantifiedPathPattern.Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound, InputPosition posUpperBound, String lowerBound, String upperBound) {
+	public QuantifiedPathPattern.Quantifier intervalPathQuantifier(InputPosition p, InputPosition posLowerBound,
+			InputPosition posUpperBound, String lowerBound, String upperBound) {
 
-		return QuantifiedPathPattern.interval(lowerBound == null ? null : Integer.parseInt(lowerBound), upperBound == null ? null : Integer.parseInt(upperBound));
+		return QuantifiedPathPattern.interval((lowerBound != null) ? Integer.parseInt(lowerBound) : null,
+				(upperBound != null) ? Integer.parseInt(upperBound) : null);
 	}
 
 	@Override
@@ -807,7 +774,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where, QuantifiedPathPattern.Quantifier pathPatternQuantifier) {
+	public PatternAtom parenthesizedPathPattern(InputPosition p, PatternElement internalPattern, Expression where,
+			QuantifiedPathPattern.Quantifier pathPatternQuantifier) {
 		return new ParenthesizedPathPatternAtom((RelationshipPattern) internalPattern, pathPatternQuantifier, where);
 	}
 
@@ -818,9 +786,10 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause loadCsvClause(InputPosition p, boolean headers, Expression source, Expression v,
-		String fieldTerminator) {
+			String fieldTerminator) {
 
-		isInstanceOf(StringLiteral.class, source, "Only string literals are supported as source for the LOAD CSV clause.");
+		isInstanceOf(StringLiteral.class, source,
+				"Only string literals are supported as source for the LOAD CSV clause.");
 		return Clauses.loadCSV(headers, (StringLiteral) source, assertSymbolicName(v), fieldTerminator);
 	}
 
@@ -831,7 +800,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause subqueryClause(InputPosition p, Statement subquery, NULL inTransactions, boolean scopeAll,
-		boolean hasScope, List<Expression> expressions, boolean optional) {
+			boolean hasScope, List<Expression> expressions, boolean optional) {
 		if (optional) {
 			throw new IllegalArgumentException("Cannot render optional subquery clause");
 		}
@@ -840,14 +809,14 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public NULL subqueryInTransactionsParams(InputPosition p, NULL batchParams, NULL concurrencyParams,
-		NULL errorParams, NULL reportParams) {
+			NULL errorParams, NULL reportParams) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause yieldClause(InputPosition p, boolean returnAll, List<Expression> expressions,
-		InputPosition returnItemsPosition, List<SortItem> orderBy, InputPosition orderPos, Expression skip,
-		InputPosition skipPosition, Expression limit, InputPosition limitPosition, Where where) {
+			InputPosition returnItemsPosition, List<SortItem> orderBy, InputPosition orderPos, Expression skip,
+			InputPosition skipPosition, Expression limit, InputPosition limitPosition, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -858,19 +827,19 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause showConstraintClause(InputPosition p, ShowCommandFilterTypes constraintType, Where where,
-		Clause yieldClause) {
+			Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause showProcedureClause(InputPosition p, boolean currentUser, String user, Where where,
-		Clause yieldClause) {
+			Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause showFunctionClause(InputPosition p, ShowCommandFilterTypes functionType, boolean currentUser,
-		String user, Where where, Clause yieldClause) {
+			String user, Where where, Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -881,38 +850,38 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement showRoles(InputPosition p, boolean withUsers, boolean showAll, Clause yieldExpr,
-		Return returnWithoutGraph, Where where) {
+			Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement grantRoles(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
-		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
+			List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement revokeRoles(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
-		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
+			List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createUser(InputPosition p, boolean replace, boolean ifNotExists,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Boolean suspended, DatabaseName homeDatabase,
-		List<NULL> nulls, List<NULL> systemAuthAttributes) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Boolean suspended, DatabaseName homeDatabase,
+			List<NULL> nulls, List<NULL> systemAuthAttributes) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement dropUser(InputPosition p, boolean ifExists,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> username) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement renameUser(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> fromUserName,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> toUserName, boolean ifExists) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> toUserName, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -943,13 +912,14 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement alterUser(InputPosition p, boolean ifExists,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Boolean suspended, DatabaseName homeDatabase,
-		boolean removeHome, List<NULL> nulls, List<NULL> systemAuthAttributes, boolean removeAllAuth,
-		List<Expression> removeAuths) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Boolean suspended, DatabaseName homeDatabase,
+			boolean removeHome, List<NULL> nulls, List<NULL> systemAuthAttributes, boolean removeAllAuth,
+			List<Expression> removeAuths) {
 		throw new UnsupportedOperationException();
 	}
 
-	@Override public Expression passwordExpression(Parameter<?> password) {
+	@Override
+	public Expression passwordExpression(Parameter<?> password) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -960,7 +930,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement showUsers(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where,
-		boolean withAuth) {
+			boolean withAuth) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -970,78 +940,84 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement showSupportedPrivileges(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showSupportedPrivileges(InputPosition p, Clause yieldExpr, Return returnWithoutGraph,
+			Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement showAllPrivileges(InputPosition p, boolean asCommand, boolean asRevoke, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showAllPrivileges(InputPosition p, boolean asCommand, boolean asRevoke, Clause yieldExpr,
+			Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement showRolePrivileges(InputPosition p,
-		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles, boolean asCommand, boolean asRevoke,
-		Clause yieldExpr, Return returnWithoutGraph, Where where) {
+			List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles, boolean asCommand, boolean asRevoke,
+			Clause yieldExpr, Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement showUserPrivileges(InputPosition p,
-		List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users, boolean asCommand, boolean asRevoke,
-		Clause yieldExpr, Return returnWithoutGraph, Where where) {
+			List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users, boolean asCommand, boolean asRevoke,
+			Clause yieldExpr, Return returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement grantPrivilege(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
-		NULL privilege) {
+			NULL privilege) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement denyPrivilege(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
-		NULL privilege) {
+			NULL privilege) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement revokePrivilege(InputPosition p, List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles,
-		NULL privilege, boolean revokeGrant, boolean revokeDeny) {
+			NULL privilege, boolean revokeGrant, boolean revokeDeny) {
 		throw new UnsupportedOperationException();
 	}
 
-	@SuppressWarnings("HiddenField") // The database options are quite different options than ours ;)
+	// The database options are quite different options than ours ;)
+	@SuppressWarnings("HiddenField")
+	@Override
 	public Statement createDatabase(InputPosition p, boolean replace, DatabaseName databaseName, boolean ifNotExists,
-		NULL aNull, SimpleEither<Map<String, Expression>, Parameter<?>> options,
-		SimpleEither<Integer, Parameter<?>> topologyPrimaries,
-		SimpleEither<Integer, Parameter<?>> topologySecondaries) {
+			NULL aNull, SimpleEither<Map<String, Expression>, Parameter<?>> options,
+			SimpleEither<Integer, Parameter<?>> topologyPrimaries,
+			SimpleEither<Integer, Parameter<?>> topologySecondaries) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createCompositeDatabase(InputPosition p, boolean replace, DatabaseName compositeDatabaseName,
-		boolean ifNotExists, SimpleEither<Map<String, Expression>, Parameter<?>> databaseOptions, NULL aNull) {
+			boolean ifNotExists, SimpleEither<Map<String, Expression>, Parameter<?>> databaseOptions, NULL aNull) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement dropDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, boolean composite,
-		boolean aliasAction, boolean dumpData, NULL wait) {
+			boolean aliasAction, boolean dumpData, NULL wait) {
 		throw new UnsupportedOperationException();
 	}
 
-	@SuppressWarnings("HiddenField") // The database options are quite different options than ours ;)
+	@SuppressWarnings("HiddenField") // The database options are quite different options
+										// than ours ;)
 	@Override
 	public Statement alterDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, AccessType accessType,
-		SimpleEither<Integer, Parameter<?>> topologyPrimaries, SimpleEither<Integer, Parameter<?>> topologySecondaries,
-		Map<String, Expression> options, java.util.Set<String> optionsToRemove, NULL aNull) {
+			SimpleEither<Integer, Parameter<?>> topologyPrimaries,
+			SimpleEither<Integer, Parameter<?>> topologySecondaries, Map<String, Expression> options,
+			java.util.Set<String> optionsToRemove, NULL aNull) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement showDatabase(InputPosition p, NULL scope, Clause yieldExpr, Return returnWithoutGraph,
-		Where where) {
+			Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1066,7 +1042,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement showAliases(InputPosition p, DatabaseName aliasName, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showAliases(InputPosition p, DatabaseName aliasName, Clause yieldExpr, Return returnWithoutGraph,
+			Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1097,33 +1074,32 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement createLocalDatabaseAlias(InputPosition p, boolean replace, DatabaseName aliasName,
-		DatabaseName targetName, boolean ifNotExists, SimpleEither<Map<String, Expression>, Parameter<?>> properties
-	) {
+			DatabaseName targetName, boolean ifNotExists,
+			SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createRemoteDatabaseAlias(InputPosition p, boolean replace, DatabaseName aliasName,
-		DatabaseName targetName, boolean ifNotExists, SimpleEither<String, Parameter<?>> url,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password,
-		SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
-		SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
+			DatabaseName targetName, boolean ifNotExists, SimpleEither<String, Parameter<?>> url,
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password,
+			SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
+			SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement alterLocalDatabaseAlias(InputPosition p, DatabaseName aliasName, DatabaseName targetName,
-		boolean ifExists, SimpleEither<Map<String, Expression>, Parameter<?>> properties
-	) {
+			boolean ifExists, SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement alterRemoteDatabaseAlias(InputPosition p, DatabaseName aliasName, DatabaseName targetName,
-		boolean ifExists, SimpleEither<String, Parameter<?>> url,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password,
-		SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
-		SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
+			boolean ifExists, SimpleEither<String, Parameter<?>> url,
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> username, Expression password,
+			SimpleEither<Map<String, Expression>, Parameter<?>> driverSettings,
+			SimpleEither<Map<String, Expression>, Parameter<?>> properties) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1139,7 +1115,8 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Parameter<?> newParameter(InputPosition p, String v, ParameterType type) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_PARAMETER, parameterFromSymbolicName(Cypher.name(v)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_PARAMETER,
+				parameterFromSymbolicName(Cypher.name(v)));
 	}
 
 	@Override
@@ -1159,25 +1136,32 @@ final class CypherDslASTFactory implements ASTFactory<
 		}
 
 		var name = symbolicName.getValue();
-		return options.getParameterValues().containsKey(name) ? Cypher.parameter(name, options.getParameterValues().get(name)) : Cypher.parameter(name);
+		return this.options.getParameterValues().containsKey(name)
+				? Cypher.parameter(name, this.options.getParameterValues().get(name)) : Cypher.parameter(name);
 	}
 
 	@Override
 	public Expression newDouble(InputPosition p, String image) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Double.parseDouble(image)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL,
+				Cypher.literalOf(Double.parseDouble(image)));
 	}
 
 	@Override
 	public Expression newDecimalInteger(InputPosition p, String image, boolean negated) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image) * (negated ? -1 : 1)));
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL,
+				Cypher.literalOf(Long.parseUnsignedLong(image) * (negated ? -1 : 1)));
 	}
 
-	@Override public Expression newHexInteger(InputPosition p, String image, boolean negated) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0x", ""), 16) * (negated ? -1 : 1)));
+	@Override
+	public Expression newHexInteger(InputPosition p, String image, boolean negated) {
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL,
+				Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0x", ""), 16) * (negated ? -1 : 1)));
 	}
 
-	@Override public Expression newOctalInteger(InputPosition p, String image, boolean negated) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL, Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1)));
+	@Override
+	public Expression newOctalInteger(InputPosition p, String image, boolean negated) {
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_NEW_LITERAL,
+				Cypher.literalOf(Long.parseUnsignedLong(image.replaceFirst("(?i)0o", ""), 8) * (negated ? -1 : 1)));
 	}
 
 	@Override
@@ -1224,7 +1208,7 @@ final class CypherDslASTFactory implements ASTFactory<
 			keysAndValues[i++] = key.string;
 			keysAndValues[i++] = valueIterator.next();
 		}
-		return options.isCreateSortedMaps() ? Cypher.sortedMapOf(keysAndValues) : Cypher.mapOf(keysAndValues);
+		return this.options.isCreateSortedMaps() ? Cypher.sortedMapOf(keysAndValues) : Cypher.mapOf(keysAndValues);
 	}
 
 	@Override
@@ -1248,13 +1232,15 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public LabelExpression labelConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
+	public LabelExpression labelConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
+			boolean containsIs) {
 
 		return lhs.and(rhs);
 	}
 
 	@Override
-	public LabelExpression labelDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
+	public LabelExpression labelDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
+			boolean containsIs) {
 
 		return lhs.or(rhs);
 	}
@@ -1276,32 +1262,27 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public LabelExpression labelColonConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
+	public LabelExpression labelColonConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
+			boolean containsIs) {
 
 		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_CONJUNCTION);
 	}
 
 	@Override
-	public LabelExpression labelColonDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs, boolean containsIs) {
+	public LabelExpression labelColonDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
+			boolean containsIs) {
 
 		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_DISJUNCTION);
-	}
-
-
-
-	private static LabelExpression colonJunjction(LabelExpression lhs, LabelExpression rhs, LabelExpression.Type colonDisjunction) {
-		List<String> value = new ArrayList<>();
-		value.addAll(lhs.value());
-		value.addAll(rhs.value());
-		return new LabelExpression(colonDisjunction, false, value, null, null);
 	}
 
 	@Override
 	public Expression labelExpressionPredicate(Expression subject, LabelExpression exp) {
 
 		if (!(subject instanceof SymbolicName symbolicName)) {
-			throw new IllegalArgumentException("Expected an symbolic name to create a label based expression predicate!");
-		} else {
+			throw new IllegalArgumentException(
+					"Expected an symbolic name to create a label based expression predicate!");
+		}
+		else {
 			List<String> values = new ArrayList<>();
 			LabelExpression current = exp;
 			while (current != null) {
@@ -1357,7 +1338,8 @@ final class CypherDslASTFactory implements ASTFactory<
 		return lhs.pow(rhs);
 	}
 
-	@Override public Expression unaryPlus(Expression e) {
+	@Override
+	public Expression unaryPlus(Expression e) {
 		return Cypher.plus(e);
 	}
 
@@ -1478,7 +1460,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression functionInvocation(InputPosition p, InputPosition functionNamePosition, List<String> namespace,
-		String name, boolean distinct, List<Expression> arguments, boolean calledFromUseClause) {
+			String name, boolean distinct, List<Expression> arguments, boolean calledFromUseClause) {
 
 		String[] parts = new String[namespace.size() + 1];
 		for (int i = 0; i < namespace.size(); i++) {
@@ -1491,7 +1473,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression listComprehension(InputPosition p, Expression v, Expression list, Expression where,
-		Expression projection) {
+			Expression projection) {
 
 		var in = Cypher.listWith(assertSymbolicName(v)).in(list);
 		if (where != null) {
@@ -1505,21 +1487,25 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression patternComprehension(InputPosition p, InputPosition relationshipPatternPosition, Expression v, PatternElement patternElement,
-		Expression where, Expression projection) {
+	public Expression patternComprehension(InputPosition p, InputPosition relationshipPatternPosition, Expression v,
+			PatternElement patternElement, Expression where, Expression projection) {
 
 		PatternComprehension.OngoingDefinitionWithoutReturn ongoingDefinitionWithPattern;
 		if (patternElement instanceof RelationshipPattern relationshipPattern) {
 			if (v != null) {
-				ongoingDefinitionWithPattern = Cypher.listBasedOn(Cypher.path(assertSymbolicName(v)).definedBy(relationshipPattern));
-			} else {
+				ongoingDefinitionWithPattern = Cypher
+					.listBasedOn(Cypher.path(assertSymbolicName(v)).definedBy(relationshipPattern));
+			}
+			else {
 				ongoingDefinitionWithPattern = Cypher.listBasedOn(relationshipPattern);
 			}
-		} else if (patternElement instanceof NamedPath namedPath) {
+		}
+		else if (patternElement instanceof NamedPath namedPath) {
 			ongoingDefinitionWithPattern = Cypher.listBasedOn(namedPath);
-		} else {
+		}
+		else {
 			throw new IllegalArgumentException(
-				"Cannot build a pattern comprehension around " + patternElement.getClass().getSimpleName());
+					"Cannot build a pattern comprehension around " + patternElement.getClass().getSimpleName());
 		}
 		if (where != null) {
 			ongoingDefinitionWithPattern = ((PatternComprehension.OngoingDefinitionWithPattern) ongoingDefinitionWithPattern)
@@ -1531,7 +1517,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression reduceExpression(InputPosition p, Expression acc, Expression accExpr, Expression v,
-		Expression list, Expression innerExpr) {
+			Expression list, Expression innerExpr) {
 
 		var variable = assertSymbolicName(v);
 		if (variable == null) {
@@ -1579,15 +1565,16 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression trimFunction(InputPosition inputPosition, ParserTrimSpecification parserTrimSpecification,
-		Expression expression, Expression expression1) {
+			Expression expression, Expression expression1) {
 
 		var call = switch (parserTrimSpecification) {
 			case BOTH -> Cypher.call("trim");
 			case LEADING -> Cypher.call("ltrim");
 			case TRAILING -> Cypher.call("rtrim");
 		};
-		return call.withArgs(
-				expression == null ? new Expression[] {expression1} : new Expression[] {expression1, expression})
+		return call
+			.withArgs((expression != null) ? new Expression[] { expression1, expression }
+					: new Expression[] { expression1 })
 			.asFunction();
 	}
 
@@ -1606,21 +1593,25 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Expression existsExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
+	public Expression existsExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements,
+			Statement q, Where where) {
 
 		if (q == null) {
 			return Cypher.exists(patternElements, where);
-		} else {
+		}
+		else {
 			return Cypher.exists(q);
 		}
 	}
 
 	@Override
-	public Expression countExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements, Statement q, Where where) {
+	public Expression countExpression(InputPosition p, NULL matchMode, List<PatternElement> patternElements,
+			Statement q, Where where) {
 
 		if (q == null) {
 			return Cypher.count(patternElements, where);
-		} else {
+		}
+		else {
 			return Cypher.count(q);
 		}
 	}
@@ -1633,9 +1624,9 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression mapProjection(InputPosition p, Expression v, List<Expression> items) {
-		return options.isCreateSortedMaps() ?
-			MapProjection.sorted(assertSymbolicName(v), items.toArray(new Object[0])) :
-			MapProjection.create(assertSymbolicName(v), items.toArray(new Object[0]));
+		return this.options.isCreateSortedMaps()
+				? MapProjection.sorted(assertSymbolicName(v), items.toArray(new Object[0]))
+				: MapProjection.create(assertSymbolicName(v), items.toArray(new Object[0]));
 	}
 
 	@Override
@@ -1660,7 +1651,7 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Expression caseExpression(InputPosition p, Expression e, List<Expression> whens, List<Expression> thens,
-		Expression elze) {
+			Expression elze) {
 
 		if (whens != null && thens != null && whens.size() != thens.size()) {
 			throw new IllegalArgumentException("Cannot combine lists of whens with a different sized list of thens.");
@@ -1672,10 +1663,11 @@ final class CypherDslASTFactory implements ASTFactory<
 			var iteratorThens = thens.iterator();
 			while (iteratorWhens.hasNext() && iteratorThens.hasNext()) {
 				var when = iteratorWhens.next();
-				if (e != null && when instanceof Comparison comparison && comparison.getComparator()
-					.equals(Operator.EQUALITY) && e.equals(comparison.getLeft())) {
+				if (e != null && when instanceof Comparison comparison
+						&& comparison.getComparator().equals(Operator.EQUALITY) && e.equals(comparison.getLeft())) {
 					aCase = aCase.when(comparison.getRight()).then(iteratorThens.next());
-				} else {
+				}
+				else {
 					aCase = aCase.when(when).then(iteratorThens.next());
 				}
 			}
@@ -1735,23 +1727,25 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Clause orderBySkipLimitClause(InputPosition inputPosition, List<SortItem> list, InputPosition pos1,
-		Expression expression, InputPosition pos2, Expression expression1, InputPosition pos3) {
+			Expression expression, InputPosition pos2, Expression expression1, InputPosition pos3) {
 		return null;
 	}
 
 	@Override
-	public Clause showTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids, Where where, Clause yieldClause) {
+	public Clause showTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids, Where where,
+			Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause terminateTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids, Where where, Clause yieldClause) {
+	public Clause terminateTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids, Where where,
+			Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Clause showSettingsClause(InputPosition p, SimpleEither<List<String>, Expression> names, Where where,
-		Clause yieldClause) {
+			Clause yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1762,64 +1756,64 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public Statement createConstraint(InputPosition p, ConstraintType constraintType, boolean replace,
-		boolean ifNotExists, SimpleEither<StringPos<InputPosition>, Parameter<?>> constraintName, Expression expression,
-		StringPos<InputPosition> label, List<Property> properties, ParserCypherTypeName propertyType,
-		SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions) {
+			boolean ifNotExists, SimpleEither<StringPos<InputPosition>, Parameter<?>> constraintName,
+			Expression expression, StringPos<InputPosition> label, List<Property> properties,
+			ParserCypherTypeName propertyType, SimpleEither<Map<String, Expression>, Parameter<?>> constraintOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement dropConstraint(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> name,
-		boolean ifExists) {
+			boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createLookupIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
-		StringPos<InputPosition> functionName, Expression functionParameter,
-		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
+			StringPos<InputPosition> functionName, Expression functionParameter,
+			SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
-		StringPos<InputPosition> label, List<Property> properties,
-		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions, CreateIndexTypes indexType) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
+			StringPos<InputPosition> label, List<Property> properties,
+			SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions, CreateIndexTypes indexType) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createFulltextIndex(InputPosition p, boolean replace, boolean ifNotExists, boolean isNode,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
-		List<StringPos<InputPosition>> labels, List<Property> properties,
-		SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> indexName, Expression expression,
+			List<StringPos<InputPosition>> labels, List<Property> properties,
+			SimpleEither<Map<String, Expression>, Parameter<?>> indexOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement dropIndex(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> name,
-		boolean ifExists) {
+			boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement createRole(InputPosition p, boolean replace,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> roleName,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRole, boolean ifNotExists, boolean immutable) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> roleName,
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRole, boolean ifNotExists, boolean immutable) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement dropRole(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> roleName,
-		boolean ifExists) {
+			boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement renameRole(InputPosition p, SimpleEither<StringPos<InputPosition>, Parameter<?>> fromRoleName,
-		SimpleEither<StringPos<InputPosition>, Parameter<?>> toRoleName, boolean ifExists) {
+			SimpleEither<StringPos<InputPosition>, Parameter<?>> toRoleName, boolean ifExists) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1835,12 +1829,13 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public NULL loadPrivilege(InputPosition inputPosition, SimpleEither<String, Parameter<?>> simpleEither,
-		SimpleEither<String, Parameter<?>> simpleEither1, boolean b) {
+			SimpleEither<String, Parameter<?>> simpleEither1, boolean b) {
 		return null;
 	}
 
 	@Override
-	public NULL graphPrivilege(InputPosition inputPosition, NULL aNull, NULL aNull2, NULL aNull3, List<NULL> qualifier, boolean immutable) {
+	public NULL graphPrivilege(InputPosition inputPosition, NULL aNull, NULL aNull2, NULL aNull3, List<NULL> qualifier,
+			boolean immutable) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1961,22 +1956,25 @@ final class CypherDslASTFactory implements ASTFactory<
 
 	@Override
 	public LabelExpression dynamicLabelLeaf(InputPosition p, Expression e, EntityType entityType, boolean all,
-		boolean containsIs) {
+			boolean containsIs) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement enableServer(InputPosition p, SimpleEither<String, Parameter<?>> serverName, SimpleEither<Map<String, Expression>, Parameter<?>> serverOptions) {
+	public Statement enableServer(InputPosition p, SimpleEither<String, Parameter<?>> serverName,
+			SimpleEither<Map<String, Expression>, Parameter<?>> serverOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement alterServer(InputPosition p, SimpleEither<String, Parameter<?>> serverName, SimpleEither<Map<String, Expression>, Parameter<?>> serverOptions) {
+	public Statement alterServer(InputPosition p, SimpleEither<String, Parameter<?>> serverName,
+			SimpleEither<Map<String, Expression>, Parameter<?>> serverOptions) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement renameServer(InputPosition p, SimpleEither<String, Parameter<?>> serverName, SimpleEither<String, Parameter<?>> newName) {
+	public Statement renameServer(InputPosition p, SimpleEither<String, Parameter<?>> serverName,
+			SimpleEither<String, Parameter<?>> newName) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1991,7 +1989,8 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Statement deallocateServers(InputPosition p, boolean dryRun, List<SimpleEither<String, Parameter<?>>> serverNames) {
+	public Statement deallocateServers(InputPosition p, boolean dryRun,
+			List<SimpleEither<String, Parameter<?>>> serverNames) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1999,4 +1998,26 @@ final class CypherDslASTFactory implements ASTFactory<
 	public Statement reallocateDatabases(InputPosition p, boolean dryRun) {
 		throw new UnsupportedOperationException();
 	}
+
+	static class PatternJuxtaposition extends TypedSubtree<PatternElement> implements PatternElement {
+
+		PatternJuxtaposition(Collection<PatternElement> children) {
+			super(children);
+		}
+
+		@Override
+		public String separator() {
+			return " ";
+		}
+
+	}
+
+	static class PatternList extends TypedSubtree<PatternElement> implements PatternElement {
+
+		PatternList(Collection<PatternElement> children) {
+			super(children);
+		}
+
+	}
+
 }

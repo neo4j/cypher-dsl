@@ -25,12 +25,15 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @Node
 public final class Genre {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private final UUID id;
 
 	private final String name;
@@ -41,10 +44,11 @@ public final class Genre {
 	}
 
 	public UUID getId() {
-		return id;
+		return this.id;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
+
 }

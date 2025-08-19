@@ -27,12 +27,12 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 /**
  * An example for a set of shared properties for the relationships in a domain.
  *
+ * @param <S> start node
+ * @param <E> end node
  * @author Michael J. Simons
- * @param <S> Start node
- * @param <E> End node
  */
 public abstract class AbstractRelationshipDefinition<S extends AbstractNodeDefinition<?>, E extends AbstractNodeDefinition<?>>
-	extends RelationshipBase<S, E, AbstractRelationshipDefinition<S, E>> {
+		extends RelationshipBase<S, E, AbstractRelationshipDefinition<S, E>> {
 
 	public static final String $DEFAULT_TYPE = "COOP_REL";
 
@@ -44,7 +44,9 @@ public abstract class AbstractRelationshipDefinition<S extends AbstractNodeDefin
 		super(start, $DEFAULT_TYPE, end, additionalTypes);
 	}
 
-	protected AbstractRelationshipDefinition(SymbolicName symbolicName, Node start, Properties properties, Node end, String... additionalTypes) {
+	protected AbstractRelationshipDefinition(SymbolicName symbolicName, Node start, Properties properties, Node end,
+			String... additionalTypes) {
 		super(symbolicName, start, $DEFAULT_TYPE, properties, end, additionalTypes);
 	}
+
 }

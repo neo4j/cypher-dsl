@@ -20,18 +20,20 @@ package org.neo4j.cypherdsl.examples.ogm.movies;
 
 import jakarta.json.bind.annotation.JsonbCreator;
 import jakarta.json.bind.annotation.JsonbProperty;
-
 import org.neo4j.ogm.annotation.GeneratedValue;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @NodeEntity
 public final class Person {
 
-	@Id @GeneratedValue
+	@Id
+	@GeneratedValue
 	private Long id;
 
 	private String name;
@@ -39,8 +41,7 @@ public final class Person {
 	private Integer born;
 
 	/**
-	 * A new person with a
-	 *
+	 * A new person with a given name and a year of birth.
 	 * @param name given name
 	 * @param born and a year in which they have been born
 	 */
@@ -57,30 +58,32 @@ public final class Person {
 	}
 
 	/**
-	 * @return The person id
+	 * {@return the person id}
 	 */
 	public Long getId() {
-		return id;
+		return this.id;
 	}
 
 	/**
-	 * @return the name
+	 * {@return the name}
 	 */
 	public String getName() {
-		return name;
-	}
-
-	/***
-	 * @return birth year
-	 */
-	public Integer getBorn() {
-		return born;
+		return this.name;
 	}
 
 	/**
+	 * {@return birth year}
+	 */
+	public Integer getBorn() {
+		return this.born;
+	}
+
+	/**
+	 * Sets the year of birth.
 	 * @param born a new birth year
 	 */
 	public void setBorn(Integer born) {
 		this.born = born;
 	}
+
 }

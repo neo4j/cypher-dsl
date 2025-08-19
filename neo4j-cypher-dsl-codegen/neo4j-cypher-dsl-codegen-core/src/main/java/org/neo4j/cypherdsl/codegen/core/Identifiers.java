@@ -25,18 +25,21 @@ package org.neo4j.cypherdsl.codegen.core;
  */
 final class Identifiers {
 
-	/**
-	 * A convenience method to decide whether a given {@code codePoint} is a valid Java identifier at the given position {@code p}.
-	 *
-	 * @param p         Position on which the {@code codePoint} is supposed to be used as identifier
-	 * @param codePoint A codepoint
-	 * @return True if the codePoint could be used as part of an identifier at the given position
-	 */
-	static boolean isValidAt(int p, int codePoint) {
-		return p == 0 && Character.isJavaIdentifierStart(codePoint) || p > 0 && Character.isJavaIdentifierPart(
-			codePoint);
-	}
-
 	private Identifiers() {
 	}
+
+	/**
+	 * A convenience method to decide whether a given {@code codePoint} is a valid Java
+	 * identifier at the given position {@code p}.
+	 * @param p position on which the {@code codePoint} is supposed to be used as
+	 * identifier
+	 * @param codePoint a codepoint
+	 * @return true if the codePoint could be used as part of an identifier at the given
+	 * position
+	 */
+	static boolean isValidAt(int p, int codePoint) {
+		return p == 0 && Character.isJavaIdentifierStart(codePoint)
+				|| p > 0 && Character.isJavaIdentifierPart(codePoint);
+	}
+
 }

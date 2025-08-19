@@ -19,6 +19,8 @@
 package org.neo4j.cypherdsl.core.ast;
 
 /**
+ * Visitors are used to traverse the complete Cypher-DSL AST.
+ *
  * @author Michael J. Simons
  * @since 1.0
  */
@@ -27,18 +29,19 @@ public interface Visitor {
 
 	/**
 	 * Enter a {@link Visitable}. Not all visitables will obey to the result
-	 *
 	 * @param segment the segment to visit.
 	 */
 	void enter(Visitable segment);
 
 	/**
-	 * A method that is used to pass control to some extent from the visitor to the {@link Visitable}. Not all visitables
-	 * react to this, and we don't give any guarantees about which will. This method has been mainly introduced in parallel
-	 * to {@link #enter(Visitable)} so that existing external implementations of {@link Visitor visitors} won't break.
-	 *
+	 * A method that is used to pass control to some extent from the visitor to the
+	 * {@link Visitable}. Not all visitables react to this, and we don't give any
+	 * guarantees about which will. This method has been mainly introduced in parallel to
+	 * {@link #enter(Visitable)} so that existing external implementations of
+	 * {@link Visitor visitors} won't break.
 	 * @param segment the segment to visit.
-	 * @return A result indicating whether visitation of child elements should continue or not.
+	 * @return a result indicating whether visitation of child elements should continue or
+	 * not.
 	 * @since 2022.3.0
 	 */
 	default EnterResult enterWithResult(Visitable segment) {
@@ -48,9 +51,9 @@ public interface Visitor {
 
 	/**
 	 * Leave a {@link Visitable}.
-	 *
 	 * @param segment the visited segment.
 	 */
 	default void leave(Visitable segment) {
 	}
+
 }

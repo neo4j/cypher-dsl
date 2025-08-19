@@ -32,34 +32,24 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * Generates a raw cypher literal. The factory method is able to replace {@code $E} placeholders with expressions passed
- * to it. To use a {@literal $E} escape it as {$literal \$E}.
+ * Generates a raw cypher literal. The factory method is able to replace {@code $E}
+ * placeholders with expressions passed to it. To use a {@literal $E} escape it as
+ * {$literal \$E}.
  *
  * @author Michael J. Simons
- * @soundtrack Foo Fighters - Echoes, Silence, Patience &amp; Grace
  * @since 2021.0.2
  */
 @API(status = Status.INTERNAL)
 final class RawLiteral implements Expression {
 
 	private static final Pattern EXPRESSION_PATTERN = Pattern.compile("((\\\\?\\$(\\w+))(?:\\s*|$))");
+
 	private static final String EXPRESSION_PLACEHOLDER = "$E";
 
-	static class RawElement extends LiteralBase<String> {
+	private final List<Expression> content;
 
-		RawElement(String content) {
-			super(unescapeEscapedPlaceholders(content));
-		}
-
-		@Override
-			public String asString() {
-
-			return content;
-		}
-
-		private static String unescapeEscapedPlaceholders(String content) {
-			return content.replace("\\$E", "$E");
-		}
+	RawLiteral(List<Expression> content) {
+		this.content = content;
 	}
 
 	static RawLiteral create(String format, Object... mixedArgs) {
@@ -81,7 +71,8 @@ final class RawLiteral implements Expression {
 		Matcher m;
 		if (!parameters.isEmpty()) {
 			m = EXPRESSION_PATTERN.matcher(format);
-			// "Reserve" all placeholders that match actual parameter names by removing them from the all
+			// "Reserve" all placeholders that match actual parameter names by removing
+			// them from the all
 			// args list so that they are taken with precedence.
 			while (m.find()) {
 				if (parameters.containsKey(m.group(3))) {
@@ -99,11 +90,12 @@ final class RawLiteral implements Expression {
 				content.add(new RawElement(format.substring(i, m.start(2))));
 				if (cnt >= all.size()) {
 					throw new IllegalArgumentException(
-						"Too few arguments for the raw literal format `" + format + "`.");
+							"Too few arguments for the raw literal format `" + format + "`.");
 				}
 				content.add(getMixedArg(all.get(cnt++)));
 				i = m.end(2);
-			} else if (parameters.containsKey(m.group(3))) {
+			}
+			else if (parameters.containsKey(m.group(3))) {
 				Parameter<?> e = parameters.get(m.group(3));
 
 				content.add(new RawElement(format.substring(i, m.start(2))));
@@ -111,7 +103,8 @@ final class RawLiteral implements Expression {
 				i = m.end(2);
 
 				all.remove(e);
-			} else {
+			}
+			else {
 				content.add(new RawElement(format.substring(i, m.end())));
 				i = m.end();
 			}
@@ -126,24 +119,37 @@ final class RawLiteral implements Expression {
 		return new RawLiteral(Collections.unmodifiableList(content));
 	}
 
-	private final List<Expression> content;
-
-	RawLiteral(List<Expression> content) {
-		this.content = content;
-	}
-
-	@Override
-	public void accept(Visitor visitor) {
-
-		visitor.enter(this);
-		content.forEach(expression -> expression.accept(visitor));
-		visitor.leave(this);
-	}
-
 	private static Expression getMixedArg(Object argument) {
 		if (argument instanceof Expression expression) {
 			return expression;
 		}
 		return Cypher.literalOf(argument);
 	}
+
+	@Override
+	public void accept(Visitor visitor) {
+
+		visitor.enter(this);
+		this.content.forEach(expression -> expression.accept(visitor));
+		visitor.leave(this);
+	}
+
+	static class RawElement extends LiteralBase<String> {
+
+		RawElement(String content) {
+			super(unescapeEscapedPlaceholders(content));
+		}
+
+		private static String unescapeEscapedPlaceholders(String content) {
+			return content.replace("\\$E", "$E");
+		}
+
+		@Override
+		public String asString() {
+
+			return this.content;
+		}
+
+	}
+
 }

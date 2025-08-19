@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -27,9 +25,12 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.StatementBuilder.OrderableOngoingReadingAndWithWithoutWhere;
 import org.neo4j.cypherdsl.core.annotations.CheckReturnValue;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A step that exposes the {@code WITH} clause. This interface used to be part of the {@link StatementBuilder} and moved
- * out of it to unify the {@literal WITH} clause taking in {@link IdentifiableElement identifable elements}.
+ * A step that exposes the {@code WITH} clause. This interface used to be part of the
+ * {@link StatementBuilder} and moved out of it to unify the {@literal WITH} clause taking
+ * in {@link IdentifiableElement identifable elements}.
  *
  * @author Michael J. Simons
  * @since 2023.0.0
@@ -39,9 +40,8 @@ public interface ExposesWith {
 
 	/**
 	 * Starts a with clause by passing variables to it.
-	 *
-	 * @param variables The variables to pass on to the next part
-	 * @return A match that can be build now
+	 * @param variables the variables to pass on to the next part
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	default OrderableOngoingReadingAndWithWithoutWhere with(String... variables) {
@@ -50,9 +50,8 @@ public interface ExposesWith {
 
 	/**
 	 * Create a match that returns one or more identifiable elements.
-	 *
-	 * @param elements The variables to pass on to the next part
-	 * @return A match that can be build now
+	 * @param elements the variables to pass on to the next part
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	default OrderableOngoingReadingAndWithWithoutWhere with(IdentifiableElement... elements) {
@@ -61,18 +60,17 @@ public interface ExposesWith {
 
 	/**
 	 * Create a match that returns one or more identifiable elements.
-	 *
-	 * @param elements The expressions to be returned. Must not be null and be at least one expression.
-	 * @return A match that can be build now
+	 * @param elements the expressions to be returned. Must not be null and be at least
+	 * one expression.
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere with(Collection<IdentifiableElement> elements);
 
 	/**
 	 * Create a match that returns the distinct set of one or more identifiable elements.
-	 *
-	 * @param variables The variables to pass on to the next part
-	 * @return A match that can be build now
+	 * @param variables the variables to pass on to the next part
+	 * @return a match that can be build now
 	 * @see #withDistinct(IdentifiableElement...)
 	 */
 	@CheckReturnValue
@@ -82,9 +80,8 @@ public interface ExposesWith {
 
 	/**
 	 * Create a match that returns the distinct set of one or more identifiable elements.
-	 *
-	 * @param elements The variables to pass on to the next part
-	 * @return A match that can be build now
+	 * @param elements the variables to pass on to the next part
+	 * @return a match that can be build now
 	 * @see #withDistinct(IdentifiableElement...)
 	 */
 	@CheckReturnValue
@@ -94,10 +91,11 @@ public interface ExposesWith {
 
 	/**
 	 * Create a match that returns the distinct set of one or more expressions.
-	 *
-	 * @param expressions The expressions to be returned. Must not be null and be at least one expression.
-	 * @return A match that can be build now
+	 * @param expressions the expressions to be returned. Must not be null and be at least
+	 * one expression.
+	 * @return a match that can be build now
 	 */
 	@CheckReturnValue
 	OrderableOngoingReadingAndWithWithoutWhere withDistinct(Collection<IdentifiableElement> expressions);
+
 }

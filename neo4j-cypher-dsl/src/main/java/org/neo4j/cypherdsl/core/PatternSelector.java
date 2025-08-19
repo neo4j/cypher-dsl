@@ -18,23 +18,27 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
  * A type resenting the {@code SHORTEST} keyword and it's variants.
+ *
  * @author Michael J. Simons
  * @since 2024.7.0
- * @soundtrack Finishing Move Inc. - Doom: The Dark Ages (Original Game Soundtrack)
+ *
  */
 @API(status = STABLE, since = "2024.7.0")
 public sealed interface PatternSelector extends Visitable {
 
-	// Yes, we could use an enum here, but that would lead to two instances with a k, two without,
-	// hence, sealed classes are better as they model what we want to express, and in the visitor
-	// we can use switch with pattern matching on classes at some point in the future for sure.
+	// Yes, we could use an enum here, but that would lead to two instances with a k, two
+	// without,
+	// hence, sealed classes are better as they model what we want to express, and in the
+	// visitor
+	// we can use switch with pattern matching on classes at some point in the future for
+	// sure.
 
 	static PatternSelector shortestK(int k) {
 		if (k <= 0) {
@@ -72,6 +76,7 @@ public sealed interface PatternSelector extends Visitable {
 		public int getK() {
 			return this.k;
 		}
+
 	}
 
 	/**
@@ -81,6 +86,7 @@ public sealed interface PatternSelector extends Visitable {
 
 		private AllShortest() {
 		}
+
 	}
 
 	/**
@@ -90,6 +96,7 @@ public sealed interface PatternSelector extends Visitable {
 
 		private Any() {
 		}
+
 	}
 
 	/**
@@ -106,5 +113,7 @@ public sealed interface PatternSelector extends Visitable {
 		public int getK() {
 			return this.k;
 		}
+
 	}
+
 }

@@ -18,10 +18,10 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * AST representation of the {@literal DISTINCT} keyword.
@@ -36,4 +36,5 @@ public enum Distinct implements Visitable {
 	 * The single instance of the {@code DISTINCT} keyword.
 	 */
 	INSTANCE
+
 }

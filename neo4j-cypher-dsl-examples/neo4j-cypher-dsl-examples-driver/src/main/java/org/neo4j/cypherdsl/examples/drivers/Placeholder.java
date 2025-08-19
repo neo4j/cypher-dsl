@@ -19,8 +19,8 @@
 package org.neo4j.cypherdsl.examples.drivers;
 
 /**
- * Make some Maven mechanism happy that I fail to understand: Without something in `src/main/java`, this project won't
- * appear in the reactor for the test results.
+ * Make some Maven mechanism happy that I fail to understand: Without something in
+ * `src/main/java`, this project won't appear in the reactor for the test results.
  *
  * @author Michael J. Simons
  */
@@ -28,4 +28,5 @@ final class Placeholder {
 
 	private Placeholder() {
 	}
+
 }

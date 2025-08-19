@@ -23,12 +23,17 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 
 /**
+ * Example type.
+ *
  * @author Michael J. Simons
  */
 @NodeEntity
 public class UserSuggestionActivity {
 
-	@Id @GeneratedValue String id;
+	@Id
+	@GeneratedValue
+	String id;
 
 	String userId;
+
 }

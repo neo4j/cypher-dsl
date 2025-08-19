@@ -31,6 +31,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
+ * Example controller.
+ *
  * @author Michael J. Simons
  */
 @RestController
@@ -46,32 +48,35 @@ public class PeopleController {
 	@GetMapping("/details/{name}")
 	public PersonDetails getDetails(@PathVariable String name) {
 
-		return peopleService.findDetails(name)
+		return this.peopleService.findDetails(name)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
 
 	@GetMapping("/findPeopleBornInThe70tiesOr")
 	public Iterable<Person> findPeopleBornInThe70tiesOr(@RequestParam(name = "name") Optional<String> optionalName) {
 
-		return peopleService.findPeopleBornInThe70tiesOr(optionalName);
+		return this.peopleService.findPeopleBornInThe70tiesOr(optionalName);
 	}
 
 	@GetMapping("/v1/findPeopleBornAfterThe70ties")
-	public Iterable<Person> findPeopleBornAfterThe70ties(@RequestParam(name = "conditions") String additionalConditions) {
+	public Iterable<Person> findPeopleBornAfterThe70ties(
+			@RequestParam(name = "conditions") String additionalConditions) {
 
-		return peopleService.findPeopleBornAfterThe70tiesAnd(additionalConditions);
+		return this.peopleService.findPeopleBornAfterThe70tiesAnd(additionalConditions);
 	}
 
 	@GetMapping("/v2/findPeopleBornAfterThe70ties")
-	public Iterable<Person> findPeopleBornAfterThe70tiesV2(@RequestParam(name = "conditions") String additionalConditions) {
+	public Iterable<Person> findPeopleBornAfterThe70tiesV2(
+			@RequestParam(name = "conditions") String additionalConditions) {
 
-		return peopleService.findPeopleBornAfterThe70tiesAndV2(additionalConditions);
+		return this.peopleService.findPeopleBornAfterThe70tiesAndV2(additionalConditions);
 	}
 
 	@PostMapping("/createNewPerson")
 	public Person createNewPerson(@RequestBody NewPersonCmd newPersonCmd) {
 
-		return peopleService.createNewPerson(newPersonCmd)
+		return this.peopleService.createNewPerson(newPersonCmd)
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 	}
+
 }

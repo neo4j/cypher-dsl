@@ -18,28 +18,30 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import java.util.Collection;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 /**
+ * Helper class to create static code describing labels and properties of a
+ * {@code org.neo4j.cypherdsl.core.Node} object.
+ *
  * @author Michael J. Simons
- * @soundtrack Queen - Queen Forever
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")
 public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 
 	/**
-	 * Get a new instance of a node model builder. The instance can be modified as long as no {@code writeToXXX} method
-	 * has been called.
-	 *
-	 * @param configuration     The generators configuration
-	 * @param packageName       A package name, which can be null. In that case, the default package name from the configuration is taken
-	 * @param suggestedTypeName A suggested type name
-	 * @return A new instance without any labels or properties registered.
+	 * Get a new instance of a node model builder. The instance can be modified as long as
+	 * no {@code writeToXXX} method has been called.
+	 * @param configuration the generators configuration
+	 * @param packageName a package name, which can be null. In that case, the default
+	 * package name from the configuration is taken
+	 * @param suggestedTypeName a suggested type name
+	 * @return a new instance without any labels or properties registered.
 	 */
 	static NodeModelBuilder create(Configuration configuration, String packageName, String suggestedTypeName) {
 
@@ -48,58 +50,65 @@ public interface NodeModelBuilder extends ModelBuilder<NodeModelBuilder> {
 
 	/**
 	 * Adds a new label to this builder.
-	 * @param newLabel The new label
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param newLabel the new label
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	NodeModelBuilder addLabel(String newLabel);
 
 	/**
 	 * Adds several new labels to this builder.
-	 * @param newLabels The list of new labels
-	 * @return This builder
- 	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param newLabels the list of new labels
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	NodeModelBuilder addLabels(Collection<String> newLabels);
 
 	/**
-	 * Adds a relationship definition to this builder
-	 * @param definition The definition of a relationship
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * Adds a relationship definition to this builder.
+	 * @param definition the definition of a relationship
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	NodeModelBuilder addRelationshipDefinition(RelationshipPropertyDefinition definition);
 
 	/**
-	 * Adds a factory method for a relationship to this builder
-	 * @param definition The definition of the relationship
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * Adds a factory method for a relationship to this builder.
+	 * @param definition the definition of the relationship
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 * @since 2023.9.0
 	 */
 	NodeModelBuilder addRelationshipFactory(RelationshipFactoryDefinition definition);
 
 	/**
 	 * Adds a model this model should extend.
-	 * @param baseModel The model to extend
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param baseModel the model to extend
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 * @since 2023.9.2
 	 */
 	NodeModelBuilder setBaseNodeModel(NodeModelBuilder baseModel);
-
-	/**
-	 * If true, this model will be extensible.
-	 * @param extensible True if this model should be extensible
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
-	 * @since 2023.9.2
-	 */
-	NodeModelBuilder setExtensible(boolean extensible);
 
 	/**
 	 * Returns {@literal true} when this builder produces extensible modules.
 	 * @return {@literal true} when this builder produces extensible modules
 	 */
 	boolean isExtensible();
+
+	/**
+	 * If true, this model will be extensible.
+	 * @param extensible true if this model should be extensible
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
+	 * @since 2023.9.2
+	 */
+	NodeModelBuilder setExtensible(boolean extensible);
+
 }

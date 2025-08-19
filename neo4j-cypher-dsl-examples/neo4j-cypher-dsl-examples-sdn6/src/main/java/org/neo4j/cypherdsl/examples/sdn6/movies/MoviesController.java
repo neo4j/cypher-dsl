@@ -28,6 +28,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * Example controller.
+ *
  * @author Michael J. Simons
  */
 @RestController
@@ -45,15 +47,16 @@ public final class MoviesController {
 
 	@GetMapping({ "", "/" })
 	public List<Movie> get() {
-		return movieService.findAll();
+		return this.movieService.findAll();
 	}
 
 	@GetMapping({ "/relatedTo/{name}" })
 	public List<Movie> relatedTo(@PathVariable String name) {
 
-		return peopleService.findOne(Example.of(new Person(name, null)))
+		return this.peopleService.findOne(Example.of(new Person(name, null)))
 			.stream()
-			.flatMap(p -> movieService.findAllRelatedTo(p).stream())
+			.flatMap(p -> this.movieService.findAllRelatedTo(p).stream())
 			.collect(Collectors.toList());
 	}
+
 }

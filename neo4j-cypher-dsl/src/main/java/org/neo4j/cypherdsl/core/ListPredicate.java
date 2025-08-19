@@ -18,18 +18,16 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * A list predicate.
  *
  * @author Michael J. Simons
- * @soundtrack Freddie Mercury - Never Boring
- * @since 1.1
- * /
+ * @since 1.1 /
  */
 @API(status = INTERNAL, since = "1.1")
 final class ListPredicate implements Expression {
@@ -40,7 +38,8 @@ final class ListPredicate implements Expression {
 	private final SymbolicName variable;
 
 	/**
-	 * The list expression. No further assertions are taken to check beforehand if it is actually a Cypher List atm.
+	 * The list expression. No further assertions are taken to check beforehand if it is
+	 * actually a Cypher List atm.
 	 */
 	private final Expression listExpression;
 
@@ -70,4 +69,5 @@ final class ListPredicate implements Expression {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
 }

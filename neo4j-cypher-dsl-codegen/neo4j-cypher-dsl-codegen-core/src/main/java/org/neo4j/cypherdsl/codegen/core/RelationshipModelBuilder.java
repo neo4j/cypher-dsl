@@ -18,10 +18,10 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.RelationshipBase;
+
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 /**
  * A variant of a {@link ModelBuilder} responsible for creating classes extending from
@@ -29,7 +29,6 @@ import org.neo4j.cypherdsl.core.RelationshipBase;
  * and their properties.
  *
  * @author Michael J. Simons
- * @soundtrack Queen - Queen Forever
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")
@@ -37,11 +36,10 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 
 	/**
 	 * Start building a new {@link RelationshipModelBuilder}.
-	 *
-	 * @param configuration    Configuration of the generator
-	 * @param packageName      The package name into the model should be generated
-	 * @param relationshipType The type of the relationship
-	 * @return The new builder
+	 * @param configuration configuration of the generator
+	 * @param packageName the package name into the model should be generated
+	 * @param relationshipType the type of the relationship
+	 * @return the new builder
 	 */
 	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType) {
 
@@ -49,55 +47,62 @@ public interface RelationshipModelBuilder extends ModelBuilder<RelationshipModel
 	}
 
 	/**
-	 * Start building a new {@link RelationshipModelBuilder}, including alternate name suggestions.
-	 *
-	 * @param configuration                Configuration of the generator
-	 * @param packageName                  The package name into the model should be generated
-	 * @param relationshipType             The type of the relationship
-	 * @param alternateClassNameSuggestion An alternative suggestion for the class name
-	 * @return The new builder
+	 * Start building a new {@link RelationshipModelBuilder}, including alternate name
+	 * suggestions.
+	 * @param configuration configuration of the generator
+	 * @param packageName the package name into the model should be generated
+	 * @param relationshipType the type of the relationship
+	 * @param alternateClassNameSuggestion an alternative suggestion for the class name
+	 * @return the new builder
 	 */
-	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType, String alternateClassNameSuggestion) {
+	static RelationshipModelBuilder create(Configuration configuration, String packageName, String relationshipType,
+			String alternateClassNameSuggestion) {
 
-		return RelationshipImplBuilder.create(configuration, packageName, relationshipType, alternateClassNameSuggestion);
+		return RelationshipImplBuilder.create(configuration, packageName, relationshipType,
+				alternateClassNameSuggestion);
 	}
 
 	/**
-	 * Registers the start node of a relationship with this builder. Will add a new relationship to this builder if none
-	 * is present, will modify the last one if this method or {@link #setEndNode(NodeModelBuilder)} or
+	 * Registers the start node of a relationship with this builder. Will add a new
+	 * relationship to this builder if none is present, will modify the last one if this
+	 * method or {@link #setEndNode(NodeModelBuilder)} or
 	 * {@link #addRelationship(NodeModelBuilder, NodeModelBuilder)} has already been used.
 	 * <p>
-	 * A wild card will be emitted for the generated class instead of a concrete class so that this relationship model
-	 * suites several different relationships with the same type.
-	 *
-	 * @param startNode The new start node, may be null
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * A wild card will be emitted for the generated class instead of a concrete class so
+	 * that this relationship model suites several different relationships with the same
+	 * type.
+	 * @param startNode the new start node, may be null
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	RelationshipModelBuilder setStartNode(NodeModelBuilder startNode);
 
 	/**
-	 * Registers the end node of the relationship with this builder. Will add a new relationship to this builder if none
-	 * is present, will modify the last one if this method or {@link #setStartNode(NodeModelBuilder)} or
+	 * Registers the end node of the relationship with this builder. Will add a new
+	 * relationship to this builder if none is present, will modify the last one if this
+	 * method or {@link #setStartNode(NodeModelBuilder)} or
 	 * {@link #addRelationship(NodeModelBuilder, NodeModelBuilder)} has already been used.
 	 * <p>
-	 * A wild card will be emitted for the generated class instead of a concrete class so that this relationship model
-	 * suites several different relationships with the same type.
-	 *
-	 * @param endNode The new start node, may be null
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * A wild card will be emitted for the generated class instead of a concrete class so
+	 * that this relationship model suites several different relationships with the same
+	 * type.
+	 * @param endNode the new start node, may be null
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 */
 	RelationshipModelBuilder setEndNode(NodeModelBuilder endNode);
 
 	/**
 	 * Registers a relationship between start and end node with this builder.
-	 *
-	 * @param startNode The new start node, may be null
-	 * @param endNode The new start node, may be null
-	 * @return This builder
-	 * @throws IllegalStateException When this builder has already been used to create Java class.
+	 * @param startNode the new start node, may be null
+	 * @param endNode the new start node, may be null
+	 * @return this builder
+	 * @throws IllegalStateException when this builder has already been used to create
+	 * Java class.
 	 * @since 2023.9.0
 	 */
 	RelationshipModelBuilder addRelationship(NodeModelBuilder startNode, NodeModelBuilder endNode);
+
 }

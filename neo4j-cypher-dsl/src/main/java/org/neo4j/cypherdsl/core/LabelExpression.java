@@ -26,37 +26,32 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * Represents a label expression, usable in {@link Cypher#node(LabelExpression)}.
  *
  * @author Michael J. Simons
- * @param type    whether this is a leaf or another node
+ * @param type whether this is a leaf or another node
  * @param negated a flag if this subtree is negated
- * @param value   a single value or a list of value for {@link Type#COLON_DISJUNCTION} or {@link Type#COLON_CONJUNCTION}
- * @param lhs     the left hand site of this tree
- * @param rhs     the right hand site of this tree
- * @soundtrack The Prodigy - Music For The Jilted Generation
+ * @param value a single value or a list of value for {@link Type#COLON_DISJUNCTION} or
+ * {@link Type#COLON_CONJUNCTION}
+ * @param lhs the left hand site of this tree
+ * @param rhs the right hand site of this tree
  * @since 2023.0.2
  */
-public record LabelExpression(
-	Type type,
-	boolean negated, List<String> value,
-	LabelExpression lhs,
-	LabelExpression rhs
-) implements Visitable {
+public record LabelExpression(Type type, boolean negated, List<String> value, LabelExpression lhs,
+		LabelExpression rhs) implements Visitable {
 
 	/**
 	 * Creates an immutable label expression.
-	 *
-	 * @param type    whether this is a leaf or another node
+	 * @param type whether this is a leaf or another node
 	 * @param negated a flag if this subtree is negated
-	 * @param value   a single value or a list of value for {@link Type#COLON_DISJUNCTION} or {@link Type#COLON_CONJUNCTION}
-	 * @param lhs     the left hand site of this tree
-	 * @param rhs     the right hand site of this tree
+	 * @param value a single value or a list of value for {@link Type#COLON_DISJUNCTION}
+	 * or {@link Type#COLON_CONJUNCTION}
+	 * @param lhs the left hand site of this tree
+	 * @param rhs the right hand site of this tree
 	 */
 	public LabelExpression {
-		value = value == null ? null : List.copyOf(value);
+		value = (value != null) ? List.copyOf(value) : null;
 	}
 
 	/**
-	 * Creates a leaf expression from a string
-	 *
+	 * Creates a leaf expression from a string.
 	 * @param value the leaf value
 	 */
 	public LabelExpression(String value) {
@@ -64,8 +59,7 @@ public record LabelExpression(
 	}
 
 	/**
-	 * Create a conjunction
-	 *
+	 * Create a conjunction.
 	 * @param next the expression to add
 	 * @return a new expression
 	 */
@@ -74,8 +68,7 @@ public record LabelExpression(
 	}
 
 	/**
-	 * Create a disjunction
-	 *
+	 * Create a disjunction.
 	 * @param next the expression to add
 	 * @return a new expression
 	 */
@@ -84,8 +77,7 @@ public record LabelExpression(
 	}
 
 	/**
-	 * Negates this expressio
-	 *
+	 * Negates this expression.
 	 * @return a new expression
 	 */
 	public LabelExpression negate() {
@@ -93,27 +85,28 @@ public record LabelExpression(
 	}
 
 	/**
-	 * Type of this expression
+	 * Type of this expression.
 	 */
 	public enum Type {
+
 		/**
-		 * A leaf
+		 * A leaf.
 		 */
 		LEAF(""),
 		/**
-		 * A list of values, conjugated
+		 * A list of values, conjugated.
 		 */
 		COLON_CONJUNCTION(":"),
 		/**
-		 * A list of values, disjoined
+		 * A list of values, disjoined.
 		 */
 		COLON_DISJUNCTION(":"),
 		/**
-		 * A conjunction
+		 * A conjunction.
 		 */
 		CONJUNCTION("&"),
 		/**
-		 * A disjunction
+		 * A disjunction.
 		 */
 		DISJUNCTION("|");
 
@@ -124,10 +117,11 @@ public record LabelExpression(
 		}
 
 		/**
-		 * @return a representation of this type
+		 * {@return a representation of this type}
 		 */
 		public String getValue() {
-			return value;
+			return this.value;
 		}
+
 	}
 }

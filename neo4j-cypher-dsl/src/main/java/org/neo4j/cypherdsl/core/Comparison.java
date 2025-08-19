@@ -18,13 +18,13 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * A concrete condition representing a comparision between two expressions.
@@ -35,6 +35,19 @@ import org.neo4j.cypherdsl.core.utils.Assertions;
  */
 @API(status = STABLE, since = "1.0")
 public final class Comparison implements Condition {
+
+	private final Expression left;
+
+	private final Operator comparator;
+
+	private final Expression right;
+
+	private Comparison(Expression left, Operator operator, Expression right) {
+
+		this.left = nestedIfCondition(left);
+		this.comparator = operator;
+		this.right = nestedIfCondition(right);
+	}
 
 	static Comparison create(Operator operator, Expression expression) {
 
@@ -58,18 +71,7 @@ public final class Comparison implements Condition {
 	}
 
 	private static Expression nestedIfCondition(Expression expression) {
-		return expression instanceof Condition ? new NestedExpression(expression) : expression;
-	}
-
-	private final Expression left;
-	private final Operator comparator;
-	private final Expression right;
-
-	private Comparison(Expression left, Operator operator, Expression right) {
-
-		this.left = nestedIfCondition(left);
-		this.comparator = operator;
-		this.right = nestedIfCondition(right);
+		return (expression instanceof Condition) ? new NestedExpression(expression) : expression;
 	}
 
 	@Override
@@ -77,12 +79,12 @@ public final class Comparison implements Condition {
 
 		EnterResult result = visitor.enterWithResult(this);
 		if (result == EnterResult.CONTINUE) {
-			if (left != null) {
-				Expressions.nameOrExpression(left).accept(visitor);
+			if (this.left != null) {
+				Expressions.nameOrExpression(this.left).accept(visitor);
 			}
-			comparator.accept(visitor);
-			if (right != null) {
-				Expressions.nameOrExpression(right).accept(visitor);
+			this.comparator.accept(visitor);
+			if (this.right != null) {
+				Expressions.nameOrExpression(this.right).accept(visitor);
 			}
 		}
 		visitor.leave(this);
@@ -103,14 +105,14 @@ public final class Comparison implements Condition {
 		return this.right;
 	}
 
-
 	@Override
 	public Condition not() {
 
 		if (this.comparator == Operator.IS_NULL) {
-			return new Comparison(left, Operator.IS_NOT_NULL, right);
-		} else if (this.comparator == Operator.IS_NOT_NULL) {
-			return new Comparison(left, Operator.IS_NULL, right);
+			return new Comparison(this.left, Operator.IS_NOT_NULL, this.right);
+		}
+		else if (this.comparator == Operator.IS_NOT_NULL) {
+			return new Comparison(this.left, Operator.IS_NULL, this.right);
 		}
 		return Condition.super.not();
 	}
@@ -119,5 +121,5 @@ public final class Comparison implements Condition {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
-}
 
+}

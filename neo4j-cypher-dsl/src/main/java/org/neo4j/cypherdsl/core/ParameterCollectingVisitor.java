@@ -45,25 +45,16 @@ import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
  */
 final class ParameterCollectingVisitor implements Visitor {
 
-	static class ParameterInformation {
-
-		final Set<String> names;
-		final Map<String, Object> values;
-		final Map<String, String> renames;
-
-		ParameterInformation(Set<String> names, Map<String, Object> values, Map<String, String> renames) {
-			this.names = Collections.unmodifiableSet(names);
-			this.values = Collections.unmodifiableMap(values);
-			this.renames = Collections.unmodifiableMap(renames);
-		}
-	}
+	final Map<String, String> parameterMapping = new TreeMap<>();
 
 	private final StatementContext statementContext;
+
 	private final boolean renderConstantsAsParameters;
 
 	private final Set<String> parameterNames = new TreeSet<>();
+
 	private final Map<String, Object> parameterValues = new TreeMap<>();
-	final Map<String, String> parameterMapping = new TreeMap<>();
+
 	private final Map<String, Set<Object>> erroneousParameters = new TreeMap<>();
 
 	private final NameResolvingStrategy nameGenerator;
@@ -74,7 +65,6 @@ final class ParameterCollectingVisitor implements Visitor {
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 	}
 
-
 	@Override
 	public void enter(Visitable segment) {
 
@@ -82,22 +72,21 @@ final class ParameterCollectingVisitor implements Visitor {
 			return;
 		}
 
-		String parameterName = statementContext.getParameterName(parameter);
+		String parameterName = this.statementContext.getParameterName(parameter);
 		Object newValue = parameter.getValue();
 		if (newValue instanceof ConstantParameterHolder constantParameterHolder) {
-			if (!renderConstantsAsParameters) {
+			if (!this.renderConstantsAsParameters) {
 				return;
 			}
 			newValue = constantParameterHolder.getValue();
 		}
 		boolean knownParameterName = !this.parameterNames.add(parameterName);
 		if (!(knownParameterName || parameter.isAnon())) {
-			this.parameterMapping.put(parameterName, nameGenerator.resolve(parameter));
+			this.parameterMapping.put(parameterName, this.nameGenerator.resolve(parameter));
 		}
 
-		Object oldValue = knownParameterName && this.parameterValues.containsKey(parameterName) ?
-			this.parameterValues.get(parameterName) :
-			Parameter.NO_VALUE;
+		Object oldValue = (knownParameterName && this.parameterValues.containsKey(parameterName))
+				? this.parameterValues.get(parameterName) : Parameter.NO_VALUE;
 		if (parameter.hasValue()) {
 			this.parameterValues.put(parameterName, newValue);
 		}
@@ -113,10 +102,27 @@ final class ParameterCollectingVisitor implements Visitor {
 
 	ParameterInformation getResult() {
 
-		if (!erroneousParameters.isEmpty()) {
-			throw new ConflictingParametersException(erroneousParameters);
+		if (!this.erroneousParameters.isEmpty()) {
+			throw new ConflictingParametersException(this.erroneousParameters);
 		}
 
 		return new ParameterInformation(this.parameterNames, this.parameterValues, this.parameterMapping);
 	}
+
+	static final class ParameterInformation {
+
+		final Set<String> names;
+
+		final Map<String, Object> values;
+
+		final Map<String, String> renames;
+
+		ParameterInformation(Set<String> names, Map<String, Object> values, Map<String, String> renames) {
+			this.names = Collections.unmodifiableSet(names);
+			this.values = Collections.unmodifiableMap(values);
+			this.renames = Collections.unmodifiableMap(renames);
+		}
+
+	}
+
 }

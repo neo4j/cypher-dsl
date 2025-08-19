@@ -63,19 +63,20 @@ import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Order;
 import org.neo4j.cypherdsl.core.Parameter;
-import org.neo4j.cypherdsl.core.PatternExpression;
-import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.PatternComprehension;
+import org.neo4j.cypherdsl.core.PatternExpression;
+import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.ProcedureCall;
 import org.neo4j.cypherdsl.core.Properties;
 import org.neo4j.cypherdsl.core.PropertyLookup;
+import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Remove;
 import org.neo4j.cypherdsl.core.Return;
 import org.neo4j.cypherdsl.core.Set;
-import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
+import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.SubqueryExpression;
 import org.neo4j.cypherdsl.core.SymbolicName;
@@ -84,8 +85,6 @@ import org.neo4j.cypherdsl.core.Unwind;
 import org.neo4j.cypherdsl.core.Use;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.With;
-import org.neo4j.cypherdsl.core.internal.NameResolvingStrategy;
-import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 import org.neo4j.cypherdsl.core.ast.ProvidesAffixes;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -95,26 +94,30 @@ import org.neo4j.cypherdsl.core.internal.CaseWhenThen;
 import org.neo4j.cypherdsl.core.internal.ConstantParameterHolder;
 import org.neo4j.cypherdsl.core.internal.Distinct;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
+import org.neo4j.cypherdsl.core.internal.NameResolvingStrategy;
 import org.neo4j.cypherdsl.core.internal.Namespace;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.ReflectiveVisitor;
 import org.neo4j.cypherdsl.core.internal.RelationshipLength;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
 import org.neo4j.cypherdsl.core.internal.RelationshipTypes;
+import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 import org.neo4j.cypherdsl.core.internal.ScopingStrategy;
-import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.internal.UsingPeriodicCommit;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 
 /**
- * This is  a simple (some would  call it naive) implementation  of a visitor to  the Cypher AST created  by the Cypher
- * builder based on the {@link ReflectiveVisitor reflective visitor}.
+ * This is a simple (some would call it naive) implementation of a visitor to the Cypher
+ * AST created by the Cypher builder based on the {@link ReflectiveVisitor reflective
+ * visitor}.
  * <p>
- * It takes care of separating elements of subtrees containing  the element type with a separator and provides pairs of
- * {@code enter} / {@code leave} for the structuring elements of the Cypher AST as needed.
+ * It takes care of separating elements of subtrees containing the element type with a
+ * separator and provides pairs of {@code enter} / {@code leave} for the structuring
+ * elements of the Cypher AST as needed.
  * <p>
- * This rendering  visitor is not  meant to be  used outside framework code,  and we don't  give any guarantees  on the
- * format being output apart from that it works within the constraints of SDN-RX respectively SDN 6 and later.
+ * This rendering visitor is not meant to be used outside framework code, and we don't
+ * give any guarantees on the format being output apart from that it works within the
+ * constraints of SDN-RX respectively SDN 6 and later.
  *
  * @author Michael J. Simons
  * @author Gerrit Meier
@@ -125,15 +128,18 @@ import org.neo4j.cypherdsl.core.internal.YieldItems;
 class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private static final EnumSet<Operator> SKIP_SPACES = EnumSet.of(Operator.EXPONENTIATION, Operator.UNARY_MINUS,
-		Operator.UNARY_PLUS);
+			Operator.UNARY_PLUS);
 
 	/**
 	 * Target of all rendering.
 	 */
 	protected final StringBuilder builder = new StringBuilder();
 
-	record SeparatorAndSupplier(AtomicReference<String> seperator, Supplier<String> supplier) {
-	}
+	/**
+	 * A set of aliased expressions that already have been seen and for which an alias
+	 * must be used on each following appearance.
+	 */
+	protected final java.util.Set<AliasedExpression> visitableToAliased = new HashSet<>();
 
 	/**
 	 * This keeps track on which level of the tree a separator is needed.
@@ -146,13 +152,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private final ScopingStrategy scopingStrategy;
 
 	/**
-	 * A set of aliased expressions that already have been seen and for which an alias must be used on each following
-	 * appearance.
-	 */
-	protected final java.util.Set<AliasedExpression> visitableToAliased = new HashSet<>();
-
-	/**
-	 * Keeps track if currently in an aliased expression so that the content can be skipped when already visited.
+	 * Keeps track if currently in an aliased expression so that the content can be
+	 * skipped when already visited.
 	 */
 	private final Deque<AliasedExpression> currentAliasedElements = new ArrayDeque<>();
 
@@ -166,6 +167,22 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	private final boolean enforceSchema;
 
 	private final Map<String, List<Configuration.RelationshipDefinition>> relationshipDefinitions;
+
+	private final Deque<Boolean> inPatternExpression = new ArrayDeque<>();
+
+	/**
+	 * Rendering parameters is not a config property due to some needs in Spring Data
+	 * Neo4j: This needs to be configured per statement, not per config there.
+	 */
+	private final boolean renderConstantsAsParameters;
+
+	private final boolean alwaysEscapeNames;
+
+	private final Dialect dialect;
+
+	boolean inReturn;
+
+	boolean inSubquery;
 
 	/**
 	 * The current level in the tree of cypher elements.
@@ -187,19 +204,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private boolean inRelationshipCondition = false;
 
-	private final Deque<Boolean> inPatternExpression = new ArrayDeque<>();
-
-	/**
-	 * Rendering parameters is not a config property due to some needs in Spring Data Neo4j: This needs to be configured
-	 * per statement, not per config  there.
-	 */
-	private final boolean renderConstantsAsParameters;
-
-	private final boolean alwaysEscapeNames;
-
-	private final Dialect dialect;
-
 	private boolean inEntity;
+
 	private boolean inPropertyLookup;
 
 	private Relationship.Direction directionOverride;
@@ -213,15 +219,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters,
-		Configuration configuration) {
-		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ?
-			NameResolvingStrategy.useGeneratedNames(statementContext, configuration.getGeneratedNames()) :
-			NameResolvingStrategy.useGivenNames(statementContext);
+			Configuration configuration) {
+		this.nameResolvingStrategy = configuration.isUseGeneratedNames()
+				? NameResolvingStrategy.useGeneratedNames(statementContext, configuration.getGeneratedNames())
+				: NameResolvingStrategy.useGivenNames(statementContext);
 
-		this.scopingStrategy = ScopingStrategy.create(
-			List.of(nameResolvingStrategy::enterScope),
-			List.of(nameResolvingStrategy::leaveScope)
-		);
+		this.scopingStrategy = ScopingStrategy.create(List.of(this.nameResolvingStrategy::enterScope),
+				List.of(this.nameResolvingStrategy::leaveScope));
 
 		this.renderConstantsAsParameters = renderConstantsAsParameters;
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
@@ -232,44 +236,45 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private void enableSeparator(int level, boolean on, Supplier<String> supplier) {
 		if (on) {
-			separatorOnLevel.put(level,
-				new SeparatorAndSupplier(new AtomicReference<>(""), supplier == null ? () -> "" : supplier));
-		} else {
-			separatorOnLevel.remove(level);
+			this.separatorOnLevel.put(level,
+					new SeparatorAndSupplier(new AtomicReference<>(""), (supplier != null) ? supplier : () -> ""));
+		}
+		else {
+			this.separatorOnLevel.remove(level);
 		}
 	}
 
 	private Optional<SeparatorAndSupplier> separatorOnCurrentLevel() {
 
-		return Optional.ofNullable(separatorOnLevel.get(currentLevel));
+		return Optional.ofNullable(this.separatorOnLevel.get(this.currentLevel));
 	}
 
 	@Override
 	protected boolean preEnter(Visitable visitable) {
 
-		Visitable lastAliased = currentAliasedElements.peek();
-		if (skipNodeContent || visitableToAliased.contains(lastAliased)) {
+		Visitable lastAliased = this.currentAliasedElements.peek();
+		if (this.skipNodeContent || this.visitableToAliased.contains(lastAliased)) {
 			return false;
 		}
 
 		if (visitable instanceof AliasedExpression aliasedExpression) {
-			currentAliasedElements.push(aliasedExpression);
+			this.currentAliasedElements.push(aliasedExpression);
 		}
 
-		int nextLevel = ++currentLevel + 1;
+		int nextLevel = ++this.currentLevel + 1;
 		if (visitable instanceof TypedSubtree<?> ts) {
 			enableSeparator(nextLevel, true, ts::separator);
 		}
 
-		separatorOnCurrentLevel().ifPresent(ref -> builder.append(ref.seperator().getAndSet("")));
+		separatorOnCurrentLevel().ifPresent(ref -> this.builder.append(ref.seperator().getAndSet("")));
 
 		if (visitable instanceof ProvidesAffixes providesAffixes) {
 			providesAffixes.getPrefix().ifPresent(this::doWithPrefix);
 		}
 
-		boolean doEnter = !skipNodeContent;
+		boolean doEnter = !this.skipNodeContent;
 		if (doEnter) {
-			scopingStrategy.doEnter(visitable);
+			this.scopingStrategy.doEnter(visitable);
 		}
 		return doEnter;
 	}
@@ -281,7 +286,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return PreEnterResult.skip();
 		}
 
-		Class<? extends Visitor> handlerType = dialect.getHandler(visitable);
+		Class<? extends Visitor> handlerType = this.dialect.getHandler(visitable);
 		if (handlerType != null) {
 			Visitor handler = this.delegateCache.computeIfAbsent(handlerType, this::newHandler);
 			return PreEnterResult.delegateTo(handler);
@@ -293,16 +298,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		try {
 			Constructor<? extends Visitor> ctor = handlerType.getDeclaredConstructor(DefaultVisitor.class);
 			return ctor.newInstance(this);
-		} catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-			throw new IllegalArgumentException(
-				dialect.name() + " has defined an illegal handler not providing a constructor accepting a delegate.");
+		}
+		catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException ex) {
+			throw new IllegalArgumentException(this.dialect.name()
+					+ " has defined an illegal handler not providing a constructor accepting a delegate.");
 		}
 	}
 
 	@Override
 	protected void postLeave(Visitable visitable) {
 
-		scopingStrategy.doLeave(visitable);
+		this.scopingStrategy.doLeave(visitable);
 
 		separatorOnCurrentLevel().ifPresent(ref -> ref.seperator().set(ref.supplier().get()));
 
@@ -311,18 +317,18 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		if (visitable instanceof TypedSubtree) {
-			enableSeparator(currentLevel + 1, false, null);
+			enableSeparator(this.currentLevel + 1, false, null);
 		}
 
-		if (currentAliasedElements.peek() == visitable) {
-			currentAliasedElements.pop();
+		if (this.currentAliasedElements.peek() == visitable) {
+			this.currentAliasedElements.pop();
 		}
 
 		if (visitable instanceof AliasedExpression aliasedExpression) {
-			visitableToAliased.add(aliasedExpression);
+			this.visitableToAliased.add(aliasedExpression);
 		}
 
-		--currentLevel;
+		--this.currentLevel;
 	}
 
 	protected void doWithPrefix(String prefix) {
@@ -335,152 +341,150 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Match match) {
 		if (match.isOptional()) {
-			builder.append("OPTIONAL ");
+			this.builder.append("OPTIONAL ");
 		}
-		builder.append("MATCH ");
+		this.builder.append("MATCH ");
 	}
 
 	void leave(Match match) {
 
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(Where where) {
-		builder.append(" WHERE ");
+		this.builder.append(" WHERE ");
 	}
 
 	void enter(Create create) {
-		builder.append("CREATE ");
+		this.builder.append("CREATE ");
 	}
 
 	void leave(Create create) {
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(Merge merge) {
-		builder.append("MERGE ");
+		this.builder.append("MERGE ");
 	}
 
 	void leave(Merge merge) {
 		if (!merge.hasEvents()) { // The last SET will include this
-			builder.append(" ");
+			this.builder.append(" ");
 		}
 	}
 
 	void enter(MergeAction onCreateOrMatchEvent) {
 		switch (onCreateOrMatchEvent.getType()) {
-			case ON_CREATE -> builder.append("ON CREATE");
-			case ON_MATCH -> builder.append("ON MATCH");
+			case ON_CREATE -> this.builder.append("ON CREATE");
+			case ON_MATCH -> this.builder.append("ON MATCH");
 		}
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(Condition condition) {
-		inRelationshipCondition = condition instanceof RelationshipPatternCondition;
+		this.inRelationshipCondition = condition instanceof RelationshipPatternCondition;
 	}
 
 	void leave(Condition condition) {
-		inRelationshipCondition = false;
+		this.inRelationshipCondition = false;
 	}
 
 	void enter(Distinct distinct) {
-		builder.append("DISTINCT ");
+		this.builder.append("DISTINCT ");
 	}
-
-	boolean inReturn;
 
 	void enter(Return returning) {
 
-		inReturn = true;
+		this.inReturn = true;
 		if (!returning.isRaw()) {
-			builder.append("RETURN ");
+			this.builder.append("RETURN ");
 		}
 	}
 
 	void leave(Return returning) {
-		inReturn = false;
+		this.inReturn = false;
 	}
 
 	void enter(With with) {
-		builder.append("WITH ");
+		this.builder.append("WITH ");
 	}
 
 	void leave(With with) {
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(Delete delete) {
 
 		if (delete.isDetach()) {
-			builder.append("DETACH ");
+			this.builder.append("DETACH ");
 		}
 
-		builder.append("DELETE ");
+		this.builder.append("DELETE ");
 	}
 
 	void leave(Delete match) {
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	boolean inLastReturn() {
-		return inReturn && !inSubquery;
+		return this.inReturn && !this.inSubquery;
 	}
 
 	void enter(AliasedExpression aliased) {
 
 		if (this.visitableToAliased.contains(aliased)) {
-			builder.append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, false, inLastReturn())));
+			this.builder.append(escapeIfNecessary(this.nameResolvingStrategy.resolve(aliased, false, inLastReturn())));
 		}
 	}
 
 	void leave(AliasedExpression aliased) {
 
-		if (!(this.visitableToAliased.contains(aliased) || scopingStrategy.isSkipAliasing())) {
-			builder.append(" AS ").append(escapeIfNecessary(nameResolvingStrategy.resolve(aliased, true, inLastReturn())));
+		if (!(this.visitableToAliased.contains(aliased) || this.scopingStrategy.isSkipAliasing())) {
+			this.builder.append(" AS ")
+				.append(escapeIfNecessary(this.nameResolvingStrategy.resolve(aliased, true, inLastReturn())));
 		}
 	}
 
 	void enter(NestedExpression nested) {
-		builder.append("(");
+		this.builder.append("(");
 	}
 
 	void leave(NestedExpression nested) {
-		builder.append(")");
+		this.builder.append(")");
 	}
 
 	void enter(Order order) {
-		builder.append(" ORDER BY ");
+		this.builder.append(" ORDER BY ");
 	}
 
 	void enter(Skip skip) {
-		builder.append(" SKIP ");
+		this.builder.append(" SKIP ");
 	}
 
 	void enter(Limit limit) {
-		builder.append(" LIMIT ");
+		this.builder.append(" LIMIT ");
 	}
 
 	void enter(SortItem.Direction direction) {
-		builder
-			.append(" ")
-			.append(direction.getSymbol());
+		this.builder.append(" ").append(direction.getSymbol());
 	}
 
 	void enter(PropertyLookup propertyLookup) {
 
-		inPropertyLookup = true;
+		this.inPropertyLookup = true;
 		if (propertyLookup.isDynamicLookup()) {
-			builder.append("[");
-		} else {
-			builder.append(".");
+			this.builder.append("[");
+		}
+		else {
+			this.builder.append(".");
 		}
 	}
 
 	void leave(PropertyLookup propertyLookup) {
 
-		inPropertyLookup = false;
+		this.inPropertyLookup = false;
 		if (propertyLookup.isDynamicLookup()) {
-			builder.append("]");
+			this.builder.append("]");
 		}
 	}
 
@@ -489,23 +493,21 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if ("elementId".equals(functionName)) {
 			functionName = "toString(id";
 		}
-		builder
-			.append(functionName)
-			.append("(");
+		this.builder.append(functionName).append("(");
 	}
 
 	void leave(FunctionInvocation functionInvocation) {
 		String functionName = functionInvocation.getFunctionName();
 		if ("elementId".equals(functionName)) {
-			builder.append(")");
+			this.builder.append(")");
 		}
-		builder.append(")");
+		this.builder.append(")");
 	}
 
 	void enter(Operation operation) {
 
 		if (operation.needsGrouping()) {
-			builder.append("(");
+			this.builder.append("(");
 		}
 	}
 
@@ -518,56 +520,57 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 		boolean skipSpaces = SKIP_SPACES.contains(operator);
 		if (type != Operator.Type.PREFIX && !skipSpaces) {
-			builder.append(" ");
+			this.builder.append(" ");
 		}
-		builder.append(operator.getRepresentation());
+		this.builder.append(operator.getRepresentation());
 		if (type != Operator.Type.POSTFIX && !skipSpaces) {
-			builder.append(" ");
+			this.builder.append(" ");
 		}
 	}
 
 	void leave(Operation operation) {
 
 		if (operation.needsGrouping()) {
-			builder.append(")");
+			this.builder.append(")");
 		}
 	}
 
 	void enter(Literal<?> expression) {
-		builder.append(expression.asString());
+		this.builder.append(expression.asString());
 	}
 
 	void enter(Node node) {
 
-		builder.append("(");
+		this.builder.append("(");
 
 		// This is only relevant for nodes in relationships.
 		// Otherwise, all the labels would be rendered again.
-		skipNodeContent = scopingStrategy.hasVisitedBefore(node);
+		this.skipNodeContent = this.scopingStrategy.hasVisitedBefore(node);
 
-		if (skipNodeContent) {
-			builder.append(nameResolvingStrategy.resolve(
-				node.getSymbolicName().orElseGet(node::getRequiredSymbolicName), true, false));
+		if (this.skipNodeContent) {
+			this.builder.append(this.nameResolvingStrategy
+				.resolve(node.getSymbolicName().orElseGet(node::getRequiredSymbolicName), true, false));
 		}
 
-		inEntity = true;
+		this.inEntity = true;
 	}
 
 	void leave(Node node) {
 
-		builder.append(")");
+		this.builder.append(")");
 
-		skipNodeContent = false;
-		inEntity = false;
+		this.skipNodeContent = false;
+		this.inEntity = false;
 	}
 
 	void enter(NodeLabel nodeLabel) {
 
-		escapeName(nodeLabel.getValue()).ifPresent(label -> builder.append(Symbols.NODE_LABEL_START).append(label));
+		escapeName(nodeLabel.getValue())
+			.ifPresent(label -> this.builder.append(Symbols.NODE_LABEL_START).append(label));
 	}
 
 	void enter(LabelExpression labelExpression) {
-		builder.append(":");
+		this.builder.append(":");
 		renderLabelExpression(labelExpression, null);
 	}
 
@@ -577,50 +580,51 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return;
 		}
 		if (l.negated()) {
-			builder.append("!");
+			this.builder.append("!");
 		}
 		var current = l.type();
 		boolean close = false;
 		if (current != LabelExpression.Type.LEAF) {
 			close = (parent != null || l.negated()) && l.type() != parent;
-			if (close && !l.negated() && (current == LabelExpression.Type.CONJUNCTION || parent == LabelExpression.Type.DISJUNCTION)) {
+			if (close && !l.negated()
+					&& (current == LabelExpression.Type.CONJUNCTION || parent == LabelExpression.Type.DISJUNCTION)) {
 				close = false;
 			}
 		}
 		if (close) {
-			builder.append("(");
+			this.builder.append("(");
 		}
 		renderLabelExpression(l.lhs(), current);
 		if (current == LabelExpression.Type.LEAF) {
-			l.value().forEach(v ->
-				escapeName(v).ifPresent(builder::append)
-			);
-		}  else {
-			builder.append(current.getValue());
+			l.value().forEach(v -> escapeName(v).ifPresent(this.builder::append));
+		}
+		else {
+			this.builder.append(current.getValue());
 		}
 		renderLabelExpression(l.rhs(), current);
 		if (close) {
-			builder.append(")");
+			this.builder.append(")");
 		}
 	}
 
 	void enter(Properties properties) {
 
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(SymbolicName symbolicName) {
-		if (!inRelationshipCondition || nameResolvingStrategy.isResolved(symbolicName)) {
-			if (Boolean.TRUE.equals(inPatternExpression.peek()) && !scopingStrategy.hasVisitedBefore(new Named() {
-				@Override
-				public Optional<SymbolicName> getSymbolicName() {
-					return Optional.of(symbolicName);
-				}
-			})) {
+		if (!this.inRelationshipCondition || this.nameResolvingStrategy.isResolved(symbolicName)) {
+			if (Boolean.TRUE.equals(this.inPatternExpression.peek())
+					&& !this.scopingStrategy.hasVisitedBefore(new Named() {
+						@Override
+						public Optional<SymbolicName> getSymbolicName() {
+							return Optional.of(symbolicName);
+						}
+					})) {
 				return;
 			}
 
-			builder.append(nameResolvingStrategy.resolve(symbolicName, inEntity, inPropertyLookup));
+			this.builder.append(this.nameResolvingStrategy.resolve(symbolicName, this.inEntity, this.inPropertyLookup));
 		}
 	}
 
@@ -633,22 +637,21 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(Relationship relationship) {
-		skipRelationshipContent = scopingStrategy.hasVisitedBefore(relationship);
-		if (enforceSchema && relationship.getDetails().getDirection() != Relationship.Direction.UNI) {
-			directionOverride = computeDirectionOverride(relationship);
+		this.skipRelationshipContent = this.scopingStrategy.hasVisitedBefore(relationship);
+		if (this.enforceSchema && relationship.getDetails().getDirection() != Relationship.Direction.UNI) {
+			this.directionOverride = computeDirectionOverride(relationship);
 		}
 	}
 
 	/**
-	 * Helper to retrieve a nodes label
-	 *
+	 * Helper to retrieve a nodes label.
 	 * @param node the node
-	 * @return A set of labels
+	 * @return a set of labels
 	 */
 	private java.util.Set<String> getLabels(Node node) {
 		var nl = node.getLabels();
 		if (nl.isEmpty()) {
-			var patternElement = scopingStrategy.lookup(node);
+			var patternElement = this.scopingStrategy.lookup(node);
 			if (patternElement instanceof Node boundNode) {
 				nl = boundNode.getLabels();
 			}
@@ -657,9 +660,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	/**
-	 * Computes an overwrite for enforcing a schema
+	 * Computes an overwrite for enforcing a schema.
 	 * @param relationship the relationship to potentially override
-	 * @return A new direction
+	 * @return a new direction
 	 */
 	Relationship.Direction computeDirectionOverride(Relationship relationship) {
 		var sourceLabels = getLabels(relationship.getLeft());
@@ -672,22 +675,22 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		}
 
 		for (String type : details.getTypes()) {
-			outer:
-			if (relationshipDefinitions.containsKey(type)) {
-				var knownRelationships = relationshipDefinitions.get(type).stream().toList();
+			outer: if (this.relationshipDefinitions.containsKey(type)) {
+				var knownRelationships = this.relationshipDefinitions.get(type).stream().toList();
 				for (var knownRelationship : knownRelationships) {
 					if (knownRelationship.selfReferential() && (sourceLabels.isEmpty() || targetLabels.isEmpty())) {
 						break outer;
 					}
-					if (
-						sourceLabels.contains(knownRelationship.targetLabel()) && (targetLabels.isEmpty() || targetLabels.contains(knownRelationship.sourceLabel())) ||
-						targetLabels.contains(knownRelationship.sourceLabel()) && (sourceLabels.isEmpty() || sourceLabels.contains(knownRelationship.sourceLabel()))
-					) {
+					if (sourceLabels.contains(knownRelationship.targetLabel())
+							&& (targetLabels.isEmpty() || targetLabels.contains(knownRelationship.sourceLabel()))
+							|| targetLabels.contains(knownRelationship.sourceLabel()) && (sourceLabels.isEmpty()
+									|| sourceLabels.contains(knownRelationship.sourceLabel()))) {
 						return Relationship.Direction.RTL;
-					} else if (
-						sourceLabels.contains(knownRelationship.sourceLabel()) && (targetLabels.isEmpty() || targetLabels.contains(knownRelationship.targetLabel())) ||
-						targetLabels.contains(knownRelationship.targetLabel()) && (sourceLabels.isEmpty() || sourceLabels.contains(knownRelationship.sourceLabel()))
-					) {
+					}
+					else if (sourceLabels.contains(knownRelationship.sourceLabel())
+							&& (targetLabels.isEmpty() || targetLabels.contains(knownRelationship.targetLabel()))
+							|| targetLabels.contains(knownRelationship.targetLabel()) && (sourceLabels.isEmpty()
+									|| sourceLabels.contains(knownRelationship.sourceLabel()))) {
 						return Relationship.Direction.LTR;
 					}
 				}
@@ -699,9 +702,12 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (details.getTypes().isEmpty()) {
 			var knownRelationships = this.relationshipDefinitions.values().stream().flatMap(List::stream).toList();
 			for (var knownRelationship : knownRelationships) {
-				if (sourceLabels.contains(knownRelationship.targetLabel()) && targetLabels.contains(knownRelationship.sourceLabel())) {
+				if (sourceLabels.contains(knownRelationship.targetLabel())
+						&& targetLabels.contains(knownRelationship.sourceLabel())) {
 					return Relationship.Direction.RTL;
-				} else if (sourceLabels.contains(knownRelationship.sourceLabel()) && targetLabels.contains(knownRelationship.targetLabel())) {
+				}
+				else if (sourceLabels.contains(knownRelationship.sourceLabel())
+						&& targetLabels.contains(knownRelationship.targetLabel())) {
 					return Relationship.Direction.LTR;
 				}
 			}
@@ -712,31 +718,31 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Relationship.Details details) {
 
-		Relationship.Direction direction = Optional.ofNullable(directionOverride).orElseGet(details::getDirection);
-		builder.append(direction.getSymbolLeft());
+		Relationship.Direction direction = Optional.ofNullable(this.directionOverride).orElseGet(details::getDirection);
+		this.builder.append(direction.getSymbolLeft());
 		if (details.hasContent()) {
-			builder.append("[");
+			this.builder.append("[");
 		}
 
-		inEntity = true;
+		this.inEntity = true;
 	}
 
 	void enter(RelationshipTypes types) {
 
-		if (skipRelationshipContent) {
+		if (this.skipRelationshipContent) {
 			return;
 		}
 
-		builder
-			.append(types.getValues().stream()
-				.map(this::escapeName)
-				.map(Optional::orElseThrow)
-				.collect(Collectors.joining(Symbols.REL_TYP_SEPARATOR, Symbols.REL_TYPE_START, "")));
+		this.builder.append(types.getValues()
+			.stream()
+			.map(this::escapeName)
+			.map(Optional::orElseThrow)
+			.collect(Collectors.joining(Symbols.REL_TYP_SEPARATOR, Symbols.REL_TYPE_START, "")));
 	}
 
 	void enter(RelationshipLength length) {
 
-		if (skipRelationshipContent) {
+		if (this.skipRelationshipContent) {
 			return;
 		}
 
@@ -744,7 +750,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		Integer maximum = length.getMaximum();
 
 		if (length.isUnbounded()) {
-			builder.append("*");
+			this.builder.append("*");
 			return;
 		}
 
@@ -752,312 +758,315 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return;
 		}
 
-		builder.append("*");
+		this.builder.append("*");
 		if (minimum != null) {
-			builder.append(minimum);
+			this.builder.append(minimum);
 		}
-		builder.append("..");
+		this.builder.append("..");
 		if (maximum != null) {
-			builder.append(maximum);
+			this.builder.append(maximum);
 		}
 	}
 
 	void leave(Relationship.Details details) {
 
-		Relationship.Direction direction = Optional.ofNullable(directionOverride).orElseGet(details::getDirection);
+		Relationship.Direction direction = Optional.ofNullable(this.directionOverride).orElseGet(details::getDirection);
 		if (details.hasContent()) {
-			builder.append("]");
+			this.builder.append("]");
 		}
-		builder.append(direction.getSymbolRight());
+		this.builder.append(direction.getSymbolRight());
 
-		inEntity = false;
+		this.inEntity = false;
 	}
 
 	void leave(Relationship relationship) {
 
-		skipRelationshipContent = false;
-		directionOverride = null;
+		this.skipRelationshipContent = false;
+		this.directionOverride = null;
 	}
 
 	void enter(Parameter<?> parameter) {
 
 		Object value = parameter.getValue();
-		if (value instanceof ConstantParameterHolder constantParameterHolder && !renderConstantsAsParameters) {
-			builder.append(constantParameterHolder.asString());
-		} else {
-			builder.append("$").append(nameResolvingStrategy.resolve(parameter));
+		if (value instanceof ConstantParameterHolder constantParameterHolder && !this.renderConstantsAsParameters) {
+			this.builder.append(constantParameterHolder.asString());
+		}
+		else {
+			this.builder.append("$").append(this.nameResolvingStrategy.resolve(parameter));
 		}
 	}
 
 	void enter(MapExpression map) {
 
-		builder.append("{");
+		this.builder.append("{");
 	}
 
 	void enter(KeyValueMapEntry map) {
 
-		builder.append(escapeIfNecessary(map.getKey())).append(": ");
+		this.builder.append(escapeIfNecessary(map.getKey())).append(": ");
 	}
 
 	void leave(MapExpression map) {
 
-		builder.append("}");
+		this.builder.append("}");
 	}
 
 	void enter(ListExpression list) {
 
-		builder.append("[");
+		this.builder.append("[");
 	}
 
 	void leave(ListExpression list) {
 
-		builder.append("]");
+		this.builder.append("]");
 	}
 
 	void enter(Unwind unwind) {
 
-		builder.append("UNWIND ");
+		this.builder.append("UNWIND ");
 	}
 
 	void leave(Unwind unwind) {
 
-		builder
-			.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(UnionPart unionPart) {
 
-		builder.append(" UNION ");
+		this.builder.append(" UNION ");
 		if (unionPart.isAll()) {
-			builder.append("ALL ");
+			this.builder.append("ALL ");
 		}
 	}
 
 	void enter(Set set) {
 
-		builder.append("SET ");
+		this.builder.append("SET ");
 	}
 
 	void leave(Set set) {
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(Remove remove) {
 
-		builder.append("REMOVE ");
+		this.builder.append("REMOVE ");
 	}
 
 	void leave(Remove remove) {
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(PatternComprehension patternComprehension) {
-		builder.append("[");
+		this.builder.append("[");
 	}
 
 	void leave(PatternComprehension patternComprehension) {
-		builder.append("]");
+		this.builder.append("]");
 	}
 
 	void enter(ListComprehension listComprehension) {
-		builder.append("[");
+		this.builder.append("[");
 	}
 
 	void leave(ListComprehension listComprehension) {
-		builder.append("]");
+		this.builder.append("]");
 	}
 
 	void enter(Case genericCase) {
-		builder.append("CASE");
+		this.builder.append("CASE");
 	}
 
 	void enter(Case.SimpleCase simpleCase) {
-		builder.append("CASE ");
+		this.builder.append("CASE ");
 	}
 
 	void enter(CaseWhenThen caseWhenExpression) {
-		builder.append(" WHEN ");
+		this.builder.append(" WHEN ");
 	}
 
 	void leave(CaseWhenThen caseWhenExpression) {
-		builder.append(" THEN ");
+		this.builder.append(" THEN ");
 	}
 
 	void enter(CaseElse caseElseExpression) {
-		builder.append(" ELSE ");
+		this.builder.append(" ELSE ");
 	}
 
 	void leave(Case caseExpression) {
-		builder.append(" END");
+		this.builder.append(" END");
 	}
 
 	void enter(ProcedureCall procedureCall) {
 
-		builder.append("CALL ");
+		this.builder.append("CALL ");
 	}
 
 	void leave(Namespace namespace) {
 
-		builder.append(".");
+		this.builder.append(".");
 	}
 
 	void leave(ProcedureName procedureName) {
 
-		builder.append(procedureName.getValue());
+		this.builder.append(procedureName.getValue());
 	}
 
 	void enter(YieldItems yieldItems) {
 
-		builder.append(" YIELD ");
+		this.builder.append(" YIELD ");
 	}
 
 	void leave(ProcedureCall procedureCall) {
 
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(Enum<?> anEnum) {
 
-		builder.append(anEnum.name().replace("_", " ")).append(" ");
+		this.builder.append(anEnum.name().replace("_", " ")).append(" ");
 	}
 
-	boolean inSubquery;
 	void enter(Subquery subquery) {
 
 		this.inSubquery = true;
-		builder.append("CALL {");
+		this.builder.append("CALL {");
 	}
 
 	void leave(Subquery subquery) {
 
 		this.inSubquery = false;
-		int l = builder.length() - 1;
-		if (builder.charAt(l) == ' ' && !subquery.doesReturnOrYield()) {
-			builder.replace(l, builder.length(), "} ");
-		} else {
-			builder.append("} ");
+		int l = this.builder.length() - 1;
+		if (this.builder.charAt(l) == ' ' && !subquery.doesReturnOrYield()) {
+			this.builder.replace(l, this.builder.length(), "} ");
+		}
+		else {
+			this.builder.append("} ");
 		}
 	}
 
 	void leave(InTransactions inTransactions) {
 
-		int l = builder.length() - 1;
-		if (builder.charAt(l) != ' ') {
-			builder.append(" ");
+		int l = this.builder.length() - 1;
+		if (this.builder.charAt(l) != ' ') {
+			this.builder.append(" ");
 		}
-		builder.append("IN TRANSACTIONS ");
+		this.builder.append("IN TRANSACTIONS ");
 		if (inTransactions.getRows() != null) {
-			builder.append("OF ").append(inTransactions.getRows()).append(" ROWS ");
+			this.builder.append("OF ").append(inTransactions.getRows()).append(" ROWS ");
 		}
 	}
 
 	void enter(Foreach foreach) {
 
-		builder.append("FOREACH (");
+		this.builder.append("FOREACH (");
 	}
 
 	void leave(Foreach foreach) {
 
-		builder.setCharAt(builder.length() - 1, ')'); // replace trailing space with ')'
-		builder.append(" ");
+		this.builder.setCharAt(this.builder.length() - 1, ')'); // replace trailing space
+																// with ')'
+		this.builder.append(" ");
 	}
 
 	void enter(SubqueryExpression subquery) {
 
 		if (subquery instanceof CountExpression) {
-			builder.append("COUNT");
-		} else if (subquery instanceof ExistentialSubquery) {
-			builder.append("EXISTS");
-		} else if (subquery instanceof CollectExpression) {
-			builder.append("COLLECT");
+			this.builder.append("COUNT");
 		}
-		builder.append(" { ");
+		else if (subquery instanceof ExistentialSubquery) {
+			this.builder.append("EXISTS");
+		}
+		else if (subquery instanceof CollectExpression) {
+			this.builder.append("COLLECT");
+		}
+		this.builder.append(" { ");
 	}
 
 	void leave(SubqueryExpression subquery) {
 
-		// Trimming the inner match without having to do this in the match (looking up if inside subquery).
-		if (builder.charAt(builder.length() - 1) == ' ') {
-			builder.replace(builder.length() - 1, builder.length(), " }");
-		} else {
-			builder.append(" }");
+		// Trimming the inner match without having to do this in the match (looking up if
+		// inside subquery).
+		if (this.builder.charAt(this.builder.length() - 1) == ' ') {
+			this.builder.replace(this.builder.length() - 1, this.builder.length(), " }");
+		}
+		else {
+			this.builder.append(" }");
 		}
 	}
 
 	void enter(Hint hint) {
 
-		builder.append(" USING ");
+		this.builder.append(" USING ");
 	}
 
 	void enter(LoadCSV loadCSV) {
 
-		builder.append("LOAD CSV");
+		this.builder.append("LOAD CSV");
 		if (loadCSV.isWithHeaders()) {
-			builder.append(" WITH HEADERS");
+			this.builder.append(" WITH HEADERS");
 		}
-		builder.append(" FROM '")
-			.append(loadCSV.getUri().toString())
-			.append("' AS ")
-			.append(loadCSV.getAlias());
+		this.builder.append(" FROM '").append(loadCSV.getUri().toString()).append("' AS ").append(loadCSV.getAlias());
 
 		if (loadCSV.getFieldTerminator() != null) {
-			builder.append(" FIELDTERMINATOR '")
-				.append(loadCSV.getFieldTerminator())
-				.append("'");
+			this.builder.append(" FIELDTERMINATOR '").append(loadCSV.getFieldTerminator()).append("'");
 		}
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(UsingPeriodicCommit usingPeriodicCommit) {
 
-		builder.append("USING PERIODIC COMMIT ");
+		this.builder.append("USING PERIODIC COMMIT ");
 		if (usingPeriodicCommit.rate() != null) {
-			builder.append(usingPeriodicCommit.rate()).append(" ");
+			this.builder.append(usingPeriodicCommit.rate()).append(" ");
 		}
 	}
 
 	void enter(Use use) {
-		builder.append("USE ");
+		this.builder.append("USE ");
 		if (use.dynamic()) {
-			builder.append("graph.byName(");
+			this.builder.append("graph.byName(");
 		}
 	}
 
 	void leave(Use use) {
 		if (use.dynamic()) {
-			builder.append(")");
+			this.builder.append(")");
 		}
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(PatternSelector shortest) {
 
 		if (shortest instanceof PatternSelector.ShortestK shortestK) {
-			builder.append("SHORTEST ").append(shortestK.getK());
-		} else if (shortest instanceof PatternSelector.ShortestKGroups shortestK) {
-			builder.append("SHORTEST ").append(shortestK.getK()).append(" GROUPS");
-		} else if (shortest instanceof PatternSelector.AllShortest) {
-			builder.append("ALL SHORTEST");
-		} else if (shortest instanceof PatternSelector.Any) {
-			builder.append("ANY");
+			this.builder.append("SHORTEST ").append(shortestK.getK());
+		}
+		else if (shortest instanceof PatternSelector.ShortestKGroups shortestK) {
+			this.builder.append("SHORTEST ").append(shortestK.getK()).append(" GROUPS");
+		}
+		else if (shortest instanceof PatternSelector.AllShortest) {
+			this.builder.append("ALL SHORTEST");
+		}
+		else if (shortest instanceof PatternSelector.Any) {
+			this.builder.append("ANY");
 		}
 	}
 
 	void leave(PatternSelector shortest) {
-		builder.append(" ");
+		this.builder.append(" ");
 	}
 
 	void enter(QuantifiedPathPattern.TargetPattern qpp) {
-		builder.append("(");
+		this.builder.append("(");
 	}
 
 	void leave(QuantifiedPathPattern.TargetPattern qpp) {
-		builder.append(")");
+		this.builder.append(")");
 	}
 
 	void enter(QuantifiedPathPattern.Quantifier quantifier) {
 
-		builder.append(quantifier.toString());
+		this.builder.append(quantifier.toString());
 	}
 
 	@Override
@@ -1066,19 +1075,23 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	/**
-	 * Escapes a symbolic name. Such a symbolic name is either used for a nodes label, the type of a relationship or a
-	 * variable.
-	 *
-	 * @param unescapedName The name to escape.
-	 * @return An empty optional when the unescaped name is {@literal null}, otherwise the correctly escaped name, safe to be used in statements.
+	 * Escapes a symbolic name. Such a symbolic name is either used for a nodes label, the
+	 * type of a relationship or a variable.
+	 * @param unescapedName the name to escape.
+	 * @return an empty optional when the unescaped name is {@literal null}, otherwise the
+	 * correctly escaped name, safe to be used in statements.
 	 */
 	protected final Optional<String> escapeName(String unescapedName) {
 
-		return SchemaNamesBridge.sanitize(unescapedName, alwaysEscapeNames);
+		return SchemaNamesBridge.sanitize(unescapedName, this.alwaysEscapeNames);
 	}
 
 	protected final String escapeIfNecessary(String potentiallyNonIdentifier) {
 
 		return SchemaNamesBridge.sanitize(potentiallyNonIdentifier, false).orElse(null);
 	}
+
+	record SeparatorAndSupplier(AtomicReference<String> seperator, Supplier<String> supplier) {
+	}
+
 }

@@ -18,35 +18,21 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.EXPERIMENTAL;
-
 import java.util.Objects;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 /**
- * Represents a property name: With a name in the graph and an optional name in the domain model.
+ * Represents a property name: With a name in the graph and an optional name in the domain
+ * model.
  *
  * @author Michael J. Simons
  * @since 2021.1.0
  */
 @API(status = EXPERIMENTAL, since = "2021.1.0")
 public final class PropertyDefinition {
-
-	/**
-	 * Creates a new property definition.
-	 *
-	 * @param nameInGraph          Required name in graph.
-	 * @param optionalNameInDomain Optional in domain
-	 * @return A working definition
-	 */
-	public static PropertyDefinition create(String nameInGraph, String optionalNameInDomain) {
-
-		if (nameInGraph == null || nameInGraph.isBlank()) {
-			throw new IllegalArgumentException("The name of the property in the graph must not be null or empty.");
-		}
-		return new PropertyDefinition(nameInGraph, optionalNameInDomain);
-	}
 
 	/**
 	 * Name of the property inside the graph.
@@ -64,17 +50,31 @@ public final class PropertyDefinition {
 	}
 
 	/**
-	 * @return The name as defined in the future graph
+	 * Creates a new property definition.
+	 * @param nameInGraph required name in graph.
+	 * @param optionalNameInDomain optional in domain
+	 * @return a working definition
 	 */
-	public String getNameInGraph() {
-		return nameInGraph;
+	public static PropertyDefinition create(String nameInGraph, String optionalNameInDomain) {
+
+		if (nameInGraph == null || nameInGraph.isBlank()) {
+			throw new IllegalArgumentException("The name of the property in the graph must not be null or empty.");
+		}
+		return new PropertyDefinition(nameInGraph, optionalNameInDomain);
 	}
 
 	/**
-	 * @return The name as defined in the domain object (most likely the field name)
+	 * {@return the name as defined in the future graph}
+	 */
+	public String getNameInGraph() {
+		return this.nameInGraph;
+	}
+
+	/**
+	 * {@return the name as defined in the domain object (most likely the field name)}
 	 */
 	public String getNameInDomain() {
-		return nameInDomain;
+		return this.nameInDomain;
 	}
 
 	@Override
@@ -86,11 +86,12 @@ public final class PropertyDefinition {
 			return false;
 		}
 		PropertyDefinition that = (PropertyDefinition) o;
-		return nameInGraph.equals(that.nameInGraph) && Objects.equals(nameInDomain, that.nameInDomain);
+		return this.nameInGraph.equals(that.nameInGraph) && Objects.equals(this.nameInDomain, that.nameInDomain);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(nameInGraph, nameInDomain);
+		return Objects.hash(this.nameInGraph, this.nameInDomain);
 	}
+
 }

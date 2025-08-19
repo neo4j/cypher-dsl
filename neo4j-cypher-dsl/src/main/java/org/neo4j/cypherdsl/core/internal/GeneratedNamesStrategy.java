@@ -38,20 +38,12 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.renderer.Configuration.GeneratedNames;
 
 /**
+ * A strategy that generates unique names per scope for named items in a statement.
+ *
  * @author Michael J. Simons
  * @since 2023.2.0
  */
 final class GeneratedNamesStrategy implements NameResolvingStrategy {
-
-	record Key(Object value) {
-
-		static Key of(Object o) {
-			if (o instanceof AliasedExpression aliasedExpression) {
-				return new Key(aliasedExpression.asName());
-			}
-			return new Key(o);
-		}
-	}
 
 	/**
 	 * Unscoped counter for parameters.
@@ -69,7 +61,8 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	private final Deque<Map<Key, String>> scopedNameLookup = new ArrayDeque<>();
 
 	/**
-	 * Used names that are either brought into a child scope or exported into the containing scope.
+	 * Used names that are either brought into a child scope or exported into the
+	 * containing scope.
 	 */
 	private final Deque<Set<String>> scopedNamesUsed = new ArrayDeque<>();
 
@@ -84,10 +77,10 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	}
 
 	/**
-	 * @return the lookup table for names in the current scope
+	 * {@return the lookup table for names in the current scope}
 	 */
 	Map<Key, String> nameLookup() {
-		return Objects.requireNonNull(scopedNameLookup.peek());
+		return Objects.requireNonNull(this.scopedNameLookup.peek());
 	}
 
 	@Override
@@ -96,7 +89,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 		var newNameLookup = new HashMap<Key, String>();
 		var newUsedNames = new HashSet<String>();
 
-		var outerNameLookup = scopedNameLookup.peek();
+		var outerNameLookup = this.scopedNameLookup.peek();
 		if (outerNameLookup != null) {
 			for (IdentifiableElement anImport : imports) {
 				var theKey = Key.of(anImport);
@@ -126,9 +119,11 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 			var theKey = Key.of(anExport);
 			if (innerNameLookup.containsKey(theKey)) {
 				outerNameLookup.put(theKey, innerNameLookup.get(theKey));
-			} else if (anExport instanceof AliasedExpression name) {
+			}
+			else if (anExport instanceof AliasedExpression name) {
 				outerNameLookup.put(theKey, name.getAlias());
-			} else if (anExport instanceof SymbolicName name) {
+			}
+			else if (anExport instanceof SymbolicName name) {
 				outerNameLookup.put(theKey, name.getValue());
 			}
 		}
@@ -139,19 +134,21 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	public String resolve(SymbolicName symbolicName, boolean inEntity, boolean inPropertyLookup) {
 
 		if (inPropertyLookup) {
-			return statementContext.resolve(symbolicName);
+			return this.statementContext.resolve(symbolicName);
 		}
 
 		// Maybe it has been used as an alias, so we can't skip early
 		var theKey = Key.of(symbolicName);
 		var nameLookup = nameLookup();
 
-		if (!config.contains(GeneratedNames.ENTITY_NAMES) || (!inEntity && !config.contains(GeneratedNames.ALL_ALIASES) && !config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY))) {
+		if (!this.config.contains(GeneratedNames.ENTITY_NAMES)
+				|| (!inEntity && !this.config.contains(GeneratedNames.ALL_ALIASES)
+						&& !this.config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY))) {
 			// Not using nameLookup.getOrDefault() to not resolve the name early
 			if (nameLookup.containsKey(theKey)) {
 				return nameLookup.get(theKey);
 			}
-			return statementContext.resolve(symbolicName);
+			return this.statementContext.resolve(symbolicName);
 		}
 
 		return nameLookup.computeIfAbsent(theKey, key -> newName());
@@ -160,25 +157,28 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	private String newName() {
 
 		String name;
-		var namesUsed = Objects.requireNonNull(scopedNamesUsed.peek());
+		var namesUsed = Objects.requireNonNull(this.scopedNamesUsed.peek());
 		var variableCount = Objects.requireNonNull(this.scopedVariableCount.peek());
 		do {
 			name = String.format("v%d", variableCount.getAndIncrement());
-		} while (namesUsed.contains(name));
+		}
+		while (namesUsed.contains(name));
 		return name;
 	}
 
 	@Override
 	public String resolve(AliasedExpression aliasedExpression, boolean isNew, boolean inLastReturn) {
 
-		if (!(config.contains(GeneratedNames.ALL_ALIASES) || (config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY) && !inLastReturn))) {
+		if (!(this.config.contains(GeneratedNames.ALL_ALIASES)
+				|| (this.config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY) && !inLastReturn))) {
 			return aliasedExpression.getAlias();
 		}
 
 		var nameLookup = nameLookup();
-		if (config.contains(GeneratedNames.REUSE_ALIASES)) {
+		if (this.config.contains(GeneratedNames.REUSE_ALIASES)) {
 			return nameLookup.computeIfAbsent(Key.of(aliasedExpression), key -> newName());
-		} else {
+		}
+		else {
 			var result = newName();
 			nameLookup().put(Key.of(aliasedExpression), result);
 			return result;
@@ -188,20 +188,30 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 	@Override
 	public String resolve(Parameter<?> parameter) {
 
-		if (!config.contains(GeneratedNames.PARAMETER_NAMES)) {
-			return statementContext.getParameterName(parameter);
+		if (!this.config.contains(GeneratedNames.PARAMETER_NAMES)) {
+			return this.statementContext.getParameterName(parameter);
 		}
 
-		return nameLookup().computeIfAbsent(
-			Key.of(parameter),
-			key -> {
-				var p = (Parameter<?>) key.value();
-				return !p.isAnon() ? String.format("p%d", parameterCount.getAndIncrement()) : statementContext.getParameterName(p);
-			});
+		return nameLookup().computeIfAbsent(Key.of(parameter), key -> {
+			var p = (Parameter<?>) key.value();
+			return !p.isAnon() ? String.format("p%d", this.parameterCount.getAndIncrement())
+					: this.statementContext.getParameterName(p);
+		});
 	}
 
 	@Override
 	public boolean isResolved(SymbolicName symbolicName) {
-		return statementContext.isResolved(symbolicName);
+		return this.statementContext.isResolved(symbolicName);
 	}
+
+	record Key(Object value) {
+
+		static Key of(Object o) {
+			if (o instanceof AliasedExpression aliasedExpression) {
+				return new Key(aliasedExpression.asName());
+			}
+			return new Key(o);
+		}
+	}
+
 }

@@ -18,10 +18,10 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.internal.RelationshipPatternCondition;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Shared interface for all conditions.
@@ -34,9 +34,8 @@ public interface Condition extends Expression {
 
 	/**
 	 * Adds a condition to this condition with an {@literal AND}.
-	 *
-	 * @param condition The new condition to add, must not be {@literal null}.
-	 * @return A new condition.
+	 * @param condition the new condition to add, must not be {@literal null}.
+	 * @return a new condition.
 	 */
 	default Condition and(Condition condition) {
 		return CompoundCondition.create(this, Operator.AND, condition);
@@ -44,9 +43,8 @@ public interface Condition extends Expression {
 
 	/**
 	 * Adds a condition to this condition with an {@literal OR}.
-	 *
-	 * @param condition The new condition to add, must not be {@literal null}.
-	 * @return A new condition.
+	 * @param condition the new condition to add, must not be {@literal null}.
+	 * @return a new condition.
 	 */
 	default Condition or(Condition condition) {
 		return CompoundCondition.create(this, Operator.OR, condition);
@@ -54,9 +52,8 @@ public interface Condition extends Expression {
 
 	/**
 	 * Adds a condition to this condition with a {@literal XOR}.
-	 *
-	 * @param condition The new condition to add, must not be {@literal null}.
-	 * @return A new condition.
+	 * @param condition the new condition to add, must not be {@literal null}.
+	 * @return a new condition.
 	 */
 	default Condition xor(Condition condition) {
 		return CompoundCondition.create(this, Operator.XOR, condition);
@@ -64,12 +61,13 @@ public interface Condition extends Expression {
 
 	/**
 	 * Adds a condition based on a path pattern to this condition with an {@literal AND}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using path patterns in WHERE</a>.
-	 *
-	 * @param pathPattern The path pattern to add to the where clause.
-	 *                    This path pattern must not be {@literal null} and must
-	 *                    not introduce new variables not available in the match.
-	 * @return A new condition.
+	 * See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using
+	 * path patterns in WHERE</a>.
+	 * @param pathPattern the path pattern to add to the where clause. This path pattern
+	 * must not be {@literal null} and must not introduce new variables not available in
+	 * the match.
+	 * @return a new condition.
 	 * @since 1.0.1
 	 */
 	default Condition and(RelationshipPattern pathPattern) {
@@ -78,12 +76,13 @@ public interface Condition extends Expression {
 
 	/**
 	 * Adds a condition based on a path pattern to this condition with an {@literal OR}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using path patterns in WHERE</a>.
-	 *
-	 * @param pathPattern The path pattern to add to the where clause.
-	 *                    This path pattern must not be {@literal null} and must
-	 *                    not introduce new variables not available in the match.
-	 * @return A new condition.
+	 * See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using
+	 * path patterns in WHERE</a>.
+	 * @param pathPattern the path pattern to add to the where clause. This path pattern
+	 * must not be {@literal null} and must not introduce new variables not available in
+	 * the match.
+	 * @return a new condition.
 	 * @since 1.0.1
 	 */
 	default Condition or(RelationshipPattern pathPattern) {
@@ -92,12 +91,13 @@ public interface Condition extends Expression {
 
 	/**
 	 * Adds a condition based on a path pattern to this condition with a {@literal XOR}.
-	 * See <a href="https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using path patterns in WHERE</a>.
-	 *
-	 * @param pathPattern The path pattern to add to the where clause.
-	 *                    This path pattern must not be {@literal null} and must
-	 *                    not introduce new variables not available in the match.
-	 * @return A new condition.
+	 * See <a href=
+	 * "https://neo4j.com/docs/cypher-manual/4.0/clauses/where/#query-where-patterns">Using
+	 * path patterns in WHERE</a>.
+	 * @param pathPattern the path pattern to add to the where clause. This path pattern
+	 * must not be {@literal null} and must not introduce new variables not available in
+	 * the match.
+	 * @return a new condition.
 	 * @since 1.0.1
 	 */
 	default Condition xor(RelationshipPattern pathPattern) {
@@ -106,10 +106,10 @@ public interface Condition extends Expression {
 
 	/**
 	 * Negates this condition.
-	 *
-	 * @return A new condition.
+	 * @return a new condition.
 	 */
 	default Condition not() {
 		return Comparison.create(Operator.NOT, this);
 	}
+
 }

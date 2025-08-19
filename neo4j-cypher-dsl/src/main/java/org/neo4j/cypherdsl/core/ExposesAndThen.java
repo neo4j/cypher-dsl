@@ -20,12 +20,14 @@ package org.neo4j.cypherdsl.core;
 
 /**
  * Allows chaining of statements to some other builders.
+ *
+ * @param <S> the source type of the builder that ultimately builds the statement ("SELF")
+ * @param <R> the result type of the statement
  * @author Michael J. Simons
- * @param <S> The source type of the builder that ultimately builds the statement ("SELF")
- * @param <R> The result type of the statement
  */
-public interface ExposesAndThen<
-	S extends ExposesAndThen<S, R>, R extends Statement> extends StatementBuilder.BuildableStatement<R> {
+public interface ExposesAndThen<S extends ExposesAndThen<S, R>, R extends Statement>
+		extends StatementBuilder.BuildableStatement<R> {
 
 	ExposesAndThen<S, R> andThen(Statement statement);
+
 }

@@ -18,8 +18,6 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -30,11 +28,13 @@ import java.time.temporal.TemporalAccessor;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A literal representing a temporal value to be formatted in a way that Neo4j's Cypher understands it.
+ * A literal representing a temporal value to be formatted in a way that Neo4j's Cypher
+ * understands it.
  *
  * @author Michael J. Simons
- * @soundtrack Fritz Kalkbrenner - Drown
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
@@ -50,19 +50,24 @@ public final class TemporalLiteral extends LiteralBase<TemporalAccessor> {
 		if (content instanceof LocalDate) {
 			method = "date";
 			formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-		} else if (content instanceof LocalDateTime) {
+		}
+		else if (content instanceof LocalDateTime) {
 			method = "localdatetime";
 			formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-		} else if (content instanceof ZonedDateTime) {
+		}
+		else if (content instanceof ZonedDateTime) {
 			method = "datetime";
 			formatter = DateTimeFormatter.ISO_ZONED_DATE_TIME;
-		} else if (content instanceof LocalTime) {
+		}
+		else if (content instanceof LocalTime) {
 			method = "localtime";
 			formatter = DateTimeFormatter.ISO_LOCAL_TIME;
-		} else if (content instanceof OffsetTime) {
+		}
+		else if (content instanceof OffsetTime) {
 			method = "time";
 			formatter = DateTimeFormatter.ISO_OFFSET_TIME;
-		} else {
+		}
+		else {
 			throw new UnsupportedLiteralException(content);
 		}
 		this.value = String.format("%s('%s')", method, formatter.format(content));
@@ -70,6 +75,7 @@ public final class TemporalLiteral extends LiteralBase<TemporalAccessor> {
 
 	@Override
 	public String asString() {
-		return value;
+		return this.value;
 	}
+
 }

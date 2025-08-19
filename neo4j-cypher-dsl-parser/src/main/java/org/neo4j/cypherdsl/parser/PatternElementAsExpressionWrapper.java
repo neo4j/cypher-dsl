@@ -18,14 +18,14 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Condition;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.RelationshipPattern;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Necessary for using relationship pattern as expressions.
@@ -49,6 +49,7 @@ final class PatternElementAsExpressionWrapper implements Expression {
 
 	@Override
 	public Condition asCondition() {
-		return Cypher.matching(relationshipPattern);
+		return Cypher.matching(this.relationshipPattern);
 	}
+
 }

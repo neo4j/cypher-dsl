@@ -22,4 +22,5 @@ import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 
 @RegisterForReflection(allDeclaredMethods = false)
 public class Class1 {
+
 }

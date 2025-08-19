@@ -18,12 +18,15 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import static org.apiguardian.api.API.Status.STABLE;
+import java.io.Serial;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A runtime exception wrapping checked parsing exception into a sensible exception hierarchy.
+ * A runtime exception wrapping checked parsing exception into a sensible exception
+ * hierarchy.
  *
  * @author Michael J. Simons
  * @since 2021.3.0
@@ -31,12 +34,15 @@ import org.apiguardian.api.API;
 @API(status = STABLE, since = "2021.3.0")
 public final class CyperDslParseException extends RuntimeException {
 
+	@Serial
 	private static final long serialVersionUID = -3188559145717360828L;
 
 	/**
-	 * @param cause Original cause, being wrapped in a {@link RuntimeException}.
+	 * Creates a new Cypher-DSL specific exception with the given cause.
+	 * @param cause original cause, being wrapped in a {@link RuntimeException}.
 	 */
 	public CyperDslParseException(Throwable cause) {
 		super(cause);
 	}
+
 }

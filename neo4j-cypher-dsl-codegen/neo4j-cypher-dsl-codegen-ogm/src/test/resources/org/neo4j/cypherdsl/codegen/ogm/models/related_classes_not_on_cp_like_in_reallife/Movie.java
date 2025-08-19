@@ -42,13 +42,7 @@ public final class Movie {
 
 	@Relationship(value = "DIRECTED", direction = Relationship.Direction.INCOMING)
 	private final List<Person> directors;
-
-	public enum Type {
-		AKTION_FILM, KOMÖDIE, SCHNULZE
-	}
-
 	private Type type;
-
 	private Integer released;
 
 	public Movie(String title, String description) {
@@ -95,4 +89,11 @@ public final class Movie {
 		this.directors.addAll(newDirectors);
 		return this;
 	}
+
+	public enum Type {
+
+		AKTION_FILM, KOMÖDIE, SCHNULZE
+
+	}
+
 }

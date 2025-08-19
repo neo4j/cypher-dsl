@@ -23,12 +23,11 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 /**
  * An entry that should find its way into GraalVM reflection-config.json.
+ *
  * @author Michael J. Simons
  */
-@JsonAutoDetect(
-	getterVisibility = JsonAutoDetect.Visibility.NON_PRIVATE,
-	isGetterVisibility = JsonAutoDetect.Visibility.NON_PRIVATE
-)
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NON_PRIVATE,
+		isGetterVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
 final class Entry {
 
 	private final String name;
@@ -42,12 +41,12 @@ final class Entry {
 	}
 
 	String getName() {
-		return name;
+		return this.name;
 	}
 
 	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 	boolean isAllDeclaredMethods() {
-		return allDeclaredMethods;
+		return this.allDeclaredMethods;
 	}
 
 	void setAllDeclaredMethods(boolean allDeclaredMethods) {
@@ -56,10 +55,11 @@ final class Entry {
 
 	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
 	boolean isAllDeclaredConstructors() {
-		return allDeclaredConstructors;
+		return this.allDeclaredConstructors;
 	}
 
 	void setAllDeclaredConstructors(boolean allDeclaredConstructors) {
 		this.allDeclaredConstructors = allDeclaredConstructors;
 	}
+
 }

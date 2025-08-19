@@ -29,6 +29,8 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 /**
+ * Example resource.
+ *
  * @author Michael J. Simons
  */
 @RequestScoped
@@ -38,6 +40,7 @@ public class MovieResource {
 	private final MovieRepository movieRepository;
 
 	/**
+	 * Creates a new {@link MovieResource}.
 	 * @param movieRepository the repository to retrieve movies from
 	 */
 	@Inject
@@ -46,19 +49,20 @@ public class MovieResource {
 	}
 
 	/**
-	 * @return All movies
+	 * {@return all movies}
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Movie> getMovies() {
 
-		return movieRepository.findAll();
+		return this.movieRepository.findAll();
 	}
 
 	@GET
 	@Path("/{title}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Movie getMovie(@PathParam("title") String title) {
-		return movieRepository.findByTitle(title);
+		return this.movieRepository.findByTitle(title);
 	}
+
 }

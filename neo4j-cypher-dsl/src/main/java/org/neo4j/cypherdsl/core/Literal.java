@@ -18,32 +18,31 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
+
+import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Represents a literal with an optional content.
  *
- * @author Michael J. Simons
  * @param <T> type of content
+ * @author Michael J. Simons
  * @since 1.0
  */
 @API(status = STABLE, since = "1.0")
 public interface Literal<T> extends Expression {
 
 	/**
-	 * The string representation should be designed in such a way the a renderer can use it correctly in
-	 * the given context of the literal, i.e. a literal containing a string should quote that string
-	 * and escape all reserved characters.
-	 *
-	 * @return A string representation to be used literally in a cypher statement.
+	 * The string representation should be designed in such a way the a renderer can use
+	 * it correctly in the given context of the literal, i.e. a literal containing a
+	 * string should quote that string and escape all reserved characters.
+	 * @return a string representation to be used literally in a cypher statement.
 	 */
 	String asString();
 
 	/**
-	 * Retrieves the actual content of this literal, might not be supported by all literals.
-	 *
+	 * Retrieves the actual content of this literal, might not be supported by all
+	 * literals.
 	 * @return the actual content of this literal
 	 * @since 2023.4.0
 	 */
@@ -77,10 +76,12 @@ public interface Literal<T> extends Expression {
 		}
 
 		/**
-		 * @return the type that wasn't supported as literal
+		 * {@return the type that wasn't supported as literal}
 		 */
 		public Class<?> getUnsupportedType() {
-			return unsupportedType;
+			return this.unsupportedType;
 		}
+
 	}
+
 }

@@ -18,18 +18,18 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * Represents a  "callable" sub-query. A  sub-query can contain statement  that returns something  (standard statements,
- * union statements and calls to stored procedures, yielding their elements). Sub-queries can be nested.
+ * Represents a "callable" sub-query. A sub-query can contain statement that returns
+ * something (standard statements, union statements and calls to stored procedures,
+ * yielding their elements). Sub-queries can be nested.
  *
  * @author Michael J. Simons
- * @soundtrack Die Ärzte - Seitenhirsch
  * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
@@ -38,25 +38,10 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
 public final class Subquery extends AbstractClause implements Clause {
 
 	private final ImportingWith importingWith;
+
 	private final Statement statement;
+
 	private final RawLiteral rawStatement;
-
-	static Subquery raw(String format, Object... mixedArgs) {
-		return new Subquery(RawLiteral.create(format, mixedArgs));
-	}
-
-	/**
-	 * The {@code statement} can either be a unit sub-query, used to modify the graph. Those won't impact the amount of
-	 * rows returned by the enclosing query.
-	 * In case it's a statement that returns or yields values it must ensure that it does not return variables with the
-	 * same names as variables in the enclosing query.
-	 *
-	 * @param statement      The statement to wrap into a sub-query.
-	 * @return A sub-query.
-	 */
-	static Subquery call(Statement statement, IdentifiableElement... imports) {
-		return new Subquery(ImportingWith.of(imports), statement);
-	}
 
 	private Subquery(ImportingWith importingWith, Statement statement) {
 		this.importingWith = importingWith;
@@ -70,13 +55,31 @@ public final class Subquery extends AbstractClause implements Clause {
 		this.statement = null;
 	}
 
+	static Subquery raw(String format, Object... mixedArgs) {
+		return new Subquery(RawLiteral.create(format, mixedArgs));
+	}
+
+	/**
+	 * The {@code statement} can either be a unit sub-query, used to modify the graph.
+	 * Those won't impact the amount of rows returned by the enclosing query. In case it's
+	 * a statement that returns or yields values it must ensure that it does not return
+	 * variables with the same names as variables in the enclosing query.
+	 * @param statement the statement to wrap into a sub-query.
+	 * @param imports the variables imported into the subquery
+	 * @return a sub-query.
+	 */
+	static Subquery call(Statement statement, IdentifiableElement... imports) {
+		return new Subquery(ImportingWith.of(imports), statement);
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
 		if (this.rawStatement != null) {
 			this.rawStatement.accept(visitor);
-		} else {
+		}
+		else {
 			this.importingWith.accept(visitor);
 			this.statement.accept(visitor);
 		}
@@ -89,11 +92,11 @@ public final class Subquery extends AbstractClause implements Clause {
 	}
 
 	/**
-	 * @return {@literal true} if this sub-query yields any items
+	 * {@return <code>true</code> if this sub-query yields any items}
 	 */
 	@API(status = INTERNAL)
 	public boolean doesReturnOrYield() {
-		return statement != null && statement.doesReturnOrYield();
+		return this.statement != null && this.statement.doesReturnOrYield();
 	}
 
 	/**
@@ -101,12 +104,16 @@ public final class Subquery extends AbstractClause implements Clause {
 	 */
 	@API(status = INTERNAL)
 	public With importingWith() {
-		var imports = this.importingWith == null ? null : this.importingWith.imports();
-		if (imports == null && statement instanceof ClausesBasedStatement cbs) {
-			return cbs.getClauses().stream().findFirst().filter(With.class::isInstance)
+		var imports = (this.importingWith != null) ? this.importingWith.imports() : null;
+		if (imports == null && this.statement instanceof ClausesBasedStatement cbs) {
+			return cbs.getClauses()
+				.stream()
+				.findFirst()
+				.filter(With.class::isInstance)
 				.map(With.class::cast)
 				.orElse(null);
 		}
 		return imports;
 	}
+
 }

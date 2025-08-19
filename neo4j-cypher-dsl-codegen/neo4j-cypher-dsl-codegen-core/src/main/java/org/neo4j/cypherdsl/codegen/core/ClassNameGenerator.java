@@ -18,18 +18,17 @@
  */
 package org.neo4j.cypherdsl.codegen.core;
 
-import static org.apiguardian.api.API.Status.INTERNAL;
-
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.NodeBase;
 import org.neo4j.cypherdsl.core.RelationshipBase;
+
+import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
  * Strategy interface for generating class names for {@link NodeBase} or
  * {@link RelationshipBase}.
  *
  * @author Michael J. Simons
- * @soundtrack Daft Punk - TRON Legacy
  * @since 2021.1.0
  */
 @API(status = INTERNAL, since = "2021.1.0")
@@ -37,13 +36,14 @@ import org.neo4j.cypherdsl.core.RelationshipBase;
 public interface ClassNameGenerator {
 
 	/**
-	 * Generates a valid Java class based on a suggestion.  Most of the time the suggestion will either be a simple string,
-	 * maybe an existing class name or the concatenated labels of a node as returned by {@code db.schema.nodeTypeProperties}.
+	 * Generates a valid Java class based on a suggestion. Most of the time the suggestion
+	 * will either be a simple string, maybe an existing class name or the concatenated
+	 * labels of a node as returned by {@code db.schema.nodeTypeProperties}.
 	 * <p>
 	 * Any implementation must remove invalid identifier parts.
-	 *
-	 * @param suggestedName Basically an arbitrary string suggesting a type name.
-	 * @return A pair of names: A valid identifier for a type and matching field name.
+	 * @param suggestedName basically an arbitrary string suggesting a type name.
+	 * @return a pair of names: A valid identifier for a type and matching field name.
 	 */
 	String generate(String suggestedName);
+
 }

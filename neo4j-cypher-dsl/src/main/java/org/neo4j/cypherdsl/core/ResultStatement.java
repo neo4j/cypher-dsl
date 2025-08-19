@@ -18,19 +18,20 @@
  */
 package org.neo4j.cypherdsl.core;
 
-import static org.apiguardian.api.API.Status.STABLE;
-
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.STABLE;
+
 /**
- * A statement that returns items from the graph. The shape of those items can be pretty much anything:
- * A list of records containing only properties, or nodes with properties mixed with relationships and
- * so on. The only guarantee given is that the query will return some data when executed.
+ * A statement that returns items from the graph. The shape of those items can be pretty
+ * much anything: A list of records containing only properties, or nodes with properties
+ * mixed with relationships and so on. The only guarantee given is that the query will
+ * return some data when executed.
  *
  * @author Michael J. Simons
- * @soundtrack Motörhead - Live At Brixton Academy
  * @since 2021.2.1
  */
 @API(status = STABLE, since = "2021.2.1")
 public interface ResultStatement extends Statement {
+
 }
