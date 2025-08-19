@@ -748,9 +748,7 @@ Neo4j-Java-Driver.</p>
 <div class="listingblock">
 <div class="title">Listing 3. Imports needed for the examples to compile</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;
-
-<span class="keyword">import</span> <span class="include">java.util.Collection</span>;
+<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">java.util.Collection</span>;
 <span class="keyword">import</span> <span class="include">java.util.Locale</span>;
 <span class="keyword">import</span> <span class="include">java.util.Map</span>;
 
@@ -760,7 +758,9 @@ Neo4j-Java-Driver.</p>
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Statement</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Configuration</span>;
-<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Renderer</span>;</code></pre>
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Renderer</span>;
+
+<span class="keyword">import</span> <span class="include">static</span> <span class="include">org.assertj.core.api.Assertions.assertThat</span>;</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -774,8 +774,7 @@ Neo4j-Java-Driver.</p>
     .returning(m)
     .build(); <i class="conum" data-value="3"></i><b>(3)</b>
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m:`Movie`) RETURN m</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m:`Movie`) RETURN m</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -803,12 +802,9 @@ assertThat(cypherRenderer.render(statement))
 <div class="title">Listing 5. Find the actor named "Tom Hanks"&#8230;&#8203;</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> tom = Cypher.anyNode().named(<span class="string"><span class="delimiter">&quot;</span><span class="content">tom</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Tom Hanks</span><span class="delimiter">&quot;</span></span>));
-<span class="type">var</span> statement = Cypher
-    .match(tom).returning(tom)
-    .build();
+<span class="type">var</span> statement = Cypher.match(tom).returning(tom).build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (tom {name: 'Tom Hanks'}) RETURN tom</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (tom {name: 'Tom Hanks'}) RETURN tom</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -818,14 +814,9 @@ assertThat(cypherRenderer.render(statement))
 <div class="title">Listing 6. Find 10 people&#8230;&#8203;</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> people = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">people</span><span class="delimiter">&quot;</span></span>);
-statement = Cypher
-    .match(people)
-    .returning(people.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
-    .limit(<span class="integer">10</span>)
-    .build();
+statement = Cypher.match(people).returning(people.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>)).limit(<span class="integer">10</span>).build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (people:`Person`) RETURN people.name LIMIT 10</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (people:`Person`) RETURN people.name LIMIT 10</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -836,14 +827,12 @@ assertThat(cypherRenderer.render(statement))
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> nineties = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">nineties</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> released = nineties.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">released</span><span class="delimiter">&quot;</span></span>);
-statement = Cypher
-    .match(nineties)
+statement = Cypher.match(nineties)
     .where(released.gte(Cypher.literalOf(<span class="integer">1990</span>)).and(released.lt(Cypher.literalOf(<span class="integer">2000</span>))))
     .returning(nineties.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>))
     .build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(
+assertThat(cypherRenderer.render(statement)).isEqualTo(
         <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (nineties:`Movie`) WHERE (nineties.released &gt;= 1990 AND nineties.released &lt; 2000) RETURN nineties.title</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
@@ -858,13 +847,11 @@ assertThat(cypherRenderer.render(statement))
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> tom = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">tom</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Tom Hanks</span><span class="delimiter">&quot;</span></span>));
 <span class="type">var</span> tomHanksMovies = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">tomHanksMovies</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = Cypher
-    .match(tom.relationshipTo(tomHanksMovies, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>))
+<span class="type">var</span> statement = Cypher.match(tom.relationshipTo(tomHanksMovies, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>))
     .returning(tom, tomHanksMovies)
     .build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(
+assertThat(cypherRenderer.render(statement)).isEqualTo(
         <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (tom:`Person` {name: 'Tom Hanks'})-[:`ACTED_IN`]-&gt;(tomHanksMovies) RETURN tom, tomHanksMovies</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
@@ -873,8 +860,7 @@ assertThat(cypherRenderer.render(statement))
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cloudAtlas = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">cloudAtlas</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Cloud Atlas</span><span class="delimiter">&quot;</span></span>));
 <span class="type">var</span> directors = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">directors</span><span class="delimiter">&quot;</span></span>);
-statement = Cypher
-    .match(cloudAtlas.relationshipFrom(directors, <span class="string"><span class="delimiter">&quot;</span><span class="content">DIRECTED</span><span class="delimiter">&quot;</span></span>))
+statement = Cypher.match(cloudAtlas.relationshipFrom(directors, <span class="string"><span class="delimiter">&quot;</span><span class="content">DIRECTED</span><span class="delimiter">&quot;</span></span>))
     .returning(directors.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
     .build();
 
@@ -889,13 +875,11 @@ assertThat(cypherRenderer.render(statement))
 <span class="type">var</span> movie = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> coActors = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">coActors</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> people = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">people</span><span class="delimiter">&quot;</span></span>);
-statement = Cypher
-    .match(tom.relationshipTo(movie, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(coActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>))
+statement = Cypher.match(tom.relationshipTo(movie, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(coActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>))
     .returning(coActors.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
     .build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(
+assertThat(cypherRenderer.render(statement)).isEqualTo(
         <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (tom:`Person` {name: 'Tom Hanks'})-[:`ACTED_IN`]-&gt;(m)&lt;-[:`ACTED_IN`]-(coActors) RETURN coActors.name</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
@@ -905,13 +889,11 @@ assertThat(cypherRenderer.render(statement))
 <pre class="CodeRay highlight"><code data-lang="java">cloudAtlas = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Cloud Atlas</span><span class="delimiter">&quot;</span></span>));
 people = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">people</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> relatedTo = people.relationshipBetween(cloudAtlas).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">relatedTo</span><span class="delimiter">&quot;</span></span>);
-statement = Cypher
-    .match(relatedTo)
+statement = Cypher.match(relatedTo)
     .returning(people.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>), Cypher.type(relatedTo), relatedTo.getRequiredSymbolicName())
     .build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(
+assertThat(cypherRenderer.render(statement)).isEqualTo(
         <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (people:`Person`)-[relatedTo]-(:`Movie` {title: 'Cloud Atlas'}) RETURN people.name, type(relatedTo), relatedTo</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
@@ -923,8 +905,7 @@ assertThat(cypherRenderer.render(statement))
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> bacon = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">bacon</span><span class="delimiter">&quot;</span></span>).withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Kevin Bacon</span><span class="delimiter">&quot;</span></span>));
 <span class="type">var</span> hollywood = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">hollywood</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = Cypher
-    .match(bacon.relationshipBetween(hollywood).length(<span class="integer">1</span>, <span class="integer">4</span>))
+<span class="type">var</span> statement = Cypher.match(bacon.relationshipBetween(hollywood).length(<span class="integer">1</span>, <span class="integer">4</span>))
     .returningDistinct(hollywood)
     .build();
 
@@ -943,26 +924,20 @@ assertThat(cypherRenderer.render(statement))
 <span class="type">var</span> cocoActors = Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">cocoActors</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> strength = Cypher.count(Cypher.asterisk()).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">Strength</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> statement = Cypher
-    .match(
-        tom.relationshipTo(Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(coActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>),
-        coActors.relationshipTo(Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">m2</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(cocoActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>)
-    )
-    .where(
-        Cypher.not(tom.relationshipTo(Cypher.anyNode(), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(cocoActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>)))
+    .match(tom.relationshipTo(Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(coActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>),
+            coActors.relationshipTo(Cypher.anyNode(<span class="string"><span class="delimiter">&quot;</span><span class="content">m2</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(cocoActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>))
+    .where(Cypher
+        .not(tom.relationshipTo(Cypher.anyNode(), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).relationshipFrom(cocoActors, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>)))
     .and(tom.isNotEqualTo(cocoActors))
-    .returning(
-        cocoActors.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">Recommended</span><span class="delimiter">&quot;</span></span>),
-        strength
-    ).orderBy(strength.asName().descending())
+    .returning(cocoActors.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">Recommended</span><span class="delimiter">&quot;</span></span>), strength)
+    .orderBy(strength.asName().descending())
     .build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">(tom:`Person` {name: 'Tom Hanks'})-[:`ACTED_IN`]-&gt;(m)&lt;-[:`ACTED_IN`]-(coActors), </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">(coActors)-[:`ACTED_IN`]-&gt;(m2)&lt;-[:`ACTED_IN`]-(cocoActors) </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">WHERE (NOT (tom)-[:`ACTED_IN`]-&gt;()&lt;-[:`ACTED_IN`]-(cocoActors) AND tom &lt;&gt; cocoActors) </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN cocoActors.name AS Recommended, count(*) AS Strength ORDER BY Strength DESC</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement)).isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">(tom:`Person` {name: 'Tom Hanks'})-[:`ACTED_IN`]-&gt;(m)&lt;-[:`ACTED_IN`]-(coActors), </span><span class="delimiter">&quot;</span></span>
+                + <span class="string"><span class="delimiter">&quot;</span><span class="content">(coActors)-[:`ACTED_IN`]-&gt;(m2)&lt;-[:`ACTED_IN`]-(cocoActors) </span><span class="delimiter">&quot;</span></span>
+                + <span class="string"><span class="delimiter">&quot;</span><span class="content">WHERE (NOT (tom)-[:`ACTED_IN`]-&gt;()&lt;-[:`ACTED_IN`]-(cocoActors) AND tom &lt;&gt; cocoActors) </span><span class="delimiter">&quot;</span></span>
+                + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN cocoActors.name AS Recommended, count(*) AS Strength ORDER BY Strength DESC</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 </div>
@@ -986,32 +961,22 @@ The Cypher-DSL will not use those values, but collect them for you.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> person = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement =
-    Cypher
-        .match(person)
-        .where(person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>).isEqualTo(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>)))
-        .set(
-            person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).to(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).withValue(<span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>)),
-            person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>))
-        )
-        .returning(person)
-        .build();
+<span class="type">var</span> statement = Cypher.match(person)
+    .where(person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>).isEqualTo(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>)))
+    .set(person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).to(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).withValue(<span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>)),
+            person.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>)))
+    .returning(person)
+    .build();
 
-assertThat(cypherRenderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (p:`Person`) WHERE p.nickname = $nickname SET p.firstName = $firstName, p.name = $name RETURN p</span><span class="delimiter">&quot;</span></span>);
+assertThat(cypherRenderer.render(statement)).isEqualTo(
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (p:`Person`) WHERE p.nickname = $nickname SET p.firstName = $firstName, p.name = $name RETURN p</span><span class="delimiter">&quot;</span></span>);
 
-<span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt; parameterNames = statement
-    .getCatalog()
-    .getParameterNames();
+<span class="predefined-type">Collection</span>&lt;<span class="predefined-type">String</span>&gt; parameterNames = statement.getCatalog().getParameterNames();
 assertThat(parameterNames).containsExactlyInAnyOrder(<span class="string"><span class="delimiter">&quot;</span><span class="content">nickname</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="1"></i><b>(1)</b>
 
-<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; parameters = statement
-    .getCatalog()
-    .getParameters();
+<span class="predefined-type">Map</span>&lt;<span class="predefined-type">String</span>, <span class="predefined-type">Object</span>&gt; parameters = statement.getCatalog().getParameters();
 assertThat(parameters).hasSize(<span class="integer">2</span>); <i class="conum" data-value="2"></i><b>(2)</b>
-assertThat(parameters)
-    .containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>)
-    .containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(parameters).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Thomas</span><span class="delimiter">&quot;</span></span>).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Anderson</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1038,7 +1003,7 @@ assertThat(parameters)
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> statement = Cypher.returning(literalTrue().as(<span class="string"><span class="delimiter">&quot;</span><span class="content">t</span><span class="delimiter">&quot;</span></span>)).build();
-<span class="type">var</span> cypher = statement.getCypher();
+<span class="type">var</span> cypher = <span class="local-variable">this</span>.statement.getCypher();
 assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN true AS t</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
@@ -1056,9 +1021,6 @@ expressions are included. In addition, properties are also available.</p>
 <div class="paragraph">
 <p>Those information can be used when dynamically building a query to verify the presence of required expressions
 or use them for further refinement.</p>
-</div>
-<div class="paragraph">
-<p>The feature plays well with the <a href="#driver-integration">driver integration</a> and could be directly used to define mapping functions.</p>
 </div>
 <div class="paragraph">
 <p>Statements parsed via the optional <a href="#cypher-parser">parser module</a> are also able to return their identifiable expressions.
@@ -1082,22 +1044,20 @@ The class offers a couple of static convenience methods for retrieving some vari
 <span class="type">var</span> b = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">B</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">b</span><span class="delimiter">&quot;</span></span>);
 
 <span class="type">var</span> mergeStatement = Cypher.merge(n)
-    .onCreate().set(n.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prop</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="integer">0</span>)))
+    .onCreate()
+    .set(n.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prop</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="integer">0</span>)))
     .merge(a.relationshipBetween(b, <span class="string"><span class="delimiter">&quot;</span><span class="content">T</span><span class="delimiter">&quot;</span></span>))
-    .onCreate().set(a.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">me</span><span class="delimiter">&quot;</span></span>)))
-    .onMatch().set(b.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">you</span><span class="delimiter">&quot;</span></span>)))
-    .returning(a.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prop</span><span class="delimiter">&quot;</span></span>)).build();
+    .onCreate()
+    .set(a.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">me</span><span class="delimiter">&quot;</span></span>)))
+    .onMatch()
+    .set(b.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">you</span><span class="delimiter">&quot;</span></span>)))
+    .returning(a.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">prop</span><span class="delimiter">&quot;</span></span>))
+    .build();
 
 <span class="type">var</span> renderer = <span class="predefined-type">Renderer</span>.getRenderer(<span class="predefined-type">Configuration</span>.prettyPrinting()); <i class="conum" data-value="1"></i><b>(1)</b>
 assertThat(renderer.render(mergeStatement))
-    .isEqualTo(
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (n)</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON CREATE SET n.prop = 0</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (a:A)-[:T]-(b:B)</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON CREATE SET a.name = 'me'</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON MATCH SET b.name = 'you'</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> +
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN a.prop</span><span class="delimiter">&quot;</span></span>
-    ); <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (n)</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON CREATE SET n.prop = 0</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (a:A)-[:T]-(b:B)</span><span class="char">\n</span><span class="delimiter">&quot;</span></span>
+            + <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON CREATE SET a.name = 'me'</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">  ON MATCH SET b.name = 'you'</span><span class="char">\n</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN a.prop</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1123,8 +1083,10 @@ the pretty printing renderer:</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> relationship = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>)
-    .relationshipTo(Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>);
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> relationship = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>)
+    .named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>)
+    .relationshipTo(Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>), <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>)
+    .named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>);
 
 <span class="type">var</span> statement = Cypher.match(relationship).returning(relationship).build();
 
@@ -1135,12 +1097,10 @@ assertThat(defaultRenderer.render(statement))
 <span class="type">var</span> escapeOnlyIfNecessary = <span class="predefined-type">Configuration</span>.newConfig().alwaysEscapeNames(<span class="predefined-constant">false</span>).build();
 
 <span class="type">var</span> renderer = <span class="predefined-type">Renderer</span>.getRenderer(escapeOnlyIfNecessary);
-assertThat(renderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:Person)-[r:ACTED_IN]-&gt;(m:Movie) RETURN r</span><span class="delimiter">&quot;</span></span>);
+assertThat(renderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:Person)-[r:ACTED_IN]-&gt;(m:Movie) RETURN r</span><span class="delimiter">&quot;</span></span>);
 
 renderer = <span class="predefined-type">Renderer</span>.getRenderer(<span class="predefined-type">Configuration</span>.prettyPrinting());
-assertThat(renderer.render(statement))
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:Person)-[r:ACTED_IN]-&gt;(m:Movie)</span><span class="char">\n</span><span class="content">RETURN r</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(renderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (a:Person)-[r:ACTED_IN]-&gt;(m:Movie)</span><span class="char">\n</span><span class="content">RETURN r</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 </div>
@@ -1154,16 +1114,17 @@ Users discretion is advised:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> key = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">key</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> cypher = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.meta.schema</span><span class="delimiter">&quot;</span></span>)
-    .yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>).with(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>)
-    .unwind(Cypher.keys(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>))).as(key)
-    .returning(
-        key,
-        Cypher.raw(<span class="string"><span class="delimiter">&quot;</span><span class="content">value[$E]</span><span class="delimiter">&quot;</span></span>, key).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+    .yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>)
+    .with(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>)
+    .unwind(Cypher.keys(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>)))
+    .as(key)
+    .returning(key, Cypher.raw(<span class="string"><span class="delimiter">&quot;</span><span class="content">value[$E]</span><span class="delimiter">&quot;</span></span>, key).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">value</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
     )
-    .build().getCypher();
+    .build()
+    .getCypher();
 
 assertThat(cypher).isEqualTo(
-    <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL apoc.meta.schema() YIELD value WITH value UNWIND keys(value) AS key RETURN key, value[key] AS value</span><span class="delimiter">&quot;</span></span>);</code></pre>
+        <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL apoc.meta.schema() YIELD value WITH value UNWIND keys(value) AS key RETURN key, value[key] AS value</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1219,11 +1180,7 @@ It is especially noteworthy that <code>elementId(node)</code> will be rendered a
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Configuration</span>;
-<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Dialect</span>;
-<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.renderer.Renderer</span>;
-
-<span class="type">class</span> <span class="class">DialectIT</span> {
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">class</span> <span class="class">DialectIT</span> {
 
     <span class="type">void</span> shouldRenderElementId() {
         <span class="type">var</span> screen = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">ScreenStateNode</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">screen</span><span class="delimiter">&quot;</span></span>);
@@ -1236,13 +1193,10 @@ It is especially noteworthy that <code>elementId(node)</code> will be rendered a
         <span class="type">var</span> rendererConfig = <span class="predefined-type">Configuration</span>.newConfig().withDialect(Dialect.NEO4J_5).build();
         <span class="type">var</span> renderer = <span class="predefined-type">Renderer</span>.getRenderer(rendererConfig);
         <span class="type">var</span> cypher = renderer.render(statement);
-        assertThat(cypher)
-            .isEqualTo(
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (screen:`ScreenStateNode`) </span><span class="delimiter">&quot;</span></span> +
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">WHERE elementId(screen) = '4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2' </span><span class="delimiter">&quot;</span></span> +
-                <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN elementId(screen)</span><span class="delimiter">&quot;</span></span>
-            );
+        assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (screen:`ScreenStateNode`) </span><span class="delimiter">&quot;</span></span>
+                + <span class="string"><span class="delimiter">&quot;</span><span class="content">WHERE elementId(screen) = '4:d32903f5-48ef-40fb-9ce5-9a3039852c46:2' </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN elementId(screen)</span><span class="delimiter">&quot;</span></span>);
     }
+
 }</code></pre>
 </div>
 </div>
@@ -1257,24 +1211,19 @@ It is especially noteworthy that <code>elementId(node)</code> will be rendered a
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> p = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> a = m.withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Matrix</span><span class="delimiter">&quot;</span></span>))
-    .relationshipFrom(p, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = Cypher
-    .match(a)
+<span class="type">var</span> a = m.withProperties(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Matrix</span><span class="delimiter">&quot;</span></span>)).relationshipFrom(p, <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">a</span><span class="delimiter">&quot;</span></span>);
+<span class="type">var</span> statement = Cypher.match(a)
     .where(p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>).gte(Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>, <span class="integer">1979</span>)))
     .returning(p)
     .build();
 
 <span class="type">var</span> catalog = statement.getCatalog();
 
-assertThat(catalog.getNodeLabels())
-    .extracting(StatementCatalog.Token::value)
+assertThat(catalog.getNodeLabels()).extracting(StatementCatalog.Token::value)
     .containsExactlyInAnyOrder(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>);
-assertThat(catalog.getProperties())
-    .containsExactlyInAnyOrder(
+assertThat(catalog.getProperties()).containsExactlyInAnyOrder(
         StatementCatalog.property(<span class="predefined-type">Set</span>.of(StatementCatalog.label(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>)), <span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>),
-        StatementCatalog.property(<span class="predefined-type">Set</span>.of(StatementCatalog.label(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>)), <span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>)
-    );</code></pre>
+        StatementCatalog.property(<span class="predefined-type">Set</span>.of(StatementCatalog.label(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>)), <span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>));</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1289,22 +1238,19 @@ contains the identifiable elements.</p>
 <div class="title">Listing 15. Using the statement catalog from a parsed statement</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> input = <span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span><span class="string"><span class="delimiter">&quot;</span><span class="content">
-    MATCH (m:`Movie` {title: 'The Matrix'})&lt;-[a:`ACTED_IN`]-(p:`Person`)
-    WHERE p.born &gt;= $born
-    RETURN p
-    </span><span class="delimiter">&quot;</span></span><span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>;
+        MATCH (m:`Movie` {title: 'The Matrix'})&lt;-[a:`ACTED_IN`]-(p:`Person`)
+        WHERE p.born &gt;= $born
+        RETURN p
+        </span><span class="delimiter">&quot;</span></span><span class="string"><span class="delimiter">&quot;</span><span class="delimiter">&quot;</span></span>;
 <span class="type">var</span> statement = CypherParser.parse(input);
 
 <span class="type">var</span> catalog = statement.getCatalog();
 
-assertThat(catalog.getNodeLabels())
-    .extracting(StatementCatalog.Token::value)
+assertThat(catalog.getNodeLabels()).extracting(StatementCatalog.Token::value)
     .containsExactlyInAnyOrder(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>);
-assertThat(catalog.getProperties())
-    .containsExactlyInAnyOrder(
+assertThat(catalog.getProperties()).containsExactlyInAnyOrder(
         StatementCatalog.property(<span class="predefined-type">Set</span>.of(StatementCatalog.label(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>)), <span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>),
-        StatementCatalog.property(<span class="predefined-type">Set</span>.of(StatementCatalog.label(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>)), <span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>)
-    );</code></pre>
+        StatementCatalog.property(<span class="predefined-type">Set</span>.of(StatementCatalog.label(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>)), <span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>));</code></pre>
 </div>
 </div>
 </div>
@@ -1323,9 +1269,8 @@ This reflects directly in the Cypher-DSL:</p>
 <span class="type">var</span> movieNode = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> ratedRel = personNode.relationshipTo(movieNode, <span class="string"><span class="delimiter">&quot;</span><span class="content">RATED</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">r</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> statement = Cypher.match(ratedRel)
-        .returning(
-                personNode.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>), <i class="conum" data-value="1"></i><b>(1)</b>
-                ratedRel.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">rating</span><span class="delimiter">&quot;</span></span>)) <i class="conum" data-value="2"></i><b>(2)</b>
+        .returning(personNode.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>), <i class="conum" data-value="1"></i><b>(1)</b>
+                        ratedRel.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">rating</span><span class="delimiter">&quot;</span></span>)) <i class="conum" data-value="2"></i><b>(2)</b>
         .build();
 
 assertThat(cypherRenderer.render(statement))
@@ -1369,8 +1314,7 @@ to the results of functions etc.:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> epochSeconds = Cypher.property(Cypher.datetime(), <span class="string"><span class="delimiter">&quot;</span><span class="content">epochSeconds</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">var</span> statement = Cypher.returning(epochSeconds).build();
-Assertions.assertThat(cypherRenderer.render(statement))
-        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN datetime().epochSeconds</span><span class="delimiter">&quot;</span></span>);</code></pre>
+Assertions.assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN datetime().epochSeconds</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1393,7 +1337,8 @@ Assertions.assertThat(cypherRenderer.render(statement))
 
 <span class="type">var</span> statement = Cypher.match(node)
         .where(locationPropV1.gt(Cypher.literalOf(<span class="integer">50</span>)))
-        .returning(locationPropV2).build();
+        .returning(locationPropV2)
+        .build();
 
 assertThat(cypherRenderer.render(statement))
         .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (p:`Person`) WHERE p.`home.location`.y &gt; 50 RETURN p.`home.location`.y</span><span class="delimiter">&quot;</span></span>);</code></pre>
@@ -1470,8 +1415,7 @@ While the examples use <a href="#functions-list-range">Section 4.1.1</a>, the li
         <span class="type">var</span> range = Cypher.range(<span class="integer">0</span>, <span class="integer">10</span>);
 
         <span class="type">var</span> statement = Cypher.returning(Cypher.valueAt(range, <span class="integer">3</span>)).build();
-        assertThat(cypherRenderer.render(statement))
-                .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10)[3]</span><span class="delimiter">&quot;</span></span>);
+        assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10)[3]</span><span class="delimiter">&quot;</span></span>);
 }
 
 <span class="annotation">@Test</span>
@@ -1480,8 +1424,7 @@ While the examples use <a href="#functions-list-range">Section 4.1.1</a>, the li
         <span class="type">var</span> range = Cypher.range(Cypher.literalOf(<span class="integer">0</span>), Cypher.literalOf(<span class="integer">10</span>));
 
         <span class="type">var</span> statement = Cypher.returning(Cypher.subListUntil(range, <span class="integer">3</span>)).build();
-        assertThat(cypherRenderer.render(statement))
-                .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10)[..3]</span><span class="delimiter">&quot;</span></span>);
+        assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10)[..3]</span><span class="delimiter">&quot;</span></span>);
 }
 
 <span class="annotation">@Test</span>
@@ -1490,8 +1433,7 @@ While the examples use <a href="#functions-list-range">Section 4.1.1</a>, the li
         <span class="type">var</span> range = Cypher.range(<span class="integer">0</span>, <span class="integer">10</span>, <span class="integer">1</span>);
 
         <span class="type">var</span> statement = Cypher.returning(Cypher.subListFrom(range, -<span class="integer">3</span>)).build();
-        assertThat(cypherRenderer.render(statement))
-                .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10, 1)[-3..]</span><span class="delimiter">&quot;</span></span>);
+        assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10, 1)[-3..]</span><span class="delimiter">&quot;</span></span>);
 }
 
 <span class="annotation">@Test</span>
@@ -1500,8 +1442,7 @@ While the examples use <a href="#functions-list-range">Section 4.1.1</a>, the li
         <span class="type">var</span> range = Cypher.range(Cypher.literalOf(<span class="integer">0</span>), Cypher.literalOf(<span class="integer">10</span>), Cypher.literalOf(<span class="integer">1</span>));
 
         <span class="type">var</span> statement = Cypher.returning(Cypher.subList(range, <span class="integer">2</span>, <span class="integer">4</span>)).build();
-        assertThat(cypherRenderer.render(statement))
-                .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10, 1)[2..4]</span><span class="delimiter">&quot;</span></span>);
+        assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN range(0, 10, 1)[2..4]</span><span class="delimiter">&quot;</span></span>);
 }</code></pre>
 </div>
 </div>
@@ -1567,7 +1508,7 @@ Let&#8217;s take the first example <a href="https://neo4j.com/docs/cypher-manual
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">labels</span><span class="delimiter">&quot;</span></span>).build(); <i class="conum" data-value="1"></i><b>(1)</b>
 assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL db.labels()</span><span class="delimiter">&quot;</span></span>);
 
-call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db.labels</span><span class="delimiter">&quot;</span></span>).build();  <i class="conum" data-value="2"></i><b>(2)</b>
+call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db.labels</span><span class="delimiter">&quot;</span></span>).build(); <i class="conum" data-value="2"></i><b>(2)</b>
 assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL db.labels()</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
@@ -1590,8 +1531,7 @@ Expressions can be literals as in <a href="#standalone-call-with-args">[standalo
 </div>
 <div id="standalone-call-with-args" class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> call = Cypher
-        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.security.createUser</span><span class="delimiter">&quot;</span></span>)
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.security.createUser</span><span class="delimiter">&quot;</span></span>)
         .withArgs(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">johnsmith</span><span class="delimiter">&quot;</span></span>), Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">h6u4%kr</span><span class="delimiter">&quot;</span></span>), Cypher.literalFalse())
         .build();
 assertThat(cypherRenderer.render(call))
@@ -1628,15 +1568,14 @@ assertThat(cypherRenderer.render(call)).isEqualTo(<span class="string"><span cla
 <div id="standalone-call-where" class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> name = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> call = Cypher
-        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.listConfig</span><span class="delimiter">&quot;</span></span>)
+<span class="type">var</span> call = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">dbms.listConfig</span><span class="delimiter">&quot;</span></span>)
         .withArgs(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">browser</span><span class="delimiter">&quot;</span></span>))
         .yield(name)
         .where(name.matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">browser</span><span class="char">\\</span><span class="content">.allow.*</span><span class="delimiter">&quot;</span></span>))
         .returning(Cypher.asterisk())
         .build();
-assertThat(cypherRenderer.render(call)).isEqualTo(
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser</span><span class="char">\\</span><span class="char">\\</span><span class="content">.allow.*' RETURN *</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(call))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">CALL dbms.listConfig('browser') YIELD name WHERE name =~ 'browser</span><span class="char">\\</span><span class="char">\\</span><span class="content">.allow.*' RETURN *</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 </div>
@@ -1649,13 +1588,15 @@ The mechanics to construct those calls via the Cypher-DSL are identical to stand
 <div id="in-query-calls" class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> label = Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">label</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = Cypher
-        .match(Cypher.anyNode().named(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>)).with(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>)
-        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db.labels</span><span class="delimiter">&quot;</span></span>).yield(label).with(label)
+<span class="type">var</span> statement = Cypher.match(Cypher.anyNode().named(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>))
+        .with(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>)
+        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">db.labels</span><span class="delimiter">&quot;</span></span>)
+        .yield(label)
+        .with(label)
         .returning(Cypher.count(label).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">numLabels</span><span class="delimiter">&quot;</span></span>))
         .build();
-assertThat(cypherRenderer.render(statement)).isEqualTo(
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n) WITH n CALL db.labels() YIELD label WITH label RETURN count(label) AS numLabels</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -1681,16 +1622,12 @@ This is where <code>asFunction</code> comes in.</p>
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> p = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Person</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
 <span class="type">var</span> createUuid = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.create.uuid</span><span class="delimiter">&quot;</span></span>).asFunction(); <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">var</span> statement = Cypher.merge(p.withProperties(Cypher.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, createUuid))) <i class="conum" data-value="2"></i><b>(2)</b>
-        .set(
-                p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Michael</span><span class="delimiter">&quot;</span></span>)),
-                p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">surname</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hunger</span><span class="delimiter">&quot;</span></span>))
-        )
+        .set(p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Michael</span><span class="delimiter">&quot;</span></span>)),
+                        p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">surname</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Hunger</span><span class="delimiter">&quot;</span></span>)))
         .returning(p)
         .build();
-assertThat(cypherRenderer.render(statement)).isEqualTo(
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (p:`Person` {id: apoc.create.uuid()}) </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">SET p.firstName = 'Michael', p.surname = 'Hunger' </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN p</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement)).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (p:`Person` {id: apoc.create.uuid()}) </span><span class="delimiter">&quot;</span></span>
+                + <span class="string"><span class="delimiter">&quot;</span><span class="content">SET p.firstName = 'Michael', p.surname = 'Hunger' </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN p</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1715,21 +1652,19 @@ assertThat(cypherRenderer.render(statement)).isEqualTo(
 <span class="type">var</span> toCamelCase = Cypher.call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.text.camelCase</span><span class="delimiter">&quot;</span></span>)
         .withArgs(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">first name</span><span class="delimiter">&quot;</span></span>)) <i class="conum" data-value="2"></i><b>(2)</b>
         .asFunction();
-<span class="type">var</span> statement = Cypher.merge(p.withProperties(Cypher.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>,
-        createUuid)))
+<span class="type">var</span> statement = Cypher.merge(p.withProperties(Cypher.mapOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">id</span><span class="delimiter">&quot;</span></span>, createUuid)))
         .set(p.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">surname</span><span class="delimiter">&quot;</span></span>).to(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Simons</span><span class="delimiter">&quot;</span></span>)))
         .with(p)
-        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.create.setProperty</span><span class="delimiter">&quot;</span></span>).withArgs(
-                p.getRequiredSymbolicName(),
-                toCamelCase,
-                Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">nameParam</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
-        ).yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>)
+        .call(<span class="string"><span class="delimiter">&quot;</span><span class="content">apoc.create.setProperty</span><span class="delimiter">&quot;</span></span>)
+        .withArgs(p.getRequiredSymbolicName(), toCamelCase, Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">nameParam</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="3"></i><b>(3)</b>
+        )
+        .yield(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>)
         .returning(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>)
         .build();
-assertThat(cypherRenderer.render(statement)).isEqualTo(
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.surname = 'Simons' </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH p CALL apoc.create.setProperty(p, apoc.text.camelCase('first name'), $nameParam) </span><span class="delimiter">&quot;</span></span>
-        + <span class="string"><span class="delimiter">&quot;</span><span class="content">YIELD node RETURN node</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypherRenderer.render(statement))
+        .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MERGE (p:`Person` {id: apoc.create.uuid()}) SET p.surname = 'Simons' </span><span class="delimiter">&quot;</span></span>
+                        + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH p CALL apoc.create.setProperty(p, apoc.text.camelCase('first name'), $nameParam) </span><span class="delimiter">&quot;</span></span>
+                        + <span class="string"><span class="delimiter">&quot;</span><span class="content">YIELD node RETURN node</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1777,7 +1712,7 @@ It allows sanitizing user input, add additional filters for labels and types to 
 </div>
 <div class="paragraph">
 <p>The parser itself is based on Neo4j&#8217;s official Cypher-Parser, thus supporting the same constructs as Neo4j itself.
-However, while we could theoretically parse all expressions that Neo4j 5.26.9 supports, we might cannot translate all of them
+However, while we could theoretically parse all expressions that Neo4j 5.26.10 supports, we might cannot translate all of them
 into elements of the Cypher-DSL. In such cases an <code>UnsupportedOperationException</code> will be thrown.</p>
 </div>
 </div>
@@ -1813,7 +1748,7 @@ into elements of the Cypher-DSL. In such cases an <code>UnsupportedOperationExce
 <div class="sect3">
 <h4 id="minimumjdkversion"><a class="anchor" href="#minimumjdkversion"></a>5.2.2. Minimum JDK version</h4>
 <div class="paragraph">
-<p>The Cypher-Parser requires JDK 11 to run which is the same version that Neo4j 5.26.9 requires.</p>
+<p>The Cypher-Parser requires JDK 11 to run which is the same version that Neo4j 5.26.10 requires.</p>
 </div>
 </div>
 <div class="sect3">
@@ -1895,8 +1830,7 @@ Here we assume the user does the right thing and don&#8217;t modify the query an
 <div id="example-using-input" class="listingblock">
 <div class="title">Listing 19. Just using the user supplied input</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> userProvidedCypher
-    = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN o as result</span><span class="delimiter">&quot;</span></span>; <i class="conum" data-value="1"></i><b>(1)</b>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> userProvidedCypher = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN o as result</span><span class="delimiter">&quot;</span></span>; <i class="conum" data-value="1"></i><b>(1)</b>
 <span class="type">var</span> userStatement = CypherParser.parse(userProvidedCypher); <i class="conum" data-value="2"></i><b>(2)</b>
 
 <span class="type">var</span> node = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Node</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">node</span><span class="delimiter">&quot;</span></span>);
@@ -1904,21 +1838,14 @@ Here we assume the user does the right thing and don&#8217;t modify the query an
 <span class="type">var</span> cypher = Cypher <i class="conum" data-value="3"></i><b>(3)</b>
     .match(node)
     .call(<i class="conum" data-value="4"></i><b>(4)</b>
-        userStatement,
-        node.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">this</span><span class="delimiter">&quot;</span></span>)
-    )
+            userStatement, node.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">this</span><span class="delimiter">&quot;</span></span>))
     .returning(result.project(<span class="string"><span class="delimiter">&quot;</span><span class="content">foo</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">bar</span><span class="delimiter">&quot;</span></span>))
     .build()
     .getCypher();
 
-assertThat(cypher).isEqualTo(
-    <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (node:`Node`) </span><span class="delimiter">&quot;</span></span>
-    + <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL {</span><span class="delimiter">&quot;</span></span>
-    + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node </span><span class="delimiter">&quot;</span></span>
-    + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node AS this </span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="5"></i><b>(5)</b>
-    + <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="6"></i><b>(6)</b>
-    + <span class="string"><span class="delimiter">&quot;</span><span class="content">} </span><span class="delimiter">&quot;</span></span>
-    + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN result{.foo, .bar}</span><span class="delimiter">&quot;</span></span>);</code></pre>
+assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (node:`Node`) </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL {</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node AS this </span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="5"></i><b>(5)</b>
+        + <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="6"></i><b>(6)</b>
+        + <span class="string"><span class="delimiter">&quot;</span><span class="content">} </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN result{.foo, .bar}</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -1970,10 +1897,7 @@ Function&lt;<span class="predefined-type">Expression</span>, AliasedExpression&g
 
 <span class="type">var</span> options = Options.newOptions() <i class="conum" data-value="2"></i><b>(2)</b>
     .withCallback( <i class="conum" data-value="3"></i><b>(3)</b>
-        ExpressionCreatedEventType.ON_RETURN_ITEM,
-        AliasedExpression.class,
-        ensureAlias
-    )
+            ExpressionCreatedEventType.ON_RETURN_ITEM, AliasedExpression.class, ensureAlias)
     .build();
 
 <span class="type">var</span> userStatement = CypherParser.parse(userProvidedCypher, options); <i class="conum" data-value="4"></i><b>(4)</b></code></pre>
@@ -2019,10 +1943,7 @@ UnaryOperator&lt;<span class="predefined-type">Expression</span>&gt; preventProp
 
 <span class="type">var</span> options = Options.newOptions()
     .withCallback( <i class="conum" data-value="2"></i><b>(2)</b>
-        ExpressionCreatedEventType.ON_REMOVE_PROPERTY,
-        <span class="predefined-type">Expression</span>.class,
-        preventPropertyDeletion
-    )
+            ExpressionCreatedEventType.ON_REMOVE_PROPERTY, <span class="predefined-type">Expression</span>.class, preventPropertyDeletion)
     .build();
 
 assertThatExceptionOfType(<span class="exception">RuntimeException</span>.class)
@@ -2058,17 +1979,14 @@ a <code>RETURN</code> clause the way you need:</p>
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> userProvidedCypher = <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:LINK]-(o:Other) RETURN distinct this, o LIMIT 23</span><span class="delimiter">&quot;</span></span>;
 
 Function&lt;ReturnDefinition, Return&gt; returnClauseFactory = d -&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
-    <span class="type">var</span> finalExpressionsReturned = d.getExpressions().stream()
+    <span class="type">var</span> finalExpressionsReturned = d.getExpressions()
+        .stream()
         .filter(e -&gt; e <span class="keyword">instanceof</span> SymbolicName &amp;&amp; <span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>.equals(((SymbolicName) e).getValue()))
         .map(e -&gt; e.as(<span class="string"><span class="delimiter">&quot;</span><span class="content">result</span><span class="delimiter">&quot;</span></span>))
         .collect(Collectors.&lt;<span class="predefined-type">Expression</span>&gt;toList());
 
-    <span class="keyword">return</span> Clauses.returning(
-        <span class="predefined-constant">false</span>,
-        finalExpressionsReturned,
-        <span class="predefined-type">List</span>.of(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>).property(<span class="string"><span class="delimiter">&quot;</span><span class="content">x</span><span class="delimiter">&quot;</span></span>).descending()),
-        d.getOptionalSkip(), d.getOptionalLimit()
-    );
+    <span class="keyword">return</span> Clauses.returning(<span class="predefined-constant">false</span>, finalExpressionsReturned,
+            <span class="predefined-type">List</span>.of(Cypher.name(<span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>).property(<span class="string"><span class="delimiter">&quot;</span><span class="content">x</span><span class="delimiter">&quot;</span></span>).descending()), d.getOptionalSkip(), d.getOptionalLimit());
 };
 
 <span class="type">var</span> options = Options.newOptions()
@@ -2143,11 +2061,8 @@ setting or removing labels with a <code>BiFunction</code> like the following:</p
 <div id="enforcing-on-parse" class="listingblock">
 <div class="title">Listing 24. Enforcing a label is always set on the pattern</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> options =
-    Options.newOptions().withLabelFilter(makeSureALabelIsPresent).build();
-<span class="type">var</span> statement = CypherParser
-    .parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) RETURN n</span><span class="delimiter">&quot;</span></span>, options)
-    .getCypher();
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> options = Options.newOptions().withLabelFilter(<span class="local-variable">this</span>.makeSureALabelIsPresent).build();
+<span class="type">var</span> statement = CypherParser.parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) RETURN n</span><span class="delimiter">&quot;</span></span>, options).getCypher();
 
 assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Movie`:`ForcedLabel`) RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
@@ -2158,11 +2073,8 @@ assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&qu
 <div id="enforcing-on-set" class="listingblock">
 <div class="title">Listing 25. Enforcing that a new collection of labels always contains a specific</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> options =
-    Options.newOptions().withLabelFilter(makeSureALabelIsPresent).build();
-<span class="type">var</span> statement = CypherParser
-    .parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) SET n:`Comedy` RETURN n</span><span class="delimiter">&quot;</span></span>, options)
-    .getCypher();
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> options = Options.newOptions().withLabelFilter(<span class="local-variable">this</span>.makeSureALabelIsPresent).build();
+<span class="type">var</span> statement = CypherParser.parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) SET n:`Comedy` RETURN n</span><span class="delimiter">&quot;</span></span>, options).getCypher();
 
 assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Movie`:`ForcedLabel`) SET n:`Comedy`:`Modified` RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
@@ -2173,9 +2085,8 @@ assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&qu
 <div id="enforcing-on-remove" class="listingblock">
 <div class="title">Listing 26. Preventing a specific label to be removed</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> options = Options.newOptions().withLabelFilter(makeSureALabelIsPresent).build();
-<span class="type">var</span> statement = CypherParser
-    .parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) REMOVE n:`Comedy`:`ForcedLabel` RETURN n</span><span class="delimiter">&quot;</span></span>, options)
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> options = Options.newOptions().withLabelFilter(<span class="local-variable">this</span>.makeSureALabelIsPresent).build();
+<span class="type">var</span> statement = CypherParser.parseStatement(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:Movie) REMOVE n:`Comedy`:`ForcedLabel` RETURN n</span><span class="delimiter">&quot;</span></span>, options)
     .getCypher();
 
 assertThat(statement).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Movie`:`ForcedLabel`) REMOVE n:`Comedy` RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
@@ -2201,9 +2112,11 @@ statements with added conditions to a <code>Neo4jRepository</code>.</p>
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslConditionExecutor</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor</span>;
 
-<span class="directive">public</span> <span class="type">interface</span> <span class="class">PeopleRepository</span> <span class="directive">extends</span> Neo4jRepository&lt;Person, <span class="predefined-type">Long</span>&gt;,
-    CypherdslConditionExecutor&lt;Person&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
-    CypherdslStatementExecutor&lt;Person&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">PeopleRepository</span> <span class="directive">extends</span> Neo4jRepository&lt;Person, <span class="predefined-type">Long</span>&gt;, CypherdslConditionExecutor&lt;Person&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+        CypherdslStatementExecutor&lt;Person&gt; {
+
+    <i class="conum" data-value="2"></i><b>(2)</b>
+
 }</code></pre>
 </div>
 </div>
@@ -2226,9 +2139,8 @@ statements with added conditions to a <code>Neo4jRepository</code>.</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornAfterThe70tiesAnd(<span class="predefined-type">String</span> additionalConditions) {
 
-    <span class="keyword">return</span> peopleRepository.findAll(
-        person.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>))
-            .and(CypherParser.parseExpression(additionalConditions).asCondition()) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="keyword">return</span> <span class="local-variable">this</span>.peopleRepository.findAll(<span class="local-variable">this</span>.person.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>))
+        .and(CypherParser.parseExpression(additionalConditions).asCondition()) <i class="conum" data-value="1"></i><b>(1)</b>
     );
 }</code></pre>
 </div>
@@ -2249,12 +2161,9 @@ know the root node (which is <code>n</code> in case of SDN 6) and the caller cod
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> exchange = restTemplate.exchange(
-    <span class="string"><span class="delimiter">&quot;</span><span class="content">/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}</span><span class="delimiter">&quot;</span></span>,
-    HttpMethod.GET,
-    <span class="predefined-constant">null</span>, <span class="keyword">new</span> ParameterizedTypeReference&lt;<span class="predefined-type">List</span>&lt;Person&gt;&gt;() { },
-    <span class="string"><span class="delimiter">&quot;</span><span class="content">person.name contains </span><span class="char">\&quot;</span><span class="content">Ricci</span><span class="char">\&quot;</span><span class="content"> OR person.name ends with 'Hirsch'</span><span class="delimiter">&quot;</span></span>
-);</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> exchange = restTemplate.exchange(<span class="string"><span class="delimiter">&quot;</span><span class="content">/api/people/v1/findPeopleBornAfterThe70ties?conditions={conditions}</span><span class="delimiter">&quot;</span></span>,
+        HttpMethod.GET, <span class="predefined-constant">null</span>, <span class="keyword">new</span> ParameterizedTypeReference&lt;<span class="predefined-type">List</span>&lt;Person&gt;&gt;() {
+        }, <span class="string"><span class="delimiter">&quot;</span><span class="content">person.name contains </span><span class="char">\&quot;</span><span class="content">Ricci</span><span class="char">\&quot;</span><span class="content"> OR person.name ends with 'Hirsch'</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2265,24 +2174,15 @@ We could change the service method slightly and apply a callback like this:</p>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornAfterThe70tiesAndV2(<span class="predefined-type">String</span> additionalConditions) {
 
-    Function&lt;<span class="predefined-type">Expression</span>, <span class="predefined-type">Expression</span>&gt; enforceReference =
-        e -&gt; personRootName.property(((SymbolicName) e).getValue()); <i class="conum" data-value="1"></i><b>(1)</b>
+    Function&lt;<span class="predefined-type">Expression</span>, <span class="predefined-type">Expression</span>&gt; enforceReference = e -&gt; <span class="local-variable">this</span>.personRootName
+        .property(((SymbolicName) e).getValue()); <i class="conum" data-value="1"></i><b>(1)</b>
     <span class="type">var</span> parserOptions = Options.newOptions()
-        .withCallback(
-            ExpressionCreatedEventType.ON_NEW_VARIABLE,
-            <span class="predefined-type">Expression</span>.class,
-            enforceReference
-        ) <i class="conum" data-value="2"></i><b>(2)</b>
+        .withCallback(ExpressionCreatedEventType.ON_NEW_VARIABLE, <span class="predefined-type">Expression</span>.class, enforceReference) <i class="conum" data-value="2"></i><b>(2)</b>
         .build();
 
-    <span class="keyword">return</span> peopleRepository.findAll(
-        person.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>)).and(
-            CypherParser.parseExpression(
-                additionalConditions,
-                parserOptions <i class="conum" data-value="3"></i><b>(3)</b>
-            ).asCondition()
-        )
-    );
+    <span class="keyword">return</span> <span class="local-variable">this</span>.peopleRepository.findAll(<span class="local-variable">this</span>.person.BORN.gte(Cypher.literalOf(<span class="integer">1980</span>))
+        .and(CypherParser.parseExpression(additionalConditions, parserOptions <i class="conum" data-value="3"></i><b>(3)</b>
+        ).asCondition()));
 }</code></pre>
 </div>
 </div>
@@ -2372,7 +2272,7 @@ Graph-QL schemes.</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> m = Cypher.node(<span class="string"><span class="delimiter">&quot;</span><span class="content">Movie</span><span class="delimiter">&quot;</span></span>).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> statement = Cypher.match(m).returning(m).build();</code></pre>
+<span class="type">var</span> statement = Cypher.match(m).returning(<span class="local-variable">this</span>.m).build();</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2401,9 +2301,12 @@ with the Cypher-DSL.</p>
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.NodeBase</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.NodeLabel</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Properties</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Property</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
 
-<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; {
+
+    <i class="conum" data-value="1"></i><b>(1)</b>
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> Movie MOVIE = <span class="keyword">new</span> Movie(); <i class="conum" data-value="2"></i><b>(2)</b>
 
@@ -2426,6 +2329,7 @@ with the Cypher-DSL.</p>
 
         <span class="keyword">return</span> <span class="keyword">new</span> Movie(getSymbolicName().orElse(<span class="predefined-constant">null</span>), getLabels(), <span class="predefined-type">Properties</span>.create(newProperties));
     }
+
 }</code></pre>
 </div>
 </div>
@@ -2463,9 +2367,7 @@ It must be overridden to guarantee type integrity.</td>
 </div>
 <div id="static-movie" class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cypher = Cypher.match(Movie.MOVIE)
-    .returning(Movie.MOVIE)
-    .build().getCypher();</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cypher = Cypher.match(Movie.MOVIE).returning(Movie.MOVIE).build().getCypher();</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2477,9 +2379,7 @@ It must be overridden to guarantee type integrity.</td>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> movie = Movie.MOVIE.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> cypher = Cypher.match(movie)
-    .returning(movie)
-    .build().getCypher();</code></pre>
+<span class="type">var</span> cypher = Cypher.match(movie).returning(movie).build().getCypher();</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2487,11 +2387,13 @@ It must be overridden to guarantee type integrity.</td>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Property</span>;
+<pre class="CodeRay highlight"><code data-lang="java"><span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; {
 
-<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">Movie</span> <span class="directive">extends</span> NodeBase&lt;Movie&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+    <i class="conum" data-value="1"></i><b>(1)</b>
 
     <span class="directive">public</span> <span class="directive">final</span> Property TITLE = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">title</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b>
+
+
 }</code></pre>
 </div>
 </div>
@@ -2516,10 +2418,10 @@ It must be overridden to guarantee type integrity.</td>
 <span class="type">var</span> cypher = Cypher.match(movie)
     .where(movie.TITLE.isEqualTo(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Matrix</span><span class="delimiter">&quot;</span></span>))) <i class="conum" data-value="1"></i><b>(1)</b>
     .returning(movie)
-    .build().getCypher();
+    .build()
+    .getCypher();
 
-Assertions.assertThat(cypher)
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m:`Movie`) WHERE m.title = 'The Matrix' RETURN m</span><span class="delimiter">&quot;</span></span>);</code></pre>
+Assertions.assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m:`Movie`) WHERE m.title = 'The Matrix' RETURN m</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -2580,7 +2482,9 @@ It exists between people and movies (going from person to movie) and has an attr
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.RelationshipBase</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
 
-<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">ActedIn</span> <span class="directive">extends</span> RelationshipBase&lt;Person, Movie, ActedIn&gt; { <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="directive">public</span> <span class="directive">final</span> <span class="type">class</span> <span class="class">ActedIn</span> <span class="directive">extends</span> RelationshipBase&lt;Person, Movie, ActedIn&gt; {
+
+    <i class="conum" data-value="1"></i><b>(1)</b>
 
     <span class="directive">public</span> <span class="directive">static</span> <span class="directive">final</span> <span class="predefined-type">String</span> <span class="error">$</span>TYPE = <span class="string"><span class="delimiter">&quot;</span><span class="content">ACTED_IN</span><span class="delimiter">&quot;</span></span>;
 
@@ -2605,6 +2509,7 @@ It exists between people and movies (going from person to movie) and has an attr
 
         <span class="keyword">return</span> <span class="keyword">new</span> ActedIn(getSymbolicName().orElse(<span class="predefined-constant">null</span>), getLeft(), <span class="predefined-type">Properties</span>.create(newProperties), getRight());
     }
+
 }</code></pre>
 </div>
 </div>
@@ -2655,6 +2560,8 @@ This is stored at the owner. In this case, the <code>Person</code>:</p>
     <span class="directive">public</span> <span class="directive">final</span> Property FIRST_NAME = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">firstName</span><span class="delimiter">&quot;</span></span>);
 
     <span class="directive">public</span> <span class="directive">final</span> Property BORN = <span class="local-variable">this</span>.property(<span class="string"><span class="delimiter">&quot;</span><span class="content">born</span><span class="delimiter">&quot;</span></span>);
+
+
 }</code></pre>
 </div>
 </div>
@@ -2756,12 +2663,9 @@ the <code>neo4j-cypher-dsl-codegen</code> models.</p>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cypher = Cypher.match(Person.PERSON)
-    .returning(Person.PERSON.NAME, Person.PERSON.BORN)
-    .build().getCypher();
+<pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cypher = Cypher.match(Person.PERSON).returning(Person.PERSON.NAME, Person.PERSON.BORN).build().getCypher();
 
-Assertions.assertThat(cypher)
-    .matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.name, </span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.born</span><span class="delimiter">&quot;</span></span>);</code></pre>
+Assertions.assertThat(cypher).matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.name, </span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.born</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2771,10 +2675,10 @@ Assertions.assertThat(cypher)
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cypher = Cypher.match(Person.PERSON)
     .returning(Person.PERSON.NAME.concat(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content"> whatever</span><span class="delimiter">&quot;</span></span>)))
-    .build().getCypher();
+    .build()
+    .getCypher();
 
-Assertions.assertThat(cypher)
-    .matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.name </span><span class="char">\\</span><span class="content">+ ' whatever'</span><span class="char">\\</span><span class="content">)</span><span class="delimiter">&quot;</span></span>);</code></pre>
+Assertions.assertThat(cypher).matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+</span><span class="char">\\</span><span class="content">.name </span><span class="char">\\</span><span class="content">+ ' whatever'</span><span class="char">\\</span><span class="content">)</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 </div>
@@ -2787,12 +2691,9 @@ Applicable to properties of nodes such as the title:</p>
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> movie = Movie.MOVIE.withProperties(Movie.MOVIE.TITLE, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">The Matrix</span><span class="delimiter">&quot;</span></span>)).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">m1</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> cypher = Cypher.match(movie)
-    .returning(movie)
-    .build().getCypher();
+<span class="type">var</span> cypher = Cypher.match(movie).returning(movie).build().getCypher();
 
-Assertions.assertThat(cypher)
-    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m1:`Movie` {title: 'The Matrix'}) RETURN m1</span><span class="delimiter">&quot;</span></span>);</code></pre>
+Assertions.assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (m1:`Movie` {title: 'The Matrix'}) RETURN m1</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2801,9 +2702,7 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> actedIn = Person.PERSON.ACTED_IN.withProperties(Person.PERSON.ACTED_IN.ROLE, Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Neo</span><span class="delimiter">&quot;</span></span>));
-<span class="type">var</span> cypher = Cypher.match(actedIn)
-    .returning(Movie.MOVIE)
-    .build().getCypher();
+<span class="type">var</span> cypher = Cypher.match(actedIn).returning(Movie.MOVIE).build().getCypher();
 
 Assertions.assertThat(cypher)
     .matches(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">)-</span><span class="char">\\</span><span class="content">[</span><span class="char">\\</span><span class="content">w+:`ACTED_IN` </span><span class="char">\\</span><span class="content">{role: 'Neo'}]-&gt;</span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Movie`</span><span class="char">\\</span><span class="content">) RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="delimiter">&quot;</span></span>);</code></pre>
@@ -2828,7 +2727,8 @@ Assertions.assertThat(cypher)
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> cypher = Cypher.match(Person.PERSON.DIRECTED)
     .match(Person.PERSON.ACTED_IN)
     .returning(Person.PERSON.DIRECTED, Person.PERSON.ACTED_IN)
-    .build().getCypher();</code></pre>
+    .build()
+    .getCypher();</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -2837,17 +2737,12 @@ Assertions.assertThat(cypher)
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="type">var</span> otherPerson = Person.PERSON.named(<span class="string"><span class="delimiter">&quot;</span><span class="content">o</span><span class="delimiter">&quot;</span></span>);
-<span class="type">var</span> cypher = Cypher.match(
-        Person.PERSON.DIRECTED.inverse()
-            .relationshipTo(otherPerson, <span class="string"><span class="delimiter">&quot;</span><span class="content">FOLLOWS</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
-    )
-    .where(otherPerson.NAME.isEqualTo(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Someone</span><span class="delimiter">&quot;</span></span>)))
-    .returning(Person.PERSON)
-    .build().getCypher();
+<span class="type">var</span> cypher = Cypher.match(Person.PERSON.DIRECTED.inverse().relationshipTo(otherPerson, <span class="string"><span class="delimiter">&quot;</span><span class="content">FOLLOWS</span><span class="delimiter">&quot;</span></span>) <i class="conum" data-value="1"></i><b>(1)</b>
+).where(otherPerson.NAME.isEqualTo(Cypher.literalOf(<span class="string"><span class="delimiter">&quot;</span><span class="content">Someone</span><span class="delimiter">&quot;</span></span>))).returning(Person.PERSON).build().getCypher();
 
 Assertions.assertThat(cypher)
     .matches(
-        <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Movie`</span><span class="char">\\</span><span class="content">)&lt;-</span><span class="char">\\</span><span class="content">[:`DIRECTED`]-</span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">)-</span><span class="char">\\</span><span class="content">[:`FOLLOWS`]-&gt;</span><span class="char">\\</span><span class="content">(o:`Person`</span><span class="char">\\</span><span class="content">) WHERE o</span><span class="char">\\</span><span class="content">.name = 'Someone' RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="delimiter">&quot;</span></span>);</code></pre>
+            <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH </span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Movie`</span><span class="char">\\</span><span class="content">)&lt;-</span><span class="char">\\</span><span class="content">[:`DIRECTED`]-</span><span class="char">\\</span><span class="content">(</span><span class="char">\\</span><span class="content">w+:`Person`</span><span class="char">\\</span><span class="content">)-</span><span class="char">\\</span><span class="content">[:`FOLLOWS`]-&gt;</span><span class="char">\\</span><span class="content">(o:`Person`</span><span class="char">\\</span><span class="content">) WHERE o</span><span class="char">\\</span><span class="content">.name = 'Someone' RETURN </span><span class="char">\\</span><span class="content">w+</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -3043,6 +2938,7 @@ application like as follows to avoid dependency conflicts:</p>
 <span class="keyword">import</span> <span class="include">java.util.List</span>;
 
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Cypher</span>;
+
 <span class="keyword">import</span> <span class="include">org.springframework.data.domain.Sort</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.stereotype.Service</span>;
 
@@ -3057,9 +2953,9 @@ application like as follows to avoid dependency conflicts:</p>
 
     <span class="predefined-type">List</span>&lt;Movie&gt; findAll() {
 
-        <span class="keyword">return</span> movieRepository
-            .findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); <i class="conum" data-value="1"></i><b>(1)</b>
+        <span class="keyword">return</span> <span class="local-variable">this</span>.movieRepository.findAll(Sort.by(Movie_.MOVIE.TITLE.getName()).ascending()); <i class="conum" data-value="1"></i><b>(1)</b>
     }
+
 }</code></pre>
 </div>
 </div>
@@ -3080,9 +2976,11 @@ application like as follows to avoid dependency conflicts:</p>
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslConditionExecutor</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.repository.support.CypherdslStatementExecutor</span>;
 
-<span class="directive">public</span> <span class="type">interface</span> <span class="class">PeopleRepository</span> <span class="directive">extends</span> Neo4jRepository&lt;Person, <span class="predefined-type">Long</span>&gt;,
-    CypherdslConditionExecutor&lt;Person&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
-    CypherdslStatementExecutor&lt;Person&gt; { <i class="conum" data-value="2"></i><b>(2)</b>
+<span class="directive">public</span> <span class="type">interface</span> <span class="class">PeopleRepository</span> <span class="directive">extends</span> Neo4jRepository&lt;Person, <span class="predefined-type">Long</span>&gt;, CypherdslConditionExecutor&lt;Person&gt;, <i class="conum" data-value="1"></i><b>(1)</b>
+        CypherdslStatementExecutor&lt;Person&gt; {
+
+    <i class="conum" data-value="2"></i><b>(2)</b>
+
 }</code></pre>
 </div>
 </div>
@@ -3112,6 +3010,12 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Cypher</span>;
 <span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.Expression</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.core.SymbolicName</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.parser.CypherParser</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.parser.ExpressionCreatedEventType</span>;
+<span class="keyword">import</span> <span class="include">org.neo4j.cypherdsl.parser.Options</span>;
+
+<span class="keyword">import</span> <span class="include">org.springframework.data.domain.Example</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.core.mapping.Constants</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.data.neo4j.core.mapping.Neo4jMappingContext</span>;
 <span class="keyword">import</span> <span class="include">org.springframework.stereotype.Service</span>;
@@ -3120,24 +3024,24 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 <span class="directive">final</span> <span class="type">class</span> <span class="class">PeopleService</span> {
 
     <span class="directive">private</span> <span class="directive">final</span> Person_ person;
+
     <span class="directive">private</span> <span class="directive">final</span> SymbolicName personRootName;
 
     <span class="directive">private</span> <span class="directive">final</span> PeopleRepository peopleRepository;
 
     PeopleService(PeopleRepository peopleRepository, Neo4jMappingContext mappingContext) {
         <span class="local-variable">this</span>.peopleRepository = peopleRepository;
-        <span class="local-variable">this</span>.personRootName = Constants.NAME_OF_TYPED_ROOT_NODE.apply(
-            mappingContext.getRequiredPersistentEntity(Person.class));
-        <span class="local-variable">this</span>.person = Person_.PERSON.named(personRootName);
+        <span class="local-variable">this</span>.personRootName = Constants.NAME_OF_TYPED_ROOT_NODE
+            .apply(mappingContext.getRequiredPersistentEntity(Person.class));
+        <span class="local-variable">this</span>.person = Person_.PERSON.named(<span class="local-variable">this</span>.personRootName);
     }
 
     <span class="predefined-type">Iterable</span>&lt;Person&gt; findPeopleBornInThe70tiesOr(Optional&lt;<span class="predefined-type">String</span>&gt; optionalName) {
 
-        <span class="keyword">return</span> peopleRepository.findAll(
-            person.BORN.gte(Cypher.literalOf(<span class="integer">1970</span>)).and(person.BORN.lt(Cypher.literalOf(<span class="integer">1980</span>))) <i class="conum" data-value="1"></i><b>(1)</b>
-                .or(optionalName
-                    .map(name -&gt; person.NAME.isEqualTo(Cypher.anonParameter(name))) <i class="conum" data-value="2"></i><b>(2)</b>
-                    .orElseGet(Cypher::noCondition)) <i class="conum" data-value="3"></i><b>(3)</b>
+        <span class="keyword">return</span> <span class="local-variable">this</span>.peopleRepository.findAll(<span class="local-variable">this</span>.person.BORN.gte(Cypher.literalOf(<span class="integer">1970</span>))
+            .and(<span class="local-variable">this</span>.person.BORN.lt(Cypher.literalOf(<span class="integer">1980</span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+            .or(optionalName.map(name -&gt; <span class="local-variable">this</span>.person.NAME.isEqualTo(Cypher.anonParameter(name))) <i class="conum" data-value="2"></i><b>(2)</b>
+                .orElseGet(Cypher::noCondition)) <i class="conum" data-value="3"></i><b>(3)</b>
         );
     }
 
@@ -3151,14 +3055,13 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
             .optionalMatch(d.DIRECTORS)
             .optionalMatch(a.ACTORS)
             .optionalMatch(Person_.PERSON.relationshipTo(m).relationshipFrom(r, ActedIn_.<span class="error">$</span>TYPE))
-            .returningDistinct(
-                Person_.PERSON.getRequiredSymbolicName(),
-                Cypher.collectDistinct(d).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">directed</span><span class="delimiter">&quot;</span></span>),
-                Cypher.collectDistinct(a).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">actedIn</span><span class="delimiter">&quot;</span></span>),
-                Cypher.collectDistinct(r).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">related</span><span class="delimiter">&quot;</span></span>)).build();
+            .returningDistinct(Person_.PERSON.getRequiredSymbolicName(), Cypher.collectDistinct(d).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">directed</span><span class="delimiter">&quot;</span></span>),
+                    Cypher.collectDistinct(a).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">actedIn</span><span class="delimiter">&quot;</span></span>), Cypher.collectDistinct(r).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">related</span><span class="delimiter">&quot;</span></span>))
+            .build();
 
-        <span class="keyword">return</span> peopleRepository.findOne(statement, PersonDetails.class); <i class="conum" data-value="4"></i><b>(4)</b>
+        <span class="keyword">return</span> <span class="local-variable">this</span>.peopleRepository.findOne(statement, PersonDetails.class); <i class="conum" data-value="4"></i><b>(4)</b>
     }
+
 }</code></pre>
 </div>
 </div>
@@ -3199,11 +3102,12 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
         .with(p)
         .optionalMatch(<span class="keyword">new</span> ActedIn_(p, a))
         .optionalMatch(<span class="keyword">new</span> Directed_(p, d))
-        .with(Cypher.collect(a).add(Cypher.collect(d))
-            .as(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>))
-        .unwind(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>).as(m)
+        .with(Cypher.collect(a).add(Cypher.collect(d)).as(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>))
+        .unwind(<span class="string"><span class="delimiter">&quot;</span><span class="content">movies</span><span class="delimiter">&quot;</span></span>)
+        .as(m)
         .returningDistinct(m)
-        .orderBy(Movie_.MOVIE.named(m).TITLE).ascending()
+        .orderBy(Movie_.MOVIE.named(m).TITLE)
+        .ascending()
         .build();
 
     <span class="keyword">return</span> <span class="local-variable">this</span>.movieRepository.findAll(statement);
@@ -3227,17 +3131,17 @@ You can read more about them in the Spring Data Neo4j 6.1 documentation, chapter
 <div class="listingblock">
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">Optional&lt;Person&gt; createNewPerson(NewPersonCmd newPersonCmd) {
-    <span class="type">var</span> p = Person_.PERSON.withProperties(
-        Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName()) <i class="conum" data-value="1"></i><b>(1)</b>
+    <span class="type">var</span> p = Person_.PERSON.withProperties(Person_.PERSON.NAME, Cypher.anonParameter(newPersonCmd.getName()) <i class="conum" data-value="1"></i><b>(1)</b>
     ).named(<span class="string"><span class="delimiter">&quot;</span><span class="content">p</span><span class="delimiter">&quot;</span></span>);
 
     <span class="type">var</span> statement = Cypher.merge(p)
-        .onCreate().set(
-            p.BORN, Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">arbitraryName</span><span class="delimiter">&quot;</span></span>)
-                .withValue(newPersonCmd.getDob().getYear()), <i class="conum" data-value="2"></i><b>(2)</b>
-            p.DOB, Cypher.anonParameter(newPersonCmd.getDob()) <i class="conum" data-value="3"></i><b>(3)</b>
-        ).returning(p).build();
-    <span class="keyword">return</span> peopleRepository.findOne(statement);
+        .onCreate()
+        .set(p.BORN, Cypher.parameter(<span class="string"><span class="delimiter">&quot;</span><span class="content">arbitraryName</span><span class="delimiter">&quot;</span></span>).withValue(newPersonCmd.getDob().getYear()), <i class="conum" data-value="2"></i><b>(2)</b>
+                p.DOB, Cypher.anonParameter(newPersonCmd.getDob()) <i class="conum" data-value="3"></i><b>(3)</b>
+        )
+        .returning(p)
+        .build();
+    <span class="keyword">return</span> <span class="local-variable">this</span>.peopleRepository.findOne(statement);
 }</code></pre>
 </div>
 </div>
@@ -3451,7 +3355,7 @@ Please make sure to name the instance accordingly when you use it as node (see n
 </tr>
 <tr>
 <td><i class="conum" data-value="2"></i><b>2</b></td>
-<td>Adapt the "Q"-class into a node. Please note it must be named accordingly, otherwise you query
+<td>Adapt the "Q"-class into a node. Please note it must be named accordingly, otherwise your query
 won&#8217;t return the expected results</td>
 </tr>
 <tr>
@@ -3505,10 +3409,9 @@ assertThat(statement.getCypher())
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
 <span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode())
-    .where(Cypher.adapt(n.firstName.eq(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">String</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>))
-            .and(n.age.gt(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">Integer</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span>))) <i class="conum" data-value="1"></i><b>(1)</b>
-        ).asCondition()
-    )
+    .where(Cypher.adapt(
+            n.firstName.eq(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">String</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>)).and(n.age.gt(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">Integer</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+    ).asCondition())
     .returning(Cypher.adapt(n).asName())
     .build();
 
@@ -3591,26 +3494,12 @@ We use the following in our tests:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>GraalVM based on JDK 17: <a href="https://www.graalvm.org/downloads/" class="bare">https://www.graalvm.org/downloads/</a></p>
+<p><a href="https://www.graalvm.org/release-notes/JDK_24/">GraalVM for JDK 24</a></p>
 </li>
 </ul>
 </div>
-<div class="admonitionblock note">
-<table>
-<tr>
-<td class="icon">
-<i class="fa icon-note" title="Note"></i>
-</td>
-<td class="content">
-At least GraalVM <strong>22.3.0</strong> is required due to restrictions in <code>org.graalvm.buildtools:native-maven-plugin</code>.
-      The rationale behind that is explained <a href="https://graalvm.github.io/native-build-tools/latest/maven-plugin.html#long_classpath_and_shading_support">here</a>
-      and we don&#8217;t do apply any of the suggested workarounds as the releases are done with GraalVM 22.3.0 anyway.
-</td>
-</tr>
-</table>
-</div>
 <div class="paragraph">
-<p>For the project, including examples but skipping native tests</p>
+<p>For the project, including examples but skipping native tests:</p>
 </div>
 <div class="ulist">
 <ul>
@@ -3673,9 +3562,9 @@ The output should be similar:</p>
 <div class="title">Listing 32. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
-openjdk version &quot;17.0.5&quot; 2022-10-18
-OpenJDK Runtime Environment GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08)
-OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed mode, sharing)</code></pre>
+openjdk version &quot;24&quot; 2025-03-18
+OpenJDK Runtime Environment GraalVM CE 24+36.1 (build 24+36-jvmci-b01)
+OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, sharing)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3684,16 +3573,12 @@ OpenJDK 64-Bit Server VM GraalVM CE 22.3.0 (build 17.0.5+8-jvmci-22.3-b08, mixed
 <div id="verify-native-image" class="listingblock">
 <div class="title">Listing 33. Check for the present of <code>native-image</code></div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">$ gu list
-ComponentId              Version             Component name                Stability                     Origin
--------------------------------------------------------------------------------------------------------------------
-graalvm                  22.3.0              GraalVM Core                  Experimental
-js                       22.3.0              Graal.js                      Experimental                  github.com
-native-image             22.3.0              Native Image                  Experimental                  github.com</code></pre>
+<pre class="CodeRay highlight"><code data-lang="console">$ which native-image
+/Users/msimons/.sdkman/candidates/java/24-graalce/bin/native-image</code></pre>
 </div>
 </div>
 <div class="paragraph">
-<p>You should see <code>native-image</code> in the list. If not, install it via <code>gu install native-image</code>.</p>
+<p>You should see <code>native-image</code> in the list. If not, you are most likely on a GraalVM version we don&#8217;t support with this project.</p>
 </div>
 <div class="paragraph">
 <p>After that, use <code>./mvnw</code> on a Unix-like operating system to build the Cypher-DSL:</p>
@@ -3729,7 +3614,7 @@ native-image             22.3.0              Native Image                  Exper
 <div class="sect3">
 <h4 id="buildonlythecoremodule"><a class="anchor" href="#buildonlythecoremodule"></a>Build only the core module</h4>
 <div class="paragraph">
-<p>The core module can be build on plain JDK 17 with:</p>
+<p>The core module can be built on plain JDK 17 with:</p>
 </div>
 <div id="build-only-core-bash" class="listingblock">
 <div class="title">Listing 37. Build only the core module</div>
@@ -3778,7 +3663,7 @@ The rendering feature is part of the core module.</p>
 Therefore, there is little to know API to do so with the AST visitor being the exception.</p>
 </div>
 <div class="paragraph">
-<p>We document our rules structure with <a href="https://www.archunit.org">ArchUnit</a> within a single unittest named <code>org.neo4j.cypherdsl.core.PackageAndAPIStructureTest</code>.</p>
+<p>We document our rules structure with <a href="https://www.archunit.org">ArchUnit</a> within a single unittest named <code>org.neo4j.cypherdsl.core.PackageAndAPIStructureTests</code>.</p>
 </div>
 <div class="sect3">
 <h4 id="codingrules"><a class="anchor" href="#codingrules"></a>Coding rules</h4>
@@ -3792,8 +3677,7 @@ Therefore, there is little to know API to do so with the AST visitor being the e
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@BeforeAll</span>
 <span class="type">void</span> importCorePackage() {
-    coreClasses = <span class="keyword">new</span> ClassFileImporter()
-        .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
+    <span class="local-variable">this</span>.coreClasses = <span class="keyword">new</span> ClassFileImporter().withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
         .importPackages(<span class="string"><span class="delimiter">&quot;</span><span class="content">org.neo4j.cypherdsl.core..</span><span class="delimiter">&quot;</span></span>);
 }</code></pre>
 </div>
@@ -3816,8 +3700,9 @@ and annotations.</p>
     ArchRule rule = noClasses().that()
         .resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core</span><span class="delimiter">&quot;</span></span>)
         .and(not(assignableFrom(AbstractStatement.class).or(assignableFrom(RendererBridge.class))))
-        .should().dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..renderer..</span><span class="delimiter">&quot;</span></span>));
-    rule.check(coreClasses);
+        .should()
+        .dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..renderer..</span><span class="delimiter">&quot;</span></span>));
+    rule.check(<span class="local-variable">this</span>.coreClasses);
 }</code></pre>
 </div>
 </div>
@@ -3841,8 +3726,10 @@ This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 <span class="type">void</span> internalPublicClassesMustBeFinal() {
     ArchRule rule = classes().that()
         .areAnnotatedWith(API.class)
-        .and().arePublic()
-        .and().areTopLevelClasses()
+        .and()
+        .arePublic()
+        .and()
+        .areTopLevelClasses()
         .and(not(modifier(JavaModifier.ABSTRACT)))
         .and(<span class="keyword">new</span> DescribedPredicate&lt;&gt;(<span class="string"><span class="delimiter">&quot;</span><span class="content">Is internal API</span><span class="delimiter">&quot;</span></span>) {
             <span class="annotation">@Override</span>
@@ -3851,9 +3738,10 @@ This package won&#8217;t be exported via <code>module-info.java</code>.</p>
                 <span class="keyword">return</span> <span class="string"><span class="delimiter">&quot;</span><span class="content">INTERNAL</span><span class="delimiter">&quot;</span></span>.equals(status.name());
             }
         })
-        .should().haveModifier(JavaModifier.FINAL)
+        .should()
+        .haveModifier(JavaModifier.FINAL)
         .andShould(ArchConditions.not(ArchConditions.resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core</span><span class="delimiter">&quot;</span></span>)));
-    rule.check(coreClasses);
+    rule.check(<span class="local-variable">this</span>.coreClasses);
 }</code></pre>
 </div>
 </div>
@@ -3887,8 +3775,9 @@ explicitly specifying a renderer:</p>
     ArchRule rule = noClasses().that()
         .resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core</span><span class="delimiter">&quot;</span></span>)
         .and(not(assignableFrom(AbstractStatement.class).or(assignableFrom(RendererBridge.class))))
-        .should().dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..renderer..</span><span class="delimiter">&quot;</span></span>));
-    rule.check(coreClasses);
+        .should()
+        .dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..renderer..</span><span class="delimiter">&quot;</span></span>));
+    rule.check(<span class="local-variable">this</span>.coreClasses);
 }</code></pre>
 </div>
 </div>
@@ -3904,10 +3793,9 @@ The <code>ast</code> and <code>utils</code> packages however should not have dep
 <span class="type">void</span> independentSupportPackages(<span class="predefined-type">String</span> supportPackage) {
     ArchRule rule = noClasses().that()
         .resideInAPackage(supportPackage)
-        .should().dependOnClassesThat(
-            resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core..</span><span class="delimiter">&quot;</span></span>).and(not(resideInAPackage(supportPackage)))
-        );
-    rule.check(coreClasses);
+        .should()
+        .dependOnClassesThat(resideInAPackage(<span class="string"><span class="delimiter">&quot;</span><span class="content">..core..</span><span class="delimiter">&quot;</span></span>).and(not(resideInAPackage(supportPackage))));
+    rule.check(<span class="local-variable">this</span>.coreClasses);
 }</code></pre>
 </div>
 </div>
@@ -11035,7 +10923,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-08-03 18:41:13 UTC
+Last updated 2025-08-19 13:36:28 UTC
 </div>
 </div>
 </body>
