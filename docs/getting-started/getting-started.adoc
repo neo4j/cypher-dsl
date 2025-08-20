@@ -44,8 +44,7 @@ Please get an instance of the default renderer via `org.neo4j.cypherdsl.renderer
 The renderer provides a single method `render` for rendering the AST into a string representation.
 
 Furthermore, the `Statement` will collect parameter names and if provided, parameter values.
-Parameter names and values are available after the statement has been built and can for example be used directly with
-Neo4j-Java-Driver.
+Parameter names and values are available after the statement has been built and can for example be used directly with the Neo4j-Java-Driver.
 
 [[how-to-use-it.examples]]
 === Examples

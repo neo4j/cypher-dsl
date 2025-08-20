@@ -35,7 +35,6 @@
 	<modules>
 		<module>neo4j-cypher-dsl-examples-core</module>
 		<module>neo4j-cypher-dsl-examples-parser</module>
-		<module>neo4j-cypher-dsl-examples-driver</module>
 		<module>neo4j-cypher-dsl-examples-ogm-quarkus</module>
 		<module>neo4j-cypher-dsl-examples-sdn6</module>
 	</modules>
