@@ -65,21 +65,9 @@
 			<optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>io.projectreactor</groupId>
-			<artifactId>reactor-core</artifactId>
-			<scope>provided</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-build-annotations</artifactId>
 			<version>${project.version}</version>
-			<scope>provided</scope>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.neo4j.driver</groupId>
-			<artifactId>neo4j-java-driver</artifactId>
 			<scope>provided</scope>
 			<optional>true</optional>
 		</dependency>
@@ -148,8 +136,6 @@
 				<configuration combine.self="append">
 					<!-- -add-opens java.base/java.lang=ALL-UNNAMED added for QueryDSL proxy mechanics based on ages old cglib -->
 					<argLine>@{argLine} -Xverify:all
-						--add-modules org.neo4j.driver
-						--add-reads org.neo4j.cypherdsl.core=org.neo4j.driver
 						--add-modules com.querydsl.core
 						--add-reads org.neo4j.cypherdsl.core=com.querydsl.core
 						--add-opens java.base/java.lang=ALL-UNNAMED</argLine>

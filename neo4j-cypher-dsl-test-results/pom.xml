@@ -81,11 +81,6 @@
 		</dependency>
 		<dependency>
 			<groupId>org.neo4j</groupId>
-			<artifactId>neo4j-cypher-dsl-examples-driver</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-parser</artifactId>
 			<version>${project.version}</version>
 		</dependency>
