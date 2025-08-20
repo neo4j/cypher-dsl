@@ -114,7 +114,6 @@ jobs:
           ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
           -pl org.neo4j:neo4j-cypher-dsl-examples
           -pl org.neo4j:neo4j-cypher-dsl-examples-core
-          -pl org.neo4j:neo4j-cypher-dsl-examples-driver
           -pl org.neo4j:neo4j-cypher-dsl-examples-parser
           -pl org.neo4j:neo4j-cypher-dsl-examples-ogm-quarkus
           -pl org.neo4j:neo4j-cypher-dsl-examples-sdn6
