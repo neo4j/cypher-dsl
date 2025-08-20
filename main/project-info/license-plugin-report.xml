@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1755610668445">
+<licensePluginReport goal="CHECK" timestamp="1755693613339">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -35,7 +35,6 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/DefaultStatementBuilder.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Delete.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/DistinctExpression.java" result="PRESENT"/>
-        <file path="src/main/java/org/neo4j/cypherdsl/core/DriverValueAdapter.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/DurationLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExistentialSubquery.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ExposesAndThen.java" result="PRESENT"/>
@@ -231,7 +230,6 @@
         <file path="src/test/java/org/neo4j/cypherdsl/core/DefaultStatementBuilderTests.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DeleteTests.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DialectIT.java" result="PRESENT"/>
-        <file path="src/test/java/org/neo4j/cypherdsl/core/DriverValueAdapterTests.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/DurationLiteralTests.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ExpressionTests.java" result="PRESENT"/>
         <file path="src/test/java/org/neo4j/cypherdsl/core/ExpressionsIT.java" result="PRESENT"/>
