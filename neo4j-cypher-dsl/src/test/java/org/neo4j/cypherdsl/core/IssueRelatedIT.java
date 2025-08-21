@@ -1035,6 +1035,7 @@ class IssueRelatedIT {
 		assertThat(cypher).isEqualTo(expected);
 	}
 
+	@SuppressWarnings("removal")
 	@ParameterizedTest // GH-319
 	@EnumSource(Dialect.class)
 	void subqueryWithRename(Dialect dialect) {
@@ -1063,11 +1064,15 @@ class IssueRelatedIT {
 				  RETURN x
 				}
 				RETURN *""";
-		if (dialect == Dialect.NEO4J_5_23 || dialect == Dialect.NEO4J_5_26) {
+
+		if (EnumSet.complementOf(EnumSet.of(Dialect.NEO4J_4, Dialect.NEO4J_5)).contains(dialect)) {
 			expected = expected.replace("CALL {", "CALL (nodes) {").replace("  WITH nodes\n", "");
 		}
-		if (dialect == Dialect.NEO4J_5_26) {
+		if (EnumSet.of(Dialect.NEO4J_5_26, Dialect.NEO4J_5_CYPHER_5).contains(dialect)) {
 			expected = "CYPHER 5 " + expected;
+		}
+		else if (EnumSet.of(Dialect.NEO4J_5_CYPHER_25).contains(dialect)) {
+			expected = "CYPHER 25 " + expected;
 		}
 		assertThat(cypher).isEqualTo(expected);
 	}

@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class Cypher5IT {
 
 	private final Renderer renderer = Renderer
-		.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).withDialect(Dialect.NEO4J_5_26).build());
+		.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).withDialect(Dialect.NEO4J_5_CYPHER_5).build());
 
 	@Test
 	void cypher5PrefixOnSimpleStatements() {

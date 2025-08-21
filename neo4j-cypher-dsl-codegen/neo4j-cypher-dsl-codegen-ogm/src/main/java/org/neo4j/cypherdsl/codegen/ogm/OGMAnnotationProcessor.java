@@ -73,9 +73,9 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
  *
  * @author Shinigami92 (Christopher Quadflieg)
  * @author Michael J. Simons
- * @since 2025.8.0
+ * @since 2025.0.0
  */
-@API(status = EXPERIMENTAL, since = "2025.8.0")
+@API(status = EXPERIMENTAL, since = "2025.0.0")
 @SupportedAnnotationTypes({ OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
 		OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION })
 @SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,

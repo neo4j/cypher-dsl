@@ -105,7 +105,7 @@ public final class Configuration {
 		this.alwaysEscapeNames = builder.alwaysEscapeNames;
 		this.indentStyle = builder.indentStyle;
 		this.indentSize = builder.indentSize;
-		this.dialect = (builder.dialect != null) ? builder.dialect : Dialect.NEO4J_4;
+		this.dialect = (builder.dialect != null) ? builder.dialect : Dialect.NEO4J_5_DEFAULT_CYPHER;
 		this.generatedNames = builder.generatedNames;
 		this.enforceSchema = builder.enforceSchema;
 
