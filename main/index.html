@@ -1842,7 +1842,7 @@ Here we assume the user does the right thing and don&#8217;t modify the query an
     .build()
     .getCypher();
 
-assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (node:`Node`) </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL {</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node AS this </span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="5"></i><b>(5)</b>
+assertThat(cypher).isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (node:`Node`) </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">CALL (node) {</span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">WITH node AS this </span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="5"></i><b>(5)</b>
         + <span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result</span><span class="delimiter">&quot;</span></span> <i class="conum" data-value="6"></i><b>(6)</b>
         + <span class="string"><span class="delimiter">&quot;</span><span class="content">} </span><span class="delimiter">&quot;</span></span> + <span class="string"><span class="delimiter">&quot;</span><span class="content">RETURN result{.foo, .bar}</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
@@ -10922,7 +10922,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-08-21 10:11:19 UTC
+Last updated 2025-08-21 16:42:23 UTC
 </div>
 </div>
 </body>
