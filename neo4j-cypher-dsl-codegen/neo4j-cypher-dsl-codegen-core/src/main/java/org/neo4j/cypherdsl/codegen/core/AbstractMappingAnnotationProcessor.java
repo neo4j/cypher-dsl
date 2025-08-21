@@ -56,7 +56,7 @@ import javax.tools.JavaFileObject;
  * ship with support for SDN6+ and Neo4j-OGM).
  *
  * @author Michael J. Simons
- * @since 2025.8.0
+ * @since 2025.0.0
  */
 public abstract class AbstractMappingAnnotationProcessor extends AbstractProcessor {
 

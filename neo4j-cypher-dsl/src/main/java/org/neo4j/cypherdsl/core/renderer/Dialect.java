@@ -60,7 +60,7 @@ public enum Dialect {
 
 	/**
 	 * Enhanced Neo4j 5 dialect that renders importing with statements for call subqueries
-	 * as variable scoped subqueries.
+	 * as variable scoped subqueries, suitable for Neo4j >= 5.23.
 	 *
 	 * @since 2024.1.0
 	 */
@@ -74,22 +74,85 @@ public enum Dialect {
 	},
 
 	/**
-	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 5}
-	 * preamble on generated statements.
-	 *
+	 * A Neo4j 5.26 and higher dialect that always renders the {@code CYPHER 5} prefix.
 	 * @since 2024.5.0
+	 * @deprecated Use {@link #NEO4J_5_CYPHER_5} if neccessary or
+	 * {@link #NEO4J_5_DEFAULT_CYPHER} in all other cases.
 	 */
+	@Deprecated(forRemoval = true)
 	NEO4J_5_26 {
-		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport();
-
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return this.handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+			return NEO4J_5_23.getHandler(visitable);
 		}
 
 		@Override
 		Optional<String> getPrefix() {
 			return Optional.of("CYPHER 5 ");
+		}
+	},
+
+	/**
+	 * Essentially the same as {@link #NEO4J_5_23} using the databases default Cypher
+	 * version. This is the default dialect for Cypher-DSL 2025.0.0 and onwards.
+	 *
+	 * @since 2025.0.0
+	 */
+	NEO4J_5_DEFAULT_CYPHER {
+		@Override
+		Class<? extends Visitor> getHandler(Visitable visitable) {
+			return NEO4J_5_23.getHandler(visitable);
+		}
+	},
+
+	/**
+	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 5}
+	 * prefix on generated statements. This dialect works on Neo4j 5.26 and higher.
+	 * Genrally, {@link #NEO4J_5_DEFAULT_CYPHER} is preferrable.
+	 *
+	 * @since 2025.0.0
+	 */
+	NEO4J_5_CYPHER_5 {
+		@Override
+		Class<? extends Visitor> getHandler(Visitable visitable) {
+			return NEO4J_5_23.getHandler(visitable);
+		}
+
+		@Override
+		Optional<String> getPrefix() {
+			return Optional.of("CYPHER 5 ");
+		}
+	},
+
+	/**
+	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 25}
+	 * prefix on generated statements. This dialect works on Neo4j 5.26 and higher.
+	 * Genrally, {@link #NEO4J_5_23} is preferable.
+	 *
+	 * @since 2025.0.0
+	 */
+	NEO4J_5_CYPHER_25 {
+		@Override
+		Class<? extends Visitor> getHandler(Visitable visitable) {
+			return NEO4J_5_23.getHandler(visitable);
+		}
+
+		@Override
+		Optional<String> getPrefix() {
+			return Optional.of("CYPHER 25 ");
+		}
+	},
+
+	/**
+	 * A placeholder for Neo4j 2025 calver. Same behaviour as
+	 * {@link #NEO4J_5_DEFAULT_CYPHER} in this version of Cypher-DSL.
+	 *
+	 * @since 2025.0.0
+	 */
+	NEO4J_2025 {
+		@Override
+		Class<? extends Visitor> getHandler(Visitable visitable) {
+			return NEO4J_5_23.getHandler(visitable);
 		}
 	};
 
