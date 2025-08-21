@@ -59,4 +59,13 @@ class MultiPartElement implements Visitable {
 	public String toString() {
 		return RendererBridge.render(this);
 	}
+
+	boolean isImporting() {
+		return this.precedingClauses.isEmpty() && !this.with.getItems().isEmpty()
+				&& this.with.getItems().stream().allMatch(IdentifiableElement.class::isInstance);
+	}
+
+	IdentifiableElement[] getImports() {
+		return this.with.getItems().stream().map(IdentifiableElement.class::cast).toArray(IdentifiableElement[]::new);
+	}
 }

@@ -55,6 +55,15 @@ class MultiPartQuery extends AbstractStatement implements Statement.SingleQuery 
 		this.remainder = remainder;
 	}
 
+	List<MultiPartElement> getParts() {
+		return this.parts;
+	}
+
+	Statement stripFirst() {
+		return new MultiPartQuery((this.parts.size() > 1) ? this.parts.subList(1, this.parts.size()) : List.of(),
+				this.remainder);
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 

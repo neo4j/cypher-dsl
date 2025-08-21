@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
@@ -25,7 +27,9 @@ import org.neo4j.cypherdsl.core.ReturnBody;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
@@ -33,39 +37,60 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
  * @author Michael J. Simons
  * @since 2024.1.0
  */
-@RegisterForReflection(allDeclaredConstructors = true) final class Neo4j523SubqueryVisitor extends VisitorWithResult {
-
-	private final static GeneralizedRenderer RETURN_BODY_RENDERER = Renderer.getRenderer(
-		Configuration.newConfig().withDialect(Dialect.NEO4J_5_23).build(), GeneralizedRenderer.class);
+@RegisterForReflection(allDeclaredConstructors = true)
+final class Neo4j523SubqueryVisitor extends VisitorWithResult {
 
 	private final DefaultVisitor delegate;
+
+	private With importing;
 
 	Neo4j523SubqueryVisitor(DefaultVisitor delegate) {
 		this.delegate = delegate;
 	}
 
-	private With importing;
-
+	@Override
 	public EnterResult enterWithResult(Visitable segment) {
 
 		if (segment instanceof Subquery subquery) {
-			var replacement = new StringBuilder("(");
 			this.importing = subquery.importingWith();
+			this.delegate.enter(subquery);
+			this.delegate.builder.replace(this.delegate.builder.length() - 1, this.delegate.builder.length(), "(");
 			if (this.importing != null) {
 				this.importing.accept(innerSegment -> {
 					if (innerSegment instanceof ReturnBody returnBody) {
-						replacement.append(RETURN_BODY_RENDERER.render(returnBody));
+						returnBody.accept(this.delegate);
 					}
 				});
+			} else if (this.delegate.hasIdentifiables()) {
+				this.delegate.builder.append("*");
 			}
-			replacement.append(") {");
-			delegate.enter(subquery);
-			delegate.builder
-				.replace(delegate.builder.length() - 1, delegate.builder.length(), replacement.toString());
+			this.delegate.builder.append(") {");
 		} else if (segment instanceof With possibleImporting) {
 			if (!Objects.equals(this.importing, possibleImporting)) {
-				delegate.enter(possibleImporting);
+				this.delegate.enter(possibleImporting);
 			} else {
+				possibleImporting.accept(new Visitor() {
+					private final Deque<Boolean> entered = new ArrayDeque<>();
+
+					@Override
+					public void enter(Visitable segment) {
+						this.entered.push(Neo4j523SubqueryVisitor.this.delegate.preEnter(segment));
+					}
+
+					@Override
+					public void leave(Visitable segment) {
+						if (this.entered.pop()) {
+							Neo4j523SubqueryVisitor.this.delegate.postLeave(segment);
+							var currentLength = Neo4j523SubqueryVisitor.this.delegate.builder.length();
+							if (segment instanceof TypedSubtree<?> t && Neo4j523SubqueryVisitor.this.delegate.builder
+								.subSequence(currentLength - t.separator().length(), currentLength)
+								.equals(t.separator())) {
+								Neo4j523SubqueryVisitor.this.delegate.builder
+									.setLength(currentLength - t.separator().length());
+							}
+						}
+					}
+				});
 				return EnterResult.SKIP_CHILDREN;
 			}
 		}
@@ -81,9 +106,10 @@ import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 		} else if (segment instanceof With possibleImporting) {
 			if (Objects.equals(this.importing, possibleImporting)) {
 				this.importing = null;
-			} else {
-				delegate.leave(possibleImporting);
+			}  else {
+				this.delegate.leave(possibleImporting);
 			}
 		}
 	}
+
 }

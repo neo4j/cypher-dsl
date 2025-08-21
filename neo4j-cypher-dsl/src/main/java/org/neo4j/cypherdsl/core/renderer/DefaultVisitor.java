@@ -213,6 +213,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this(statementContext, renderConstantsAsParameters, Configuration.newConfig().alwaysEscapeNames(true).build());
 	}
 
+	boolean hasIdentifiables() {
+		return !this.scopingStrategy.getIdentifiables().isEmpty();
+	}
+
 	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters,
 		Configuration configuration) {
 		this.nameResolvingStrategy = configuration.isUseGeneratedNames() ?
