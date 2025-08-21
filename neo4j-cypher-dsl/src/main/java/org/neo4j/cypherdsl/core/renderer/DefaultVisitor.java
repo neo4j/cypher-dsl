@@ -1043,21 +1043,17 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(PatternSelector shortest) {
 
 		if (shortest instanceof PatternSelector.ShortestK shortestK) {
-			this.builder.append("SHORTEST ").append(shortestK.getK());
+			this.builder.append("SHORTEST ").append(shortestK.getK()).append(" ");
 		}
 		else if (shortest instanceof PatternSelector.ShortestKGroups shortestK) {
-			this.builder.append("SHORTEST ").append(shortestK.getK()).append(" GROUPS");
+			this.builder.append("SHORTEST ").append(shortestK.getK()).append(" GROUPS ");
 		}
 		else if (shortest instanceof PatternSelector.AllShortest) {
-			this.builder.append("ALL SHORTEST");
+			this.builder.append("ALL SHORTEST ");
 		}
 		else if (shortest instanceof PatternSelector.Any) {
-			this.builder.append("ANY");
+			this.builder.append("ANY ");
 		}
-	}
-
-	void leave(PatternSelector shortest) {
-		this.builder.append(" ");
 	}
 
 	void enter(QuantifiedPathPattern.TargetPattern qpp) {

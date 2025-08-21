@@ -23,6 +23,7 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
@@ -90,6 +91,47 @@ class DialectIT {
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
 		String cypher = renderer.render(Cypher.match(n).returning(n.elementId()).build());
 		assertThat(cypher).isEqualTo(expected);
+	}
+
+	@ParameterizedTest
+	@CsvSource(textBlock = """
+			NEO4J_4,MATCH p = shortestPath((wos:`Station`)-[:`LINK`]->(bmv:`Station`)) RETURN p
+			NEO4J_5,MATCH p = shortestPath((wos:`Station`)-[:`LINK`]->(bmv:`Station`)) RETURN p
+			NEO4J_5_23,MATCH p = SHORTEST 1 (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_26,CYPHER 5 MATCH p = SHORTEST 1 (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_DEFAULT_CYPHER,MATCH p = SHORTEST 1 (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_CYPHER_5,CYPHER 5 MATCH p = SHORTEST 1 (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_CYPHER_25,CYPHER 25 MATCH p = SHORTEST 1 (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			""")
+	void shortestPath(Dialect dialect, String expected) {
+
+		var stmt = Cypher.match(Cypher.shortestK(1)
+			.named("p")
+			.definedBy(Cypher.node("Station").named("wos").relationshipTo(Cypher.node("Station").named("bmv"), "LINK")))
+			.returning(Cypher.name("p"))
+			.build();
+		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+		assertThat(renderer.render(stmt)).isEqualTo(expected);
+	}
+
+	@ParameterizedTest
+	@CsvSource(textBlock = """
+			NEO4J_4,MATCH p = allShortestPaths((wos:`Station`)-[:`LINK`]->(bmv:`Station`)) RETURN p
+			NEO4J_5,MATCH p = allShortestPaths((wos:`Station`)-[:`LINK`]->(bmv:`Station`)) RETURN p
+			NEO4J_5_23,MATCH p = ALL SHORTEST (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_26,CYPHER 5 MATCH p = ALL SHORTEST (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_DEFAULT_CYPHER,MATCH p = ALL SHORTEST (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_CYPHER_5,CYPHER 5 MATCH p = ALL SHORTEST (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			NEO4J_5_CYPHER_25,CYPHER 25 MATCH p = ALL SHORTEST (wos:`Station`)-[:`LINK`]->(bmv:`Station`) RETURN p
+			""")
+	void allShortestPath(Dialect dialect, String expected) {
+		var stmt = Cypher.match(Cypher.allShortest()
+			.named("p")
+			.definedBy(Cypher.node("Station").named("wos").relationshipTo(Cypher.node("Station").named("bmv"), "LINK")))
+			.returning(Cypher.name("p"))
+			.build();
+		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+		assertThat(renderer.render(stmt)).isEqualTo(expected);
 	}
 
 	@Test // GH-539

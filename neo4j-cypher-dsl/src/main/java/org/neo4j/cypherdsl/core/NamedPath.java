@@ -135,8 +135,13 @@ public final class NamedPath implements PatternElement, Named {
 		this.name.accept(visitor);
 		if (this.optionalPattern != null) {
 			Operator.ASSIGMENT.accept(visitor);
-			Visitable.visitIfNotNull(this.optionalPatternSelector, visitor);
+			if (this.optionalPatternSelector != null) {
+				visitor.enter(this.optionalPatternSelector);
+			}
 			this.optionalPattern.accept(visitor);
+			if (this.optionalPatternSelector != null) {
+				visitor.leave(this.optionalPatternSelector);
+			}
 		}
 		visitor.leave(this);
 	}

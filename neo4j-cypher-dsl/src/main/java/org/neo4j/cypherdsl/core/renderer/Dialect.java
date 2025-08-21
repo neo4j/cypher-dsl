@@ -24,6 +24,7 @@ import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
+import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -43,7 +44,14 @@ public enum Dialect {
 	/**
 	 * Neo4j 4.4 and earlier.
 	 */
-	NEO4J_4,
+	NEO4J_4 {
+		private final DefaultNeo4j4HandlerSupplier handlerSupplier = new DefaultNeo4j4HandlerSupplier();
+
+		@Override
+		Class<? extends Visitor> getHandler(Visitable visitable) {
+			return this.handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
+		}
+	},
 
 	/**
 	 * Neo4j 5.
@@ -164,6 +172,19 @@ public enum Dialect {
 		return Optional.empty();
 	}
 
+	private static final class DefaultNeo4j4HandlerSupplier
+			implements Function<Visitable, Optional<Class<? extends Visitor>>> {
+
+		@Override
+		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
+			if (visitable instanceof PatternSelector) {
+				return Optional.of(PatternSelectorVisitorPreNeo4j521.class);
+			}
+			return Optional.empty();
+		}
+
+	}
+
 	private static class DefaultNeo4j5HandlerSupplier
 			implements Function<Visitable, Optional<Class<? extends Visitor>>> {
 
@@ -175,6 +196,9 @@ public enum Dialect {
 			else if (visitable instanceof Comparison) {
 				return Optional.of(Neo4j5ComparisonVisitor.class);
 			}
+			else if (visitable instanceof PatternSelector) {
+				return Optional.of(PatternSelectorVisitorPreNeo4j521.class);
+			}
 			return Optional.empty();
 		}
 
@@ -185,6 +209,9 @@ public enum Dialect {
 
 		@Override
 		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
+			if (visitable instanceof PatternSelector) {
+				return Optional.empty();
+			}
 			return super.apply(visitable).or(() -> {
 				if (visitable instanceof Subquery || visitable instanceof With) {
 					return Optional.of(Neo4j523SubqueryVisitor.class);
