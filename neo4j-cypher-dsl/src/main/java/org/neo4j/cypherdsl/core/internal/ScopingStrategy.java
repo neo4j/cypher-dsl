@@ -412,7 +412,7 @@ public final class ScopingStrategy {
 				visitedNamed.stream()
 					.filter(element -> {
 						if (element instanceof Named named) {
-							return named.getRequiredSymbolicName().equals(segment);
+							return named.getSymbolicName().filter(s -> s.equals(segment)).isPresent();
 						} else if (element instanceof Aliased aliased) {
 							return aliased.getAlias().equals((symbolicName).getValue());
 						} else {
