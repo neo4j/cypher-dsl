@@ -325,7 +325,7 @@ class CypherDSLExamplesTests {
 			.limit(Integer.parseInt(limit))
 			.build();
 		assertThat(statement.getCypher()).isEqualTo(
-				"MATCH (m:`Movie`) WHERE exists(m.`some property`) RETURN m{.*} ORDER BY m.`some property` ASC SKIP 21 LIMIT 42");
+				"MATCH (m:`Movie`) WHERE m.`some property` IS NOT NULL RETURN m{.*} ORDER BY m.`some property` ASC SKIP 21 LIMIT 42");
 	}
 
 	@Test
@@ -349,7 +349,7 @@ class CypherDSLExamplesTests {
 			.limit(Cypher.anonParameter(Integer.parseInt(limit)))
 			.build();
 		assertThat(statement.getCypher()).isEqualTo(
-				"MATCH (m:`Movie`) WHERE exists(m[$pcdsl01]) RETURN m{.*} ORDER BY m[$pcdsl01] ASC SKIP $pcdsl02 LIMIT $pcdsl03");
+				"MATCH (m:`Movie`) WHERE m[$pcdsl01] IS NOT NULL RETURN m{.*} ORDER BY m[$pcdsl01] ASC SKIP $pcdsl02 LIMIT $pcdsl03");
 		assertThat(statement.getCatalog().getParameters())
 			.containsAllEntriesOf(Map.of("pcdsl01", "some property", "pcdsl02", 21, "pcdsl03", 42));
 	}

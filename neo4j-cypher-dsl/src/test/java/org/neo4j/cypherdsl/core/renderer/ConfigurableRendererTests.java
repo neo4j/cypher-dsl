@@ -105,7 +105,7 @@ class ConfigurableRendererTests {
 			.getRenderer(Configuration.newConfig()
 				.withGeneratedNames(EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.ENTITY_NAMES)))
 				.build())
-			.render(stmnt)).isEqualTo("MATCH (n:`N`) CALL {MATCH (m) RETURN m} RETURN n, m");
+			.render(stmnt)).isEqualTo("MATCH (n:`N`) CALL (*) {MATCH (m) RETURN m} RETURN n, m");
 	}
 
 	@Test // GH-645
@@ -120,7 +120,7 @@ class ConfigurableRendererTests {
 			.getRenderer(Configuration.newConfig()
 				.withGeneratedNames(EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.ENTITY_NAMES)))
 				.build())
-			.render(stmnt)).isEqualTo("MATCH (n:`N`) CALL {MATCH (m) RETURN m} RETURN n, m");
+			.render(stmnt)).isEqualTo("MATCH (n:`N`) CALL (*) {MATCH (m) RETURN m} RETURN n, m");
 	}
 
 }

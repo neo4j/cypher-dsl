@@ -335,7 +335,7 @@ class CypherParserTests {
 		Statement parsed = CypherParser.parseStatement(statement);
 		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
 		assertThat(cypher).isEqualTo(
-				"MATCH (n:Person) CALL {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
+				"MATCH (n:Person) CALL (*) {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
 	}
 
 	@Test
@@ -370,8 +370,7 @@ class CypherParserTests {
 		assertThat(cypher).isEqualTo("""
 				MATCH (this:Movie)
 				WHERE this.released = $releaseYear
-				CALL {
-					WITH this
+				CALL (this) {
 					MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
 					RETURN {
 						average: avg(this_actorsAggregate_this0.screentime),
@@ -514,12 +513,11 @@ class CypherParserTests {
 		var normalized = renderer.render(CypherParser.parse(cypher, parseOptions));
 
 		assertThat(normalized).isEqualTo("""
-				CALL {
+				CALL () {
 				  CREATE (v0:Movie)
 				  RETURN v0
 				}
-				CALL {
-				  WITH v0
+				CALL (v0) {
 				  RETURN v0 {
 				    .title
 				  } AS v1
@@ -806,7 +804,7 @@ class CypherParserTests {
 					"call { call dbms.showCurrentUser() yield username return username} return username", options);
 			assertThat(procedures.get()).isEqualTo(2);
 			assertThat(statement.getCypher())
-				.isEqualTo("CALL {CALL dbms.showCurrentUser() YIELD username RETURN username} RETURN username");
+				.isEqualTo("CALL () {CALL dbms.showCurrentUser() YIELD username RETURN username} RETURN username");
 		}
 
 		@Test

@@ -48,6 +48,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -87,8 +88,10 @@ class TckTests {
 				var method = this.getClass()
 					.getDeclaredMethod(type + "ShouldWork", Renderer.class, String.class, String.class);
 
-				var renderer = Renderer
-					.getRenderer(Configuration.newConfig().alwaysEscapeNames(entry.getValue().alwaysEscape).build());
+				var renderer = Renderer.getRenderer(Configuration.newConfig()
+					.withDialect(Dialect.NEO4J_4)
+					.alwaysEscapeNames(entry.getValue().alwaysEscape)
+					.build());
 
 				entries = entry.getValue()
 					.asArguments()

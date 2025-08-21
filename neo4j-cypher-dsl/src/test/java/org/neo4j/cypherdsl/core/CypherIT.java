@@ -3108,8 +3108,8 @@ class CypherIT {
 				.returning(n)
 				.build();
 
-			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (n) WHERE distance(n.location, point($point.point)) > $point.distance RETURN n");
+			assertThat(cypherRenderer.render(statement)).isEqualTo(
+					"MATCH (n) WHERE point.distance(n.location, point($point.point)) > $point.distance RETURN n");
 		}
 
 	}
@@ -4637,11 +4637,9 @@ class CypherIT {
 					MATCH (b:Bike)
 					CREATE (u)-[:LIKES]->(b)
 					WITH u
-					CALL {
-					  WITH u
+					CALL (u) {
 					  MATCH (u)-[:SOMETHING]->(x)
-					  CALL {
-					    WITH x
+					  CALL (x) {
 					    MATCH (x)-[:DEEPER]->(y)
 					    RETURN y {
 					      .bar
@@ -4653,7 +4651,7 @@ class CypherIT {
 					  } AS anyThing
 					}
 					WITH u
-					CALL {
+					CALL (*) {
 					  USE movies.actors
 					  MATCH (person:Person)
 					  RETURN person
@@ -4699,11 +4697,9 @@ class CypherIT {
 						MATCH (b:Bike)
 						CREATE (u)-[:LIKES]->(b)
 						WITH u
-						CALL {
-						\tWITH u
+						CALL (u) {
 						\tMATCH (u)-[:SOMETHING]->(x)
-						\tCALL {
-						\t\tWITH x
+						\tCALL (x) {
 						\t\tMATCH (x)-[:DEEPER]->(y)
 						\t\tRETURN y {
 						\t\t\t.bar
@@ -4715,7 +4711,7 @@ class CypherIT {
 						\t} AS anyThing
 						}
 						WITH u
-						CALL {
+						CALL (*) {
 						\tUSE movies.actors
 						\tMATCH (person:Person)
 						\tRETURN person
@@ -4799,11 +4795,11 @@ class CypherIT {
 				.build();
 
 			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(mergeStatement)).isEqualTo("""
-					CALL {
+					CALL () {
 					  CREATE (a:A)
 					  RETURN a
 					}
-					CALL {
+					CALL (*) {
 					  CREATE (b:B)
 					  RETURN b
 					}
@@ -4822,7 +4818,7 @@ class CypherIT {
 				.build();
 
 			assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(resultStatement)).isEqualTo("""
-					CALL {
+					CALL () {
 					  MATCH (node) RETURN node AS node
 					}
 					RETURN node""");
@@ -4994,7 +4990,7 @@ class CypherIT {
 			var cypher = Cypher.callRawCypher("MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b")
 				.build()
 				.getCypher();
-			assertThat(cypher).isEqualTo("CALL {MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b}");
+			assertThat(cypher).isEqualTo("CALL () {MATCH (n:Test) WHERE n.id = $id RETURN id(n) as a, n.id as b}");
 		}
 
 		@Test
@@ -5008,7 +5004,7 @@ class CypherIT {
 				.getCypher();
 
 			assertThat(cypher).isEqualTo(
-					"CALL {MATCH (n:Test) RETURN id(n) as a, n.id as b, n.timestamp as timestamp} WITH * WHERE (timestamp > $from AND timestamp <= $to) RETURN *");
+					"CALL () {MATCH (n:Test) RETURN id(n) as a, n.id as b, n.timestamp as timestamp} WITH * WHERE (timestamp > $from AND timestamp <= $to) RETURN *");
 		}
 
 	}

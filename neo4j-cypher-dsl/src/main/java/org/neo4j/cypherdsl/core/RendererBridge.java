@@ -34,7 +34,7 @@ import org.neo4j.cypherdsl.core.renderer.Renderer;
 final class RendererBridge {
 
 	private static final Configuration CONFIGURATION = Configuration.newConfig()
-		.withDialect(Dialect.NEO4J_5)
+		.withDialect(Dialect.NEO4J_5_DEFAULT_CYPHER)
 		.alwaysEscapeNames(false)
 		.build();
 

@@ -23,10 +23,8 @@ import java.net.URI;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
-import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,10 +33,9 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 /**
  * @author Michael J. Simons
  */
-class SubqueriesIT {
+class SubqueriesGQLIT {
 
-	private static final Renderer cypherRenderer = Renderer
-		.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).build());
+	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
 
 	@Test // GH-533
 	void unitSubqueries() {
@@ -52,8 +49,8 @@ class SubqueriesIT {
 			.build();
 
 		var statement = outer.call(inner).returning(Cypher.count(Cypher.asterisk())).build();
-		assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (p:`Person`) CALL {WITH p UNWIND range(1, 5) AS i CREATE (:`Person` {name: p.name})} RETURN count(*)");
+		assertThat(statement.getCypher()).isEqualTo(
+				"MATCH (p:`Person`) CALL (p) {UNWIND range(1, 5) AS i CREATE (:`Person` {name: p.name})} RETURN count(*)");
 	}
 
 	@Nested
@@ -78,97 +75,6 @@ class SubqueriesIT {
 	}
 
 	@Nested
-	class DialectSupport {
-
-		@ParameterizedTest
-		@CsvSource(delimiterString = "|", textBlock = """
-				NEO4J_5|UNWIND [0, 1, 2] AS x CALL {RETURN 'hello' AS innerReturn} RETURN innerReturn
-				NEO4J_5_23|UNWIND [0, 1, 2] AS x CALL (*) {RETURN 'hello' AS innerReturn} RETURN innerReturn
-				""")
-		void starterExample(Dialect dialect, String expected) {
-			var stmt = Cypher.unwind(Cypher.listOf(Cypher.literalOf(0), Cypher.literalOf(1), Cypher.literalOf(2)))
-				.as("x")
-				.call(Cypher.returning(Cypher.literalOf("hello").as("innerReturn")).build())
-				.returning("innerReturn")
-				.build();
-
-			var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
-			assertThat(renderer.render(stmt)).isEqualTo(expected);
-		}
-
-		@ParameterizedTest
-		@CsvSource(delimiterString = "|",
-				textBlock = """
-						NEO4J_5|MATCH (p:Player), (t:Team) CALL {WITH p WITH p, rand() AS random SET p.rating = random RETURN p.name AS playerName, p.rating AS rating} RETURN playerName, rating, t AS team ORDER BY rating LIMIT 1
-						NEO4J_5_23|MATCH (p:Player), (t:Team) CALL (p) {WITH p, rand() AS random SET p.rating = random RETURN p.name AS playerName, p.rating AS rating} RETURN playerName, rating, t AS team ORDER BY rating LIMIT 1
-						""")
-		void someImports(Dialect dialect, String expected) {
-
-			var p = Cypher.node("Player").named("p");
-			var t = Cypher.node("Team").named("t");
-
-			var rating = Cypher.name("rating");
-			var playerName = Cypher.name("playerName");
-			var stmt = Cypher.match(p, t)
-				.call(Cypher.with(p, Cypher.rand().as("random"))
-					.set(p.property("rating").to(Cypher.name("random")))
-					.returning(p.property("name").as(playerName), p.property("rating").as(rating))
-					.build(), p)
-				.returning(playerName, rating, t.as("team"))
-				.orderBy(rating)
-				.limit(1)
-				.build();
-
-			var renderer = Renderer
-				.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).withDialect(dialect).build());
-			assertThat(renderer.render(stmt)).isEqualTo(expected);
-		}
-
-		@ParameterizedTest
-		@CsvSource(delimiterString = "|", textBlock = """
-				NEO4J_5|MATCH (p:Player), (t:Team) CALL {WITH * RETURN p AS player, t AS team} RETURN player, team
-				NEO4J_5_23|MATCH (p:Player), (t:Team) CALL (*) {RETURN p AS player, t AS team} RETURN player, team
-				""")
-		void allImports(Dialect dialect, String expected) {
-
-			var p = Cypher.node("Player").named("p");
-			var t = Cypher.node("Team").named("t");
-
-			var player = Cypher.name("player");
-			var stmt = Cypher.match(p, t)
-				.call(Cypher.returning(p.as("player"), t.as("team")).build(), Cypher.asterisk())
-				.returning(player, Cypher.name("team"))
-				.build();
-
-			var renderer = Renderer
-				.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).withDialect(dialect).build());
-			assertThat(renderer.render(stmt)).isEqualTo(expected);
-		}
-
-		@ParameterizedTest
-		@CsvSource(delimiterString = "|",
-				textBlock = """
-						NEO4J_5|MATCH (t:Team) CALL {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
-						NEO4J_5_23|MATCH (t:Team) CALL (*) {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
-						""")
-		void noImports(Dialect dialect, String expected) {
-
-			var p = Cypher.node("Player").named("p");
-			var t = Cypher.node("Team").named("t");
-
-			var stmt = Cypher.match(t)
-				.call(Cypher.match(p).returning(Cypher.count(p).as("totalPlayers")).build())
-				.returning(Cypher.count(t).as("totalTeams"), Cypher.name("totalPlayers"))
-				.build();
-
-			var renderer = Renderer
-				.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).withDialect(dialect).build());
-			assertThat(renderer.render(stmt)).isEqualTo(expected);
-		}
-
-	}
-
-	@Nested
 	class ResultReturningSubqueries {
 
 		@Test
@@ -183,7 +89,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("UNWIND [0, 1, 2] AS x CALL {WITH x RETURN (x * 10) AS y} RETURN x, y");
+				.isEqualTo("UNWIND [0, 1, 2] AS x CALL (x) {RETURN (x * 10) AS y} RETURN x, y");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("x"), SymbolicName.of("y"));
@@ -214,7 +120,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"CALL {MATCH (p:`Person`) RETURN p ORDER BY p.age ASC LIMIT 1 UNION MATCH (p:`Person`) RETURN p ORDER BY p.age DESC LIMIT 1} RETURN p.name, p.age ORDER BY p.name");
+					"CALL () {MATCH (p:`Person`) RETURN p ORDER BY p.age ASC LIMIT 1 UNION MATCH (p:`Person`) RETURN p ORDER BY p.age DESC LIMIT 1} RETURN p.name, p.age ORDER BY p.name");
 		}
 
 		@Test
@@ -232,7 +138,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"MATCH (p:`Person`) CALL {UNWIND range(1, 5) AS i CREATE (c:`Clone`) RETURN count(c) AS numberOfClones} RETURN p.name, numberOfClones");
+					"MATCH (p:`Person`) CALL (*) {UNWIND range(1, 5) AS i CREATE (c:`Clone`) RETURN count(c) AS numberOfClones} RETURN p.name, numberOfClones");
 		}
 
 		@Test
@@ -250,7 +156,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"MATCH (p:`Person`) CALL {WITH p MATCH (other:`Person`) WHERE other.age < p.age RETURN count(other) AS youngerPersonsCount} RETURN p.name, youngerPersonsCount");
+					"MATCH (p:`Person`) CALL (p) {MATCH (other:`Person`) WHERE other.age < p.age RETURN count(other) AS youngerPersonsCount} RETURN p.name, youngerPersonsCount");
 		}
 
 		@Test
@@ -269,7 +175,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"CALL dbms.components() YIELD name WITH name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} RETURN n");
+					"CALL dbms.components() YIELD name WITH name CALL (name) {MATCH (n) WHERE n.name = name RETURN n} RETURN n");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("n"));
@@ -286,7 +192,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"CALL dbms.components() YIELD name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} RETURN n");
+					"CALL dbms.components() YIELD name CALL (name) {MATCH (n) WHERE n.name = name RETURN n} RETURN n");
 
 			// After inQueryCall with with
 			SymbolicName label = Cypher.name("label");
@@ -303,7 +209,7 @@ class SubqueriesIT {
 				.returning("n")
 				.build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL {WITH label MATCH (n) WHERE n.name = label RETURN n} RETURN n");
+					"MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL (label) {MATCH (n) WHERE n.name = label RETURN n} RETURN n");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("n"));
@@ -321,7 +227,7 @@ class SubqueriesIT {
 				.returning("n2")
 				.build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"MATCH (n) WITH n CALL db.labels() YIELD label CALL {WITH label MATCH (n2) WHERE n2.name = label RETURN n2} RETURN n2");
+					"MATCH (n) WITH n CALL db.labels() YIELD label CALL (label) {MATCH (n2) WHERE n2.name = label RETURN n2} RETURN n2");
 		}
 
 		@Test
@@ -338,7 +244,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (p:`Person`) WITH p CALL {WITH p MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
+				.isEqualTo("MATCH (p:`Person`) WITH p CALL (p) {MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("n"));
@@ -357,7 +263,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (p:`Person`) WITH p CALL {WITH p MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
+				.isEqualTo("MATCH (p:`Person`) WITH p CALL (p) {MATCH (n) WHERE n.name = p.name RETURN n} RETURN n");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("n"));
@@ -374,7 +280,7 @@ class SubqueriesIT {
 			}
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"CALL {CALL {CALL {CALL {CALL {MATCH (n) RETURN n} RETURN n} RETURN n} RETURN n} RETURN n} RETURN n");
+					"CALL () {CALL () {CALL () {CALL () {CALL () {MATCH (n) RETURN n} RETURN n} RETURN n} RETURN n} RETURN n} RETURN n");
 		}
 
 	}
@@ -497,7 +403,7 @@ class SubqueriesIT {
 					.build())
 				.build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"LOAD CSV FROM 'file:///friends.csv' AS line CALL {WITH line CREATE (:`Person` {name: line[1], age: toInteger(line[2])})} IN TRANSACTIONS");
+					"LOAD CSV FROM 'file:///friends.csv' AS line CALL (line) {CREATE (:`Person` {name: line[1], age: toInteger(line[2])})} IN TRANSACTIONS");
 		}
 
 		@Test
@@ -513,7 +419,7 @@ class SubqueriesIT {
 					.build(), 2)
 				.build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"LOAD CSV FROM 'file:///friends.csv' AS line CALL {WITH line CREATE (:`Person` {name: line[1], age: toInteger(line[2])})} IN TRANSACTIONS OF 2 ROWS");
+					"LOAD CSV FROM 'file:///friends.csv' AS line CALL (line) {CREATE (:`Person` {name: line[1], age: toInteger(line[2])})} IN TRANSACTIONS OF 2 ROWS");
 		}
 
 		@Test
@@ -523,7 +429,7 @@ class SubqueriesIT {
 				.callInTransactions(Cypher.with("n").detachDelete("n").build(), 2)
 				.build();
 			assertThat(cypherRenderer.render(statement))
-				.isEqualTo("MATCH (n) CALL {WITH n DETACH DELETE n} IN TRANSACTIONS OF 2 ROWS");
+				.isEqualTo("MATCH (n) CALL (n) {DETACH DELETE n} IN TRANSACTIONS OF 2 ROWS");
 		}
 
 		@ParameterizedTest
@@ -543,7 +449,7 @@ class SubqueriesIT {
 				.returning("u")
 				.build();
 
-			String expected = "MATCH (p:`Person`) WITH p CALL {WITH p CREATE (p)-[:`IS`]->(u:`User`) RETURN u} IN TRANSACTIONS";
+			String expected = "MATCH (p:`Person`) WITH p CALL (p) {CREATE (p)-[:`IS`]->(u:`User`) RETURN u} IN TRANSACTIONS";
 			if (numRows > 0) {
 				expected += " OF " + numRows + " ROWS";
 			}
@@ -572,7 +478,7 @@ class SubqueriesIT {
 				.returning("u")
 				.build();
 
-			String expected = "MATCH (p:`Person`) WITH p CALL {WITH p CREATE (p)-[:`IS`]->(u:`User`) RETURN u} IN TRANSACTIONS";
+			String expected = "MATCH (p:`Person`) WITH p CALL (p) {CREATE (p)-[:`IS`]->(u:`User`) RETURN u} IN TRANSACTIONS";
 			if (numRows > 0) {
 				expected += " OF " + numRows + " ROWS";
 			}
@@ -599,7 +505,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"CALL dbms.components() YIELD name WITH name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
+					"CALL dbms.components() YIELD name WITH name CALL (name) {MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("n"));
@@ -616,7 +522,7 @@ class SubqueriesIT {
 				.build();
 
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"CALL dbms.components() YIELD name CALL {WITH name MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
+					"CALL dbms.components() YIELD name CALL (name) {MATCH (n) WHERE n.name = name RETURN n} IN TRANSACTIONS RETURN n");
 
 			// After inQueryCall with with
 			SymbolicName label = Cypher.name("label");
@@ -633,7 +539,7 @@ class SubqueriesIT {
 				.returning("n")
 				.build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL {WITH label MATCH (n) WHERE n.name = label RETURN n} IN TRANSACTIONS RETURN n");
+					"MATCH (n) WITH n CALL db.labels() YIELD label WITH label CALL (label) {MATCH (n) WHERE n.name = label RETURN n} IN TRANSACTIONS RETURN n");
 
 			assertThat(statement.getCatalog().getIdentifiableExpressions())
 				.containsExactlyInAnyOrder(SymbolicName.of("n"));
@@ -651,7 +557,7 @@ class SubqueriesIT {
 				.returning("n2")
 				.build();
 			assertThat(cypherRenderer.render(statement)).isEqualTo(
-					"MATCH (n) WITH n CALL db.labels() YIELD label CALL {WITH label MATCH (n2) WHERE n2.name = label RETURN n2} IN TRANSACTIONS RETURN n2");
+					"MATCH (n) WITH n CALL db.labels() YIELD label CALL (label) {MATCH (n2) WHERE n2.name = label RETURN n2} IN TRANSACTIONS RETURN n2");
 		}
 
 	}

@@ -577,7 +577,7 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (person:`Person`) WHERE distance(person.location, point($location.point)) = $location.distance RETURN person");
+				"MATCH (person:`Person`) WHERE point.distance(person.location, point($location.point)) = $location.distance RETURN person");
 	}
 
 	@Test // GH-141
@@ -594,7 +594,7 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(cypherRenderer.render(statement)).isEqualTo(
-				"MATCH (person:`Person`) WHERE distance(person.location, point($location.point)) = $location.distance RETURN person");
+				"MATCH (person:`Person`) WHERE point.distance(person.location, point($location.point)) = $location.distance RETURN person");
 	}
 
 	@Test
@@ -683,8 +683,7 @@ class IssueRelatedIT {
 		String cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
 		assertThat(cypher).isEqualTo("""
 				MATCH (node:Node)
-				CALL {
-				  WITH node
+				CALL (node) {
 				  WITH node AS this
 				  MATCH (this)-[:LINK]-(o:Other) RETURN o AS result
 				}
@@ -707,7 +706,7 @@ class IssueRelatedIT {
 			.getCypher();
 
 		assertThat(statement).isEqualTo(
-				"UNWIND $events AS message WITH message.value AS event, message.header AS header, message.key AS key, message.value AS value CALL {WITH key, value CREATE (e:Event {key: key, value: value})}");
+				"UNWIND $events AS message WITH message.value AS event, message.header AS header, message.key AS key, message.value AS value CALL (*) {WITH key, value CREATE (e:Event {key: key, value: value})}");
 	}
 
 	@Test // GH-190
@@ -1024,8 +1023,7 @@ class IssueRelatedIT {
 		String expected = """
 				MATCH p = (:lookingType)<-[:specifiedRelation]-()
 				WITH nodes(p) AS nodes, relationships(p) AS relations
-				CALL {
-				  WITH nodes
+				CALL (nodes) {
 				  UNWIND nodes AS n
 				  WITH n
 				  MATCH second_p = (n)-[second_relations:otherRelation]->(second_nodes)
@@ -1092,16 +1090,37 @@ class IssueRelatedIT {
 			.returning(Cypher.literalTrue())
 			.build();
 
-		Renderer renderer = Renderer.getRenderer(Configuration.prettyPrinting());
-		String cypher = renderer.render(completeStatement);
-		String expected = """
+		String cypher;
+
+		cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(completeStatement);
+		assertThat(cypher).isEqualTo("""
+				MATCH p = (:Target)<-[:REL]-()
+				WITH nodes(p) AS nodes, relationships(p) AS relations
+				CALL (*) {
+				  RETURN 1
+				}
+				RETURN true""");
+
+		cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(completeStatement);
+		assertThat(cypher).isEqualTo("""
+				MATCH p = (:Target)<-[:REL]-()
+				WITH nodes(p) AS nodes, relationships(p) AS relations
+				CALL (*) {
+				  RETURN 1
+				}
+				RETURN true""");
+
+		cypher = Renderer
+			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withDialect(Dialect.NEO4J_4).build())
+			.render(completeStatement);
+		assertThat(cypher).isEqualTo("""
 				MATCH p = (:Target)<-[:REL]-()
 				WITH nodes(p) AS nodes, relationships(p) AS relations
 				CALL {
 				  RETURN 1
 				}
-				RETURN true""";
-		assertThat(cypher).isEqualTo(expected);
+				RETURN true""");
+
 	}
 
 	@Test // GH-349
@@ -1109,12 +1128,12 @@ class IssueRelatedIT {
 		Node n = Cypher.anyNode("n");
 		ResultStatement statement = Cypher.match(n)
 			.call("apoc.util.validate")
-			.withArgs(Cypher.exists(n.property("foo")), Cypher.literalOf("Error"), Cypher.listOf())
+			.withArgs(Cypher.exists(n.property("foo")).not(), Cypher.literalOf("Error"), Cypher.listOf())
 			.withoutResults()
 			.returning(n)
 			.build();
 		assertThat(statement.getCypher())
-			.isEqualTo("MATCH (n) CALL apoc.util.validate(exists(n.foo), 'Error', []) RETURN n");
+			.isEqualTo("MATCH (n) CALL apoc.util.validate(n.foo IS NULL, 'Error', []) RETURN n");
 	}
 
 	@Test // GH-349
@@ -1129,14 +1148,8 @@ class IssueRelatedIT {
 
 		Statement statement = createSomewhatComplexStatement();
 		Renderer renderer = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build());
-		assertThat(renderer.render(statement)).isEqualTo("" + "CALL {" + "CREATE (this0:Movie)"
-				+ " SET this0.title = $this0_title" + " WITH this0" + " CALL {" + "WITH this0"
-				+ " CALL apoc.util.validate(NOT (any(r IN ['admin'] WHERE any(rr IN $auth.roles WHERE r = rr))), '@neo4j/graphql/FORBIDDEN', [0])"
-				+ " MERGE (this0_genres_connectOrCreate0:Genre {name: $this0_genres_connectOrCreate0_node_name})"
-				+ " ON CREATE"
-				+ " SET this0_genres_connectOrCreate0.name = $this0_genres_connectOrCreate0_on_create_name"
-				+ " MERGE (this0)-[this0_relationship_this0_genres_connectOrCreate0:IN_GENRE]->(this0_genres_connectOrCreate0)"
-				+ " RETURN count(*)" + "}" + " RETURN this0" + "}" + " RETURN [this0{.title}] AS data");
+		assertThat(renderer.render(statement)).isEqualTo(
+				"CALL () {CREATE (this0:Movie) SET this0.title = $this0_title WITH this0 CALL (this0) {CALL apoc.util.validate(NOT (any(r IN ['admin'] WHERE any(rr IN $auth.roles WHERE r = rr))), '@neo4j/graphql/FORBIDDEN', [0]) MERGE (this0_genres_connectOrCreate0:Genre {name: $this0_genres_connectOrCreate0_node_name}) ON CREATE SET this0_genres_connectOrCreate0.name = $this0_genres_connectOrCreate0_on_create_name MERGE (this0)-[this0_relationship_this0_genres_connectOrCreate0:IN_GENRE]->(this0_genres_connectOrCreate0) RETURN count(*)} RETURN this0} RETURN [this0{.title}] AS data");
 	}
 
 	@Test // GH-1193
@@ -1473,7 +1486,7 @@ class IssueRelatedIT {
 
 		var expected = """
 				MATCH (a:Actor)
-				CALL {
+				CALL (*) {
 				  WITH a
 				  MATCH (a)-[ACTED_IN]->(m:Movie)
 				  RETURN m AS x UNION
@@ -1487,7 +1500,7 @@ class IssueRelatedIT {
 	}
 
 	@Test // GH-595
-	void callWithMostImportIntoScope() {
+	void callWithMustImportIntoScope() {
 		SymbolicName var = Cypher.name("var");
 		Node movie = Cypher.node("Movie").named("m");
 		Node actor = Cypher.node("Actor").named("a");
@@ -1501,7 +1514,10 @@ class IssueRelatedIT {
 				.build())
 			.returning(movie.project(movie.property("title"), "actors", actors))
 			.build();
-		var expected = """
+		var cypher = Renderer
+			.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).withPrettyPrint(true).build())
+			.render(statement);
+		assertThat(cypher).isEqualTo("""
 				UNWIND $x AS var
 				CALL {
 				  WITH var
@@ -1516,9 +1532,75 @@ class IssueRelatedIT {
 				RETURN m {
 				  .title,
 				  actors: actors
-				}""";
-		var cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(statement);
-		assertThat(cypher).isEqualTo(expected);
+				}""");
+		cypher = Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).build()).render(statement);
+		assertThat(cypher).isEqualTo("""
+				UNWIND $x AS var
+				CALL (var) {
+				  CREATE (m:Movie)
+				  RETURN m
+				}
+				CALL (m) {
+				  MATCH (m)<-[:ACTED_IN]-(a:Actor)
+				  RETURN collect(a) AS actors
+				}
+				RETURN m {
+				  .title,
+				  actors: actors
+				}""");
+
+	}
+
+	@Test // GH-595
+	void callWithMustImportIntoScopeProper() {
+		SymbolicName var = Cypher.name("var");
+		Node movie = Cypher.node("Movie").named("m");
+		Node actor = Cypher.node("Actor").named("a");
+		SymbolicName actors = Cypher.name("actors");
+		Statement statement = Cypher.unwind(Cypher.parameter("x"))
+			.as(var)
+			.call(Cypher.create(movie).returning(movie).build(), var)
+			.call(Cypher.match(movie.relationshipFrom(actor, "ACTED_IN"))
+				.returning(Cypher.collect(actor).as(actors))
+				.build(), movie)
+			.returning(movie.project(movie.property("title"), "actors", actors))
+			.build();
+		var cypher = Renderer
+			.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).withPrettyPrint(true).build())
+			.render(statement);
+		assertThat(cypher).isEqualTo("""
+				UNWIND $x AS var
+				CALL {
+				  WITH var
+				  CREATE (m:Movie)
+				  RETURN m
+				}
+				CALL {
+				  WITH m
+				  MATCH (m)<-[:ACTED_IN]-(a:Actor)
+				  RETURN collect(a) AS actors
+				}
+				RETURN m {
+				  .title,
+				  actors: actors
+				}""");
+
+		cypher = Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).build()).render(statement);
+		assertThat(cypher).isEqualTo("""
+				UNWIND $x AS var
+				CALL (var) {
+				  CREATE (m:Movie)
+				  RETURN m
+				}
+				CALL (m) {
+				  MATCH (m)<-[:ACTED_IN]-(a:Actor)
+				  RETURN collect(a) AS actors
+				}
+				RETURN m {
+				  .title,
+				  actors: actors
+				}""");
+
 	}
 
 	@ParameterizedTest(name = "{1}") // GH-605
@@ -1601,8 +1683,27 @@ class IssueRelatedIT {
 			.returning(x, Cypher.count(Cypher.asterisk()))
 			.build();
 
-		var expected = "MATCH (this:`User`) CALL {WITH * WITH this AS x RETURN count(*) AS x} RETURN x, count(*)";
-		assertThat(stmt.getCypher()).isEqualTo(expected);
+		assertThat(stmt.getCypher())
+			.isEqualTo("MATCH (this:`User`) CALL (*) {WITH this AS x RETURN count(*) AS x} RETURN x, count(*)");
+		assertThat(Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).build()).render(stmt))
+			.isEqualTo("MATCH (this:`User`) CALL {WITH * WITH this AS x RETURN count(*) AS x} RETURN x, count(*)");
+	}
+
+	@Test
+	void withAllProperShouldWork() {
+
+		var this0 = Cypher.node("User").named("this");
+		var x = Cypher.name("x");
+		var stmt = Cypher.match(this0)
+			.call(Cypher.with(this0.as("x")).returning(Cypher.count(Cypher.asterisk()).as(x)).build(),
+					Cypher.asterisk())
+			.returning(x, Cypher.count(Cypher.asterisk()))
+			.build();
+
+		assertThat(stmt.getCypher())
+			.isEqualTo("MATCH (this:`User`) CALL (*) {WITH this AS x RETURN count(*) AS x} RETURN x, count(*)");
+		assertThat(Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).build()).render(stmt))
+			.isEqualTo("MATCH (this:`User`) CALL {WITH * WITH this AS x RETURN count(*) AS x} RETURN x, count(*)");
 	}
 
 	@Test // GH-634
@@ -1716,7 +1817,7 @@ class IssueRelatedIT {
 			.build();
 
 		assertThat(resultStatement.getCypher()).isEqualTo(
-				"CREATE (n1:`Foo`) WITH n1 CALL {WITH n1 MERGE (n2:`Bar` {foo: 'x'}) CREATE (n1)-[:`NESTED`]->(n2) RETURN count(n2) AS foo_2} RETURN true");
+				"CREATE (n1:`Foo`) WITH n1 CALL (n1) {MERGE (n2:`Bar` {foo: 'x'}) CREATE (n1)-[:`NESTED`]->(n2) RETURN count(n2) AS foo_2} RETURN true");
 	}
 
 	@Test // GH-832
@@ -1822,7 +1923,9 @@ class IssueRelatedIT {
 			.returning(Cypher.collect(createThis1.project("id")).as("data"))
 			.build();
 
-		String cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(stmt);
+		String cypher = Renderer
+			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withDialect(Dialect.NEO4J_4).build())
+			.render(stmt);
 		assertThat(cypher).isEqualTo("""
 				UNWIND $create_param0 AS create_var0
 				CALL {
@@ -1831,6 +1934,105 @@ class IssueRelatedIT {
 				  SET create_this1.id = create_var0.id
 				  WITH create_this1, create_var0
 				  CALL {
+				    WITH create_this1, create_var0
+				    UNWIND create_var0.actors.create AS create_var2
+				    WITH create_var2.node AS create_var3, create_var2.edge AS create_var4, create_this1
+				    CREATE (create_this5:Actor)
+				    SET create_this5.name = create_var3.name
+				    MERGE (create_this1)<-[create_this6:ACTED_IN]-(create_this5)
+				  }
+				  RETURN create_this1
+				}
+				RETURN collect(create_this1 {
+				  .id
+				}) AS data""");
+
+		cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(stmt);
+		assertThat(cypher).isEqualTo("""
+				UNWIND $create_param0 AS create_var0
+				CALL (create_var0) {
+				  CREATE (create_this1:Movie)
+				  SET create_this1.id = create_var0.id
+				  WITH create_this1, create_var0
+				  CALL (create_this1, create_var0) {
+				    UNWIND create_var0.actors.create AS create_var2
+				    WITH create_var2.node AS create_var3, create_var2.edge AS create_var4, create_this1
+				    CREATE (create_this5:Actor)
+				    SET create_this5.name = create_var3.name
+				    MERGE (create_this1)<-[create_this6:ACTED_IN]-(create_this5)
+				  }
+				  RETURN create_this1
+				}
+				RETURN collect(create_this1 {
+				  .id
+				}) AS data""");
+	}
+
+	@Test // GH-533
+	void additionalUnitSubqueriesExplicitImports() {
+
+		var createThis1 = Cypher.name("create_this1");
+		var createVar0 = Cypher.name("create_var0");
+		var createVar2 = Cypher.name("create_var2");
+		var createThis5 = Cypher.name("create_this5");
+		var createVar3 = Cypher.name("create_var3");
+		var stmt = Cypher.unwind(Cypher.parameter("create_param0"))
+			.as(createVar0)
+			.call(Cypher.with(createVar0)
+				.create(Cypher.node("Movie").named(createThis1))
+				.set(createThis1.property("id").to(createVar0.property("id")))
+				.with(createThis1, createVar0)
+				.call(Cypher.with(createThis1, createVar0)
+					.unwind(createVar0.property("actors").property("create"))
+					.as(createVar2)
+					.with(createVar2.property("node").as(createVar3), createVar2.property("edge").as("create_var4"),
+							createThis1)
+					.create(Cypher.node("Actor").named(createThis5))
+					.set(createThis5.property("name").to(createVar3.property("name")))
+					.merge(Cypher.anyNode(createThis1)
+						.relationshipFrom(Cypher.anyNode(createThis5), "ACTED_IN")
+						.named("create_this6"))
+					.build(), createThis1, createVar0)
+				.returning(createThis1)
+				.build(), createVar0)
+			.returning(Cypher.collect(createThis1.project("id")).as("data"))
+			.build();
+
+		String cypher = Renderer
+			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withDialect(Dialect.NEO4J_4).build())
+			.render(stmt);
+		assertThat(cypher).isEqualTo("""
+				UNWIND $create_param0 AS create_var0
+				CALL {
+				  WITH create_var0
+				  WITH create_var0
+				  CREATE (create_this1:Movie)
+				  SET create_this1.id = create_var0.id
+				  WITH create_this1, create_var0
+				  CALL {
+				    WITH create_this1, create_var0
+				    WITH create_this1, create_var0
+				    UNWIND create_var0.actors.create AS create_var2
+				    WITH create_var2.node AS create_var3, create_var2.edge AS create_var4, create_this1
+				    CREATE (create_this5:Actor)
+				    SET create_this5.name = create_var3.name
+				    MERGE (create_this1)<-[create_this6:ACTED_IN]-(create_this5)
+				  }
+				  RETURN create_this1
+				}
+				RETURN collect(create_this1 {
+				  .id
+				}) AS data""");
+
+		cypher = Renderer.getRenderer(Configuration.prettyPrinting()).render(stmt);
+		assertThat(cypher).isEqualTo("""
+				UNWIND $create_param0 AS create_var0
+				CALL (create_var0) {
+				  WITH create_var0
+				  CREATE (create_this1:Movie)
+				  SET create_this1.id = create_var0.id
+				  WITH create_this1, create_var0
+				  CALL (create_this1, create_var0) {
 				    WITH create_this1, create_var0
 				    UNWIND create_var0.actors.create AS create_var2
 				    WITH create_var2.node AS create_var3, create_var2.edge AS create_var4, create_this1
@@ -1867,9 +2069,10 @@ class IssueRelatedIT {
 		assertThat(statement.getCypher()).isEqualTo(expected.replace("\n", " "));
 	}
 
-	@Test // GH-999
-	void subQueryFromParserScope() {
-		var cfg = Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build();
+	@ParameterizedTest // GH-999
+	@EnumSource(value = Dialect.class, names = { "NEO4J_4", "NEO4J_5_DEFAULT_CYPHER" })
+	void subQueryFromParserScope(Dialect dialect) {
+		var cfg = Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).withDialect(dialect).build();
 		var renderer = Renderer.getRenderer(cfg);
 
 		var named = Cypher.node("Movie").named("m");
@@ -1880,7 +2083,8 @@ class IssueRelatedIT {
 			.returning("movies")
 			.build();
 		var normalized = renderer.render(stmt);
-		assertThat(normalized).isEqualTo("""
+
+		var expected = (dialect == Dialect.NEO4J_4) ? """
 				CALL {
 				  CREATE (v0:Movie)
 				  RETURN v0
@@ -1891,7 +2095,18 @@ class IssueRelatedIT {
 				    .title
 				  } AS v1
 				}
-				RETURN v1""");
+				RETURN v1""" : """
+				CALL () {
+				  CREATE (v0:Movie)
+				  RETURN v0
+				}
+				CALL (v0) {
+				  RETURN v0 {
+				    .title
+				  } AS v1
+				}
+				RETURN v1""";
+		assertThat(normalized).isEqualTo(expected);
 	}
 
 	@Test // GH-1014
@@ -1965,31 +2180,55 @@ class IssueRelatedIT {
 			.returning(Cypher.asterisk())
 			.build();
 
-		var renderer = Renderer
-			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build());
+		assertThat(Renderer
+			.getRenderer(Configuration.newConfig()
+				.withPrettyPrint(true)
+				.withGeneratedNames(true)
+				.withDialect(Dialect.NEO4J_4)
+				.build())
+			.render(stmt)).isEqualTo("""
+					MATCH (v0:Movie)
+					CALL {
+					  WITH v0
+					  MATCH (v0)<-[v1:ACTED_IN]-(v2:Actor)
+					  WITH collect( {
+					    node: v2
+					  }) AS v3
+					  WITH v3, size(v3) AS v4
+					  CALL {
+					    WITH v3
+					    UNWIND v3 AS v5
+					    WITH v5.node AS v6
+					    CALL {
+					      WITH v6
+					      MATCH (v6)-[v0:ACTED_IN]->(v1:Movie)
+					      RETURN *
+					    }
+					  }
+					}
+					RETURN *""");
 
-		var expected = """
-				MATCH (v0:Movie)
-				CALL {
-				  WITH v0
-				  MATCH (v0)<-[v1:ACTED_IN]-(v2:Actor)
-				  WITH collect( {
-				    node: v2
-				  }) AS v3
-				  WITH v3, size(v3) AS v4
-				  CALL {
-				    WITH v3
-				    UNWIND v3 AS v5
-				    WITH v5.node AS v6
-				    CALL {
-				      WITH v6
-				      MATCH (v6)-[v0:ACTED_IN]->(v1:Movie)
-				      RETURN *
-				    }
-				  }
-				}
-				RETURN *""";
-		assertThat(renderer.render(stmt)).isEqualTo(expected);
+		assertThat(
+				Renderer.getRenderer(Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build())
+					.render(stmt))
+			.isEqualTo("""
+					MATCH (v0:Movie)
+					CALL (v0) {
+					  MATCH (v0)<-[v1:ACTED_IN]-(v2:Actor)
+					  WITH collect( {
+					    node: v2
+					  }) AS v3
+					  WITH v3, size(v3) AS v4
+					  CALL (v3) {
+					    UNWIND v3 AS v5
+					    WITH v5.node AS v6
+					    CALL (v6) {
+					      MATCH (v6)-[v0:ACTED_IN]->(v1:Movie)
+					      RETURN *
+					    }
+					  }
+					}
+					RETURN *""");
 	}
 
 	@ParameterizedTest // GH-1084
@@ -2024,7 +2263,7 @@ class IssueRelatedIT {
 			.returning(Cypher.asterisk())
 			.build()
 			.getCypher();
-		assertThat(cypher).isEqualTo("CALL {MATCH (n:Movie) RETURN n} WITH * WHERE n.title = 'The Matrix' RETURN *");
+		assertThat(cypher).isEqualTo("CALL () {MATCH (n:Movie) RETURN n} WITH * WHERE n.title = 'The Matrix' RETURN *");
 	}
 
 	@Test
@@ -2036,7 +2275,8 @@ class IssueRelatedIT {
 			.returning(Cypher.asterisk())
 			.build()
 			.getCypher();
-		assertThat(cypher).isEqualTo("CALL {MATCH (n:`Movie`) RETURN n} WITH * WHERE n.title = 'The Matrix' RETURN *");
+		assertThat(cypher)
+			.isEqualTo("CALL () {MATCH (n:`Movie`) RETURN n} WITH * WHERE n.title = 'The Matrix' RETURN *");
 	}
 
 	@Test

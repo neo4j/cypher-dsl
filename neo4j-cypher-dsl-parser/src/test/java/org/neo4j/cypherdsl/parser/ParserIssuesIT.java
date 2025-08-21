@@ -21,11 +21,18 @@ package org.neo4j.cypherdsl.parser;
 import org.junit.jupiter.api.Test;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 class ParserIssuesIT {
+
+	private final Configuration rendererConfig = Configuration.newConfig()
+		.withPrettyPrint(true)
+		.withGeneratedNames(true)
+		.withDialect(Dialect.NEO4J_4)
+		.build();
 
 	@Test // GH-1076
 	void parsingDeeplyNestedSubqueriesThenNormalizeShouldWork() {
@@ -78,8 +85,7 @@ class ParserIssuesIT {
 					actorsConnection: var11
 				} AS this
 				""";
-		var renderer = Renderer
-			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build());
+		var renderer = Renderer.getRenderer(this.rendererConfig);
 		var normalized = renderer.render(CypherParser.parse(cypher, Options.defaultOptions()));
 		assertThat(normalized).isEqualTo("""
 				MATCH (v0:Movie)
@@ -176,8 +182,7 @@ class ParserIssuesIT {
 					actedInConnection: var4
 				} AS this
 				""";
-		var renderer = Renderer
-			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build());
+		var renderer = Renderer.getRenderer(this.rendererConfig);
 		var normalized = renderer.render(CypherParser.parse(cypher));
 
 		assertThat(normalized).isEqualTo("""
@@ -236,8 +241,7 @@ class ParserIssuesIT {
 
 		var statement = CypherParser.parse(cypher, Options.newOptions().createSortedMaps(true).build());
 
-		var renderer = Renderer
-			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build());
+		var renderer = Renderer.getRenderer(this.rendererConfig);
 		var normalized = renderer.render(statement);
 		assertThat(normalized).isEqualTo("""
 				MATCH (v0:User)
@@ -284,8 +288,7 @@ class ParserIssuesIT {
 				""";
 
 		var parserConfig = Options.newOptions().createSortedMaps(true).alwaysCreateRelationshipsLTR(true).build();
-		var renderer = Renderer
-			.getRenderer(Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build());
+		var renderer = Renderer.getRenderer(this.rendererConfig);
 
 		var s1 = renderer.render(CypherParser.parse(q1, parserConfig));
 		var s2 = renderer.render(CypherParser.parse(q2, parserConfig));

@@ -31,6 +31,7 @@ import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Statement;
 import org.neo4j.cypherdsl.core.TreeNode;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -290,8 +291,7 @@ class ComparisonIT {
 		return Stream.of(Arguments.of(EnumSet.allOf(Configuration.GeneratedNames.class), """
 				MATCH (v0:Movie)
 				WHERE v0.released = $p0
-				CALL {
-					WITH v0
+				CALL (v0) {
 					MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
 					RETURN {
 						min: min(v2.screentime),
@@ -311,8 +311,7 @@ class ComparisonIT {
 				"""), Arguments.of(EnumSet.of(Configuration.GeneratedNames.ENTITY_NAMES), """
 				MATCH (v0:Movie)
 				WHERE v0.released = $releaseYear
-				CALL {
-					WITH v0
+				CALL (v0) {
 					MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
 					RETURN {
 						min: min(v2.screentime),
@@ -332,8 +331,7 @@ class ComparisonIT {
 				"""), Arguments.of(EnumSet.of(Configuration.GeneratedNames.PARAMETER_NAMES), """
 				MATCH (this:Movie)
 				WHERE this.released = $p0
-				CALL {
-					WITH this
+				CALL (this) {
 					MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
 					RETURN {
 						min: min(this_actorsAggregate_this0.screentime),
@@ -353,8 +351,7 @@ class ComparisonIT {
 				"""), Arguments.of(EnumSet.of(Configuration.GeneratedNames.ALL_ALIASES), """
 				MATCH (this:Movie)
 				WHERE this.released = $releaseYear
-				CALL {
-					WITH this
+				CALL (this) {
 					MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
 					RETURN {
 						min: min(this_actorsAggregate_this0.screentime),
@@ -374,8 +371,7 @@ class ComparisonIT {
 				"""), Arguments.of(EnumSet.of(Configuration.GeneratedNames.INTERNAL_ALIASES_ONLY), """
 				MATCH (this:Movie)
 				WHERE this.released = $releaseYear
-				CALL {
-					WITH this
+				CALL (this) {
 					MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
 					RETURN {
 						min: min(this_actorsAggregate_this0.screentime),
@@ -395,8 +391,7 @@ class ComparisonIT {
 				"""), Arguments.of(EnumSet.complementOf(EnumSet.of(Configuration.GeneratedNames.ALL_ALIASES)), """
 				MATCH (v0:Movie)
 				WHERE v0.released = $p0
-				CALL {
-					WITH v0
+				CALL (v0) {
 					MATCH (v1:Actor)-[v2:ACTED_IN]->(v0)
 					RETURN {
 						min: min(v2.screentime),
@@ -469,8 +464,7 @@ class ComparisonIT {
 		var in = """
 				MATCH (this:Movie)
 				WHERE this.released = $releaseYear
-				CALL {
-					WITH this
+				CALL (*) {
 					MATCH (this_actorsAggregate_this1:Actor)-[this_actorsAggregate_this0:ACTED_IN]->(this)
 					RETURN {
 						min: min(this_actorsAggregate_this0.screentime),
@@ -581,7 +575,7 @@ class ComparisonIT {
 					node -> (node.getValue() instanceof Statement s) ? s.getCypher() : node.getValue().toString());
 		assertThat(target).hasToString(
 				"""
-						MATCH (n:`Person` {name: 'Tom Hanks'}) CALL {WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
+						MATCH (n:`Person` {name: 'Tom Hanks'}) CALL (n) {MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m} RETURN n.name, m.title
 						├── Match{cypher=MATCH (n:Person {name: 'Tom Hanks'})}
 						│   └── Pattern{cypher=(n:Person {name: 'Tom Hanks'})}
 						│       └── InternalNodeImpl{cypher=(n:Person {name: 'Tom Hanks'})}
@@ -591,7 +585,7 @@ class ComparisonIT {
 						│               └── MapExpression{cypher={name: 'Tom Hanks'}}
 						│                   └── KeyValueMapEntry{cypher=name: 'Tom Hanks'}
 						│                       └── StringLiteral{cypher='Tom Hanks'}
-						├── Subquery{cypher=CALL {WITH n MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
+						├── Subquery{cypher=CALL (n) {MATCH (m:Movie)<-[:ACTED_IN]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m}}
 						│   └── WITH n MATCH (m:`Movie`)<-[:`ACTED_IN`]-(n) WHERE (m.released >= 1900 AND n.born = 1956) RETURN m
 						│       ├── With{cypher=WITH n}
 						│       │   └── ReturnBody{cypher=n}
@@ -655,7 +649,11 @@ class ComparisonIT {
 					RETURN this0
 				} RETURN this0
 				""";
-		var cfg = Configuration.newConfig().withPrettyPrint(true).withGeneratedNames(true).build();
+		var cfg = Configuration.newConfig()
+			.withPrettyPrint(true)
+			.withGeneratedNames(true)
+			.withDialect(Dialect.NEO4J_4)
+			.build();
 		var renderer = Renderer.getRenderer(cfg);
 		var parseOptions = Options.newOptions().createSortedMaps(true).build();
 		var normalized = renderer.render(CypherParser.parse(cypher, parseOptions));

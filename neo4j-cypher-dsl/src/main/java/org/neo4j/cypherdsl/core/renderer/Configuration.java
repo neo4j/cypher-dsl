@@ -342,7 +342,7 @@ public final class Configuration {
 
 		private boolean alwaysEscapeNames = true;
 
-		private Dialect dialect = Dialect.NEO4J_4;
+		private Dialect dialect = Dialect.NEO4J_5_DEFAULT_CYPHER;
 
 		private Set<GeneratedNames> generatedNames = EnumSet.noneOf(GeneratedNames.class);
 

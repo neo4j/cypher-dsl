@@ -84,7 +84,7 @@ class CypherDSLParserExamplesTests {
 			.build()
 			.getCypher();
 
-		assertThat(cypher).isEqualTo("MATCH (node:`Node`) " + "CALL {" + "WITH node " + "WITH node AS this " // <.>
+		assertThat(cypher).isEqualTo("MATCH (node:`Node`) " + "CALL (node) {" + "WITH node AS this " // <.>
 				+ "MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result" // <.>
 				+ "} " + "RETURN result{.foo, .bar}");
 		// end::example-using-input[]
@@ -391,7 +391,7 @@ class CypherDSLParserExamplesTests {
 			.getCypher();
 
 		assertThat(cypher).isEqualTo(
-				"MATCH (node:`Node`) CALL {WITH node WITH node AS this MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result} RETURN result{.foo, .bar}");
+				"MATCH (node:`Node`) CALL (node) {WITH node AS this MATCH (this)-[:`LINK`]-(o:`Other`) RETURN o AS result} RETURN result{.foo, .bar}");
 	}
 
 	@Test

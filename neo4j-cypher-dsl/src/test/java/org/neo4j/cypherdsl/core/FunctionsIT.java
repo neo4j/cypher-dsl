@@ -43,7 +43,8 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
  */
 class FunctionsIT {
 
-	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
+	private static final Renderer cypherRenderer = Renderer
+		.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).build());
 
 	private static Stream<Arguments> neo5jSpecificFunctions() {
 		Node n = Cypher.node("Node").named("n");
@@ -411,7 +412,7 @@ class FunctionsIT {
 				.returning(Cypher.name("n"))
 				.build();
 			assertThat(stmnt.getCypher()).isEqualTo(
-					"UNWIND graph.names() AS graphName CALL {USE graph.byName(graphName) MATCH (n) RETURN n} RETURN n");
+					"UNWIND graph.names() AS graphName CALL (*) {USE graph.byName(graphName) MATCH (n) RETURN n} RETURN n");
 		}
 
 	}

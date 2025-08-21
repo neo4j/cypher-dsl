@@ -90,7 +90,7 @@ class UseIT {
 
 		var expected = """
 				UNWIND ['cineasts.latest', 'cineasts.upcoming'] AS graphName
-				CALL {
+				CALL (*) {
 				USE graph.byName(graphName)
 				  MATCH (movie:`Movie`)
 				  RETURN movie
@@ -99,7 +99,7 @@ class UseIT {
 				""".lines()
 			.map(String::trim)
 			.collect(Collectors.joining(" "))
-			.replace("CALL { ", "CALL {")
+			.replace("CALL (*) { ", "CALL (*) {")
 			.replace(" }", "}");
 
 		var innerStatement = Cypher.match(Cypher.node("Movie").named("movie")).returning("movie").build();
@@ -117,7 +117,7 @@ class UseIT {
 
 		var innerStatement = this.ongoingInnerStatementDefinition.build();
 		var cypher = Cypher.use("cineasts.latest", innerStatement).getCypher();
-		assertThat(cypher).isEqualTo("USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
+		assertThat(cypher).isEqualTo("USE cineasts.latest CALL () {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
 	}
 
 	@Test
@@ -149,7 +149,7 @@ class UseIT {
 		var innerStatement = this.ongoingInnerStatementDefinition.build();
 		var cypher = Cypher.use("cineasts.latest", innerStatement).explain().getCypher();
 		assertThat(cypher)
-			.isEqualTo("EXPLAIN USE cineasts.latest CALL {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
+			.isEqualTo("EXPLAIN USE cineasts.latest CALL () {MATCH (movie:`Movie`) RETURN movie} RETURN movie");
 	}
 
 	@Test

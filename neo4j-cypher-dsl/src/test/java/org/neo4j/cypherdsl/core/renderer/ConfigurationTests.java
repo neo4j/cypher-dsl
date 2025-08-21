@@ -32,8 +32,8 @@ class ConfigurationTests {
 	void dialectShouldBeIncludedInEquals() {
 
 		Configuration cfg0 = Configuration.newConfig().build();
-		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.NEO4J_4).build();
-		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
+		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.NEO4J_5_DEFAULT_CYPHER).build();
+		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_4).build();
 
 		assertThat(cfg0).isEqualTo(cfg1).isNotEqualTo(cfg2);
 	}
@@ -42,8 +42,8 @@ class ConfigurationTests {
 	void dialectShouldBeIncludedInHash() {
 
 		Configuration cfg0 = Configuration.newConfig().build();
-		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.NEO4J_4).build();
-		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_5).build();
+		Configuration cfg1 = Configuration.newConfig().withDialect(Dialect.NEO4J_5_DEFAULT_CYPHER).build();
+		Configuration cfg2 = Configuration.newConfig().withDialect(Dialect.NEO4J_4).build();
 
 		assertThat(cfg0).hasSameHashCodeAs(cfg1).doesNotHaveSameHashCodeAs(cfg2);
 	}
