@@ -125,7 +125,7 @@ public enum Dialect {
 	},
 
 	/**
-	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 5}
+	 * Essentially the same as {@link #NEO4J_5_23} but also enabling the {@code CYPHER 25}
 	 * prefix on generated statements. This dialect works on Neo4j 5.26 and higher.
 	 * Genrally, {@link #NEO4J_5_23} is preferable.
 	 *
