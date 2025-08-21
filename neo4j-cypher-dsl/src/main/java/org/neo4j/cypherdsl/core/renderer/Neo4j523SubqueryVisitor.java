@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core.renderer;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.Objects;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
@@ -25,7 +27,9 @@ import org.neo4j.cypherdsl.core.ReturnBody;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.With;
 import org.neo4j.cypherdsl.core.ast.EnterResult;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.ast.VisitorWithResult;
 
 /**
@@ -54,25 +58,48 @@ final class Neo4j523SubqueryVisitor extends VisitorWithResult {
 	public EnterResult enterWithResult(Visitable segment) {
 
 		if (segment instanceof Subquery subquery) {
-			var replacement = new StringBuilder("(");
 			this.importing = subquery.importingWith();
+			this.delegate.enter(subquery);
+			this.delegate.builder.replace(this.delegate.builder.length() - 1, this.delegate.builder.length(), "(");
 			if (this.importing != null) {
 				this.importing.accept(innerSegment -> {
 					if (innerSegment instanceof ReturnBody returnBody) {
-						replacement.append(RETURN_BODY_RENDERER.render(returnBody));
+						returnBody.accept(this.delegate);
 					}
 				});
 			}
-			replacement.append(") {");
-			this.delegate.enter(subquery);
-			this.delegate.builder.replace(this.delegate.builder.length() - 1, this.delegate.builder.length(),
-					replacement.toString());
+			else if (this.delegate.hasIdentifiables()) {
+				this.delegate.builder.append("*");
+			}
+			this.delegate.builder.append(") {");
 		}
 		else if (segment instanceof With possibleImporting) {
 			if (!Objects.equals(this.importing, possibleImporting)) {
 				this.delegate.enter(possibleImporting);
 			}
 			else {
+				possibleImporting.accept(new Visitor() {
+					private final Deque<Boolean> entered = new ArrayDeque<>();
+
+					@Override
+					public void enter(Visitable segment) {
+						this.entered.push(Neo4j523SubqueryVisitor.this.delegate.preEnter(segment));
+					}
+
+					@Override
+					public void leave(Visitable segment) {
+						if (this.entered.pop()) {
+							Neo4j523SubqueryVisitor.this.delegate.postLeave(segment);
+							var currentLength = Neo4j523SubqueryVisitor.this.delegate.builder.length();
+							if (segment instanceof TypedSubtree<?> t && Neo4j523SubqueryVisitor.this.delegate.builder
+								.subSequence(currentLength - t.separator().length(), currentLength)
+								.equals(t.separator())) {
+								Neo4j523SubqueryVisitor.this.delegate.builder
+									.setLength(currentLength - t.separator().length());
+							}
+						}
+					}
+				});
 				return EnterResult.SKIP_CHILDREN;
 			}
 		}

@@ -54,6 +54,12 @@ public interface ExposesSubqueryCall {
 	 */
 	@CheckReturnValue
 	default BuildableSubquery call(Statement statement) {
+		if (statement instanceof MultiPartQuery multiPartQuery) {
+			var parts = multiPartQuery.getParts();
+			if (!parts.isEmpty() && parts.get(0).isImporting()) {
+				return call(multiPartQuery.stripFirst(), parts.get(0).getImports());
+			}
+		}
 		return call(statement, new IdentifiableElement[0]);
 	}
 
@@ -104,7 +110,7 @@ public interface ExposesSubqueryCall {
 	 */
 	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement) {
-		return callInTransactions(statement, null, new IdentifiableElement[0]);
+		return callInTransactions(statement, (Integer) null);
 	}
 
 	/**
@@ -132,6 +138,13 @@ public interface ExposesSubqueryCall {
 	 */
 	@CheckReturnValue
 	default BuildableSubquery callInTransactions(Statement statement, Integer rows) {
+		if (statement instanceof MultiPartQuery multiPartQuery) {
+			var parts = multiPartQuery.getParts();
+			if (!parts.isEmpty() && parts.get(0).isImporting()) {
+				return callInTransactions(multiPartQuery.stripFirst(), rows, parts.get(0).getImports());
+			}
+		}
+
 		return callInTransactions(statement, rows, new IdentifiableElement[0]);
 	}
 

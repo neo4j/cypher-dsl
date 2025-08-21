@@ -82,7 +82,7 @@ class SubqueriesIT {
 		@ParameterizedTest
 		@CsvSource(delimiterString = "|", textBlock = """
 				NEO4J_5|UNWIND [0, 1, 2] AS x CALL {RETURN 'hello' AS innerReturn} RETURN innerReturn
-				NEO4J_5_23|UNWIND [0, 1, 2] AS x CALL () {RETURN 'hello' AS innerReturn} RETURN innerReturn
+				NEO4J_5_23|UNWIND [0, 1, 2] AS x CALL (*) {RETURN 'hello' AS innerReturn} RETURN innerReturn
 				""")
 		void starterExample(Dialect dialect, String expected) {
 			var stmt = Cypher.unwind(Cypher.listOf(Cypher.literalOf(0), Cypher.literalOf(1), Cypher.literalOf(2)))
@@ -148,7 +148,7 @@ class SubqueriesIT {
 		@CsvSource(delimiterString = "|",
 				textBlock = """
 						NEO4J_5|MATCH (t:Team) CALL {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
-						NEO4J_5_23|MATCH (t:Team) CALL () {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
+						NEO4J_5_23|MATCH (t:Team) CALL (*) {MATCH (p:Player) RETURN count(p) AS totalPlayers} RETURN count(t) AS totalTeams, totalPlayers
 						""")
 		void noImports(Dialect dialect, String expected) {
 
