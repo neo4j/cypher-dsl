@@ -38,6 +38,8 @@ include::2023.1.adoc[]
 
 include::2023.0.adoc[]
 
+include::2022.11.adoc[]
+
 include::2022.10.adoc[]
 
 include::2022.9.adoc[]
