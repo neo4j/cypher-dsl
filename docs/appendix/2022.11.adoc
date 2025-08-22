@@ -1,0 +1,7 @@
+== 2022.11
+
+=== 2022.11.0
+
+==== 🚀 Features
+
+* Allow to call raw cypher from top level entry point (#1073) (#1074)

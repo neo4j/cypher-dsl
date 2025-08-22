@@ -1,0 +1,47 @@
+== 2025.0
+
+=== 2025.0.0
+
+It's about time to create a 2025 major release of Cypher-DSL.
+First things first: We removed the deprecated, direct integration of the Neo4j Java driver.
+That integration used to allow making all Cypher-DSL statements "executable", that is: You were able to pass a query executor to them and get results back.
+It has been used in https://github.com/spring-projects/spring-data-neo4j[Spring Data Neo4j] testing code, but not much anywhere else.
+We removed it because it started to became costly: The common Neo4j Java driver and it's dependency will change a lot in their 6.x series, and especially the dependencies will drag us down.
+Cypher-DSL is a project that is used by Spring Data Neo4j, https://github.com/neo4j/neo4j-jdbc[Neo4j JDBC Driver] and many more. All of them need to keep an eye on dependency management, hence we prefer to be more lightweight here again.
+You won't notice a difference in most use-cases.
+
+With this major we welcome and thank @Shinigami92 as first-time contributor to the ecosystem.
+They took inspiration of the Spring Data Neo4j annotation processor and started off a similar processor for https://github.com/neo4j/neo4j-ogm[Neo4j-OGM], so that you can now enjoy a static metamodel based on Cypher-DSL for Neo4j-OGM as well.
+A usecase might be in a Quarkus application.
+
+==== 🚀 Features
+
+* Enhance old dialects to render `ALL SHORTEST` and `SHORTEST 1` as legacy functions.
+* Add an annotation processor for Neo4j-OGM annotations. (#1287)
+
+==== 🐛 Bug Fixes
+
+* Improve rendering of the importing `CALL` clause.
+* Clearing the scoping strategy could lead to a premature resolution of symbolic names.
+
+==== 🔄️ Refactorings
+
+* Make Neo4j 5 the default dialect, promote the usage of a dialect without Cypher prefix.
+* Remove the remaining bits of driver dependencies.
+* Use Spring-Java-Formatter and corresponding checkstyle config. (#1308)
+* Remove JetBrains annotations. (#1294)
+* Remove deprecated features and unnecessary suppressions. (#1292)
+
+==== 🧹 Housekeeping
+
+* Remove superfluous .editorconfig
+* Dependency upgrades:
+** Bump org.springframework.data:spring-data-neo4j (#1307)
+** Bump quarkus.platform.version from 3.24.5 to 3.25.3 (#1306)
+** Bump io.projectreactor:reactor-bom (#1305)
+** Bump mockito.version from 5.18.0 to 5.19.0 (#1304)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1303)
+** Bump neo4j.version from 5.26.9 to 5.26.10 (#1302)
+** Bump com.puppycrawl.tools:checkstyle from 10.26.1 to 11.0.0 (#1301)
+** Bump org.assertj:assertj-core from 3.27.3 to 3.27.4 (#1299)
+** Bump org.codehaus.mojo:flatten-maven-plugin (#1297)

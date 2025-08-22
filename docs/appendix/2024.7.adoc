@@ -1,5 +1,13 @@
 == 2024.7
 
+=== 2024.7.3
+
+==== 🐛 Bug Fixes
+
+* Improve rendering of the importing `CALL` clause.
+* Clearing the scoping strategy could lead to a premature resolution of symbolic names.
+* Add back a test-class deleted by accident.
+
 === 2024.7.2
 
 This is a dependency upgrade release only.
