@@ -1,5 +1,24 @@
 == 2025.0
 
+=== 2025.0.1
+
+==== 🔄️ Refactorings
+
+* Existential subqueries in latest Neo4j do work with multiple matches, too. (#1322)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.checkerframework:checker-qual (#1321)
+** Bump quarkus.platform.version from 3.25.4 to 3.26.1 (#1320)
+** Bump neo4j.version from 5.26.10 to 5.26.11 (#1319)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1318)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1317)
+** Bump com.fasterxml.jackson:jackson-bom (#1316)
+** Bump com.puppycrawl.tools:checkstyle from 11.0.0 to 11.0.1 (#1315)
+** Bump quarkus.platform.version from 3.25.3 to 3.25.4 (#1312)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1311)
+
 === 2025.0.0
 
 It's about time to create a 2025 major release of Cypher-DSL.
