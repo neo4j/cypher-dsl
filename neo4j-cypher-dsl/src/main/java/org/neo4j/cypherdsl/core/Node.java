@@ -66,8 +66,19 @@ public interface Node
 	 * @param labels the labels to check
 	 * @return a condition that checks whether this node has all the labels to query
 	 * @since 2024.3.0
+	 * @deprecated use {@link #hasLabels(Labels)}
 	 */
+	@SuppressWarnings("removal")
+	@Deprecated(forRemoval = true)
 	Condition hasLabels(LabelExpression labels);
+
+	/**
+	 * Returns a condition that checks for the presence of a label expression on a node.
+	 * @param labels the labels to check
+	 * @return a condition that checks whether this node has all the labels to query
+	 * @since 2025.1.0
+	 */
+	Condition hasLabels(Labels labels);
 
 	/**
 	 * Creates a new condition whether this node is equal to {@literal otherNode}.

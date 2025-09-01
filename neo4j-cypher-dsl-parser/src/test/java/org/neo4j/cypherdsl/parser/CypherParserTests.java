@@ -286,9 +286,7 @@ class CypherParserTests {
 			"MATCH (h:(Human|Occupation|X)&!A|B|C) RETURN h" })
 	void labelExpressions(String statement) {
 
-		Statement parsed = CypherParser.parseStatement(statement);
-		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
-		assertThat(cypher).isEqualTo(statement);
+		assertParsedStatement(statement, statement);
 	}
 
 	@ParameterizedTest
@@ -302,9 +300,7 @@ class CypherParserTests {
 			""")
 	void optimizedLabelExpressions(String statement, String expected) {
 
-		Statement parsed = CypherParser.parseStatement(statement);
-		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
-		assertThat(cypher).isEqualTo(expected);
+		assertParsedStatement(statement, expected);
 	}
 
 	@ParameterizedTest
@@ -317,6 +313,23 @@ class CypherParserTests {
 					""")
 	void whereInMatch(String statement, String expected) {
 
+		assertParsedStatement(statement, expected);
+	}
+
+	@ParameterizedTest
+	@CsvSource(delimiterString = "@",
+			textBlock = """
+					WITH ['Person', 'Director'] AS labels MATCH (directors:$(labels)) RETURN directors@WITH ['Person', 'Director'] AS labels MATCH (directors:$(labels)) RETURN directors
+					MATCH (n:$any(['Movie', 'Actor'])) RETURN n AS nodes@MATCH (n:$any(['Movie', 'Actor'])) RETURN n AS nodes
+					MATCH (n:$any(['Movie', 'Actor'])&`Foo`|`Bar`&$($IWantToDie)) RETURN n AS nodes@MATCH (n:$any(['Movie', 'Actor'])&Foo|Bar&$($IWantToDie)) RETURN n AS nodes
+					MATCH (n:$($a)|$any($b)) RETURN n AS nodes@MATCH (n:$($a)|$any($b)) RETURN n AS nodes
+					""")
+	void dynamicLabelExpressions(String statement, String expected) {
+
+		assertParsedStatement(statement, expected);
+	}
+
+	private static void assertParsedStatement(String statement, String expected) {
 		Statement parsed = CypherParser.parseStatement(statement);
 		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
 		assertThat(cypher).isEqualTo(expected);
@@ -332,9 +345,7 @@ class CypherParserTests {
 				}
 				return n.name
 				""";
-		Statement parsed = CypherParser.parseStatement(statement);
-		String cypher = Renderer.getRenderer(Configuration.newConfig().alwaysEscapeNames(false).build()).render(parsed);
-		assertThat(cypher).isEqualTo(
+		assertParsedStatement(statement,
 				"MATCH (n:Person) CALL (*) {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1900 RETURN n AS m} RETURN n.name");
 	}
 

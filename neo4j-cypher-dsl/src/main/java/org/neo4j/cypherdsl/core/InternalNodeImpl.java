@@ -41,7 +41,7 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	InternalNodeImpl() {
 	}
 
-	InternalNodeImpl(LabelExpression labelExpression, Where innerPredicate) {
+	InternalNodeImpl(Labels labelExpression, Where innerPredicate) {
 		super(null, null, labelExpression, null, innerPredicate);
 	}
 
@@ -49,8 +49,8 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 		super(primaryLabel, additionalLabels);
 	}
 
-	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression,
-			Properties properties, Where innerPredicate) {
+	InternalNodeImpl(SymbolicName symbolicName, List<NodeLabel> labels, Labels labelExpression, Properties properties,
+			Where innerPredicate) {
 		super(symbolicName, labels, labelExpression, properties, innerPredicate);
 	}
 
@@ -63,7 +63,7 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	public InternalNodeImpl named(SymbolicName newSymbolicName) {
 
 		Assertions.notNull(newSymbolicName, "Symbolic name is required.");
-		return new InternalNodeImpl(newSymbolicName, this.labels, this.labelExpression, this.properties,
+		return new InternalNodeImpl(newSymbolicName, this.staticLabels, this.dynamicLabels, this.properties,
 				this.innerPredicate);
 
 	}
@@ -71,7 +71,7 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 	@Override
 	public InternalNodeImpl withProperties(MapExpression newProperties) {
 
-		return new InternalNodeImpl(this.getSymbolicName().orElse(null), this.labels, this.labelExpression,
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), this.staticLabels, this.dynamicLabels,
 				Properties.create(newProperties), this.innerPredicate);
 	}
 
@@ -81,7 +81,7 @@ final class InternalNodeImpl extends NodeBase<InternalNodeImpl> {
 			return this;
 		}
 
-		return new InternalNodeImpl(this.getSymbolicName().orElse(null), this.labels, this.labelExpression,
+		return new InternalNodeImpl(this.getSymbolicName().orElse(null), this.staticLabels, this.dynamicLabels,
 				this.properties, Where.from(predicate));
 	}
 

@@ -23,7 +23,8 @@ import java.util.List;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 
 /**
- * Represents a label expression, usable in {@link Cypher#node(LabelExpression)}.
+ * This class is not used or supported anymore and will be removed in the next major
+ * version of Cypher-DSL.
  *
  * @author Michael J. Simons
  * @param type whether this is a leaf or another node
@@ -33,7 +34,10 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
  * @param lhs the left hand site of this tree
  * @param rhs the right hand site of this tree
  * @since 2023.0.2
+ * @deprecated Use {@link Labels} accessible via {@link Cypher#exactlyLabel(String)},
+ * {@link Cypher#allLabels(Expression)} or {@link Cypher#anyLabel(Expression)}
  */
+@Deprecated(forRemoval = true)
 public record LabelExpression(Type type, boolean negated, List<String> value, LabelExpression lhs,
 		LabelExpression rhs) implements Visitable {
 
@@ -86,7 +90,10 @@ public record LabelExpression(Type type, boolean negated, List<String> value, La
 
 	/**
 	 * Type of this expression.
+	 *
+	 * @deprecated No replacement, see {@link Labels} and its associated type
 	 */
+	@Deprecated(forRemoval = true)
 	public enum Type {
 
 		/**

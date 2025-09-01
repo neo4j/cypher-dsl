@@ -23,10 +23,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class LabelExpressionTests {
+class LabelsTests {
 
-	static final LabelExpression SIMPLE_OR = new LabelExpression("Person").or(new LabelExpression("Organization"));
-	static final LabelExpression OR_AND_NOT = SIMPLE_OR.and(new LabelExpression("Sanctioned").negate());
+	static final Labels SIMPLE_OR = Labels.exactly("Person").or(Labels.exactly("Organization"));
+	static final Labels OR_AND_NOT = SIMPLE_OR.and(Labels.exactly("Sanctioned").negate());
 
 	@Test // GH-1077
 	void labelExpressionsShouldWork1() {
@@ -44,6 +44,44 @@ class LabelExpressionTests {
 		var cypher = Cypher.match(node).returning(node).build().getCypher();
 
 		assertThat(cypher).isEqualTo("MATCH (n:(`Person`|`Organization`)&!`Sanctioned`) RETURN n");
+	}
+
+	@Test
+	void shouldMatchLabelsDynamically() {
+		var labels = Cypher.listOf(Cypher.literalOf("Person"), Cypher.literalOf("Director")).as("labels");
+		var directors = Cypher.node(Cypher.allLabels(labels)).named("directors");
+		var stmt = Cypher.with(labels).match(directors).returning(directors).build();
+		assertThat(stmt.getCypher())
+			.isEqualTo("WITH ['Person', 'Director'] AS labels MATCH (directors:$(labels)) RETURN directors");
+	}
+
+	@Test
+	void shouldMatchNodesDynamicallyUsingAny() {
+		var labels = Cypher.listOf(Cypher.literalOf("Movie"), Cypher.literalOf("Actor"));
+		var n = Cypher.node(Cypher.anyLabel(labels)).named("n");
+		var stmt = Cypher.match(n).returning(n.as("nodes")).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:$any(['Movie', 'Actor'])) RETURN n AS nodes");
+	}
+
+	@Test
+	void combinationWithLabelExpressionsShouldWork() {
+
+		var labels = Cypher.anyLabel(Cypher.listOf(Cypher.literalOf("Movie"), Cypher.literalOf("Actor")))
+			.and(Cypher.exactlyLabel("Foo"))
+			.or(Cypher.exactlyLabel("Bar").and(Cypher.allLabels(Cypher.parameter("IWantToDie"))));
+		var n = Cypher.node(labels).named("n");
+		var stmt = Cypher.match(n).returning(n.as("nodes")).build();
+		assertThat(stmt.getCypher())
+			.isEqualTo("MATCH (n:$any(['Movie', 'Actor'])&`Foo`|`Bar`&$($IWantToDie)) RETURN n AS nodes");
+	}
+
+	@Test
+	void dynamicConjunctionsShouldWork() {
+
+		var labels = Cypher.allLabels(Cypher.parameter("a")).or(Cypher.anyLabel(Cypher.parameter("b")));
+		var n = Cypher.node(labels).named("n");
+		var stmt = Cypher.match(n).returning(n.as("nodes")).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:$($a)|$any($b)) RETURN n AS nodes");
 	}
 
 	@Nested
@@ -70,7 +108,7 @@ class LabelExpressionTests {
 		@Test // GH-1141
 		void labelExpressionsInPredicates() {
 
-			var movieOrFilm = new LabelExpression("Movie").or(new LabelExpression("Film"));
+			var movieOrFilm = Labels.exactly("Movie").or(Labels.exactly("Film"));
 
 			String statement;
 			Node a = Cypher.node("Person").withProperties("name", Cypher.literalOf("Keanu Reeves")).named("a");

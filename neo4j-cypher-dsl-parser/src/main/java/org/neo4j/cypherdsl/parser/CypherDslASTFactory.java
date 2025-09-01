@@ -58,7 +58,7 @@ import org.neo4j.cypherdsl.core.Finish;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
-import org.neo4j.cypherdsl.core.LabelExpression;
+import org.neo4j.cypherdsl.core.Labels;
 import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.MergeAction;
@@ -96,7 +96,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements
-		ASTFactory<Statements, Statement, Statement, Clause, Finish, Return, Expression, List<Expression>, SortItem, PatternElement, NodeAtom, PathAtom, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, LabelExpression, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Statement, Statement, Clause, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition, EntityType, QuantifiedPathPattern.Quantifier, PatternAtom, DatabaseName, PatternSelector, NULL, PatternElement> {
+		ASTFactory<Statements, Statement, Statement, Clause, Finish, Return, Expression, List<Expression>, SortItem, PatternElement, NodeAtom, PathAtom, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Labels, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Statement, Statement, Clause, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition, EntityType, QuantifiedPathPattern.Quantifier, PatternAtom, DatabaseName, PatternSelector, NULL, PatternElement> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
 
@@ -157,14 +157,6 @@ final class CypherDslASTFactory implements
 		return (SymbolicName) v;
 	}
 
-	private static LabelExpression colonJunjction(LabelExpression lhs, LabelExpression rhs,
-			LabelExpression.Type colonDisjunction) {
-		List<String> value = new ArrayList<>();
-		value.addAll(lhs.value());
-		value.addAll(rhs.value());
-		return new LabelExpression(colonDisjunction, false, value, null, null);
-	}
-
 	private String[] computeFinalLabelList(LabelParsedEventType event, List<StringPos<InputPosition>> inputLabels) {
 
 		return (inputLabels != null) ? this.options.getLabelFilter()
@@ -172,47 +164,35 @@ final class CypherDslASTFactory implements
 			.toArray(new String[0]) : new String[0];
 	}
 
-	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, LabelExpression inputLabels) {
+	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, Labels inputLabels) {
 
 		if (inputLabels == null) {
 			return Optional.of(new String[0]);
 		}
 
-		if (inputLabels.type() == LabelExpression.Type.COLON_CONJUNCTION
-				|| (inputLabels.type() == LabelExpression.Type.LEAF && inputLabels.value() != null)) {
-			return Optional.of(this.options.getLabelFilter().apply(event, inputLabels.value()).toArray(new String[0]));
+		if (inputLabels.getType() == Labels.Type.COLON_CONJUNCTION
+				|| (inputLabels.getType() == Labels.Type.LEAF && inputLabels.getValue() != null)) {
+			return Optional
+				.of(this.options.getLabelFilter().apply(event, inputLabels.getStaticValues()).toArray(new String[0]));
 		}
 		return Optional.empty();
 	}
 
-	private String[] computeFinalTypeList(TypeParsedEventType event, LabelExpression inputTypes) {
+	private String[] computeFinalTypeList(TypeParsedEventType event, Labels inputTypes) {
 
 		if (inputTypes == null) {
 			return new String[0];
 		}
 
-		if ((inputTypes.negated() && inputTypes.value().size() > 1)
-				|| inputTypes.type() == LabelExpression.Type.CONJUNCTION) {
+		if ((inputTypes.isNegated() && inputTypes.getValue().size() > 1)
+				|| inputTypes.getType() == Labels.Type.CONJUNCTION) {
 			throw new UnsupportedOperationException(
 					"Expressions for relationship types are not supported in Cypher-DSL");
 		}
 
-		List<String> types = new ArrayList<>();
-		traverseTypeExpression(types, inputTypes);
+		Collection<String> types = inputTypes.getStaticValues();
 
 		return this.options.getTypeFilter().apply(event, types).toArray(new String[0]);
-	}
-
-	void traverseTypeExpression(List<String> types, LabelExpression expression) {
-
-		if (expression.type() == LabelExpression.Type.LEAF
-				|| expression.type() == LabelExpression.Type.COLON_DISJUNCTION) {
-			types.addAll(expression.value());
-		}
-		else {
-			traverseTypeExpression(types, expression.lhs());
-			traverseTypeExpression(types, expression.rhs());
-		}
 	}
 
 	private <T extends Expression> T applyCallbacksFor(ExpressionCreatedEventType type, T newExpression) {
@@ -698,7 +678,7 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public NodeAtom nodePattern(InputPosition p, Expression v, LabelExpression labels, Expression properties,
+	public NodeAtom nodePattern(InputPosition p, Expression v, Labels labels, Expression properties,
 			Expression predicate) {
 
 		Node node;
@@ -707,10 +687,13 @@ final class CypherDslASTFactory implements
 		}
 		else {
 			var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
-			node = finalLabels.map(l -> {
+			node = finalLabels.flatMap(l -> {
+				if (l.length == 0) {
+					return Optional.empty();
+				}
 				var primaryLabel = l[0];
 				var additionalLabels = Arrays.stream(l).skip(1).toList();
-				return Cypher.node(primaryLabel, additionalLabels);
+				return Optional.of(Cypher.node(primaryLabel, additionalLabels));
 			}).orElseGet(() -> Cypher.node(labels));
 		}
 
@@ -727,11 +710,11 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v,
-			LabelExpression relTypes, PathLength pathLength, Expression properties, Expression predicate) {
+	public PathAtom relationshipPattern(InputPosition p, boolean left, boolean right, Expression v, Labels relTypes,
+			PathLength pathLength, Expression properties, Expression predicate) {
 		return PathAtom.of(assertSymbolicName(v), pathLength, left, right,
 				computeFinalTypeList(TypeParsedEventType.ON_RELATIONSHIP_PATTERN, relTypes), (MapExpression) properties,
-				relTypes != null && relTypes.negated(), predicate);
+				relTypes != null && relTypes.isNegated(), predicate);
 	}
 
 	@Override
@@ -1232,65 +1215,54 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public LabelExpression labelConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
-			boolean containsIs) {
+	public Labels labelConjunction(InputPosition p, Labels lhs, Labels rhs, boolean containsIs) {
 
 		return lhs.and(rhs);
 	}
 
 	@Override
-	public LabelExpression labelDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
-			boolean containsIs) {
+	public Labels labelDisjunction(InputPosition p, Labels lhs, Labels rhs, boolean containsIs) {
 
 		return lhs.or(rhs);
 	}
 
 	@Override
-	public LabelExpression labelNegation(InputPosition p, LabelExpression e, boolean containsIs) {
+	public Labels labelNegation(InputPosition p, Labels e, boolean containsIs) {
 
 		return e.negate();
 	}
 
 	@Override
-	public LabelExpression labelWildcard(InputPosition p, boolean containsIs) {
+	public Labels labelWildcard(InputPosition p, boolean containsIs) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public LabelExpression labelLeaf(InputPosition p, String e, EntityType entityType, boolean containsIs) {
-		return new LabelExpression(e);
+	public Labels labelLeaf(InputPosition p, String e, EntityType entityType, boolean containsIs) {
+		return Cypher.exactlyLabel(e);
 	}
 
 	@Override
-	public LabelExpression labelColonConjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
-			boolean containsIs) {
+	public Labels labelColonConjunction(InputPosition p, Labels lhs, Labels rhs, boolean containsIs) {
 
-		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_CONJUNCTION);
+		return lhs.conjunctionWith(rhs);
 	}
 
 	@Override
-	public LabelExpression labelColonDisjunction(InputPosition p, LabelExpression lhs, LabelExpression rhs,
-			boolean containsIs) {
+	public Labels labelColonDisjunction(InputPosition p, Labels lhs, Labels rhs, boolean containsIs) {
 
-		return colonJunjction(lhs, rhs, LabelExpression.Type.COLON_DISJUNCTION);
+		return lhs.disjunctionWith(rhs);
 	}
 
 	@Override
-	public Expression labelExpressionPredicate(Expression subject, LabelExpression exp) {
+	public Expression labelExpressionPredicate(Expression subject, Labels exp) {
 
 		if (!(subject instanceof SymbolicName symbolicName)) {
 			throw new IllegalArgumentException(
 					"Expected an symbolic name to create a label based expression predicate!");
 		}
-		else {
-			List<String> values = new ArrayList<>();
-			LabelExpression current = exp;
-			while (current != null) {
-				values.addAll(current.value());
-				current = current.rhs();
-			}
-			return Cypher.hasLabelsOrType(symbolicName, values.toArray(String[]::new));
-		}
+
+		return Cypher.hasLabelsOrType(symbolicName, exp);
 	}
 
 	@Override
@@ -1955,9 +1927,12 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public LabelExpression dynamicLabelLeaf(InputPosition p, Expression e, EntityType entityType, boolean all,
+	public Labels dynamicLabelLeaf(InputPosition p, Expression e, EntityType entityType, boolean all,
 			boolean containsIs) {
-		throw new UnsupportedOperationException();
+		if (all) {
+			return Cypher.allLabels(e);
+		}
+		return Cypher.anyLabel(e);
 	}
 
 	@Override

@@ -32,6 +32,13 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 @API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
+	@Deprecated(forRemoval = true)
+	@Override
+	@SuppressWarnings("removal")
+	public final Condition hasLabels(LabelExpression labels) {
+		return hasLabels(Labels.of(labels));
+	}
+
 	@Override
 	public final Condition hasLabels(String... labelsToQuery) {
 		return HasLabelCondition.create(
@@ -41,8 +48,8 @@ abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 	}
 
 	@Override
-	public final Condition hasLabels(LabelExpression labels) {
-		return new HasLabelExpressionCondition(
+	public final Condition hasLabels(Labels labels) {
+		return HasLabelCondition.create(
 				this.getSymbolicName()
 					.orElseThrow(() -> new IllegalStateException("Cannot query a node without a symbolic name.")),
 				labels);

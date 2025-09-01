@@ -44,9 +44,9 @@ import static org.apiguardian.api.API.Status.STABLE;
 @SuppressWarnings("deprecation") // IDEA is stupid.
 public abstract class NodeBase<SELF extends Node> extends AbstractNode implements Node {
 
-	final List<NodeLabel> labels;
+	final List<NodeLabel> staticLabels;
 
-	final LabelExpression labelExpression;
+	final Labels dynamicLabels;
 
 	final Properties properties;
 
@@ -74,11 +74,11 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 * Creates a new base object from a {@link SymbolicName} name, a list of labels and a
 	 * set of properties.
 	 * @param symbolicName the symbolic name for this node object
-	 * @param labels the list of labels, no primary is given
+	 * @param staticLabels the list of labels, no primary is given
 	 * @param properties a set of properties
 	 */
-	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, Properties properties) {
-		this(symbolicName, new ArrayList<>(labels), null, properties, null);
+	protected NodeBase(SymbolicName symbolicName, List<NodeLabel> staticLabels, Properties properties) {
+		this(symbolicName, new ArrayList<>(staticLabels), null, properties, null);
 	}
 
 	NodeBase() {
@@ -91,12 +91,12 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 		this(symbolicName, assertLabels(primaryLabel, additionalLabels), Properties.create(properties));
 	}
 
-	NodeBase(SymbolicName symbolicName, List<NodeLabel> labels, LabelExpression labelExpression, Properties properties,
+	NodeBase(SymbolicName symbolicName, List<NodeLabel> staticLabels, Labels dynamicLabels, Properties properties,
 			Where innerPredicate) {
 
 		this.symbolicName = symbolicName;
-		this.labels = labels;
-		this.labelExpression = labelExpression;
+		this.staticLabels = staticLabels;
+		this.dynamicLabels = dynamicLabels;
 		this.properties = properties;
 		this.innerPredicate = innerPredicate;
 	}
@@ -113,7 +113,9 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 		List<NodeLabel> labels = new ArrayList<>();
 		labels.add(new NodeLabel(primaryLabel));
-		labels.addAll(Arrays.stream(additionalLabels).map(NodeLabel::new).toList());
+		if (additionalLabels != null) {
+			labels.addAll(Arrays.stream(additionalLabels).map(NodeLabel::new).toList());
+		}
 
 		return labels;
 	}
@@ -132,8 +134,8 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 	 * @return a new node
 	 */
 	@Override
-	@SuppressWarnings("squid:S3038") // This is overridden to make sure we allow a
-										// covariant return type
+	// This is overridden to make sure we allow a covariant return type
+	@SuppressWarnings("squid:S3038")
 	public abstract SELF named(SymbolicName newSymbolicName);
 
 	@Override
@@ -182,7 +184,7 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 	@Override
 	public final List<NodeLabel> getLabels() {
-		return (this.labels != null) ? List.copyOf(this.labels) : List.of();
+		return (this.staticLabels != null) ? List.copyOf(this.staticLabels) : List.of();
 	}
 
 	@Override
@@ -211,10 +213,10 @@ public abstract class NodeBase<SELF extends Node> extends AbstractNode implement
 
 		visitor.enter(this);
 		this.getSymbolicName().ifPresent(s -> s.accept(visitor));
-		if (this.labels != null) {
-			this.labels.forEach(label -> label.accept(visitor));
+		if (this.staticLabels != null) {
+			this.staticLabels.forEach(label -> label.accept(visitor));
 		}
-		Visitable.visitIfNotNull(this.labelExpression, visitor);
+		Visitable.visitIfNotNull(this.dynamicLabels, visitor);
 		Visitable.visitIfNotNull(this.properties, visitor);
 		Visitable.visitIfNotNull(this.innerPredicate, visitor);
 		visitor.leave(this);
