@@ -3333,7 +3333,15 @@ should work - at least from a syntactic point of view - out of the box.</p>
 </div>
 <div id="appendix.query-dsl-support.query-dsl-simple" class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in appendix/query-dsl-support.adoc - include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/querydsl/QueryDSLAdapterTests.java[tags=query-dsl-simple]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="1"></i><b>(1)</b>
+<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode()) <i class="conum" data-value="2"></i><b>(2)</b>
+    .where(Cypher.adapt(n.firstName.eq(<span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>).and(n.age.gt(<span class="integer">25</span>))).asCondition()) <i class="conum" data-value="3"></i><b>(3)</b>
+    .returning(Cypher.adapt(n).asName()) <i class="conum" data-value="4"></i><b>(4)</b>
+    .build();
+
+assertThat(statement.getCatalog().getParameters()).isEmpty();
+assertThat(statement.getCypher())
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Person`) WHERE n.firstName = 'P' AND n.age &gt; 25 RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -3364,7 +3372,17 @@ won&#8217;t return the expected results</td>
 </div>
 <div id="appendix.query-dsl-support.query-dsl-simple-avoid-constants" class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in appendix/query-dsl-support.adoc - include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/querydsl/QueryDSLAdapterTests.java[tags=query-dsl-simple-avoid-constants]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
+<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode())
+    .where(Cypher.adapt(n.firstName.eq(<span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>).and(n.age.gt(<span class="integer">25</span>))).asCondition())
+    .returning(Cypher.adapt(n).asName())
+    .build();
+
+statement.setRenderConstantsAsParameters(<span class="predefined-constant">true</span>); <i class="conum" data-value="1"></i><b>(1)</b>
+assertThat(statement.getCatalog().getParameters()).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">pcdsl01</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">P</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="2"></i><b>(2)</b>
+assertThat(statement.getCatalog().getParameters()).containsEntry(<span class="string"><span class="delimiter">&quot;</span><span class="content">pcdsl02</span><span class="delimiter">&quot;</span></span>, <span class="integer">25</span>);
+assertThat(statement.getCypher())
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Person`) WHERE n.firstName = $pcdsl01 AND n.age &gt; $pcdsl02 RETURN n</span><span class="delimiter">&quot;</span></span>); <i class="conum" data-value="3"></i><b>(3)</b></code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -3388,7 +3406,17 @@ won&#8217;t return the expected results</td>
 </div>
 <div id="appendix.query-dsl-support.query-dsl-parameters" class="listingblock">
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="java">Unresolved directive in appendix/query-dsl-support.adoc - include::../../neo4j-cypher-dsl/src/test/java/org/neo4j/cypherdsl/core/querydsl/QueryDSLAdapterTests.java[tags=query-dsl-parameters]</code></pre>
+<pre class="CodeRay highlight"><code data-lang="java">QPerson n = <span class="keyword">new</span> QPerson(<span class="string"><span class="delimiter">&quot;</span><span class="content">n</span><span class="delimiter">&quot;</span></span>);
+<span class="predefined-type">Statement</span> statement = Cypher.match(Cypher.adapt(n).asNode())
+    .where(Cypher.adapt(
+            n.firstName.eq(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">String</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">name</span><span class="delimiter">&quot;</span></span>)).and(n.age.gt(<span class="keyword">new</span> Param&lt;&gt;(<span class="predefined-type">Integer</span>.class, <span class="string"><span class="delimiter">&quot;</span><span class="content">age</span><span class="delimiter">&quot;</span></span>))) <i class="conum" data-value="1"></i><b>(1)</b>
+    ).asCondition())
+    .returning(Cypher.adapt(n).asName())
+    .build();
+
+assertThat(statement.getCatalog().getParameterNames()).hasSize(<span class="integer">2</span>); <i class="conum" data-value="2"></i><b>(2)</b>
+assertThat(statement.getCypher())
+    .isEqualTo(<span class="string"><span class="delimiter">&quot;</span><span class="content">MATCH (n:`Person`) WHERE n.firstName = $name AND n.age &gt; $age RETURN n</span><span class="delimiter">&quot;</span></span>);</code></pre>
 </div>
 </div>
 <div class="colist arabic">
@@ -11095,7 +11123,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2025-09-01 09:18:40 UTC
+Last updated 2025-09-01 14:16:26 UTC
 </div>
 </div>
 </body>
