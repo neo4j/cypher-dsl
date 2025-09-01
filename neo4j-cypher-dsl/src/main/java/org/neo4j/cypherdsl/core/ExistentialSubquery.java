@@ -51,8 +51,8 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 		this.innerWhere = innerWhere;
 	}
 
-	ExistentialSubquery(Match fragment) {
-		this.fragments = List.of(fragment);
+	ExistentialSubquery(List<Match> fragments) {
+		this.fragments = List.copyOf(fragments);
 		this.importingWith = new ImportingWith();
 		this.innerWhere = null;
 	}
@@ -63,9 +63,9 @@ public final class ExistentialSubquery implements SubqueryExpression, Condition 
 		this.innerWhere = null;
 	}
 
-	static ExistentialSubquery exists(Match fragment) {
+	static ExistentialSubquery exists(List<Match> fragments) {
 
-		return new ExistentialSubquery(fragment);
+		return new ExistentialSubquery(fragments);
 	}
 
 	static Condition exists(Statement statement, IdentifiableElement... imports) {
