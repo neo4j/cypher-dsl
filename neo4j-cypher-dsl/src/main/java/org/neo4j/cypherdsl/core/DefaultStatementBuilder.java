@@ -614,11 +614,24 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 	@Override
 	public final Condition asCondition() {
 
-		if (this.currentOngoingMatch == null || !this.currentSinglePartElements.isEmpty()) {
-			throw new IllegalArgumentException("Only simple MATCH statements can be used as existential subqueries.");
+		var matches = new ArrayList<Match>();
+		if (!this.currentSinglePartElements.isEmpty()) {
+			for (var visitable : this.currentSinglePartElements) {
+				if (visitable instanceof Match match) {
+					matches.add(match);
+				}
+			}
 		}
 
-		return ExistentialSubquery.exists(this.currentOngoingMatch.buildMatch());
+		if (this.currentOngoingMatch != null) {
+			matches.add(this.currentOngoingMatch.buildMatch());
+		}
+
+		if (matches.isEmpty()) {
+			throw new IllegalArgumentException("Only MATCH statements can be used as existential subqueries.");
+		}
+
+		return ExistentialSubquery.exists(matches);
 	}
 
 	@Override

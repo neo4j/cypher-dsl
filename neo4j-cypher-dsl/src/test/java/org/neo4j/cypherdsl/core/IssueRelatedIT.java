@@ -2300,6 +2300,47 @@ class IssueRelatedIT {
 		assertThat(query.getCypher()).isEqualTo("MATCH (n:`Node`) RETURN CASE n.prop WHEN 'A' THEN 1 ELSE 2 END");
 	}
 
+	@Test // GH-1313
+	void asConditionShouldWorkWithMultipleMatchesToo() {
+		var me = Cypher.node("User").named("me").withProperties(Cypher.mapOf("id", Cypher.parameter("userId")));
+		var c = Cypher.node("Company").named("c");
+		var myCompany = Cypher.node("Company").named("myCompany");
+		var isAdmin = Cypher
+			.match(me.relationshipTo(
+					Cypher.node("Role").withProperties(Cypher.mapOf("name", Cypher.literalOf("Admin"))), "HAS_ROLE"))
+			.asCondition()
+			.as("isAdmin");
+		var stmt = Cypher.match(me)
+			.with(me, isAdmin)
+			.match(c)
+			.where(isAdmin.asCondition()
+				.or(Cypher.match(me.relationshipTo(myCompany, "WORKdS_FOR"))
+					.match(myCompany.relationshipTo(c, "PARENT_OF"))
+					.asCondition()
+
+				))
+			.returning(c)
+			.build();
+
+		var expected = """
+				MATCH (me:User {
+				  id: $userId
+				})
+				WITH me, EXISTS {
+				  MATCH (me)-[:HAS_ROLE]->(:Role {
+				    name: 'Admin'
+				  })
+				} AS isAdmin
+				MATCH (c:Company)
+				WHERE (isAdmin
+				  OR EXISTS {
+				    MATCH (me)-[:WORKdS_FOR]->(myCompany:Company)
+				    MATCH (myCompany)-[:PARENT_OF]->(c)
+				  })
+				RETURN c""";
+		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(stmt)).isEqualTo(expected);
+	}
+
 	@Nested
 	class Chaining {
 
