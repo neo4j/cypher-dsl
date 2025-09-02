@@ -252,18 +252,4 @@ final class Conditions {
 		return ConstantCondition.FALSE;
 	}
 
-	/**
-	 * Creates condition testing the existing of labels or types.
-	 * @param symbolicName reference to the entity that should be checked for labels or
-	 * types
-	 * @param labelsOrTypes the list of labels or types to check for
-	 * @return a condition that checks whether a node has a set of given labels or a
-	 * relationship a set of given types.
-	 * @since 2021.3.0
-	 */
-	static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
-
-		return HasLabelCondition.create(symbolicName, labelsOrTypes);
-	}
-
 }

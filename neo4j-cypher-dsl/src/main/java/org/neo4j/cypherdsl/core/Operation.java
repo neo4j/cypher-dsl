@@ -20,9 +20,9 @@ package org.neo4j.cypherdsl.core;
 
 import java.util.Arrays;
 import java.util.EnumSet;
-import java.util.List;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
@@ -63,7 +63,7 @@ public final class Operation implements Expression {
 		this.right = right;
 	}
 
-	Operation(Expression left, Operator operator, NodeLabels right) {
+	Operation(Expression left, Operator operator, Visitable right) {
 
 		this.left = left;
 		this.operator = operator;
@@ -100,8 +100,13 @@ public final class Operation implements Expression {
 				String.format("Only operators %s can be used to modify labels", LABEL_OPERATORS));
 		Assertions.notEmpty(nodeLabels, "The labels cannot be empty.");
 
-		List<NodeLabel> listOfNodeLabels = Arrays.stream(nodeLabels).map(NodeLabel::new).toList();
-		return new Operation(op1.getRequiredSymbolicName(), operator, new NodeLabels(listOfNodeLabels));
+		var listOfNodeLabels = new TypedSubtree<>(Arrays.stream(nodeLabels).map(NodeLabel::new).toList()) {
+			@Override
+			public String separator() {
+				return "";
+			}
+		};
+		return new Operation(op1.getRequiredSymbolicName(), operator, listOfNodeLabels);
 	}
 
 	@Override

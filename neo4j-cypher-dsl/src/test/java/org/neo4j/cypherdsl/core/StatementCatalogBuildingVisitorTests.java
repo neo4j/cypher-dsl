@@ -64,7 +64,7 @@ class StatementCatalogBuildingVisitorTests {
 	@Test
 	void labelExpressionsShouldWork() {
 
-		var p = Cypher.node(new LabelExpression("Person").or(new LabelExpression("Actor")));
+		var p = Cypher.node(Cypher.exactlyLabel("Person").or(Cypher.exactlyLabel("Actor")));
 		var statement = Cypher.match(p)
 			.where(p.property("born").gte(Cypher.parameter("born", 1979)))
 			.returning(p)

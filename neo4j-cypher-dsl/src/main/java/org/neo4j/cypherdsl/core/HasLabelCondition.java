@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.TypedSubtree;
+import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
@@ -38,11 +40,21 @@ public final class HasLabelCondition implements Condition {
 
 	private final SymbolicName nodeName;
 
-	private final List<NodeLabel> nodeLabels;
+	private final Visitable labels;
 
 	private HasLabelCondition(SymbolicName nodeName, List<NodeLabel> nodeLabels) {
 		this.nodeName = nodeName;
-		this.nodeLabels = nodeLabels;
+		this.labels = new TypedSubtree<>(nodeLabels) {
+			@Override
+			public String separator() {
+				return "";
+			}
+		};
+	}
+
+	private HasLabelCondition(SymbolicName nodeName, Labels labels) {
+		this.nodeName = nodeName;
+		this.labels = labels;
 	}
 
 	static HasLabelCondition create(SymbolicName nodeName, String... labels) {
@@ -59,12 +71,20 @@ public final class HasLabelCondition implements Condition {
 		return new HasLabelCondition(nodeName, nodeLabels);
 	}
 
+	static HasLabelCondition create(SymbolicName nodeName, Labels labels) {
+
+		Assertions.notNull(nodeName, "A symbolic name for the node is required.");
+		Assertions.notNull(labels, "Labels to query are required.");
+
+		return new HasLabelCondition(nodeName, labels);
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 
 		visitor.enter(this);
 		this.nodeName.accept(visitor);
-		this.nodeLabels.forEach(label -> label.accept(visitor));
+		this.labels.accept(visitor);
 		visitor.leave(this);
 	}
 

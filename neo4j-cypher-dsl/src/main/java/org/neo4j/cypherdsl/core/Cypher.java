@@ -139,13 +139,59 @@ public final class Cypher {
 	}
 
 	/**
+	 * Creates an expression that matches the given {@code label} exactly. Can be used as
+	 * starting point to add conditions via {@link Labels#and(Labels)} or
+	 * {@link Labels#or(Labels)}.
+	 * @param label the label to match
+	 * @return a label expression
+	 */
+	public static Labels exactlyLabel(String label) {
+		return Labels.exactly(label);
+	}
+
+	/**
+	 * Creates a dynamic label expression matching all labels to which {@code expression}
+	 * resolves.
+	 * @param expression the expression that must resolve to a string or a list of strings
+	 * @return a dynamic label expression
+	 * @since 2025.1.0
+	 */
+	public static Labels allLabels(Expression expression) {
+		return Labels.all(expression);
+	}
+
+	/**
+	 * Creates a dynamic label expression matching any label to which {@code expression}
+	 * resolves.
+	 * @param expression the expression that must resolve to a string or a list of strings
+	 * @return a dynamic label expression
+	 * @since 2025.1.0
+	 */
+	public static Labels anyLabel(Expression expression) {
+		return Labels.any(expression);
+	}
+
+	/**
 	 * Creates a new {@literal Node} object.
 	 * @param labelExpression required expression
 	 * @return a node matching a label expression
 	 * @since 2023.0.2
+	 * @deprecated use {@link #node(Labels)}
 	 */
+	@SuppressWarnings("removal")
+	@Deprecated(forRemoval = true)
 	public static Node node(LabelExpression labelExpression) {
-		return new InternalNodeImpl(Objects.requireNonNull(labelExpression), null);
+		return node(Labels.of(labelExpression));
+	}
+
+	/**
+	 * Creates a new {@literal Node} object.
+	 * @param labels required expression
+	 * @return a node matching the given labels
+	 * @since 2025.1.0
+	 */
+	public static Node node(Labels labels) {
+		return new InternalNodeImpl(Objects.requireNonNull(labels), null);
 	}
 
 	/**
@@ -1498,7 +1544,20 @@ public final class Cypher {
 	 * @since 2023.9.0
 	 */
 	public static Condition hasLabelsOrType(SymbolicName symbolicName, String... labelsOrTypes) {
-		return Conditions.hasLabelsOrType(symbolicName, labelsOrTypes);
+		return HasLabelCondition.create(symbolicName, labelsOrTypes);
+	}
+
+	/**
+	 * Checks if a given object has the given labels or types.
+	 * @param symbolicName reference to the entity that should be checked for labels or
+	 * types
+	 * @param labels the expression of labels or types to check for
+	 * @return a condition that checks whether a node has a set of given labels or a
+	 * relationship a set of given types.
+	 * @since 2025.1.0
+	 */
+	public static Condition hasLabelsOrType(SymbolicName symbolicName, Labels labels) {
+		return HasLabelCondition.create(symbolicName, labels);
 	}
 
 	/**

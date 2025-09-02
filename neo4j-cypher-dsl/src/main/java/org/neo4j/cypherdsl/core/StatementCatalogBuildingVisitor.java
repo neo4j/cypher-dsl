@@ -147,8 +147,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		Set<Token> result = new TreeSet<>();
 		if (node.getLabels().isEmpty()) {
 			node.accept(segment -> {
-				if (segment instanceof LabelExpression l) {
-					collectLabels(l, null, result);
+				if (segment instanceof Labels l) {
+					l.getStaticValues().stream().map(Token::label).forEach(result::add);
 				}
 			});
 		}
@@ -156,18 +156,6 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 			node.getLabels().stream().map(NodeLabel::getValue).map(Token::label).forEach(result::add);
 		}
 		return result;
-	}
-
-	private static void collectLabels(LabelExpression l, LabelExpression.Type parent, Set<Token> labels) {
-		if (l == null) {
-			return;
-		}
-		var current = l.type();
-		collectLabels(l.lhs(), current, labels);
-		if (current == LabelExpression.Type.LEAF) {
-			l.value().stream().map(Token::label).forEach(labels::add);
-		}
-		collectLabels(l.rhs(), current, labels);
 	}
 
 	private Map<SymbolicName, PatternElement> createNewScope(Collection<IdentifiableElement> imports) {
@@ -464,8 +452,8 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 		}
 	}
 
-	void enter(LabelExpression labelExpression) {
-		collectLabels(labelExpression, null, this.tokens);
+	void enter(Labels labels) {
+		labels.getStaticValues().forEach(label -> this.tokens.add(StatementCatalog.Token.label(label)));
 	}
 
 	PatternElement lookup(SymbolicName s) {

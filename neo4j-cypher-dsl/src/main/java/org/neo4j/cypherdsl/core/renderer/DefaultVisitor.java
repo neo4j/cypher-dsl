@@ -46,7 +46,7 @@ import org.neo4j.cypherdsl.core.FunctionInvocation;
 import org.neo4j.cypherdsl.core.Hint;
 import org.neo4j.cypherdsl.core.InTransactions;
 import org.neo4j.cypherdsl.core.KeyValueMapEntry;
-import org.neo4j.cypherdsl.core.LabelExpression;
+import org.neo4j.cypherdsl.core.Labels;
 import org.neo4j.cypherdsl.core.Limit;
 import org.neo4j.cypherdsl.core.ListComprehension;
 import org.neo4j.cypherdsl.core.ListExpression;
@@ -184,6 +184,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	boolean inSubquery;
 
+	private final Deque<Boolean> inLabelExpression = new ArrayDeque<>();
+
 	/**
 	 * The current level in the tree of cypher elements.
 	 */
@@ -218,10 +220,6 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this(statementContext, renderConstantsAsParameters, Configuration.newConfig().alwaysEscapeNames(true).build());
 	}
 
-	boolean hasIdentifiables() {
-		return !this.scopingStrategy.getIdentifiables().isEmpty();
-	}
-
 	DefaultVisitor(StatementContext statementContext, boolean renderConstantsAsParameters,
 			Configuration configuration) {
 		this.nameResolvingStrategy = configuration.isUseGeneratedNames()
@@ -236,6 +234,10 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this.dialect = configuration.getDialect();
 		this.enforceSchema = configuration.isEnforceSchema();
 		this.relationshipDefinitions = configuration.getRelationshipDefinitions();
+	}
+
+	boolean hasIdentifiables() {
+		return !this.scopingStrategy.getIdentifiables().isEmpty();
 	}
 
 	private void enableSeparator(int level, boolean on, Supplier<String> supplier) {
@@ -569,46 +571,73 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(NodeLabel nodeLabel) {
 
-		escapeName(nodeLabel.getValue())
-			.ifPresent(label -> this.builder.append(Symbols.NODE_LABEL_START).append(label));
+		escapeName(nodeLabel.getValue()).ifPresent(label -> {
+			var inLabelExpression = this.inLabelExpression.peek();
+			if (inLabelExpression == null || !inLabelExpression) {
+				this.builder.append(Symbols.NODE_LABEL_START);
+			}
+			this.builder.append(label);
+		});
 	}
 
-	void enter(LabelExpression labelExpression) {
+	void enter(Labels labels) {
+		this.inLabelExpression.push(true);
 		this.builder.append(":");
-		renderLabelExpression(labelExpression, null);
+		renderLabelExpression(labels, null);
 	}
 
 	@SuppressWarnings("squid:S3776")
-	void renderLabelExpression(LabelExpression l, LabelExpression.Type parent) {
+	void renderLabelExpression(Labels l, Labels.Type parent) {
 		if (l == null) {
 			return;
 		}
-		if (l.negated()) {
+		if (l.isNegated()) {
 			this.builder.append("!");
 		}
-		var current = l.type();
+		var current = l.getType();
 		boolean close = false;
-		if (current != LabelExpression.Type.LEAF) {
-			close = (parent != null || l.negated()) && l.type() != parent;
-			if (close && !l.negated()
-					&& (current == LabelExpression.Type.CONJUNCTION || parent == LabelExpression.Type.DISJUNCTION)) {
+		if (current != Labels.Type.LEAF) {
+			close = (parent != null || l.isNegated()) && l.getType() != parent;
+			if (close && !l.isNegated() && (current == Labels.Type.CONJUNCTION || parent == Labels.Type.DISJUNCTION)) {
 				close = false;
 			}
 		}
 		if (close) {
 			this.builder.append("(");
 		}
-		renderLabelExpression(l.lhs(), current);
-		if (current == LabelExpression.Type.LEAF) {
-			l.value().forEach(v -> escapeName(v).ifPresent(this.builder::append));
+		renderLabelExpression(l.getLhs(), current);
+		if (current == Labels.Type.LEAF) {
+			l.getValue().forEach(v -> v.accept(this));
 		}
 		else {
 			this.builder.append(current.getValue());
 		}
-		renderLabelExpression(l.rhs(), current);
+		renderLabelExpression(l.getRhs(), current);
 		if (close) {
 			this.builder.append(")");
 		}
+	}
+
+	void enter(Labels.Value value) {
+
+		var modifier = switch (value.modifier()) {
+			case ALL -> "$(";
+			case ANY -> "$any(";
+			case STATIC -> "";
+		};
+
+		this.builder.append(modifier);
+	}
+
+	void leave(Labels.Value value) {
+
+		if (value.modifier() != Labels.Modifier.STATIC) {
+			this.builder.append(")");
+		}
+	}
+
+	void leave(Labels labels) {
+		this.inLabelExpression.pop();
 	}
 
 	void enter(Properties properties) {
