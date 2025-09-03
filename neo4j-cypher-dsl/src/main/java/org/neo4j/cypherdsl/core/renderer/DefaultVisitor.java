@@ -582,7 +582,9 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void enter(Labels labels) {
 		this.inLabelExpression.push(true);
-		this.builder.append(":");
+		if (!labels.isEmpty()) {
+			this.builder.append(":");
+		}
 		renderLabelExpression(labels, null);
 	}
 
@@ -609,7 +611,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		if (current == Labels.Type.LEAF) {
 			l.getValue().forEach(v -> v.accept(this));
 		}
-		else {
+		else if (EnumSet.of(Labels.Type.COLON_CONJUNCTION, Labels.Type.COLON_DISJUNCTION).contains(current)
+				&& !l.getValue().isEmpty()) {
+			l.getValue().get(0).accept(this);
+			for (var value : l.getValue().subList(1, l.getValue().size())) {
+				this.builder.append(current.getValue());
+				value.accept(this);
+			}
+		}
+		else if (!l.isEmpty()) {
 			this.builder.append(current.getValue());
 		}
 		renderLabelExpression(l.getRhs(), current);

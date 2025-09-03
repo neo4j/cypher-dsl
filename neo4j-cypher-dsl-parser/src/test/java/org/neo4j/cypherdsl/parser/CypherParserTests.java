@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -256,10 +257,48 @@ class CypherParserTests {
 		assertThat(cypher).isEqualTo("MATCH (m:`Movie` {title: 'The Matrix'}) WHERE false RETURN m");
 	}
 
+	@ParameterizedTest
+	@CsvSource(delimiterString = "@",
+			textBlock = """
+					WITH ['x'] AS l MATCH (n) SET n:$(l) RETURN n@WITH ['x'] AS l MATCH (n) SET n:$(l) RETURN n
+					WITH ['x'] AS l, ['y'] AS l2 MATCH (n) SET n:$(l):$(l2) RETURN n@WITH ['x'] AS l, ['y'] AS l2 MATCH (n) SET n:$(l):$(l2) RETURN n
+					""")
+	void labelColonConjunctionSet(String in, String expected) {
+		assertThat(CypherParser.parse(in).getCypher()).isEqualTo(expected);
+	}
+
 	@Test
 	void labelColonConjunction() {
 		assertThat(CypherParser.parse("MATCH (a:A:B:C) RETURN a").getCypher())
 			.isEqualTo("MATCH (a:`A`:`B`:`C`) RETURN a");
+	}
+
+	@Test
+	void labelColonConjunctionMixed() {
+		var options = Options.newOptions()
+			.withLabelFilter(
+					(labelParsedEventType, strings) -> strings.stream().filter(Predicate.not("B"::equals)).toList())
+			.build();
+		assertThat(CypherParser.parse("MATCH (a:A:B:$($trolololo):C) RETURN a", options).getCypher())
+			.isEqualTo("MATCH (a:`A`:$($trolololo):`C`) RETURN a");
+	}
+
+	@Test
+	void labelColonConjunction0Element() {
+		var options = Options.newOptions()
+			.withLabelFilter((labelParsedEventType, strings) -> strings.stream().filter(s -> false).toList())
+			.build();
+		assertThat(CypherParser.parse("MATCH (a:A:B) RETURN a", options).getCypher()).isEqualTo("MATCH (a) RETURN a");
+	}
+
+	@Test
+	void labelColonConjunction1Element() {
+		var options = Options.newOptions()
+			.withLabelFilter(
+					(labelParsedEventType, strings) -> strings.stream().filter(Predicate.not("B"::equals)).toList())
+			.build();
+		assertThat(CypherParser.parse("MATCH (a:A:B) RETURN a", options).getCypher())
+			.isEqualTo("MATCH (a:`A`) RETURN a");
 	}
 
 	@Test

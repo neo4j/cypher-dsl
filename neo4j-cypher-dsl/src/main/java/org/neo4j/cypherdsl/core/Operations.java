@@ -160,6 +160,18 @@ final class Operations {
 	}
 
 	/**
+	 * Creates an operation adding one or more labels from a given {@link Node node}.
+	 * @param target the target of the new labels
+	 * @param labels the labels to be added
+	 * @return a set operation
+	 * @since 2021.2.3
+	 */
+	static Operation set(Node target, Labels labels) {
+
+		return Operation.create(target, Operator.SET_LABEL, labels);
+	}
+
+	/**
 	 * Creates an operation removing one or more labels from a given {@link Node node}.
 	 * @param target the target of the remove operation
 	 * @param label the labels to be removed
