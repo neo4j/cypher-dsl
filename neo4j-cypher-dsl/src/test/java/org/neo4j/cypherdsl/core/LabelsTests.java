@@ -123,7 +123,9 @@ class LabelsTests {
 
 	@Test
 	void dynamicSetAllColonMixed() {
-		var labels = Cypher.allLabels(Cypher.parameter("a")).conjunctionWith(Cypher.allLabels(Cypher.parameter("b"))).conjunctionWith(Labels.exactly("OhBuggerOff"));
+		var labels = Cypher.allLabels(Cypher.parameter("a"))
+			.conjunctionWith(Cypher.allLabels(Cypher.parameter("b")))
+			.conjunctionWith(Labels.exactly("OhBuggerOff"));
 		var n = Cypher.node("Whatever").named("n");
 		var stmt = Cypher.match(n).set(n, labels).build();
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) SET n:$($a):$($b):`OhBuggerOff`");

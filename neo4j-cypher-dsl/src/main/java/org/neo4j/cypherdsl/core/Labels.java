@@ -84,12 +84,13 @@ public final class Labels implements Visitable {
 	}
 
 	/**
-	 * Creates a colon conjunction of all values
+	 * Creates a colon conjunction of all values.
 	 * @param values the values for the conjunction
 	 * @return a new labels expression
 	 */
 	public static Labels colonConjunction(Collection<Value> values) {
-		return new Labels(Type.COLON_CONJUNCTION, false, values == null ? List.of() : List.copyOf(values), null, null);
+		return new Labels(Type.COLON_CONJUNCTION, false, (values != null) ? List.copyOf(values) : List.of(), null,
+				null);
 	}
 
 	/** Whether this is a leaf or another node. */
@@ -237,12 +238,6 @@ public final class Labels implements Visitable {
 	public boolean isEmpty() {
 		return (this.value == null || this.value.isEmpty()) && (this.lhs == null || this.lhs.isEmpty())
 				&& (this.rhs == null || this.rhs.isEmpty());
-	}
-
-	@Override
-	public String toString() {
-		return "Labels{" + "lhs=" + lhs + ", type=" + type + ", negated=" + negated + ", value=" + value + ", rhs="
-				+ rhs + '}';
 	}
 
 	/**
