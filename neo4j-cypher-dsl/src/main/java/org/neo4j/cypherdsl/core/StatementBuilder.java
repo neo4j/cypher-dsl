@@ -854,6 +854,16 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 		BuildableMatchAndUpdate remove(Node node, Collection<String> labels);
 
 		/**
+		 * Creates {@code SET} clause for removing the given labels from a node.
+		 * @param node the node whose labels are to be changed
+		 * @param labels the labels to be removed
+		 * @return a match with a REMOVE clause that can be build now
+		 * @since 2025.1.0
+		 */
+		@CheckReturnValue
+		BuildableMatchAndUpdate remove(Node node, Labels labels);
+
+		/**
 		 * Creates {@code SET} clause for removing the enumerated properties.
 		 * @param properties the properties to be removed
 		 * @return a match with a REMOVE clause that can be build now

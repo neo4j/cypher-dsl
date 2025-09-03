@@ -164,7 +164,7 @@ final class Operations {
 	 * @param target the target of the new labels
 	 * @param labels the labels to be added
 	 * @return a set operation
-	 * @since 2021.2.3
+	 * @since 2025.1.0
 	 */
 	static Operation set(Node target, Labels labels) {
 
@@ -181,6 +181,18 @@ final class Operations {
 	static Operation remove(Node target, String... label) {
 
 		return Operation.create(target, Operator.REMOVE_LABEL, label);
+	}
+
+	/**
+	 * Creates an operation removing one or more labels from a given {@link Node node}.
+	 * @param node the node from which the labels should be removed
+	 * @param labels the labels to be removed
+	 * @return a remove operation
+	 * @since 2025.1.0
+	 */
+	static Expression remove(Node node, Labels labels) {
+
+		return Operation.create(node, Operator.REMOVE_LABEL, labels);
 	}
 
 }

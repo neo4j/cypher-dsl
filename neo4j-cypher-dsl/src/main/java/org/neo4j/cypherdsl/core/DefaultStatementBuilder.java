@@ -491,6 +491,13 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 	}
 
 	@Override
+	public BuildableMatchAndUpdate remove(Node node, Labels labels) {
+
+		this.closeCurrentOngoingUpdate();
+		return new DefaultStatementWithUpdateBuilder(UpdateType.REMOVE, Operations.remove(node, labels));
+	}
+
+	@Override
 	public final OngoingReadingWithWhere where(Condition newCondition) {
 
 		if (this.currentOngoingMatch == null) {
@@ -1404,6 +1411,12 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 		}
 
 		@Override
+		public BuildableMatchAndUpdate remove(Node node, Labels labels) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).remove(node, labels);
+		}
+
+		@Override
 		public BuildableMatchAndUpdate remove(Property... properties) {
 
 			return DefaultStatementBuilder.this.addWith(buildWith()).remove(properties);
@@ -1710,6 +1723,15 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 		public BuildableMatchAndUpdate remove(Node node, Collection<String> labels) {
 
 			return remove(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate remove(Node node, Labels labels) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.REMOVE, Operations.remove(node, labels));
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
 		}
 
 		@Override
