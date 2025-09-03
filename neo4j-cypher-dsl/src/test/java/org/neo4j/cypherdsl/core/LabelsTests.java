@@ -96,11 +96,31 @@ class LabelsTests {
 	}
 
 	@Test
+	void dynamicRemoveWrongType1() {
+		var labels = Cypher.allLabels(Cypher.parameter("a")).or(Cypher.anyLabel(Cypher.parameter("b")));
+		var n = Cypher.node("Whatever").named("n");
+		var match = Cypher.match(n);
+		assertThatIllegalArgumentException().isThrownBy(() -> match.remove(n, labels))
+			.withMessage(
+					"Only a single dynamic label expression or a set of static labels might be used in an updating clause");
+	}
+
+	@Test
 	void dynamicSetWrongSelector() {
 		var labels = Cypher.anyLabel(Cypher.parameter("a"));
 		var n = Cypher.node("Whatever").named("n");
 		var match = Cypher.match(n);
 		assertThatIllegalArgumentException().isThrownBy(() -> match.set(n, labels))
+			.withMessage(
+					"Only a single dynamic label expression or a set of static labels might be used in an updating clause");
+	}
+
+	@Test
+	void dynamicRemoveWrongSelector() {
+		var labels = Cypher.anyLabel(Cypher.parameter("a"));
+		var n = Cypher.node("Whatever").named("n");
+		var match = Cypher.match(n);
+		assertThatIllegalArgumentException().isThrownBy(() -> match.remove(n, labels))
 			.withMessage(
 					"Only a single dynamic label expression or a set of static labels might be used in an updating clause");
 	}
@@ -114,11 +134,27 @@ class LabelsTests {
 	}
 
 	@Test
+	void dynamicRemoveAll() {
+		var labels = Cypher.allLabels(Cypher.parameter("a"));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).remove(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) REMOVE n:$($a)");
+	}
+
+	@Test
 	void dynamicSetAllColon() {
 		var labels = Cypher.allLabels(Cypher.parameter("a")).conjunctionWith(Cypher.allLabels(Cypher.parameter("b")));
 		var n = Cypher.node("Whatever").named("n");
 		var stmt = Cypher.match(n).set(n, labels).build();
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) SET n:$($a):$($b)");
+	}
+
+	@Test
+	void dynamicRemoveAllColon() {
+		var labels = Cypher.allLabels(Cypher.parameter("a")).conjunctionWith(Cypher.allLabels(Cypher.parameter("b")));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).remove(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) REMOVE n:$($a):$($b)");
 	}
 
 	@Test
@@ -129,6 +165,16 @@ class LabelsTests {
 		var n = Cypher.node("Whatever").named("n");
 		var stmt = Cypher.match(n).set(n, labels).build();
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) SET n:$($a):$($b):`OhBuggerOff`");
+	}
+
+	@Test
+	void dynamicRemoveAllColonMixed() {
+		var labels = Cypher.allLabels(Cypher.parameter("a"))
+			.conjunctionWith(Cypher.allLabels(Cypher.parameter("b")))
+			.conjunctionWith(Labels.exactly("OhBuggerOff"));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).remove(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) REMOVE n:$($a):$($b):`OhBuggerOff`");
 	}
 
 	@Nested
