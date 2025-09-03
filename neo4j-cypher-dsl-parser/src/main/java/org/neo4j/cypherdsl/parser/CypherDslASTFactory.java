@@ -22,7 +22,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -64,6 +66,7 @@ import org.neo4j.cypherdsl.core.MapProjection;
 import org.neo4j.cypherdsl.core.MergeAction;
 import org.neo4j.cypherdsl.core.NamedPath;
 import org.neo4j.cypherdsl.core.Node;
+import org.neo4j.cypherdsl.core.NodeLabel;
 import org.neo4j.cypherdsl.core.Operation;
 import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Parameter;
@@ -162,20 +165,6 @@ final class CypherDslASTFactory implements
 		return (inputLabels != null) ? this.options.getLabelFilter()
 			.apply(event, inputLabels.stream().map(v -> v.string).toList())
 			.toArray(new String[0]) : new String[0];
-	}
-
-	private Optional<String[]> computeFinalLabelList(LabelParsedEventType event, Labels inputLabels) {
-
-		if (inputLabels == null) {
-			return Optional.of(new String[0]);
-		}
-
-		if (inputLabels.getType() == Labels.Type.COLON_CONJUNCTION
-				|| (inputLabels.getType() == Labels.Type.LEAF && inputLabels.getValue() != null)) {
-			return Optional
-				.of(this.options.getLabelFilter().apply(event, inputLabels.getStaticValues()).toArray(new String[0]));
-		}
-		return Optional.empty();
 	}
 
 	private String[] computeFinalTypeList(TypeParsedEventType event, Labels inputTypes) {
@@ -347,7 +336,7 @@ final class CypherDslASTFactory implements
 		}
 
 		@SuppressWarnings("squid:S4276") // The function is needed due to the assigment
-											// below
+		// below
 		var transformer = Function.<PatternElement>identity();
 		for (UnaryOperator<PatternElement> callback : callbacks) {
 			transformer = transformer.andThen(callback);
@@ -428,8 +417,19 @@ final class CypherDslASTFactory implements
 			boolean containsIs) {
 
 		var s = assertSymbolicName(v);
-		var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, Cypher.setLabel(Cypher.anyNode(s), labels));
+		Operation operation;
+		if (values.isEmpty() && !(dynamicLabels == null || dynamicLabels.isEmpty())) {
+			var labels = Cypher.allLabels(dynamicLabels.get(0));
+			for (var e : dynamicLabels.subList(1, dynamicLabels.size())) {
+				labels = labels.conjunctionWith(Cypher.allLabels(e));
+			}
+			operation = Cypher.setLabel(Cypher.anyNode(s), labels);
+		}
+		else {
+			var labels = computeFinalLabelList(LabelParsedEventType.ON_SET, values);
+			operation = Cypher.setLabel(Cypher.anyNode(s), labels);
+		}
+		return applyCallbacksFor(ExpressionCreatedEventType.ON_SET_LABELS, operation);
 	}
 
 	@Override
@@ -677,6 +677,26 @@ final class CypherDslASTFactory implements
 		return PatternSelector.shortestKGroups(k);
 	}
 
+	private static Collection<Labels.Value> flatten(Labels labels) {
+
+		var values = new LinkedHashSet<Labels.Value>();
+		flatten0(labels, values);
+		return values;
+	}
+
+	private static void flatten0(Labels l, java.util.Set<Labels.Value> values) {
+		if (l == null) {
+			return;
+		}
+		var current = l.getType();
+		flatten0(l.getLhs(), values);
+		if (current == Labels.Type.LEAF || (l.getLhs() == null && l.getRhs() == null
+				&& EnumSet.of(Labels.Type.COLON_CONJUNCTION, Labels.Type.COLON_DISJUNCTION).contains(l.getType()))) {
+			values.addAll(l.getValue());
+		}
+		flatten0(l.getRhs(), values);
+	}
+
 	@Override
 	public NodeAtom nodePattern(InputPosition p, Expression v, Labels labels, Expression properties,
 			Expression predicate) {
@@ -685,16 +705,43 @@ final class CypherDslASTFactory implements
 		if (labels == null) {
 			node = Cypher.anyNode();
 		}
-		else {
-			var finalLabels = computeFinalLabelList(LabelParsedEventType.ON_NODE_PATTERN, labels);
-			node = finalLabels.flatMap(l -> {
-				if (l.length == 0) {
-					return Optional.empty();
+		else if (labels.getType() == Labels.Type.COLON_CONJUNCTION
+				|| (labels.getType() == Labels.Type.LEAF && labels.getValue() != null)) {
+			var values = flatten(labels);
+
+			List<String> staticLabels = new ArrayList<>();
+			int dynamicLabelsCnt = 0;
+			for (var value : values) {
+				if (value.modifier() == Labels.Modifier.STATIC && value.visitable() instanceof NodeLabel nodeLabel) {
+					staticLabels.add(nodeLabel.getValue());
 				}
-				var primaryLabel = l[0];
-				var additionalLabels = Arrays.stream(l).skip(1).toList();
-				return Optional.of(Cypher.node(primaryLabel, additionalLabels));
-			}).orElseGet(() -> Cypher.node(labels));
+				else {
+					++dynamicLabelsCnt;
+				}
+			}
+			var newConjunctionRequired = dynamicLabelsCnt > 0;
+			staticLabels = List
+				.copyOf(this.options.getLabelFilter().apply(LabelParsedEventType.ON_NODE_PATTERN, staticLabels));
+
+			if (newConjunctionRequired) {
+				List<Labels.Value> newValues = new ArrayList<>();
+				for (var value : values) {
+					if (value.modifier() != Labels.Modifier.STATIC || value.visitable() instanceof NodeLabel nodeLabel
+							&& staticLabels.contains(nodeLabel.getValue())) {
+						newValues.add(value);
+					}
+				}
+				node = Cypher.node(Labels.colonConjunction(newValues));
+			}
+			else if (staticLabels.isEmpty()) {
+				node = Cypher.anyNode();
+			}
+			else {
+				node = Cypher.node(staticLabels.get(0), staticLabels.subList(1, staticLabels.size()));
+			}
+		}
+		else {
+			node = Cypher.node(labels);
 		}
 
 		if (v != null) {
@@ -989,7 +1036,7 @@ final class CypherDslASTFactory implements
 	}
 
 	@SuppressWarnings("HiddenField") // The database options are quite different options
-										// than ours ;)
+	// than ours ;)
 	@Override
 	public Statement alterDatabase(InputPosition p, DatabaseName databaseName, boolean ifExists, AccessType accessType,
 			SimpleEither<Integer, Parameter<?>> topologyPrimaries,
@@ -1244,7 +1291,6 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public Labels labelColonConjunction(InputPosition p, Labels lhs, Labels rhs, boolean containsIs) {
-
 		return lhs.conjunctionWith(rhs);
 	}
 

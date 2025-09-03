@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 class LabelsTests {
 
@@ -82,6 +83,50 @@ class LabelsTests {
 		var n = Cypher.node(labels).named("n");
 		var stmt = Cypher.match(n).returning(n.as("nodes")).build();
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:$($a)|$any($b)) RETURN n AS nodes");
+	}
+
+	@Test
+	void dynamicSetWrongType1() {
+		var labels = Cypher.allLabels(Cypher.parameter("a")).or(Cypher.anyLabel(Cypher.parameter("b")));
+		var n = Cypher.node("Whatever").named("n");
+		var match = Cypher.match(n);
+		assertThatIllegalArgumentException().isThrownBy(() -> match.set(n, labels))
+			.withMessage(
+					"Only a single dynamic label expression or a set of static labels might be used in an updating clause");
+	}
+
+	@Test
+	void dynamicSetWrongSelector() {
+		var labels = Cypher.anyLabel(Cypher.parameter("a"));
+		var n = Cypher.node("Whatever").named("n");
+		var match = Cypher.match(n);
+		assertThatIllegalArgumentException().isThrownBy(() -> match.set(n, labels))
+			.withMessage(
+					"Only a single dynamic label expression or a set of static labels might be used in an updating clause");
+	}
+
+	@Test
+	void dynamicSetAll() {
+		var labels = Cypher.allLabels(Cypher.parameter("a"));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).set(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) SET n:$($a)");
+	}
+
+	@Test
+	void dynamicSetAllColon() {
+		var labels = Cypher.allLabels(Cypher.parameter("a")).conjunctionWith(Cypher.allLabels(Cypher.parameter("b")));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).set(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) SET n:$($a):$($b)");
+	}
+
+	@Test
+	void dynamicSetAllColonMixed() {
+		var labels = Cypher.allLabels(Cypher.parameter("a")).conjunctionWith(Cypher.allLabels(Cypher.parameter("b"))).conjunctionWith(Labels.exactly("OhBuggerOff"));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).set(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) SET n:$($a):$($b):`OhBuggerOff`");
 	}
 
 	@Nested

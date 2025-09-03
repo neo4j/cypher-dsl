@@ -300,6 +300,12 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 			}
 
 			@Override
+			public BuildableOngoingMergeAction set(Node node, Labels labels) {
+
+				return this.set(Operations.set(node, labels));
+			}
+
+			@Override
 			public BuildableOngoingMergeAction mutate(Expression target, Expression properties) {
 				((SupportsActionsOnTheUpdatingClause) DefaultStatementBuilder.this.currentOngoingUpdate.builder)
 					.on(type, UpdateType.MUTATE, target, properties);
@@ -440,6 +446,13 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 	public final BuildableMatchAndUpdate set(Node named, Collection<String> labels) {
 
 		return set(named, labels.toArray(new String[] {}));
+	}
+
+	@Override
+	public BuildableMatchAndUpdate set(Node node, Labels labels) {
+
+		this.closeCurrentOngoingUpdate();
+		return new DefaultStatementWithUpdateBuilder(UpdateType.SET, Operations.set(node, labels));
 	}
 
 	@Override
@@ -1367,6 +1380,12 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 		}
 
 		@Override
+		public BuildableMatchAndUpdate set(Node node, Labels labels) {
+
+			return DefaultStatementBuilder.this.addWith(buildWith()).set(node, labels);
+		}
+
+		@Override
 		public BuildableMatchAndUpdate mutate(Expression target, Expression properties) {
 
 			return DefaultStatementBuilder.this.addWith(buildWith()).mutate(target, properties);
@@ -1658,6 +1677,15 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 		public BuildableMatchAndUpdate set(Node node, Collection<String> labels) {
 
 			return set(node, labels.toArray(new String[] {}));
+		}
+
+		@Override
+		public BuildableMatchAndUpdate set(Node node, Labels labels) {
+
+			DefaultStatementWithUpdateBuilder result = DefaultStatementBuilder.this.new DefaultStatementWithUpdateBuilder(
+					UpdateType.SET, Operations.set(node, labels));
+			DefaultStatementBuilder.this.addUpdatingClause(this.builder.build());
+			return result;
 		}
 
 		@Override

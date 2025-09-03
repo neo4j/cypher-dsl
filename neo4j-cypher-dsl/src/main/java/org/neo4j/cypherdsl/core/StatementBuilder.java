@@ -815,6 +815,16 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 		@CheckReturnValue
 		R set(Node node, Collection<String> labels);
 
+		/**
+		 * Creates {@code SET} clause for setting the given labels to a node.
+		 * @param node the node whose labels are to be changed
+		 * @param labels the labels to be set
+		 * @return a match with a SET clause that can be build now
+		 * @since 2025.1.0
+		 */
+		@CheckReturnValue
+		R set(Node node, Labels labels);
+
 	}
 
 	/**

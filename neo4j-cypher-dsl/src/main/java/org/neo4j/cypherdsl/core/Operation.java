@@ -109,6 +109,19 @@ public final class Operation implements Expression {
 		return new Operation(op1.getRequiredSymbolicName(), operator, listOfNodeLabels);
 	}
 
+	static Operation create(Node op1, Operator operator, Labels labels) {
+
+		Assertions.notNull(op1, "The first operand must not be null.");
+		Assertions.isTrue(op1.getSymbolicName().isPresent(), "The node must have a name.");
+		Assertions.isTrue(LABEL_OPERATORS.contains(operator),
+				String.format("Only operators %s can be used to modify labels", LABEL_OPERATORS));
+		Assertions.notNull(labels, "The labels cannot be empty.");
+		Assertions.isTrue(labels.canBeUsedInUpdate(),
+				"Only a single dynamic label expression or a set of static labels might be used in an updating clause");
+
+		return new Operation(op1.getRequiredSymbolicName(), operator, labels);
+	}
+
 	@Override
 	public void accept(Visitor visitor) {
 

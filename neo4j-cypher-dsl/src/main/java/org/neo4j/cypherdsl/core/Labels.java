@@ -83,6 +83,15 @@ public final class Labels implements Visitable {
 		return new Labels(Modifier.ANY, expression);
 	}
 
+	/**
+	 * Creates a colon conjunction of all values
+	 * @param values the values for the conjunction
+	 * @return a new labels expression
+	 */
+	public static Labels colonConjunction(Collection<Value> values) {
+		return new Labels(Type.COLON_CONJUNCTION, false, values == null ? List.of() : List.copyOf(values), null, null);
+	}
+
 	/** Whether this is a leaf or another node. */
 	private final Type type;
 
@@ -214,6 +223,26 @@ public final class Labels implements Visitable {
 			}));
 		}
 		collectLabels(l.getRhs(), labels);
+	}
+
+	boolean canBeUsedInUpdate() {
+		var b = this.lhs == null && this.rhs == null
+				&& EnumSet.of(Type.LEAF, Type.COLON_CONJUNCTION).contains(this.type);
+		if (b) {
+			b = !this.value.isEmpty() && this.value.get(0).modifier == Modifier.ALL;
+		}
+		return b;
+	}
+
+	public boolean isEmpty() {
+		return (this.value == null || this.value.isEmpty()) && (this.lhs == null || this.lhs.isEmpty())
+				&& (this.rhs == null || this.rhs.isEmpty());
+	}
+
+	@Override
+	public String toString() {
+		return "Labels{" + "lhs=" + lhs + ", type=" + type + ", negated=" + negated + ", value=" + value + ", rhs="
+				+ rhs + '}';
 	}
 
 	/**

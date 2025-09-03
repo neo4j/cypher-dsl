@@ -3352,13 +3352,24 @@ public final class Cypher {
 	}
 
 	/**
-	 * Creates an operation adding one or more labels from a given {@link Node node}.
+	 * Creates an operation adding one or more labels to a given {@link Node node}.
 	 * @param target the target of the new labels
 	 * @param label the labels to be added
 	 * @return a set operation
 	 * @since 2023.9.0
 	 */
 	public static Operation setLabel(Node target, String... label) {
+		return Operations.set(target, label);
+	}
+
+	/**
+	 * Creates an operation adding dynamic labels to a {@link Node node}.
+	 * @param target the target of the new labels
+	 * @param label the labels to be added
+	 * @return a set operation
+	 * @since 2025.1.0
+	 */
+	public static Operation setLabel(Node target, Labels label) {
 		return Operations.set(target, label);
 	}
 
