@@ -35,8 +35,6 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
  * @author Andreas Berger
  * @author Michael J. Simons
  */
-@SuppressWarnings("removal") // This is for the parameter methods. I want to keep calling
-								// them this way until they are gone.
 class ParameterIT {
 
 	private static final Node userNode = Cypher.node("User").named("u");
@@ -67,6 +65,34 @@ class ParameterIT {
 		assertThat(statement.getCatalog().getParameters()).containsEntry("param", 5).containsEntry("name", "Neo");
 
 		assertThat(statement.getCatalog().getParameterNames()).containsExactlyInAnyOrder("param", "name");
+	}
+
+	@Test
+	void shouldCollectParametersOnlyOnce() {
+		Statement statement = Cypher.match(userNode)
+			.where(userNode.property("cnt").isEqualTo(Cypher.parameter("param", 5)))
+			.and(Cypher.anonParameter("y").isTrue())
+			.or(Cypher.anonParameter("y").isFalse())
+			.and(Cypher.anonParameter("z").isTrue())
+			.or(Cypher.anonParameter("z").isFalse())
+			.returning(userNode)
+			.limit(Cypher.parameter("param").withValue(5))
+			.build();
+
+		assertThat(statement.getCatalog().getParameters()).containsOnly(Map.entry("param", 5),
+				Map.entry("pcdsl01", "y"), Map.entry("pcdsl02", "z"));
+	}
+
+	@Test
+	void equalsShouldWork() {
+		var p1 = Cypher.anonParameter("y");
+		var p2 = Cypher.anonParameter("y");
+		var p3 = Cypher.anonParameter("z");
+		var p4 = Cypher.parameter("pcdsl01", "z");
+		assertThat(p1).isEqualTo(p1);
+		assertThat(p1).isEqualTo(p2);
+		assertThat(p1).isNotEqualTo(p3);
+		assertThat(p1).isNotEqualTo(p4);
 	}
 
 	@Test
