@@ -124,16 +124,20 @@ public final class Parameter<T> implements Expression {
 		if (o == null || getClass() != o.getClass()) {
 			return false;
 		}
-		if (this.isAnon()) {
-			return super.equals(o);
-		}
+
 		Parameter<?> parameter = (Parameter<?>) o;
+		if (this.isAnon() && parameter.isAnon()) {
+			return Objects.deepEquals(this.value, parameter.value);
+		}
+		else if (this.isAnon() != parameter.isAnon()) {
+			return false;
+		}
 		return Objects.equals(this.name, parameter.name);
 	}
 
 	@Override
 	public int hashCode() {
-		return this.isAnon() ? super.hashCode() : Objects.hash(this.name);
+		return this.isAnon() ? Objects.hashCode(this.value) : Objects.hash(this.name);
 	}
 
 	@Override
