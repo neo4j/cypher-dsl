@@ -24,6 +24,7 @@ import java.util.function.Function;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.FunctionInvocation;
+import org.neo4j.cypherdsl.core.Labels;
 import org.neo4j.cypherdsl.core.PatternSelector;
 import org.neo4j.cypherdsl.core.Subquery;
 import org.neo4j.cypherdsl.core.With;
@@ -84,14 +85,17 @@ public enum Dialect {
 	/**
 	 * A Neo4j 5.26 and higher dialect that always renders the {@code CYPHER 5} prefix.
 	 * @since 2024.5.0
-	 * @deprecated Use {@link #NEO4J_5_CYPHER_5} if neccessary or
+	 * @deprecated Use {@link #NEO4J_5_CYPHER_5} if necessary or
 	 * {@link #NEO4J_5_DEFAULT_CYPHER} in all other cases.
 	 */
 	@Deprecated(forRemoval = true)
 	NEO4J_5_26 {
+
+		private final DefaultNeo4j5HandlerSupplier handlerSupplier = new DefaultNeo4j5HandlerSupplierWithDynamicLabelsSupport();
+
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return NEO4J_5_23.getHandler(visitable);
+			return this.handlerSupplier.apply(visitable).orElseGet(() -> super.getHandler(visitable));
 		}
 
 		@Override
@@ -109,7 +113,7 @@ public enum Dialect {
 	NEO4J_5_DEFAULT_CYPHER {
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return NEO4J_5_23.getHandler(visitable);
+			return NEO4J_5_26.getHandler(visitable);
 		}
 	},
 
@@ -123,7 +127,7 @@ public enum Dialect {
 	NEO4J_5_CYPHER_5 {
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return NEO4J_5_23.getHandler(visitable);
+			return NEO4J_5_26.getHandler(visitable);
 		}
 
 		@Override
@@ -142,7 +146,7 @@ public enum Dialect {
 	NEO4J_5_CYPHER_25 {
 		@Override
 		Class<? extends Visitor> getHandler(Visitable visitable) {
-			return NEO4J_5_23.getHandler(visitable);
+			return NEO4J_5_26.getHandler(visitable);
 		}
 
 		@Override
@@ -180,6 +184,9 @@ public enum Dialect {
 			if (visitable instanceof PatternSelector) {
 				return Optional.of(PatternSelectorVisitorPreNeo4j521.class);
 			}
+			else if (visitable instanceof Labels) {
+				return Optional.of(Neo4j5Pre26LabelsVisitor.class);
+			}
 			return Optional.empty();
 		}
 
@@ -199,12 +206,15 @@ public enum Dialect {
 			else if (visitable instanceof PatternSelector) {
 				return Optional.of(PatternSelectorVisitorPreNeo4j521.class);
 			}
+			else if (visitable instanceof Labels) {
+				return Optional.of(Neo4j5Pre26LabelsVisitor.class);
+			}
 			return Optional.empty();
 		}
 
 	}
 
-	private static final class DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport
+	private static class DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport
 			extends DefaultNeo4j5HandlerSupplier {
 
 		@Override
@@ -218,6 +228,19 @@ public enum Dialect {
 				}
 				return Optional.empty();
 			});
+		}
+
+	}
+
+	private static final class DefaultNeo4j5HandlerSupplierWithDynamicLabelsSupport
+			extends DefaultNeo4j5HandlerSupplierWithNewImportScopeSubquerySupport {
+
+		@Override
+		public Optional<Class<? extends Visitor>> apply(Visitable visitable) {
+			if (visitable instanceof Labels) {
+				return Optional.empty();
+			}
+			return super.apply(visitable);
 		}
 
 	}

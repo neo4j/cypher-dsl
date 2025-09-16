@@ -176,7 +176,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	 */
 	private final boolean renderConstantsAsParameters;
 
-	private final boolean alwaysEscapeNames;
+	protected final boolean alwaysEscapeNames;
 
 	private final Dialect dialect;
 
