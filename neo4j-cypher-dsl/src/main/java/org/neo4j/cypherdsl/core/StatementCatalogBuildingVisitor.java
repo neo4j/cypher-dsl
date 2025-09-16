@@ -454,6 +454,20 @@ class StatementCatalogBuildingVisitor extends ReflectiveVisitor {
 
 	void enter(Labels labels) {
 		labels.getStaticValues().forEach(label -> this.tokens.add(StatementCatalog.Token.label(label)));
+		this.extractParametersFromLabels(labels, null);
+	}
+
+	@SuppressWarnings("squid:S3776")
+	void extractParametersFromLabels(Labels l, Labels.Type parent) {
+		if (l == null) {
+			return;
+		}
+		var current = l.getType();
+		extractParametersFromLabels(l.getLhs(), current);
+		if (l.getValue() != null) {
+			l.getValue().forEach(v -> v.accept(this));
+		}
+		extractParametersFromLabels(l.getRhs(), current);
 	}
 
 	PatternElement lookup(SymbolicName s) {
