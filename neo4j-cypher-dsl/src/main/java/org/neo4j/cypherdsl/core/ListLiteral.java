@@ -47,4 +47,9 @@ public final class ListLiteral extends LiteralBase<Iterable<Literal<?>>> {
 			.collect(Collectors.joining(", ", "[", "]"));
 	}
 
+	@Override
+	public Iterable<Literal<?>> getContent() {
+		return super.content;
+	}
+
 }

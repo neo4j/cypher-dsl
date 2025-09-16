@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import java.util.Map;
+
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -175,6 +177,17 @@ class LabelsTests {
 		var n = Cypher.node("Whatever").named("n");
 		var stmt = Cypher.match(n).remove(n, labels).build();
 		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) REMOVE n:$($a):$($b):`OhBuggerOff`");
+	}
+
+	@Test
+	void labelsAsParametersMustBeInTheCatalog() {
+		var labels = Cypher.allLabels(Cypher.parameter("a", "X"))
+			.conjunctionWith(Cypher.allLabels(Cypher.parameter("b", "Y")));
+		var n = Cypher.node("Whatever").named("n");
+		var stmt = Cypher.match(n).remove(n, labels).build();
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n:`Whatever`) REMOVE n:$($a):$($b)");
+		assertThat(stmt.getCatalog().getParameterNames()).containsExactly("a", "b");
+		assertThat(stmt.getCatalog().getParameters()).containsAllEntriesOf(Map.of("a", "X", "b", "Y"));
 	}
 
 	@Nested

@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,7 @@ import org.neo4j.cypherdsl.core.renderer.Dialect;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 /**
  * @author Michael J. Simons
@@ -132,6 +134,52 @@ class DialectIT {
 			.build();
 		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
 		assertThat(renderer.render(stmt)).isEqualTo(expected);
+	}
+
+	@ParameterizedTest
+	@CsvSource(quoteCharacter = '@',
+			textBlock = """
+					NEO4J_4,                MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					NEO4J_5,                MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					NEO4J_5_23,             MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					NEO4J_5_26,             @CYPHER 5 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					NEO4J_5_CYPHER_5,       @CYPHER 5 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					NEO4J_5_DEFAULT_CYPHER, @MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					NEO4J_5_CYPHER_25,      @CYPHER 25 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					""")
+	void labelRenderingShouldWork(Dialect dialect, String expected) {
+		var m = Cypher.node(Cypher.exactlyLabel("Movie")).named("m");
+		var parameterWithListOfStrings = Cypher.parameter("x",
+				Cypher.listOf(Cypher.literalOf("a"), Cypher.literalOf("b")));
+		var parameterWithASingleString = Cypher.parameter("y", Cypher.literalOf("c"));
+		var parameterWithListLiteral = Cypher.parameter("z",
+				Cypher.literalOf(List.of(Cypher.literalOf("d"), Cypher.literalOf("e"))));
+		var parameterWithAListOfJavaStrings = Cypher.parameter("foo", List.of("k", "l"));
+
+		var stmt = Cypher.match(m)
+			.set(m, Labels.all(parameterWithListOfStrings)
+				.conjunctionWith(Labels.all(parameterWithASingleString))
+				.conjunctionWith(Labels.all(parameterWithListLiteral))
+				.conjunctionWith(Labels.all(Cypher.listOf(Cypher.literalOf("f"), Cypher.literalOf("g"))))
+				.conjunctionWith(Labels.all(Cypher.literalOf("h")))
+				.conjunctionWith(Labels.all(Cypher.literalOf(List.of(Cypher.literalOf("i"), Cypher.literalOf("j")))))
+				.conjunctionWith(Labels.all(parameterWithAListOfJavaStrings))
+				.conjunctionWith(Labels.all(Cypher.parameter("bar", "m"))))
+			.returning(Cypher.asterisk())
+			.build();
+
+		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+		assertThat(renderer.render(stmt)).isEqualTo(expected);
+	}
+
+	@Test
+	void expressionsMightNotBeRenderedInLabels() {
+		var m = Cypher.node("Movie").named("m");
+		var stmt = Cypher.match(m).set(m, Labels.all(m.property("x"))).returning(Cypher.asterisk()).build();
+
+		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(Dialect.NEO4J_4).build());
+		assertThatIllegalArgumentException().isThrownBy(() -> renderer.render(stmt))
+			.withMessage("Cannot render the given Labels in a Cypher pre 5.26 compatible way");
 	}
 
 	@Test // GH-539
