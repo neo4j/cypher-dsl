@@ -1,0 +1,5 @@
+module:org.neo4j.cypherdsl.core
+org.neo4j.cypherdsl.core
+org.neo4j.cypherdsl.core.annotations
+org.neo4j.cypherdsl.core.ast
+org.neo4j.cypherdsl.core.renderer
