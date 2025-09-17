@@ -1,5 +1,36 @@
 == 2025.0
 
+=== 2025.0.2
+
+==== 🚀 Features
+
+* Add support for rendering some label expressions for older Neo4j versions.
+* Deduplicate parameters while collecting.
+* Add support for dynamic label expression in the `REMOVE` clause. (#1325)
+* Add support for dynamic label expression in the `SET` clause. (#1324)
+* Add support for dynamic label expressions. (#1323)
+
+==== 🐛 Bug Fixes
+
+* Extract parameters from Label expressions, too.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump Neo4j-OGM and OGM-Quarkus example to 4.0.20.
+** Bump org.checkerframework:checker-qual (#1338)
+** Bump com.google.testing.compile:compile-testing (#1336)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1335)
+** Bump quarkus.platform.version from 3.26.2 to 3.26.3 (#1334)
+** Bump org.springframework.data:spring-data-neo4j (#1333)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1332)
+** Bump org.apache.maven.plugins:maven-shade-plugin (#1331)
+** Bump com.google.testing.compile:compile-testing from 0.21.0 to 0.22.0 (#1328)
+** Bump quarkus.platform.version from 3.26.1 to 3.26.2 (#1330)
+** Bump neo4j.version from 5.26.11 to 5.26.12 (#1329)
+* Restore `QueryDSLAdapterTests` once again.
+
+
 === 2025.0.1
 
 ==== 🔄️ Refactorings
