@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1757922443682">
+<licensePluginReport goal="CHECK" timestamp="1758094710311">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -207,6 +207,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Neo4j523SubqueryVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Neo4j5ComparisonVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Neo4j5FunctionInvocationVisitor.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Neo4j5Pre26LabelsVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/PatternSelectorVisitorPreNeo4j521.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/PrettyPrintingVisitor.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/renderer/Renderer.java" result="PRESENT"/>
