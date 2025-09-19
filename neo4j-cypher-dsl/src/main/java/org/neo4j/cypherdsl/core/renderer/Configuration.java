@@ -100,6 +100,11 @@ public final class Configuration {
 	 */
 	private final Map<String, List<RelationshipDefinition>> relationshipDefinitions;
 
+	/**
+	 * Flag that can be used to disable dynamic labels, defaults to false.
+	 */
+	private final boolean disableDynamicLabels;
+
 	private Configuration(Builder builder) {
 		this.prettyPrint = builder.prettyPrint;
 		this.alwaysEscapeNames = builder.alwaysEscapeNames;
@@ -108,6 +113,7 @@ public final class Configuration {
 		this.dialect = (builder.dialect != null) ? builder.dialect : Dialect.NEO4J_5_DEFAULT_CYPHER;
 		this.generatedNames = builder.generatedNames;
 		this.enforceSchema = builder.enforceSchema;
+		this.disableDynamicLabels = builder.disableDynamicLabels;
 
 		Map<String, List<RelationshipDefinition>> mutableRelationshipDefinitions = new HashMap<>();
 		builder.relationshipDefinitions.forEach((k, v) -> mutableRelationshipDefinitions.put(k, List.copyOf(v)));
@@ -222,6 +228,15 @@ public final class Configuration {
 		return this.relationshipDefinitions;
 	}
 
+	/**
+	 * Returns {@literal true} if dynamic labels are disabled.
+	 * @return {@literal true} if dynamic labels are disabled
+	 * @since 2025.0.3
+	 */
+	public boolean isDisableDynamicLabels() {
+		return this.disableDynamicLabels;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) {
@@ -235,13 +250,14 @@ public final class Configuration {
 				&& this.indentStyle == that.indentStyle && this.alwaysEscapeNames == that.alwaysEscapeNames
 				&& this.dialect == that.dialect && this.generatedNames.equals(that.generatedNames)
 				&& this.enforceSchema == that.enforceSchema
-				&& this.relationshipDefinitions.equals(that.relationshipDefinitions);
+				&& this.relationshipDefinitions.equals(that.relationshipDefinitions)
+				&& this.disableDynamicLabels == that.disableDynamicLabels;
 	}
 
 	@Override
 	public int hashCode() {
 		return Objects.hash(this.prettyPrint, this.indentStyle, this.indentSize, this.alwaysEscapeNames, this.dialect,
-				this.generatedNames, this.enforceSchema, this.relationshipDefinitions);
+				this.generatedNames, this.enforceSchema, this.relationshipDefinitions, this.disableDynamicLabels);
 	}
 
 	@Override
@@ -347,6 +363,8 @@ public final class Configuration {
 		private Set<GeneratedNames> generatedNames = EnumSet.noneOf(GeneratedNames.class);
 
 		private boolean enforceSchema = false;
+
+		private boolean disableDynamicLabels = false;
 
 		private Map<String, List<RelationshipDefinition>> relationshipDefinitions = new HashMap<>();
 
@@ -474,6 +492,17 @@ public final class Configuration {
 		@API(status = EXPERIMENTAL, since = "2023.7.0")
 		public Builder withEnforceSchema(boolean enforceSchema) {
 			this.enforceSchema = enforceSchema;
+			return this;
+		}
+
+		/**
+		 * Use this setting to disable dynamic labels.
+		 * @param disableDynamicLabels the new value
+		 * @return this builder
+		 * @since 2025.0.3
+		 */
+		public Builder disableDynamicLabels(boolean disableDynamicLabels) {
+			this.disableDynamicLabels = disableDynamicLabels;
 			return this;
 		}
 

@@ -139,15 +139,22 @@ class DialectIT {
 	@ParameterizedTest
 	@CsvSource(quoteCharacter = '@',
 			textBlock = """
-					NEO4J_4,                MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
-					NEO4J_5,                MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
-					NEO4J_5_23,             MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
-					NEO4J_5_26,             @CYPHER 5 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
-					NEO4J_5_CYPHER_5,       @CYPHER 5 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
-					NEO4J_5_DEFAULT_CYPHER, @MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
-					NEO4J_5_CYPHER_25,      @CYPHER 25 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					false, NEO4J_4,                MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					false, NEO4J_5,                MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					false, NEO4J_5_23,             MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					false, NEO4J_5_26,             @CYPHER 5 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					false, NEO4J_5_CYPHER_5,       @CYPHER 5 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					false, NEO4J_5_DEFAULT_CYPHER, @MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					false, NEO4J_5_CYPHER_25,      @CYPHER 25 MATCH (m:`Movie`) SET m:$($x):$($y):$($z):$(['f', 'g']):$('h'):$(['i', 'j']):$($foo):$($bar) RETURN *@
+					true, NEO4J_4,                 MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					true, NEO4J_5,                 MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					true, NEO4J_5_23,              MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					true, NEO4J_5_26,              CYPHER 5 MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					true, NEO4J_5_CYPHER_5,        CYPHER 5 MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					true, NEO4J_5_DEFAULT_CYPHER,  MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
+					true, NEO4J_5_CYPHER_25,       CYPHER 25 MATCH (m:`Movie`) SET m:`a`:`b`:`c`:`d`:`e`:`f`:`g`:`h`:`i`:`j`:`k`:`l`:`m` RETURN *
 					""")
-	void labelRenderingShouldWork(Dialect dialect, String expected) {
+	void labelRenderingShouldWork(boolean disableDynamicLabels, Dialect dialect, String expected) {
 		var m = Cypher.node(Cypher.exactlyLabel("Movie")).named("m");
 		var parameterWithListOfStrings = Cypher.parameter("x",
 				Cypher.listOf(Cypher.literalOf("a"), Cypher.literalOf("b")));
@@ -168,7 +175,8 @@ class DialectIT {
 			.returning(Cypher.asterisk())
 			.build();
 
-		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+		var renderer = Renderer.getRenderer(
+				Configuration.newConfig().disableDynamicLabels(disableDynamicLabels).withDialect(dialect).build());
 		assertThat(renderer.render(stmt)).isEqualTo(expected);
 	}
 

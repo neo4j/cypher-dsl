@@ -55,7 +55,6 @@ import org.neo4j.cypherdsl.core.MapExpression;
 import org.neo4j.cypherdsl.core.Match;
 import org.neo4j.cypherdsl.core.Merge;
 import org.neo4j.cypherdsl.core.MergeAction;
-import org.neo4j.cypherdsl.core.Named;
 import org.neo4j.cypherdsl.core.NestedExpression;
 import org.neo4j.cypherdsl.core.Node;
 import org.neo4j.cypherdsl.core.NodeLabel;
@@ -180,6 +179,8 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	private final Dialect dialect;
 
+	private final boolean disableDynamicLabels;
+
 	boolean inReturn;
 
 	boolean inSubquery;
@@ -233,6 +234,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 		this.alwaysEscapeNames = configuration.isAlwaysEscapeNames();
 		this.dialect = configuration.getDialect();
 		this.enforceSchema = configuration.isEnforceSchema();
+		this.disableDynamicLabels = configuration.isDisableDynamicLabels();
 		this.relationshipDefinitions = configuration.getRelationshipDefinitions();
 	}
 
@@ -292,7 +294,13 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 			return PreEnterResult.skip();
 		}
 
-		Class<? extends Visitor> handlerType = this.dialect.getHandler(visitable);
+		Class<? extends Visitor> handlerType;
+		if (visitable instanceof Labels && this.disableDynamicLabels) {
+			handlerType = Neo4j5Pre26LabelsVisitor.class;
+		}
+		else {
+			handlerType = this.dialect.getHandler(visitable);
+		}
 		if (handlerType != null) {
 			Visitor handler = this.delegateCache.computeIfAbsent(handlerType, this::newHandler);
 			return PreEnterResult.delegateTo(handler);
@@ -658,12 +666,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(SymbolicName symbolicName) {
 		if (!this.inRelationshipCondition || this.nameResolvingStrategy.isResolved(symbolicName)) {
 			if (Boolean.TRUE.equals(this.inPatternExpression.peek())
-					&& !this.scopingStrategy.hasVisitedBefore(new Named() {
-						@Override
-						public Optional<SymbolicName> getSymbolicName() {
-							return Optional.of(symbolicName);
-						}
-					})) {
+					&& !this.scopingStrategy.hasVisitedBefore(() -> Optional.of(symbolicName))) {
 				return;
 			}
 
