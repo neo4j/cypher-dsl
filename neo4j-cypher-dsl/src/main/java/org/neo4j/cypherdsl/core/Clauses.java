@@ -27,14 +27,16 @@ import java.util.List;
 import org.apiguardian.api.API;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
 /**
- * Builder / factory for various {@link Clause clauses}. It's mostly useful for building a Cypher-DSL AST
- * outside of the fluent API.
+ * Builder / factory for various {@link Clause clauses}. It's mostly useful for building a
+ * Cypher-DSL AST outside the fluent API.
  *
  * @author Michael J. Simons
  * @since 2021.3.0
@@ -234,8 +236,48 @@ public final class Clauses {
 	}
 
 	/**
+	 * Creates a standalone <code>ORDER BY</code> clause.
+	 * @param sortItems the items to sort by
+	 * @param skip a literal number item specifying the skipped items, may be
+	 * {@literal null}
+	 * @param limit a literal number item specifying the total limit of items, may be
+	 * {@literal null}
+	 * @return an immutable order by clause
+	 * @since 2024.7.4
+	 */
+	public static Clause orderBy(List<SortItem> sortItems, Expression skip, Expression limit) {
+
+		return new OrderByClause(new Order(sortItems), (skip != null) ? Skip.create(skip) : null,
+				(limit != null) ? Limit.create(limit) : null);
+	}
+
+	static final class OrderByClause extends AbstractClause {
+
+		private final Order order;
+
+		private final Skip skip;
+
+		private final Limit limit;
+
+		OrderByClause(Order order, Skip skip, Limit limit) {
+			this.order = order;
+			this.skip = skip;
+			this.limit = limit;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+			this.order.accept(visitor);
+			Visitable.visitIfNotNull(this.skip, visitor);
+			Visitable.visitIfNotNull(this.limit, visitor);
+		}
+
+	}
+
+	/**
 	 * Not to be instantiated.
 	 */
 	private Clauses() {
 	}
+
 }

@@ -1738,9 +1738,9 @@ final class CypherDslASTFactory implements ASTFactory<
 	}
 
 	@Override
-	public Clause orderBySkipLimitClause(InputPosition inputPosition, List<SortItem> list, InputPosition pos1,
-		Expression expression, InputPosition pos2, Expression expression1, InputPosition pos3) {
-		return null;
+	public Clause orderBySkipLimitClause(InputPosition t, List<SortItem> order, InputPosition orderPos, Expression skip,
+			InputPosition skipPos, Expression limit, InputPosition limitPos) {
+		return Clauses.orderBy(order, skip, limit);
 	}
 
 	@Override

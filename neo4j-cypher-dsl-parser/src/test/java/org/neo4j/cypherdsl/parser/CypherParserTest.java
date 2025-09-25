@@ -672,6 +672,20 @@ class CypherParserTest {
 			.containsExactly("NULL", "1.0", "100", "5039", "762", "'Hallo'", "true", "false", "Infinity", "NaN");
 	}
 
+	@ParameterizedTest // GH-1341
+	@CsvSource(delimiterString = "|",
+		textBlock = """
+						MATCH (c:Content) ORDER BY c.publishedDate RETURN c | MATCH (c:`Content`) ORDER BY c.publishedDate ASC RETURN c
+						MATCH (c:Content) ORDER BY c.publishedDate SKIP 1 RETURN c | MATCH (c:`Content`) ORDER BY c.publishedDate ASC SKIP 1 RETURN c
+						MATCH (c:Content) ORDER BY c.publishedDate LIMIT 1 RETURN c | MATCH (c:`Content`) ORDER BY c.publishedDate ASC LIMIT 1 RETURN c
+						MATCH (c:Content) ORDER BY c.publishedDate SKIP 1 LIMIT 2 RETURN c | MATCH (c:`Content`) ORDER BY c.publishedDate ASC SKIP 1 LIMIT 2 RETURN c
+						MATCH (c:Content) WITH c WHERE c.prop = 3 ORDER BY c.publishedDate RETURN c | MATCH (c:`Content`) WITH c WHERE c.prop = 3 ORDER BY c.publishedDate ASC RETURN c
+					""")
+	void orderByMidwayShouldWork(String in, String expected) {
+		var statement = CypherParser.parse(in);
+		assertThat(statement.getCypher()).isEqualTo(expected);
+	}
+
 	@Nested
 	class InvocationCallbacks {
 
