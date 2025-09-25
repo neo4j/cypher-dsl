@@ -1,5 +1,24 @@
 == 2025.0
 
+=== 2025.0.3
+
+==== 🚀 Features
+
+* Add support for `ORDER BY` after match.
+* Make dynamic labels configurable even on latest dialects.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.springframework.boot:spring-boot-starter-parent (#1349)
+** Bump org.apache.maven.plugins:maven-javadoc-plugin (#1348)
+** Bump quarkus.platform.version from 3.26.3 to 3.26.4 (#1347)
+** Bump org.neo4j:neo4j-ogm-quarkus from 3.16.0 to 3.16.1 (#1346)
+** Bump mockito.version from 5.19.0 to 5.20.0 (#1344)
+** Bump org.assertj:assertj-core from 3.27.4 to 3.27.5 (#1343)
+** Bump org.codehaus.mojo:flatten-maven-plugin (#1342)
+
+
 === 2025.0.2
 
 ==== 🚀 Features

@@ -1,5 +1,11 @@
 == 2024.7
 
+=== 2024.7.4
+
+==== 🚀 Features
+
+* Add support for `ORDER BY` after match.
+
 === 2024.7.3
 
 ==== 🐛 Bug Fixes
