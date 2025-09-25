@@ -410,6 +410,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(Return returning) {
 
 		this.inReturn = true;
+		addBlankIfNecessary();
 		if (!returning.isRaw()) {
 			this.builder.append("RETURN ");
 		}
@@ -468,7 +469,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(Order order) {
-		this.builder.append(" ORDER BY ");
+		addBlankIfNecessary();
+		this.builder.append("ORDER BY ");
+	}
+
+	private void addBlankIfNecessary() {
+		var lastString = this.builder.substring(Math.max(0, this.builder.length() - 1));
+		if (!lastString.isBlank() && !lastString.equals("{")) {
+			this.builder.append(" ");
+		}
 	}
 
 	void enter(Skip skip) {

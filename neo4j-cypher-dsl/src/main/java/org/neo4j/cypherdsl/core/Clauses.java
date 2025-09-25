@@ -23,6 +23,8 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.internal.LoadCSV;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
 import org.neo4j.cypherdsl.core.internal.YieldItems;
@@ -32,7 +34,7 @@ import static org.apiguardian.api.API.Status.STABLE;
 
 /**
  * Builder / factory for various {@link Clause clauses}. It's mostly useful for building a
- * Cypher-DSL AST outside of the fluent API.
+ * Cypher-DSL AST outside the fluent API.
  *
  * @author Michael J. Simons
  * @since 2021.3.0
@@ -220,6 +222,45 @@ public final class Clauses {
 		Assertions.isTrue(updatingClauses.stream().allMatch(UpdatingClause.class::isInstance),
 				"Only updating clauses SET, REMOVE, CREATE, MERGE, DELETE, and FOREACH are allowed as clauses applied inside FOREACH.");
 		return new Foreach(v, list, updatingClauses.stream().map(UpdatingClause.class::cast).toList());
+	}
+
+	/**
+	 * Creates a standalone <code>ORDER BY</code> clause.
+	 * @param sortItems the items to sort by
+	 * @param skip a literal number item specifying the skipped items, may be
+	 * {@literal null}
+	 * @param limit a literal number item specifying the total limit of items, may be
+	 * {@literal null}
+	 * @return an immutable order by clause
+	 * @since 2024.7.4
+	 */
+	public static Clause orderBy(List<SortItem> sortItems, Expression skip, Expression limit) {
+
+		return new OrderByClause(new Order(sortItems), (skip != null) ? Skip.create(skip) : null,
+				(limit != null) ? Limit.create(limit) : null);
+	}
+
+	static final class OrderByClause extends AbstractClause {
+
+		private final Order order;
+
+		private final Skip skip;
+
+		private final Limit limit;
+
+		OrderByClause(Order order, Skip skip, Limit limit) {
+			this.order = order;
+			this.skip = skip;
+			this.limit = limit;
+		}
+
+		@Override
+		public void accept(Visitor visitor) {
+			this.order.accept(visitor);
+			Visitable.visitIfNotNull(this.skip, visitor);
+			Visitable.visitIfNotNull(this.limit, visitor);
+		}
+
 	}
 
 }
