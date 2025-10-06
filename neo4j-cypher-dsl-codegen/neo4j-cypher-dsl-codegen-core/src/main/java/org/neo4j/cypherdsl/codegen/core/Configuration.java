@@ -22,9 +22,13 @@ import java.nio.file.Path;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 
@@ -74,6 +78,12 @@ public final class Configuration {
 	 * whether generated code should be marked.
 	 */
 	public static final String PROPERTY_ADD_AT_GENERATED = "org.neo4j.cypherdsl.codegen.add_at_generated";
+
+	/**
+	 * Lookup key to be used in an annotations processors environment options for a comma
+	 * separated list of types that should be excluded from being processed.
+	 */
+	public static final String PROPERTY_EXCLUDES = "org.neo4j.cypherdsl.codegen.excludes";
 
 	private static final Configuration DEFAULT_CONFIG = newConfig().build();
 
@@ -130,9 +140,15 @@ public final class Configuration {
 	 */
 	private final boolean addAtGenerated;
 
+	/**
+	 * Set of qualified names to exclude from processing.
+	 */
+	private final Set<String> excludes;
+
 	private Configuration(UnaryOperator<String> typeNameDecorator, ClassNameGenerator nodeNameGenerator,
 			ClassNameGenerator relationshipNameGenerator, FieldNameGenerator fieldNameGenerator, JavaVersion target,
-			String defaultPackage, Path path, String indent, Clock clock, boolean addAtGenerated) {
+			String defaultPackage, Path path, String indent, Clock clock, boolean addAtGenerated,
+			Set<String> excludes) {
 		this.typeNameDecorator = typeNameDecorator;
 		this.nodeNameGenerator = nodeNameGenerator;
 		this.relationshipNameGenerator = relationshipNameGenerator;
@@ -143,6 +159,7 @@ public final class Configuration {
 		this.indent = indent;
 		this.clock = Optional.ofNullable(clock);
 		this.addAtGenerated = addAtGenerated;
+		this.excludes = excludes;
 	}
 
 	/**
@@ -265,6 +282,15 @@ public final class Configuration {
 	}
 
 	/**
+	 * Returns {@literal true} if the type with the given name should be excluded.
+	 * @param qualifiedName the type name to be checked
+	 * @return {@literal true} if the type with the given name should be excluded
+	 */
+	boolean exclude(String qualifiedName) {
+		return this.excludes.contains(qualifiedName);
+	}
+
+	/**
 	 * Enum for the available indent styles.
 	 */
 	public enum IndentStyle {
@@ -322,6 +348,8 @@ public final class Configuration {
 		private String timestamp;
 
 		private boolean addAtGenerated = false;
+
+		private Set<String> excludes = Set.of();
 
 		private Builder() {
 		}
@@ -490,6 +518,24 @@ public final class Configuration {
 		}
 
 		/**
+		 * Configures the types to exclude.
+		 * @param excludes if {@literal null} or empty, no types will be excluded
+		 * @return this builder
+		 */
+		public Builder withExcludes(String excludes) {
+			if (excludes == null || excludes.isBlank()) {
+				this.excludes = Set.of();
+			}
+			else {
+				this.excludes = Arrays.stream(excludes.split(","))
+					.map(String::trim)
+					.filter(Predicate.not(String::isBlank))
+					.collect(Collectors.toUnmodifiableSet());
+			}
+			return this;
+		}
+
+		/**
 		 * {@return a new, immutable configuration}
 		 */
 		public Configuration build() {
@@ -518,7 +564,7 @@ public final class Configuration {
 			}
 			return new Configuration(typeNameDecorator, this.nodeNameGenerator, this.relationshipNameGenerator,
 					this.fieldNameGenerator, this.target, this.defaultPackage, this.path, indent, clock,
-					this.addAtGenerated);
+					this.addAtGenerated, this.excludes);
 		}
 
 	}
