@@ -72,10 +72,7 @@ final class ForeignAdapterFactory {
 		var constructor = this.adapterCache.computeIfAbsent(expression.getClass(), k -> {
 			var interfaces = getInterfaces(k);
 			String adapterName;
-			if (interfaces.stream().anyMatch("org.neo4j.driver.Value"::equals)) {
-				adapterName = "org.neo4j.cypherdsl.core.DriverValueAdapter";
-			}
-			else if (interfaces.stream().anyMatch("com.querydsl.core.types.Expression"::equals)) {
+			if (interfaces.stream().anyMatch("com.querydsl.core.types.Expression"::equals)) {
 				adapterName = "org.neo4j.cypherdsl.core.QueryDSLAdapter";
 			}
 			else {
