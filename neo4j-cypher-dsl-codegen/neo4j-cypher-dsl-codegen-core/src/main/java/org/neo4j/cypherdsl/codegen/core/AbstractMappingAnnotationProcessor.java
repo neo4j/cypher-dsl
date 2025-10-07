@@ -315,99 +315,144 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 			Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
 		Map<String, List<RelationshipModelBuilder>> result = new HashMap<>();
 
-		relationshipDefinitions.forEach((type, definitions) -> {
-			RelationshipModelBuilder relationshipBuilder = null;
+		relationshipDefinitions.forEach((type, allDefinitions) -> {
+			allDefinitions.stream()
+				.collect(Collectors.groupingBy(pd -> pd.getValue().getStart().getPackageName()))
+				.forEach((packageName, definitions) -> {
+					RelationshipModelBuilder relationshipBuilder = null;
 
-			// Simple case: All unique types
-			if (definitions.size() == 1) {
+					// Simple case: All unique types
+					if (definitions.size() == 1) {
+						NodeModelBuilder owner = definitions.get(0).getKey();
+						RelationshipPropertyDefinition definition = definitions.get(0).getValue();
 
-				NodeModelBuilder owner = definitions.get(0).getKey();
-				RelationshipPropertyDefinition definition = definitions.get(0).getValue();
-
-				relationshipBuilder = RelationshipModelBuilder.create(this.configuration, owner.getPackageName(), type);
-				relationshipBuilder.setStartNode(definition.getStart());
-				relationshipBuilder.setEndNode(definition.getEnd());
-				relationshipBuilder.addProperties(definition.getProperties());
-			}
-			else {
-				Set<NodeModelBuilder> owners = definitions.stream().map(Map.Entry::getKey).collect(Collectors.toSet());
-
-				// Exactly one owner, but variable targets
-				if (owners.size() == 1) {
-
-					NodeModelBuilder owner = owners.stream().findFirst().get();
-
-					Map<Boolean, List<RelationshipPropertyDefinition>> ownerAtStartOrEnd = definitions.stream()
-						.map(Map.Entry::getValue)
-						.collect(Collectors.partitioningBy(p -> p.getStart() == owner));
-
-					if (sameOrNoProperties(definitions)) {
 						relationshipBuilder = RelationshipModelBuilder.create(this.configuration,
 								owner.getPackageName(), type);
-						relationshipBuilder.addProperties(definitions.get(0).getValue().getProperties());
-						if (ownerAtStartOrEnd.get(true).isEmpty()) {
-							relationshipBuilder.setEndNode(owner);
-						}
-						else if (ownerAtStartOrEnd.get(false).isEmpty()) {
-							relationshipBuilder.setStartNode(owner);
-						}
+						relationshipBuilder.setStartNode(definition.getStart());
+						relationshipBuilder.setEndNode(definition.getEnd());
+						relationshipBuilder.addProperties(definition.getProperties());
 					}
 					else {
-						List<RelationshipModelBuilder> newBuilders = new ArrayList<>();
-						for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
+						Set<NodeModelBuilder> owners = definitions.stream()
+							.map(Map.Entry::getKey)
+							.collect(Collectors.toSet());
+						// Exactly one owner, but variable targets
+						if (owners.size() == 1) {
+							NodeModelBuilder owner = owners.stream().findFirst().get();
 
-							RelationshipPropertyDefinition propertyDefinition = definition.getValue();
-							RelationshipModelBuilder newBuilder = RelationshipModelBuilder.create(this.configuration,
-									owner.getPackageName(), type, type + "_"
-											+ propertyDefinition.getEnd().getPlainClassName().toUpperCase(Locale.ROOT));
-							newBuilder.addProperties(propertyDefinition.getProperties());
-							if (ownerAtStartOrEnd.get(true).isEmpty()) {
-								newBuilder.setStartNode(propertyDefinition.getStart());
-								newBuilder.setEndNode(owner);
-							}
-							else if (ownerAtStartOrEnd.get(false).isEmpty()) {
-								newBuilder.setStartNode(owner);
-								newBuilder.setEndNode(propertyDefinition.getEnd());
-							}
+							Map<Boolean, List<RelationshipPropertyDefinition>> ownerAtStartOrEnd = definitions.stream()
+								.map(Map.Entry::getValue)
+								.collect(Collectors.partitioningBy(p -> p.getStart() == owner));
 
-							definition.getKey().addRelationshipDefinition(propertyDefinition.withBuilder(newBuilder));
-							newBuilders.add(newBuilder);
+							if (sameOrNoProperties(definitions)) {
+								relationshipBuilder = RelationshipModelBuilder.create(this.configuration,
+										owner.getPackageName(), type);
+								relationshipBuilder.addProperties(definitions.get(0).getValue().getProperties());
+								if (ownerAtStartOrEnd.get(true).isEmpty()) {
+									relationshipBuilder.setEndNode(owner);
+									relationshipBuilder.setStartNode(
+											uniqueNodeBuilder(definitions, RelationshipPropertyDefinition::getStart));
+								}
+								else if (ownerAtStartOrEnd.get(false).isEmpty()) {
+									relationshipBuilder.setStartNode(owner);
+									relationshipBuilder.setEndNode(
+											uniqueNodeBuilder(definitions, RelationshipPropertyDefinition::getEnd));
+								}
+							}
+							else {
+								List<RelationshipModelBuilder> newBuilders = new ArrayList<>();
+								for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
+
+									RelationshipPropertyDefinition propertyDefinition = definition.getValue();
+									RelationshipModelBuilder newBuilder = RelationshipModelBuilder.create(
+											this.configuration, owner.getPackageName(), type,
+											type + "_"
+													+ propertyDefinition.getEnd()
+														.getPlainClassName()
+														.toUpperCase(Locale.ROOT));
+									newBuilder.addProperties(propertyDefinition.getProperties());
+									if (ownerAtStartOrEnd.get(true).isEmpty()) {
+										newBuilder.setStartNode(propertyDefinition.getStart());
+										newBuilder.setEndNode(owner);
+									}
+									else if (ownerAtStartOrEnd.get(false).isEmpty()) {
+										newBuilder.setStartNode(owner);
+										newBuilder.setEndNode(propertyDefinition.getEnd());
+									}
+
+									definition.getKey()
+										.addRelationshipDefinition(propertyDefinition.withBuilder(newBuilder));
+									newBuilders.add(newBuilder);
+								}
+								result.put(type, Collections.unmodifiableList(newBuilders));
+							}
 						}
-						result.put(type, Collections.unmodifiableList(newBuilders));
+						else if (owners.size() > 1) {
+							var intermediateBuilders = new HashMap<String, LocalRelBuilderState>();
+							for (var owner : owners) {
+								for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
+									var start = definition.getValue().getStart();
+									var end = definition.getValue().getEnd();
+									if (intermediateBuilders.containsKey(type)) {
+										var intermediateBuilder = intermediateBuilders.get(type);
+										if (intermediateBuilder.start != start) {
+											intermediateBuilder.start = null;
+										}
+										if (intermediateBuilder.end != end) {
+											intermediateBuilder.end = null;
+										}
+									}
+									else {
+										var localRelationshipBuilder = RelationshipModelBuilder
+											.create(this.configuration, owner.getPackageName(), type);
+										intermediateBuilders.put(type,
+												new LocalRelBuilderState(localRelationshipBuilder, start, end));
+									}
+								}
+							}
+							// Go over all half finished builders and close them
+							intermediateBuilders.forEach((t, intermediateBuilder) -> {
+								var finalBuilder = intermediateBuilder.value;
+								finalBuilder.setStartNode(intermediateBuilder.start);
+								finalBuilder.setEndNode(intermediateBuilder.end);
+								// now that we have seen all definitions per type, we can
+								// assign them proper
+								for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
+									if (definition.getValue().getType().equals(t)) {
+										var finishedDefinition = definition.getValue().withBuilder(finalBuilder);
+										definition.getKey().addRelationshipDefinition(finishedDefinition);
+									}
+								}
+								var builders = result.computeIfAbsent(type, ignored -> new ArrayList<>());
+								builders.add(finalBuilder);
+							});
+						}
 					}
-				}
-				else if (owners.size() > 1) {
-					List<NodeModelBuilder> startNodes = definitions.stream()
-						.map(d -> d.getValue().getStart())
-						.distinct()
-						.toList();
-					List<NodeModelBuilder> endNodes = definitions.stream()
-						.map(d -> d.getValue().getStart())
-						.distinct()
-						.toList();
-					relationshipBuilder = RelationshipModelBuilder.create(this.configuration,
-							owners.stream().findFirst().get().getPackageName(), type);
-					if (startNodes.size() == 1) {
-						relationshipBuilder.setStartNode(startNodes.get(0));
-					}
-					else if (endNodes.size() == 1) {
-						relationshipBuilder.setStartNode(endNodes.get(0));
-					}
-				}
-			}
 
-			// A single builder created for all definitions
-			// Multiple builders have been taken care of independent.
-			if (relationshipBuilder != null) {
-				for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
-					RelationshipPropertyDefinition finishedDefinition = definition.getValue()
-						.withBuilder(relationshipBuilder);
-					definition.getKey().addRelationshipDefinition(finishedDefinition);
-				}
-				result.put(type, Collections.singletonList(relationshipBuilder));
-			}
+					// A single builder created for all definitions
+					// Multiple builders have been taken care of independent.
+					if (relationshipBuilder != null) {
+						for (Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition> definition : definitions) {
+							RelationshipPropertyDefinition finishedDefinition = definition.getValue()
+								.withBuilder(relationshipBuilder);
+							definition.getKey().addRelationshipDefinition(finishedDefinition);
+						}
+						var builders = result.computeIfAbsent(type, ignored -> new ArrayList<>());
+						builders.add(relationshipBuilder);
+					}
+				});
 		});
 		return Collections.unmodifiableMap(result);
+	}
+
+	private static NodeModelBuilder uniqueNodeBuilder(
+			List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>> definitions,
+			Function<RelationshipPropertyDefinition, NodeModelBuilder> mapper) {
+		var hlp = definitions.stream().map(Map.Entry::getValue).map(mapper).distinct().toList();
+		if (hlp.size() == 1) {
+			return hlp.get(0);
+		}
+		return null;
 	}
 
 	protected final boolean describesEnum(TypeMirror typeMirror) {
@@ -477,6 +522,22 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 		@Override
 		public E visitType(TypeElement e, Void unused) {
 			return this.delegate.apply(e);
+		}
+
+	}
+
+	private static class LocalRelBuilderState {
+
+		RelationshipModelBuilder value;
+
+		NodeModelBuilder start;
+
+		NodeModelBuilder end;
+
+		LocalRelBuilderState(RelationshipModelBuilder value, NodeModelBuilder start, NodeModelBuilder end) {
+			this.value = value;
+			this.end = end;
+			this.start = start;
 		}
 
 	}
