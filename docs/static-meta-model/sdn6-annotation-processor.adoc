@@ -122,6 +122,9 @@ The processor supports the following arguments:
   pretty much everything you can register with `org.springframework.data.neo4j.core.convert.Neo4jConversions` ). However,
   these converters must have a default-non-args constructor in the context of the annotation processor.
 
+| org.neo4j.cypherdsl.codegen.excludes
+| A comma separated list of fully qualified names of types that should be ignored (i.e. despite being annotated as `Node` or `RelationshipProperties`)
+
 |===
 
 The generated classes can be used in a variety of places:

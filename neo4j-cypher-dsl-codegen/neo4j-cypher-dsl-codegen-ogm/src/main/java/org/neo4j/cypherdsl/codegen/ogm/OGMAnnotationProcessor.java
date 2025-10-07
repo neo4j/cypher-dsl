@@ -68,7 +68,7 @@ import org.neo4j.ogm.annotation.RelationshipEntity;
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
 /**
- * This processors works on Neo4j-OGM annotations and creates a static metamodel based on
+ * This processor works on Neo4j-OGM annotations and creates a static metamodel based on
  * CypherDSL for those classes.
  *
  * @author Shinigami92 (Christopher Quadflieg)
@@ -79,7 +79,8 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 @SupportedAnnotationTypes({ OGMAnnotationProcessor.NODE_ENTITY_ANNOTATION,
 		OGMAnnotationProcessor.RELATIONSHIP_ENTITY_ANNOTATION })
 @SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,
-		Configuration.PROPERTY_INDENT_SIZE, Configuration.PROPERTY_TIMESTAMP, Configuration.PROPERTY_ADD_AT_GENERATED })
+		Configuration.PROPERTY_INDENT_SIZE, Configuration.PROPERTY_TIMESTAMP, Configuration.PROPERTY_ADD_AT_GENERATED,
+		Configuration.PROPERTY_EXCLUDES })
 public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProcessor {
 
 	static final String NODE_ENTITY_ANNOTATION = "org.neo4j.ogm.annotation.NodeEntity";

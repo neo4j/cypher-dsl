@@ -101,6 +101,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 					Boolean.parseBoolean(options.getOrDefault(Configuration.PROPERTY_ADD_AT_GENERATED, "true")))
 			.withTarget(processingEnv.getSourceVersion().equals(SourceVersion.RELEASE_8)
 					? Configuration.JavaVersion.RELEASE_8 : Configuration.JavaVersion.RELEASE_11)
+			.withExcludes(options.get(Configuration.PROPERTY_EXCLUDES))
 			.build();
 	}
 
@@ -134,11 +135,12 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	 * @param from the environment to extract from
 	 * @return a set of type elements that match the given annotation
 	 */
-	protected static Set<TypeElement> getTypesAnnotatedWith(TypeElement annotation, RoundEnvironment from) {
+	protected Set<TypeElement> getTypesAnnotatedWith(TypeElement annotation, RoundEnvironment from) {
 		return from.getElementsAnnotatedWith(annotation)
 			.stream()
 			.filter(e -> e.getKind().isClass())
 			.map(TypeElement.class::cast)
+			.filter(t -> !this.configuration.exclude(t.getQualifiedName().toString()))
 			.collect(Collectors.toSet());
 	}
 

@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.codegen.sdn6;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.Arrays;
+import java.util.HashSet;
 
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
@@ -29,6 +30,7 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
@@ -129,7 +131,7 @@ class SDN6AnnotationProcessorTests {
 
 	@CsvSource({
 			"8, ids, 'InternalGeneratedId, InternalGeneratedIdWithSpringId, ExternalGeneratedId, ExternalGeneratedIdImplicit, InternalGeneratedPrimitiveLongId',",
-			"8, simple, 'Person, Movie, ActedIn, Follows, Directed, Produced',",
+			"8, simple, 'Person, Movie, ActedIn, Follows, Directed, Produced, Src, Target2, Rel21, Rel22',",
 			"8, labels, 'LabelOnNode1, LabelOnNode2, LabelOnNode3, MultipleLabels1, MultipleLabels2, MultipleLabels3', nodeswithdifferentlabelannotations",
 			"8, same_properties_for_rel_type, 'Person, Movie, Play, ActedIn', ",
 			"8, different_properties_for_rel_type, 'Person, Movie, Play, ActedInPlay, ActedInMovie', ",
@@ -139,13 +141,21 @@ class SDN6AnnotationProcessorTests {
 			"8, same_rel_mixed_different_directions, 'Person, Movie, Book, Wrote', ",
 			"8, abstract_rels, 'Person, Movie, Directed',", "8, primitives, 'Connector', ",
 			"8, enums_and_inner_classes, 'ConnectorTransport', ",
-			"8, related_classes_not_on_cp_like_in_reallife, 'Movie, Person', ", "8, self_referential, 'Example', ",
+			"8, related_classes_not_on_cp_like_in_reallife, 'Movie, Person, Directed', ",
+			"8, self_referential, 'Example, BelongsTo', ",
 			"17, records, 'NodeWithRecordProperties, RecordAsRelationship, RecordTarget', " })
 	@ParameterizedTest
 	void validSourceFiles(String release, String scenario, @ConvertWith(StringArrayConverter.class) String[] expected,
 			String subpackage) {
 
-		Compilation compilation = getCompiler(release).withProcessors(new SDN6AnnotationProcessor())
+		var options = """
+				-Aorg.neo4j.cypherdsl.codegen.excludes=
+				  org.neo4j.cypherdsl.codegen.sdn6.models.simple.TotallyIgnored,
+				  org.neo4j.cypherdsl.codegen.sdn6.models.simple.Target,
+				  org.neo4j.cypherdsl.codegen.sdn6.models.simple.Edge,
+				  org.neo4j.cypherdsl.codegen.sdn6.models.simple.Target3,
+				""";
+		Compilation compilation = getCompiler(release, options).withProcessors(new SDN6AnnotationProcessor())
 			.compile(getJavaResources("org/neo4j/cypherdsl/codegen/sdn6/models/" + scenario));
 
 		CompilationSubject.assertThat(compilation).succeeded();
@@ -158,13 +168,21 @@ class SDN6AnnotationProcessorTests {
 			CompilationSubject.assertThat(compilation).hadWarningCount(0);
 		}
 
+		var allExpectedNames = new HashSet<String>();
 		for (String expectedSourceFile : expected) {
-			String finalName = scenario + "." + ((subpackage != null) ? subpackage + "." : "") + expectedSourceFile
-					+ "_";
+			var typeName = scenario + "." + ((subpackage != null) ? subpackage + "." : "") + expectedSourceFile + "_";
+			var resourceName = typeName.replaceAll("\\.", "/") + ".java";
 			CompilationSubject.assertThat(compilation)
-				.generatedSourceFile("org.neo4j.cypherdsl.codegen.sdn6.models." + finalName)
-				.hasSourceEquivalentTo(JavaFileObjects.forResource(finalName.replaceAll("\\.", "/") + ".java"));
+				.generatedSourceFile("org.neo4j.cypherdsl.codegen.sdn6.models." + typeName)
+				.hasSourceEquivalentTo(JavaFileObjects.forResource(resourceName));
+			allExpectedNames.add(resourceName);
 		}
+		var generated = compilation.generatedSourceFiles()
+			.stream()
+			.map(JavaFileObject::getName)
+			.map(name -> name.substring(name.lastIndexOf(scenario)))
+			.toList();
+		Assertions.assertThat(generated).containsOnly(allExpectedNames.toArray(String[]::new));
 	}
 
 	/**

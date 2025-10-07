@@ -85,7 +85,7 @@ import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 		SDN6AnnotationProcessor.RELATIONSHIP_PROPERTIES_ANNOTATION })
 @SupportedOptions({ Configuration.PROPERTY_PREFIX, Configuration.PROPERTY_SUFFIX, Configuration.PROPERTY_INDENT_STYLE,
 		Configuration.PROPERTY_INDENT_SIZE, Configuration.PROPERTY_TIMESTAMP, Configuration.PROPERTY_ADD_AT_GENERATED,
-		SDN6AnnotationProcessor.PROPERTY_CUSTOM_CONVERTER_CLASSES })
+		SDN6AnnotationProcessor.PROPERTY_CUSTOM_CONVERTER_CLASSES, Configuration.PROPERTY_EXCLUDES })
 public final class SDN6AnnotationProcessor extends AbstractMappingAnnotationProcessor {
 
 	static final String NODE_ANNOTATION = "org.springframework.data.neo4j.core.schema.Node";
