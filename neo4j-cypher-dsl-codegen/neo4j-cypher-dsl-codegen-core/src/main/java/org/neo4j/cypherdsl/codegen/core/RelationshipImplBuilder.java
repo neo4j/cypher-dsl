@@ -110,7 +110,9 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 	@Override
 	public RelationshipModelBuilder setStartNode(NodeModelBuilder newStartNode) {
-
+		if (newStartNode == null) {
+			return this;
+		}
 		return callOnlyWithoutJavaFilePresent(() -> {
 			var lastRelation = getOrCreateLastDefinedRelationType();
 			lastRelation.start = extractClassName(newStartNode);
@@ -120,7 +122,9 @@ final class RelationshipImplBuilder extends AbstractModelBuilder<RelationshipMod
 
 	@Override
 	public RelationshipModelBuilder setEndNode(NodeModelBuilder newEndNode) {
-
+		if (newEndNode == null) {
+			return this;
+		}
 		return callOnlyWithoutJavaFilePresent(() -> {
 			var lastRelation = getOrCreateLastDefinedRelationType();
 			lastRelation.end = extractClassName(newEndNode);

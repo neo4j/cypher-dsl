@@ -30,7 +30,6 @@ import com.google.testing.compile.Compilation;
 import com.google.testing.compile.CompilationSubject;
 import com.google.testing.compile.Compiler;
 import com.google.testing.compile.JavaFileObjects;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.converter.ArgumentConversionException;
@@ -43,6 +42,8 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.lang.NonNull;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michael J. Simons
@@ -182,7 +183,55 @@ class SDN6AnnotationProcessorTests {
 			.map(JavaFileObject::getName)
 			.map(name -> name.substring(name.lastIndexOf(scenario)))
 			.toList();
-		Assertions.assertThat(generated).containsOnly(allExpectedNames.toArray(String[]::new));
+		assertThat(generated).containsOnly(allExpectedNames.toArray(String[]::new));
+	}
+
+	@Test
+	void sameRelDifferentPackageShouldMakeSense() {
+
+		var resources = "org/neo4j/cypherdsl/codegen/sdn6/models/same_rel_different_package";
+		Compilation compilation = getCompiler("17").withProcessors(new SDN6AnnotationProcessor())
+			.compile(getJavaResources(resources));
+
+		CompilationSubject.assertThat(compilation).succeeded();
+		CompilationSubject.assertThat(compilation).hadWarningCount(0);
+
+		var basePackage = "org.neo4j.cypherdsl.codegen.sdn6.models.same_rel_different_package.";
+
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.Company_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/Company_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.DomainEntity_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/DomainEntity_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.DomainEntity2_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/DomainEntity2_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.Place_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/Place_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.In_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/In1_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.Uses_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/Uses1_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "domain.Abuses_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/Abuses1_.java"));
+
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "application.CompanyModel_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/CompanyModel_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "application.PlaceModel_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/PlaceModel_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "application.In_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/In2_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "application.Uses_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("same_rel_different_package/Uses2_.java"));
 	}
 
 	/**
