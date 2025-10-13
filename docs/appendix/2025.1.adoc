@@ -1,0 +1,31 @@
+== 2025.1
+
+=== 2025.1.0
+
+==== 🚀 Features
+
+* Add option `org.neo4j.cypherdsl.codegen.excludes` for excluding types from processing. (#1363, codegen)
+
+==== 🐛 Bug Fixes
+
+* Generate relationship meta model always per package and in the package of the start node. (codegen)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Upgrade to latest OGM and OGM Quarkus including driver 6.
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1367)
+** Bump org.ow2.asm:asm from 9.8 to 9.9 (#1372)
+** Bump com.puppycrawl.tools:checkstyle from 11.1.0 to 12.0.1 (#1371)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1370)
+** Bump neo4j.version from 5.26.12 to 5.26.13 (#1369)
+** Bump quarkus.platform.version from 3.28.2 to 3.28.3 (#1368)
+** Bump org.jacoco:jacoco-maven-plugin from 0.8.13 to 0.8.14 (#1366)
+** Bump org.junit:junit-bom from 5.13.4 to 6.0.0 (#1365)
+** Bump org.checkerframework:checker-qual (#1357)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1362)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#1361)
+** Bump quarkus.platform.version from 3.26.4 to 3.28.2 (#1356)
+** Bump org.assertj:assertj-core from 3.27.5 to 3.27.6 (#1355)
+** Bump com.puppycrawl.tools:checkstyle from 11.0.1 to 11.1.0 (#1354)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1352)
