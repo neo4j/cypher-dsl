@@ -65,6 +65,18 @@ class CypherIT {
 	}
 
 	@Test
+	void parameterLiterals() {
+
+		Statement statement = Cypher
+			.returning(Cypher.literalOf(Cypher.parameter("asd")).as("t"),
+					Cypher.literalOf(Map.of("another", Cypher.parameter("parameter"))).as("t2"))
+			.build();
+		String cypher = statement.getCypher();
+		assertThat(cypher).isEqualTo("RETURN $asd AS t, {another: $parameter} AS t2");
+		assertThat(statement.getCypher()).isSameAs(cypher);
+	}
+
+	@Test
 	void shouldGenerateStatementsOfCorrectType() {
 
 		Statement statement = Cypher.returning(Cypher.literalTrue().as("t")).build();

@@ -741,6 +741,9 @@ public final class Cypher {
 		if (object instanceof Period period) {
 			return (Literal<T>) PeriodLiteral.of(period);
 		}
+		if (object instanceof Parameter<?> parameter) {
+			return (Literal<T>) ParameterLiteral.of(parameter);
+		}
 		if (object instanceof Iterable || object.getClass().isArray()) {
 			List<Literal<?>> elements = new ArrayList<>();
 			Consumer<Object> handleElement = element -> {
