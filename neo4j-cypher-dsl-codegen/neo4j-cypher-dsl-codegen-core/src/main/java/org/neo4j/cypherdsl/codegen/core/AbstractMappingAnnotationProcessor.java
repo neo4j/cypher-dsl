@@ -315,7 +315,9 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 			Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
 		Map<String, List<RelationshipModelBuilder>> result = new HashMap<>();
 
-		relationshipDefinitions.forEach((type, allDefinitions) -> {
+		for (var entry : relationshipDefinitions.entrySet()) {
+			String type = entry.getKey();
+			List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>> allDefinitions = entry.getValue();
 			allDefinitions.stream()
 				.collect(Collectors.groupingBy(pd -> pd.getValue().getStart().getPackageName()))
 				.forEach((packageName, definitions) -> {
@@ -441,7 +443,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 						builders.add(relationshipBuilder);
 					}
 				});
-		});
+		}
 		return Collections.unmodifiableMap(result);
 	}
 
