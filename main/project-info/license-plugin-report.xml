@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1760348548437">
+<licensePluginReport goal="CHECK" timestamp="1761854830527">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="9999-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
@@ -110,6 +110,7 @@
         <file path="src/main/java/org/neo4j/cypherdsl/core/Order.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Parameter.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/ParameterCollectingVisitor.java" result="PRESENT"/>
+        <file path="src/main/java/org/neo4j/cypherdsl/core/ParameterLiteral.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/Pattern.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/PatternComprehension.java" result="PRESENT"/>
         <file path="src/main/java/org/neo4j/cypherdsl/core/PatternElement.java" result="PRESENT"/>
