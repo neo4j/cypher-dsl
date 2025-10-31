@@ -40,8 +40,8 @@ import org.neo4j.driver.Result;
 import org.neo4j.driver.Session;
 import org.neo4j.driver.summary.ResultSummary;
 import org.neo4j.driver.types.Node;
-import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.neo4j.Neo4jContainer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -53,8 +53,7 @@ class SchemaNamesIT {
 
 	private static final Config DRIVER_CONFIG = Config.builder().withMaxConnectionPoolSize(1).build();
 
-	private static final Map<Neo4jContainer<?>, Driver> CACHED_CONNECTIONS = Collections
-		.synchronizedMap(new HashMap<>());
+	private static final Map<Neo4jContainer, Driver> CACHED_CONNECTIONS = Collections.synchronizedMap(new HashMap<>());
 
 	private static final String LATEST_VERSION = "4.4";
 
@@ -103,7 +102,7 @@ class SchemaNamesIT {
 			new TestItem(Category.Q, "Unicode literal backtick at end", "Foo \u0060", "Foo `"),
 			new TestItem(Category.Q, "Cypher unicode literal backtick at end", "Foo \\u0060", "Foo `"));
 
-	private static Driver newDriverInstance(Neo4jContainer<?> server) {
+	private static Driver newDriverInstance(Neo4jContainer server) {
 		return GraphDatabase.driver(server.getBoltUrl(), AuthTokens.basic("neo4j", server.getAdminPassword()),
 				DRIVER_CONFIG);
 	}
@@ -124,7 +123,7 @@ class SchemaNamesIT {
 		}
 		return versions.map(version -> {
 			@SuppressWarnings("resource")
-			Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:" + version).withReuse(true);
+			Neo4jContainer neo4j = new Neo4jContainer("neo4j:" + version).withReuse(true);
 			neo4j.start();
 
 			String[] majorMinor = version.split("\\.");
