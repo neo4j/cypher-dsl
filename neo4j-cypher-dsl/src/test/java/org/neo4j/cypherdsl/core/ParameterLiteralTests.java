@@ -18,34 +18,17 @@
  */
 package org.neo4j.cypherdsl.core;
 
-/**
- * Representation of a parameter literal. For internal use only.
- *
- * @author Michael J. Simons
- * @since 2025.2.0
- */
-final class ParameterLiteral extends LiteralBase<Parameter<?>> {
+import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.Test;
 
-	private ParameterLiteral(Parameter<?> content) {
-		super(content);
-	}
+class ParameterLiteralTests {
 
-	static Literal<Parameter<?>> of(Parameter<?> content) {
-		if (content.isAnon()) {
-			throw new IllegalArgumentException("Anonymous parameters cannot be used as parameter literals");
-		}
-		return new ParameterLiteral(content);
-	}
-
-	@Override
-	public String asString() {
-
-		return "$" + content.getName();
-	}
-
-	@Override
-	public Parameter<?> getContent() {
-		return this.content;
+	@Test
+	void anonParametersAreUnsupported() {
+		var anonParameter = Cypher.anonParameter("whatever");
+		Assertions.assertThatIllegalArgumentException()
+			.isThrownBy(() -> ParameterLiteral.of(anonParameter))
+			.withMessage("Anonymous parameters cannot be used as parameter literals");
 	}
 
 }
