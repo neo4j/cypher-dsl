@@ -1,0 +1,25 @@
+== 2025.2
+
+=== 2025.2.0 🎃
+
+No breaking changes in this release (as most of the time), only a small new feature needed for the https://github.com/neo4j/neo4j-jdbc[Neo4j JDBC Driver] which you definitely check out.
+
+==== 🚀 Features
+
+* Add support for parameter inside literal maps. (#1382)
+
+==== 🔄️ Refactorings
+
+* Prevent anonymous parameters from being used in literals.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Upgrade testcontainers.version to 2.0.1
+** Bump org.graalvm.buildtools:native-maven-plugin (#1377)
+** Bump org.springframework.data:spring-data-neo4j (#1376)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1375)
+** Bump com.puppycrawl.tools:checkstyle from 12.0.1 to 12.1.1 (#1380)
+** Bump quarkus.platform.version from 3.28.3 to 3.28.5 (#1381)
+** Bump neo4j.version from 5.26.13 to 5.26.14 (#1379)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1378)
