@@ -189,7 +189,7 @@
 		<neo4j-java-driver.version>6.0.1</neo4j-java-driver.version>
 		<neo4j-ogm-quarkus.version>4.0.0</neo4j-ogm-quarkus.version>
 		<neo4j-ogm.version>5.0.0</neo4j-ogm.version>
-		<neo4j.version>5.26.14</neo4j.version>
+		<neo4j.version>5.26.15</neo4j.version>
 		<opencsv.version>5.12.0</opencsv.version>
 		<project.build.docs>${project.build.directory}/docs</project.build.docs>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
