@@ -19,6 +19,8 @@
 package org.neo4j.cypherdsl.parser;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Dialect;
@@ -359,6 +361,22 @@ class ParserIssuesIT {
 				""";
 		assertThat(CypherParser.parse(cypher).getCypher()).isEqualTo(
 				"MATCH (n:`Person`) RETURN CASE WHEN n.eyes = 'blue' THEN 1 WHEN n.age < 40 THEN 2 ELSE 3 END AS result, n.eyes, n.age");
+	}
+
+	@ParameterizedTest // GH-1404
+	@EnumSource(Dialect.class)
+	void shouldRenderWithoutDroppingColons(Dialect dialect) {
+		String cypher = "MATCH (:PurchaseOrder|TollerOrder)-[:PLACED_IN]->(:Site), (po:Purchase_orders)<-[:IS_PURCHASED]-(m:Material)\nRETURN *";
+		var statement = CypherParser.parse(cypher);
+		Configuration rendererConfig = Configuration.newConfig()
+			.alwaysEscapeNames(false)
+			.withPrettyPrint(true)
+			.withDialect(dialect)
+			.build();
+		var renderer = Renderer.getRenderer(rendererConfig);
+
+		String result = renderer.render(statement);
+		assertThat(result).endsWith(cypher);
 	}
 
 }

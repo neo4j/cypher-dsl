@@ -2341,6 +2341,20 @@ class IssueRelatedIT {
 		assertThat(Renderer.getRenderer(Configuration.prettyPrinting()).render(stmt)).isEqualTo(expected);
 	}
 
+	@ParameterizedTest // GH-1404
+	@EnumSource(Dialect.class)
+	void labelsExpressionMustBeLeftFromAllLabelHandlers(Dialect dialect) {
+		var stmt = Cypher
+			.match(Cypher.node(Labels.exactly("Purchase_orders").or(Labels.exactly("Another")))
+				.named("po")
+				.relationshipFrom(Cypher.node("Material").named("m"), "IS_PURCHASED"))
+			.returning(Cypher.name("m"))
+			.build();
+		var renderer = Renderer.getRenderer(Configuration.newConfig().withDialect(dialect).build());
+		assertThat(renderer.render(stmt))
+			.endsWith("MATCH (po:`Purchase_orders`|`Another`)<-[:`IS_PURCHASED`]-(m:`Material`) RETURN m");
+	}
+
 	@Nested
 	class Chaining {
 

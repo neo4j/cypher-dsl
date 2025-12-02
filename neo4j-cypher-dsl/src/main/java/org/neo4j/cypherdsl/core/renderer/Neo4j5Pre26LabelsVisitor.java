@@ -20,6 +20,7 @@ package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.neo4j.cypherdsl.build.annotations.RegisterForReflection;
 import org.neo4j.cypherdsl.core.Labels;
@@ -43,6 +44,8 @@ import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 final class Neo4j5Pre26LabelsVisitor implements Visitor {
 
 	private final DefaultVisitor delegate;
+
+	private final AtomicBoolean didDelegate = new AtomicBoolean(false);
 
 	Neo4j5Pre26LabelsVisitor(DefaultVisitor delegate) {
 		this.delegate = delegate;
@@ -103,7 +106,17 @@ final class Neo4j5Pre26LabelsVisitor implements Visitor {
 			}
 		}
 		else {
+			this.didDelegate.compareAndSet(false, true);
 			this.delegate.enter(labels);
+		}
+	}
+
+	@Override
+	public void leave(Visitable segment) {
+
+		if (this.didDelegate.compareAndSet(true, false)) {
+			// Cast needs to be in here to make the visitor pick up the correct target
+			this.delegate.leave((Labels) segment);
 		}
 	}
 
