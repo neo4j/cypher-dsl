@@ -39,13 +39,14 @@ import org.neo4j.cypherdsl.examples.sdn6.movies.Person;
 import org.neo4j.cypherdsl.examples.sdn6.movies.PersonDetails;
 import org.neo4j.driver.AuthTokens;
 import org.neo4j.driver.GraphDatabase;
-import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.neo4j.Neo4jContainer;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.resttestclient.TestRestTemplate;
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureTestRestTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.ResourceLoader;
@@ -64,10 +65,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @EnabledIf("is606OrHigher")
 @Testcontainers(disabledWithoutDocker = true)
+@AutoConfigureTestRestTemplate
 class ApplicationIT {
 
 	@Container
-	private static final Neo4jContainer<?> neo4j = new Neo4jContainer<>("neo4j:2025.06").withReuse(true);
+	private static final Neo4jContainer neo4j = new Neo4jContainer("neo4j:2025.06").withReuse(true);
 
 	@SuppressWarnings("unused") // It is used via {@code @EnableIf}
 	static boolean is606OrHigher() {
