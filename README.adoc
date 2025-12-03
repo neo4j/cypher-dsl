@@ -6,9 +6,9 @@
 :artifactId: neo4j-cypher-dsl
 
 // This will be next version and also the one that will be put into the manual for the main branch
-:neo4j-cypher-dsl-version: 2025.2.1-SNAPSHOT
+:neo4j-cypher-dsl-version: 2025.2.2-SNAPSHOT
 // This is the latest released version, used only in the readme
-:neo4j-cypher-dsl-version-latest: 2025.2.0
+:neo4j-cypher-dsl-version-latest: 2025.2.1
 
 // end::properties[]
 
