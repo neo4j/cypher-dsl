@@ -1,5 +1,50 @@
 == 2025.2
 
+=== 2025.2.1
+
+No breaking changes. The updated Spring Boot bits only do affect our own testing. Cypher-DSL does not use anything, either from Spring, Spring Boot or Quarkus directly, hence you can use this release equally with Spring Boot 3 or 4. The same is true for Spring Data Neo4j and OGM, in case you use the Cypher-DSL annotation processor. None of the annotations Cypher-DSL understands has changed in their major releases.
+
+Thanks to @pecollet for finding another—and quite some nasty— bug in the way Cypher-DSL traverses Label expressions.
+
+==== 🚀 Features
+
+==== 🐛 Bug Fixes
+
+* Leave the `Labels` expression in all cases and handlers if a delegation had been made.
+
+==== 🔄️ Refactorings
+
+* Adapt to changes in Spring Boot 4.
+
+==== 🧰 Tasks
+
+* Configure ignored blame revs.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j:neo4j-ogm-quarkus from 4.1.0 to 4.2.0
+** Bump org.springframework.data:spring-data-neo4j
+** Bump org.springframework.boot:spring-boot-starter-parent
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1402)
+** Bump com.puppycrawl.tools:checkstyle from 12.1.1 to 12.1.2 (#1401)
+** Bump quarkus.platform.version from 3.29.2 to 3.29.4 (#1399)
+** Bump neo4j.version from 5.26.16 to 5.26.17 (#1397)
+** Bump org.apache.maven.plugins:maven-jar-plugin (#1396)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1395)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1394)
+** Bump org.asciidoctor:asciidoctorj from 3.0.0 to 3.0.1 (#1393)
+** Bump org.neo4j.driver:neo4j-java-driver (#1392)
+** Bump org.checkerframework:checker-qual (#1391)
+** Bump quarkus.platform.version from 3.29.0 to 3.29.2 (#1390)
+** Bump neo4j.version from 5.26.15 to 5.26.16 (#1389)
+** Bump com.fasterxml.jackson:jackson-bom (#1388)
+** Bump org.neo4j:neo4j-ogm-quarkus from 4.0.0 to 4.1.0 (#1387)
+** Bump quarkus.platform.version from 3.28.5 to 3.29.0 (#1386)
+** Bump neo4j.version from 5.26.14 to 5.26.15 (#1385)
+** Bump org.junit:junit-bom from 6.0.0 to 6.0.1 (#1384)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1383)
+
 === 2025.2.0 🎃
 
 No breaking changes in this release (as most of the time), only a small new feature needed for the https://github.com/neo4j/neo4j-jdbc[Neo4j JDBC Driver] which you definitely check out.
