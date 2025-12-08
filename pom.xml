@@ -135,7 +135,7 @@
 		<apiguardian.version>1.1.2</apiguardian.version>
 		<archunit.version>1.4.1</archunit.version>
 		<asciidoctor-maven-plugin.version>3.2.0</asciidoctor-maven-plugin.version>
-		<asciidoctorj-diagram.version>3.0.1</asciidoctorj-diagram.version>
+		<asciidoctorj-diagram.version>3.1.0</asciidoctorj-diagram.version>
 		<asciidoctorj.version>3.0.1</asciidoctorj.version>
 		<asm.version>9.9</asm.version>
 		<assertj.version>3.27.6</assertj.version>
