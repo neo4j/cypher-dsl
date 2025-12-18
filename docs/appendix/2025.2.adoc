@@ -1,5 +1,23 @@
 == 2025.2
 
+=== 2025.2.2 🎅🏻
+
+Thanks for another year of Cypher-DSL, with good feedback, excellent bug-reports and more.
+Merry Christmas and happy holidays. This release contains only updated dependencies.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j:neo4j-ogm-core from 5.0.0 to 5.0.1 (#1414)
+** Bump org.checkerframework:checker-qual (#1411)
+** Bump neo4j.version from 5.26.17 to 5.26.18 (#1405)
+** Bump org.testcontainers:testcontainers-bom (#1406)
+** Bump org.asciidoctor:asciidoctorj-diagram (#1407)
+** Bump quarkus.platform.version from 3.29.4 to 3.30.2 (#1409)
+** Bump org.apache.maven.plugins:maven-source-plugin (#1410)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1412)
+** Bump com.puppycrawl.tools:checkstyle from 12.1.2 to 12.2.0 (#1413)
+
 === 2025.2.1
 
 No breaking changes. The updated Spring Boot bits only do affect our own testing. Cypher-DSL does not use anything, either from Spring, Spring Boot or Quarkus directly, hence you can use this release equally with Spring Boot 3 or 4. The same is true for Spring Data Neo4j and OGM, in case you use the Cypher-DSL annotation processor. None of the annotations Cypher-DSL understands has changed in their major releases.
