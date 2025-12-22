@@ -184,7 +184,7 @@
 		<maven.compiler.parameters>true</maven.compiler.parameters>
 		<maven.compiler.release>${java.version}</maven.compiler.release>
 		<maven.version>3.8.4</maven.version>
-		<mockito.version>5.20.0</mockito.version>
+		<mockito.version>5.21.0</mockito.version>
 		<moditect-maven-plugin.version>1.3.0.Final</moditect-maven-plugin.version>
 		<neo4j-java-driver.version>6.0.2</neo4j-java-driver.version>
 		<neo4j-ogm-quarkus.version>4.2.1</neo4j-ogm-quarkus.version>
