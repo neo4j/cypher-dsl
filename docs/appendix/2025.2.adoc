@@ -1,5 +1,41 @@
 == 2025.2
 
+=== 2025.2.3
+
+Happy new year. This first Cypher-DSL release of 2026 just contains updated dependencies.
+
+==== 🧰 Tasks
+
+* Extend license header to 2026.
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump com.puppycrawl.tools:checkstyle from 12.3.0 to 13.0.0 (#1429)
+** Bump org.springframework.data:spring-data-neo4j (#1431)
+** Bump org.junit:junit-bom from 6.0.1 to 6.0.2 (#1430)
+** Bump org.checkerframework:checker-qual (#1428)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1427)
+** Bump quarkus.platform.version from 3.30.4 to 3.30.6 (#1426)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1425)
+** Bump org.ow2.asm:asm from 9.9 to 9.9.1 (#1424)
+** Bump quarkus.platform.version from 3.30.2 to 3.30.4 (#1423)
+** Bump org.testcontainers:testcontainers-bom (#1422)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1421)
+** Bump com.puppycrawl.tools:checkstyle from 12.2.0 to 12.3.0 (#1420)
+** Bump neo4j.version from 5.26.18 to 5.26.19 (#1419)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1418)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1417)
+** Bump mockito.version from 5.20.0 to 5.21.0 (#1416)
+** Bump org.apache.maven.plugins:maven-resources-plugin (#1415)
+
+==== 🛠 Build
+
+* Require Java 25 for the build consistently, release with 17. (#1432)
+* Ignore `.git-blame-ignore-revs` during license check.
+* Add shims to start Maven warning free on JDK 25.
+* Update required Maven version and Maven wrapper to 3.9.12.
+
 === 2025.2.2 🎅🏻
 
 Thanks for another year of Cypher-DSL, with good feedback, excellent bug-reports and more.
