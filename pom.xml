@@ -157,7 +157,7 @@
 		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
 		<japicmp-maven-plugin.version>0.25.3</japicmp-maven-plugin.version>
 		<java-module-name/>
-		<java.version>17</java.version>
+		<java.version>25</java.version>
 		<javapoet.version>1.13.0</javapoet.version>
 		<javax.annotation-api.version>1.3.2</javax.annotation-api.version>
 		<jaxb.version>2.3.1</jaxb.version>
@@ -182,7 +182,7 @@
 		<maven-surefire-plugin.version>3.5.4</maven-surefire-plugin.version>
 		<maven.compiler.debug>true</maven.compiler.debug>
 		<maven.compiler.parameters>true</maven.compiler.parameters>
-		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<maven.compiler.release>17</maven.compiler.release>
 		<maven.version>3.8.4</maven.version>
 		<mockito.version>5.21.0</mockito.version>
 		<moditect-maven-plugin.version>1.3.0.Final</moditect-maven-plugin.version>
@@ -495,7 +495,7 @@
 						<quiet>true</quiet>
 						<detectOfflineLinks>false</detectOfflineLinks>
 						<detectJavaApiLink>true</detectJavaApiLink>
-						<release>${java.version}</release>
+						<release>${maven.compiler.release}</release>
 						<tags>
 							<tag>
 								<name>neo4j.version</name>

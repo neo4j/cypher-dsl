@@ -15,7 +15,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 21
+          java-version: 25
 
       - name: 'Prepare git'
         run: git config --global core.autocrlf false
