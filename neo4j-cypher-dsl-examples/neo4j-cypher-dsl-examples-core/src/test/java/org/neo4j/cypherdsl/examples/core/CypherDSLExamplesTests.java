@@ -46,7 +46,8 @@ class CypherDSLExamplesTests {
 	private static final Renderer cypherRenderer = Renderer.getDefaultRenderer();
 
 	@Test
-	void escapingNames() {
+	void escapingNames()
+	{
 
 		// tag::escaping[]
 		var relationship = Cypher.node("Person")

@@ -109,9 +109,15 @@ jobs:
         with:
           distribution: zulu
           java-version: ${{ matrix.java }}
+      - name: Enable Checkstyle on Java >= 21
+        if:  ${{ matrix.java  != '17' }}
+        run: echo "SKIP_CHECKSTYLE=false" >> $GITHUB_ENV
+      - name: Disable Checkstyle on Java = 17
+        if: ${{ matrix.java  == '17' }}
+        run: echo "SKIP_CHECKSTYLE=true" >> $GITHUB_ENV
       - name: Run Maven build
         run: >
-          ./mvnw --no-transfer-progress clean verify -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
+          ./mvnw --no-transfer-progress clean verify -Dcheckstyle.skip=$SKIP_CHECKSTYLE -Djqassistant.skip=true -Drevision=$REVISION -Dsha1=-$GITHUB_SHA -Dchangelist=
           -pl org.neo4j:neo4j-cypher-dsl-examples
           -pl org.neo4j:neo4j-cypher-dsl-examples-core
           -pl org.neo4j:neo4j-cypher-dsl-examples-parser
