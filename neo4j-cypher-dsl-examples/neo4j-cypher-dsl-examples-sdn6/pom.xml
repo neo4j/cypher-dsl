@@ -38,7 +38,7 @@
 	<description>Example how to use the SDN 6 code generator.</description>
 
 	<properties>
-		<checkstyle.version>12.3.0</checkstyle.version>
+		<checkstyle.version>13.0.0</checkstyle.version>
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>17</java.version>
 		<license-maven-plugin.version>5.0.0</license-maven-plugin.version>
@@ -190,56 +190,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>io.spring.javaformat</groupId>
-				<artifactId>spring-javaformat-maven-plugin</artifactId>
-				<version>${spring-javaformat.version}</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>validate</goal>
-						</goals>
-						<phase>validate</phase>
-						<inherited>true</inherited>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>${maven-checkstyle-plugin.version}</version>
-				<configuration>
-					<excludes>**/module-info.java</excludes>
-					<includeTestSourceDirectory>true</includeTestSourceDirectory>
-					<configLocation>../../etc/checkstyle/config.xml</configLocation>
-					<suppressionsLocation>../../etc/checkstyle/suppressions.xml</suppressionsLocation>
-					<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
-					<consoleOutput>true</consoleOutput>
-					<failsOnError>true</failsOnError>
-					<includeTestSourceDirectory>true</includeTestSourceDirectory>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>com.puppycrawl.tools</groupId>
-						<artifactId>checkstyle</artifactId>
-						<version>${checkstyle.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>io.spring.javaformat</groupId>
-						<artifactId>spring-javaformat-checkstyle</artifactId>
-						<version>${spring-javaformat.version}</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<id>validate</id>
-						<goals>
-							<goal>check</goal>
-						</goals>
-						<phase>validate</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>com.github.ekryd.sortpom</groupId>
 				<artifactId>sortpom-maven-plugin</artifactId>
 				<version>${sortpom-maven-plugin.version}</version>
@@ -284,6 +234,67 @@
 
 	<!-- This is not relevant to the example, only for our project structure and build chain. -->
 	<profiles>
+		<profile>
+			<id>with_checkstyle</id>
+			<activation>
+				<jdk>[21,)</jdk>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>io.spring.javaformat</groupId>
+						<artifactId>spring-javaformat-maven-plugin</artifactId>
+						<version>${spring-javaformat.version}</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>validate</goal>
+								</goals>
+								<phase>validate</phase>
+								<inherited>true</inherited>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-checkstyle-plugin</artifactId>
+						<version>${maven-checkstyle-plugin.version}</version>
+						<configuration>
+							<excludes>**/module-info.java</excludes>
+							<includeTestSourceDirectory>true</includeTestSourceDirectory>
+							<configLocation>../../etc/checkstyle/config.xml</configLocation>
+							<suppressionsLocation>../../etc/checkstyle/suppressions.xml</suppressionsLocation>
+							<inputEncoding>${project.build.sourceEncoding}</inputEncoding>
+							<consoleOutput>true</consoleOutput>
+							<failsOnError>true</failsOnError>
+							<includeTestSourceDirectory>true</includeTestSourceDirectory>
+						</configuration>
+						<dependencies>
+							<dependency>
+								<groupId>com.puppycrawl.tools</groupId>
+								<artifactId>checkstyle</artifactId>
+								<version>${checkstyle.version}</version>
+							</dependency>
+							<dependency>
+								<groupId>io.spring.javaformat</groupId>
+								<artifactId>spring-javaformat-checkstyle</artifactId>
+								<version>${spring-javaformat.version}</version>
+							</dependency>
+						</dependencies>
+						<executions>
+							<execution>
+								<id>validate</id>
+								<goals>
+									<goal>check</goal>
+								</goals>
+								<phase>validate</phase>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
 		<profile>
 			<id>revisionMissing</id>
 			<activation>
