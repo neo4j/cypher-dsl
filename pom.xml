@@ -708,6 +708,7 @@
 								<exclude>**/*.txt</exclude>
 								<exclude>**/*.yaml</exclude>
 								<exclude>**/.flattened-pom.xml</exclude>
+								<exclude>**/.git-blame-ignore-revs</exclude>
 								<exclude>**/org.mockito.plugins.MockMaker</exclude>
 								<exclude>bin/runtests.java</exclude>
 								<exclude>**/src/test/resources/**/*_.java</exclude>
