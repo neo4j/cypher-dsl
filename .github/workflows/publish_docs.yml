@@ -29,7 +29,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: zulu
-          java-version: 21
+          java-version: 25
       - name: Run docs generation
         run: >
           ./mvnw --no-transfer-progress install -pl neo4j-cypher-dsl-bom &&
