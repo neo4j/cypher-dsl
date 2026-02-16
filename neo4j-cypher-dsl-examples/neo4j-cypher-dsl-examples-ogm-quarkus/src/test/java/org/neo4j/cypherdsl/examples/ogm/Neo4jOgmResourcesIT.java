@@ -21,7 +21,9 @@ package org.neo4j.cypherdsl.examples.ogm;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import io.quarkus.test.junit.QuarkusTest;
@@ -31,7 +33,9 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.driver.Driver;
+import org.neo4j.driver.Values;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -58,6 +62,30 @@ public class Neo4jOgmResourcesIT {
 			tx.run(movies);
 			tx.commit();
 		}
+	}
+
+	/**
+	 * Test not Quarkus or Code gen builder specific, we just happen to have both a Neo4j
+	 * instance and a driver connected to it.
+	 */
+	@Test // GH-1449
+	void everlastingDurationFun() {
+
+		var theDuration = Duration.ofDays(364).plusHours(47).plusMinutes(59).plusSeconds(61).plusMillis(1001);
+		var isoOne = this.driver.executableQuery(Cypher.returning(Cypher.literalOf(theDuration)).build().getCypher())
+			.execute()
+			.records()
+			.get(0)
+			.get(0)
+			.asIsoDuration();
+		var isoTwo = this.driver.executableQuery("RETURN $1")
+			.withParameters(Map.of("1", Values.value(theDuration)))
+			.execute()
+			.records()
+			.get(0)
+			.get(0)
+			.asIsoDuration();
+		assertThat(isoOne).isEqualTo(isoTwo);
 	}
 
 	@Test

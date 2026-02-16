@@ -33,15 +33,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 class DurationLiteralTests {
 
 	static Stream<Arguments> asStringShouldWork() {
-		return Stream.of(Arguments.of(Duration.ofDays(1), "duration('P1D')"),
+		return Stream.of(Arguments.of(Duration.ofDays(1), "duration('PT24H')"),
 				Arguments.of(Duration.ofHours(1), "duration('PT1H')"),
 				Arguments.of(Duration.ofMinutes(61), "duration('PT1H1M')"),
 				Arguments.of(Duration.ofSeconds(61), "duration('PT1M1S')"),
 				Arguments.of(Duration.ofSeconds(61).plusMillis(1123), "duration('PT1M2.123S')"),
 				Arguments.of(Duration.ofSeconds(61).plusNanos(1123), "duration('PT1M1.000001123S')"),
-				Arguments.of(Duration.ofHours(23).plusMinutes(61).plusSeconds(120), "duration('P1DT3M')"),
+				Arguments.of(Duration.ofHours(23).plusMinutes(61).plusSeconds(120), "duration('PT24H3M')"),
 				Arguments.of(Duration.ofDays(364).plusHours(47).plusMinutes(59).plusSeconds(61).plusMillis(1001),
-						"duration('P366DT2.001S')"));
+						"duration('PT8784H2.001S')"));
 	}
 
 	@ParameterizedTest

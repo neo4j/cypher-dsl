@@ -46,11 +46,8 @@ final class DurationLiteral extends LiteralBase<Duration> {
 	public String asString() {
 		var result = new StringBuilder();
 		result.append("duration('P");
-		if (this.content.toDaysPart() != 0L) {
-			result.append(this.content.toDaysPart()).append("D");
-		}
 
-		var hours = this.content.toHoursPart();
+		var hours = this.content.toHours();
 		var minutes = this.content.toMinutesPart();
 		var seconds = this.content.toSecondsPart();
 		var nanos = this.content.toNanosPart();
