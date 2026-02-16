@@ -38,7 +38,7 @@
 	<description>Example how to use the SDN 6 code generator.</description>
 
 	<properties>
-		<checkstyle.version>13.1.0</checkstyle.version>
+		<checkstyle.version>13.2.0</checkstyle.version>
 		<java-module-name>org.neo4j.cypherdsl.examples.sdn6</java-module-name>
 		<java.version>17</java.version>
 		<license-maven-plugin.version>5.0.0</license-maven-plugin.version>
