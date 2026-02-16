@@ -187,6 +187,31 @@ class SDN6AnnotationProcessorTests {
 	}
 
 	@Test
+	void bidiMappingsForStaticMetaModelAreFiltered() {
+
+		var resources = "org/neo4j/cypherdsl/codegen/sdn6/models/bidi";
+		Compilation compilation = getCompiler("17").withProcessors(new SDN6AnnotationProcessor())
+			.compile(getJavaResources(resources));
+
+		CompilationSubject.assertThat(compilation).succeeded();
+		CompilationSubject.assertThat(compilation).hadWarningCount(1);
+		CompilationSubject.assertThat(compilation)
+			.hadWarningContaining(
+					"Bidirectional mappings are not supported for the static meta model (Relationship: HAS_PATH_POINTS)");
+
+		var basePackage = "org.neo4j.cypherdsl.codegen.sdn6.models.bidi.";
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "Element_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("bidi/Element_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "Point_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("bidi/Point_.java"));
+		CompilationSubject.assertThat(compilation)
+			.generatedSourceFile(basePackage + "HasPathPoints_")
+			.hasSourceEquivalentTo(JavaFileObjects.forResource("bidi/HasPathPoints_.java"));
+	}
+
+	@Test
 	void sameRelDifferentPackageShouldMakeSense() {
 
 		var resources = "org/neo4j/cypherdsl/codegen/sdn6/models/same_rel_different_package";

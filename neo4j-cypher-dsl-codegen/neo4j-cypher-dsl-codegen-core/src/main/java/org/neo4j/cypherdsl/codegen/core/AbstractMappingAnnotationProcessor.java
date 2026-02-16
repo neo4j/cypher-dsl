@@ -29,6 +29,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -49,6 +50,7 @@ import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.SimpleElementVisitor8;
 import javax.lang.model.util.Types;
+import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
 /**
@@ -291,15 +293,47 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 			Map<TypeElement, Map.Entry<TypeElement, List<PropertyDefinition>>> relationshipProperties,
 			Map<TypeElement, NodeModelBuilder> nodeBuilders) {
 
+		record F(String type, NodeModelBuilder definingType, RelationshipPropertyDefinition definition,
+				boolean outgoing) {
+		}
+
 		Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> definitions = new HashMap<>();
-		allRelationshipFields.forEach((start, l) -> l.forEach(f -> {
-			RelationshipPropertyDefinition propertyDefinition = asRelationshipDefinition(start, f,
-					relationshipProperties, nodeBuilders);
-			if (propertyDefinition != null) {
-				definitions.computeIfAbsent(propertyDefinition.getType(), k -> new ArrayList<>())
-					.add(new AbstractMap.SimpleEntry<>(start, propertyDefinition));
-			}
-		}));
+		Map<String, List<F>> hlp = allRelationshipFields.entrySet().stream().flatMap((e) -> {
+			var start = e.getKey();
+			var l = e.getValue();
+			return l.stream().map(f -> {
+				RelationshipPropertyDefinition propertyDefinition = asRelationshipDefinition(start, f,
+						relationshipProperties, nodeBuilders);
+
+				if (propertyDefinition == null) {
+					return null;
+				}
+				return new F(propertyDefinition.getType(), start, propertyDefinition,
+						propertyDefinition.getStart() == start);
+			});
+		}).filter(Objects::nonNull).collect(Collectors.groupingBy(F::type));
+
+		// This finds bidirectional definitions per type.
+		// it will filter out incoming (that is, include only the outgoing definition in
+		// the metamodel)
+		//
+		hlp.forEach((type, definitionsPerType) -> {
+			definitionsPerType.forEach(x -> {
+				if (definitionsPerType.size() == 1 || x.outgoing()
+						|| definitionsPerType.stream()
+							.noneMatch(x2 -> x2.outgoing && x2.definition().getStart() == x.definition().getStart()
+									&& x2.definition().getEnd() == x.definition().getEnd())) {
+					definitions.computeIfAbsent(x.definition().getType(), k -> new ArrayList<>())
+						.add(new AbstractMap.SimpleEntry<>(x.definingType(), x.definition()));
+				}
+				else {
+					this.messager.printMessage(Diagnostic.Kind.WARNING,
+							"Bidirectional mappings are not supported for the static meta model (Relationship: %s)"
+								.formatted(type));
+				}
+			});
+		});
+
 		return Collections.unmodifiableMap(definitions);
 	}
 
