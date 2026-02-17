@@ -2,8 +2,6 @@
 
 === 2025.2.4
 
-==== 🚀 Features
-
 ==== 🐛 Bug Fixes
 
 * Don’t generate meta model that cannot be initialized. (#1450)
