@@ -1,5 +1,42 @@
 == 2025.2
 
+=== 2025.2.4
+
+==== 🚀 Features
+
+==== 🐛 Bug Fixes
+
+* Don’t generate meta model that cannot be initialized. (#1450)
+
+==== 🔄️ Refactorings
+
+* Don’t use date parts for duration literals. (#1449)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.springframework.data:spring-data-neo4j (#1453)
+** Bump quarkus.platform.version from 3.31.1 to 3.31.3 (#1452)
+** Bump org.junit:junit-bom from 6.0.2 to 6.0.3 (#1451)
+** Bump org.checkerframework:checker-qual (#1448)
+** Bump com.puppycrawl.tools:checkstyle from 13.1.0 to 13.2.0 (#1447)
+** Bump neo4j.version from 5.26.20 to 5.26.21 (#1445)
+** Bump com.puppycrawl.tools:checkstyle from 13.0.0 to 13.1.0 (#1444)
+** Bump quarkus.platform.version from 3.30.8 to 3.31.1 (#1443)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1442)
+** Bump org.assertj:assertj-core from 3.27.6 to 3.27.7 (#1441)
+** Bump quarkus.platform.version from 3.30.6 to 3.30.8 (#1440)
+** Bump neo4j.version from 5.26.19 to 5.26.20 (#1439)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1438)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1437)
+** Bump org.springframework.data:spring-data-neo4j (#1435)
+** Bump com.fasterxml.jackson:jackson-bom (#1434)
+** Bump org.neo4j:neo4j-ogm-core and quarkus integration to latest.
+
+==== 🛠 Build
+
+* Disable testing of all Neo4j versions for schema names on GitHub.
+
 === 2025.2.3
 
 Happy new year. This first Cypher-DSL release of 2026 just contains updated dependencies.
