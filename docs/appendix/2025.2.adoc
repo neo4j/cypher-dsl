@@ -1,5 +1,33 @@
 == 2025.2
 
+=== 2025.2.5
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j:neo4j-ogm-quarkus from 4.2.3 to 4.2.4 (#1475)
+** Bump neo4j.version from 5.26.21 to 5.26.22 (#1474)
+** Bump mockito.version from 5.22.0 to 5.23.0 (#1473)
+** Bump org.checkerframework:checker-qual (#1472)
+** Bump org.asciidoctor:asciidoctorj-diagram (#1471)
+** Bump joda-time:joda-time from 2.14.0 to 2.14.1 (#1470)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1469)
+** Bump org.apache.maven.plugins:maven-resources-plugin (#1468)
+** Bump quarkus.platform.version from 3.32.1 to 3.32.2 (#1467)
+** Bump org.apache.maven.plugins:maven-shade-plugin (#1466)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1465)
+** Bump quarkus.platform.version from 3.31.4 to 3.32.1 (#1464)
+** Bump com.puppycrawl.tools:checkstyle from 13.2.0 to 13.3.0 (#1463)
+** Bump mockito.version from 5.21.0 to 5.22.0 (#1462)
+** Bump org.neo4j:neo4j-ogm-core from 5.0.2 to 5.0.3 (#1461)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1460)
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1459)
+** Bump com.fasterxml.jackson:jackson-bom (#1458)
+** Bump org.neo4j:neo4j-ogm-quarkus from 4.2.2 to 4.2.3 (#1457)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1456)
+** Bump quarkus.platform.version from 3.31.3 to 3.31.4 (#1455)
+** Bump org.neo4j.driver:neo4j-java-driver (#1454)
+
 === 2025.2.4
 
 ==== 🐛 Bug Fixes
