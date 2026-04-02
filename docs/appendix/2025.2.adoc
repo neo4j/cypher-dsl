@@ -1,5 +1,22 @@
 == 2025.2
 
+=== 2025.2.6
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j:neo4j-ogm-quarkus from 4.2.4 to 4.2.5
+** Bump org.neo4j:neo4j-ogm-core from 5.0.3 to 5.0.4 (#1476)
+** Bump neo4j.version from 5.26.22 to 5.26.23 (#1477)
+** Bump org.asciidoctor:asciidoctorj-diagram (#1478)
+** Bump com.fasterxml.jackson:jackson-bom (#1480)
+** Bump org.springframework.data:spring-data-neo4j (#1481)
+** Bump quarkus.platform.version from 3.32.2 to 3.32.4 (#1482)
+** Bump org.testcontainers:testcontainers-bom (#1483)
+** Bump org.neo4j.driver:neo4j-java-driver (#1485)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1486)
+** Bump org.springframework.boot:spring-boot-starter-parent (#1487)
+
 === 2025.2.5
 
 ==== 🧹 Housekeeping
