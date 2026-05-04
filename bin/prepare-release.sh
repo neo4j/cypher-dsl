@@ -12,4 +12,4 @@ fi
 rm $DIR/../README.adoc.bak
 
 git add README.adoc
-git commit -m "Prepare release."
+git commit -sm "Prepare release."
