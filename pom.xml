@@ -154,7 +154,7 @@
 		<flatten-maven-plugin.version>1.7.3</flatten-maven-plugin.version>
 		<guava.version>33.6.0-jre</guava.version>
 		<jackson.version>2.21.3</jackson.version>
-		<jacoco-maven-plugin.version>0.8.14</jacoco-maven-plugin.version>
+		<jacoco-maven-plugin.version>0.8.15</jacoco-maven-plugin.version>
 		<japicmp-maven-plugin.version>0.26.1</japicmp-maven-plugin.version>
 		<java-module-name/>
 		<java.version>25</java.version>
