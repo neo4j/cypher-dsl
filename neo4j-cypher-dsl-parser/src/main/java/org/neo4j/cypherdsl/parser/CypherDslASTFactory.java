@@ -49,7 +49,6 @@ import org.neo4j.cypher.internal.parser.common.ast.factory.ScopeType;
 import org.neo4j.cypher.internal.parser.common.ast.factory.ShowCommandFilterTypes;
 import org.neo4j.cypher.internal.parser.common.ast.factory.SimpleEither;
 import org.neo4j.cypherdsl.core.Case;
-import org.neo4j.cypherdsl.core.Clause;
 import org.neo4j.cypherdsl.core.Clauses;
 import org.neo4j.cypherdsl.core.Comparison;
 import org.neo4j.cypherdsl.core.Cypher;
@@ -86,6 +85,7 @@ import org.neo4j.cypherdsl.core.SymbolicName;
 import org.neo4j.cypherdsl.core.Where;
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
+import org.neo4j.cypherdsl.parser.ClauseOrReturnFactory.ReturnContext;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 
@@ -98,7 +98,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  */
 @API(status = INTERNAL, since = "2021.3.0")
 final class CypherDslASTFactory implements
-		ASTFactory<Statements, Statement, Statement, Clause, Finish, Return, Expression, List<Expression>, SortItem, PatternElement, NodeAtom, PathAtom, PathLength, Clause, Expression, Expression, Expression, Hint, Expression, Labels, Expression, Parameter<?>, Expression, Property, Expression, Clause, Statement, Statement, Statement, Clause, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition, EntityType, QuantifiedPathPattern.Quantifier, PatternAtom, DatabaseName, PatternSelector, NULL, PatternElement> {
+		ASTFactory<Statements, Statement, Statement, ClauseOrReturnFactory, ClauseOrReturnFactory, ClauseOrReturnFactory, ClauseOrReturnFactory.ReturnExpressionFactory, List<ClauseOrReturnFactory.ReturnExpressionFactory>, SortItem, PatternElement, NodeAtom, PathAtom, PathLength, ClauseOrReturnFactory, Expression, Expression, Expression, Hint, Expression, Labels, Expression, Parameter<?>, Expression, Property, Expression, ClauseOrReturnFactory, Statement, Statement, Statement, ClauseOrReturnFactory, Where, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, InputPosition, EntityType, QuantifiedPathPattern.Quantifier, PatternAtom, DatabaseName, PatternSelector, NULL, PatternElement> {
 
 	private static CypherDslASTFactory instanceFromDefaultOptions;
 
@@ -220,13 +220,13 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Statement newSingleQuery(InputPosition p, List<Clause> clauses) {
+	public Statement newSingleQuery(InputPosition p, List<ClauseOrReturnFactory> clauses) {
 		return newSingleQuery(clauses);
 	}
 
 	@Override
-	public Statement newSingleQuery(List<Clause> clauses) {
-		return Statement.of(clauses);
+	public Statement newSingleQuery(List<ClauseOrReturnFactory> clauses) {
+		return Statement.of(clauses.stream().map(ClauseOrReturnFactory::toClause).toList());
 	}
 
 	@Override
@@ -240,56 +240,64 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause directUseClause(InputPosition p, DatabaseName databaseName) {
+	public ClauseOrReturnFactory directUseClause(InputPosition p, DatabaseName databaseName) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause functionUseClause(InputPosition p, Expression function) {
+	public ClauseOrReturnFactory functionUseClause(InputPosition p, Expression function) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Finish newFinishClause(InputPosition p) {
-		return Finish.create();
+	public ClauseOrReturnFactory newFinishClause(InputPosition p) {
+		return new ClauseOrReturnFactory(Finish.create());
 	}
 
 	@Override
-	public List<Expression> newReturnItems(InputPosition p, boolean returnAll, List<Expression> returnItems) {
+	public List<ClauseOrReturnFactory.ReturnExpressionFactory> newReturnItems(InputPosition p, boolean returnAll,
+			List<ClauseOrReturnFactory.ReturnExpressionFactory> returnItems) {
 		var finalReturnItems = returnItems;
 
 		if (returnAll) {
-			finalReturnItems = Stream.concat(Stream.of(Cypher.asterisk()), finalReturnItems.stream()).toList();
+			finalReturnItems = Stream.concat(Stream.of(ctx -> Cypher.asterisk()), finalReturnItems.stream()).toList();
 		}
 
 		if (finalReturnItems.isEmpty()) {
 			if (!returnAll) {
 				throw new IllegalArgumentException("Cannot return nothing.");
 			}
-			finalReturnItems = Collections.singletonList(Cypher.asterisk());
+			finalReturnItems = Collections.singletonList(ctx -> Cypher.asterisk());
 		}
 		return finalReturnItems;
 	}
 
 	@Override
-	public Return newReturnClause(InputPosition p, boolean distinct, List<Expression> returnItems,
-			List<SortItem> sortItems, InputPosition orderPos, Expression skip, InputPosition skipPosition,
-			Expression limit, InputPosition limitPosition) {
+	public ClauseOrReturnFactory newReturnClause(InputPosition p, boolean distinct,
+			List<ClauseOrReturnFactory.ReturnExpressionFactory> returnItems, List<SortItem> sortItems,
+			InputPosition orderPos, Expression skip, InputPosition skipPosition, Expression limit,
+			InputPosition limitPosition) {
 
-		return this.options.getReturnClauseFactory()
-			.apply(new ReturnDefinition(distinct, returnItems, sortItems, skip, limit));
+		ClauseOrReturnFactory.ReturnFactory f = context -> {
+			var finalReturnItems = returnItems.stream().map(f1 -> f1.create(context)).toList();
+			return this.options.getReturnClauseFactory()
+				.apply(new ReturnDefinition(distinct, finalReturnItems, sortItems, skip, limit));
+		};
+
+		return new ClauseOrReturnFactory(f);
 	}
 
 	@Override
-	public Expression newReturnItem(InputPosition p, Expression e, Expression v) {
+	public ClauseOrReturnFactory.ReturnExpressionFactory newReturnItem(InputPosition p, Expression e, Expression v) {
 
 		var s = assertSymbolicName(v);
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e.as(s));
+		return context -> applyCallbacksFor(context.eventType(), e.as(s));
 	}
 
 	@Override
-	public Expression newReturnItem(InputPosition p, Expression e, int eStartOffset, int eEndOffset) {
-		return applyCallbacksFor(ExpressionCreatedEventType.ON_RETURN_ITEM, e);
+	public ClauseOrReturnFactory.ReturnExpressionFactory newReturnItem(InputPosition p, Expression e, int eStartOffset,
+			int eEndOffset) {
+		return context -> applyCallbacksFor(context.eventType(), e);
 	}
 
 	@Override
@@ -303,13 +311,26 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause withClause(InputPosition p, Return returnClause, Where where) {
-		return Clauses.with(returnClause, where);
+	public ClauseOrReturnFactory withClause(InputPosition p, ClauseOrReturnFactory returnClause, Where where) {
+
+		Return finalReturn;
+		if (returnClause.returnFactory() != null) {
+			finalReturn = returnClause.returnFactory()
+				.create(new ReturnContext(ExpressionCreatedEventType.ON_WITH_ITEM));
+		}
+		else if (returnClause.clause() instanceof Return aReturn) {
+			finalReturn = aReturn;
+		}
+		else {
+			throw new IllegalArgumentException("Unexpected type of clause in WITH");
+		}
+
+		return new ClauseOrReturnFactory(Clauses.with(finalReturn, where));
 	}
 
 	@Override
-	public Clause matchClause(InputPosition p, boolean optional, NULL matchMode, List<PatternElement> patternElements,
-			InputPosition patternPos, List<Hint> hints, Where whereIn) {
+	public ClauseOrReturnFactory matchClause(InputPosition p, boolean optional, NULL matchMode,
+			List<PatternElement> patternElements, InputPosition patternPos, List<Hint> hints, Where whereIn) {
 
 		var patternElementCallbacks = this.options.getOnNewPatternElementCallbacks()
 			.getOrDefault(PatternElementCreatedEventType.ON_MATCH, List.of());
@@ -324,8 +345,8 @@ final class CypherDslASTFactory implements
 		}
 		var transformedPatternElements = transformIfPossible(patternElementCallbacks, openForTransformation);
 
-		return this.options.getMatchClauseFactory()
-			.apply(new MatchDefinition(optional, transformedPatternElements, whereIn, hints));
+		return new ClauseOrReturnFactory(this.options.getMatchClauseFactory()
+			.apply(new MatchDefinition(optional, transformedPatternElements, whereIn, hints)));
 	}
 
 	private List<PatternElement> transformIfPossible(List<UnaryOperator<PatternElement>> callbacks,
@@ -372,22 +393,22 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause createClause(InputPosition p, List<PatternElement> patternElements) {
+	public ClauseOrReturnFactory createClause(InputPosition p, List<PatternElement> patternElements) {
 
 		var callbacks = this.options.getOnNewPatternElementCallbacks()
 			.getOrDefault(PatternElementCreatedEventType.ON_CREATE, List.of());
-		return Clauses.create(transformIfPossible(callbacks,
-				patternElements.stream().map(v -> (v instanceof NodeAtom n) ? n.value() : v).toList()));
+		return new ClauseOrReturnFactory(Clauses.create(transformIfPossible(callbacks,
+				patternElements.stream().map(v -> (v instanceof NodeAtom n) ? n.value() : v).toList())));
 	}
 
 	@Override
-	public Clause insertClause(InputPosition p, List<PatternElement> patternElements) {
+	public ClauseOrReturnFactory insertClause(InputPosition p, List<PatternElement> patternElements) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause setClause(InputPosition p, List<Expression> setItems) {
-		return Clauses.set(setItems);
+	public ClauseOrReturnFactory setClause(InputPosition p, List<Expression> setItems) {
+		return new ClauseOrReturnFactory(Clauses.set(setItems));
 	}
 
 	@Override
@@ -432,8 +453,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause removeClause(InputPosition p, List<Expression> removeItems) {
-		return Clauses.remove(removeItems);
+	public ClauseOrReturnFactory removeClause(InputPosition p, List<Expression> removeItems) {
+		return new ClauseOrReturnFactory(Clauses.remove(removeItems));
 	}
 
 	@Override
@@ -457,18 +478,19 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause deleteClause(InputPosition p, boolean detach, List<Expression> expressions) {
-		return Clauses.delete(detach, applyCallbacksFor(ExpressionCreatedEventType.ON_DELETE_ITEM, expressions));
+	public ClauseOrReturnFactory deleteClause(InputPosition p, boolean detach, List<Expression> expressions) {
+		return new ClauseOrReturnFactory(
+				Clauses.delete(detach, applyCallbacksFor(ExpressionCreatedEventType.ON_DELETE_ITEM, expressions)));
 	}
 
 	@Override
-	public Clause unwindClause(InputPosition p, Expression e, Expression v) {
-		return Clauses.unwind(e, assertSymbolicName(v));
+	public ClauseOrReturnFactory unwindClause(InputPosition p, Expression e, Expression v) {
+		return new ClauseOrReturnFactory(Clauses.unwind(e, assertSymbolicName(v)));
 	}
 
 	@Override
-	public Clause mergeClause(InputPosition p, PatternElement patternElementIn, List<Clause> setClauses,
-			List<MergeActionType> actionTypes, List<InputPosition> positions) {
+	public ClauseOrReturnFactory mergeClause(InputPosition p, PatternElement patternElementIn,
+			List<ClauseOrReturnFactory> setClauses, List<MergeActionType> actionTypes, List<InputPosition> positions) {
 
 		var patternElement = (patternElementIn instanceof NodeAtom n) ? n.value() : patternElementIn;
 		var mergeActions = new ArrayList<MergeAction>();
@@ -479,10 +501,10 @@ final class CypherDslASTFactory implements
 			while (iteratorClauses.hasNext() && iteratorTypes.hasNext()) {
 				var type = iteratorTypes.next();
 				switch (type) {
-					case OnCreate ->
-						mergeActions.add(MergeAction.of(MergeAction.Type.ON_CREATE, (Set) iteratorClauses.next()));
-					case OnMatch ->
-						mergeActions.add(MergeAction.of(MergeAction.Type.ON_MATCH, (Set) iteratorClauses.next()));
+					case OnCreate -> mergeActions
+						.add(MergeAction.of(MergeAction.Type.ON_CREATE, (Set) iteratorClauses.next().toClause()));
+					case OnMatch -> mergeActions
+						.add(MergeAction.of(MergeAction.Type.ON_MATCH, (Set) iteratorClauses.next().toClause()));
 					default -> throw new IllegalArgumentException("Unsupported MergeActionType: " + type);
 				}
 			}
@@ -490,19 +512,21 @@ final class CypherDslASTFactory implements
 
 		var callbacks = this.options.getOnNewPatternElementCallbacks()
 			.getOrDefault(PatternElementCreatedEventType.ON_MERGE, List.of());
-		return Clauses.merge(transformIfPossible(callbacks, List.of(patternElement)), mergeActions);
+		return new ClauseOrReturnFactory(
+				Clauses.merge(transformIfPossible(callbacks, List.of(patternElement)), mergeActions));
 	}
 
 	@Override
-	public Clause callClause(InputPosition p, InputPosition namespacePosition, InputPosition procedureNamePosition,
-			InputPosition procedureResultPosition, List<String> namespace, String name, List<Expression> arguments,
-			boolean yieldAll, List<Expression> resultItems, Where where, boolean optional) {
+	public ClauseOrReturnFactory callClause(InputPosition p, InputPosition namespacePosition,
+			InputPosition procedureNamePosition, InputPosition procedureResultPosition, List<String> namespace,
+			String name, List<Expression> arguments, boolean yieldAll, List<Expression> resultItems, Where where,
+			boolean optional) {
 		var intermediateResult = Clauses.callClause(namespace, name, arguments,
 				(!yieldAll || (resultItems != null)) ? resultItems : List.of(Cypher.asterisk()), where);
 		if (optional) {
 			throw new IllegalArgumentException("Cannot render optional call clause");
 		}
-		return applyCallbacksFor(InvocationCreatedEventType.ON_CALL, intermediateResult);
+		return new ClauseOrReturnFactory(applyCallbacksFor(InvocationCreatedEventType.ON_CALL, intermediateResult));
 	}
 
 	@Override
@@ -814,26 +838,29 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause loadCsvClause(InputPosition p, boolean headers, Expression source, Expression v,
+	public ClauseOrReturnFactory loadCsvClause(InputPosition p, boolean headers, Expression source, Expression v,
 			String fieldTerminator) {
 
 		isInstanceOf(StringLiteral.class, source,
 				"Only string literals are supported as source for the LOAD CSV clause.");
-		return Clauses.loadCSV(headers, (StringLiteral) source, assertSymbolicName(v), fieldTerminator);
+		return new ClauseOrReturnFactory(
+				Clauses.loadCSV(headers, (StringLiteral) source, assertSymbolicName(v), fieldTerminator));
 	}
 
 	@Override
-	public Clause foreachClause(InputPosition p, Expression v, Expression list, List<Clause> objects) {
-		return Clauses.forEach(assertSymbolicName(v), list, objects);
+	public ClauseOrReturnFactory foreachClause(InputPosition p, Expression v, Expression list,
+			List<ClauseOrReturnFactory> objects) {
+		return new ClauseOrReturnFactory(Clauses.forEach(assertSymbolicName(v), list,
+				objects.stream().map(ClauseOrReturnFactory::toClause).toList()));
 	}
 
 	@Override
-	public Clause subqueryClause(InputPosition p, Statement subquery, NULL inTransactions, boolean scopeAll,
-			boolean hasScope, List<Expression> expressions, boolean optional) {
+	public ClauseOrReturnFactory subqueryClause(InputPosition p, Statement subquery, NULL inTransactions,
+			boolean scopeAll, boolean hasScope, List<Expression> expressions, boolean optional) {
 		if (optional) {
 			throw new IllegalArgumentException("Cannot render optional subquery clause");
 		}
-		return Clauses.callClause(subquery);
+		return new ClauseOrReturnFactory(Clauses.callClause(subquery));
 	}
 
 	@Override
@@ -843,43 +870,45 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause yieldClause(InputPosition p, boolean returnAll, List<Expression> expressions,
-			InputPosition returnItemsPosition, List<SortItem> orderBy, InputPosition orderPos, Expression skip,
-			InputPosition skipPosition, Expression limit, InputPosition limitPosition, Where where) {
+	public ClauseOrReturnFactory yieldClause(InputPosition p, boolean returnAll,
+			List<ClauseOrReturnFactory.ReturnExpressionFactory> expressions, InputPosition returnItemsPosition,
+			List<SortItem> orderBy, InputPosition orderPos, Expression skip, InputPosition skipPosition,
+			Expression limit, InputPosition limitPosition, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showIndexClause(InputPosition p, ShowCommandFilterTypes indexType, Where where, Clause yieldClause) {
+	public ClauseOrReturnFactory showIndexClause(InputPosition p, ShowCommandFilterTypes indexType, Where where,
+			ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showConstraintClause(InputPosition p, ShowCommandFilterTypes constraintType, Where where,
-			Clause yieldClause) {
+	public ClauseOrReturnFactory showConstraintClause(InputPosition p, ShowCommandFilterTypes constraintType,
+			Where where, ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showProcedureClause(InputPosition p, boolean currentUser, String user, Where where,
-			Clause yieldClause) {
+	public ClauseOrReturnFactory showProcedureClause(InputPosition p, boolean currentUser, String user, Where where,
+			ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showFunctionClause(InputPosition p, ShowCommandFilterTypes functionType, boolean currentUser,
-			String user, Where where, Clause yieldClause) {
+	public ClauseOrReturnFactory showFunctionClause(InputPosition p, ShowCommandFilterTypes functionType,
+			boolean currentUser, String user, Where where, ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement useGraph(Statement command, Clause useGraph) {
+	public Statement useGraph(Statement command, ClauseOrReturnFactory useGraph) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement showRoles(InputPosition p, boolean withUsers, boolean showAll, Clause yieldExpr,
-			Return returnWithoutGraph, Where where) {
+	public Statement showRoles(InputPosition p, boolean withUsers, boolean showAll, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -958,39 +987,40 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Statement showUsers(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where,
-			boolean withAuth) {
+	public Statement showUsers(InputPosition p, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where, boolean withAuth) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement showCurrentUser(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showCurrentUser(InputPosition p, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement showSupportedPrivileges(InputPosition p, Clause yieldExpr, Return returnWithoutGraph,
-			Where where) {
+	public Statement showSupportedPrivileges(InputPosition p, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Statement showAllPrivileges(InputPosition p, boolean asCommand, boolean asRevoke, Clause yieldExpr,
-			Return returnWithoutGraph, Where where) {
+	public Statement showAllPrivileges(InputPosition p, boolean asCommand, boolean asRevoke,
+			ClauseOrReturnFactory yieldExpr, ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement showRolePrivileges(InputPosition p,
 			List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> roles, boolean asCommand, boolean asRevoke,
-			Clause yieldExpr, Return returnWithoutGraph, Where where) {
+			ClauseOrReturnFactory yieldExpr, ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public Statement showUserPrivileges(InputPosition p,
 			List<SimpleEither<StringPos<InputPosition>, Parameter<?>>> users, boolean asCommand, boolean asRevoke,
-			Clause yieldExpr, Return returnWithoutGraph, Where where) {
+			ClauseOrReturnFactory yieldExpr, ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1045,8 +1075,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Statement showDatabase(InputPosition p, NULL scope, Clause yieldExpr, Return returnWithoutGraph,
-			Where where) {
+	public Statement showDatabase(InputPosition p, NULL scope, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1071,8 +1101,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Statement showAliases(InputPosition p, DatabaseName aliasName, Clause yieldExpr, Return returnWithoutGraph,
-			Where where) {
+	public Statement showAliases(InputPosition p, DatabaseName aliasName, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -1743,31 +1773,31 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Clause orderBySkipLimitClause(InputPosition t, List<SortItem> order, InputPosition orderPos, Expression skip,
-			InputPosition skipPos, Expression limit, InputPosition limitPos) {
-		return Clauses.orderBy(order, skip, limit);
+	public ClauseOrReturnFactory orderBySkipLimitClause(InputPosition t, List<SortItem> order, InputPosition orderPos,
+			Expression skip, InputPosition skipPos, Expression limit, InputPosition limitPos) {
+		return new ClauseOrReturnFactory(Clauses.orderBy(order, skip, limit));
 	}
 
 	@Override
-	public Clause showTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids, Where where,
-			Clause yieldClause) {
+	public ClauseOrReturnFactory showTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids,
+			Where where, ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause terminateTransactionsClause(InputPosition p, SimpleEither<List<String>, Expression> ids, Where where,
-			Clause yieldClause) {
+	public ClauseOrReturnFactory terminateTransactionsClause(InputPosition p,
+			SimpleEither<List<String>, Expression> ids, Where where, ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause showSettingsClause(InputPosition p, SimpleEither<List<String>, Expression> names, Where where,
-			Clause yieldClause) {
+	public ClauseOrReturnFactory showSettingsClause(InputPosition p, SimpleEither<List<String>, Expression> names,
+			Where where, ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Clause turnYieldToWith(Clause yieldClause) {
+	public ClauseOrReturnFactory turnYieldToWith(ClauseOrReturnFactory yieldClause) {
 		throw new UnsupportedOperationException();
 	}
 
@@ -2004,7 +2034,8 @@ final class CypherDslASTFactory implements
 	}
 
 	@Override
-	public Statement showServers(InputPosition p, Clause yieldExpr, Return returnWithoutGraph, Where where) {
+	public Statement showServers(InputPosition p, ClauseOrReturnFactory yieldExpr,
+			ClauseOrReturnFactory returnWithoutGraph, Where where) {
 		throw new UnsupportedOperationException();
 	}
 

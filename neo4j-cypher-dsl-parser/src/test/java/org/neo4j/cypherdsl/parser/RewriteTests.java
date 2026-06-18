@@ -19,17 +19,25 @@
 package org.neo4j.cypherdsl.parser;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
+import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
 import org.neo4j.cypherdsl.core.Parameter;
+import org.neo4j.cypherdsl.core.Property;
 import org.neo4j.cypherdsl.core.SymbolicName;
+import org.neo4j.cypherdsl.core.renderer.Configuration;
+import org.neo4j.cypherdsl.core.renderer.GeneralizedRenderer;
+import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -60,8 +68,8 @@ class RewriteTests {
 	// end::enforcing-labels-function[]
 
 	@Test
-	@SuppressWarnings("squid:S5976") // About making it a parameterized test. Used in the
-										// docs.
+	// About making it a parameterized test. Used in the docs.
+	@SuppressWarnings("squid:S5976")
 	void shouldRewriteLabelsOnParseNode() {
 
 		// tag::enforcing-on-parse[]
@@ -162,6 +170,96 @@ class RewriteTests {
 		var statement = CypherParser.parse("Match (x:Movie) where x.title = $param1 RETURN x", parserOptions)
 			.getCypher();
 		assertThat(statement).isEqualTo("MATCH (y:`Movie`) WHERE y.title = $foo RETURN y");
+	}
+
+	@Test
+	void returnItemsShouldBeIndependentFromWith1() {
+
+		var fragmentRenderer = Renderer.getRenderer(Configuration.defaultConfig(), GeneralizedRenderer.class);
+
+		Function<Expression, AliasedExpression> aliasIfMissing = expression -> {
+			if (expression instanceof AliasedExpression aliased) {
+				return aliased;
+			}
+			return expression.as(fragmentRenderer.render(expression));
+		};
+
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_RETURN_ITEM, AliasedExpression.class, aliasIfMissing)
+			.build();
+
+		var statement = CypherParser.parseStatement("MATCH (n) WITH n, n AS m RETURN n.foo, m.bar AS bar", options);
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) WITH n, n AS m RETURN n.foo AS `n.foo`, m.bar AS bar");
+	}
+
+	@Test
+	void returnItemsShouldBeIndependentFromWith2() {
+
+		var fragmentRenderer = Renderer.getRenderer(Configuration.defaultConfig(), GeneralizedRenderer.class);
+
+		Function<Expression, AliasedExpression> aliasIfMissing = expression -> {
+			if (expression instanceof AliasedExpression aliased) {
+				return aliased;
+			}
+			return expression.as(fragmentRenderer.render(expression));
+		};
+
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_WITH_ITEM, AliasedExpression.class, aliasIfMissing)
+			.build();
+
+		var statement = CypherParser.parseStatement("MATCH (n) WITH n, n AS m RETURN n.foo, m.bar AS bar", options);
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) WITH n AS n, n AS m RETURN n.foo, m.bar AS bar");
+	}
+
+	@Test
+	void returnItemsShouldBeIndependentFromWith3() {
+
+		var input = "MATCH (n) WITH n, n AS m RETURN n.foo, m.bar AS bar";
+
+		// This test is here to demonstrate that we
+		// - the parser does create new items
+		// - and that Cypher-DSL won't do semantic analysis on the AST
+		// So the n in the in WITH clause above is not known to be the same
+		// n as in the RETURN clause. Those are individual items during creation
+		// of the AST and in case they are rewritten to something else we
+		// cannot know at a later stage, so if the with clauses are modified:
+		// You are on your own.
+
+		var aliasesWith = List.of("a", "b").iterator();
+		var aliasesReturn = List.of("A", "B").iterator();
+
+		var mapped = new HashMap<Expression, String>();
+
+		Function<Expression, AliasedExpression> aliasIfMissingReturn = expression -> {
+			var newAlias = aliasesReturn.next();
+			if (expression instanceof Property property) {
+				var existingAlias = mapped.get(property.getContainerReference());
+				if (existingAlias != null) {
+					return Cypher.name(existingAlias).property(property.getName()).as(newAlias);
+				}
+			}
+			return expression.as(newAlias);
+		};
+
+		Function<Expression, AliasedExpression> aliasIfMissingWith = expression -> {
+			if (expression instanceof AliasedExpression aliased) {
+				return aliased;
+			}
+			var newAlias = aliasesWith.next();
+			if (expression instanceof SymbolicName symbolicName) {
+				mapped.put(symbolicName, newAlias);
+			}
+			return expression.as(newAlias);
+		};
+
+		var options = Options.newOptions()
+			.withCallback(ExpressionCreatedEventType.ON_WITH_ITEM, AliasedExpression.class, aliasIfMissingWith)
+			.withCallback(ExpressionCreatedEventType.ON_RETURN_ITEM, AliasedExpression.class, aliasIfMissingReturn)
+			.build();
+
+		var statement = CypherParser.parseStatement(input, options);
+		assertThat(statement.getCypher()).isEqualTo("MATCH (n) WITH n AS a, n AS m RETURN a.foo AS A, m.bar AS B");
 	}
 
 }

@@ -139,7 +139,8 @@ public final class CypherParser {
 
 		return handle(input, () -> new Cypher<>(CypherDslASTFactory.getInstance(options),
 				CypherDslASTExceptionFactory.INSTANCE, getCharStream(input))
-			.Clause());
+			.Clause()
+			.toClause());
 	}
 
 	/**

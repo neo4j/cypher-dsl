@@ -39,6 +39,10 @@ public enum ExpressionCreatedEventType {
 	 */
 	ON_RETURN_ITEM(Expression.class),
 	/**
+	 * Fired for every new item in a with clause.
+	 */
+	ON_WITH_ITEM(Expression.class),
+	/**
 	 * Fired when a property is set.
 	 */
 	ON_SET_PROPERTY(Operation.class),
