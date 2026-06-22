@@ -72,6 +72,7 @@ import org.neo4j.cypherdsl.core.QuantifiedPathPattern;
 import org.neo4j.cypherdsl.core.Relationship;
 import org.neo4j.cypherdsl.core.Remove;
 import org.neo4j.cypherdsl.core.Return;
+import org.neo4j.cypherdsl.core.Search;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.Skip;
 import org.neo4j.cypherdsl.core.SortItem;
@@ -1118,6 +1119,41 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(QuantifiedPathPattern.Quantifier quantifier) {
 
 		this.builder.append(quantifier.toString());
+	}
+
+	void enter(Search search) {
+		giveSpaceIfNeccessary();
+		this.builder.append("SEARCH ");
+		search.getName().accept(this);
+		this.builder.append(" IN (");
+	}
+
+	void enter(Search.VectorIndexClause vectorIndexClause) {
+		this.builder.append("VECTOR INDEX %s ".formatted(vectorIndexClause.name()));
+	}
+
+	void enter(Search.ForClause forClause) {
+		this.builder.append("FOR ");
+	}
+
+	void enter(Search.TopKClause topKClause) {
+		giveSpaceIfNeccessary();
+		this.builder.append("LIMIT %d".formatted(topKClause.value()));
+	}
+
+	private void giveSpaceIfNeccessary() {
+		var l = this.builder.length();
+		if (l != 0 && this.builder.charAt(l - 1) != ' ') {
+			this.builder.append(" ");
+		}
+	}
+
+	void leave(Search search) {
+		this.builder.append(")");
+		if (search.getScoreAlias() != null) {
+			this.builder.append(" SCORE AS ");
+			search.getScoreAlias().accept(this);
+		}
 	}
 
 	@Override

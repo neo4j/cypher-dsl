@@ -61,7 +61,24 @@ public final class Clauses {
 	public static Clause match(boolean optional, List<PatternElement> patternElements, Where optionalWhere,
 			List<Hint> optionalHints) {
 
-		return new Match(optional, Pattern.of(patternElements), optionalWhere, optionalHints);
+		return match(optional, patternElements, null, optionalWhere, optionalHints);
+	}
+
+	/**
+	 * Builds a {@code MATCH} clause. The result can be safely cast to a {@link Match} if
+	 * needed.
+	 * @param optional should this be an optional match?
+	 * @param patternElements the pattern elements to match
+	 * @param optionalSearch an optional search clause
+	 * @param optionalWhere an optional where sub-clause
+	 * @param optionalHints optional hints to be used
+	 * @return an immutable match clause
+	 * @since 2025.3.0
+	 */
+	static Clause match(boolean optional, List<PatternElement> patternElements, Search optionalSearch,
+			Where optionalWhere, List<Hint> optionalHints) {
+
+		return new Match(optional, Pattern.of(patternElements), optionalSearch, optionalWhere, optionalHints);
 	}
 
 	/**

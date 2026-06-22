@@ -32,6 +32,7 @@ import org.neo4j.cypherdsl.core.Operator;
 import org.neo4j.cypherdsl.core.Parameter;
 import org.neo4j.cypherdsl.core.PropertyLookup;
 import org.neo4j.cypherdsl.core.Return;
+import org.neo4j.cypherdsl.core.Search;
 import org.neo4j.cypherdsl.core.Set;
 import org.neo4j.cypherdsl.core.StatementContext;
 import org.neo4j.cypherdsl.core.Subquery;
@@ -66,6 +67,8 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	private boolean passedFirstReadingOrUpdatingClause;
 
+	private boolean inSearch;
+
 	PrettyPrintingVisitor(StatementContext statementContext, Configuration configuration) {
 		this(statementContext, false, configuration);
 	}
@@ -91,13 +94,22 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 
 	@Override
 	void enter(Where where) {
-		if (this.currentVisitedElements.stream().noneMatch(Return.class::isInstance)) {
+		if (this.inSearch || this.currentVisitedElements.stream().noneMatch(Return.class::isInstance)) {
 			this.builder.append("\n");
+			if (this.inSearch) {
+				++this.indentationLevel;
+			}
 			indent(this.indentationLevel);
 			this.builder.append("WHERE ");
 		}
 		else {
 			super.enter(where);
+		}
+	}
+
+	void leave(Where where) {
+		if (this.inSearch) {
+			--this.indentationLevel;
 		}
 	}
 
@@ -313,6 +325,55 @@ class PrettyPrintingVisitor extends DefaultVisitor {
 		else {
 			super.enter(parameter);
 		}
+	}
+
+	@Override
+	void enter(Search search) {
+		this.inSearch = true;
+		trimNewline();
+		this.indent(++this.indentationLevel);
+		super.enter(search);
+	}
+
+	@Override
+	void enter(Search.VectorIndexClause vectorIndexClause) {
+		trimNewline();
+		this.indent(++this.indentationLevel);
+		super.enter(vectorIndexClause);
+	}
+
+	void leave(Search.VectorIndexClause vectorIndexClause) {
+		--this.indentationLevel;
+	}
+
+	@Override
+	void enter(Search.ForClause forClause) {
+		trimNewline();
+		this.indent(++this.indentationLevel);
+		super.enter(forClause);
+	}
+
+	void leave(Search.ForClause forClause) {
+		--this.indentationLevel;
+	}
+
+	@Override
+	void enter(Search.TopKClause topKClause) {
+		trimNewline();
+		this.indent(++this.indentationLevel);
+		super.enter(topKClause);
+	}
+
+	void leave(Search.TopKClause topKClause) {
+		--this.indentationLevel;
+	}
+
+	@Override
+	void leave(Search search) {
+		trimNewline();
+		this.indent(this.indentationLevel--);
+		super.leave(search);
+		this.inSearch = false;
 	}
 
 }

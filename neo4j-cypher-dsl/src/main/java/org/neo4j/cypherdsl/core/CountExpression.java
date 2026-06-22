@@ -53,11 +53,11 @@ public final class CountExpression implements SubqueryExpression, ExposesWhere<E
 		var imports = optionalWith.imports();
 
 		if (imports != null && patternOrUnion instanceof Pattern pattern) {
-			this.fragments = List.of(new Match(false, pattern, innerWhere, null));
+			this.fragments = List.of(new Match(false, pattern, null, innerWhere, null));
 			this.innerWhere = null;
 		}
 		else if (imports != null && patternOrUnion instanceof Match match) {
-			this.fragments = List.of(new Match(false, match.pattern, innerWhere, null));
+			this.fragments = List.of(new Match(false, match.pattern, null, innerWhere, null));
 			this.innerWhere = null;
 		}
 		else {

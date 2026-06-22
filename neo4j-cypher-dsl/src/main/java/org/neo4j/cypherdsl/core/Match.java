@@ -49,11 +49,14 @@ public final class Match extends AbstractClause implements ReadingClause {
 	 */
 	private final List<Hint> hints;
 
+	private final Search optionalSearch;
+
 	private final Where optionalWhere;
 
-	Match(boolean optional, Pattern pattern, Where optionalWhere, List<Hint> optionalHints) {
+	Match(boolean optional, Pattern pattern, Search optionalSearch, Where optionalWhere, List<Hint> optionalHints) {
 		this.optional = optional;
 		this.pattern = pattern;
+		this.optionalSearch = optionalSearch;
 		this.optionalWhere = optionalWhere;
 		this.hints = (optionalHints != null) ? new ArrayList<>(optionalHints) : Collections.emptyList();
 	}
@@ -72,6 +75,7 @@ public final class Match extends AbstractClause implements ReadingClause {
 		visitor.enter(this);
 		this.pattern.accept(visitor);
 		this.hints.forEach(value -> value.accept(visitor));
+		Visitable.visitIfNotNull(this.optionalSearch, visitor);
 		Visitable.visitIfNotNull(this.optionalWhere, visitor);
 		visitor.leave(this);
 	}
