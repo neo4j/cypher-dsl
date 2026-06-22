@@ -105,7 +105,7 @@ public final class Search implements Visitable, Clause {
 	public interface SpecifyVector {
 
 		/**
-		 * Specifies the vector a vector as literal.
+		 * Specifies the vector expression to search with.
 		 * @param vector the vector to search with
 		 * @return the next step
 		 */

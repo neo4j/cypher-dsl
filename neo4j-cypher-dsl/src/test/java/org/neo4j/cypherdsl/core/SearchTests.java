@@ -265,7 +265,7 @@ class SearchTests {
 		}
 
 		@Test
-		void vectorSearchWithFilterWithAnANDPredicateOnseparateProperties() {
+		void vectorSearchWithFilterWithAnAndPredicateOnSeparateProperties() {
 
 			var snowWhite = Cypher.node("Movie", Cypher.mapOf("title", Cypher.literalOf("Snow White")))
 				.named("snowWhite");
