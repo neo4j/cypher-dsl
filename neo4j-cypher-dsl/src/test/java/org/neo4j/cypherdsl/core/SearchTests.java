@@ -172,7 +172,7 @@ class SearchTests {
 						movie.property("releaseDate").property("year").as("year"))
 				.build();
 
-			if (this.prettyPrint) {
+			if (!this.prettyPrint) {
 				assertThat(stmt.getCypher()).isEqualTo(
 						"MATCH (movie:`Movie`) SEARCH movie IN (VECTOR INDEX moviePlots FOR vector([1, 2, 3], 3, INTEGER NOT NULL) WHERE movie.releaseDate > date('1990') LIMIT 4) RETURN movie.title AS title, movie.releaseDate.year AS year");
 			}
@@ -208,7 +208,7 @@ class SearchTests {
 						movie.property("releaseDate").property("year").as("year"))
 				.build();
 
-			if (this.prettyPrint) {
+			if (!this.prettyPrint) {
 				assertThat(stmt.getCypher()).isEqualTo(
 						"MATCH (movie:`Movie`) SEARCH movie IN (VECTOR INDEX moviePlots FOR vector([1, 2, 3], 3, INTEGER NOT NULL) LIMIT 4) WHERE movie.releaseDate > date('1990') RETURN movie.title AS title, movie.releaseDate.year AS year");
 			}
@@ -245,7 +245,7 @@ class SearchTests {
 						movie.property("releaseDate").property("year").as("year"))
 				.build();
 
-			if (this.prettyPrint) {
+			if (!this.prettyPrint) {
 				assertThat(stmt.getCypher()).isEqualTo(
 						"MATCH (movie:`Movie`) SEARCH movie IN (VECTOR INDEX moviePlots FOR vector([1, 2, 3], 3, INTEGER NOT NULL) WHERE movie.releaseDate > date('1990') LIMIT 4) WHERE movie.rating > 7.5 RETURN movie.title AS title, movie.releaseDate.year AS year");
 			}
@@ -286,7 +286,7 @@ class SearchTests {
 						movie.property("releaseDate").property("year").as("year"))
 				.build();
 
-			if (this.prettyPrint) {
+			if (!this.prettyPrint) {
 				assertThat(stmt.getCypher()).isEqualTo(
 						"MATCH (snowWhite:`Movie` {title: 'Snow White'}) MATCH (movie:`Movie`) SEARCH movie IN (VECTOR INDEX moviePlots FOR snowWhite.embedding WHERE (movie.releaseDate < date('2000') AND movie.rating >= snowWhite.rating) LIMIT 4) RETURN movie.title AS title, movie.releaseDate.year AS year");
 			}

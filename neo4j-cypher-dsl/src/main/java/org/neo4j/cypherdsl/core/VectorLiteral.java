@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import java.util.Vector;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +53,7 @@ public final class VectorLiteral implements Literal<List<? extends Number>> {
 	/**
 	 * Creates a vector composed of {@link ElementType#INTEGER8}.
 	 * @param elements the elements for the new vector
-	 * @return a new {@link Vector}
+	 * @return a new {@link VectorLiteral}
 	 */
 	static VectorLiteral of(byte[] elements) {
 		assertSize(Objects.requireNonNull(elements, MSG_NULL_CHECK).length);
@@ -68,7 +67,7 @@ public final class VectorLiteral implements Literal<List<? extends Number>> {
 	/**
 	 * Creates a vector composed of {@link ElementType#INTEGER16}.
 	 * @param elements the elements for the new vector
-	 * @return a new {@link Vector}
+	 * @return a new {@link VectorLiteral}
 	 */
 	static VectorLiteral of(short[] elements) {
 		assertSize(Objects.requireNonNull(elements, MSG_NULL_CHECK).length);
@@ -82,7 +81,7 @@ public final class VectorLiteral implements Literal<List<? extends Number>> {
 	/**
 	 * Creates a vector composed of {@link ElementType#INTEGER32}.
 	 * @param elements the elements for the new vector
-	 * @return a new {@link Vector}
+	 * @return a new {@link VectorLiteral}
 	 */
 	static VectorLiteral of(int[] elements) {
 		assertSize(Objects.requireNonNull(elements, MSG_NULL_CHECK).length);
@@ -92,7 +91,7 @@ public final class VectorLiteral implements Literal<List<? extends Number>> {
 	/**
 	 * Creates a vector composed of {@link ElementType#INTEGER}.
 	 * @param elements the elements for the new vector
-	 * @return a new {@link Vector}
+	 * @return a new {@link VectorLiteral}
 	 */
 	static VectorLiteral of(long[] elements) {
 		assertSize(Objects.requireNonNull(elements, MSG_NULL_CHECK).length);
@@ -102,7 +101,7 @@ public final class VectorLiteral implements Literal<List<? extends Number>> {
 	/**
 	 * Creates a vector composed of {@link ElementType#FLOAT32}.
 	 * @param elements the elements for the new vector
-	 * @return a new {@link Vector}
+	 * @return a new {@link VectorLiteral}
 	 */
 	static VectorLiteral of(float[] elements) {
 		assertSize(Objects.requireNonNull(elements, MSG_NULL_CHECK).length);
@@ -116,7 +115,7 @@ public final class VectorLiteral implements Literal<List<? extends Number>> {
 	/**
 	 * Creates a vector composed of {@link ElementType#FLOAT}.
 	 * @param elements the elements for the new vector
-	 * @return a new {@link Vector}
+	 * @return a new {@link VectorLiteral}
 	 */
 	static VectorLiteral of(double[] elements) {
 		assertSize(Objects.requireNonNull(elements, MSG_NULL_CHECK).length);

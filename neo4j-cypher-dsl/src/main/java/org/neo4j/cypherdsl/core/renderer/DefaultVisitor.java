@@ -1122,14 +1122,14 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(Search search) {
-		giveSpaceIfNeccessary();
+		giveSpaceIfNecessary();
 		this.builder.append("SEARCH ");
 		search.getName().accept(this);
 		this.builder.append(" IN (");
 	}
 
 	void enter(Search.VectorIndexClause vectorIndexClause) {
-		this.builder.append("VECTOR INDEX %s ".formatted(vectorIndexClause.name()));
+		this.builder.append("VECTOR INDEX %s ".formatted(escapeIfNecessary(vectorIndexClause.name())));
 	}
 
 	void enter(Search.ForClause forClause) {
@@ -1137,11 +1137,11 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	}
 
 	void enter(Search.TopKClause topKClause) {
-		giveSpaceIfNeccessary();
+		giveSpaceIfNecessary();
 		this.builder.append("LIMIT %d".formatted(topKClause.value()));
 	}
 
-	private void giveSpaceIfNeccessary() {
+	private void giveSpaceIfNecessary() {
 		var l = this.builder.length();
 		if (l != 0 && this.builder.charAt(l - 1) != ' ') {
 			this.builder.append(" ");

@@ -3617,6 +3617,12 @@ public final class Cypher {
 		return VectorLiteral.of(elements);
 	}
 
+	/**
+	 * Creates a builder for the {@code SEARCH} clause.
+	 * @param name the name of the node or relationship to search
+	 * @return the builder entry point
+	 * @since 2025.3.0
+	 */
 	public static Search.SpecifyIndexName search(SymbolicName name) {
 		return new Search.Builder(name);
 	}

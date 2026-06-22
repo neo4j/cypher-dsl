@@ -23,6 +23,7 @@ import java.util.Objects;
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
+import org.neo4j.cypherdsl.core.utils.Assertions;
 
 import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
@@ -244,7 +245,7 @@ public final class Search implements Visitable, Clause {
 		private SymbolicName scoreAlias;
 
 		Builder(SymbolicName name) {
-			this.name = name;
+			this.name = Objects.requireNonNull(name, "Name is required");
 		}
 
 		static Condition assertCondition(Condition condition) {
@@ -256,6 +257,7 @@ public final class Search implements Visitable, Clause {
 
 		@Override
 		public SpecifyVector in(String indexName) {
+			Assertions.hasText(indexName, "The index name must not be null or empty");
 			this.indexName = indexName;
 			return this;
 		}
@@ -273,6 +275,9 @@ public final class Search implements Visitable, Clause {
 
 		@Override
 		public SpecifyScoreOrBuild limit(int topK) {
+			if (topK < 0) {
+				throw new IllegalArgumentException("topK must be greater than or equal to 0");
+			}
 			this.topK = topK;
 			return this;
 		}
