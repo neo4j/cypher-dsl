@@ -36,6 +36,7 @@ import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMatchAndUpdate;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingMerge;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithWhere;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhere;
+import org.neo4j.cypherdsl.core.StatementBuilder.OngoingReadingWithoutWhereWithSearch;
 import org.neo4j.cypherdsl.core.StatementBuilder.OngoingUpdate;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.internal.ProcedureName;
@@ -54,8 +55,9 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  */
 @API(status = INTERNAL, since = "2021.2.1")
 class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, OngoingMerge, OngoingReadingWithWhere,
-		OngoingReadingWithoutWhere, OngoingMatchAndUpdate, BuildableMatchAndUpdate, BuildableOngoingMergeAction,
-		ExposesSubqueryCall.BuildableSubquery, StatementBuilder.VoidCall, StatementBuilder.Terminal {
+		OngoingReadingWithoutWhere, OngoingReadingWithoutWhereWithSearch, OngoingMatchAndUpdate,
+		BuildableMatchAndUpdate, BuildableOngoingMergeAction, ExposesSubqueryCall.BuildableSubquery,
+		StatementBuilder.VoidCall, StatementBuilder.Terminal {
 
 	private static final EnumSet<UpdateType> MERGE_OR_CREATE = EnumSet.of(UpdateType.CREATE, UpdateType.MERGE);
 
@@ -513,6 +515,15 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 	}
 
 	@Override
+	public final OngoingReadingWithoutWhereWithSearch search(Search search) {
+		if (this.currentOngoingMatch == null) {
+			throw new IllegalStateException("No current match");
+		}
+		this.currentOngoingMatch.search = search;
+		return this;
+	}
+
+	@Override
 	public final OngoingReadingWithWhere and(Condition additionalCondition) {
 
 		this.currentOngoingMatch.conditionBuilder.and(additionalCondition);
@@ -823,6 +834,8 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 
 		private final List<Hint> hints = new ArrayList<>();
 
+		private Search search;
+
 		private final ConditionBuilder conditionBuilder = new ConditionBuilder();
 
 		private final boolean optional;
@@ -832,7 +845,7 @@ class DefaultStatementBuilder implements StatementBuilder, OngoingUpdate, Ongoin
 		}
 
 		Match buildMatch() {
-			return (Match) Clauses.match(this.optional, this.patternList,
+			return (Match) Clauses.match(this.optional, this.patternList, this.search,
 					Where.from(this.conditionBuilder.buildCondition().orElse(null)), this.hints);
 		}
 

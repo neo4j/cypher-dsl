@@ -3557,4 +3557,74 @@ public final class Cypher {
 		return Predicates.single(variable);
 	}
 
+	/**
+	 * Creates an INTEGER8 vector.
+	 * @param elements the elements for the new vector
+	 * @return a new {@link VectorLiteral}
+	 * @since 2025.3.0
+	 */
+	public static VectorLiteral vector(byte[] elements) {
+		return VectorLiteral.of(elements);
+	}
+
+	/**
+	 * Creates an INTEGER16 vector.
+	 * @param elements the elements for the new vector
+	 * @return a new {@link VectorLiteral}
+	 * @since 2025.3.0
+	 */
+	public static VectorLiteral vector(short[] elements) {
+		return VectorLiteral.of(elements);
+	}
+
+	/**
+	 * Creates an INTEGER32 vector.
+	 * @param elements the elements for the new vector
+	 * @return a new {@link VectorLiteral}
+	 * @since 2025.3.0
+	 */
+	public static VectorLiteral vector(int[] elements) {
+		return VectorLiteral.of(elements);
+	}
+
+	/**
+	 * Creates an INTEGER vector.
+	 * @param elements the elements for the new vector
+	 * @return a new {@link VectorLiteral}
+	 * @since 2025.3.0
+	 */
+	public static VectorLiteral vector(long[] elements) {
+		return VectorLiteral.of(elements);
+	}
+
+	/**
+	 * Creates an FLOAT32 vector.
+	 * @param elements the elements for the new vector
+	 * @return a new {@link VectorLiteral}
+	 * @since 2025.3.0
+	 */
+	public static VectorLiteral vector(float[] elements) {
+		return VectorLiteral.of(elements);
+	}
+
+	/**
+	 * Creates an FLOAT vector.
+	 * @param elements the elements for the new vector
+	 * @return a new {@link VectorLiteral}
+	 * @since 2025.3.0
+	 */
+	public static VectorLiteral vector(double[] elements) {
+		return VectorLiteral.of(elements);
+	}
+
+	/**
+	 * Creates a builder for the {@code SEARCH} clause.
+	 * @param name the name of the node or relationship to search
+	 * @return the builder entry point
+	 * @since 2025.3.0
+	 */
+	public static Search.SpecifyIndexName search(SymbolicName name) {
+		return new Search.Builder(name);
+	}
+
 }

@@ -81,13 +81,26 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	}
 
 	/**
+	 * A match that exposes {@code returning}, {@code search} and {@code where} methods to
+	 * add required information. While the search and where clauses are optional, a
+	 * returning clause needs to be specified before the statement can be built.
+	 *
+	 * @since 1.0
+	 */
+	interface OngoingReadingWithoutWhere
+			extends OngoingReading, ExposesHints, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesMatch,
+			ExposesExistentialSubqueryCall, ExposesSearch {
+
+	}
+
+	/**
 	 * A match that exposes {@code returning} and {@code where} methods to add required
 	 * information. While the where clause is optional, a returning clause needs to be
 	 * specified before the statement can be built.
 	 *
-	 * @since 1.0
+	 * @since 2025.3.0
 	 */
-	interface OngoingReadingWithoutWhere extends OngoingReading, ExposesHints,
+	interface OngoingReadingWithoutWhereWithSearch extends OngoingReading, ExposesHints,
 			ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesMatch, ExposesExistentialSubqueryCall {
 
 	}
