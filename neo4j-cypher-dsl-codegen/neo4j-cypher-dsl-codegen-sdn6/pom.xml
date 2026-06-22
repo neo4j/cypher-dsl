@@ -43,6 +43,11 @@
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl-codegen-core</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.neo4j</groupId>
+			<artifactId>neo4j-cypher-dsl-parser</artifactId>
+			<scope>runtime</scope>
+		</dependency>
 
 		<!-- SDN 6 annotation proc -->
 		<dependency>
