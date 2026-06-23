@@ -25,9 +25,9 @@ For the full project, including examples and native tests:
 
 For the project, including examples but skipping native tests:
 
-* JDK 17+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
+* JDK 26+ (Can be https://openjdk.java.net[OpenJDK] or https://www.oracle.com/technetwork/java/index.html[Oracle JDK])
 
-Maven 3.8.4 is our build tool of choice. We provide the Maven wrapper, see `mvnw` respectively `mvnw.cmd` in the project root;
+Maven 3.9.16 is our build tool of choice. We provide the Maven wrapper, see `mvnw` respectively `mvnw.cmd` in the project root;
 the wrapper downloads the appropriate Maven version automatically.
 
 The build requires a local copy of the project:
@@ -70,9 +70,9 @@ The output should be similar:
 .Verify your JDK
 ----
 $ java -version
-openjdk version "24" 2025-03-18
-OpenJDK Runtime Environment GraalVM CE 24+36.1 (build 24+36-jvmci-b01)
-OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, sharing)
+openjdk version "25.0.2" 2026-01-20
+OpenJDK Runtime Environment GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01)
+OpenJDK 64-Bit Server VM GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01, mixed mode, sharing)
 ----
 
 Check whether GraalVM `native-image` is present with:
@@ -82,7 +82,12 @@ Check whether GraalVM `native-image` is present with:
 .Check for the present of `native-image`
 ----
 $ which native-image
-/Users/msimons/.sdkman/candidates/java/24-graalce/bin/native-image
+/Users/msimons/.sdkman/candidates/java/25.0.2-graalce/bin/native-image
+
+$ native-image --version
+native-image 25.0.2 2026-01-20
+GraalVM Runtime Environment GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01)
+Substrate VM GraalVM CE 25.0.2+10.1 (build 25.0.2+10, serial gc)
 ----
 
 You should see `native-image` in the list. If not, you are most likely on a GraalVM version we don't support with this project.
@@ -93,7 +98,7 @@ After that, use `./mvnw` on a Unix-like operating system to build the Cypher-DSL
 [[build-default-bash]]
 .Build with default settings on Linux / macOS
 ----
-$ ./mvnw clean verify
+$ ./mvnw clean verify -DenableNativeTests
 ----
 
 On a Windows machine, use
@@ -107,13 +112,13 @@ $ mvnw.cmd clean verify
 
 === Skipping native tests
 
-On a plain JDK 17 or higher, run the following to skip the native tests:
+On a plain JDK 26 or higher, run the following without running the native tests:
 
 [source,console,subs="verbatim,attributes"]
 [[build-skip-native-bash]]
 .Skipping native tests
 ----
-$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests
+$ ./mvnw clean verify
 ----
 
 === Build only the core module
@@ -124,7 +129,7 @@ The core module can be built on plain JDK 17 with:
 [[build-only-core-bash]]
 .Build only the core module
 ----
-$ ./mvnw clean verify -am -pl org.neo4j:neo4j-cypher-dsl
+$ ./mvnw clean verify -am -pl neo4j-cypher-dsl-build/processor -pl org.neo4j:neo4j-cypher-dsl
 ----
 
 === CI-friendly version numbers
