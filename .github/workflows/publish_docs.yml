@@ -48,7 +48,7 @@ jobs:
           git add .
           git commit -m "Update GH-Pages."
       - name: Push changes
-        uses: ad-m/github-push-action@v0.6.0
+        uses: ad-m/github-push-action@d91a481090679876dfc4178fef17f286781251df # v0.8.0
         with:
           directory: target/gh-pages
           branch: gh-pages

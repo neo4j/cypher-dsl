@@ -63,7 +63,6 @@ import org.neo4j.cypherdsl.codegen.core.RelationshipPropertyDefinition;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
-import org.neo4j.ogm.annotation.RelationshipEntity;
 
 import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 
@@ -187,34 +186,6 @@ public final class OGMAnnotationProcessor extends AbstractMappingAnnotationProce
 		}
 
 		return true;
-	}
-
-	private String getRelationshipEntityType(Element annotatedEntity) {
-
-		var relationshipEntity = annotatedEntity.getAnnotation(RelationshipEntity.class);
-		if (relationshipEntity == null) {
-			return null;
-		}
-
-		String typeValue = relationshipEntity.type();
-		String valueValue = relationshipEntity.value();
-		String relationshipType = null;
-
-		if (!typeValue.isEmpty() && !valueValue.isEmpty()) {
-			if (!typeValue.equals(valueValue)) {
-				this.messager.printMessage(Diagnostic.Kind.ERROR,
-						"Different @AliasFor mirror values for annotation [org.neo4j.ogm.annotation.RelationshipEntity]!",
-						annotatedEntity);
-			}
-			relationshipType = typeValue;
-		}
-		else if (!typeValue.isEmpty()) {
-			relationshipType = typeValue;
-		}
-		else if (!valueValue.isEmpty()) {
-			relationshipType = valueValue;
-		}
-		return relationshipType;
 	}
 
 	// Tries to figure out the direction of this relationship, so that we can decide on
