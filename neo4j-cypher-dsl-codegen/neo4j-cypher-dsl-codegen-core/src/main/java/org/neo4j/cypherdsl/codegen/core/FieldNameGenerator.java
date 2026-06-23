@@ -37,6 +37,7 @@ public interface FieldNameGenerator {
 	/**
 	 * Single instance of the default {@link FieldNameGenerator}.
 	 */
+	@SuppressWarnings("squid:S6548")
 	enum Default implements FieldNameGenerator {
 
 		/**
@@ -45,6 +46,7 @@ public interface FieldNameGenerator {
 		INSTANCE;
 
 		@Override
+		@SuppressWarnings("squid:S3776")
 		public String generate(String name) {
 			StringBuilder sb = new StringBuilder();
 

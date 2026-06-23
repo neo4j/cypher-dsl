@@ -33,6 +33,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 final class RelationshipNameGenerator extends AbstractClassNameGenerator implements ClassNameGenerator {
 
 	@Override
+	@SuppressWarnings("squid:S3776")
 	public String generate(String suggestedName) {
 
 		final StringBuilder sb = generateTypeName(suggestedName);

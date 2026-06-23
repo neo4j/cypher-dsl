@@ -73,6 +73,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	/**
 	 * Default constructor is required by the annotation processor system of Java.
 	 */
+	@SuppressWarnings("squid:S5993")
 	public AbstractMappingAnnotationProcessor() {
 	}
 
@@ -298,7 +299,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 		}
 
 		Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> definitions = new HashMap<>();
-		Map<String, List<F>> hlp = allRelationshipFields.entrySet().stream().flatMap((e) -> {
+		Map<String, List<F>> hlp = allRelationshipFields.entrySet().stream().flatMap(e -> {
 			var start = e.getKey();
 			var l = e.getValue();
 			return l.stream().map(f -> {
@@ -316,23 +317,20 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 		// This finds bidirectional definitions per type.
 		// it will filter out incoming (that is, include only the outgoing definition in
 		// the metamodel)
-		//
-		hlp.forEach((type, definitionsPerType) -> {
-			definitionsPerType.forEach(x -> {
-				if (definitionsPerType.size() == 1 || x.outgoing()
-						|| definitionsPerType.stream()
-							.noneMatch(x2 -> x2.outgoing && x2.definition().getStart() == x.definition().getStart()
-									&& x2.definition().getEnd() == x.definition().getEnd())) {
-					definitions.computeIfAbsent(x.definition().getType(), k -> new ArrayList<>())
-						.add(new AbstractMap.SimpleEntry<>(x.definingType(), x.definition()));
-				}
-				else {
-					this.messager.printMessage(Diagnostic.Kind.WARNING,
-							"Bidirectional mappings are not supported for the static meta model (Relationship: %s)"
-								.formatted(type));
-				}
-			});
-		});
+		hlp.forEach((type, definitionsPerType) -> definitionsPerType.forEach(x -> {
+			if (definitionsPerType.size() == 1 || x.outgoing()
+					|| definitionsPerType.stream()
+						.noneMatch(x2 -> x2.outgoing && x2.definition().getStart() == x.definition().getStart()
+								&& x2.definition().getEnd() == x.definition().getEnd())) {
+				definitions.computeIfAbsent(x.definition().getType(), k -> new ArrayList<>())
+					.add(new AbstractMap.SimpleEntry<>(x.definingType(), x.definition()));
+			}
+			else {
+				this.messager.printMessage(Diagnostic.Kind.WARNING,
+						"Bidirectional mappings are not supported for the static meta model (Relationship: %s)"
+							.formatted(type));
+			}
+		}));
 
 		return Collections.unmodifiableMap(definitions);
 	}
@@ -345,6 +343,7 @@ public abstract class AbstractMappingAnnotationProcessor extends AbstractProcess
 	 * @return map of builder per type. Can be multiple builders in case of different
 	 * relationship property classes with different properties.
 	 */
+	@SuppressWarnings("squid:S3776") // Yolo
 	protected final Map<String, List<RelationshipModelBuilder>> populateListOfRelationships(
 			Map<String, List<Map.Entry<NodeModelBuilder, RelationshipPropertyDefinition>>> relationshipDefinitions) {
 		Map<String, List<RelationshipModelBuilder>> result = new HashMap<>();

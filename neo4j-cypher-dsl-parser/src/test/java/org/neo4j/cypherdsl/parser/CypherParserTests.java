@@ -146,9 +146,13 @@ class CypherParserTests {
 
 		assertThatExceptionOfType(UnsupportedCypherException.class)
 			.isThrownBy(() -> CypherParser.parse("CREATE ROLE myrole"))
-			.withMessage("You used one Cypher construct not yet supported by the Cypher-DSL:\n" + "\n"
-					+ "\tCREATE ROLE myrole\n" + "\n"
-					+ "Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new");
+			.withMessage(
+					"""
+							You used one Cypher construct not yet supported by the Cypher-DSL:
+
+							\tCREATE ROLE myrole
+
+							Feel free to open an issue so that we might add support for it at https://github.com/neo4j-contrib/cypher-dsl/issues/new""");
 	}
 
 	@Test

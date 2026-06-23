@@ -33,6 +33,8 @@ import org.neo4j.cypherdsl.core.renderer.Configuration;
 import org.neo4j.cypherdsl.core.renderer.Renderer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
+import static org.assertj.core.api.Assertions.assertThatNullPointerException;
 
 class SearchTests {
 
@@ -110,6 +112,91 @@ class SearchTests {
 			.build();
 		assertThat(search).hasToString(
 				"Search{cypher=SEARCH movie IN (VECTOR INDEX moviePlots FOR vector([1, 2, 3], 3, INTEGER NOT NULL) WHERE (movie.releaseDate > date('1990') AND movie.title STARTS WITH 'A') LIMIT 4) SCORE AS similarityScore}");
+	}
+
+	@Nested
+	class ExceptionalStates {
+
+		@Test
+		void nameIsRequired() {
+			assertThatNullPointerException().isThrownBy(() -> Cypher.search(null)).withMessage("Name is required");
+		}
+
+		@Test
+		void indexNameMustNotBeNull() {
+			var search = Cypher.search(Cypher.name("movie"));
+			assertThatIllegalArgumentException().isThrownBy(() -> search.in(null))
+				.withMessage("The index name must not be null or empty");
+		}
+
+		@Test
+		void indexNameMustNotBeEmpty() {
+			var search = Cypher.search(Cypher.name("movie"));
+			assertThatIllegalArgumentException().isThrownBy(() -> search.in(""))
+				.withMessage("The index name must not be null or empty");
+		}
+
+		@Test
+		void indexNameMustNotBeBlank() {
+			var search = Cypher.search(Cypher.name("movie"));
+			assertThatIllegalArgumentException().isThrownBy(() -> search.in("   "))
+				.withMessage("The index name must not be null or empty");
+		}
+
+		@Test
+		void vectorMustNotBeNull() {
+			var moviePlots = Cypher.search(Cypher.name("movie")).in("moviePlots");
+			assertThatNullPointerException().isThrownBy(() -> moviePlots.forVector(null));
+		}
+
+		@Test
+		void vectorExpressionMustBeSupported() {
+			var moviePlots = Cypher.search(Cypher.name("movie")).in("moviePlots");
+			var notAVector = Cypher.literalOf("not a vector");
+			assertThatIllegalArgumentException().isThrownBy(() -> moviePlots.forVector(notAVector))
+				.withMessageStartingWith("Unsupported vector expression");
+		}
+
+		@Test
+		void topKMustNotBeNegative() {
+			var moviePlots = Cypher.search(Cypher.name("movie"))
+				.in("moviePlots")
+				.forVector(Cypher.vector(new long[] { 1, 2, 3 }));
+			assertThatIllegalArgumentException().isThrownBy(() -> moviePlots.limit(-1))
+				.withMessage("topK must be greater than or equal to 0");
+		}
+
+		@Test
+		void whereOnlyAllowsComparisons() {
+			var movie = Cypher.name("movie");
+			var compound = movie.property("releaseDate")
+				.gt(Cypher.date("1990"))
+				.and(movie.property("title").startsWith(Cypher.literalOf("A")));
+			var moviePlots = Cypher.search(movie).in("moviePlots").forVector(Cypher.vector(new long[] { 1, 2, 3 }));
+			assertThatIllegalArgumentException().isThrownBy(() -> moviePlots.where(compound))
+				.withMessage("Only comparison conditions are supported");
+		}
+
+		@Test
+		void whereDoesNotAllowNullPredicate() {
+			var moviePlots = Cypher.search(Cypher.name("movie"))
+				.in("moviePlots")
+				.forVector(Cypher.vector(new long[] { 1, 2, 3 }));
+			assertThatNullPointerException().isThrownBy(() -> moviePlots.where(null));
+		}
+
+		@Test
+		void whereOnlyAllowsComparisonsInAdditionalPredicates() {
+			var movie = Cypher.name("movie");
+			var valid = movie.property("releaseDate").gt(Cypher.date("1990"));
+			var compound = movie.property("rating")
+				.gt(Cypher.literalOf(7.5))
+				.and(movie.property("title").startsWith(Cypher.literalOf("A")));
+			var moviePlots = Cypher.search(movie).in("moviePlots").forVector(Cypher.vector(new long[] { 1, 2, 3 }));
+			assertThatIllegalArgumentException().isThrownBy(() -> moviePlots.where(valid, compound))
+				.withMessage("Only comparison conditions are supported");
+		}
+
 	}
 
 	@Nested

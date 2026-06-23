@@ -182,4 +182,17 @@ class VectorTests {
 			.isEqualTo("vector([1.0, 2.0, 3.0], 3, FLOAT NOT NULL)");
 	}
 
+	@Test
+	void maximumSizeShouldBeAccepted() {
+		var elements = new long[4096];
+		assertThat(VectorLiteral.of(elements).getContent()).hasSize(4096);
+	}
+
+	@Test
+	void oneAboveMaximumSizeShouldBeRejected() {
+		var elements = new long[4097];
+		assertThatIllegalArgumentException().isThrownBy(() -> VectorLiteral.of(elements))
+			.withMessage("'4097' is not a valid value. Must be a number in the range 1 to 4096 (GQL 42N31)");
+	}
+
 }

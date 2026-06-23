@@ -281,7 +281,7 @@ class SDN6AnnotationProcessorTests {
 		@Override
 		protected Object convert(Object source, Class<?> targetType) throws ArgumentConversionException {
 			if (source instanceof String && String[].class.isAssignableFrom(targetType)) {
-				return Arrays.stream(((String) source).split("\\s*,\\s*")).map(String::trim).toArray(String[]::new);
+				return Arrays.stream(((String) source).split(",")).map(String::trim).toArray(String[]::new);
 			}
 			else {
 				throw new IllegalArgumentException(

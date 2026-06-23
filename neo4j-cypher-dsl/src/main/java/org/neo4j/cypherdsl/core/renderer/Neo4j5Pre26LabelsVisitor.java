@@ -51,6 +51,8 @@ final class Neo4j5Pre26LabelsVisitor implements Visitor {
 		this.delegate = delegate;
 	}
 
+	// Expression list is not public, cannot use instanceof
+	@SuppressWarnings("squid:S1872")
 	void render(Object visitable) {
 		if (visitable instanceof Parameter<?> parameter) {
 			render(parameter.getValue());
