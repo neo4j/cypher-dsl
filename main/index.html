@@ -3507,12 +3507,12 @@ We use the following in our tests:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>JDK 17+ (Can be <a href="https://openjdk.java.net">OpenJDK</a> or <a href="https://www.oracle.com/technetwork/java/index.html">Oracle JDK</a>)</p>
+<p>JDK 26+ (Can be <a href="https://openjdk.java.net">OpenJDK</a> or <a href="https://www.oracle.com/technetwork/java/index.html">Oracle JDK</a>)</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>Maven 3.8.4 is our build tool of choice. We provide the Maven wrapper, see <code>mvnw</code> respectively <code>mvnw.cmd</code> in the project root;
+<p>Maven 3.9.16 is our build tool of choice. We provide the Maven wrapper, see <code>mvnw</code> respectively <code>mvnw.cmd</code> in the project root;
 the wrapper downloads the appropriate Maven version automatically.</p>
 </div>
 <div class="paragraph">
@@ -3565,9 +3565,9 @@ The output should be similar:</p>
 <div class="title">Listing 32. Verify your JDK</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ java -version
-openjdk version &quot;24&quot; 2025-03-18
-OpenJDK Runtime Environment GraalVM CE 24+36.1 (build 24+36-jvmci-b01)
-OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, sharing)</code></pre>
+openjdk version &quot;25.0.2&quot; 2026-01-20
+OpenJDK Runtime Environment GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01)
+OpenJDK 64-Bit Server VM GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01, mixed mode, sharing)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3577,7 +3577,12 @@ OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, 
 <div class="title">Listing 33. Check for the present of <code>native-image</code></div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="console">$ which native-image
-/Users/msimons/.sdkman/candidates/java/24-graalce/bin/native-image</code></pre>
+/Users/msimons/.sdkman/candidates/java/25.0.2-graalce/bin/native-image
+
+$ native-image --version
+native-image 25.0.2 2026-01-20
+GraalVM Runtime Environment GraalVM CE 25.0.2+10.1 (build 25.0.2+10-jvmci-b01)
+Substrate VM GraalVM CE 25.0.2+10.1 (build 25.0.2+10, serial gc)</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3589,7 +3594,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, 
 <div id="build-default-bash" class="listingblock">
 <div class="title">Listing 34. Build with default settings on Linux / macOS</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
+<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -DenableNativeTests</code></pre>
 </div>
 </div>
 <div class="paragraph">
@@ -3605,12 +3610,12 @@ OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, 
 <div class="sect3">
 <h4 id="skippingnativetests"><a class="anchor" href="#skippingnativetests"></a>Skipping native tests</h4>
 <div class="paragraph">
-<p>On a plain JDK 17 or higher, run the following to skip the native tests:</p>
+<p>On a plain JDK 26 or higher, run the following without running the native tests:</p>
 </div>
 <div id="build-skip-native-bash" class="listingblock">
 <div class="title">Listing 36. Skipping native tests</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -pl \!org.neo4j:neo4j-cypher-dsl-native-tests</code></pre>
+<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify</code></pre>
 </div>
 </div>
 </div>
@@ -3622,7 +3627,7 @@ OpenJDK 64-Bit Server VM GraalVM CE 24+36.1 (build 24+36-jvmci-b01, mixed mode, 
 <div id="build-only-core-bash" class="listingblock">
 <div class="title">Listing 37. Build only the core module</div>
 <div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -am -pl org.neo4j:neo4j-cypher-dsl</code></pre>
+<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean verify -am -pl neo4j-cypher-dsl-build/processor -pl org.neo4j:neo4j-cypher-dsl</code></pre>
 </div>
 </div>
 </div>
@@ -12007,7 +12012,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-06-23 08:50:12 UTC
+Last updated 2026-06-23 13:24:47 UTC
 </div>
 </div>
 </body>
