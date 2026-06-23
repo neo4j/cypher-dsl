@@ -68,8 +68,8 @@ public interface Node
 	 * @since 2024.3.0
 	 * @deprecated use {@link #hasLabels(Labels)}
 	 */
-	@SuppressWarnings("removal")
 	@Deprecated(forRemoval = true)
+	@SuppressWarnings("removal")
 	Condition hasLabels(LabelExpression labels);
 
 	/**

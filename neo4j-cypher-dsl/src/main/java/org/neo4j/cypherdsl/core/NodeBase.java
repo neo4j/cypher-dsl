@@ -41,7 +41,7 @@ import static org.apiguardian.api.API.Status.STABLE;
  * @since 2021.1.0
  */
 @API(status = STABLE, since = "2021.1.0")
-@SuppressWarnings("deprecation") // IDEA is stupid.
+@SuppressWarnings({ "deprecation", "removal" })
 public abstract class NodeBase<SELF extends Node> extends AbstractNode implements Node {
 
 	final List<NodeLabel> staticLabels;

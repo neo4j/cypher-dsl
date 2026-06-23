@@ -32,8 +32,8 @@ import static org.apiguardian.api.API.Status.INTERNAL;
 @API(status = INTERNAL, since = "2021.1.0")
 abstract class AbstractNode extends AbstractPropertyContainer implements Node {
 
-	@Deprecated(forRemoval = true)
 	@Override
+	@Deprecated(forRemoval = true)
 	@SuppressWarnings("removal")
 	public final Condition hasLabels(LabelExpression labels) {
 		return hasLabels(Labels.of(labels));
