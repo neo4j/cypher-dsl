@@ -25,6 +25,7 @@ import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Property;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 /**
  * @author Michael J. Simons
@@ -38,13 +39,13 @@ public class Src {
 	@Property("tagline")
 	private final String description;
 
-	@Relationship(type = "R1", direction = Relationship.Direction.INCOMING)
+	@Relationship(type = "R1", direction = Direction.INCOMING)
 	private List<Bridge> bridges = new ArrayList<>();
 
-	@Relationship(type = "R2", direction = Relationship.Direction.INCOMING)
+	@Relationship(type = "R2", direction = Direction.INCOMING)
 	private List<Target> targets = new ArrayList<>();
 
-	@Relationship(type = "R3", direction = Relationship.Direction.INCOMING)
+	@Relationship(type = "R3", direction = Direction.INCOMING)
 	private List<Edge> edges = new ArrayList<>();
 
 	// This will be ignored, not annotated and the other type is not a node

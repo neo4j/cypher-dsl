@@ -23,6 +23,8 @@ import java.util.Objects;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * Assertions used throughout the Cypher-DSL. Mostly copied over from
  * {@literal org.springframework.util.Assert}. Thanks to the original authors: Keith
@@ -32,7 +34,7 @@ import org.apiguardian.api.API;
  * @author Michael J. Simons
  * @since 2020.0.0
  */
-@API(status = API.Status.INTERNAL, since = "2020.0.0")
+@API(status = INTERNAL, since = "2020.0.0")
 public final class Assertions {
 
 	private Assertions() {

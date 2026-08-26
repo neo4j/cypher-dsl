@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.codegen.ogm.models.same_rel_different_source;
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Relationship.Direction;
 
 /**
  * @author Michael J. Simons
@@ -31,7 +32,7 @@ public class Movie {
 	@Id
 	private final String title;
 
-	@Relationship(value = "WROTE", direction = Relationship.Direction.INCOMING)
+	@Relationship(value = "WROTE", direction = Direction.INCOMING)
 	private Person writtenBy;
 
 	Movie(String title) {

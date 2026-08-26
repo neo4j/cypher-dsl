@@ -18,20 +18,14 @@
  */
 package org.neo4j.cypherdsl.parser;
 
-import org.neo4j.cypher.internal.ast.factory.ASTFactory;
-
 /**
- * The type of a parsed entity.
+ * The type of parsed entity.
  *
  * @author Michael J. Simons
  * @since 2023.0.0
  */
 enum EntityType {
 
-	NODE, RELATIONSHIP,
-	/**
-	 * Why the hell is there {@link ASTFactory#nodeOrRelationshipType()} ?!
-	 */
-	LOLWHAT
+	NODE, RELATIONSHIP, UNKNOWN
 
 }

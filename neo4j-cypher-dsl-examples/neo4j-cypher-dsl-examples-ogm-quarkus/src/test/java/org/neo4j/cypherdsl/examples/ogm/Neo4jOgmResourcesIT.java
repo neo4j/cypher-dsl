@@ -33,6 +33,7 @@ import jakarta.inject.Inject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.driver.Driver;
 import org.neo4j.driver.Values;
@@ -43,7 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Michael J. Simons
  */
 @QuarkusTest
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(Lifecycle.PER_CLASS)
 public class Neo4jOgmResourcesIT {
 
 	private static final int NUMBER_OF_INITIAL_MOVIES = 38;

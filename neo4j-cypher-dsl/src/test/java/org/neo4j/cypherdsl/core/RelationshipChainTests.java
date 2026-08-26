@@ -20,13 +20,14 @@ package org.neo4j.cypherdsl.core;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.TestInstance.Lifecycle;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author Michael J. Simons
  */
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@TestInstance(Lifecycle.PER_CLASS)
 class RelationshipChainTests {
 
 	private final Node s = Cypher.node("Start").named("s");

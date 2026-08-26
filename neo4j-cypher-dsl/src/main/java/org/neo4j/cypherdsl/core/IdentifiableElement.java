@@ -37,7 +37,6 @@ public sealed interface IdentifiableElement permits AliasedExpression, Asterisk,
 	 * Transform this element into an expression.
 	 * @return this element as an expression. Will return the same instance if it is
 	 * already an expression.
-	 * @since 2021.2.2
 	 */
 	Expression asExpression();
 

@@ -22,11 +22,12 @@ import java.util.List;
 
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 @Node
 public class Point {
 
-	@Relationship(type = "HAS_PATH_POINTS", direction = Relationship.Direction.INCOMING)
+	@Relationship(type = "HAS_PATH_POINTS", direction = Direction.INCOMING)
 	private List<Element> element;
 
 }

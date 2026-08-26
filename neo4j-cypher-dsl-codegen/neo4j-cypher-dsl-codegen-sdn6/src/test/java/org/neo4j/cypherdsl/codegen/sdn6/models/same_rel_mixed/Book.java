@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.codegen.sdn6.models.same_rel_mixed;
 import org.springframework.data.neo4j.core.schema.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 /**
  * @author Michael J. Simons
@@ -31,7 +32,7 @@ public class Book {
 	@Id
 	private final String title;
 
-	@Relationship(value = "WROTE", direction = Relationship.Direction.INCOMING)
+	@Relationship(value = "WROTE", direction = Direction.INCOMING)
 	private Person writtenBy;
 
 	Book(String title) {

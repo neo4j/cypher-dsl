@@ -1743,7 +1743,7 @@ final class CypherDslASTFactory implements
 
 	@Override
 	public EntityType nodeOrRelationshipType() {
-		return EntityType.LOLWHAT;
+		return EntityType.UNKNOWN;
 	}
 
 	@Override

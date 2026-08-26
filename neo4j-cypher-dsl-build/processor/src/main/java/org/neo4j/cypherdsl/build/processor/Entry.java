@@ -19,15 +19,16 @@
 package org.neo4j.cypherdsl.build.processor;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
 /**
  * An entry that should find its way into GraalVM reflection-config.json.
  *
  * @author Michael J. Simons
  */
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NON_PRIVATE,
-		isGetterVisibility = JsonAutoDetect.Visibility.NON_PRIVATE)
+@JsonAutoDetect(getterVisibility = Visibility.NON_PRIVATE, isGetterVisibility = Visibility.NON_PRIVATE)
 final class Entry {
 
 	private final String name;
@@ -44,7 +45,7 @@ final class Entry {
 		return this.name;
 	}
 
-	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@JsonInclude(Include.NON_DEFAULT)
 	boolean isAllDeclaredMethods() {
 		return this.allDeclaredMethods;
 	}
@@ -53,7 +54,7 @@ final class Entry {
 		this.allDeclaredMethods = allDeclaredMethods;
 	}
 
-	@JsonInclude(JsonInclude.Include.NON_DEFAULT)
+	@JsonInclude(Include.NON_DEFAULT)
 	boolean isAllDeclaredConstructors() {
 		return this.allDeclaredConstructors;
 	}

@@ -32,7 +32,6 @@ import static org.apiguardian.api.API.Status.STABLE;
  * subquery.
  *
  * @author Michael J. Simons
- * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
 @API(status = STABLE, since = "2020.1.2")
@@ -104,7 +103,7 @@ public interface ExposesSubqueryCall {
 	BuildableSubquery call(Statement statement, IdentifiableElement... imports);
 
 	/**
-	 * Starts building a new sub-query from a {@code CALL ... IN TRANSACTIONS} clause
+	 * Starts building a new sub-query from a {@code CALL ... IN TRANSACTIONS} clause.
 	 * @param statement the sub-query to be called in transactions
 	 * @return ongoing sub-query definition
 	 */

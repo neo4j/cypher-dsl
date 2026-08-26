@@ -26,6 +26,7 @@ import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 import org.neo4j.cypherdsl.core.utils.Assertions;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
 import static org.apiguardian.api.API.Status.INTERNAL;
 
 /**
@@ -34,7 +35,7 @@ import static org.apiguardian.api.API.Status.INTERNAL;
  * @author Michael J. Simons
  * @since 2020.1.0
  */
-@API(status = API.Status.EXPERIMENTAL, since = "2020.1.0")
+@API(status = EXPERIMENTAL, since = "2020.1.0")
 public final class ListOperator implements Expression, Visitable {
 
 	/**

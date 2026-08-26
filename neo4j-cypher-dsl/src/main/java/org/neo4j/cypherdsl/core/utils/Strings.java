@@ -22,6 +22,8 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * The usual, static class with helper methods centered around missing functionality in
  * {@link String}. Not supported for external use in any way.
@@ -29,7 +31,7 @@ import org.apiguardian.api.API;
  * @author Michael J. Simons
  * @since 2020.1.0
  */
-@API(status = API.Status.INTERNAL, since = "2020.1.0")
+@API(status = INTERNAL, since = "2020.1.0")
 public final class Strings {
 
 	private Strings() {

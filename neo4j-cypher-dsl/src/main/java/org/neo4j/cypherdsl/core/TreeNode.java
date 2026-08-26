@@ -33,6 +33,8 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.EXPERIMENTAL;
+
 /**
  * A mutable tree structure providing
  * <a href="https://en.wikipedia.org/wiki/Breadth-first_search">Breadth-first search</a>
@@ -44,7 +46,7 @@ import org.neo4j.cypherdsl.core.ast.Visitor;
  * @author Michael J. Simons
  * @since 2023.2.0
  */
-@API(status = API.Status.EXPERIMENTAL, since = "2023.2.0")
+@API(status = EXPERIMENTAL, since = "2023.2.0")
 public final class TreeNode<E> {
 
 	private final TreeNode<E> parent;

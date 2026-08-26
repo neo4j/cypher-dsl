@@ -37,7 +37,6 @@ public interface ExposesPatternLengthAccessors<T extends RelationshipPattern> {
 	/**
 	 * Creates a new relationship pattern with an unbound length minimum length.
 	 * @return the new relationship
-	 * @since 1.1.1
 	 */
 	T unbounded();
 

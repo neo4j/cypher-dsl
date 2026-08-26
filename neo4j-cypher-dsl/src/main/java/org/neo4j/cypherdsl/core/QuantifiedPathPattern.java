@@ -22,6 +22,7 @@ import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.ast.Visitable;
 import org.neo4j.cypherdsl.core.ast.Visitor;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
 import static org.apiguardian.api.API.Status.STABLE;
 
 /**
@@ -133,7 +134,7 @@ public final class QuantifiedPathPattern implements PatternElement {
 	/**
 	 * Synthetic element for the Cypher-DSL AST.
 	 */
-	@API(status = API.Status.INTERNAL)
+	@API(status = INTERNAL)
 	public static final class TargetPattern implements PatternElement {
 
 		private final PatternElement delegate;

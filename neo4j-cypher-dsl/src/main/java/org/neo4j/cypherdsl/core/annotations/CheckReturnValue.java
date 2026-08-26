@@ -26,6 +26,8 @@ import java.lang.annotation.Target;
 
 import org.apiguardian.api.API;
 
+import static org.apiguardian.api.API.Status.INTERNAL;
+
 /**
  * Simple version of the JSR 305 annotation that allows detecting accidentally omitted
  * calls to
@@ -45,7 +47,7 @@ import org.apiguardian.api.API;
 @Documented
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.CLASS)
-@API(status = API.Status.INTERNAL, since = "2021.1.1")
+@API(status = INTERNAL, since = "2021.1.1")
 public @interface CheckReturnValue {
 
 }

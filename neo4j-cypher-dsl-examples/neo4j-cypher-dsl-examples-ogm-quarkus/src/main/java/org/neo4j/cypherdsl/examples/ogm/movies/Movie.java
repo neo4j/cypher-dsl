@@ -27,6 +27,7 @@ import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Property;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Relationship.Direction;
 
 /**
  * Example type.
@@ -42,10 +43,10 @@ public final class Movie {
 	@Property("tagline")
 	private String description;
 
-	@Relationship(value = "ACTED_IN", direction = Relationship.Direction.INCOMING)
+	@Relationship(value = "ACTED_IN", direction = Direction.INCOMING)
 	private List<Actor> actors = new ArrayList<>();
 
-	@Relationship(value = "DIRECTED", direction = Relationship.Direction.INCOMING)
+	@Relationship(value = "DIRECTED", direction = Direction.INCOMING)
 	private List<Person> directors = new ArrayList<>();
 
 	private LocalDate watchedOn;

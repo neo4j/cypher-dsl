@@ -23,6 +23,7 @@ import java.util.List;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.neo4j.core.schema.Node;
 import org.springframework.data.neo4j.core.schema.Relationship;
+import org.springframework.data.neo4j.core.schema.Relationship.Direction;
 
 @Node
 public class Element {
@@ -30,7 +31,7 @@ public class Element {
 	@Id
 	Long id;
 
-	@Relationship(type = "HAS_PATH_POINTS", direction = Relationship.Direction.OUTGOING)
+	@Relationship(type = "HAS_PATH_POINTS", direction = Direction.OUTGOING)
 	private List<Point> points;
 
 }

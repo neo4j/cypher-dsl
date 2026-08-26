@@ -52,7 +52,6 @@ public interface ExposesWhere<T> {
 	 * must not be {@literal null} and must not introduce new variables not available in
 	 * the match.
 	 * @return a match or a call restricted by a where clause with no return items yet.
-	 * @since 1.0.1
 	 */
 	@CheckReturnValue
 	default T where(RelationshipPattern pathPattern) {

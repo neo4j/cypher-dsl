@@ -44,7 +44,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * An ongoing update statement that can be used to chain more update statements or add
 	 * a with or return clause.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingUpdate extends BuildableStatement<Statement>, ExposesCreate, ExposesMerge, ExposesDelete,
 			ExposesReturning, ExposesFinish, ExposesWith, ExposesSet, ExposesForeach {
@@ -73,7 +72,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 		 * This can be used against a 4.x database to turn this ongoing match statement
 		 * into a condition to be used in an existential subquery.
 		 * @return an existential subquery.
-		 * @neo4j.version 4.0.0
 		 */
 		@Neo4jVersion(minimum = "4.0.0")
 		Condition asCondition();
@@ -85,7 +83,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * add required information. While the search and where clauses are optional, a
 	 * returning clause needs to be specified before the statement can be built.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingReadingWithoutWhere
 			extends OngoingReading, ExposesHints, ExposesWhere<StatementBuilder.OngoingReadingWithWhere>, ExposesMatch,
@@ -109,7 +106,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * A match that has a non-empty {@code where}-part. THe returning clause is still
 	 * open.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingReadingWithWhere extends OngoingReading, ExposesMatch,
 			ExposesLogicalOperators<OngoingReadingWithWhere>, ExposesExistentialSubqueryCall {
@@ -120,7 +116,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * A match that exposes {@code returning} and for which it is not decided whether the
 	 * optional where part has been used or note.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingReading extends ExposesReturning, ExposesFinish, ExposesWith, ExposesUpdatingClause, ExposesUnwind,
 			ExposesCreate, ExposesMatch, ExposesCall<OngoingInQueryCallWithoutArguments>, ExposesSubqueryCall {
@@ -130,7 +125,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * Builder part for unwinding.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingUnwind {
 
@@ -159,7 +153,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A match that knows what to return and which is ready to be build.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingReadingAndReturn extends TerminalExposesOrderBy, TerminalExposesSkip, TerminalExposesLimit,
 			BuildableStatement<ResultStatement> {
@@ -177,7 +170,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A match that knows what to pipe to the next part of a multipart query.
 	 *
-	 * @since 1.0
 	 */
 	interface OrderableOngoingReadingAndWithWithoutWhere extends OrderableOngoingReadingAndWith {
 
@@ -212,7 +204,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * Represents a reading statement ending in a combination of {@code WITH} and
 	 * {@code WHERE} clauses.
 	 *
-	 * @since 1.0
 	 * @see OrderableOngoingReadingAndWith
 	 * @see ExposesLogicalOperators
 	 */
@@ -225,7 +216,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * Represents a reading statement ending in a with clause, potentially already having
 	 * an order and not exposing order methods.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingReadingAndWith extends OngoingReading, ExposesMatch, ExposesLoadCSV {
 
@@ -234,7 +224,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * Represents a reading statement ending in a {@code WITH} clause.
 	 *
-	 * @since 1.0
 	 * @see OngoingReadingAndWith
 	 */
 	interface OrderableOngoingReadingAndWith extends ExposesOrderBy, ExposesSkip, ExposesLimit, OngoingReadingAndWith {
@@ -253,7 +242,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * Combines the capabilities of skip, limit and adds additional expressions to the
 	 * order-by items.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingMatchAndReturnWithOrder
 			extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultStatement> {
@@ -272,7 +260,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * An intermediate step while defining the order of a result set. This definitional
 	 * will eventually return a buildable statement and thus is terminal.
 	 *
-	 * @since 1.0
 	 */
 	interface TerminalOngoingOrderDefinition
 			extends TerminalExposesSkip, TerminalExposesLimit, BuildableStatement<ResultStatement> {
@@ -299,7 +286,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * Combines the capabilities of skip, limit and adds additional expressions to the
 	 * order-by items.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingReadingAndWithWithWhereAndOrder extends ExposesSkip, ExposesLimit, OngoingReadingAndWith {
 
@@ -316,7 +302,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * An intermediate step while defining the order of a with clause.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingOrderDefinition extends ExposesSkip, ExposesLimit {
 
@@ -343,7 +328,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * method.
 	 *
 	 * @param <T> the type of the statement that is returned
-	 * @since 1.0
 	 */
 	interface BuildableStatement<T extends Statement> {
 
@@ -378,7 +362,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * A step that exposes several methods to specify ordering. This is a terminal
 	 * operation just before a statement is buildable.
 	 *
-	 * @since 1.0
 	 */
 	interface TerminalExposesOrderBy {
 
@@ -417,7 +400,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step that exposes the {@link #skip(Number)} method.
 	 *
-	 * @since 1.0
 	 */
 	interface TerminalExposesSkip {
 
@@ -444,7 +426,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step that exposes the {@link #limit(Number)} method.
 	 *
-	 * @since 1.0
 	 */
 	interface TerminalExposesLimit extends BuildableStatement<ResultStatement> {
 
@@ -483,7 +464,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * See {@link TerminalExposesOrderBy}, but on a with clause.
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesOrderBy {
 
@@ -531,7 +511,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step that exposes the {@link #skip(Number)} method.
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesSkip {
 
@@ -559,7 +538,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step that exposes the {@link #limit(Number)} method.
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesLimit {
 
@@ -595,7 +573,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 		 * Starts defining a {@link Foreach} clause.
 		 * @param variable the variable to use in the iterator
 		 * @return a step for selecting the source of iteration
-		 * @since 2023.4.0
 		 */
 		ForeachSourceStep foreach(SymbolicName variable);
 
@@ -640,7 +617,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step providing all the supported updating clauses (DELETE, SET).
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesUpdatingClause extends ExposesDelete, ExposesMerge, ExposesSetAndRemove, ExposesForeach {
 
@@ -649,7 +625,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step that exposes only the {@code DELETE} clause.
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesDelete {
 
@@ -738,7 +713,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * Set part of a statement.
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesSet {
 
@@ -823,7 +797,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 		 * @param node the node whose labels are to be changed
 		 * @param labels the labels to be set
 		 * @return a match with a SET clause that can be build now
-		 * @since 2021.2.2
 		 */
 		@CheckReturnValue
 		R set(Node node, Collection<String> labels);
@@ -843,7 +816,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	/**
 	 * A step that exposes the set clause.
 	 *
-	 * @since 1.0
 	 */
 	interface ExposesSetAndRemove extends ExposesSet, ExposesSetLabel<BuildableMatchAndUpdate> {
 
@@ -899,7 +871,6 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 	 * After a MATCH..UPDATE chain has been established, a RETURN can be added, a pipeline
 	 * with WITH can be started or more mutating steps can be added.
 	 *
-	 * @since 1.0
 	 */
 	interface OngoingMatchAndUpdate
 			extends ExposesReturning, ExposesFinish, ExposesWith, ExposesUpdatingClause, ExposesCreate {
@@ -1032,14 +1003,12 @@ public interface StatementBuilder extends ExposesMatch, ExposesCreate, ExposesMe
 		 * Allows to use a {@literal *} in this standalone call.
 		 * @param asterisk the actual * ;)
 		 * @return the ongoing standalone call to be configured.
-		 * @since 2022.8.0
 		 */
 		OngoingStandaloneCallWithReturnFields yield(Asterisk asterisk);
 
 		/**
 		 * Convenience method to yield all items of this standalone call.
 		 * @return the ongoing standalone call to be configured.
-		 * @since 2022.8.0
 		 */
 		default OngoingStandaloneCallWithReturnFields yieldStar() {
 			return this.yield(Cypher.asterisk());

@@ -92,7 +92,6 @@ public interface Relationship extends RelationshipPattern, PropertyContainer, Ex
 	 * While the direction in the schema package is centered around the node, the
 	 * direction here is the direction between two nodes.
 	 *
-	 * @since 1.0
 	 */
 	@API(status = INTERNAL, since = "1.0")
 	enum Direction {

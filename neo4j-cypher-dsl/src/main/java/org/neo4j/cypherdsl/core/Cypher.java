@@ -977,7 +977,6 @@ public final class Cypher {
 	 * Starts building a statement based on one subquery.
 	 * @param subquery the statement representing the subquery
 	 * @return a new ongoing read without any further conditions or returns.
-	 * @neo4j.version 4.0.0
 	 * @since 2020.1.2
 	 * @see ExposesSubqueryCall#call(Statement)
 	 */

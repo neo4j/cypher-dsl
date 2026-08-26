@@ -158,7 +158,6 @@ public interface Statement extends Visitable {
 	/**
 	 * Represents {@code RegularQuery}.
 	 *
-	 * @since 1.0
 	 */
 	interface RegularQuery extends Statement {
 
@@ -167,7 +166,6 @@ public interface Statement extends Visitable {
 	/**
 	 * Represents a {@code SingleQuery}.
 	 *
-	 * @since 1.0
 	 */
 	interface SingleQuery extends RegularQuery {
 

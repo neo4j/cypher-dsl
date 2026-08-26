@@ -32,7 +32,6 @@ import static org.apiguardian.api.API.Status.STABLE;
  * allowed to return anything.
  *
  * @author Michael J. Simons
- * @neo4j.version 4.0.0
  * @since 2020.1.2
  */
 @API(status = STABLE, since = "2020.1.2")

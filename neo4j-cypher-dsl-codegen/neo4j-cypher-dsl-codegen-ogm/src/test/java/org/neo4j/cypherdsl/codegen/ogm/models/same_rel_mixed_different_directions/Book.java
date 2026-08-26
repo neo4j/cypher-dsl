@@ -21,6 +21,7 @@ package org.neo4j.cypherdsl.codegen.ogm.models.same_rel_mixed_different_directio
 import org.neo4j.ogm.annotation.Id;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.neo4j.ogm.annotation.Relationship.Direction;
 
 /**
  * @author Michael J. Simons
@@ -32,7 +33,7 @@ public class Book {
 	private final String title;
 
 	// Makes not much sense, but one never knows
-	@Relationship(value = "WROTE", direction = Relationship.Direction.OUTGOING)
+	@Relationship(value = "WROTE", direction = Direction.OUTGOING)
 	private Person writtenBy;
 
 	Book(String title) {

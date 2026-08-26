@@ -91,7 +91,6 @@ public final class SortItem implements Visitable {
 	/**
 	 * Sort direction.
 	 *
-	 * @since 1.0
 	 */
 	@API(status = STABLE)
 	public enum Direction implements Visitable {

@@ -227,7 +227,6 @@ public enum Operator implements Visitable {
 	/**
 	 * {@link Operator} type.
 	 *
-	 * @since 1.0
 	 */
 	public enum Type {
 

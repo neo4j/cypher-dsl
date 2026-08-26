@@ -37,7 +37,6 @@ public interface SubqueryExpressionBuilder {
 	 * @param requiredPattern one pattern is required
 	 * @param patternElement optional pattern
 	 * @return the immutable {@link CountExpression}
-	 * @since 2023.9.0
 	 */
 	CountExpression count(PatternElement requiredPattern, PatternElement... patternElement);
 
@@ -45,7 +44,6 @@ public interface SubqueryExpressionBuilder {
 	 * Creates a {@literal COUNT} with an inner {@literal UNION} sub-query.
 	 * @param union the union that will be the source of the {@literal COUNT} sub-query
 	 * @return the immutable {@link CountExpression}
-	 * @since 2023.9.0
 	 */
 	CountExpression count(Statement.UnionQuery union);
 
@@ -60,7 +58,6 @@ public interface SubqueryExpressionBuilder {
 	 * is defined with the same variable.
 	 * @param statement the statement to be passed to {@code COLLECT{}}
 	 * @return a collecting sub-query.
-	 * @since 2023.9.0
 	 */
 	CollectExpression collect(Statement statement);
 
