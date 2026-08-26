@@ -1,5 +1,47 @@
 == 2025.3
 
+=== 2025.3.1
+
+==== 📖 Documentation
+
+* Update required java version for building in the readme.
+
+==== 🧰 Tasks
+
+* Pin all actions (including officials) to their current sha. (#1558)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** July / August roundup of dependency upgrades (Bigger diff due to new rules in Spring Java-Format).
+** Bump org.junit:junit-bom from 6.1.2 to 6.1.3 (#1584)
+** Bump org.checkerframework:checker-qual (#1585)
+** Bump quarkus.platform.version from 3.38.0 to 3.38.3 (#1589)
+** Bump com.fasterxml.jackson:jackson-bom (#1590)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1593)
+** Bump joda-time:joda-time from 2.14.2 to 2.14.3 (#1572)
+** Bump org.apache.maven.plugins:maven-jar-plugin (#1573)
+** Bump org.codehaus.mojo:flatten-maven-plugin (#1575)
+** Bump com.mycila:license-maven-plugin from 5.0.0 to 5.1.1 (#1576)
+** Bump quarkus.platform.version from 3.37.2 to 3.38.0 (#1577)
+** Bump org.neo4j.driver:neo4j-java-driver (#1578)
+** Bump neo4j.version from 5.26.28 to 5.26.29 (#1579)
+** Bump com.tngtech.archunit:archunit from 1.4.2 to 1.5.0 (#1580)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1581)
+** Bump org.checkerframework:checker-qual (#1559)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1561)
+** Bump neo4j.version from 5.26.27 to 5.26.28 (#1562)
+** Bump quarkus.platform.version from 3.37.0 to 3.37.2 (#1563)
+** Bump com.puppycrawl.tools:checkstyle from 13.7.0 to 13.8.0 (#1564)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1565)
+** Bump org.junit:junit-bom from 6.1.1 to 6.1.2 (#1566)
+** Bump com.fasterxml.jackson:jackson-bom (#1567)
+** Update Neo4j-OGM and Neo4j-OGM Quarkus extension to 4.0.7 and 4.2.7.
+** Bump com.puppycrawl.tools:checkstyle from 13.6.0 to 13.7.0 (#1556)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1554)
+** Bump quarkus.platform.version from 3.36.3 to 3.37.0 (#1553)
+** Bump org.junit:junit-bom from 6.1.0 to 6.1.1 (#1552)
+
 === 2025.3.0
 
 Yes, still in the 2025.x series, and still no changes that warrant a major version bump increase. Starting with this release we will build on JDK 26 by default, still releasing for Java 17. All our testing will be exercised on 17, 21, 25 and 26.
