@@ -115,7 +115,9 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>${exec-maven-plugin.version}</version>
+				<configuration>
+					<skip>false</skip>
+				</configuration>
 				<executions>
 					<execution>
 						<id>remove-shaded-modules</id>
