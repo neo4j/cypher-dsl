@@ -24,7 +24,7 @@
 	<parent>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-cypher-dsl-codegen</artifactId>
-		<version>${revision}${sha1}${changelist}</version>
+		<version>2025.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl-codegen-ogm</artifactId>

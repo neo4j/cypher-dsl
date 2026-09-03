@@ -25,7 +25,7 @@
 	<parent>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-cypher-dsl-examples</artifactId>
-		<version>${revision}${sha1}${changelist}</version>
+		<version>2025.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl-examples-core</artifactId>
@@ -37,11 +37,22 @@
 		<java-module-name>org.neo4j.cypherdsl.examples.core</java-module-name>
 	</properties>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.neo4j</groupId>
+				<artifactId>neo4j-cypher-dsl-bom</artifactId>
+				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.neo4j</groupId>
 			<artifactId>neo4j-cypher-dsl</artifactId>
-			<version>${revision}${sha1}${changelist}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.assertj</groupId>

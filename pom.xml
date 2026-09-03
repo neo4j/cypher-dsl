@@ -24,7 +24,7 @@
 
 	<groupId>org.neo4j</groupId>
 	<artifactId>neo4j-cypher-dsl-parent</artifactId>
-	<version>${revision}${sha1}${changelist}</version>
+	<version>2025.3.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Neo4j Cypher DSL</name>
@@ -140,14 +140,12 @@
 		<assertj.version>3.27.7</assertj.version>
 		<auto-common.version>1.2.2</auto-common.version>
 		<cglib.version>3.3.0</cglib.version>
-		<changelist>-SNAPSHOT</changelist>
 		<checker-qual.version>4.2.2</checker-qual.version>
 		<checkstyle.version>14.0.0</checkstyle.version>
 		<compile-testing.version>0.23.0</compile-testing.version>
 		<covered-ratio-complexity>0.75</covered-ratio-complexity>
 		<covered-ratio-instructions>0.75</covered-ratio-instructions>
-		<cypher-dsl.version.next/>
-		<cypher-dsl.version.old>2022.7.3</cypher-dsl.version.old>
+		<cypher-dsl.version.old>2025.3.1</cypher-dsl.version.old>
 		<error_prone_annotations.version>2.23.0</error_prone_annotations.version>
 		<exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
 		<flatten-maven-plugin.version>1.8.0</flatten-maven-plugin.version>
@@ -173,6 +171,7 @@
 		<maven-install-plugin.version>3.1.4</maven-install-plugin.version>
 		<maven-jar-plugin.version>3.5.1</maven-jar-plugin.version>
 		<maven-javadoc-plugin.version>3.12.0</maven-javadoc-plugin.version>
+		<maven-release-plugin.version>3.3.1</maven-release-plugin.version>
 		<maven-resources-plugin.version>3.5.0</maven-resources-plugin.version>
 		<maven-scm-plugin.version>1.12.0</maven-scm-plugin.version>
 		<maven-shade-plugin.version>3.6.2</maven-shade-plugin.version>
@@ -194,11 +193,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<quarkus.platform.version>3.39.1</quarkus.platform.version>
 		<querydsl.version>5.1.0</querydsl.version>
-		<revision>9999</revision>
-		<sha1/>
 		<slf4j.version>2.0.17</slf4j.version>
 		<sonar-maven-plugin.version>5.7.0.6970</sonar-maven-plugin.version>
 		<sortpom-maven-plugin.version>4.0.0</sortpom-maven-plugin.version>
+		<spring-boot.version>4.1.1</spring-boot.version>
 		<spring-data-neo4j.version>8.1.1</spring-data-neo4j.version>
 		<spring-javaformat.version>0.0.48</spring-javaformat.version>
 		<testcontainers.version>2.0.5</testcontainers.version>
@@ -513,6 +511,11 @@
 					<version>${spring-javaformat.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>flatten-maven-plugin</artifactId>
+					<version>${flatten-maven-plugin.version}</version>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-checkstyle-plugin</artifactId>
 					<version>${maven-checkstyle-plugin.version}</version>
@@ -598,7 +601,7 @@
 							<!--
 							 | See this helpful discussion: https://github.com/siom79/japicmp/issues/201
 							 | The interfaces we have are generally not be implemented by our users, but are just part
-							 | of the DSL contract. So it rather safe to assume compatibility.
+							 | of the DSL contract. So its rather safe to assume compatibility.
 							 | Further reading:
 							 | https://docs.oracle.com/javase/specs/jls/se11/html/jls-13.html#jls-13.5.3
 							 -->
@@ -779,6 +782,9 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>${exec-maven-plugin.version}</version>
 				<inherited>false</inherited>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
 				<executions>
 					<execution>
 						<id>prepare-release</id>
@@ -788,9 +794,19 @@
 						<configuration>
 							<executable>bin/prepare-release.sh</executable>
 							<arguments>
-								<argument>${revision}${sha1}${changelist}</argument>
-								<argument>${cypher-dsl.version.next}</argument>
+								<argument>${project.version}</argument>
+								<!--suppress MavenModelInspection -->
+								<argument>${isDryRun}</argument>
 							</arguments>
+						</configuration>
+					</execution>
+					<execution>
+						<id>release-prepared</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>bin/update-previous-version.sh</executable>
 						</configuration>
 					</execution>
 				</executions>
@@ -892,31 +908,6 @@
 				</executions>
 			</plugin>
 			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>flatten-maven-plugin</artifactId>
-				<version>${flatten-maven-plugin.version}</version>
-				<configuration>
-					<updatePomFile>true</updatePomFile>
-					<flattenMode>resolveCiFriendliesOnly</flattenMode>
-				</configuration>
-				<executions>
-					<execution>
-						<id>flatten</id>
-						<goals>
-							<goal>flatten</goal>
-						</goals>
-						<phase>package</phase>
-					</execution>
-					<execution>
-						<id>flatten.clean</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<phase>clean</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
 				<groupId>org.asciidoctor</groupId>
 				<artifactId>asciidoctor-maven-plugin</artifactId>
 				<version>${asciidoctor-maven-plugin.version}</version>
@@ -958,6 +949,49 @@
 						<phase>prepare-package</phase>
 					</execution>
 				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<inherited>false</inherited>
+				<executions>
+					<execution>
+						<id>prepare-release</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration combine.self="append">
+							<skip>false</skip>
+						</configuration>
+					</execution>
+					<execution>
+						<id>release-prepared</id>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration combine.self="append">
+							<skip>false</skip>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${maven-release-plugin.version}</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+					<goals>deploy</goals>
+					<!--suppress MavenModelInspection -->
+					<arguments>-Drelease -Dgpg.skip=${skipSigning} -DskipTests=${skipTestsDuringRelease} -DisDryRun=${dryRun} -Dsort.skip</arguments>
+					<preparationGoals>clean exec:exec@prepare-release verify</preparationGoals>
+					<completionGoals>compile exec:exec@release-prepared</completionGoals>
+					<pushChanges>false</pushChanges>
+					<localCheckout>true</localCheckout>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>
@@ -1132,6 +1166,56 @@
 										</slack>
 									</webhooks>
 								</announce>
+							</jreleaser>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		<profile>
+			<id>deploy_to_central</id>
+			<activation>
+				<property>
+					<name>deploy_to_central</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jreleaser</groupId>
+						<artifactId>jreleaser-maven-plugin</artifactId>
+						<configuration combine.self="append">
+							<skip>false</skip>
+							<jreleaser>
+								<project>
+									<!-- Setting this explicitly to the JReleaser env variables spares us from checking out the tag. -->
+									<!--suppress MavenModelInspection -->
+									<version>${env.JRELEASER_PROJECT_VERSION}</version>
+								</project>
+								<signing>
+									<active>ALWAYS</active>
+									<mode>COMMAND</mode>
+									<command>
+										<homeDir>~/.gnupg</homeDir>
+									</command>
+								</signing>
+								<deploy>
+									<maven>
+										<mavenCentral>
+											<neo4j_jdbc>
+												<active>ALWAYS</active>
+												<url>https://central.sonatype.com/api/v1/publisher</url>
+												<namespace>org.neo4j</namespace>
+												<verifyPom>false</verifyPom>
+												<applyMavenCentralRules>true</applyMavenCentralRules>
+												<stagingRepositories>
+													<stagingRepository>${project.build.directory}/artifacts</stagingRepository>
+												</stagingRepositories>
+												<maxRetries>1000</maxRetries>
+											</neo4j_jdbc>
+										</mavenCentral>
+									</maven>
+								</deploy>
 							</jreleaser>
 						</configuration>
 					</plugin>
