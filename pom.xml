@@ -561,7 +561,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>${exec-maven-plugin.version}</version>
-					<inherited>false</inherited>
 					<configuration>
 						<skip>true</skip>
 					</configuration>
