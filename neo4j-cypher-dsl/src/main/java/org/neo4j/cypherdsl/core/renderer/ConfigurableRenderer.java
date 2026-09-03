@@ -19,7 +19,6 @@
 package org.neo4j.cypherdsl.core.renderer;
 
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -45,7 +44,7 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 
 	private static final int STATEMENT_CACHE_SIZE = 128;
 
-	private final LRUCache<Integer, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
+	private final LRUCache<CacheKey, String> renderedStatementCache = new LRUCache<>(STATEMENT_CACHE_SIZE);
 
 	private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
@@ -95,7 +94,7 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 		if (visitable instanceof Statement statement) {
 			String renderedContent;
 
-			int key = Objects.hash(statement, statement.isRenderConstantsAsParameters(),
+			var key = new CacheKey(statement, statement.isRenderConstantsAsParameters(),
 					this.configuration.getDialect());
 			try {
 				this.read.lock();
@@ -135,6 +134,9 @@ final class ConfigurableRenderer implements GeneralizedRenderer, Renderer {
 		else {
 			return new PrettyPrintingVisitor(statementContext, renderConstantsAsParameters, this.configuration);
 		}
+	}
+
+	private record CacheKey(Statement statement, boolean constantsAsParameters, Dialect dialect) {
 	}
 
 }
