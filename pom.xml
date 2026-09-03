@@ -558,6 +558,40 @@
 					<version>${maven-resources-plugin.version}</version>
 				</plugin>
 				<plugin>
+					<groupId>org.codehaus.mojo</groupId>
+					<artifactId>exec-maven-plugin</artifactId>
+					<version>${exec-maven-plugin.version}</version>
+					<inherited>false</inherited>
+					<configuration>
+						<skip>true</skip>
+					</configuration>
+					<executions>
+						<execution>
+							<id>prepare-release</id>
+							<goals>
+								<goal>exec</goal>
+							</goals>
+							<configuration>
+								<executable>bin/prepare-release.sh</executable>
+								<arguments>
+									<argument>${project.version}</argument>
+									<!--suppress MavenModelInspection -->
+									<argument>${isDryRun}</argument>
+								</arguments>
+							</configuration>
+						</execution>
+						<execution>
+							<id>release-prepared</id>
+							<goals>
+								<goal>exec</goal>
+							</goals>
+							<configuration>
+								<executable>bin/update-previous-version.sh</executable>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-site-plugin</artifactId>
 					<version>${maven-site-plugin.version}</version>
@@ -774,40 +808,6 @@
 							<goal>check</goal>
 						</goals>
 						<phase>validate</phase>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>${exec-maven-plugin.version}</version>
-				<inherited>false</inherited>
-				<configuration>
-					<skip>true</skip>
-				</configuration>
-				<executions>
-					<execution>
-						<id>prepare-release</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>bin/prepare-release.sh</executable>
-							<arguments>
-								<argument>${project.version}</argument>
-								<!--suppress MavenModelInspection -->
-								<argument>${isDryRun}</argument>
-							</arguments>
-						</configuration>
-					</execution>
-					<execution>
-						<id>release-prepared</id>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<executable>bin/update-previous-version.sh</executable>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
