@@ -561,9 +561,6 @@
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>exec-maven-plugin</artifactId>
 					<version>${exec-maven-plugin.version}</version>
-					<configuration>
-						<skip>true</skip>
-					</configuration>
 					<executions>
 						<execution>
 							<id>prepare-release</id>
@@ -571,6 +568,7 @@
 								<goal>exec</goal>
 							</goals>
 							<configuration>
+								<skip>true</skip>
 								<executable>bin/prepare-release.sh</executable>
 								<arguments>
 									<argument>${project.version}</argument>
@@ -585,6 +583,7 @@
 								<goal>exec</goal>
 							</goals>
 							<configuration>
+								<skip>true</skip>
 								<executable>bin/update-previous-version.sh</executable>
 							</configuration>
 						</execution>
