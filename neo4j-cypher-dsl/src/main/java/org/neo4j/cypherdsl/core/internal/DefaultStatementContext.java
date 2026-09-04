@@ -18,9 +18,11 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Parameter;
@@ -51,8 +53,19 @@ public final class DefaultStatementContext implements StatementContext {
 	@Override
 	public String getParameterName(Parameter<?> parameter) {
 
-		return this.parameterNames.computeIfAbsent(parameter,
-				p -> p.isAnon() ? String.format("pcdsl%02d", this.parameterCount.incrementAndGet()) : p.getName());
+		return this.parameterNames.computeIfAbsent(parameter, p -> {
+			if (p.isAnon()) {
+				return String.format("pcdsl%02d", this.parameterCount.incrementAndGet());
+			}
+			var name = p.getName();
+			if (name.chars().allMatch(Character::isDigit)) {
+				return name;
+			}
+			return Arrays.stream(name.split("\\."))
+				.map(String::trim)
+				.map(part -> SchemaNamesBridge.sanitize(part, false).orElseThrow())
+				.collect(Collectors.joining("."));
+		});
 	}
 
 	@Override

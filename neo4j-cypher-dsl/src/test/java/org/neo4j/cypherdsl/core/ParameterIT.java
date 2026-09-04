@@ -96,6 +96,15 @@ class ParameterIT {
 	}
 
 	@Test
+	void parameterNamesShouldBeSanitized() {
+		var p1 = Cypher.parameter("pcdsl01", "z");
+		assertThat(p1).hasToString("Parameter{cypher=$pcdsl01}");
+
+		var p2 = Cypher.parameter("Hallo ' ` das", "z");
+		assertThat(p2).hasToString("Parameter{cypher=$`Hallo ' `` das`}");
+	}
+
+	@Test
 	void shouldDealWithNullValues() {
 		Statement statement = Cypher.match(userNode)
 			.set(userNode.property("name").to(Cypher.parameter("param").withValue(null)))
