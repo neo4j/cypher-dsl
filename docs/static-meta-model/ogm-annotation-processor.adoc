@@ -6,7 +6,7 @@ We provide a Java annotation processor for https://github.com/neo4j/neo4j-ogm[Ne
 [source,subs="verbatim,attributes",indent=0,tabsize=4]
 .Coordinates of the Neo4j-OGM annotation processor
 ----
-{groupId}:neo4j-cypher-dsl-codegen-ogm:{the-version}
+{groupId}:neo4j-cypher-dsl-codegen-ogm:{neo4j-cypher-dsl-version-latest}
 ----
 
 The annotation processor understands classes annotated with `@NodeEntity` and `@RelationshipEntity`.
@@ -55,7 +55,7 @@ In a Gradle project, please add the following:
 [source,groovy,subs="verbatim,attributes"]
 ----
 dependencies {
-    annotationProcessor '{groupId}:neo4j-cypher-dsl-codegen-ogm:{the-version}'
+    annotationProcessor '{groupId}:neo4j-cypher-dsl-codegen-ogm:{neo4j-cypher-dsl-version-latest}'
 }
 ----
 

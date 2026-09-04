@@ -279,6 +279,7 @@
 						<!-- Not needed -->
 						<artifactId>test-unit</artifactId>
 					</exclusion>
+
 				</exclusions>
 			</dependency>
 			<dependency>

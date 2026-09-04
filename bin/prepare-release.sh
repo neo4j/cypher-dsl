@@ -3,9 +3,7 @@
 set -euo pipefail
 DIR="$(dirname "$(realpath "$0")")"
 
-sed -i .bak 's/\(:neo4j-cypher-dsl-version-latest:\) \(.*\)/\1 '"${1}"'/g' $DIR/../README.adoc
-
-sed -i.bak 's/\(:latest_version:\) \(.*\)/\1 '"${1}"'/g' $DIR/../README.adoc
+sed -i.bak 's/\(:neo4j-cypher-dsl-version-latest:\) \(.*\)/\1 '"${1}"'/g' $DIR/../README.adoc
 rm $DIR/../README.adoc.bak
 
 if test -n "${2-}"; then
