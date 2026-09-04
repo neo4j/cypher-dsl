@@ -47,7 +47,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
-          ./mvnw --no-transfer-progress install -DSCHEMA_NAMES_TEST_ALL_VERSIONS=false -P$USE_SONAR
+          ./mvnw -U --no-transfer-progress clean install -DSCHEMA_NAMES_TEST_ALL_VERSIONS=false -P$USE_SONAR
           -pl !org.neo4j:neo4j-cypher-dsl-examples-core
           -pl !org.neo4j:neo4j-cypher-dsl-examples-parser
           -pl !org.neo4j:neo4j-cypher-dsl-examples-ogm-quarkus
