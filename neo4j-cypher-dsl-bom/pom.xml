@@ -25,7 +25,7 @@
 	<parent>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-cypher-dsl-parent</artifactId>
-		<version>${revision}${sha1}${changelist}</version>
+		<version>2025.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl-bom</artifactId>
@@ -74,13 +74,29 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>flatten-maven-plugin</artifactId>
-				<configuration combine.self="override">
-					<updatePomFile>true</updatePomFile>
-					<flattenMode>bom</flattenMode>
-					<pomElements>
-						<properties>remove</properties>
-					</pomElements>
-				</configuration>
+				<executions>
+					<execution>
+						<id>flatten</id>
+						<goals>
+							<goal>flatten</goal>
+						</goals>
+						<phase>process-resources</phase>
+						<configuration>
+							<updatePomFile>true</updatePomFile>
+							<flattenMode>bom</flattenMode>
+							<pomElements>
+								<properties>remove</properties>
+							</pomElements>
+						</configuration>
+					</execution>
+					<execution>
+						<id>flatten-clean</id>
+						<goals>
+							<goal>clean</goal>
+						</goals>
+						<phase>clean</phase>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>

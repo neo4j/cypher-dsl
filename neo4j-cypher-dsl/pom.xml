@@ -25,7 +25,7 @@
 	<parent>
 		<groupId>org.neo4j</groupId>
 		<artifactId>neo4j-cypher-dsl-parent</artifactId>
-		<version>${revision}${sha1}${changelist}</version>
+		<version>2025.3.2-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>neo4j-cypher-dsl</artifactId>
@@ -115,7 +115,6 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>${exec-maven-plugin.version}</version>
 				<executions>
 					<execution>
 						<id>remove-shaded-modules</id>
@@ -124,6 +123,7 @@
 						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
+							<skip>false</skip>
 							<executable>bin/remove-shaded-modules.sh</executable>
 						</configuration>
 					</execution>

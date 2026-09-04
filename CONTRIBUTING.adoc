@@ -132,27 +132,6 @@ The core module can be built on plain JDK 17 with:
 $ ./mvnw clean verify -am -pl neo4j-cypher-dsl-build/processor -pl org.neo4j:neo4j-cypher-dsl
 ----
 
-=== CI-friendly version numbers
-
-We use CI-friendly version numbers, the current build will always identify itself as 9999-SNAPSHOT.
-If you need to create a specific version you can specify the revision, the changelist and an optional hash like this:
-
-[source,console,subs="verbatim,attributes"]
-.Specifying revision and changelist
-----
-$ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT
-----
-
-=== Releasing (Only relevant for the current maintainers)
-
-Prepare a release with:
-
-[source,console,subs="verbatim,attributes"]
-----
-./mvnw exec:exec@prepare-release -pl :neo4j-cypher-dsl-parent -Drevision=2020.0.1 -Dchangelist= -Dcypher-dsl.version.next=2020.0.2-SNAPSHOT
-----
-
-and then let do Teamcity the rest, but chose the same version number there, too.
 // end::building-manual[]
 
 == Tasks

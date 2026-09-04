@@ -23,16 +23,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>4.1.1</version>
-		<relativePath></relativePath>
-		<!-- lookup parent from repository -->
+		<groupId>org.neo4j</groupId>
+		<artifactId>neo4j-cypher-dsl-examples</artifactId>
+		<version>2025.3.2-SNAPSHOT</version>
 	</parent>
-
-	<groupId>org.neo4j</groupId>
 	<artifactId>neo4j-cypher-dsl-examples-sdn6</artifactId>
-	<version>${revision}${sha1}${changelist}</version>
 
 	<name>Examples (SDN 6 Code generator)</name>
 	<description>Example how to use the SDN 6 code generator.</description>
@@ -53,6 +48,14 @@
 				<groupId>org.neo4j</groupId>
 				<artifactId>neo4j-cypher-dsl-bom</artifactId>
 				<version>${project.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -119,6 +122,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot.version}</version>
 			</plugin>
 			<!-- tag::sdn-processor[] -->
 			<plugin>
@@ -318,7 +322,7 @@
 				</property>
 			</activation>
 			<properties>
-				<sha1></sha1>
+				<sha1/>
 			</properties>
 		</profile>
 		<profile>

@@ -31,14 +31,8 @@ jobs:
           ref: ${{ env.refName }}
           fetch-depth: 0
 
-      - name: Determine revision
-        id: revision_step
-        run: |
-          REVISION=$(./bin/extract-version.sh latest)
-          echo "REVISION=$REVISION" >> $GITHUB_ENV
-
       - name: 'Create release'
         env:
           JRELEASER_GITHUB_TOKEN: ${{ secrets.JRELEASER_TOKEN }}
           JRELEASER_SLACK_WEBHOOK: ${{ secrets.JRELEASER_SLACK_WEBHOOK }}
-        run: ./mvnw --no-transfer-progress -Djreleaser -Drevision=$REVISION -Dsha1= -Dchangelist= jreleaser:announce -pl org.neo4j:neo4j-cypher-dsl-parent
+        run: ./mvnw --no-transfer-progress -Djreleaser jreleaser:announce -pl org.neo4j:neo4j-cypher-dsl-parent
