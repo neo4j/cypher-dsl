@@ -965,7 +965,7 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 
 	void leave(ProcedureName procedureName) {
 
-		this.builder.append(procedureName.getValue());
+		this.builder.append(escapeIfNecessary(procedureName.getValue()));
 	}
 
 	void enter(YieldItems yieldItems) {

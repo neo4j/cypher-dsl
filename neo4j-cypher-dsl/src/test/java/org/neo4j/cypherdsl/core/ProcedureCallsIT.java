@@ -59,6 +59,14 @@ class ProcedureCallsIT {
 	}
 
 	@Test
+	void procedureNamesMustBeEscaped() {
+
+		var expected = "CALL `this is a`.`very odd`.`procedure!`()";
+		assertThat(Cypher.call("this is a", "very odd", "procedure!").build().getCypher()).isEqualTo(expected);
+		assertThat(Cypher.call("this is a.very odd.procedure!").build().getCypher()).isEqualTo(expected);
+	}
+
+	@Test
 	void shouldGenerateStatementsOfCorrectType() {
 
 		Statement call = Cypher.call("db", "labels").build();
