@@ -18,6 +18,9 @@
  */
 package org.neo4j.cypherdsl.core.internal;
 
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
 import org.apiguardian.api.API;
 import org.neo4j.cypherdsl.core.Literal;
 
@@ -41,7 +44,9 @@ public final class Namespace implements Literal<String[]> {
 	@Override
 	public String asString() {
 
-		return String.join(".", this.content);
+		return Arrays.stream(this.content)
+			.map(part -> SchemaNamesBridge.sanitize(part, false).orElseThrow())
+			.collect(Collectors.joining("."));
 	}
 
 }

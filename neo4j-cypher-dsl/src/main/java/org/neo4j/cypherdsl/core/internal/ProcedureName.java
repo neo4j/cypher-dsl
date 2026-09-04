@@ -58,12 +58,17 @@ public final class ProcedureName implements Visitable {
 	 * @return a new procedure
 	 */
 	public static ProcedureName from(String... namespaceAndProcedure) {
-		if (namespaceAndProcedure.length == 1) {
-			return new ProcedureName(namespaceAndProcedure[0]);
+		var allNames = Arrays.stream(namespaceAndProcedure)
+			.flatMap(v -> Arrays.stream(v.split("\\.")))
+			.map(String::trim)
+			.toArray(String[]::new);
+
+		if (allNames.length == 1) {
+			return new ProcedureName(allNames[0]);
 		}
 		else {
-			Namespace namespace = new Namespace(Arrays.copyOf(namespaceAndProcedure, namespaceAndProcedure.length - 1));
-			return new ProcedureName(namespace, namespaceAndProcedure[namespaceAndProcedure.length - 1]);
+			Namespace namespace = new Namespace(Arrays.copyOf(allNames, allNames.length - 1));
+			return new ProcedureName(namespace, allNames[allNames.length - 1]);
 		}
 	}
 
