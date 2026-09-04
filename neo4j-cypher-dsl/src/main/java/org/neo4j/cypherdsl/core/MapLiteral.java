@@ -22,6 +22,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apiguardian.api.API;
+import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
 
 import static org.apiguardian.api.API.Status.STABLE;
 
@@ -42,7 +43,8 @@ public final class MapLiteral extends LiteralBase<Map<String, Literal<?>>> {
 	public String asString() {
 		return this.content.entrySet()
 			.stream()
-			.map(entry -> entry.getKey() + ": " + entry.getValue().asString())
+			.map(entry -> SchemaNamesBridge.sanitize(entry.getKey(), false).orElseThrow() + ": "
+					+ entry.getValue().asString())
 			.collect(Collectors.joining(", ", "{", "}"));
 	}
 

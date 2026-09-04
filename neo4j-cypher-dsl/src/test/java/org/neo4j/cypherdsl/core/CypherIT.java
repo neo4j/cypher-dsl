@@ -78,6 +78,20 @@ class CypherIT {
 	}
 
 	@Test
+	void mapLiteralKeysMustBeEscaped() {
+
+		var n = Cypher.anyNode("n");
+		var evilKey = "a: 1} OR true OR {b";
+
+		var stmt = Cypher.match(n)
+			.where(n.property("attrs").isEqualTo(Cypher.literalOf(Map.of(evilKey, 1))))
+			.returning(n)
+			.build();
+
+		assertThat(stmt.getCypher()).isEqualTo("MATCH (n) WHERE n.attrs = {`a: 1} OR true OR {b`: 1} RETURN n");
+	}
+
+	@Test
 	void shouldGenerateStatementsOfCorrectType() {
 
 		Statement statement = Cypher.returning(Cypher.literalTrue().as("t")).build();
