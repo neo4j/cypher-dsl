@@ -742,6 +742,7 @@ final class CypherDslASTFactory implements
 					++dynamicLabelsCnt;
 				}
 			}
+			int labelsBeforeFilter = staticLabels.size();
 			var newConjunctionRequired = dynamicLabelsCnt > 0;
 			staticLabels = List
 				.copyOf(this.options.getLabelFilter().apply(LabelParsedEventType.ON_NODE_PATTERN, staticLabels));
@@ -757,6 +758,14 @@ final class CypherDslASTFactory implements
 				node = Cypher.node(Labels.colonConjunction(newValues));
 			}
 			else if (staticLabels.isEmpty()) {
+				if (labelsBeforeFilter > 0) {
+					// The filter rejected every label. Widening to "any node" would
+					// expose
+					// strictly more data than the caller asked for.
+					throw new IllegalArgumentException(
+							"The configured label filter removed all labels from a node pattern; "
+									+ "refusing to widen the pattern to match every node.");
+				}
 				node = Cypher.anyNode();
 			}
 			else {

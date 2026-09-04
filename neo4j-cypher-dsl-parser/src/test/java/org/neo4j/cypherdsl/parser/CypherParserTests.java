@@ -292,7 +292,10 @@ class CypherParserTests {
 		var options = Options.newOptions()
 			.withLabelFilter((labelParsedEventType, strings) -> strings.stream().filter(s -> false).toList())
 			.build();
-		assertThat(CypherParser.parse("MATCH (a:A:B) RETURN a", options).getCypher()).isEqualTo("MATCH (a) RETURN a");
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> CypherParser.parse("MATCH (a:A:B) RETURN a", options).getCypher())
+			.withMessage(
+					"The configured label filter removed all labels from a node pattern; refusing to widen the pattern to match every node.");
 	}
 
 	@Test
