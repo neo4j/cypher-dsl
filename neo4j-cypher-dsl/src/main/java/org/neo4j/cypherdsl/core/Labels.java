@@ -24,6 +24,7 @@ import java.util.EnumSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.StreamSupport;
 
 import org.neo4j.cypherdsl.core.ast.TypedSubtree;
 import org.neo4j.cypherdsl.core.ast.Visitable;
@@ -236,8 +237,16 @@ public final class Labels implements Visitable {
 	}
 
 	public boolean isEmpty() {
-		return (this.value == null || this.value.isEmpty()) && (this.lhs == null || this.lhs.isEmpty())
-				&& (this.rhs == null || this.rhs.isEmpty());
+		boolean valueIsEmpty = true;
+		if (this.value != null) {
+			if (this.value.isEmpty() || !(this.value.get(0).visitable() instanceof ListLiteral listLiteral)) {
+				valueIsEmpty = false;
+			}
+			else {
+				valueIsEmpty = StreamSupport.stream(listLiteral.content.spliterator(), false).findAny().isEmpty();
+			}
+		}
+		return valueIsEmpty && (this.lhs == null || this.lhs.isEmpty()) && (this.rhs == null || this.rhs.isEmpty());
 	}
 
 	/**

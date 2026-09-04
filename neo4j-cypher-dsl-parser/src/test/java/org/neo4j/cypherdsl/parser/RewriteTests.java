@@ -29,6 +29,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.neo4j.cypherdsl.core.AliasedExpression;
 import org.neo4j.cypherdsl.core.Cypher;
 import org.neo4j.cypherdsl.core.Expression;
@@ -116,6 +118,30 @@ class RewriteTests {
 						.build())
 			.getCypher();
 		assertThat(statement).isEqualTo("MATCH (p:`Person`)-[:`ACTED_IN`]->(n:`Movie`) RETURN n");
+	}
+
+	@ParameterizedTest
+	@CsvSource(
+			textBlock = """
+					MATCH (n:Movie) RETURN n                   🫸 MATCH (n:`Movie`:`Tenant 42`) RETURN n
+					MATCH (n:`Movie`|`Movie`) RETURN n         🫸 MATCH (n:$(['Movie', 'Tenant 42'])) RETURN n
+					MATCH (n:Movie:`Some thing`) RETURN n      🫸 MATCH (n:`Movie`:`Some thing`:`Tenant 42`) RETURN n
+					MATCH (n:$($asd)|Movie) RETURN n           🫸 MATCH (n:$($asd)|$(['Movie', 'Tenant 42'])) RETURN n
+					MATCH (n:$($asd)&Movie) RETURN n           🫸 MATCH (n:$($asd)&$(['Movie', 'Tenant 42'])) RETURN n
+					MATCH (n:Movie&`Some thing`) RETURN n      🫸 MATCH (n:$(['Movie', 'Tenant 42'])&$(['Some thing', 'Tenant 42'])) RETURN n
+					MATCH (n:Movie&`Some thing`|Movie) RETURN n🫸 MATCH (n:$(['Movie', 'Tenant 42'])&$(['Some thing', 'Tenant 42'])|$(['Movie', 'Tenant 42'])) RETURN n
+					MATCH (n:Movie|`Some thing`|Movie) RETURN n🫸 MATCH (n:$(['Movie', 'Tenant 42'])|$(['Some thing', 'Tenant 42'])|$(['Movie', 'Tenant 42'])) RETURN n
+					""",
+			delimiterString = "🫸")
+	void shouldFilterLabelExpressions(String in, String expected) {
+		var options = Options.newOptions().withLabelFilter((event, labels) -> {
+			var out = new LinkedHashSet<>(labels);
+			if (event == LabelParsedEventType.ON_NODE_PATTERN) {
+				out.add("Tenant 42");
+			}
+			return out;
+		}).build();
+		assertThat(CypherParser.parseStatement(in, options).getCypher()).isEqualTo(expected);
 	}
 
 	@Test
