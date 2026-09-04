@@ -299,6 +299,17 @@ class CypherParserTests {
 	}
 
 	@Test
+	void labelColonConjunction0Element2() {
+		var options = Options.newOptions()
+			.withLabelFilter((labelParsedEventType, strings) -> strings.stream().filter(s -> false).toList())
+			.build();
+		assertThatIllegalArgumentException()
+			.isThrownBy(() -> CypherParser.parse("MATCH (a:A|B)) RETURN a", options).getCypher())
+			.withMessage(
+					"The configured label filter removed all labels from a node pattern; refusing to widen the pattern to match every node.");
+	}
+
+	@Test
 	void labelColonConjunction1Element() {
 		var options = Options.newOptions()
 			.withLabelFilter(

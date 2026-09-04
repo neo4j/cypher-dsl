@@ -773,7 +773,14 @@ final class CypherDslASTFactory implements
 			}
 		}
 		else {
-			node = Cypher.node(labels);
+			boolean wasEmpty = labels.isEmpty();
+			var newLabels = filterTree(labels, LabelParsedEventType.ON_NODE_PATTERN);
+			if (!wasEmpty && newLabels.isEmpty()) {
+				throw new IllegalArgumentException(
+						"The configured label filter removed all labels from a node pattern; "
+								+ "refusing to widen the pattern to match every node.");
+			}
+			node = Cypher.node(newLabels);
 		}
 
 		if (v != null) {
@@ -786,6 +793,46 @@ final class CypherDslASTFactory implements
 			node = (Node) node.where(predicate);
 		}
 		return new NodeAtom(node);
+	}
+
+	Labels filterTree(Labels node, LabelParsedEventType event) {
+		if (node == null) {
+			return null;
+		}
+
+		var lhs = filterTree(node.getLhs(), event);
+		var rhs = filterTree(node.getRhs(), event);
+
+		Labels newLabels = null;
+		if (node.getType() == Labels.Type.LEAF) {
+			var staticValues = node.getStaticValues();
+			if (staticValues.isEmpty()) {
+				return node;
+			}
+			var newValues = this.options.getLabelFilter().apply(event, staticValues).stream().distinct().toList();
+			if (newValues.equals(List.copyOf(staticValues))) {
+				return node;
+			}
+			return Cypher.allLabels(Cypher.literalOf(newValues));
+		}
+		else if (Cypher.node(lhs).toString().equals(Cypher.node(rhs).toString())) {
+			return lhs;
+		}
+		else if (node.getType() == Labels.Type.COLON_CONJUNCTION) {
+			newLabels = Labels.colonConjunction(java.util.List.of(new Labels.Value(Labels.Modifier.STATIC, lhs),
+					new Labels.Value(Labels.Modifier.STATIC, rhs)));
+		}
+		else if (node.getType() == Labels.Type.COLON_DISJUNCTION) {
+			newLabels = lhs.disjunctionWith(rhs);
+		}
+		else if (node.getType() == Labels.Type.DISJUNCTION) {
+			newLabels = lhs.or(rhs);
+		}
+		else if (node.getType() == Labels.Type.CONJUNCTION) {
+			newLabels = lhs.and(rhs);
+		}
+
+		return (newLabels != null) ? (node.isNegated() ? newLabels.negate() : newLabels) : node;
 	}
 
 	@Override
