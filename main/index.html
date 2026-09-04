@@ -3631,33 +3631,6 @@ Substrate VM GraalVM CE 25.0.2+10.1 (build 25.0.2+10, serial gc)</code></pre>
 </div>
 </div>
 </div>
-<div class="sect3">
-<h4 id="ci-friendlyversionnumbers"><a class="anchor" href="#ci-friendlyversionnumbers"></a>CI-friendly version numbers</h4>
-<div class="paragraph">
-<p>We use CI-friendly version numbers, the current build will always identify itself as 9999-SNAPSHOT.
-If you need to create a specific version you can specify the revision, the changelist and an optional hash like this:</p>
-</div>
-<div class="listingblock">
-<div class="title">Listing 38. Specifying revision and changelist</div>
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">$ ./mvnw clean package -pl org.neo4j:neo4j-cypher-dsl -Drevision=2022.1.0 -Dchangelist=-SNAPSHOT</code></pre>
-</div>
-</div>
-</div>
-<div class="sect3">
-<h4 id="releasingonlyrelevantforthecurrentmaintainers"><a class="anchor" href="#releasingonlyrelevantforthecurrentmaintainers"></a>Releasing (Only relevant for the current maintainers)</h4>
-<div class="paragraph">
-<p>Prepare a release with:</p>
-</div>
-<div class="listingblock">
-<div class="content">
-<pre class="CodeRay highlight"><code data-lang="console">./mvnw exec:exec@prepare-release -pl :neo4j-cypher-dsl-parent -Drevision=2020.0.1 -Dchangelist= -Dcypher-dsl.version.next=2020.0.2-SNAPSHOT</code></pre>
-</div>
-</div>
-<div class="paragraph">
-<p>and then let do Teamcity the rest, but chose the same version number there, too.</p>
-</div>
-</div>
 </div>
 <div class="sect2 group">
 <h3 id="arch-rules"><a class="anchor" href="#arch-rules"></a>Architecture</h3>
@@ -3681,7 +3654,7 @@ Therefore, there is little to know API to do so with the AST visitor being the e
 <p>The following naming conventions are used throughout the project:</p>
 </div>
 <div id="arch-rules.naming:TypeNameMustBeginWithGroupId" class="listingblock">
-<div class="title">Listing 39. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
+<div class="title">Listing 38. All Java types must be located in packages that start with <code>org.neo4j.cypherdsl</code>.</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@BeforeAll</span>
 <span class="type">void</span> importCorePackage() {
@@ -3701,7 +3674,7 @@ To keep things both clear and concise, we restrict the usage of those annotation
 and annotations.</p>
 </div>
 <div id="arch-rules.api:api-guardian-usage" class="listingblock">
-<div class="title">Listing 40. @API Guardian annotations must not be used on fields</div>
+<div class="title">Listing 39. @API Guardian annotations must not be used on fields</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
 <span class="type">void</span> coreMostNotDependOnRendering() {
@@ -3728,7 +3701,7 @@ Everything that needs to be public for reasons (like being used in the renderer)
 This package won&#8217;t be exported via <code>module-info.java</code>.</p>
 </div>
 <div id="arch-rules.api:internal" class="listingblock">
-<div class="title">Listing 41. Non abstract, public classes that are only part of internal API must be final</div>
+<div class="title">Listing 40. Non abstract, public classes that are only part of internal API must be final</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
 <span class="type">void</span> internalPublicClassesMustBeFinal() {
@@ -3776,7 +3749,7 @@ JDK module name should reflect exactly one package.</p>
 explicitly specifying a renderer:</p>
 </div>
 <div id="arch-rules.structure:core-must-not-depend-on-renderer" class="listingblock">
-<div class="title">Listing 42. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
+<div class="title">Listing 41. The Cypher-DSL core package must not depend on the rendering infrastructure</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Test</span>
 <span class="type">void</span> coreMostNotDependOnRendering() {
@@ -3794,7 +3767,7 @@ explicitly specifying a renderer:</p>
 The <code>ast</code> and <code>utils</code> packages however should not have dependencies outside their own:</p>
 </div>
 <div id="arch-rules.structure:supporting-packages-are-dependency-free" class="listingblock">
-<div class="title">Listing 43. Supporting packages must not depend on anything from the outside</div>
+<div class="title">Listing 42. Supporting packages must not depend on anything from the outside</div>
 <div class="content">
 <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@ParameterizedTest</span>
 <span class="annotation">@ValueSource</span>(strings = { <span class="string"><span class="delimiter">&quot;</span><span class="content">..core.ast</span><span class="delimiter">&quot;</span></span>, <span class="string"><span class="delimiter">&quot;</span><span class="content">..core.utils</span><span class="delimiter">&quot;</span></span> })
@@ -12292,7 +12265,7 @@ since early 2020 (see <a href="https://spring.io/blog/2020/04/30/updates-to-spri
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2026-09-03 10:59:05 UTC
+Last updated 2026-09-04 13:02:37 UTC
 </div>
 </div>
 </body>
