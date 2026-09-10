@@ -18,6 +18,8 @@
  */
 package org.neo4j.cypherdsl.core;
 
+import org.neo4j.cypherdsl.core.internal.SchemaNamesBridge;
+
 /**
  * Representation of a parameter literal. For internal use only.
  *
@@ -40,7 +42,7 @@ final class ParameterLiteral extends LiteralBase<Parameter<?>> {
 	@Override
 	public String asString() {
 
-		return "$" + content.getName();
+		return "$" + SchemaNamesBridge.sanitize(content.getName(), false).orElseThrow();
 	}
 
 	@Override
