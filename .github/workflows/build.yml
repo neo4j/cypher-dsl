@@ -6,6 +6,9 @@ on:
       - main
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: 'Neo4j Cypher-DSL'
@@ -44,7 +47,6 @@ jobs:
 
       - name: 'Run Maven build'
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: >
           ./mvnw -U --no-transfer-progress clean install -DSCHEMA_NAMES_TEST_ALL_VERSIONS=false -P$USE_SONAR

@@ -27,3 +27,10 @@ if [[ $NEW_OLD_VERSION != *-M* && $NEW_OLD_VERSION != *-RC* ]]
 then
   "$DIR"/../mvnw versions:set-property -DgenerateBackupPoms=false -Dproperty=cypher-dsl.version.old -DnewVersion="$NEW_OLD_VERSION" -pl :neo4j-cypher-dsl-parent
 fi
+
+# We need to exclude that project by default (Native Image only up to 25), adding in the release
+# process is a pain and so versions:update-parent cannot be used
+NEW_DEV_VERSION=$(sed -n 's/project\.dev\.org\.neo4j\\:neo4j-cypher-dsl-parent=\(.*\)/\1/p' "$DIR"/../release.properties)
+sed -i.bak 's/<version>\([0-9.]*-SNAPSHOT\)<\/version>/<version>'"${NEW_DEV_VERSION}"'<\/version>/g' "$DIR"/../neo4j-cypher-dsl-native-tests/pom.xml
+git add "$DIR"/../neo4j-cypher-dsl-native-tests/pom.xml
+rm "$DIR"/../neo4j-cypher-dsl-native-tests/pom.xml.bak
