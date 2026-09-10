@@ -19,6 +19,7 @@
 package org.neo4j.cypherdsl.core;
 
 import java.net.URI;
+import java.util.EnumSet;
 
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,18 @@ class SubqueriesGQLIT {
 				.render(parsed);
 			assertThat(cypher).isEqualTo(
 					"MATCH (n:Person) CALL (*) {MATCH (n:Movie {title: 'The Matrix'}) WHERE n.released >= 1980 RETURN n AS m} RETURN n.name");
+		}
+
+		@Test
+		void partialResolvedMustBeEscaped() {
+
+			var w = Cypher.node("Movie").named("weird`name");
+			var statement = Cypher.call(Cypher.match(w).returning(w).build()).returning(w).build();
+			var renderer = Renderer.getRenderer(Configuration.newConfig()
+				.withGeneratedNames(EnumSet.of(Configuration.GeneratedNames.PARAMETER_NAMES))
+				.build());
+			assertThat(renderer.render(statement))
+				.isEqualTo("CALL () {MATCH (`weird``name`:`Movie`) RETURN `weird``name`} RETURN `weird``name`");
 		}
 
 	}
