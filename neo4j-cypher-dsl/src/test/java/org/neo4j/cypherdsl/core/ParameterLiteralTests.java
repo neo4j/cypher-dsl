@@ -20,6 +20,8 @@ package org.neo4j.cypherdsl.core;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class ParameterLiteralTests {
 
@@ -29,6 +31,24 @@ class ParameterLiteralTests {
 		Assertions.assertThatIllegalArgumentException()
 			.isThrownBy(() -> ParameterLiteral.of(anonParameter))
 			.withMessage("Anonymous parameters cannot be used as parameter literals");
+	}
+
+	@ParameterizedTest
+	@CsvSource(textBlock = """
+			true  | blah            | MATCH (n:`F`) WHERE n.x = $blah RETURN n
+			true  | p OR true OR $q | MATCH (n:`F`) WHERE n.x = $`p OR true OR $q` RETURN n
+			false | blah            | MATCH (n:`F`) WHERE n.x = $blah RETURN n
+			false | p OR true OR $q | MATCH (n:`F`) WHERE n.x = $`p OR true OR $q` RETURN n
+			""", delimiterString = "|")
+	void namesMustBeEscapedIfNecessary(boolean useLiteral, String in, String expected) {
+		var n = Cypher.node("F").named("n");
+		var parameter = Cypher.parameter(in);
+		var q = Cypher.match(n)
+			.where(n.property("x").isEqualTo(useLiteral ? Cypher.literalOf(parameter) : parameter))
+			.returning(n)
+			.build()
+			.getCypher();
+		Assertions.assertThat(q).isEqualTo(expected);
 	}
 
 }
