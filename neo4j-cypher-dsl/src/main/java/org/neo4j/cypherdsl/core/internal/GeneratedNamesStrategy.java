@@ -146,7 +146,7 @@ final class GeneratedNamesStrategy implements NameResolvingStrategy {
 						&& !this.config.contains(GeneratedNames.INTERNAL_ALIASES_ONLY))) {
 			// Not using nameLookup.getOrDefault() to not resolve the name early
 			if (nameLookup.containsKey(theKey)) {
-				return nameLookup.get(theKey);
+				return SchemaNamesBridge.sanitize(nameLookup.get(theKey), false).orElseThrow();
 			}
 			return this.statementContext.resolve(symbolicName);
 		}
