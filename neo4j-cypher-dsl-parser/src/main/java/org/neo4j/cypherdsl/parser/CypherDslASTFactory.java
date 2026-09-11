@@ -179,6 +179,13 @@ final class CypherDslASTFactory implements
 		}
 
 		Collection<String> types = inputTypes.getStaticValues();
+		// The input named types but none could be collected: they are all dynamic.
+		// Returning an empty array here renders as "any type" — strictly broader
+		// than what was submitted.
+		if (types.isEmpty() && !inputTypes.isEmpty()) {
+			throw new UnsupportedOperationException(
+					"Expressions for relationship types are not supported in Cypher-DSL");
+		}
 
 		return this.options.getTypeFilter().apply(event, types).toArray(new String[0]);
 	}

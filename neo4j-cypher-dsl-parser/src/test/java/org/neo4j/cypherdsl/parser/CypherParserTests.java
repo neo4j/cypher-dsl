@@ -929,6 +929,14 @@ class CypherParserTests {
 				.isThrownBy(() -> CypherParser.parseStatement("MATCH (n) RETURN elementId(n)", options));
 		}
 
+		@Test
+		void dynamicRelationshipExpressionsMustNotBeDropped() {
+			assertThatExceptionOfType(UnsupportedOperationException.class)
+				.isThrownBy(
+						() -> CypherParser.parseStatement("WITH ['ACTED_IN'] AS t MATCH (a)-[r:$(t)]->(b) RETURN r"))
+				.withStackTraceContaining("Expressions for relationship types are not supported in Cypher-DSL");
+		}
+
 	}
 
 }

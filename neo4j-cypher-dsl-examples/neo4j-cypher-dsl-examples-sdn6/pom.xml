@@ -322,7 +322,7 @@
 				</property>
 			</activation>
 			<properties>
-				<sha1 />
+				<sha1/>
 			</properties>
 		</profile>
 		<profile>
