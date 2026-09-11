@@ -4,7 +4,7 @@
 // tag::properties[]
 :groupId: org.neo4j
 :artifactId: neo4j-cypher-dsl
-:neo4j-cypher-dsl-version-latest: 2025.3.2
+:neo4j-cypher-dsl-version-latest: 6666
 // end::properties[]
 
 image:https://github.com/neo4j-contrib/cypher-dsl/workflows/build/badge.svg[link=https://github.com/neo4j-contrib/cypher-dsl/actions]
