@@ -18,8 +18,6 @@
 ** Bump org.neo4j:neo4j-ogm-core from 5.0.8 to 5.0.9 (#1603)
 ** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1604)
 ** Bump org.apache.maven.plugins:maven-compiler-plugin (#1609)
-** Bump org.apache.maven.plugins:maven-surefire-plugin (#1607)
-** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1606)
 ** Bump org.checkerframework:checker-qual (#1605)
 ** Bump quarkus.platform.version from 3.39.1 to 3.39.2 (#1602)
 ** Bump org.jreleaser:jreleaser-maven-plugin (#1601)
