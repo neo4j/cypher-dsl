@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1789127116871">
+<licensePluginReport goal="CHECK" timestamp="1789127316354">
     <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="2025.3.3-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
