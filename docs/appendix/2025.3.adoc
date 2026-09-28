@@ -1,5 +1,25 @@
 == 2025.3
 
+=== 2025.3.4
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1613)
+** Bump org.apache.maven.plugins:maven-surefire-plugin (#1615)
+** Bump org.sonarsource.scanner.maven:sonar-maven-plugin (#1616)
+** Bump org.apache.maven.plugins:maven-install-plugin (#1617)
+** Bump quarkus.platform.version from 3.39.2 to 3.39.4 (#1618)
+** Bump org.apache.maven.plugins:maven-deploy-plugin (#1619)
+** Bump org.codehaus.mojo:exec-maven-plugin (#1621)
+** Bump org.neo4j.driver:neo4j-java-driver (#1622)
+** Bump mockito.version from 5.23.0 to 5.24.0 (#1623)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1624)
+
+==== 🛠 Build
+
+* Move sortpom plugin into validate phase.
+
 === 2025.3.3
 
 ==== 🐛 Bug Fixes
