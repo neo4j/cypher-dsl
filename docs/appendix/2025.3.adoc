@@ -9,10 +9,7 @@
 ** Bump org.checkerframework:checker-qual (#1630)
 ** Bump neo4j.version from 5.26.30 to 5.26.31 (#1626)
 ** Bump com.google.guava:guava (#1627)
-** Bump org.apache.maven:apache-maven from 3.9.16 to 3.10.0 (#1628)
 ** Bump joda-time:joda-time from 2.14.3 to 2.15.0 (#1629)
-** Bump org.apache.maven.plugins:maven-surefire-plugin (#1631)
-** Bump org.apache.maven.plugins:maven-failsafe-plugin (#1632)
 ** Bump com.puppycrawl.tools:checkstyle from 14.1.0 to 14.3.0 (#1633)
 ** Bump quarkus.platform.version from 3.39.4 to 3.40.1 (#1634)
 
