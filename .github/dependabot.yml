@@ -6,7 +6,8 @@ updates:
     interval: weekly
     time: "04:00"
   open-pull-requests-limit: 10
-  default-days: 3
+  cooldown:
+    default-days: 3
   ignore:
     - dependency-name: "org.apache.maven:apache-maven"
       versions: [ "[3.10.0,)" ]
