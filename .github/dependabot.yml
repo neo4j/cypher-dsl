@@ -6,3 +6,8 @@ updates:
     interval: weekly
     time: "04:00"
   open-pull-requests-limit: 10
+  ignore:
+    - dependency-name: "org.apache.maven.plugins:maven-surefire-plugin"
+      versions: [ "[3.6.0,)" ]
+    - dependency-name: "org.apache.maven.plugins:maven-failsafe-plugin"
+      versions: [ "[3.6.0,)" ]
