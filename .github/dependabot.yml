@@ -9,8 +9,6 @@ updates:
   cooldown:
     default-days: 3
   ignore:
-    - dependency-name: "org.apache.maven:apache-maven"
-      versions: [ "[3.10.0,)" ]
     - dependency-name: "org.apache.maven.plugins:maven-surefire-plugin"
       versions: [ "[3.6.0,)" ]
     - dependency-name: "org.apache.maven.plugins:maven-failsafe-plugin"
