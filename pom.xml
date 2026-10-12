@@ -201,7 +201,7 @@
 		<spring-javaformat.version>0.0.48</spring-javaformat.version>
 		<testcontainers.version>2.0.5</testcontainers.version>
 		<use-latest-version-for-docs>0</use-latest-version-for-docs>
-		<versions-maven-plugin.version>2.21.0</versions-maven-plugin.version>
+		<versions-maven-plugin.version>2.22.0</versions-maven-plugin.version>
 	</properties>
 
 	<dependencyManagement>
