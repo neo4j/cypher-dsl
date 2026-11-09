@@ -515,9 +515,15 @@ class DefaultVisitor extends ReflectiveVisitor implements RenderingVisitor {
 	void enter(FunctionInvocation functionInvocation) {
 		String functionName = functionInvocation.getFunctionName();
 		if ("elementId".equals(functionName)) {
-			functionName = "toString(id";
+			this.builder.append("toString(id(");
 		}
-		this.builder.append(functionName).append("(");
+		else {
+			var parts = functionName.split("\\.");
+			for (var part : parts) {
+				this.builder.append(escapeIfNecessary(part)).append(".");
+			}
+			this.builder.setCharAt(this.builder.length() - 1, '(');
+		}
 	}
 
 	void leave(FunctionInvocation functionInvocation) {
