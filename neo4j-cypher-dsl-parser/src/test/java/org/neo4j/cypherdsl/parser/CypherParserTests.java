@@ -30,6 +30,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -935,6 +936,17 @@ class CypherParserTests {
 				.isThrownBy(
 						() -> CypherParser.parseStatement("WITH ['ACTED_IN'] AS t MATCH (a)-[r:$(t)]->(b) RETURN r"))
 				.withStackTraceContaining("Expressions for relationship types are not supported in Cypher-DSL");
+		}
+
+		@Test
+		void oddFunctionCall() {
+			var result = CypherParser
+				.parseExpression("`1 UNION MATCH (x) WITH x RETURN x.n AS n ORDER BY toString`(id(x))");
+			assertThat(result).hasToString(
+					"FunctionInvocation{cypher=```1 UNION MATCH (x) WITH x RETURN x```.`n AS n ORDER BY toString`(id(x))}")
+				.asInstanceOf(InstanceOfAssertFactories.type(FunctionInvocation.class))
+				.extracting(FunctionInvocation::getFunctionName)
+				.isEqualTo("`1 UNION MATCH (x) WITH x RETURN x`.n AS n ORDER BY toString");
 		}
 
 	}
