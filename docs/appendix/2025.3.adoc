@@ -1,5 +1,24 @@
 == 2025.3
 
+=== 2025.3.6
+
+==== 🐛 Bug Fixes
+
+* Quote individual function name parts if necessary. (#1650)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump org.neo4j:neo4j-ogm-core from 5.0.10 to 5.0.11 (#1642)
+** Bump quarkus.platform.version from 3.40.1 to 3.40.1.1 (#1648)
+** Bump spring-boot.version from 4.1.1 to 4.1.2 (#1647)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1646)
+** Bump org.ow2.asm:asm from 9.10.1 to 9.11.1 (#1645)
+** Bump com.fasterxml.jackson:jackson-bom (#1644)
+** Bump neo4j.version from 5.26.31 to 5.26.32 (#1641)
+** Bump com.google.testing.compile:compile-testing (#1640)
+** Bump com.tngtech.archunit:archunit from 1.5.0 to 1.5.1 (#1636)
+
 === 2025.3.5
 
 ==== 🧹 Housekeeping
