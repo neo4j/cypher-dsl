@@ -21,7 +21,6 @@ package org.neo4j.cypherdsl.support.schema_name;
 import java.io.Serial;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
@@ -66,15 +65,13 @@ import java.util.regex.Pattern;
  */
 public final class SchemaNames {
 
-	private static final String ESCAPED_UNICODE_BACKTICK = "\\u0060";
+	private static final String ESCAPED_BACKSLASH = "\\u005C";
 
-	private static final Pattern PATTERN_ESCAPED_4DIGIT_UNICODE = Pattern.compile("\\\\u+(\\p{XDigit}{4})");
+	private static final String ESCAPED_U = "\\u0075";
+
+	private static final Pattern PATTERN_BACKSLASHES_BEFORE_U = Pattern.compile("(?<!\\\\)(\\\\++)u");
 
 	private static final Pattern PATTERN_LABEL_AND_TYPE_QUOTATION = Pattern.compile("(?<!`)`(?:`{2})*(?!`)");
-
-	private static final List<String[]> SUPPORTED_ESCAPE_CHARS = List.of(new String[] { "\\b", "\b" },
-			new String[] { "\\f", "\f" }, new String[] { "\\n", "\n" }, new String[] { "\\r", "\r" },
-			new String[] { "\\t", "\t" }, new String[] { "\\`", "``" });
 
 	private static final int CACHE_SIZE = 128;
 
@@ -131,7 +128,7 @@ public final class SchemaNames {
 	 */
 	public static Optional<String> sanitize(String value, boolean enforceQuotes, int major, int minor) {
 
-		if (major >= 0 && (major < 3 || major > 6)) {
+		if (major >= 0 && (major < 3 || (major > 5 && major < 2025))) {
 			throw new IllegalArgumentException("Unsupported major version: " + major);
 		}
 
@@ -151,38 +148,102 @@ public final class SchemaNames {
 
 	private static SchemaName sanitize(CacheKey key) {
 
-		String workingValue = key.value;
-
-		// Replace current and future escaped chars
-		for (String[] pair : SUPPORTED_ESCAPE_CHARS) {
-			workingValue = workingValue.replace(pair[0], pair[1]);
-		}
-		workingValue = workingValue.replace(ESCAPED_UNICODE_BACKTICK, "`");
-
-		// Replace escaped octal hex
-		// Excluding the support for 6 digit literals, as this contradicts the overall
-		// example in CIP-59r
-		Matcher matcher = PATTERN_ESCAPED_4DIGIT_UNICODE.matcher(workingValue);
-		StringBuilder sb = new StringBuilder();
-		while (matcher.find()) {
-			String replacement = Character.toString((char) Integer.parseInt(matcher.group(1), 16));
-			matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
-		}
-		matcher.appendTail(sb);
-		workingValue = sb.toString();
+		String workingValue = decodeEscapes(key.value);
 
 		if (substituteRemainingEscapedUnicodeLiteral(key.major, key.minor)) {
-			workingValue = workingValue.replace("\\u", "\\u005C\\u0075");
+			workingValue = obfuscateUnicodeEscapeStarts(workingValue);
 		}
 
-		matcher = PATTERN_LABEL_AND_TYPE_QUOTATION.matcher(workingValue);
+		Matcher matcher = PATTERN_LABEL_AND_TYPE_QUOTATION.matcher(workingValue);
 		workingValue = matcher.replaceAll("`$0");
 
-		if (unescapeEscapedBackslashes(key.major)) {
-			workingValue = workingValue.replace("\\\\", "\\");
-		}
-
 		return new SchemaName(workingValue, !isIdentifier(workingValue));
+	}
+
+	/**
+	 * Decodes Cypher escape sequences in a single pass from left to right, so that an
+	 * escaped backslash is never treated as the start of another escape sequence:
+	 * {@code \\u0060} is a literal backslash followed by the text {@code u0060}. Decoded
+	 * characters are not scanned again. Supported are {@code \\}, {@code \b}, {@code \f},
+	 * {@code \n}, {@code \r}, {@code \t}, {@code \`} (an escaped backtick) and 4-digit
+	 * Unicode escapes with one or more {@code u}. Excluding the support for 6 digit
+	 * literals, as this contradicts the overall example in CIP-59r. A backslash not
+	 * starting a supported escape sequence is taken literally.
+	 * @param value the value to decode
+	 * @return the decoded value
+	 */
+	private static String decodeEscapes(String value) {
+
+		int length = value.length();
+		StringBuilder sb = new StringBuilder(length);
+		int i = 0;
+		while (i < length) {
+			char c = value.charAt(i);
+			if (c != '\\' || i + 1 == length) {
+				sb.append(c);
+				++i;
+				continue;
+			}
+
+			char next = value.charAt(i + 1);
+			String replacement = switch (next) {
+				case '\\' -> "\\";
+				case 'b' -> "\b";
+				case 'f' -> "\f";
+				case 'n' -> "\n";
+				case 'r' -> "\r";
+				case 't' -> "\t";
+				case '`' -> "``";
+				default -> null;
+			};
+			if (replacement != null) {
+				sb.append(replacement);
+				i += 2;
+				continue;
+			}
+
+			if (next == 'u') {
+				int start = i + 1;
+				while (start < length && value.charAt(start) == 'u') {
+					++start;
+				}
+				if (isHex4(value, start)) {
+					sb.append((char) Integer.parseInt(value.substring(start, start + 4), 16));
+					i = start + 4;
+					continue;
+				}
+			}
+
+			sb.append(c);
+			++i;
+		}
+		return sb.toString();
+	}
+
+	private static boolean isHex4(String value, int start) {
+		if (start + 4 > value.length()) {
+			return false;
+		}
+		for (int i = start; i < start + 4; ++i) {
+			char c = value.charAt(i);
+			if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F'))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Obfuscates every run of backslashes followed by a {@code u} with escaped literals,
+	 * so that Neo4j neither decodes nor rejects it as a Unicode escape. The whole run is
+	 * replaced, as Neo4j does not consider a backslash preceded by an odd number of
+	 * backslashes to be the start of a Unicode escape.
+	 * @param value the decoded value
+	 * @return the obfuscated value
+	 */
+	private static String obfuscateUnicodeEscapeStarts(String value) {
+		return PATTERN_BACKSLASHES_BEFORE_U.matcher(value)
+			.replaceAll(r -> Matcher.quoteReplacement(ESCAPED_BACKSLASH.repeat(r.group(1).length()) + ESCAPED_U));
 	}
 
 	/**
@@ -197,18 +258,7 @@ public final class SchemaNames {
 		if (major == -1) {
 			return true;
 		}
-		return major >= 4 && major <= 5 && (minor == -1 || minor >= 2);
-	}
-
-	/**
-	 * A helper method to determine whether a given Neo4j version supports escaped
-	 * backslashes.
-	 * @param major the Neo4j Major version
-	 * @return {@literal true} if escaped backslashes aren't supported and must be
-	 * unescaped
-	 */
-	private static boolean unescapeEscapedBackslashes(int major) {
-		return major <= 5;
+		return major >= 4 && major <= 5 && (minor == -1 || minor >= 2) || major >= 2025;
 	}
 
 	/**

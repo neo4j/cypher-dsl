@@ -19,10 +19,13 @@
 package org.neo4j.cypherdsl.support.schema_name;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.api.Timeout.ThreadMode;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
@@ -47,13 +50,18 @@ class SchemaNamesTests {
 	void shouldThrowOnInvalidVersions() {
 		assertThatIllegalArgumentException().isThrownBy(() -> SchemaNames.sanitize("whatever", false, 2, 3))
 			.withMessage("Unsupported major version: 2");
+		assertThatIllegalArgumentException().isThrownBy(() -> SchemaNames.sanitize("whatever", false, 6, 0))
+			.withMessage("Unsupported major version: 6");
 		assertThatIllegalArgumentException().isThrownBy(() -> SchemaNames.sanitize("whatever", false, 7, 3))
 			.withMessage("Unsupported major version: 7");
+		assertThatIllegalArgumentException().isThrownBy(() -> SchemaNames.sanitize("whatever", false, 2024, 1))
+			.withMessage("Unsupported major version: 2024");
 	}
 
 	@Test
-	void shouldSupportFutureNeo4j() {
-		assertThat(SchemaNames.sanitize("x\\\\y", false, 6, -1)).hasValue("`x\\\\y`");
+	void shouldSupportCalVerNeo4j() {
+		assertThat(SchemaNames.sanitize("x\\\\y", false, 2025, -1)).hasValue("`x\\y`");
+		assertThat(SchemaNames.sanitize("x\\\\y", false, 2026, 10)).hasValue("`x\\y`");
 	}
 
 	@Test
@@ -97,22 +105,82 @@ class SchemaNamesTests {
 
 		v = SchemaNames.sanitize("administrator\\user", false, 4, 2);
 		assertThat(v).hasValue(obfuscated);
+
+		v = SchemaNames.sanitize("administrator\\user", false, 5, 26);
+		assertThat(v).hasValue(obfuscated);
+
+		v = SchemaNames.sanitize("administrator\\user", false, 2025, 0);
+		assertThat(v).hasValue(obfuscated);
+
+		v = SchemaNames.sanitize("administrator\\user");
+		assertThat(v).hasValue(obfuscated);
+	}
+
+	@Test
+	void shouldNeutralizeUnicodeEscapesOnCalVerNeo4j() {
+
+		String payload = ") SET n:Injected //";
+
+		// Decoded and escaped as a backtick
+		assertThat(SchemaNames.sanitize("x\\u0060" + payload, false, 2025, 0)).hasValue("`x``" + payload + "`");
+
+		// Not valid escapes, so the start of the escape gets obfuscated
+		for (String invalidEscape : List.of("u+060", "u٠٠٦٠", "u００６０")) {
+			assertThat(SchemaNames.sanitize("x\\" + invalidEscape + payload, false, 2025, 0))
+				.hasValue("`x\\u005C\\u0075" + invalidEscape.substring(1) + payload + "`");
+		}
+	}
+
+	@Test
+	void shouldDecodeUnicodeEscapes() {
+
+		assertThat(SchemaNames.sanitize("x\\u0041y")).hasValue("xAy");
+	}
+
+	@Test
+	void shouldDecodeUnicodeEscapesWithRepeatedU() {
+
+		assertThat(SchemaNames.sanitize("x\\uu0060y")).hasValue("`x``y`");
+	}
+
+	@Test
+	void shouldNotTreatEscapedBackslashesAsStartOfEscapes() {
+
+		String bs = "\\";
+
+		assertThat(SchemaNames.sanitize("x" + bs + bs + "u0060y")).hasValue("`x\\u005C\\u00750060y`");
+		assertThat(SchemaNames.sanitize("x" + bs + bs + bs + bs + "u0041y")).hasValue("`x\\u005C\\u005C\\u00750041y`");
+		assertThat(SchemaNames.sanitize("x" + bs + bs + "n")).hasValue("`x\\n`");
+		assertThat(SchemaNames.sanitize("x" + bs + bs + "`")).hasValue("`x\\```");
+
+		assertThat(SchemaNames.sanitize("x" + bs + bs + "u0060y", false, 3, -1)).hasValue("`x\\u0060y`");
+	}
+
+	@Test
+	@Timeout(value = 2, threadMode = ThreadMode.SEPARATE_THREAD)
+	void shouldHandleLongRunsOfBackslashesInLinearTime() {
+
+		// Decodes to 100_001 backslashes not followed by a u, which took several seconds
+		// with a backtracking pattern
+		String value = "\\".repeat(200_001) + "x";
+		assertThat(SchemaNames.sanitize(value)).hasValueSatisfying(v -> assertThat(v).hasSize(100_001 + 3));
+	}
+
+	@Test
+	void shouldKeepTrailingBackslash() {
+
+		assertThat(SchemaNames.sanitize("x\\")).hasValue("`x\\`");
 	}
 
 	@Test
 	void shouldHandleEscapedBackslashes() {
 
-		for (String input : new String[] { "x\\y", "x\\\\y" }) {
-			Optional<String> v = SchemaNames.sanitize(input, false, 4, -1);
-			String expected = "`x\\y`";
-			assertThat(v).hasValue(expected);
-
-			v = SchemaNames.sanitize("x\\\\y", false, 4, -1);
-			assertThat(v).hasValue(expected);
+		for (int major : new int[] { 3, 4, 5, 2025, -1 }) {
+			for (String input : new String[] { "x\\y", "x\\\\y" }) {
+				assertThat(SchemaNames.sanitize(input, false, major, -1)).hasValue("`x\\y`");
+			}
+			assertThat(SchemaNames.sanitize("x\\\\\\\\y", false, major, -1)).hasValue("`x\\\\y`");
 		}
-
-		Optional<String> v = SchemaNames.sanitize("x\\\\y", false, 6, -1);
-		assertThat(v).hasValue("`x\\\\y`");
 	}
 
 }
