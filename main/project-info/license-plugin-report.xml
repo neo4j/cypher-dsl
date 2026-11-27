@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<licensePluginReport goal="CHECK" timestamp="1795773277868">
-    <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="2025.4.0-SNAPSHOT"/>
+<licensePluginReport goal="CHECK" timestamp="1795775197054">
+    <module artifactId="neo4j-cypher-dsl" groupId="org.neo4j" version="2025.4.1-SNAPSHOT"/>
     <files>
         <file path="pom.xml" result="PRESENT"/>
         <file path="src/main/java/module-info.java" result="PRESENT"/>
