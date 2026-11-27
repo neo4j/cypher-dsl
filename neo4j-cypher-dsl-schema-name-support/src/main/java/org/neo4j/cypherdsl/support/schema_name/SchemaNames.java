@@ -59,6 +59,12 @@ import java.util.regex.Pattern;
  *
  * This utility can be used standalone, the distributed module does not have any
  * dependencies. Shading is ok as well, there is no encapsulation to break.
+ * <p>
+ *
+ * <strong>Scope:</strong> The {@code sanitize} methods produce schema names for
+ * data-query statements only, that is labels, relationship types and property keys. Their
+ * output is <em>not</em> safe to concatenate into administration commands (such as
+ * database, user or role names in {@code SHOW DATABASE} or {@code CREATE USER}).
  *
  * @author Michael J. Simons
  * @since 2022.8.0
@@ -95,7 +101,9 @@ public final class SchemaNames {
 
 	/**
 	 * Sanitizes the given input to be used as a valid schema name, adds quotes if
-	 * necessary.
+	 * necessary. The result is meant for data-query schema names (labels, relationship
+	 * types, property keys), not for administration command identifiers; see the class
+	 * documentation.
 	 * @param value the value to sanitize
 	 * @return a value that is safe to be used in string concatenation, an empty optional
 	 * indicates a value that cannot be safely quoted
