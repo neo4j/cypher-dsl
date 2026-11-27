@@ -18,6 +18,7 @@
  */
 package org.neo4j.cypherdsl.support.schema_name;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -55,7 +56,9 @@ class SchemaNamesIT {
 
 	private static final Map<Neo4jContainer, Driver> CACHED_CONNECTIONS = Collections.synchronizedMap(new HashMap<>());
 
-	private static final String LATEST_VERSION = "4.4";
+	private static final String LATEST_VERSION = "2026.10.2";
+
+	private static final String INJECTION_PAYLOAD = ") SET n:Injected //";
 
 	private static final List<TestItem> TEST_DATA = Arrays.asList(
 			new TestItem(Category.Q, "Simple label", "ABC", "ABC"),
@@ -112,61 +115,111 @@ class SchemaNamesIT {
 		CACHED_CONNECTIONS.values().forEach(Driver::close);
 	}
 
-	@TestFactory
-	Stream<DynamicNode> shouldHaveConsistentResultsOnAllSupportedVersions() {
+	private static Stream<VersionUnderTest> versionsUnderTest() {
 		Stream<String> versions;
 		if (Boolean.getBoolean("SCHEMA_NAMES_TEST_ALL_VERSIONS")) {
-			versions = Stream.of("3.5", "4.0", "4.1", "4.2", "4.3", LATEST_VERSION);
+			versions = Stream.of("3.5", "4.0", "4.1", "4.2", "4.3", "4.4", "5.26", "2025", LATEST_VERSION);
 		}
 		else {
 			versions = Stream.of(LATEST_VERSION);
 		}
 		return versions.map(version -> {
-			@SuppressWarnings("resource")
-			Neo4jContainer neo4j = new Neo4jContainer("neo4j:" + version).withReuse(true);
-			neo4j.start();
-
-			String[] majorMinor = version.split("\\.");
-			int major;
-			int minor;
 			// Latest supported must work without config
-			if (SchemaNamesIT.LATEST_VERSION.equals(version)) {
-				major = -1;
-				minor = -1;
+			if (LATEST_VERSION.equals(version)) {
+				return new VersionUnderTest(version, -1, -1);
 			}
-			else {
-				major = Integer.parseInt(majorMinor[0]);
-				minor = Integer.parseInt(majorMinor[1]);
-			}
+			String[] majorMinor = version.split("\\.");
+			return new VersionUnderTest(version, Integer.parseInt(majorMinor[0]),
+					(majorMinor.length > 1) ? Integer.parseInt(majorMinor[1]) : -1);
+		});
+	}
 
+	private static Neo4jContainer start(VersionUnderTest version) {
+		Neo4jContainer neo4j = new Neo4jContainer("neo4j:" + version.image()).withReuse(true);
+		neo4j.start();
+		return neo4j;
+	}
+
+	private static List<String> createAndGetLabels(Neo4jContainer neo4j, VersionUnderTest version, String input) {
+		String schemaName = SchemaNames.sanitize(input, false, version.major(), version.minor())
+			.orElseThrow(NoSuchElementException::new);
+		Driver driver = CACHED_CONNECTIONS.computeIfAbsent(neo4j, SchemaNamesIT::newDriverInstance);
+		try (Session session = driver.session()) {
+			Result result = session.run(String.format("CREATE (n:%s) RETURN n", schemaName));
+			Node node = result.single().get(0).asNode();
+			ResultSummary summary = result.consume();
+			assertThat(summary.counters().nodesCreated()).isOne();
+			List<String> labels = new ArrayList<>();
+			node.labels().forEach(labels::add);
+			return labels;
+		}
+	}
+
+	private static Stream<DynamicTest> toTests(Neo4jContainer neo4j, VersionUnderTest version, List<TestItem> items) {
+		return items.stream()
+			.map(item -> DynamicTest.dynamicTest(item.description() + " (" + item.input() + ")",
+					() -> assertThat(createAndGetLabels(neo4j, version, item.input())).doesNotContain("Injected")
+						.containsExactly(item.expected())));
+	}
+
+	@TestFactory
+	Stream<DynamicNode> shouldHaveConsistentResultsOnAllSupportedVersions() {
+		return versionsUnderTest().map(version -> {
+			@SuppressWarnings("resource")
+			Neo4jContainer neo4j = start(version);
 			Stream<DynamicNode> categories = TEST_DATA.stream()
 				.collect(Collectors.groupingBy(TestItem::category))
 				.entrySet()
 				.stream()
-				.map(entry -> {
-					Stream<DynamicTest> nested = entry.getValue()
-						.stream()
-						.map(item -> DynamicTest.dynamicTest(item.description() + " (" + item.input + ")", () -> {
-							String schemaName = SchemaNames.sanitize(item.input(), false, major, minor)
-								.orElseThrow(NoSuchElementException::new);
-							Driver driver = CACHED_CONNECTIONS.computeIfAbsent(neo4j, SchemaNamesIT::newDriverInstance);
-							try (Session session = driver.session()) {
-								Result result = session.run(String.format("CREATE (n:%s) RETURN n", schemaName));
-								Node node = result.single().get(0).asNode();
-								assertThat(node.labels()).containsExactly(item.expected());
-								ResultSummary summary = result.consume();
-								assertThat(summary.counters().nodesCreated()).isOne();
-							}
-						}));
-					return DynamicContainer.dynamicContainer(entry.getKey().value, nested);
-				});
-			return DynamicContainer.dynamicContainer(version, categories);
+				.map(entry -> DynamicContainer.dynamicContainer(entry.getKey().value,
+						toTests(neo4j, version, entry.getValue())));
+			return DynamicContainer.dynamicContainer(version.image(), categories);
+		});
+	}
+
+	@TestFactory
+	Stream<DynamicNode> shouldDecodeCypherEscapesWithoutInjectionOnAllSupportedVersions() {
+
+		String bs = "\\";
+		String p = INJECTION_PAYLOAD;
+		List<TestItem> injections = List.of(
+				new TestItem(Category.I, "Unicode backtick", "x" + bs + "u0060" + p, "x`" + p),
+				new TestItem(Category.I, "Escaped backtick", "x" + bs + "`" + p, "x`" + p),
+				new TestItem(Category.I, "Escaped backslash before backtick", "x" + bs + bs + "`" + p,
+						"x" + bs + "`" + p),
+				new TestItem(Category.I, "Escaped backslash before unicode backtick", "x" + bs + bs + bs + "u0060" + p,
+						"x" + bs + "`" + p),
+				new TestItem(Category.I, "Invalid unicode escape (sign)", "x" + bs + "u+060" + p,
+						"x" + bs + "u+060" + p),
+				new TestItem(Category.I, "Invalid unicode escape (Arabic-Indic digits)", "x" + bs + "u٠٠٦٠" + p,
+						"x" + bs + "u٠٠٦٠" + p),
+				new TestItem(Category.I, "Invalid unicode escape (fullwidth digits)", "x" + bs + "u００６０" + p,
+						"x" + bs + "u００６０" + p));
+		List<TestItem> escapes = List.of(
+				new TestItem(Category.U, "Unicode backtick at start", bs + "u0060atStart", "`atStart"),
+				new TestItem(Category.U, "Two unicode backticks", "x" + bs + "u0060" + bs + "u0060y", "x`y"),
+				new TestItem(Category.U, "Unicode escape", "x" + bs + "u0041y", "xAy"),
+				new TestItem(Category.U, "Unicode escape with repeated u", "x" + bs + "uu0060y", "x`y"),
+				new TestItem(Category.U, "Escaped backslash before unicode escape", "x" + bs + bs + "u0060y",
+						"x" + bs + "u0060y"),
+				new TestItem(Category.U, "Two escaped backslashes before unicode escape",
+						"x" + bs + bs + bs + bs + "u0041y", "x" + bs + bs + "u0041y"),
+				new TestItem(Category.B, "Escaped backslash", "x" + bs + bs + "y", "x" + bs + "y"),
+				new TestItem(Category.B, "Escaped backslash before escape character", "x" + bs + bs + "n",
+						"x" + bs + "n"),
+				new TestItem(Category.B, "Trailing backslash", "x" + bs, "x" + bs));
+
+		return versionsUnderTest().map(version -> {
+			Neo4jContainer neo4j = start(version);
+			return DynamicContainer.dynamicContainer(version.image(),
+					Stream.of(DynamicContainer.dynamicContainer(Category.I.value, toTests(neo4j, version, injections)),
+							DynamicContainer.dynamicContainer("Cypher escapes", toTests(neo4j, version, escapes))));
 		});
 	}
 
 	enum Category {
 
-		Q("Quoting"), U("Unicode"), B("Backslashes"), E("Escaping");
+		Q("Quoting"), U("Unicode"), B("Backslashes"), E("Escaping"), I("Injection");
 
 		private final String value;
 
@@ -177,6 +230,9 @@ class SchemaNamesIT {
 	}
 
 	record TestItem(Category category, String description, String input, String expected) {
+	}
+
+	record VersionUnderTest(String image, int major, int minor) {
 	}
 
 }
