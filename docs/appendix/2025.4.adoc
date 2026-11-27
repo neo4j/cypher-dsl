@@ -1,0 +1,29 @@
+== 2025.4
+
+=== 2025.4.0
+
+We improved the decoding of Cypher Unicode escapes and in the process, the sanitiser produces slightly different output now for three cases:
+
+* `x\\n` now produces the literal `x\n`,
+* `\u005C\u005C` produces two backslashes
+* `x\\u0060y` produces the literal `x\u0060y`
+
+All variants will be safely sanitized for Cypher of course. These are some edge-cases, but we felt that a minor bump is in order. No other functional or API changes.
+
+==== 🔄️ Refactorings
+
+* Decode Cypher escapes in schema names in a single pass. (#1661)
+
+==== 🧹 Housekeeping
+
+* Dependency upgrades:
+** Bump com.fasterxml.jackson:jackson-bom (#1651)
+** Bump joda-time:joda-time from 2.15.0 to 2.15.1 (#1654)
+** Bump com.github.siom79.japicmp:japicmp-maven-plugin (#1656)
+** Bump neo4j.version from 5.26.32 to 5.26.33 (#1652)
+** Bump org.checkerframework:checker-qual (#1653)
+** Bump org.springframework.data:spring-data-neo4j (#1655)
+** Bump org.graalvm.buildtools:native-maven-plugin (#1657)
+** Bump org.jreleaser:jreleaser-maven-plugin (#1658)
+** Bump org.apache.maven.plugins:maven-enforcer-plugin (#1659)
+** Bump org.jacoco:jacoco-maven-plugin from 0.8.15 to 0.8.16 (#1660)
